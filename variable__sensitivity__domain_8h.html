@@ -164,22 +164,24 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --vsd-values                 value tracking - &quot;</span>                            \</div>
-<div class="line">  <span class="stringliteral">&quot;constants|intervals|set-of-constants\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span>\</div>
-<div class="line">  <span class="stringliteral">&quot; --vsd-structs                struct field sensitive analysis - &quot;</span>           \</div>
-<div class="line">  <span class="stringliteral">&quot;top-bottom|every-field\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span>              \</div>
-<div class="line">  <span class="stringliteral">&quot; --vsd-arrays                 array entry sensitive analysis - &quot;</span>            \</div>
-<div class="line">  <span class="stringliteral">&quot;top-bottom|smash|up-to-n-elements|every-element\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --vsd-array-max-elements     the n in --vsd-arrays up-to-n-elements - &quot;</span>    \</div>
-<div class="line">  <span class="stringliteral">&quot;defaults to 10 if not given\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span>         \</div>
-<div class="line">  <span class="stringliteral">&quot; --vsd-pointers               pointer sensitive analysis - &quot;</span>                \</div>
-<div class="line">  <span class="stringliteral">&quot;top-bottom|constants|value-set\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span>      \</div>
-<div class="line">  <span class="stringliteral">&quot; --vsd-unions                 union sensitive analysis - top-bottom\n&quot;</span>      \</div>
-<div class="line">  <span class="stringliteral">&quot; --vsd-data-dependencies      track data dependencies\n&quot;</span>                    \</div>
-<div class="line">  <span class="stringliteral">&quot; --vsd-liveness               track variable liveness\n&quot;</span>                    \</div>
-<div class="line">  <span class="stringliteral">&quot; --vsd-flow-insensitive       disables flow sensitivity\n&quot;</span>                  \</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--vsd-values} [{yconstants}|{yintervals}|{yset-of-constants}] \t &quot;</span>       \</div>
+<div class="line">  <span class="stringliteral">&quot;value tracking\n&quot;</span>                                                           \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--vsd-structs} [{ytop-bottom}|{yevery-field}] \t &quot;</span>                       \</div>
+<div class="line">  <span class="stringliteral">&quot;struct field sensitive analysis\n&quot;</span>                                          \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--vsd-arrays} [[ytop-bottom}|{ysmash}|{yup-to-n-elements}|&quot;</span>              \</div>
+<div class="line">  <span class="stringliteral">&quot;{yevery-element}] \t &quot;</span>                                                      \</div>
+<div class="line">  <span class="stringliteral">&quot;array entry sensitive analysis\n&quot;</span>                                           \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--vsd-array-max-elements} {uN} \t &quot;</span>                                      \</div>
+<div class="line">  <span class="stringliteral">&quot;set the {un} in {y--vsd-arrays} {yup-to-n-elements} (defaults to 10 if &quot;</span>    \</div>
+<div class="line">  <span class="stringliteral">&quot;not given)\n&quot;</span>                                                               \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--vsd-pointers} [{ytop-bottom}|{yconstants}|{yvalue-set}] \t &quot;</span>           \</div>
+<div class="line">  <span class="stringliteral">&quot;pointer sensitive analysis\n&quot;</span>                                               \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--vsd-unions} [{ytop-bottom}] \t union sensitive analysis\n&quot;</span>             \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--vsd-data-dependencies} \t track data dependencies\n&quot;</span>                   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--vsd-liveness} \t track variable liveness\n&quot;</span>                            \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--vsd-flow-insensitive} \t disables flow sensitivity\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00086">86</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00085">85</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
 
 </div>
 </div>
@@ -202,8 +204,7 @@ Macros</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(vsd-unions):&quot;</span>                                                              \</div>
 <div class="line">  <span class="stringliteral">&quot;(vsd-flow-insensitive)&quot;</span>                                                     \</div>
 <div class="line">  <span class="stringliteral">&quot;(vsd-data-dependencies)&quot;</span>                                                    \</div>
-<div class="line">  <span class="stringliteral">&quot;(vsd-liveness)&quot;</span>                                                             \</div>
-<div class="line">                                                                               \</div>
+<div class="line">  <span class="stringliteral">&quot;(vsd-liveness)&quot;</span></div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00074">74</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
 
@@ -245,7 +246,7 @@ Macros</h2></td></tr>
 <div class="line">  options.set_option(<span class="stringliteral">&quot;liveness&quot;</span>, cmdline.isset(<span class="stringliteral">&quot;vsd-liveness&quot;</span>)); <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
 <div class="line">  (void)0</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00104">104</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00103">103</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
 
 </div>
 </div>

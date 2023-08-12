@@ -152,28 +152,34 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --bounds-check               enable array bounds checks\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --pointer-check              enable pointer checks\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --memory-leak-check          enable memory leak checks\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --memory-cleanup-check       enable memory cleanup checks\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --div-by-zero-check          enable division by zero checks\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --signed-overflow-check      enable signed arithmetic over- and underflow checks\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --unsigned-overflow-check    enable arithmetic over- and underflow checks\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span>  \</div>
-<div class="line">  <span class="stringliteral">&quot; --pointer-overflow-check     enable pointer arithmetic over- and underflow checks\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span>  \</div>
-<div class="line">  <span class="stringliteral">&quot; --conversion-check           check whether values can be represented after type cast\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span>  \</div>
-<div class="line">  <span class="stringliteral">&quot; --undefined-shift-check      check shift greater than bit-width\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --float-overflow-check       check floating-point for +/-Inf\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --nan-check                  check floating-point for NaN\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --enum-range-check           checks that all enum type expressions have values in the enum range\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --pointer-primitive-check    checks that all pointers in pointer primitives are valid or null\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --retain-trivial-checks      include checks that are trivially true\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --error-label label          check that label is unreachable\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --no-built-in-assertions     ignore assertions in built-in library\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --no-assertions              ignore user assertions\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --no-assumptions             ignore user assumptions\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --assert-to-assume           convert user assertions to assumptions\n&quot;</span> \</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--bounds-check} \t enable array bounds checks\n&quot;</span>                         \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--pointer-check} \t enable pointer checks\n&quot;</span>                             \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--memory-leak-check} \t enable memory leak checks\n&quot;</span>                     \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--memory-cleanup-check} \t enable memory cleanup checks\n&quot;</span>               \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--div-by-zero-check} \t enable division by zero checks\n&quot;</span>                \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--signed-overflow-check} \t &quot;</span>                                            \</div>
+<div class="line">  <span class="stringliteral">&quot;enable signed arithmetic over- and underflow checks\n&quot;</span>                      \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--unsigned-overflow-check} \t &quot;</span>                                          \</div>
+<div class="line">  <span class="stringliteral">&quot;enable arithmetic over- and underflow checks\n&quot;</span>                             \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--pointer-overflow-check} \t &quot;</span>                                           \</div>
+<div class="line">  <span class="stringliteral">&quot;enable pointer arithmetic over- and underflow checks\n&quot;</span>                     \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--conversion-check} \t &quot;</span>                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;check whether values can be represented after type cast\n&quot;</span>                  \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--undefined-shift-check} \t check shift greater than bit-width&quot;</span>          \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--float-overflow-check} \t check floating-point for +/-Inf\n&quot;</span>            \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--nan-check} \t check floating-point for NaN\n&quot;</span>                          \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--enum-range-check} \t &quot;</span>                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;checks that all enum type expressions have values in the enum range\n&quot;</span>      \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--pointer-primitive-check} \t &quot;</span>                                          \</div>
+<div class="line">  <span class="stringliteral">&quot;checks that all pointers in pointer primitives are valid or null\n&quot;</span>         \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--retain-trivial-checks} \t include checks that are trivially true\n&quot;</span>    \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--error-label} {ulabel} \t check that label {ulabel} is unreachable\n&quot;</span>   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--no-built-in-assertions} \t ignore assertions in built-in library\n&quot;</span>    \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--no-assertions} \t ignore user assertions\n&quot;</span>                            \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--no-assumptions} \t ignore user assumptions\n&quot;</span>                          \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--assert-to-assume} \t convert user assertions to assumptions\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8h_source.html#l00053">53</a> of file <a class="el" href="goto__check__c_8h_source.html">goto_check_c.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8h_source.html#l00052">52</a> of file <a class="el" href="goto__check__c_8h_source.html">goto_check_c.h</a>.</p>
 
 </div>
 </div>
@@ -253,7 +259,7 @@ Functions</h2></td></tr>
 <div class="line">    options.set_option(<span class="stringliteral">&quot;error-label&quot;</span>, cmdline.get_values(<span class="stringliteral">&quot;error-label&quot;</span>)); \</div>
 <div class="line">  (void)0</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__check__c_8h_source.html#l00075">75</a> of file <a class="el" href="goto__check__c_8h_source.html">goto_check_c.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__check__c_8h_source.html#l00081">81</a> of file <a class="el" href="goto__check__c_8h_source.html">goto_check_c.h</a>.</p>
 
 </div>
 </div>

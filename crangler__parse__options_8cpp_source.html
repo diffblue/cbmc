@@ -105,67 +105,71 @@ $(document).ready(function(){initNavTree('crangler__parse__options_8cpp_source.h
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="cout__message_8h.html">util/cout_message.h</a>&gt;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="exit__codes_8h.html">util/exit_codes.h</a>&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="version_8h.html">util/version.h</a>&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="json__parser_8h.html">json/json_parser.h</a>&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="c__wrangler_8h.html">c_wrangler.h</a>&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="classcrangler__parse__optionst.html#ac9ae94cb61bbc8a98f16e3ad375f9517">   24</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classcrangler__parse__optionst.html#ac9ae94cb61bbc8a98f16e3ad375f9517">crangler_parse_optionst::doit</a>()</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classparse__options__baset.html#a5031a82e4ab9208af3a5a812bdc9ebf8">cmdline</a>.<a class="code" href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">args</a>.empty())</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    std::cerr &lt;&lt; <span class="stringliteral">&quot;please give a configuration file\n&quot;</span>;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#a9a393c769921c4af6cd4fbf9121be28c">CPROVER_EXIT_INCORRECT_TASK</a>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  }</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;file_name : <a class="code" href="classparse__options__baset.html#a5031a82e4ab9208af3a5a812bdc9ebf8">cmdline</a>.<a class="code" href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">args</a>)</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="classcrangler__parse__optionst.html#a399f9c3380047e4d753f7a254aa5c80c">process_crangler_json</a>(file_name);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;}</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classcrangler__parse__optionst.html#a399f9c3380047e4d753f7a254aa5c80c">   38</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcrangler__parse__optionst.html#a399f9c3380047e4d753f7a254aa5c80c">crangler_parse_optionst::process_crangler_json</a>(</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keyword">const</span> std::string &amp;file_name)</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="classconsole__message__handlert.html">console_message_handlert</a> message_handler;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="classjsont.html">jsont</a> configuration;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="json__parser_8cpp.html#a02d54439dc189ccfa00eac45011a9c86">parse_json</a>(file_name, message_handler, configuration))</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="c__wrangler_8cpp.html#aa691fe9114f326d21b23726ea55683fa">c_wrangler</a>(configuration);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classcrangler__parse__optionst.html#a52717ff8c7762c5c9378adbcc75068c8">   50</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcrangler__parse__optionst.html#a52717ff8c7762c5c9378adbcc75068c8">crangler_parse_optionst::help</a>()</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;{</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  std::cout &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            &lt;&lt; <a class="code" href="parse__options_8cpp.html#a6bb96dff7c967555d14049749086134d">banner_string</a>(<span class="stringliteral">&quot;CRANGLER&quot;</span>, <a class="code" href="version_8h.html#a1a24d8124c3c2a9ed466d3ff1a63b92d">CBMC_VERSION</a>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;               <span class="stringliteral">&quot;Usage:                       Purpose:\n&quot;</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;               <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;               <span class="stringliteral">&quot; crangler [-?] [-h] [--help]  show help\n&quot;</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;               <span class="stringliteral">&quot; crangler file.json ...       configuration file names\n&quot;</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;               <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="help__formatter_8h.html">util/help_formatter.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="version_8h.html">util/version.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="json__parser_8h.html">json/json_parser.h</a>&gt;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="c__wrangler_8h.html">c_wrangler.h</a>&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="classcrangler__parse__optionst.html#ac9ae94cb61bbc8a98f16e3ad375f9517">   25</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classcrangler__parse__optionst.html#ac9ae94cb61bbc8a98f16e3ad375f9517">crangler_parse_optionst::doit</a>()</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;{</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classparse__options__baset.html#a5031a82e4ab9208af3a5a812bdc9ebf8">cmdline</a>.<a class="code" href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">args</a>.empty())</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    std::cerr &lt;&lt; <span class="stringliteral">&quot;please give a configuration file\n&quot;</span>;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#a9a393c769921c4af6cd4fbf9121be28c">CPROVER_EXIT_INCORRECT_TASK</a>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  }</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;file_name : <a class="code" href="classparse__options__baset.html#a5031a82e4ab9208af3a5a812bdc9ebf8">cmdline</a>.<a class="code" href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">args</a>)</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <a class="code" href="classcrangler__parse__optionst.html#a399f9c3380047e4d753f7a254aa5c80c">process_crangler_json</a>(file_name);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;}</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classcrangler__parse__optionst.html#a399f9c3380047e4d753f7a254aa5c80c">   39</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcrangler__parse__optionst.html#a399f9c3380047e4d753f7a254aa5c80c">crangler_parse_optionst::process_crangler_json</a>(</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">const</span> std::string &amp;file_name)</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;{</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="classconsole__message__handlert.html">console_message_handlert</a> message_handler;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="classjsont.html">jsont</a> configuration;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="json__parser_8cpp.html#a02d54439dc189ccfa00eac45011a9c86">parse_json</a>(file_name, message_handler, configuration))</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="c__wrangler_8cpp.html#aa691fe9114f326d21b23726ea55683fa">c_wrangler</a>(configuration);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;}</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classcrangler__parse__optionst.html#a52717ff8c7762c5c9378adbcc75068c8">   51</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcrangler__parse__optionst.html#a52717ff8c7762c5c9378adbcc75068c8">crangler_parse_optionst::help</a>()</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;{</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  std::cout &lt;&lt; <span class="charliteral">&#39;\n&#39;</span> &lt;&lt; <a class="code" href="parse__options_8cpp.html#a6bb96dff7c967555d14049749086134d">banner_string</a>(<span class="stringliteral">&quot;CRANGLER&quot;</span>, <a class="code" href="version_8h.html#a1a24d8124c3c2a9ed466d3ff1a63b92d">CBMC_VERSION</a>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  std::cout &lt;&lt; <a class="code" href="help__formatter_8h.html#a4acde3ef7739289b9c7f10a0eb48bc2e">help_formatter</a>(</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="stringliteral">&quot;Usage:                     \tPurpose:\n&quot;</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="stringliteral">&quot; {bcrangler} [{y-?}] [{y-h}] [{y--help}] \t show this help\n&quot;</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="stringliteral">&quot; {bcrangler} {ufile.json} ... \t configuration file names\n&quot;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
 <div class="ttc" id="ac__wrangler_8cpp_html_aa691fe9114f326d21b23726ea55683fa"><div class="ttname"><a href="c__wrangler_8cpp.html#aa691fe9114f326d21b23726ea55683fa">c_wrangler</a></div><div class="ttdeci">void c_wrangler(const jsont &amp;config)</div><div class="ttdef"><b>Definition:</b> <a href="c__wrangler_8cpp_source.html#l00595">c_wrangler.cpp:595</a></div></div>
 <div class="ttc" id="ac__wrangler_8h_html"><div class="ttname"><a href="c__wrangler_8h.html">c_wrangler.h</a></div><div class="ttdoc">C Wrangler.</div></div>
 <div class="ttc" id="aclasscmdlinet_html_a71c26c279a95d2804eddf3772fb2ce88"><div class="ttname"><a href="classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88">cmdlinet::args</a></div><div class="ttdeci">argst args</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00145">cmdline.h:145</a></div></div>
 <div class="ttc" id="aclassconsole__message__handlert_html"><div class="ttname"><a href="classconsole__message__handlert.html">console_message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="cout__message_8h_source.html#l00029">cout_message.h:30</a></div></div>
-<div class="ttc" id="aclasscrangler__parse__optionst_html_a399f9c3380047e4d753f7a254aa5c80c"><div class="ttname"><a href="classcrangler__parse__optionst.html#a399f9c3380047e4d753f7a254aa5c80c">crangler_parse_optionst::process_crangler_json</a></div><div class="ttdeci">void process_crangler_json(const std::string &amp;file_name)</div><div class="ttdef"><b>Definition:</b> <a href="crangler__parse__options_8cpp_source.html#l00038">crangler_parse_options.cpp:38</a></div></div>
-<div class="ttc" id="aclasscrangler__parse__optionst_html_a52717ff8c7762c5c9378adbcc75068c8"><div class="ttname"><a href="classcrangler__parse__optionst.html#a52717ff8c7762c5c9378adbcc75068c8">crangler_parse_optionst::help</a></div><div class="ttdeci">void help() override</div><div class="ttdef"><b>Definition:</b> <a href="crangler__parse__options_8cpp_source.html#l00050">crangler_parse_options.cpp:50</a></div></div>
-<div class="ttc" id="aclasscrangler__parse__optionst_html_ac9ae94cb61bbc8a98f16e3ad375f9517"><div class="ttname"><a href="classcrangler__parse__optionst.html#ac9ae94cb61bbc8a98f16e3ad375f9517">crangler_parse_optionst::doit</a></div><div class="ttdeci">int doit() override</div><div class="ttdef"><b>Definition:</b> <a href="crangler__parse__options_8cpp_source.html#l00024">crangler_parse_options.cpp:24</a></div></div>
+<div class="ttc" id="aclasscrangler__parse__optionst_html_a399f9c3380047e4d753f7a254aa5c80c"><div class="ttname"><a href="classcrangler__parse__optionst.html#a399f9c3380047e4d753f7a254aa5c80c">crangler_parse_optionst::process_crangler_json</a></div><div class="ttdeci">void process_crangler_json(const std::string &amp;file_name)</div><div class="ttdef"><b>Definition:</b> <a href="crangler__parse__options_8cpp_source.html#l00039">crangler_parse_options.cpp:39</a></div></div>
+<div class="ttc" id="aclasscrangler__parse__optionst_html_a52717ff8c7762c5c9378adbcc75068c8"><div class="ttname"><a href="classcrangler__parse__optionst.html#a52717ff8c7762c5c9378adbcc75068c8">crangler_parse_optionst::help</a></div><div class="ttdeci">void help() override</div><div class="ttdef"><b>Definition:</b> <a href="crangler__parse__options_8cpp_source.html#l00051">crangler_parse_options.cpp:51</a></div></div>
+<div class="ttc" id="aclasscrangler__parse__optionst_html_ac9ae94cb61bbc8a98f16e3ad375f9517"><div class="ttname"><a href="classcrangler__parse__optionst.html#ac9ae94cb61bbc8a98f16e3ad375f9517">crangler_parse_optionst::doit</a></div><div class="ttdeci">int doit() override</div><div class="ttdef"><b>Definition:</b> <a href="crangler__parse__options_8cpp_source.html#l00025">crangler_parse_options.cpp:25</a></div></div>
 <div class="ttc" id="aclassjsont_html"><div class="ttname"><a href="classjsont.html">jsont</a></div><div class="ttdef"><b>Definition:</b> <a href="json_8h_source.html#l00026">json.h:27</a></div></div>
 <div class="ttc" id="aclassparse__options__baset_html_a5031a82e4ab9208af3a5a812bdc9ebf8"><div class="ttname"><a href="classparse__options__baset.html#a5031a82e4ab9208af3a5a812bdc9ebf8">parse_options_baset::cmdline</a></div><div class="ttdeci">cmdlinet cmdline</div><div class="ttdef"><b>Definition:</b> <a href="parse__options_8h_source.html#l00028">parse_options.h:28</a></div></div>
 <div class="ttc" id="acout__message_8h_html"><div class="ttname"><a href="cout__message_8h.html">cout_message.h</a></div></div>
 <div class="ttc" id="acrangler__parse__options_8h_html"><div class="ttname"><a href="crangler__parse__options_8h.html">crangler_parse_options.h</a></div><div class="ttdoc">CRANGLER Command Line Option Processing.</div></div>
 <div class="ttc" id="aexit__codes_8h_html"><div class="ttname"><a href="exit__codes_8h.html">exit_codes.h</a></div><div class="ttdoc">Document and give macros for the exit codes of CPROVER binaries.</div></div>
 <div class="ttc" id="aexit__codes_8h_html_a9a393c769921c4af6cd4fbf9121be28c"><div class="ttname"><a href="exit__codes_8h.html#a9a393c769921c4af6cd4fbf9121be28c">CPROVER_EXIT_INCORRECT_TASK</a></div><div class="ttdeci">#define CPROVER_EXIT_INCORRECT_TASK</div><div class="ttdoc">The command line is correctly structured but cannot be carried out due to missing files,...</div><div class="ttdef"><b>Definition:</b> <a href="exit__codes_8h_source.html#l00049">exit_codes.h:49</a></div></div>
+<div class="ttc" id="ahelp__formatter_8h_html"><div class="ttname"><a href="help__formatter_8h.html">help_formatter.h</a></div><div class="ttdoc">Help Formatter.</div></div>
+<div class="ttc" id="ahelp__formatter_8h_html_a4acde3ef7739289b9c7f10a0eb48bc2e"><div class="ttname"><a href="help__formatter_8h.html#a4acde3ef7739289b9c7f10a0eb48bc2e">help_formatter</a></div><div class="ttdeci">static help_formattert help_formatter(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8h_source.html#l00040">help_formatter.h:40</a></div></div>
 <div class="ttc" id="ajson__parser_8cpp_html_a02d54439dc189ccfa00eac45011a9c86"><div class="ttname"><a href="json__parser_8cpp.html#a02d54439dc189ccfa00eac45011a9c86">parse_json</a></div><div class="ttdeci">bool parse_json(std::istream &amp;in, const std::string &amp;filename, message_handlert &amp;message_handler, jsont &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8cpp_source.html#l00016">json_parser.cpp:16</a></div></div>
 <div class="ttc" id="ajson__parser_8h_html"><div class="ttname"><a href="json__parser_8h.html">json_parser.h</a></div></div>
-<div class="ttc" id="aparse__options_8cpp_html_a6bb96dff7c967555d14049749086134d"><div class="ttname"><a href="parse__options_8cpp.html#a6bb96dff7c967555d14049749086134d">banner_string</a></div><div class="ttdeci">std::string banner_string(const std::string &amp;front_end, const std::string &amp;version)</div><div class="ttdef"><b>Definition:</b> <a href="parse__options_8cpp_source.html#l00173">parse_options.cpp:173</a></div></div>
+<div class="ttc" id="aparse__options_8cpp_html_a6bb96dff7c967555d14049749086134d"><div class="ttname"><a href="parse__options_8cpp.html#a6bb96dff7c967555d14049749086134d">banner_string</a></div><div class="ttdeci">std::string banner_string(const std::string &amp;front_end, const std::string &amp;version)</div><div class="ttdef"><b>Definition:</b> <a href="parse__options_8cpp_source.html#l00171">parse_options.cpp:171</a></div></div>
 <div class="ttc" id="aversion_8h_html"><div class="ttname"><a href="version_8h.html">version.h</a></div></div>
 <div class="ttc" id="aversion_8h_html_a1a24d8124c3c2a9ed466d3ff1a63b92d"><div class="ttname"><a href="version_8h.html#a1a24d8124c3c2a9ed466d3ff1a63b92d">CBMC_VERSION</a></div><div class="ttdeci">const char * CBMC_VERSION</div></div>
 </div><!-- fragment --></div><!-- contents -->

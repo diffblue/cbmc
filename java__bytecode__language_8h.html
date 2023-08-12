@@ -155,11 +155,11 @@ Macros</h2></td></tr>
 <tr class="separator:a138cbebd03edb1867a3e989276bad500"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3b9b751f215773663876cb87e20a19c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8h.html#ad3b9b751f215773663876cb87e20a19c">HELP_JAVA_CLASS_NAME</a></td></tr>
 <tr class="separator:ad3b9b751f215773663876cb87e20a19c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb3a8547f64165854f441b7e06186ec4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8h.html#adb3a8547f64165854f441b7e06186ec4">OPT_JAVA_JAR</a></td></tr>
+<tr class="memitem:adb3a8547f64165854f441b7e06186ec4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8h.html#adb3a8547f64165854f441b7e06186ec4">OPT_JAVA_JAR</a>&#160;&#160;&#160;  &quot;(jar):&quot;</td></tr>
 <tr class="separator:adb3a8547f64165854f441b7e06186ec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4fdcd268ded5fa4782a8252c51acffa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8h.html#aa4fdcd268ded5fa4782a8252c51acffa">HELP_JAVA_JAR</a></td></tr>
 <tr class="separator:aa4fdcd268ded5fa4782a8252c51acffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b0c62bc916383fa8d65930ea038039c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8h.html#a0b0c62bc916383fa8d65930ea038039c">OPT_JAVA_GOTO_BINARY</a></td></tr>
+<tr class="memitem:a0b0c62bc916383fa8d65930ea038039c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8h.html#a0b0c62bc916383fa8d65930ea038039c">OPT_JAVA_GOTO_BINARY</a>&#160;&#160;&#160;  &quot;(gb):&quot;</td></tr>
 <tr class="separator:a0b0c62bc916383fa8d65930ea038039c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57764569e71e7e5cdc7a768330678419"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8h.html#a57764569e71e7e5cdc7a768330678419">HELP_JAVA_GOTO_BINARY</a></td></tr>
 <tr class="separator:a57764569e71e7e5cdc7a768330678419"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -196,14 +196,12 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;    class-name                name of class\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              The entry point is the method specified by\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              --function, or otherwise, the\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              public static void main(String[])\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              method of the given class.\n&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;  {uclass-name} \t &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;name of class. The entry point is the method specified by --function, &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;or otherwise, the public static void main(String[]) method of the given &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;class.\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00153">153</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00144">144</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -218,18 +216,14 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; -classpath dirs/jars\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; -cp dirs/jars\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --classpath dirs/jars        set class search path of directories and\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              jar files\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              A &quot;</span> <a class="code" href="java__bytecode__language_8h.html#a789b19d601a12c5d7a1ad1ebce2053cd">JAVA_CLASSPATH_SEPARATOR</a> \</div>
-<div class="line">  <span class="stringliteral">&quot; separated list of directories and JAR\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              archives to search for class files.\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --main-class class-name      set the name of the main class\n&quot;</span></div>
-<div class="ttc" id="ajava__bytecode__language_8h_html_a789b19d601a12c5d7a1ad1ebce2053cd"><div class="ttname"><a href="java__bytecode__language_8h.html#a789b19d601a12c5d7a1ad1ebce2053cd">JAVA_CLASSPATH_SEPARATOR</a></div><div class="ttdeci">#define JAVA_CLASSPATH_SEPARATOR</div><div class="ttdef"><b>Definition:</b> <a href="java__bytecode__language_8h_source.html#l00135">java_bytecode_language.h:135</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y-classpath} {udirs/jars}, {y-cp} {udirs/jars}, &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;{y--classpath} {udirs/jars} \t &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;set class search path of directories and jar files to a &quot;</span> \</div>
+<div class="line">  JAVA_CLASSPATH_SEPARATOR <span class="stringliteral">&quot;-separated list of directories and JAR &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;archives to search for class files\n&quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--main-class} {uclass-name} \t set the name of the main class\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00138">138</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00131">131</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -244,15 +238,12 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;    --gb goto-binary          goto-binary file to be checked\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              The entry point is the method specified by\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              --function, or otherwise, the\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              public static void main(String[])\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              of the class specified by --main-class\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              (checked in this order).\n&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--gb} {ugoto-binary} \t &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;goto-binary file to be checked. The entry point is the method specified &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;by {y--function}, or otherwise, the public static void main(String[]) of &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;the class specified by {y--main-class} (checked in this order).\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00175">175</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00163">163</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -267,16 +258,13 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;    -jar jarfile              JAR file to be checked\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              The entry point is the method specified by\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              --function or otherwise, the\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              public static void main(String[]) method\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              of the class specified by --main-class or the main\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              class specified in the JAR manifest\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              (checked in this order).\n&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y-jar} {ujarfile} \t &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;JAR file to be checked. The entry point is the method specified by &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;{y--function} or otherwise, the public static void main(String[]) method &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;of the class specified by {y--main-class} or the main class specified in &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;the JAR manifest (checked in this order).\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00163">163</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00153">153</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -291,12 +279,11 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;    method-name               fully qualified name of method\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              used as entry point, e.g.\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              mypackage.Myclass.foo:(I)Z\n&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;  {umethod-name} \t &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;fully qualified name of method  used as entry point, e.g. &quot;</span> \</div>
+<div class="line">  <span class="stringliteral">&quot;mypackage.Myclass.foo:(I)Z\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00148">148</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00139">139</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -365,7 +352,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00272">272</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00258">258</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -381,7 +368,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00135">135</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00128">128</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -392,14 +379,12 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define OPT_JAVA_GOTO_BINARY</td>
+          <td class="memname">#define OPT_JAVA_GOTO_BINARY&#160;&#160;&#160;  &quot;(gb):&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;(gb):&quot;</span></div>
-</div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00172">172</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00160">160</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -410,14 +395,12 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define OPT_JAVA_JAR</td>
+          <td class="memname">#define OPT_JAVA_JAR&#160;&#160;&#160;  &quot;(jar):&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;(jar):&quot;</span></div>
-</div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00160">160</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00150">150</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -439,7 +422,7 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a7ef72f294370e16463f94f040fe5bf8daf11aa1b70ee22a39b55738bafa1afc9b"></a>LAZY_METHODS_MODE_EXTERNAL_DRIVER&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00184">184</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00170">170</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>

@@ -160,30 +160,33 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --mm &lt;tso,pso,rmo,power&gt;     instruments a weak memory model\n&quot;</span>            \</div>
-<div class="line">  <span class="stringliteral">&quot; --scc                        detects critical cycles per SCC (one thread per SCC)\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --one-event-per-cycle        only instruments one event per cycle\n&quot;</span>       \</div>
-<div class="line">  <span class="stringliteral">&quot; --minimum-interference       instruments an optimal number of events\n&quot;</span>    \</div>
-<div class="line">  <span class="stringliteral">&quot; --my-events                  only instruments events whose ids appear in inst.evt\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --read-first|--write-first   only instrument cycles where a read or \n&quot;</span>    \</div>
-<div class="line">  <span class="stringliteral">&quot;                              write occurs as first event, respectively\n&quot;</span>  \</div>
-<div class="line">  <span class="stringliteral">&quot; --max-var N                  limit cycles to N variables read/written\n&quot;</span>   \</div>
-<div class="line">  <span class="stringliteral">&quot; --max-po-trans N             limit cycles to N program-order edges\n&quot;</span>      \</div>
-<div class="line">  <span class="stringliteral">&quot; --ignore-arrays              instrument arrays as a single object\n&quot;</span>       \</div>
-<div class="line">  <span class="stringliteral">&quot; --cav11                      always instrument shared variables, even\n&quot;</span>   \</div>
-<div class="line">  <span class="stringliteral">&quot;                              when they are not part of any cycle\n&quot;</span>        \</div>
-<div class="line">  <span class="stringliteral">&quot; --force-loop-duplication|--no-loop-duplication\n&quot;</span>                          \</div>
-<div class="line">  <span class="stringliteral">&quot;                              optional program transformation to\n&quot;</span>         \</div>
-<div class="line">  <span class="stringliteral">&quot;                              construct cycles in program loops\n&quot;</span>          \</div>
-<div class="line">  <span class="stringliteral">&quot; --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n&quot;</span> <span class="comment">/* NOLINT(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --no-dependencies            no dependency analysis\n&quot;</span>                     \</div>
-<div class="line">  <span class="stringliteral">&quot; --no-po-rendering            no representation of the threads in the dot\n&quot;</span>\</div>
-<div class="line">  <span class="stringliteral">&quot; --hide-internals             do not include thread-internal (Rfi)\n&quot;</span>       \</div>
-<div class="line">  <span class="stringliteral">&quot;                              events in dot output\n&quot;</span>                       \</div>
-<div class="line">  <span class="stringliteral">&quot; --render-cluster-file        clusterises the dot by files\n&quot;</span>               \</div>
-<div class="line">  <span class="stringliteral">&quot; --render-cluster-function    clusterises the dot by functions\n&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--mm} [{ytso}|{ypso}|{yrmo}|{ypower}] \t &quot;</span>                               \</div>
+<div class="line">  <span class="stringliteral">&quot;instruments a weak memory model\n&quot;</span>                                          \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--scc} \t detects critical cycles per SCC (one thread per SCC)\n&quot;</span>        \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--one-event-per-cycle} \t only instruments one event per cycle\n&quot;</span>        \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--minimum-interference} \t instruments an optimal number of events\n&quot;</span>    \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--my-events} \t only instruments events whose ids appear in inst.evt\n&quot;</span>  \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--read-first}, {y--write-first} \t &quot;</span>                                     \</div>
+<div class="line">  <span class="stringliteral">&quot;only instrument cycles where a read or write occurs as first event, &quot;</span>       \</div>
+<div class="line">  <span class="stringliteral">&quot;respectively\n&quot;</span>                                                             \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--max-var} {uN} \t limit cycles to {uN} variables read/written\n&quot;</span>        \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--max-po-trans} {uN} \t limit cycles to {uN} program-order edges\n&quot;</span>      \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--ignore-arrays} \t instrument arrays as a single object\n&quot;</span>              \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--cav11} \t &quot;</span>                                                            \</div>
+<div class="line">  <span class="stringliteral">&quot;always instrument shared variables, even when they are not part of &quot;</span>        \</div>
+<div class="line">  <span class="stringliteral">&quot;any cycle\n&quot;</span>                                                                \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--force-loop-duplication}, {y--no-loop-duplication} \t &quot;</span>                 \</div>
+<div class="line">  <span class="stringliteral">&quot;optional program transformation to construct cycles in program loops\n&quot;</span>     \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--cfg-kill} \t enables symbolic execution used to reduce spurious &quot;</span>      \</div>
+<div class="line">  <span class="stringliteral">&quot;cycles\n&quot;</span>                                                                   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--no-dependencies} \t no dependency analysis\n&quot;</span>                          \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--no-po-rendering} \t no representation of the threads in the dot\n&quot;</span>     \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--hide-internals} \t do not include thread-internal (Rfi) events in &quot;</span>    \</div>
+<div class="line">  <span class="stringliteral">&quot;dot output\n&quot;</span>                                                               \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--render-cluster-file} \t clusterises the dot by files\n&quot;</span>                \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--render-cluster-function} \t clusterises the dot by functions\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00094">94</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00092">92</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
 
 </div>
 </div>
@@ -202,9 +205,9 @@ Functions</h2></td></tr>
 <div class="line">  OPT_WMM_INSTRUMENTATION_STRATEGIES                                           \</div>
 <div class="line">  OPT_WMM_LIMITS                                                               \</div>
 <div class="line">  OPT_WMM_LOOPS                                                                \</div>
-<div class="line">  OPT_WMM_MISC                                                                 \</div>
+<div class="line">  OPT_WMM_MISC</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00086">86</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00085">85</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
 
 </div>
 </div>
@@ -223,9 +226,9 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(minimum-interference)&quot;</span>                                                     \</div>
 <div class="line">  <span class="stringliteral">&quot;(read-first)&quot;</span>                                                               \</div>
 <div class="line">  <span class="stringliteral">&quot;(write-first)&quot;</span>                                                              \</div>
-<div class="line">  <span class="stringliteral">&quot;(my-events)&quot;</span>                                                                \</div>
+<div class="line">  <span class="stringliteral">&quot;(my-events)&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00060">60</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00059">59</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
 
 </div>
 </div>
@@ -241,9 +244,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(max-var):&quot;</span>                                                                 \</div>
-<div class="line">  <span class="stringliteral">&quot;(max-po-trans):&quot;</span>                                                            \</div>
+<div class="line">  <span class="stringliteral">&quot;(max-po-trans):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00067">67</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00066">66</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
 
 </div>
 </div>
@@ -259,9 +262,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(force-loop-duplication)&quot;</span>                                                   \</div>
-<div class="line">  <span class="stringliteral">&quot;(no-loop-duplication)&quot;</span>                                                      \</div>
+<div class="line">  <span class="stringliteral">&quot;(no-loop-duplication)&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00071">71</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00070">70</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
 
 </div>
 </div>
@@ -277,7 +280,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00058">58</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00057">57</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
 
 </div>
 </div>
@@ -300,9 +303,9 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(render-cluster-function)&quot;</span>                                                  \</div>
 <div class="line">  <span class="stringliteral">&quot;(cav11)&quot;</span>                                                                    \</div>
 <div class="line">  <span class="stringliteral">&quot;(hide-internals)&quot;</span>                                                           \</div>
-<div class="line">  <span class="stringliteral">&quot;(ignore-arrays)&quot;</span>                                                            \</div>
+<div class="line">  <span class="stringliteral">&quot;(ignore-arrays)&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00075">75</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weak__memory_8h_source.html#l00074">74</a> of file <a class="el" href="weak__memory_8h_source.html">weak_memory.h</a>.</p>
 
 </div>
 </div>

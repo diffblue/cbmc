@@ -95,8 +95,6 @@ $(document).ready(function(){initNavTree('parse__options_8cpp.html',''); initRes
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="parse__options_8h_source.html">parse_options.h</a>&quot;</code><br />
-<code>#include &lt;algorithm&gt;</code><br />
-<code>#include &lt;cctype&gt;</code><br />
 <code>#include &lt;climits&gt;</code><br />
 <code>#include &lt;sysexits.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="cmdline_8h_source.html">cmdline.h</a>&quot;</code><br />
@@ -111,7 +109,7 @@ $(document).ready(function(){initNavTree('parse__options_8cpp.html',''); initRes
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="parse__options_8cpp__incl.svg" width="1807" height="724"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="parse__options_8cpp__incl.svg" width="1962" height="724"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -124,8 +122,6 @@ Functions</h2></td></tr>
 <tr class="separator:a397ae5a3df1f9dcf4f6cff3e829e1e59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bb96dff7c967555d14049749086134d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parse__options_8cpp.html#a6bb96dff7c967555d14049749086134d">banner_string</a> (const std::string &amp;front_end, const std::string &amp;version)</td></tr>
 <tr class="separator:a6bb96dff7c967555d14049749086134d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2993d2f298359d0bd90d928fa615073f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parse__options_8cpp.html#a2993d2f298359d0bd90d928fa615073f">help_entry</a> (const std::string &amp;option, const std::string &amp;description, const std::size_t left_margin, const std::size_t width)</td></tr>
-<tr class="separator:a2993d2f298359d0bd90d928fa615073f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a397ae5a3df1f9dcf4f6cff3e829e1e59"></a>
@@ -147,9 +143,9 @@ Functions</h2></td></tr>
 <p>Utility for displaying help centered messages borderered by "* *". </p>
 <p>We use this for displaying banner information and the like in help messages. </p><div class="fragment"><div class="line"><a class="code" href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a>(<span class="stringliteral">&quot;test-text&quot;</span>)</div>
 <div class="line">== <span class="stringliteral">&quot;* *                        test-text                        * *&quot;</span></div>
-<div class="ttc" id="aparse__options_8cpp_html_a397ae5a3df1f9dcf4f6cff3e829e1e59"><div class="ttname"><a href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a></div><div class="ttdeci">std::string align_center_with_border(const std::string &amp;text)</div><div class="ttdoc">Utility for displaying help centered messages borderered by &quot;* *&quot;.</div><div class="ttdef"><b>Definition:</b> <a href="parse__options_8cpp_source.html#l00160">parse_options.cpp:160</a></div></div>
+<div class="ttc" id="aparse__options_8cpp_html_a397ae5a3df1f9dcf4f6cff3e829e1e59"><div class="ttname"><a href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a></div><div class="ttdeci">std::string align_center_with_border(const std::string &amp;text)</div><div class="ttdoc">Utility for displaying help centered messages borderered by &quot;* *&quot;.</div><div class="ttdef"><b>Definition:</b> <a href="parse__options_8cpp_source.html#l00158">parse_options.cpp:158</a></div></div>
 </div><!-- fragment --> 
-<p class="definition">Definition at line <a class="el" href="parse__options_8cpp_source.html#l00160">160</a> of file <a class="el" href="parse__options_8cpp_source.html">parse_options.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parse__options_8cpp_source.html#l00158">158</a> of file <a class="el" href="parse__options_8cpp_source.html">parse_options.cpp</a>.</p>
 
 </div>
 </div>
@@ -179,49 +175,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="parse__options_8cpp_source.html#l00173">173</a> of file <a class="el" href="parse__options_8cpp_source.html">parse_options.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a2993d2f298359d0bd90d928fa615073f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2993d2f298359d0bd90d928fa615073f">&#9670;&nbsp;</a></span>help_entry()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string help_entry </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>option</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>description</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::size_t&#160;</td>
-          <td class="paramname"><em>left_margin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::size_t&#160;</td>
-          <td class="paramname"><em>width</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="parse__options_8cpp_source.html#l00182">182</a> of file <a class="el" href="parse__options_8cpp_source.html">parse_options.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parse__options_8cpp_source.html#l00171">171</a> of file <a class="el" href="parse__options_8cpp_source.html">parse_options.cpp</a>.</p>
 
 </div>
 </div>

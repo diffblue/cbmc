@@ -140,18 +140,16 @@ $(document).ready(function(){initNavTree('dump__c_8h_source.html',''); initResiz
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  &quot;(dump-c-type-header):&quot;                                                      \</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  &quot;(no-system-headers)(use-all-headers)(harness)&quot;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">// clang-format off</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="dump__c_8h.html#a8076b7913d6163f0a1e5ea88c42ca4ca">   52</a></span>&#160;<span class="preprocessor">#define HELP_DUMP_C                                                            \</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">    &quot; --dump-c                     generate C source\n&quot;</span>                        \</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    &quot; --dump-c-type-header m       generate a C header for types local in m\n&quot; \</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    &quot; --dump-cpp                   generate C++ source\n&quot;                      \</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    &quot; --no-system-headers          generate C source expanding libc includes\n&quot;\</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    &quot; --use-all-headers            generate C source with all includes\n&quot;      \</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    &quot; --harness                    include input generator in output\n&quot;</div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="dump__c_8h.html#a8076b7913d6163f0a1e5ea88c42ca4ca">   51</a></span>&#160;<span class="preprocessor">#define HELP_DUMP_C                                                            \</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">  &quot; {y--dump-c} \t generate C source\n&quot;</span>                                        \</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  &quot; {y--dump-c-type-header} {um} \t &quot;                                          \</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  &quot;generate a C header for types local in {um}\n&quot;                              \</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  &quot; {y--dump-cpp} \t generate C++ source\n&quot;                                    \</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  &quot; {y--no-system-headers} \t generate C source expanding libc includes\n&quot;     \</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  &quot; {y--use-all-headers} \t generate C source with all includes\n&quot;             \</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  &quot; {y--harness} \t include input generator in output\n&quot;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">// clang-format on</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_DUMP_C_H</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_DUMP_C_H</span></div>
 <div class="ttc" id="aclassgoto__functionst_html"><div class="ttname"><a href="classgoto__functionst.html">goto_functionst</a></div><div class="ttdoc">A collection of goto functions.</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00024">goto_functions.h:25</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:91</a></div></div>
 <div class="ttc" id="adump__c_8h_html_aaa10c9d655bc66bf660907c9e5e6fa55"><div class="ttname"><a href="dump__c_8h.html#aaa10c9d655bc66bf660907c9e5e6fa55">dump_cpp</a></div><div class="ttdeci">void dump_cpp(const goto_functionst &amp;src, const bool use_system_headers, const bool use_all_headers, const bool include_harness, const namespacet &amp;ns, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="dump__c_8cpp_source.html#l01658">dump_c.cpp:1658</a></div></div>

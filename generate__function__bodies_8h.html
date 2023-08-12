@@ -155,24 +155,21 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --generate-function-body &lt;regex&gt;\n&quot;</span> \</div>
-<div class="line">  <span class="comment">/* NOLINTNEXTLINE(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              Generate bodies for functions matching regex\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --generate-havocing-body &lt;option&gt;\n&quot;</span> \</div>
-<div class="line">  <span class="comment">/* NOLINTNEXTLINE(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              &lt;fun_name&gt;,params:&lt;p_n1;p_n2;..&gt;\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              or\n&quot;</span> \</div>
-<div class="line">  <span class="comment">/* NOLINTNEXTLINE(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              &lt;fun_name&gt;[,&lt;call-site-id&gt;,params:&lt;p_n1;p_n2;..&gt;]+\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --generate-function-body-options &lt;option&gt;\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              One of assert-false, assume-false,\n&quot;</span> \</div>
-<div class="line">  <span class="comment">/* NOLINTNEXTLINE(whitespace/line_length) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              nondet-return, assert-false-assume-false and\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              havoc[,params:&lt;regex&gt;][,globals:&lt;regex&gt;]\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                                   [,params:&lt;p_n1;p_n2;..&gt;]\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              (default: nondet-return)\n&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--generate-function-body} {uregex} \t &quot;</span>                                  \</div>
+<div class="line">  <span class="stringliteral">&quot;generate bodies for functions matching {uregex}\n&quot;</span>                          \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--generate-havocing-body} &lt;option&gt; &quot;</span>                                     \</div>
+<div class="line">  <span class="stringliteral">&quot;{ufun_name},{yparams}:{up1};{up2};.. \t &quot;</span>                                   \</div>
+<div class="line">  <span class="stringliteral">&quot;generate havocing body\n&quot;</span>                                                   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--generate-havocing-body} &lt;option&gt; &quot;</span>                                     \</div>
+<div class="line">  <span class="stringliteral">&quot;{ufun_name}[,{ucall-site-id},{yparams}:{up1};{up2};..]+ \t &quot;</span>                \</div>
+<div class="line">  <span class="stringliteral">&quot;generate havocing body\n&quot;</span>                                                   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--generate-function-body-options} {uoption} \t &quot;</span>                         \</div>
+<div class="line">  <span class="stringliteral">&quot;One of {yassert-false}, {yassume-false}, {ynondet-return}, &quot;</span>                \</div>
+<div class="line">  <span class="stringliteral">&quot;{yassert-false-assume-false} and &quot;</span>                                          \</div>
+<div class="line">  <span class="stringliteral">&quot;{yhavoc}[,{yparams}:{uregex}][,{yglobals}:{uregex}]&quot;</span>                        \</div>
+<div class="line">  <span class="stringliteral">&quot;[,{yparams}:{up1};{up2};..] (default: {ynondet-return})\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8h_source.html#l00093">93</a> of file <a class="el" href="generate__function__bodies_8h_source.html">generate_function_bodies.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8h_source.html#l00092">92</a> of file <a class="el" href="generate__function__bodies_8h_source.html">generate_function_bodies.h</a>.</p>
 
 </div>
 </div>
@@ -191,7 +188,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(generate-havocing-body):&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(generate-function-body-options):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8h_source.html#l00088">88</a> of file <a class="el" href="generate__function__bodies_8h_source.html">generate_function_bodies.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8h_source.html#l00087">87</a> of file <a class="el" href="generate__function__bodies_8h_source.html">generate_function_bodies.h</a>.</p>
 
 </div>
 </div>

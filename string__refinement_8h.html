@@ -176,7 +176,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__refinement_8h_source.html#l00062">62</a> of file <a class="el" href="string__refinement_8h_source.html">string_refinement.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__refinement_8h_source.html#l00061">61</a> of file <a class="el" href="string__refinement_8h_source.html">string_refinement.h</a>.</p>
 
 </div>
 </div>
@@ -191,20 +191,21 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --no-refine-strings          turn off string refinement\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --string-printable           restrict to printable strings and characters\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --string-non-empty           restrict to non-empty strings (experimental)\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --string-input-value st      restrict non-null strings to a fixed value st;\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              the switch can be used multiple times to give\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              several strings\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --max-nondet-string-length n bound the length of nondet (e.g. input) strings.\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              Default is &quot;</span> + <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="magic_8h.html#aa34328d28009ef0d60eb12c611da6306">MAX_CONCRETE_STRING_SIZE</a> - 1) + <span class="stringliteral">&quot;; note that\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              setting the value higher than this does not work\n&quot;</span> <span class="comment">/* NOLINT(*) */</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;                              with --trace or --validate-trace.\n&quot;</span> <span class="comment">/* NOLINT(*) */</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--no-refine-strings} \t turn off string refinement\n&quot;</span>                    \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--string-printable} \t restrict to printable strings and characters\n&quot;</span>   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--string-non-empty} \t restrict to non-empty strings (experimental)\n&quot;</span>   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--string-input-value} {ust} \t &quot;</span>                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;restrict non-null strings to a fixed value {ust}; the switch can be used &quot;</span>  \</div>
+<div class="line">  <span class="stringliteral">&quot;multiple times to give several strings\n&quot;</span>                                   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--max-nondet-string-length} {un} \t &quot;</span>                                    \</div>
+<div class="line">  <span class="stringliteral">&quot;bound the length of nondet (e.g. input) strings. Default is &quot;</span> +             <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">\</a></div>
+<div class="line"><a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">    std::to_string</a>(<a class="code" href="magic_8h.html#aa34328d28009ef0d60eb12c611da6306">MAX_CONCRETE_STRING_SIZE</a> - 1) +                             \</div>
+<div class="line">    <span class="stringliteral">&quot;; note that setting the value higher than this does not work &quot;</span>            \</div>
+<div class="line">    <span class="stringliteral">&quot;with {y--trace} or {y--validate-trace}.\n&quot;</span></div>
 <div class="ttc" id="amagic_8h_html_aa34328d28009ef0d60eb12c611da6306"><div class="ttname"><a href="magic_8h.html#aa34328d28009ef0d60eb12c611da6306">MAX_CONCRETE_STRING_SIZE</a></div><div class="ttdeci">const std::size_t MAX_CONCRETE_STRING_SIZE</div><div class="ttdef"><b>Definition:</b> <a href="magic_8h_source.html#l00014">magic.h:14</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="string__refinement_8h_source.html#l00039">39</a> of file <a class="el" href="string__refinement_8h_source.html">string_refinement.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__refinement_8h_source.html#l00038">38</a> of file <a class="el" href="string__refinement_8h_source.html">string_refinement.h</a>.</p>
 
 </div>
 </div>
@@ -219,8 +220,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --refine-strings             use string refinement (experimental)\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot; --string-printable           restrict to printable strings (experimental)\n&quot;</span> <span class="comment">/* NOLINT(*) */</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--refine-strings} \t use string refinement (experimental)\n&quot;</span>             \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--string-printable} \t restrict to printable strings (experimental)\n&quot;</span></div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="string__refinement_8h_source.html#l00057">57</a> of file <a class="el" href="string__refinement_8h_source.html">string_refinement.h</a>.</p>
 
@@ -243,7 +244,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(string-non-empty)&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(max-nondet-string-length):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="string__refinement_8h_source.html#l00032">32</a> of file <a class="el" href="string__refinement_8h_source.html">string_refinement.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__refinement_8h_source.html#l00031">31</a> of file <a class="el" href="string__refinement_8h_source.html">string_refinement.h</a>.</p>
 
 </div>
 </div>

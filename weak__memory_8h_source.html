@@ -146,70 +146,69 @@ $(document).ready(function(){initNavTree('weak__memory_8h_source.html',''); init
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;#endif</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> &amp;message);</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">// clang-format off</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#a8547c655826c2bf4f62d2309e0a0afcb">   58</a></span>&#160;<span class="preprocessor">#define OPT_WMM_MEMORY_MODEL  &quot;(mm):&quot;</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#a2b0d6692a293547548c344c00113e20e">   60</a></span>&#160;<span class="preprocessor">#define OPT_WMM_INSTRUMENTATION_STRATEGIES                                     \</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">  &quot;(one-event-per-cycle)&quot;</span>                                                      \</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  &quot;(minimum-interference)&quot;                                                     \</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  &quot;(read-first)&quot;                                                               \</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  &quot;(write-first)&quot;                                                              \</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  &quot;(my-events)&quot;                                                                \</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#a8f2462ecc14994f44a0b40ac62a09e27">   67</a></span>&#160;<span class="preprocessor">#define OPT_WMM_LIMITS                                                         \</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">  &quot;(max-var):&quot;</span>                                                                 \</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  &quot;(max-po-trans):&quot;                                                            \</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#aebd3ab9736432640f98aac0d50aeb82e">   71</a></span>&#160;<span class="preprocessor">#define OPT_WMM_LOOPS                                                          \</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">  &quot;(force-loop-duplication)&quot;</span>                                                   \</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  &quot;(no-loop-duplication)&quot;                                                      \</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#a72140aa3c49343f25c8302d2207bebfb">   75</a></span>&#160;<span class="preprocessor">#define OPT_WMM_MISC                                                           \</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">  &quot;(scc)&quot;</span>                                                                      \</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  &quot;(cfg-kill)&quot;                                                                 \</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  &quot;(no-dependencies)&quot;                                                          \</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  &quot;(no-po-rendering)&quot;                                                          \</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  &quot;(render-cluster-file)&quot;                                                      \</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  &quot;(render-cluster-function)&quot;                                                  \</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  &quot;(cav11)&quot;                                                                    \</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  &quot;(hide-internals)&quot;                                                           \</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  &quot;(ignore-arrays)&quot;                                                            \</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#aeb590acc0361717fb933152ee20f29cf">   86</a></span>&#160;<span class="preprocessor">#define OPT_WMM                                                                \</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">  OPT_WMM_MEMORY_MODEL                                                         \</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">  OPT_WMM_INSTRUMENTATION_STRATEGIES                                           \</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">  OPT_WMM_LIMITS                                                               \</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">  OPT_WMM_LOOPS                                                                \</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">  OPT_WMM_MISC                                                                 \</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor"></span> </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#aefae22d6708e20dc99254e682b0655ce">   94</a></span>&#160;<span class="preprocessor">#define HELP_WMM_FULL                                                          \</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">  &quot; --mm &lt;tso,pso,rmo,power&gt;     instruments a weak memory model\n&quot;</span>            \</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  &quot; --scc                        detects critical cycles per SCC (one thread per SCC)\n&quot; <span class="comment">/* NOLINT(whitespace/line_length) */</span><span class="preprocessor"> \</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">  &quot; --one-event-per-cycle        only instruments one event per cycle\n&quot;</span>       \</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  &quot; --minimum-interference       instruments an optimal number of events\n&quot;    \</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  &quot; --my-events                  only instruments events whose ids appear in inst.evt\n&quot; <span class="comment">/* NOLINT(whitespace/line_length) */</span><span class="preprocessor"> \</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">  &quot; --read-first|--write-first   only instrument cycles where a read or \n&quot;</span>    \</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  &quot;                              write occurs as first event, respectively\n&quot;  \</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  &quot; --max-var N                  limit cycles to N variables read/written\n&quot;   \</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  &quot; --max-po-trans N             limit cycles to N program-order edges\n&quot;      \</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  &quot; --ignore-arrays              instrument arrays as a single object\n&quot;       \</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  &quot; --cav11                      always instrument shared variables, even\n&quot;   \</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  &quot;                              when they are not part of any cycle\n&quot;        \</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  &quot; --force-loop-duplication|--no-loop-duplication\n&quot;                          \</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  &quot;                              optional program transformation to\n&quot;         \</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  &quot;                              construct cycles in program loops\n&quot;          \</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  &quot; --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n&quot; <span class="comment">/* NOLINT(whitespace/line_length) */</span><span class="preprocessor"> \</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">  &quot; --no-dependencies            no dependency analysis\n&quot;</span>                     \</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  &quot; --no-po-rendering            no representation of the threads in the dot\n&quot;\</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  &quot; --hide-internals             do not include thread-internal (Rfi)\n&quot;       \</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  &quot;                              events in dot output\n&quot;                       \</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  &quot; --render-cluster-file        clusterises the dot by files\n&quot;               \</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  &quot; --render-cluster-function    clusterises the dot by functions\n&quot;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment">// clang-format on</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#a8547c655826c2bf4f62d2309e0a0afcb">   57</a></span>&#160;<span class="preprocessor">#define OPT_WMM_MEMORY_MODEL  &quot;(mm):&quot;</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#a2b0d6692a293547548c344c00113e20e">   59</a></span>&#160;<span class="preprocessor">#define OPT_WMM_INSTRUMENTATION_STRATEGIES                                     \</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">  &quot;(one-event-per-cycle)&quot;</span>                                                      \</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  &quot;(minimum-interference)&quot;                                                     \</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  &quot;(read-first)&quot;                                                               \</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  &quot;(write-first)&quot;                                                              \</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  &quot;(my-events)&quot;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#a8f2462ecc14994f44a0b40ac62a09e27">   66</a></span>&#160;<span class="preprocessor">#define OPT_WMM_LIMITS                                                         \</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">  &quot;(max-var):&quot;</span>                                                                 \</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  &quot;(max-po-trans):&quot;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#aebd3ab9736432640f98aac0d50aeb82e">   70</a></span>&#160;<span class="preprocessor">#define OPT_WMM_LOOPS                                                          \</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">  &quot;(force-loop-duplication)&quot;</span>                                                   \</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  &quot;(no-loop-duplication)&quot;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#a72140aa3c49343f25c8302d2207bebfb">   74</a></span>&#160;<span class="preprocessor">#define OPT_WMM_MISC                                                           \</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">  &quot;(scc)&quot;</span>                                                                      \</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  &quot;(cfg-kill)&quot;                                                                 \</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  &quot;(no-dependencies)&quot;                                                          \</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  &quot;(no-po-rendering)&quot;                                                          \</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  &quot;(render-cluster-file)&quot;                                                      \</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  &quot;(render-cluster-function)&quot;                                                  \</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  &quot;(cav11)&quot;                                                                    \</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  &quot;(hide-internals)&quot;                                                           \</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  &quot;(ignore-arrays)&quot;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#aeb590acc0361717fb933152ee20f29cf">   85</a></span>&#160;<span class="preprocessor">#define OPT_WMM                                                                \</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">  OPT_WMM_MEMORY_MODEL                                                         \</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">  OPT_WMM_INSTRUMENTATION_STRATEGIES                                           \</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">  OPT_WMM_LIMITS                                                               \</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">  OPT_WMM_LOOPS                                                                \</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">  OPT_WMM_MISC</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="weak__memory_8h.html#aefae22d6708e20dc99254e682b0655ce">   92</a></span>&#160;<span class="preprocessor">#define HELP_WMM_FULL                                                          \</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">  &quot; {y--mm} [{ytso}|{ypso}|{yrmo}|{ypower}] \t &quot;</span>                               \</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  &quot;instruments a weak memory model\n&quot;                                          \</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  &quot; {y--scc} \t detects critical cycles per SCC (one thread per SCC)\n&quot;        \</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  &quot; {y--one-event-per-cycle} \t only instruments one event per cycle\n&quot;        \</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  &quot; {y--minimum-interference} \t instruments an optimal number of events\n&quot;    \</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  &quot; {y--my-events} \t only instruments events whose ids appear in inst.evt\n&quot;  \</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  &quot; {y--read-first}, {y--write-first} \t &quot;                                     \</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  &quot;only instrument cycles where a read or write occurs as first event, &quot;       \</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  &quot;respectively\n&quot;                                                             \</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  &quot; {y--max-var} {uN} \t limit cycles to {uN} variables read/written\n&quot;        \</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  &quot; {y--max-po-trans} {uN} \t limit cycles to {uN} program-order edges\n&quot;      \</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  &quot; {y--ignore-arrays} \t instrument arrays as a single object\n&quot;              \</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  &quot; {y--cav11} \t &quot;                                                            \</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  &quot;always instrument shared variables, even when they are not part of &quot;        \</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  &quot;any cycle\n&quot;                                                                \</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  &quot; {y--force-loop-duplication}, {y--no-loop-duplication} \t &quot;                 \</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  &quot;optional program transformation to construct cycles in program loops\n&quot;     \</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  &quot; {y--cfg-kill} \t enables symbolic execution used to reduce spurious &quot;      \</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  &quot;cycles\n&quot;                                                                   \</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  &quot; {y--no-dependencies} \t no dependency analysis\n&quot;                          \</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  &quot; {y--no-po-rendering} \t no representation of the threads in the dot\n&quot;     \</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  &quot; {y--hide-internals} \t do not include thread-internal (Rfi) events in &quot;    \</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  &quot;dot output\n&quot;                                                               \</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  &quot; {y--render-cluster-file} \t clusterises the dot by files\n&quot;                \</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  &quot; {y--render-cluster-function} \t clusterises the dot by functions\n&quot;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H</span></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a75fd5a161012d70279ba54f9bac5bda2"><div class="ttname"><a href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a></div><div class="ttdeci">::goto_functiont goto_functiont</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00027">goto_functions.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>

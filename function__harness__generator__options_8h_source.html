@@ -118,51 +118,55 @@ $(document).ready(function(){initNavTree('function__harness__generator__options_
 <div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="function__harness__generator__options_8h.html#a34b7a34b8b3271c4811e4d7a1df21fcb">   24</a></span>&#160;<span class="preprocessor">#define FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT              \</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">  &quot;treat-pointers-equal-maybe&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">// clang-format off</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="function__harness__generator__options_8h.html#a71ca69351a822caed2bd9fa9dcc563a3">   28</a></span>&#160;<span class="preprocessor">#define FUNCTION_HARNESS_GENERATOR_OPTIONS                                     \</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">  &quot;(&quot;</span> FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT &quot;):&quot;                             \</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT &quot;)&quot;                        \</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT &quot;):&quot;               \</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT &quot;):&quot;                 \</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT &quot;):&quot;                \</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING &quot;):&quot;                 \</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT &quot;)&quot;            \</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">// FUNCTION_HARNESS_GENERATOR_OPTIONS</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">// clang-format on</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">// clang-format off</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="function__harness__generator__options_8h.html#a31cab981a6c7ad577bb9b001817bc34d">   41</a></span>&#160;<span class="preprocessor">#define FUNCTION_HARNESS_GENERATOR_HELP                                        \</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">  &quot;function harness generator (--harness-type call-function)\n\n&quot;</span>              \</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  &quot;--&quot; FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT                                 \</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  &quot;                    the function the harness should call\n&quot;                 \</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  &quot;--&quot; FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT                           \</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  &quot;              set global variables to non-deterministic values\n&quot;           \</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  &quot;                              in harness\n&quot;                                 \</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  COMMON_HARNESS_GENERATOR_HELP                                                \</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  &quot;--&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                   \</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  &quot; p    treat the function parameter with the name `p&#39; as\n&quot;                  \</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  &quot;                              an array\n&quot;                                   \</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  &quot;--&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                     \</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  &quot; p,q,r[;s,t]    treat the function parameters `q,r&#39; equal\n&quot;                \</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  &quot;                              to parameter `p&#39;; `s` to `t` and so on\n&quot;     \</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  &quot;--&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT               \</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  &quot;                function parameters equality is non-deterministic\n&quot;        \</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  &quot;--&quot; FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                    \</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  &quot; array_name:size_name\n&quot;                                                    \</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  &quot;                              set the parameter &lt;size_name&gt; to the size&quot;    \</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  &quot; of\n                              the array &lt;array_name&gt;\n&quot;                \</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  &quot;                              (implies &quot;                                    \</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  &quot;-- &quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                  \</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  &quot; &lt;array_name&gt;)\n&quot;                                                           \</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  &quot;--&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                     \</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  &quot; p    treat the function parameter with the name `p&#39; as\n&quot;                  \</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  &quot;                              a string of characters\n&quot;                     \</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="comment">// FUNCTION_HARNESS_GENERATOR_HELP</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">// clang-format on</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_HARNESS_FUNCTION_HARNESS_GENERATOR_OPTIONS_H</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="function__harness__generator__options_8h.html#a71ca69351a822caed2bd9fa9dcc563a3">   27</a></span>&#160;<span class="preprocessor">#define FUNCTION_HARNESS_GENERATOR_OPTIONS                                     \</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">  &quot;(&quot;</span> FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT                                  \</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  &quot;):&quot;                                                                         \</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT                            \</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  &quot;)&quot;                                                                          \</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                    \</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  &quot;):&quot;                                                                         \</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                      \</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  &quot;):&quot;                                                                         \</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                     \</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  &quot;):&quot;                                                                         \</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                      \</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  &quot;):&quot;                                                                         \</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  &quot;(&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT &quot;)&quot;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="function__harness__generator__options_8h.html#a31cab981a6c7ad577bb9b001817bc34d">   42</a></span>&#160;<span class="preprocessor">#define FUNCTION_HARNESS_GENERATOR_HELP                                        \</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">  &quot;function harness generator ({y--harness-type} {ycall-function}):\n&quot;</span>         \</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  &quot; {y--&quot; FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT                              \</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  &quot;} {ufunction_name} \t &quot;                                                     \</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  &quot;the function the harness should call\n&quot;                                     \</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  &quot; {y--&quot; FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT                        \</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  &quot;} \t &quot;                                                                      \</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  &quot;set global variables to non-deterministic values in &quot;                       \</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  &quot;harness\n&quot; COMMON_HARNESS_GENERATOR_HELP                                    \</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  &quot; {y--&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                \</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  &quot;} {up} \t &quot;                                                                 \</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  &quot;treat the function parameter with the name {up} as an array\n&quot;              \</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  &quot; {y--&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_OPT                  \</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  &quot;} &quot;                                                                         \</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  &quot;{up}{y,}{uq}{y,}{ur}[{y;}{us}{y,}{ut}] \t &quot;                                 \</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  &quot;treat the function parameters {uq}{y,}{ur} equal to parameter {up}; &quot;       \</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  &quot;{us} to {ut} and so on\n&quot;                                                   \</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  &quot; {y--&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTERS_EQUAL_MAYBE_OPT            \</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  &quot;} \t &quot;                                                                      \</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  &quot;function parameters equality is non-deterministic\n&quot;                        \</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  &quot; {y--&quot; FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                 \</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  &quot;} &quot;                                                                         \</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  &quot;{uarray_name}{y:}{usize_name} \t &quot;                                          \</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  &quot;set the parameter {usize_name} to the size of the array {uarray_name} &quot;     \</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  &quot;(implies &quot;                                                                  \</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  &quot;{y-- &quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                \</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  &quot;} &quot;                                                                         \</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  &quot;{uarray_name})\n&quot;                                                           \</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  &quot; {y--&quot; FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                  \</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  &quot;} {up} \t &quot;                                                                 \</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  &quot;treat the function parameter with the name {up} as a string of &quot;            \</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  &quot;characters\n&quot;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_HARNESS_FUNCTION_HARNESS_GENERATOR_OPTIONS_H</span></div>
 <div class="ttc" id="acommon__harness__generator__options_8h_html"><div class="ttname"><a href="common__harness__generator__options_8h.html">common_harness_generator_options.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

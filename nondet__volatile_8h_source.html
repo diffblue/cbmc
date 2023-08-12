@@ -122,28 +122,25 @@ $(document).ready(function(){initNavTree('nondet__volatile_8h_source.html',''); 
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  &quot;(&quot; NONDET_VOLATILE_MODEL_OPT &quot;):&quot;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
 <div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="nondet__volatile_8h.html#ace3d747a89675ddff7aa25a7b7159330">   32</a></span>&#160;<span class="preprocessor">#define HELP_NONDET_VOLATILE \</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">  help_entry( \</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">    &quot;--&quot;</span> NONDET_VOLATILE_OPT, \</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    &quot;makes reads from volatile variables non-deterministic&quot;) &lt;&lt; \</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  help_entry( \</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    &quot;--&quot; NONDET_VOLATILE_VARIABLE_OPT &quot; &lt;variable&gt;&quot;, \</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    &quot;makes reads from given volatile variable non-deterministic&quot;) &lt;&lt; \</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  help_entry( \</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    &quot;--&quot; NONDET_VOLATILE_MODEL_OPT &quot; &lt;variable&gt;:&lt;model&gt;&quot;, \</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    &quot;models reads from given volatile variable by a call to the given model&quot;)</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">// clang-format on</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keywordtype">void</span> <a class="code" href="nondet__volatile_8h.html#a0fce196e880d792cd7deb2efdbe4c729">parse_nondet_volatile_options</a>(<span class="keyword">const</span> <a class="code" href="classcmdlinet.html">cmdlinet</a> &amp;cmdline, <a class="code" href="classoptionst.html">optionst</a> &amp;options);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keywordtype">void</span> <a class="code" href="nondet__volatile_8h.html#a91053d2a363b9554549f8748f86f621b">nondet_volatile</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, <span class="keyword">const</span> <a class="code" href="classoptionst.html">optionst</a> &amp;options);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="nondet__volatile_8h.html#a97e0c7c565c6026aa94e38ccfc49741b">   57</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="nondet__volatile_8h.html#a91053d2a363b9554549f8748f86f621b">nondet_volatile</a>(</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  std::function&lt;<span class="keywordtype">bool</span>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;)&gt; should_havoc = [](<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;) {</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  });</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">  &quot; {y--&quot;</span> NONDET_VOLATILE_OPT &quot;} \t &quot; \</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  &quot;makes reads from volatile variables non-deterministic\n&quot; \</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  &quot; {y--&quot; NONDET_VOLATILE_VARIABLE_OPT &quot;} {uvariable} \t &quot; \</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  &quot;makes reads from given volatile variable non-deterministic\n&quot; \</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  &quot; {y--&quot; NONDET_VOLATILE_MODEL_OPT &quot;} {uvariable}:{umodel} \t &quot; \</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  &quot;models reads from given volatile variable by a call to the given model\n&quot; \</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">// clang-format on</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keywordtype">void</span> <a class="code" href="nondet__volatile_8h.html#a0fce196e880d792cd7deb2efdbe4c729">parse_nondet_volatile_options</a>(<span class="keyword">const</span> <a class="code" href="classcmdlinet.html">cmdlinet</a> &amp;cmdline, <a class="code" href="classoptionst.html">optionst</a> &amp;options);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keywordtype">void</span> <a class="code" href="nondet__volatile_8h.html#a91053d2a363b9554549f8748f86f621b">nondet_volatile</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, <span class="keyword">const</span> <a class="code" href="classoptionst.html">optionst</a> &amp;options);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="nondet__volatile_8h.html#a97e0c7c565c6026aa94e38ccfc49741b">   54</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="nondet__volatile_8h.html#a91053d2a363b9554549f8748f86f621b">nondet_volatile</a>(</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  std::function&lt;<span class="keywordtype">bool</span>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;)&gt; should_havoc = [](<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;) {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  });</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H</span></div>
 <div class="ttc" id="aclasscmdlinet_html"><div class="ttname"><a href="classcmdlinet.html">cmdlinet</a></div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00020">cmdline.h:21</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>

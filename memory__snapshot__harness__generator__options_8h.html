@@ -161,30 +161,35 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;memory snapshot harness generator (--harness-type\n&quot;</span>                        \</div>
-<div class="line">  <span class="stringliteral">&quot;  initialize-with-memory-snapshot)\n\n&quot;</span>                                     \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a2c48aee194a6706e18931c5b38cf0b62">MEMORY_SNAPSHOT_HARNESS_SNAPSHOT_OPT</a> <span class="stringliteral">&quot; &lt;file&gt;      initialise memory &quot;</span>  \</div>
-<div class="line">  <span class="stringliteral">&quot;from JSON memory snapshot\n&quot;</span>                                                \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#aa7a15b791849b4ba2213fe2bd19e9b02">MEMORY_SNAPSHOT_HARNESS_INITIAL_GOTO_LOC_OPT</a> <span class="stringliteral">&quot; &lt;func[:&lt;n&gt;]&gt;\n&quot;</span>          \</div>
-<div class="line">  <span class="stringliteral">&quot;                              use given function and location number as &quot;</span>   \</div>
-<div class="line">  <span class="stringliteral">&quot;entry\n                              point\n&quot;</span>                               \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a031c1a8af134411761e8e91c4468787b">MEMORY_SNAPSHOT_HARNESS_INITIAL_SOURCE_LOC_OPT</a> <span class="stringliteral">&quot; &lt;file:&lt;n&gt;&gt;\n&quot;</span>          \</div>
-<div class="line">  <span class="stringliteral">&quot;                              use given file name and line number as &quot;</span>      \</div>
-<div class="line">  <span class="stringliteral">&quot;entry\n                              point\n&quot;</span>                               \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a141d3795f73d7118da6fe26d1bde904c">MEMORY_SNAPSHOT_HARNESS_HAVOC_VARIABLES_OPT</a> <span class="stringliteral">&quot; vars        initialise&quot;</span>   \</div>
-<div class="line">  <span class="stringliteral">&quot; variables from `vars&#39; to\n&quot;</span>                                                \</div>
-<div class="line">  <span class="stringliteral">&quot;                              non-deterministic values\n&quot;</span>                   \</div>
-<div class="line">  COMMON_HARNESS_GENERATOR_HELP                                                \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a39d1067a0bf5d834d51d7311cf349944">MEMORY_SNAPSHOT_HARNESS_TREAT_POINTER_AS_ARRAY_OPT</a>                      \</div>
-<div class="line">  <span class="stringliteral">&quot; p    treat the global pointer with the name `p&#39; as\n&quot;</span>                      \</div>
-<div class="line">  <span class="stringliteral">&quot;                              an array\n&quot;</span>                                   \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a27c2e00a9af11c9ec593b59ffe4003cc">MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT</a>                       \</div>
-<div class="line">  <span class="stringliteral">&quot; array_name:size_name\n&quot;</span>                                                    \</div>
-<div class="line">  <span class="stringliteral">&quot;                              set the parameter &lt;size_name&gt; to the size&quot;</span>    \</div>
-<div class="line">  <span class="stringliteral">&quot; of\n                              the array &lt;array_name&gt;\n&quot;</span>                \</div>
-<div class="line">  <span class="stringliteral">&quot;                              (implies &quot;</span>                                    \</div>
-<div class="line">  <span class="stringliteral">&quot;-- &quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a39d1067a0bf5d834d51d7311cf349944">MEMORY_SNAPSHOT_HARNESS_TREAT_POINTER_AS_ARRAY_OPT</a>                     \</div>
-<div class="line">  <span class="stringliteral">&quot; &lt;array_name&gt;)\n&quot;</span>                                                           \</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;memory snapshot harness generator ({y--harness-type}\n&quot;</span>                     \</div>
+<div class="line">  <span class="stringliteral">&quot;  {yinitialize-with-memory-snapshot}):\n&quot;</span>                                   \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a2c48aee194a6706e18931c5b38cf0b62">MEMORY_SNAPSHOT_HARNESS_SNAPSHOT_OPT</a>                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;} {ufile} \t &quot;</span>                                                              \</div>
+<div class="line">  <span class="stringliteral">&quot;initialize memory from JSON memory snapshot\n&quot;</span>                              \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#aa7a15b791849b4ba2213fe2bd19e9b02">MEMORY_SNAPSHOT_HARNESS_INITIAL_GOTO_LOC_OPT</a>                         \</div>
+<div class="line">  <span class="stringliteral">&quot;} {ufunc}[{y:}{un}] &quot;</span>                                                       \</div>
+<div class="line">  <span class="stringliteral">&quot;\t &quot;</span>                                                                        \</div>
+<div class="line">  <span class="stringliteral">&quot;use given function and location number as entry point\n&quot;</span>                    \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a031c1a8af134411761e8e91c4468787b">MEMORY_SNAPSHOT_HARNESS_INITIAL_SOURCE_LOC_OPT</a>                       \</div>
+<div class="line">  <span class="stringliteral">&quot;} {ufile}{y:}{un} &quot;</span>                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;\t &quot;</span>                                                                        \</div>
+<div class="line">  <span class="stringliteral">&quot;use given file name and line number as entry point\n&quot;</span>                       \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a141d3795f73d7118da6fe26d1bde904c">MEMORY_SNAPSHOT_HARNESS_HAVOC_VARIABLES_OPT</a>                          \</div>
+<div class="line">  <span class="stringliteral">&quot;} {uvars} \t &quot;</span>                                                              \</div>
+<div class="line">  <span class="stringliteral">&quot;initialize variables from {uvars} to non-deterministic &quot;</span>                    \</div>
+<div class="line">  <span class="stringliteral">&quot;values\n&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a8a974518ad258baa6524a03838049626">COMMON_HARNESS_GENERATOR_HELP</a>                                     \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a39d1067a0bf5d834d51d7311cf349944">MEMORY_SNAPSHOT_HARNESS_TREAT_POINTER_AS_ARRAY_OPT</a>                   \</div>
+<div class="line">  <span class="stringliteral">&quot;} {up} \t &quot;</span>                                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;treat the global pointer with the name {up} as an array\n&quot;</span>                  \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a27c2e00a9af11c9ec593b59ffe4003cc">MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT</a>                    \</div>
+<div class="line">  <span class="stringliteral">&quot;} &quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;{uarray_name}{y:}{usize_name} \t &quot;</span>                                          \</div>
+<div class="line">  <span class="stringliteral">&quot;set the parameter {usize_name} to the size of the array {uarray_name} &quot;</span>     \</div>
+<div class="line">  <span class="stringliteral">&quot;(implies &quot;</span>                                                                  \</div>
+<div class="line">  <span class="stringliteral">&quot;{y-- &quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a39d1067a0bf5d834d51d7311cf349944">MEMORY_SNAPSHOT_HARNESS_TREAT_POINTER_AS_ARRAY_OPT</a>                   \</div>
+<div class="line">  <span class="stringliteral">&quot;} &quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;{uarray_name})\n&quot;</span></div>
+<div class="ttc" id="acommon__harness__generator__options_8h_html_a8a974518ad258baa6524a03838049626"><div class="ttname"><a href="common__harness__generator__options_8h.html#a8a974518ad258baa6524a03838049626">COMMON_HARNESS_GENERATOR_HELP</a></div><div class="ttdeci">#define COMMON_HARNESS_GENERATOR_HELP</div><div class="ttdef"><b>Definition:</b> <a href="common__harness__generator__options_8h_source.html#l00034">common_harness_generator_options.h:34</a></div></div>
 <div class="ttc" id="amemory__snapshot__harness__generator__options_8h_html_a031c1a8af134411761e8e91c4468787b"><div class="ttname"><a href="memory__snapshot__harness__generator__options_8h.html#a031c1a8af134411761e8e91c4468787b">MEMORY_SNAPSHOT_HARNESS_INITIAL_SOURCE_LOC_OPT</a></div><div class="ttdeci">#define MEMORY_SNAPSHOT_HARNESS_INITIAL_SOURCE_LOC_OPT</div><div class="ttdef"><b>Definition:</b> <a href="memory__snapshot__harness__generator__options_8h_source.html#l00016">memory_snapshot_harness_generator_options.h:16</a></div></div>
 <div class="ttc" id="amemory__snapshot__harness__generator__options_8h_html_a141d3795f73d7118da6fe26d1bde904c"><div class="ttname"><a href="memory__snapshot__harness__generator__options_8h.html#a141d3795f73d7118da6fe26d1bde904c">MEMORY_SNAPSHOT_HARNESS_HAVOC_VARIABLES_OPT</a></div><div class="ttdeci">#define MEMORY_SNAPSHOT_HARNESS_HAVOC_VARIABLES_OPT</div><div class="ttdef"><b>Definition:</b> <a href="memory__snapshot__harness__generator__options_8h_source.html#l00017">memory_snapshot_harness_generator_options.h:17</a></div></div>
 <div class="ttc" id="amemory__snapshot__harness__generator__options_8h_html_a27c2e00a9af11c9ec593b59ffe4003cc"><div class="ttname"><a href="memory__snapshot__harness__generator__options_8h.html#a27c2e00a9af11c9ec593b59ffe4003cc">MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT</a></div><div class="ttdeci">#define MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT</div><div class="ttdef"><b>Definition:</b> <a href="memory__snapshot__harness__generator__options_8h_source.html#l00019">memory_snapshot_harness_generator_options.h:19</a></div></div>
@@ -207,14 +212,19 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a2c48aee194a6706e18931c5b38cf0b62">MEMORY_SNAPSHOT_HARNESS_SNAPSHOT_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                                \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#aa7a15b791849b4ba2213fe2bd19e9b02">MEMORY_SNAPSHOT_HARNESS_INITIAL_GOTO_LOC_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                        \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a031c1a8af134411761e8e91c4468787b">MEMORY_SNAPSHOT_HARNESS_INITIAL_SOURCE_LOC_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                      \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a141d3795f73d7118da6fe26d1bde904c">MEMORY_SNAPSHOT_HARNESS_HAVOC_VARIABLES_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                         \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a39d1067a0bf5d834d51d7311cf349944">MEMORY_SNAPSHOT_HARNESS_TREAT_POINTER_AS_ARRAY_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                  \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a27c2e00a9af11c9ec593b59ffe4003cc">MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                   \</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a2c48aee194a6706e18931c5b38cf0b62">MEMORY_SNAPSHOT_HARNESS_SNAPSHOT_OPT</a>                                     \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#aa7a15b791849b4ba2213fe2bd19e9b02">MEMORY_SNAPSHOT_HARNESS_INITIAL_GOTO_LOC_OPT</a>                             \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a031c1a8af134411761e8e91c4468787b">MEMORY_SNAPSHOT_HARNESS_INITIAL_SOURCE_LOC_OPT</a>                           \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a141d3795f73d7118da6fe26d1bde904c">MEMORY_SNAPSHOT_HARNESS_HAVOC_VARIABLES_OPT</a>                              \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a39d1067a0bf5d834d51d7311cf349944">MEMORY_SNAPSHOT_HARNESS_TREAT_POINTER_AS_ARRAY_OPT</a>                       \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="memory__snapshot__harness__generator__options_8h.html#a27c2e00a9af11c9ec593b59ffe4003cc">MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT</a> <span class="stringliteral">&quot;):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="memory__snapshot__harness__generator__options_8h_source.html#l00022">22</a> of file <a class="el" href="memory__snapshot__harness__generator__options_8h_source.html">memory_snapshot_harness_generator_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__snapshot__harness__generator__options_8h_source.html#l00021">21</a> of file <a class="el" href="memory__snapshot__harness__generator__options_8h_source.html">memory_snapshot_harness_generator_options.h</a>.</p>
 
 </div>
 </div>

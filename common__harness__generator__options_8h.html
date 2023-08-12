@@ -168,23 +168,28 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a24b5f3fdc0ceae182dd6ab959ea043bd">COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT</a>                        \</div>
-<div class="line">  <span class="stringliteral">&quot; N       minimum level at which a pointer can first be NULL\n&quot;</span>              \</div>
-<div class="line">  <span class="stringliteral">&quot;                              in a recursively nondet initialized struct\n&quot;</span> \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a487b9821f3236035249586d802cc36a4">COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT</a>                      \</div>
-<div class="line">  <span class="stringliteral">&quot; N     limit size of nondet (e.g. input) object tree;\n&quot;</span>                    \</div>
-<div class="line">  <span class="stringliteral">&quot;                              at level N pointers are set to null\n&quot;</span>        \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a1b44d423934b159b06c384b0171dd960">COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT</a>                             \</div>
-<div class="line">  <span class="stringliteral">&quot; N            minimum size of dynamically created arrays\n&quot;</span>                 \</div>
-<div class="line">  <span class="stringliteral">&quot;                              (default: 1)\n&quot;</span>                               \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a44ccbfee83291c5c57d8b25f06e14b41">COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT</a>                             \</div>
-<div class="line">  <span class="stringliteral">&quot; N            maximum size of dynamically created arrays\n&quot;</span>                 \</div>
-<div class="line">  <span class="stringliteral">&quot;                              (default: 2)\n&quot;</span>                               \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a13549e6e87c239e8afbb1d2d72663185">COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT</a>               \</div>
-<div class="line">  <span class="stringliteral">&quot; &lt;function-name&gt;,  name of the function(s) pointer parameters\n&quot;</span>            \</div>
-<div class="line">  <span class="stringliteral">&quot;              that can be NULL pointing.\n&quot;</span>                                 \</div>
-<div class="line">  <span class="stringliteral">&quot;--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#afe751f683763f0decab328310aff771b">COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT</a>                               \</div>
-<div class="line">  <span class="stringliteral">&quot; &lt;member-expr&gt;  path to the member to be havoced\n&quot;</span>                         \</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a24b5f3fdc0ceae182dd6ab959ea043bd">COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT</a>                     \</div>
+<div class="line">  <span class="stringliteral">&quot;} {uN} \t &quot;</span>                                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;minimum level at which a pointer can first be NULL in a recursively &quot;</span>       \</div>
+<div class="line">  <span class="stringliteral">&quot;nondet initialized struct\n&quot;</span>                                                \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a487b9821f3236035249586d802cc36a4">COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT</a>                   \</div>
+<div class="line">  <span class="stringliteral">&quot;} {uN} \t &quot;</span>                                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;limit size of nondet (e.g. input) object tree; at level {uN} pointers &quot;</span>     \</div>
+<div class="line">  <span class="stringliteral">&quot;are set to null\n&quot;</span>                                                          \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a1b44d423934b159b06c384b0171dd960">COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT</a>                          \</div>
+<div class="line">  <span class="stringliteral">&quot;} {uN} \t &quot;</span>                                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;minimum size of dynamically created arrays (default: 1)\n&quot;</span>                  \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a44ccbfee83291c5c57d8b25f06e14b41">COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT</a>                          \</div>
+<div class="line">  <span class="stringliteral">&quot;} {uN} \t &quot;</span>                                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot;maximum size of dynamically created arrays (default: 2)\n&quot;</span>                  \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a13549e6e87c239e8afbb1d2d72663185">COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT</a>            \</div>
+<div class="line">  <span class="stringliteral">&quot;} &quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;{ufunction_name} \t &quot;</span>                                                       \</div>
+<div class="line">  <span class="stringliteral">&quot;name of the function(s) pointer parameters that can be NULL &quot;</span>               \</div>
+<div class="line">  <span class="stringliteral">&quot;pointing\n&quot;</span>                                                                 \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#afe751f683763f0decab328310aff771b">COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT</a>                            \</div>
+<div class="line">  <span class="stringliteral">&quot;} {umember_expr} \t &quot;</span>                                                       \</div>
+<div class="line">  <span class="stringliteral">&quot;path to the member to be havocked\n&quot;</span></div>
 <div class="ttc" id="acommon__harness__generator__options_8h_html_a13549e6e87c239e8afbb1d2d72663185"><div class="ttname"><a href="common__harness__generator__options_8h.html#a13549e6e87c239e8afbb1d2d72663185">COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT</a></div><div class="ttdeci">#define COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT</div><div class="ttdef"><b>Definition:</b> <a href="common__harness__generator__options_8h_source.html#l00017">common_harness_generator_options.h:17</a></div></div>
 <div class="ttc" id="acommon__harness__generator__options_8h_html_a1b44d423934b159b06c384b0171dd960"><div class="ttname"><a href="common__harness__generator__options_8h.html#a1b44d423934b159b06c384b0171dd960">COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT</a></div><div class="ttdeci">#define COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT</div><div class="ttdef"><b>Definition:</b> <a href="common__harness__generator__options_8h_source.html#l00015">common_harness_generator_options.h:15</a></div></div>
 <div class="ttc" id="acommon__harness__generator__options_8h_html_a24b5f3fdc0ceae182dd6ab959ea043bd"><div class="ttname"><a href="common__harness__generator__options_8h.html#a24b5f3fdc0ceae182dd6ab959ea043bd">COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT</a></div><div class="ttdeci">#define COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT</div><div class="ttdef"><b>Definition:</b> <a href="common__harness__generator__options_8h_source.html#l00012">common_harness_generator_options.h:12</a></div></div>
@@ -271,14 +276,19 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a24b5f3fdc0ceae182dd6ab959ea043bd">COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                    \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a487b9821f3236035249586d802cc36a4">COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                  \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a1b44d423934b159b06c384b0171dd960">COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                         \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a44ccbfee83291c5c57d8b25f06e14b41">COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                         \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a13549e6e87c239e8afbb1d2d72663185">COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT</a> <span class="stringliteral">&quot;):&quot;</span>           \</div>
-<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#afe751f683763f0decab328310aff771b">COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT</a> <span class="stringliteral">&quot;):&quot;</span>                           \</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a24b5f3fdc0ceae182dd6ab959ea043bd">COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT</a>                         \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a487b9821f3236035249586d802cc36a4">COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT</a>                       \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a1b44d423934b159b06c384b0171dd960">COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT</a>                              \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a44ccbfee83291c5c57d8b25f06e14b41">COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT</a>                              \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#a13549e6e87c239e8afbb1d2d72663185">COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT</a>                \</div>
+<div class="line">  <span class="stringliteral">&quot;):&quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;(&quot;</span> <a class="code" href="common__harness__generator__options_8h.html#afe751f683763f0decab328310aff771b">COMMON_HARNESS_GENERATOR_HAVOC_MEMBER_OPT</a> <span class="stringliteral">&quot;):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="common__harness__generator__options_8h_source.html#l00022">22</a> of file <a class="el" href="common__harness__generator__options_8h_source.html">common_harness_generator_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common__harness__generator__options_8h_source.html#l00021">21</a> of file <a class="el" href="common__harness__generator__options_8h_source.html">common_harness_generator_options.h</a>.</p>
 
 </div>
 </div>

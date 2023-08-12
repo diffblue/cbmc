@@ -170,24 +170,20 @@ always going to be one of these two" </p>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; --&quot;</span> <a class="code" href="restrict__function__pointers_8h.html#a4ab3f221182ebae979a904110cb1dc47">RESTRICT_FUNCTION_POINTER_OPT</a>                                          \</div>
-<div class="line">  <span class="stringliteral">&quot; &lt;pointer_name&gt;/&lt;target[,targets]*&gt;\n&quot;</span>                                      \</div>
-<div class="line">  <span class="stringliteral">&quot;                              restrict a function pointer to a set of &quot;</span>     \</div>
-<div class="line">  <span class="stringliteral">&quot;possible targets\n&quot;</span>                                                         \</div>
-<div class="line">  <span class="stringliteral">&quot;                              targets must all exist in the symbol table&quot;</span>   \</div>
-<div class="line">  <span class="stringliteral">&quot; with a matching type\n&quot;</span>                                                    \</div>
-<div class="line">  <span class="stringliteral">&quot;                              works for globals and function parameters&quot;</span>    \</div>
-<div class="line">  <span class="stringliteral">&quot; right now\n&quot;</span>                                                               \</div>
-<div class="line">  <span class="stringliteral">&quot; --&quot;</span> <a class="code" href="restrict__function__pointers_8h.html#a8768cff5014f7febb7a904374bbdad6b">RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT</a>                                \</div>
-<div class="line">  <span class="stringliteral">&quot; &lt;file_name&gt;\n&quot;</span>                                                             \</div>
-<div class="line">  <span class="stringliteral">&quot;                              add function pointer restrictions from &quot;</span>      \</div>
-<div class="line">  <span class="stringliteral">&quot;file\n&quot;</span>                                                                     \</div>
-<div class="line">  <span class="stringliteral">&quot; --&quot;</span> <a class="code" href="restrict__function__pointers_8h.html#af85602cd437bd9f6429a27b033d7104a">RESTRICT_FUNCTION_POINTER_BY_NAME_OPT</a>                                  \</div>
-<div class="line">  <span class="stringliteral">&quot; &lt;symbol_name&gt;/target[targets]*&gt;\n&quot;</span>                                         \</div>
-<div class="line">  <span class="stringliteral">&quot;                              restrict a function pointer where &quot;</span>           \</div>
-<div class="line">  <span class="stringliteral">&quot; &lt;symbol_name&gt;\n&quot;</span>                                                           \</div>
-<div class="line">  <span class="stringliteral">&quot;                              is the unmangled name, before labelling &quot;</span>     \</div>
-<div class="line">  <span class="stringliteral">&quot;function pointers\n&quot;</span></div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="restrict__function__pointers_8h.html#a4ab3f221182ebae979a904110cb1dc47">RESTRICT_FUNCTION_POINTER_OPT</a>                                        \</div>
+<div class="line">  <span class="stringliteral">&quot;} &quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;{upointer_name}/{utarget[,targets]*} \t &quot;</span>                                   \</div>
+<div class="line">  <span class="stringliteral">&quot;restrict a function pointer to a set of possible targets; targets must &quot;</span>    \</div>
+<div class="line">  <span class="stringliteral">&quot;all exist in the symbol table with a matching type; works for globals &quot;</span>     \</div>
+<div class="line">  <span class="stringliteral">&quot;and function parameters right now\n&quot;</span>                                        \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="restrict__function__pointers_8h.html#a8768cff5014f7febb7a904374bbdad6b">RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT</a>                              \</div>
+<div class="line">  <span class="stringliteral">&quot;} {ufile_name} \t &quot;</span>                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;add function pointer restrictions from file {ufile_name}\n&quot;</span>                 \</div>
+<div class="line">  <span class="stringliteral">&quot; {y--&quot;</span> <a class="code" href="restrict__function__pointers_8h.html#af85602cd437bd9f6429a27b033d7104a">RESTRICT_FUNCTION_POINTER_BY_NAME_OPT</a>                                \</div>
+<div class="line">  <span class="stringliteral">&quot;} &quot;</span>                                                                         \</div>
+<div class="line">  <span class="stringliteral">&quot;{usymbol_name}/{utarget[targets]*} \t &quot;</span>                                     \</div>
+<div class="line">  <span class="stringliteral">&quot;restrict a function pointer where {usymbol_name} is the unmangled &quot;</span>         \</div>
+<div class="line">  <span class="stringliteral">&quot;name, before labelling function pointers\n&quot;</span></div>
 <div class="ttc" id="arestrict__function__pointers_8h_html_a4ab3f221182ebae979a904110cb1dc47"><div class="ttname"><a href="restrict__function__pointers_8h.html#a4ab3f221182ebae979a904110cb1dc47">RESTRICT_FUNCTION_POINTER_OPT</a></div><div class="ttdeci">#define RESTRICT_FUNCTION_POINTER_OPT</div><div class="ttdef"><b>Definition:</b> <a href="restrict__function__pointers_8h_source.html#l00036">restrict_function_pointers.h:36</a></div></div>
 <div class="ttc" id="arestrict__function__pointers_8h_html_a8768cff5014f7febb7a904374bbdad6b"><div class="ttname"><a href="restrict__function__pointers_8h.html#a8768cff5014f7febb7a904374bbdad6b">RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT</a></div><div class="ttdeci">#define RESTRICT_FUNCTION_POINTER_FROM_FILE_OPT</div><div class="ttdef"><b>Definition:</b> <a href="restrict__function__pointers_8h_source.html#l00037">restrict_function_pointers.h:37</a></div></div>
 <div class="ttc" id="arestrict__function__pointers_8h_html_af85602cd437bd9f6429a27b033d7104a"><div class="ttname"><a href="restrict__function__pointers_8h.html#af85602cd437bd9f6429a27b033d7104a">RESTRICT_FUNCTION_POINTER_BY_NAME_OPT</a></div><div class="ttdeci">#define RESTRICT_FUNCTION_POINTER_BY_NAME_OPT</div><div class="ttdef"><b>Definition:</b> <a href="restrict__function__pointers_8h_source.html#l00039">restrict_function_pointers.h:39</a></div></div>
