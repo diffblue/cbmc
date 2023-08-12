@@ -84,29 +84,24 @@ void generate_function_bodies(
   goto_modelt &model,
   message_handlert &message_handler);
 
-// clang-format off
 #define OPT_REPLACE_FUNCTION_BODY \
   "(generate-function-body):" \
   "(generate-havocing-body):" \
   "(generate-function-body-options):"
 
-#define HELP_REPLACE_FUNCTION_BODY \
-  " --generate-function-body <regex>\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              Generate bodies for functions matching regex\n" \
-  " --generate-havocing-body <option>\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              <fun_name>,params:<p_n1;p_n2;..>\n" \
-  "                              or\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              <fun_name>[,<call-site-id>,params:<p_n1;p_n2;..>]+\n" \
-  " --generate-function-body-options <option>\n" \
-  "                              One of assert-false, assume-false,\n" \
-  /* NOLINTNEXTLINE(whitespace/line_length) */ \
-  "                              nondet-return, assert-false-assume-false and\n" \
-  "                              havoc[,params:<regex>][,globals:<regex>]\n" \
-  "                                   [,params:<p_n1;p_n2;..>]\n" \
-  "                              (default: nondet-return)\n"
-// clang-format on
+#define HELP_REPLACE_FUNCTION_BODY                                             \
+  " {y--generate-function-body} {uregex} \t "                                  \
+  "generate bodies for functions matching {uregex}\n"                          \
+  " {y--generate-havocing-body} <option> "                                     \
+  "{ufun_name},{yparams}:{up1};{up2};.. \t "                                   \
+  "generate havocing body\n"                                                   \
+  " {y--generate-havocing-body} <option> "                                     \
+  "{ufun_name}[,{ucall-site-id},{yparams}:{up1};{up2};..]+ \t "                \
+  "generate havocing body\n"                                                   \
+  " {y--generate-function-body-options} {uoption} \t "                         \
+  "One of {yassert-false}, {yassume-false}, {ynondet-return}, "                \
+  "{yassert-false-assume-false} and "                                          \
+  "{yhavoc}[,{yparams}:{uregex}][,{yglobals}:{uregex}]"                        \
+  "[,{yparams}:{up1};{up2};..] (default: {ynondet-return})\n"
 
 #endif // CPROVER_GOTO_PROGRAMS_GENERATE_FUNCTION_BODIES_H

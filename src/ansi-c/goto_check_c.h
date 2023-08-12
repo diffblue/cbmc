@@ -49,29 +49,35 @@ void goto_check_c(
   "(no-assertions)(no-assumptions)"                                            \
   "(assert-to-assume)"
 
-// clang-format off
-#define HELP_GOTO_CHECK \
-  " --bounds-check               enable array bounds checks\n" \
-  " --pointer-check              enable pointer checks\n" /* NOLINT(whitespace/line_length) */ \
-  " --memory-leak-check          enable memory leak checks\n" \
-  " --memory-cleanup-check       enable memory cleanup checks\n" \
-  " --div-by-zero-check          enable division by zero checks\n" \
-  " --signed-overflow-check      enable signed arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */ \
-  " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */  \
-  " --pointer-overflow-check     enable pointer arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */  \
-  " --conversion-check           check whether values can be represented after type cast\n" /* NOLINT(whitespace/line_length) */  \
-  " --undefined-shift-check      check shift greater than bit-width\n" \
-  " --float-overflow-check       check floating-point for +/-Inf\n" \
-  " --nan-check                  check floating-point for NaN\n" \
-  " --enum-range-check           checks that all enum type expressions have values in the enum range\n" /* NOLINT(whitespace/line_length) */ \
-  " --pointer-primitive-check    checks that all pointers in pointer primitives are valid or null\n" /* NOLINT(whitespace/line_length) */ \
-  " --retain-trivial-checks      include checks that are trivially true\n" \
-  " --error-label label          check that label is unreachable\n" \
-  " --no-built-in-assertions     ignore assertions in built-in library\n" \
-  " --no-assertions              ignore user assertions\n" \
-  " --no-assumptions             ignore user assumptions\n" \
-  " --assert-to-assume           convert user assertions to assumptions\n" \
+#define HELP_GOTO_CHECK                                                        \
+  " {y--bounds-check} \t enable array bounds checks\n"                         \
+  " {y--pointer-check} \t enable pointer checks\n"                             \
+  " {y--memory-leak-check} \t enable memory leak checks\n"                     \
+  " {y--memory-cleanup-check} \t enable memory cleanup checks\n"               \
+  " {y--div-by-zero-check} \t enable division by zero checks\n"                \
+  " {y--signed-overflow-check} \t "                                            \
+  "enable signed arithmetic over- and underflow checks\n"                      \
+  " {y--unsigned-overflow-check} \t "                                          \
+  "enable arithmetic over- and underflow checks\n"                             \
+  " {y--pointer-overflow-check} \t "                                           \
+  "enable pointer arithmetic over- and underflow checks\n"                     \
+  " {y--conversion-check} \t "                                                 \
+  "check whether values can be represented after type cast\n"                  \
+  " {y--undefined-shift-check} \t check shift greater than bit-width"          \
+  " {y--float-overflow-check} \t check floating-point for +/-Inf\n"            \
+  " {y--nan-check} \t check floating-point for NaN\n"                          \
+  " {y--enum-range-check} \t "                                                 \
+  "checks that all enum type expressions have values in the enum range\n"      \
+  " {y--pointer-primitive-check} \t "                                          \
+  "checks that all pointers in pointer primitives are valid or null\n"         \
+  " {y--retain-trivial-checks} \t include checks that are trivially true\n"    \
+  " {y--error-label} {ulabel} \t check that label {ulabel} is unreachable\n"   \
+  " {y--no-built-in-assertions} \t ignore assertions in built-in library\n"    \
+  " {y--no-assertions} \t ignore user assertions\n"                            \
+  " {y--no-assumptions} \t ignore user assumptions\n"                          \
+  " {y--assert-to-assume} \t convert user assertions to assumptions\n"
 
+// clang-format off
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
   options.set_option("bounds-check", cmdline.isset("bounds-check")); \
   options.set_option("pointer-check", cmdline.isset("pointer-check")); \

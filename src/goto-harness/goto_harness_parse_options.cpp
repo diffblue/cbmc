@@ -11,6 +11,7 @@ Author: Diffblue Ltd.
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/suffix.h>
@@ -172,32 +173,35 @@ int goto_harness_parse_optionst::doit()
 
 void goto_harness_parse_optionst::help()
 {
-  std::cout
-    << '\n'
-    << banner_string("Goto-Harness", CBMC_VERSION) << '\n'
-    << align_center_with_border("Copyright (C) 2019") << '\n'
-    << align_center_with_border("Diffblue Ltd.") << '\n'
-    << align_center_with_border("info@diffblue.com") << '\n'
-    << '\n'
-    << "Usage:                       Purpose:\n"
-    << '\n'
-    << " goto-harness [-?] [-h] [--help]  show help\n"
-    << " goto-harness --version           show version\n"
-    << " goto-harness <in> <out> --harness-function-name <name> --harness-type "
-       "<harness-type> [harness options]\n"
-    << "\n"
-    << "<in>                       goto binary to read from\n"
-    << "<out>                      file to write the harness to\n"
-    << "                           the harness is printed as C code, if <out> "
-       "has a .c suffix,\n"
-       "                           else a goto binary including the harness is "
-       "generated\n"
-    << "--harness-function-name    the name of the harness function to "
-       "generate\n"
-    << "--harness-type             one of the harness types listed below\n"
-    << "\n\n"
-    << FUNCTION_HARNESS_GENERATOR_HELP << "\n\n"
-    << MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP << '\n';
+  std::cout << '\n'
+            << banner_string("Goto-Harness", CBMC_VERSION) << '\n'
+            << align_center_with_border("Copyright (C) 2019") << '\n'
+            << align_center_with_border("Diffblue Ltd.") << '\n'
+            << align_center_with_border("info@diffblue.com") << '\n';
+
+  // clang-format off
+  std::cout << help_formatter(
+    "\n"
+    "Usage:                     \tPurpose:\n"
+    "\n"
+    " {bgoto-harness} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bgoto-harness} {y--version} \t show version and exit\n"
+    " {bgoto-harness} {uin} {uout} {y--harness-function-name} {uname}"
+    " {y--harness-type} {uharness-type} [harness options]\n"
+    "\n"
+    "  {uin} \t goto binary to read from\n"
+    "  {uout} \t file to write the harness to; the harness is printed as C"
+    " code, if {uout} has a .c suffix, else a goto binary including the harness"
+    " is generated\n"
+    " {y--harness-function-name} {uname} \t the name of the harness function to"
+    " generate\n"
+    " {y--harness-type} {utype} \t one of the harness types listed below\n"
+    "\n"
+    FUNCTION_HARNESS_GENERATOR_HELP
+    "\n"
+    MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP
+    "\n");
+  // clang-format on
 }
 
 goto_harness_parse_optionst::goto_harness_parse_optionst(

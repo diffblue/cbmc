@@ -30,15 +30,12 @@ class optionst;
   "(" NONDET_VOLATILE_MODEL_OPT "):"
 
 #define HELP_NONDET_VOLATILE \
-  help_entry( \
-    "--" NONDET_VOLATILE_OPT, \
-    "makes reads from volatile variables non-deterministic") << \
-  help_entry( \
-    "--" NONDET_VOLATILE_VARIABLE_OPT " <variable>", \
-    "makes reads from given volatile variable non-deterministic") << \
-  help_entry( \
-    "--" NONDET_VOLATILE_MODEL_OPT " <variable>:<model>", \
-    "models reads from given volatile variable by a call to the given model")
+  " {y--" NONDET_VOLATILE_OPT "} \t " \
+  "makes reads from volatile variables non-deterministic\n" \
+  " {y--" NONDET_VOLATILE_VARIABLE_OPT "} {uvariable} \t " \
+  "makes reads from given volatile variable non-deterministic\n" \
+  " {y--" NONDET_VOLATILE_MODEL_OPT "} {uvariable}:{umodel} \t " \
+  "models reads from given volatile variable by a call to the given model\n" \
 // clang-format on
 
 void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options);

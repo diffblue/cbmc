@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/options.h>
 #include <util/version.h>
 
@@ -720,61 +721,59 @@ void janalyzer_parse_optionst::help()
   std::cout << '\n' << banner_string("JANALYZER", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2016-2018") << '\n'
             << align_center_with_border("Daniel Kroening, Diffblue") << '\n'
-            << align_center_with_border("kroening@kroening.com") << '\n'
-            <<
+            << align_center_with_border("kroening@kroening.com") << '\n';
+
+  std::cout << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    " janalyzer [-?] [-h] [--help] show help\n"
-    " janalyzer\n"
+    " {bjanalyzer} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bjanalyzer}\n"
     HELP_JAVA_METHOD_NAME
-    " janalyzer\n"
+    " {bjanalyzer}\n"
     HELP_JAVA_CLASS_NAME
-    " janalyzer\n"
+    " {bjanalyzer}\n"
     HELP_JAVA_JAR
-    " janalyzer\n"
+    " {bjanalyzer}\n"
     HELP_JAVA_GOTO_BINARY
     "\n"
     HELP_JAVA_CLASSPATH
     HELP_FUNCTIONS
     "\n"
     "Task options:\n"
-    " --show                       display the abstract domains\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --verify                     use the abstract domains to check assertions\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --simplify file_name         use the abstract domains to simplify the program\n"
-    " --no-simplify-slicing        do not remove instructions from which no\n"
-    "                              property can be reached (use with --simplify)\n" // NOLINT(*)
-    " --unreachable-instructions   list dead code\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --unreachable-functions      list functions unreachable from the entry point\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --reachable-functions        list functions reachable from the entry point\n"
+    " {y--show} \t display the abstract domains\n"
+    " {y--verify} \t use the abstract domains to check assertions\n"
+    " {y--simplify} {ufile_name} \t use the abstract domains to simplify the"
+    " program\n"
+    " {y--no-simplify-slicing} \t do not remove instructions from which no"
+    " property can be reached (use with {y--simplify})\n"
+    " {y--unreachable-instructions} \t list dead code\n"
+    " {y--unreachable-functions} \t list functions unreachable from the entry"
+    " point"
+    " {y--reachable-functions} \t list functions reachable from the entry point"
     "\n"
     "Abstract interpreter options:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --location-sensitive         use location-sensitive abstract interpreter\n"
-    " --concurrent                 use concurrency-aware abstract interpreter\n"
+    " {y--location-sensitive} \t use location-sensitive abstract interpreter"
+    " {y--concurrent} \t use concurrency-aware abstract interpreter\n"
     "\n"
     "Domain options:\n"
-    " --constants                  constant domain\n"
-    " --intervals                  interval domain\n"
-    " --non-null                   non-null domain\n"
-    " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
+    " {y--constants} \t constant domain\n"
+    " {y--intervals} \t interval domain\n"
+    " {y--non-null} \t non-null domain\n"
+    " {y--dependence-graph} \t data and control dependencies between"
+    " instructions"
     "\n"
     "Output options:\n"
-    " --text file_name             output results in plain text to given file\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --json file_name             output results in JSON format to given file\n"
-    " --xml file_name              output results in XML format to given file\n"
-    " --dot file_name              output results in DOT format to given file\n"
+    " {y--text} {ufile_name} \t output results in plain text to given file\n"
+    " {y--json} {ufile_name} \t output results in JSON format to given file\n"
+    " {y--xml} {ufile_name} \t output results in XML format to given file\n"
+    " {y--dot} {ufile_name} \t output results in DOT format to given file\n"
     "\n"
     "Specific analyses:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --taint file_name            perform taint analysis using rules in given file\n"
-    " --show-taint                 print taint analysis results on stdout\n"
-    " --show-local-may-alias       perform procedure-local may alias analysis\n"
+    " {y--taint} {ufile_name} \t perform taint analysis using rules in given"
+    " file\n"
+    " {y--show-taint} \t print taint analysis results on stdout\n"
+    " {y--show-local-may-alias} \t perform procedure-local may alias analysis\n"
     "\n"
     "Java Bytecode frontend options:\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
@@ -783,20 +782,20 @@ void janalyzer_parse_optionst::help()
     HELP_CONFIG_PLATFORM
     "\n"
     "Program representations:\n"
-    " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show loaded symbol table\n"
+    " {y--show-parse-tree} \t show parse tree\n"
+    " {y--show-symbol-table} \t show loaded symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
     HELP_SHOW_PROPERTIES
     "\n"
     "Program instrumentation options:\n"
-    " --no-assertions              ignore user assertions\n"
-    " --no-assumptions             ignore user assumptions\n"
-    " --property id                enable selected properties only\n"
+    " {y--no-assertions} \t ignore user assertions\n"
+    " {y--no-assumptions} \t ignore user assumptions\n"
+    " {y--property} {uid} \t enable selected properties only\n"
     "\n"
     "Other options:\n"
-    " --version                    show version and exit\n"
-    " --verbosity #                verbosity level\n"
+    " {y--version} \t show version and exit\n"
+    " {y--verbosity {u#} \t verbosity level\n"
     HELP_TIMESTAMP
-    "\n";
+    "\n");
   // clang-format on
 }

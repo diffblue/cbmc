@@ -37,14 +37,12 @@ class message_handlert;
 /// \endcode
 void json_interface(cmdlinet &, message_handlert &);
 
-// clang-format off
 #define OPT_JSON_INTERFACE \
   "(json-ui)" \
   "(json-interface)"
 
-#define HELP_JSON_INTERFACE \
-  " --json-ui                    use JSON-formatted output\n" \
-  " --json-interface             bi-directional JSON interface\n"
-// clang-format on
+#define HELP_JSON_INTERFACE                                                    \
+  " {y--json-ui} \t use JSON-formatted output\n"                               \
+  " {y--json-interface} \t bi-directional JSON interface\n"
 
 #endif // CPROVER_JSON_JSON_INTERFACE_H

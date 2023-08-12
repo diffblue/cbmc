@@ -56,6 +56,7 @@ protected:
 #define OPT_REPLACE_CALLS "(replace-calls):"
 
 #define HELP_REPLACE_CALLS                                                     \
-  " --replace-calls f:g          replace calls to f with calls to g\n"
+  " {y--replace-calls} {uf}:{ug} \t replace calls to {uf} with calls to "      \
+  "{ug}\n"
 
 #endif // CPROVER_GOTO_PROGRAMS_REPLACE_CALLS_H

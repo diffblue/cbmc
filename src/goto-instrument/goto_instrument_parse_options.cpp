@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/json.h>
 #include <util/options.h>
 #include <util/string2int.h>
@@ -1856,143 +1857,158 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 /// display command line help
 void goto_instrument_parse_optionst::help()
 {
-  // clang-format off
-  std::cout << '\n' << banner_string("Goto-Instrument", CBMC_VERSION) << '\n'
+  std::cout << '\n'
+            << banner_string("Goto-Instrument", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2008-2013") << '\n'
             << align_center_with_border("Daniel Kroening") << '\n'
-            << align_center_with_border("kroening@kroening.com") << '\n'
-            <<
+            << align_center_with_border("kroening@kroening.com") << '\n';
+
+  // clang-format off
+  std::cout << help_formatter(
     "\n"
-    "Usage:                       Purpose:\n"
+    "Usage:                     \tPurpose:\n"
     "\n"
-    " goto-instrument [-?] [-h] [--help]  show help\n"
-    " goto-instrument --version           show version and exit\n"
-    " goto-instrument [options] in [out]  perform analysis or instrumentation\n"
+    " {bgoto-instrument} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bgoto-instrument} {y--version} \t show version and exit\n"
+    " {bgoto-instrument} [options] {uin} [{uout}] \t perform analysis or"
+    " instrumentation\n"
     "\n"
     "Dump Source:\n"
     HELP_DUMP_C
-    " --horn                       print program as constrained horn clauses\n"
+    " {y--horn} \t print program as constrained horn clauses\n"
     "\n"
     "Diagnosis:\n"
     HELP_SHOW_PROPERTIES
     HELP_DOCUMENT_PROPERTIES
-    " --show-symbol-table          show loaded symbol table\n"
-    " --list-symbols               list symbols with type information\n"
+    " {y--show-symbol-table} \t show loaded symbol table\n"
+    " {y--list-symbols} \t list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
     HELP_GOTO_PROGRAM_STATS
-    " --show-locations             show all source locations\n"
-    " --dot                        generate CFG graph in DOT format\n"
-    " --print-internal-representation\n" // NOLINTNEXTLINE(*)
-    "                              show verbose internal representation of the program\n"
-    " --list-undefined-functions   list functions without body\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --list-calls-args            list all function calls with their arguments\n"
-    " --call-graph                 show graph of function calls\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --reachable-call-graph       show graph of function calls potentially reachable from main function\n"
+    " {y--show-locations} \t show all source locations\n"
+    " {y--dot} \t generate CFG graph in DOT format\n"
+    " {y--print-internal-representation} \t show verbose internal"
+    " representation of the program\n"
+    " {y--list-undefined-functions} \t list functions without body\n"
+    " {y--list-calls-args} \t list all function calls with their arguments\n"
+    " {y--call-graph} \t show graph of function calls\n"
+    " {y--reachable-call-graph} \t show graph of function calls potentially"
+    " reachable from main function\n"
     HELP_SHOW_CLASS_HIERARCHY
     HELP_VALIDATE
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --validate-goto-binary       check the well-formedness of the passed in goto\n"
-    "                              binary and then exit\n"
-    " --interpreter                do concrete execution\n"
+    " {y--validate-goto-binary} \t check the well-formedness of the passed in"
+    " goto binary and then exit\n"
+    " {y--interpreter} \t do concrete execution\n"
     "\n"
     "Data-flow analyses:\n"
-    " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --show-threaded              show instructions that may be executed by more than one thread\n"
-    " --show-local-safe-pointers   show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
-    " --show-safe-dereferences     show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
-    "                              *and* used as a dereference operand\n" // NOLINT(*)
-    " --show-value-sets            show points-to information (using value sets)\n" // NOLINT(*)
-    " --show-global-may-alias      show may-alias information over globals\n"
-    " --show-local-bitvector-analysis\n"
-    "                              show procedure-local pointer analysis\n"
-    " --escape-analysis            perform escape analysis\n"
-    " --show-escape-analysis       show results of escape analysis\n"
-    " --custom-bitvector-analysis  perform configurable bitvector analysis\n"
-    " --show-custom-bitvector-analysis\n"
-    "                              show results of configurable bitvector analysis\n" // NOLINT(*)
-    " --interval-analysis          perform interval analysis\n"
-    " --show-intervals             show results of interval analysis\n"
-    " --show-uninitialized         show maybe-uninitialized variables\n"
-    " --show-points-to             show points-to information\n"
-    " --show-rw-set                show read-write sets\n"
-    " --show-call-sequences        show function call sequences\n"
-    " --show-reaching-definitions  show reaching definitions\n"
-    " --show-dependence-graph      show program-dependence graph\n"
-    " --show-sese-regions          show single-entry-single-exit regions\n"
+    " {y--show-struct-alignment} \t show struct members that might be"
+    " concurrently accessed\n"
+    " {y--show-threaded} \t show instructions that may be executed by more than"
+    " one thread\n"
+    " {y--show-local-safe-pointers} \t show pointer expressions that are"
+    " trivially dominated by a not-null check\n"
+    " {y--show-safe-dereferences} \t show pointer expressions that are"
+    " trivially dominated by a not-null check *and* used as a dereference"
+    " operand\n"
+    " {y--show-value-sets} \t show points-to information (using value sets)\n"
+    " {y--show-global-may-alias} \t show may-alias information over globals\n"
+    " {y--show-local-bitvector-analysis} \t show procedure-local pointer"
+    " analysis\n"
+    " {y--escape-analysis} \t perform escape analysis\n"
+    " {y--show-escape-analysis} \t show results of escape analysis\n"
+    " {y--custom-bitvector-analysis} \t perform configurable bitvector"
+    " analysis\n"
+    " {y--show-custom-bitvector-analysis} \t show results of configurable"
+    " bitvector analysis\n"
+    " {y--interval-analysis} \t perform interval analysis\n"
+    " {y--show-intervals} \t show results of interval analysis\n"
+    " {y--show-uninitialized} \t show maybe-uninitialized variables\n"
+    " {y--show-points-to} \t show points-to information\n"
+    " {y--show-rw-set} \t show read-write sets\n"
+    " {y--show-call-sequences} \t show function call sequences\n"
+    " {y--show-reaching-definitions} \t show reaching definitions\n"
+    " {y--show-dependence-graph} \t show program-dependence graph\n"
+    " {y--show-sese-regions} \t show single-entry-single-exit regions\n"
     "\n"
     "Safety checks:\n"
-    " --no-assertions              ignore user assertions\n"
+    " {y--no-assertions} \t ignore user assertions\n"
     HELP_GOTO_CHECK
     HELP_UNINITIALIZED_CHECK
-    " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n" // NOLINT(*)
-    " --race-check                 add floating-point data race checks\n"
+    " {y--stack-depth} {un} \t add check that call stack size of non-inlined"
+    " functions never exceeds {un}\n"
+    " {y--race-check} \t add floating-point data race checks\n"
     "\n"
     "Semantic transformations:\n"
-    << HELP_NONDET_VOLATILE <<
-    " --isr <function>             instruments an interrupt service routine\n"
-    " --mmio                       instruments memory-mapped I/O\n"
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
-    " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
-    "                              (use multiple times if required)\n"
-    " --nondet-static-matching r   add nondeterministic initialization of variables\n" // NOLINT(*)
-    "                              with static lifetime matching regex r\n"
-    " --function-enter <f>, --function-exit <f>, --branch <f>\n"
-    "                              instruments a call to <f> at the beginning,\n" // NOLINT(*)
-    "                              the exit, or a branch point, respectively\n"
-    " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
-    " --check-call-sequence <seq>  instruments checks to assert that all call\n"
-    "                              sequences match <seq>\n"
-    " --undefined-function-is-assume-false\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "                              convert each call to an undefined function to assume(false)\n"
+    HELP_NONDET_VOLATILE
+    " {y--isr} {ufunction} \t instruments an interrupt service routine\n"
+    " {y--mmio} \t instruments memory-mapped I/O\n"
+    " {y--nondet-static} \t add nondeterministic initialization of variables"
+    " with static lifetime\n"
+    " {y--nondet-static-exclude} {ue} \t same as nondet-static except for the"
+    " variable {ue} (use multiple times if required)\n"
+    " {y--nondet-static-matching} {ur} \t add nondeterministic initialization"
+    " of variables with static lifetime matching regex {ur}\n"
+    " {y--function-enter} {uf}, {y--function-exit} {uf}, {y--branch} {uf} \t"
+    " instruments a call to {uf} at the beginning, the exit, or a branch point,"
+    " respectively\n"
+    " {y--splice-call} {ucaller},{ucallee} \t prepends a call to {ucallee} in"
+    " the body of {ucaller}\n"
+    " {y--check-call-sequence} {useq} \t instruments checks to assert that all"
+    " call sequences match {useq}\n"
+    " {y--undefined-function-is-assume-false} \t convert each call to an"
+    " undefined function to assume(false)\n"
     HELP_INSERT_FINAL_ASSERT_FALSE
     HELP_REPLACE_FUNCTION_BODY
     HELP_RESTRICT_FUNCTION_POINTER
     HELP_REMOVE_CALLS_NO_BODY
-    " --add-library                add models of C library functions\n"
+    " {y--add-library} \t add models of C library functions\n"
     HELP_CONFIG_LIBRARY
-    " --model-argc-argv <n>        model up to <n> command line arguments\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
+    " {y--model-argc-argv} {un} \t model up to {un} command line arguments\n"
+    " {y--remove-function-body} {uf} remove the implementation of function {uf}"
+    " (may be repeated)\n"
     HELP_REPLACE_CALLS
     HELP_ANSI_C_LANGUAGE
     "\n"
     "Semantics-preserving transformations:\n"
-    " --ensure-one-backedge-per-target\n"
-    "                              transform loop bodies such that there is a\n"
-    "                              single edge back to the loop head\n"
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
+    " {y--ensure-one-backedge-per-target} \t transform loop bodies such that"
+    " there is a single edge back to the loop head\n"
+    " {y--drop-unused-functions} \t drop functions trivially unreachable from"
+    " main function\n"
     HELP_REMOVE_POINTERS
-    " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)
-    " --inline                     perform full inlining\n"
-    " --partial-inline             perform partial inlining\n"
-    " --function-inline <function> transitively inline all calls <function> makes\n" // NOLINT(*)
-    " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
-    " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
-    " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
+    " {y--constant-propagator} \t propagate constants and simplify"
+    " expressions\n"
+    " {y--inline} \t perform full inlining\n"
+    " {y--partial-inline} \t perform partial inlining\n"
+    " {y--function-inline} {ufunction} \t transitively inline all calls"
+    " {ufunction} makes\n"
+    " {y--no-caching} \t disable caching of intermediate results during"
+    " transitive function inlining\n"
+    " {y--log} {ufile} \t log in JSON format which code segments were inlined,"
+    " use with {y--function-inline}\n"
+    " {y--remove-function-pointers} \t replace function pointers by case"
+    " statement over function calls\n"
     HELP_REMOVE_CONST_FUNCTION_POINTERS
-    " --value-set-fi-fp-removal    build flow-insensitive value set and replace function pointers by a case statement\n" // NOLINT(*)
-    "                              over the possible assignments. If the set of possible assignments is empty the function pointer\n" // NOLINT(*)
-    "                              is removed using the standard remove-function-pointers pass. \n" // NOLINT(*)
+    " {y--value-set-fi-fp-removal} \t build flow-insensitive value set and"
+    " replace function pointers by a case statement over the possible"
+    " assignments. If the set of possible assignments is empty the function"
+    " pointer is removed using the standard remove-function-pointers pass.\n"
     "\n"
     "Loop information and transformations:\n"
     HELP_UNWINDSET
-    " --unwindset-file <file>      read unwindset from file\n"
-    " --partial-loops              permit paths with partial loops\n"
-    " --unwinding-assertions       generate unwinding assertions\n"
-    " --continue-as-loops          add loop for remaining iterations after unwound part\n" // NOLINT(*)
-    " --k-induction <k>            check loops with k-induction\n"
-    " --step-case                  k-induction: do step-case\n"
-    " --base-case                  k-induction: do base-case\n"
-    " --havoc-loops                over-approximate all loops\n"
-    " --accelerate                 add loop accelerators\n"
-    " --z3                         use Z3 when computing loop accelerators\n"
-    " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
-    " --show-lexical-loops         show single-entry-single-back-edge loops\n"
-    " --show-natural-loops         show natural loop heads\n"
+    " {y--unwindset-file_<file>} \t read unwindset from file\n"
+    " {y--partial-loops} \t permit paths with partial loops\n"
+    " {y--unwinding-assertions} \t generate unwinding assertions\n"
+    " {y--continue-as-loops} \t add loop for remaining iterations after"
+    " unwound part\n"
+    " {y--k-induction} {uk} \t check loops with k-induction\n"
+    " {y--step-case} \t k-induction: do step-case\n"
+    " {y--base-case} \t k-induction: do base-case\n"
+    " {y--havoc-loops} \t over-approximate all loops\n"
+    " {y--accelerate} \t add loop accelerators\n"
+    " {y--z3} \t use Z3 when computing loop accelerators\n"
+    " {y--skip-loops {uloop-ids} \t add gotos to skip selected loops during"
+    " execution\n"
+    " {y--show-lexical-loops} \t show single-entry-single-back-edge loops\n"
+    " {y--show-natural-loops} \t show natural loop heads\n"
     "\n"
     "Memory model instrumentations:\n"
     HELP_WMM_FULL
@@ -2000,20 +2016,22 @@ void goto_instrument_parse_optionst::help()
     "Slicing:\n"
     HELP_REACHABILITY_SLICER
     HELP_FP_REACHABILITY_SLICER
-    " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
-    " --property id                slice with respect to specific property only\n" // NOLINT(*)
-    " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)
-    " --aggressive-slice           remove bodies of any functions not on the shortest path between\n" // NOLINT(*)
-    "                              the start function and the function containing the property(s)\n" // NOLINT(*)
-    " --aggressive-slice-call-depth <n>\n"
-    "                              used with aggressive-slice, preserves all functions within <n> function calls\n" // NOLINT(*)
-    "                              of the functions on the shortest path\n"
-    " --aggressive-slice-preserve-function <f>\n"
-    "                              force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
-    " --aggressive-slice-preserve-functions-containing <f>\n"
-    "                              force the aggressive slicer to preserve all functions with names containing <f>\n" // NOLINT(*)
-    " --aggressive-slice-preserve-all-direct-paths \n"
-    "                              force aggressive slicer to preserve all direct paths\n" // NOLINT(*)
+    " {y--full-slice} \t slice away instructions that don't affect assertions\n"
+    " {y--property} {uid} \t slice with respect to specific property only\n"
+    " {y--slice-global-inits} \t slice away initializations of unused global"
+    " variables\n"
+    " {y--aggressive-slice} \t remove bodies of any functions not on the"
+    " shortest path between the start function and the function containing the"
+    " property/properties\n"
+    " {y--aggressive-slice-call-depth} {un} \t used with aggressive-slice,"
+    " preserves all functions within {un} function calls of the functions on"
+    " the shortest path\n"
+    " {y--aggressive-slice-preserve-function} {uf} \t force the aggressive"
+    " slicer to preserve function {uf}\n"
+    " {y--aggressive-slice-preserve-functions-containing} {uf} \t force the"
+    " aggressive slicer to preserve all functions with names containing {uf}\n"
+    " {y--aggressive-slice-preserve-all-direct-paths} \t force aggressive"
+    " slicer to preserve all direct paths\n"
     "\n"
     "Code contracts:\n"
     HELP_DFCC
@@ -2026,11 +2044,11 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "User-interface options:\n"
     HELP_FLUSH
-    " --xml                        output files in XML where supported\n"
-    " --xml-ui                     use XML-formatted output\n"
-    " --json-ui                    use JSON-formatted output\n"
-    " --verbosity #                verbosity level\n"
+    " {y--xml} \t output files in XML where supported\n"
+    " {y--xml-ui} \t use XML-formatted output\n"
+    " {y--json-ui} \t use JSON-formatted output\n"
+    " {y--verbosity} {u#} \t verbosity level\n"
     HELP_TIMESTAMP
-    "\n";
+    "\n");
   // clang-format on
 }

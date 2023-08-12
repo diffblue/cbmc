@@ -48,15 +48,13 @@ void dump_cpp(
   "(dump-c-type-header):"                                                      \
   "(no-system-headers)(use-all-headers)(harness)"
 
-// clang-format off
 #define HELP_DUMP_C                                                            \
-    " --dump-c                     generate C source\n"                        \
-    " --dump-c-type-header m       generate a C header for types local in m\n" \
-    " --dump-cpp                   generate C++ source\n"                      \
-    " --no-system-headers          generate C source expanding libc includes\n"\
-    " --use-all-headers            generate C source with all includes\n"      \
-    " --harness                    include input generator in output\n"
-
-// clang-format on
+  " {y--dump-c} \t generate C source\n"                                        \
+  " {y--dump-c-type-header} {um} \t "                                          \
+  "generate a C header for types local in {um}\n"                              \
+  " {y--dump-cpp} \t generate C++ source\n"                                    \
+  " {y--no-system-headers} \t generate C source expanding libc includes\n"     \
+  " {y--use-all-headers} \t generate C source with all includes\n"             \
+  " {y--harness} \t include input generator in output\n"
 
 #endif // CPROVER_GOTO_INSTRUMENT_DUMP_C_H

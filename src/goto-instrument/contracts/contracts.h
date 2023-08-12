@@ -29,32 +29,28 @@ Date: February 2016
 #include <string>
 #include <unordered_set>
 
-// clang-format off
 #define FLAG_LOOP_CONTRACTS "apply-loop-contracts"
 #define HELP_LOOP_CONTRACTS                                                    \
-  " --apply-loop-contracts\n"                                                  \
-  "                              check and use loop contracts when provided\n"
+  " {y--apply-loop-contracts} \t check and use loop contracts when provided\n"
 
 #define FLAG_LOOP_CONTRACTS_NO_UNWIND "loop-contracts-no-unwind"
 #define HELP_LOOP_CONTRACTS_NO_UNWIND                                          \
-  " --loop-contracts-no-unwind\n"                                              \
-  "                              do not unwind transformed loops\n"
+  " {y--loop-contracts-no-unwind} \t do not unwind transformed loops\n"
 
 #define FLAG_LOOP_CONTRACTS_FILE "loop-contracts-file"
 #define HELP_LOOP_CONTRACTS_FILE                                               \
-  " --loop-contracts-file <file>\n"                                            \
-  "                              parse and annotate loop contracts from files\n"
+  " {y--loop-contracts-file} {ufile} \t "                                      \
+  "parse and annotate loop contracts from files\n"
 
 #define FLAG_REPLACE_CALL "replace-call-with-contract"
 #define HELP_REPLACE_CALL                                                      \
-  " --replace-call-with-contract <function>[/contract]\n"                      \
-  "                              replace calls to function with contract\n"
+  " {y--replace-call-with-contract} {ufunction}[/{ucontract}] \t "             \
+  "replace calls to {ufunction} with {ucontract}\n"
 
 #define FLAG_ENFORCE_CONTRACT "enforce-contract"
 #define HELP_ENFORCE_CONTRACT                                                  \
-  " --enforce-contract <function>[/contract]"                                  \
-  "                              wrap function with an assertion of contract\n"
-// clang-format on
+  " {y--enforce-contract} {ufunction}[/{ucontract}] \t "                       \
+  "wrap function with an assertion of contract\n"
 
 class local_may_aliast;
 

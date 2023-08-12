@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/exit_codes.h>
+#include <util/help_formatter.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/version.h>
@@ -960,18 +961,20 @@ void jbmc_parse_optionst::help()
             << align_center_with_border("Copyright (C) 2001-2018") << '\n'
             << align_center_with_border("Daniel Kroening, Edmund Clarke") << '\n' // NOLINT(*)
             << align_center_with_border("Carnegie Mellon University, Computer Science Department") << '\n' // NOLINT(*)
-            << align_center_with_border("kroening@kroening.com") << '\n'
-            << "\n"
-    "Usage:                       Purpose:\n"
+            << align_center_with_border("kroening@kroening.com") << '\n';
+
+  std::cout << help_formatter(
     "\n"
-    " jbmc [-?] [-h] [--help]      show help\n"
-    " jbmc\n"
+    "Usage:                     \tPurpose:\n"
+    "\n"
+    " {bjbmc} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bjbmc}\n"
     HELP_JAVA_METHOD_NAME
-    " jbmc\n"
+    " {bjbmc}\n"
     HELP_JAVA_CLASS_NAME
-    " jbmc\n"
+    " {bjbmc}\n"
     HELP_JAVA_JAR
-    " jbmc\n"
+    " {bjbmc}\n"
     HELP_JAVA_GOTO_BINARY
     "\n"
     HELP_JAVA_CLASSPATH
@@ -979,49 +982,50 @@ void jbmc_parse_optionst::help()
     "\n"
     "Analysis options:\n"
     HELP_SHOW_PROPERTIES
-    " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
-    " --property id                only check one specific property\n"
-    " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
-    " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
-    "                              (implies --trace)\n"
-    " --localize-faults            localize faults (experimental)\n"
+    " {y--symex-coverage-report} {uf} \t generate a Cobertura XML coverage"
+    " report in {uf}\n"
+    " {y--property} {uid} \t only check one specific property\n"
+    " {y--trace} \t give a counterexample trace for failed properties\n"
+    " {y--stop-on-fail} \t stop analysis once a failed property is detected"
+    " (implies {y--trace})\n"
+    " {y--localize-faults} \t localize faults (experimental)\n"
     HELP_JAVA_TRACE_VALIDATION
     "\n"
     "Platform options:\n"
     HELP_CONFIG_PLATFORM
     "\n"
     "Program representations:\n"
-    " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show loaded symbol table\n"
-    " --list-symbols               list symbols with type information\n"
+    " {y--show-parse-tree} \t show parse tree\n"
+    " {y--show-symbol-table} \t show loaded symbol table\n"
+    " {y--list-symbols} \t list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
-    " --drop-unused-functions      drop functions trivially unreachable\n"
-    "                              from main function\n"
+    " {y--drop-unused-functions} \t drop functions trivially unreachable"
+    " from main function\n"
     HELP_SHOW_CLASS_HIERARCHY
     "\n"
     "Program instrumentation options:\n"
-    " --no-assertions              ignore user assertions\n"
-    " --no-assumptions             ignore user assumptions\n"
-    " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
+    " {y--no-assertions} \t ignore user assertions\n"
+    " {y--no-assumptions} \t ignore user assumptions\n"
+    " {y--mm} {uMM} \t memory consistency model for concurrent programs\n"
     HELP_REACHABILITY_SLICER
-    " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
+    " {y--full-slice} \t run full slicer (experimental)\n"
     "\n"
     "Java Bytecode frontend options:\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     // This one is handled by jbmc_parse_options not by the Java frontend,
     // hence its presence here:
-    " --java-threading             enable java multi-threading support (experimental)\n" // NOLINT(*)
-    " --java-unwind-enum-static    unwind loops in static initialization of enums\n" // NOLINT(*)
-    // Currently only supported in the JBMC frontend:
-    " --symex-driven-lazy-loading  only load functions when first entered by symbolic\n" // NOLINT(*)
-    "                              execution. Note that --show-symbol-table,\n"
-    "                              --show-goto-functions/properties output\n"
-    "                              will be restricted to loaded methods in this case,\n" // NOLINT(*)
-    "                              and only output after the symex phase.\n"
+    " {y--java-threading} \t enable java multi-threading support"
+    " (experimental)\n"
+    " {y--java-unwind-enum-static} \t unwind loops in static initialization of"
+    " enums\n"
+    " {y--symex-driven-lazy-loading} \t only load functions when first entered"
+    " by symbolic execution. Note that {y--show-symbol-table},"
+    " {y--show-goto-functions}, {y--show-properties} output will be restricted"
+    " to loaded methods in this case, and only output after the symex phase.\n"
     "\n"
     "Semantic transformations:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
+    " {y--nondet-static} \t add nondeterministic initialization of variables"
+    " with static lifetime\n"
     "\n"
     "BMC options:\n"
     HELP_BMC
@@ -1030,18 +1034,19 @@ void jbmc_parse_optionst::help()
     HELP_CONFIG_BACKEND
     HELP_SOLVER
     HELP_STRING_REFINEMENT
-    " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
-    " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
+    " {y--arrays-uf-never} \t never turn arrays into uninterpreted functions\n"
+    " {y--arrays-uf-always} \t always turn arrays into uninterpreted"
+    " functions\n"
     "\n"
     "Other options:\n"
-    " --version                    show version and exit\n"
+    " {y--version} \t show version and exit\n"
     HELP_XML_INTERFACE
     HELP_JSON_INTERFACE
     HELP_VALIDATE
     HELP_GOTO_TRACE
     HELP_FLUSH
-    " --verbosity #                verbosity level\n"
+    " {y--verbosity} {u#} \t verbosity level\n"
     HELP_TIMESTAMP
-    "\n";
+    "\n");
   // clang-format on
 }

@@ -11,10 +11,10 @@
 #else
 #define OPT_TIMESTAMP "(timestamp):"
 
-#define HELP_TIMESTAMP                                                         \
-  " --timestamp <monotonic|wall> print microsecond-precision timestamps.\n"    \
-  "                              monotonic: stamps increase monotonically.\n"  \
-  "                              wall: ISO-8601 wall clock timestamps.\n"
+#  define HELP_TIMESTAMP                                                       \
+    " {y--timestamp} [{ymonotonic}|{ywall}] \t "                               \
+    "print microsecond-precision timestamps. {ymonotonic}: stamps increase "   \
+    "monotonically. {ywall}: ISO-8601 wall clock timestamps.\n"
 #endif
 
 #include <memory>

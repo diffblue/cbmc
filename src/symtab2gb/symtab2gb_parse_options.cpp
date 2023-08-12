@@ -8,25 +8,24 @@ Author: Diffblue Ltd.
 
 #include "symtab2gb_parse_options.h"
 
-#include <fstream>
-#include <iostream>
-#include <string>
-
-#include <ansi-c/ansi_c_language.h>
+#include <util/config.h>
+#include <util/exception_utils.h>
+#include <util/exit_codes.h>
+#include <util/help_formatter.h>
+#include <util/version.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 
+#include <ansi-c/ansi_c_language.h>
 #include <json-symtab-language/json_symtab_language.h>
 #include <langapi/mode.h>
-
 #include <linking/linking.h>
 
-#include <util/config.h>
-#include <util/exception_utils.h>
-#include <util/exit_codes.h>
-#include <util/version.h>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 symtab2gb_parse_optionst::symtab2gb_parse_optionst(int argc, const char *argv[])
   : parse_options_baset{SYMTAB2GB_OPTIONS,
@@ -147,24 +146,23 @@ int symtab2gb_parse_optionst::doit()
 
 void symtab2gb_parse_optionst::help()
 {
-  log.status()
-    << '\n'
-    << banner_string("symtab2gb", CBMC_VERSION) << '\n'
-    << align_center_with_border("Copyright (C) 2019") << '\n'
-    << align_center_with_border("Diffblue Ltd.") << '\n'
-    << align_center_with_border("info@diffblue.com") << '\n'
-    << '\n'
-    << "Usage:                                   Purpose:\n"
-    << '\n'
-    << "symtab2gb [-?] [-h] [--help]             show help\n"
-       "symtab2gb                                compile .json_symtabs\n"
-       "  <json-symtab-file>+                    to a single goto-binary\n"
-       "  [--out <outfile>]\n\n"
-       "<json-symtab-file>                       a CBMC symbol table in\n"
-       "                                         JSON format\n"
-       "--out <outfile>                          specify the filename of\n"
-       "                                         the resulting binary\n"
-       "                                         (default: a.out)\n"
-       " --verbosity #                verbosity level\n"
-    << messaget::eom;
+  log.status() << '\n'
+               << banner_string("symtab2gb", CBMC_VERSION) << '\n'
+               << align_center_with_border("Copyright (C) 2019") << '\n'
+               << align_center_with_border("Diffblue Ltd.") << '\n'
+               << align_center_with_border("info@diffblue.com") << '\n';
+
+  log.status() << help_formatter(
+    "\n"
+    "Usage:                                  \tPurpose:\n"
+    "\n"
+    " {bsymtab2gb} [{y-?}] [{y-h}] [{y--help}] \t show this help\n"
+    " {bsymtab2gb} [options] {ujson-symtab-file...} \t compile CBMC symbol"
+    " table(s) in JSON format to a single goto-binary\n"
+    "\n"
+    "Options:\n"
+    " {y--out} {uoutfile} \t specify the filename of the resulting binary"
+    " (default: a.out)\n"
+    " {y--verbosity} {u#} \t verbosity level\n");
+  log.status() << messaget::eom;
 }

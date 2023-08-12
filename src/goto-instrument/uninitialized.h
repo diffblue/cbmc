@@ -27,7 +27,7 @@ void show_uninitialized(
 #define OPT_UNINITIALIZED_CHECK "(uninitialized-check)"
 
 #define HELP_UNINITIALIZED_CHECK                                               \
-  " --uninitialized-check        add checks for uninitialized locals "         \
-  "(experimental)\n" // NOLINT(whitespace/line_length)
+  " {y--uninitialized-check} \t "                                              \
+  "add checks for uninitialized locals (experimental)\n"
 
 #endif // CPROVER_GOTO_INSTRUMENT_UNINITIALIZED_H

@@ -30,8 +30,7 @@ class typet;
 #define OPT_FUNCTIONS \
   "(function):"
 
-#define HELP_FUNCTIONS \
-  " --function name              set main function name\n"
+#define HELP_FUNCTIONS " {y--function} {uname} \t set main function name\n"
 
 class languaget:public messaget
 {

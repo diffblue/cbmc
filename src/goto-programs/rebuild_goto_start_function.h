@@ -21,12 +21,6 @@ class message_handlert;
 class optionst;
 class symbol_table_baset;
 
-#define OPT_FUNCTIONS \
-  "(function):"
-
-#define HELP_FUNCTIONS \
-  " --function name              set main function name\n"
-
 /// Eliminate the existing entry point function symbol and any symbols created
 /// in that scope from the \p symbol_table.
 void remove_existing_entry_point(symbol_table_baset &);

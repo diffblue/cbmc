@@ -110,8 +110,7 @@ private:
   "(remove-const-function-pointers)"
 
 #define HELP_REMOVE_CONST_FUNCTION_POINTERS                                    \
-  " --remove-const-function-pointers\n"                                        \
-  "                              remove function pointers that are constant"   \
-  " or constant part of an array\n"
+  " {y--remove-const-function-pointers} \t "                                   \
+  "remove function pointers that are constant or constant part of an array\n"
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_CONST_FUNCTION_POINTERS_H

@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "parse_options.h"
 
-#include <algorithm>
-#include <cctype>
 #include <climits>
 
 #if defined (_WIN32)
@@ -177,55 +175,4 @@ banner_string(const std::string &front_end, const std::string &version)
                                   "-bit";
 
   return align_center_with_border(version_str);
-}
-
-std::string help_entry(
-  const std::string &option,
-  const std::string &description,
-  const std::size_t left_margin,
-  const std::size_t width)
-{
-  PRECONDITION(!option.empty());
-  PRECONDITION(!std::isspace(option.front()));
-  PRECONDITION(!std::isspace(option.back()));
-  PRECONDITION(option.length() <= width);
-
-  PRECONDITION(!description.empty());
-  PRECONDITION(!std::isspace(description.front()));
-  PRECONDITION(!std::isspace(description.back()));
-
-  PRECONDITION(left_margin < width);
-
-  std::string result;
-
-  if(option.length() >= left_margin - 1)
-  {
-    result = " " + option + "\n";
-    result += wrap_line(description, left_margin, width) + "\n";
-
-    return result;
-  }
-
-  std::string padding(left_margin - option.length() - 1, ' ');
-  result = " " + option + padding;
-
-  if(description.length() <= (width - left_margin))
-  {
-    return result + description + "\n";
-  }
-
-  auto it = description.cbegin() + (width - left_margin);
-  auto rit = std::reverse_iterator<decltype(it)>(it) - 1;
-
-  auto rit_space = std::find(rit, description.crend(), ' ');
-  auto it_space = rit_space.base() - 1;
-  CHECK_RETURN(*it_space == ' ');
-
-  result.append(description.cbegin(), it_space);
-  result.append("\n");
-
-  result +=
-    wrap_line(it_space + 1, description.cend(), left_margin, width) + "\n";
-
-  return result;
 }
