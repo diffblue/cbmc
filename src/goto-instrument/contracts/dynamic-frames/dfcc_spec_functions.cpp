@@ -205,7 +205,7 @@ void dfcc_spec_functionst::generate_havoc_instructions(
           "__havoc_target",
           location);
 
-        havoc_program.add(goto_programt::make_decl(target_expr));
+        havoc_program.add(goto_programt::make_decl(target_expr, location));
 
         call.lhs() = target_expr;
         havoc_program.add(goto_programt::make_function_call(call, location));
@@ -221,7 +221,8 @@ void dfcc_spec_functionst::generate_havoc_instructions(
             target_expr, pointer_type(target_type))},
           nondet,
           location));
-        auto label = havoc_program.add(goto_programt::make_dead(target_expr));
+        auto label =
+          havoc_program.add(goto_programt::make_dead(target_expr, location));
         goto_instruction->complete_goto(label);
       }
       else if(
