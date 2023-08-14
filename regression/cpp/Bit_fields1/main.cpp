@@ -9,6 +9,7 @@ struct some_struct {
 
   // an anonymous bitfield
   signed int :2;
+  signed int d : 2, : 6;
 
   // with typedef
   INT x:1;
