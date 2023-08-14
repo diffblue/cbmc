@@ -6,17 +6,16 @@ include ../../src/common
 ifeq ($(BUILD_ENV_),MSVC)
 	exe=../../../src/goto-cc/goto-cl
 	is_windows=true
-	excluded_tests = -X winbug
 else
 	exe=../../../src/goto-cc/goto-cc
 	is_windows=false
 endif
 
 test:
-	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-inspect/goto-inspect $(is_windows)' $(excluded_tests)
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-inspect/goto-inspect $(is_windows)'
 
 tests.log:
-	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-inspect/goto-inspect $(is_windows)' $(excluded_tests)
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-inspect/goto-inspect $(is_windows)'
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;

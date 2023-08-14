@@ -1,6 +1,6 @@
-CORE winbug
+CORE
 main.c
-" "
+' '
 ^EXIT=6$
 ^SIGNAL=0$
 --
@@ -13,10 +13,3 @@ END_FUNCTION
 --
 This is testing the behaviour of the goto-inspect binary in case a binary
 is present, but no inspection option is present.
-
-This is labelled `winbug` to avoid running on windows because of issues with
-the empty string in line 3 (simulating the lack of an option) not working as
-it should (it is contrary to the behaviour of unix systems). The behaviour
-has been verified manually on a machine as working as expected, but getting
-the test to run automatically is a lot more involved, so we're opting to
-skipping this on that platform for now.
