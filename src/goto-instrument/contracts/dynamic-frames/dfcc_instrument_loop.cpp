@@ -249,8 +249,8 @@ dfcc_instrument_loopt::add_prehead_instructions(
   {
     pre_loop_head_instrs.add(
       goto_programt::make_decl(entered_loop, loop_head_location));
-    pre_loop_head_instrs.add(
-      goto_programt::make_assignment(entered_loop, false_exprt{}));
+    pre_loop_head_instrs.add(goto_programt::make_assignment(
+      entered_loop, false_exprt{}, loop_head_location));
   }
 
   // initial_invariant = <loop_invariant>;
@@ -276,8 +276,8 @@ dfcc_instrument_loopt::add_prehead_instructions(
     // in_base_case = true;
     pre_loop_head_instrs.add(
       goto_programt::make_decl(in_base_case, loop_head_location));
-    pre_loop_head_instrs.add(
-      goto_programt::make_assignment(in_base_case, true_exprt{}));
+    pre_loop_head_instrs.add(goto_programt::make_assignment(
+      in_base_case, true_exprt{}, loop_head_location));
   }
 
   {
@@ -417,11 +417,11 @@ dfcc_instrument_loopt::add_step_instructions(
       loop_head_location);
     step_instrs.add(
       goto_programt::make_decl(in_loop_havoc_block, loop_head_location));
-    step_instrs.add(
-      goto_programt::make_assignment(in_loop_havoc_block, true_exprt{}));
+    step_instrs.add(goto_programt::make_assignment(
+      in_loop_havoc_block, true_exprt{}, loop_head_location));
     step_instrs.destructive_append(havoc_instrs);
-    step_instrs.add(
-      goto_programt::make_assignment(in_loop_havoc_block, false_exprt{}));
+    step_instrs.add(goto_programt::make_assignment(
+      in_loop_havoc_block, false_exprt{}, loop_head_location));
   }
 
   goto_convertt converter(symbol_table, log.get_message_handler());
@@ -490,8 +490,8 @@ void dfcc_instrument_loopt::add_body_instructions(
 
   {
     // Record that we entered the loop with `entered_loop = true`.
-    pre_loop_latch_instrs.add(
-      goto_programt::make_assignment(entered_loop, true_exprt{}));
+    pre_loop_latch_instrs.add(goto_programt::make_assignment(
+      entered_loop, true_exprt{}, loop_head_location));
   }
 
   {
