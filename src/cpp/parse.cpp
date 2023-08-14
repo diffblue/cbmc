@@ -1412,6 +1412,10 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   if(!optCvQualify(cv_q))
     return false;
 
+  if(member_spec.is_empty())
+    if(!optMemberSpec(member_spec))
+      return false;
+
   // added these two to do "const static volatile int i=1;"
   if(!optStorageSpec(storage_spec))
     return false;
