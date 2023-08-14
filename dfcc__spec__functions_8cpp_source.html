@@ -299,7 +299,7 @@ $(document).ready(function(){initNavTree('dfcc__spec__functions_8cpp_source.html
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          <span class="stringliteral">&quot;__havoc_target&quot;</span>,</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;          location);</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        havoc_program.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#aed2036161f66e70afdbc1cc141b66009">goto_programt::make_decl</a>(target_expr));</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        havoc_program.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#aed2036161f66e70afdbc1cc141b66009">goto_programt::make_decl</a>(target_expr, location));</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        call.<a class="code" href="classcode__function__callt.html#a1113eda711f50e3859031d8ba3f9da98">lhs</a>() = target_expr;</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        havoc_program.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a>(call, location));</div>
@@ -315,179 +315,180 @@ $(document).ready(function(){initNavTree('dfcc__spec__functions_8cpp_source.html
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;            target_expr, <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(target_type))},</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;          nondet,</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;          location));</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <span class="keyword">auto</span> label = havoc_program.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a2b23788636b4b51d252a3b9506adfd29">goto_programt::make_dead</a>(target_expr));</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        goto_instruction-&gt;complete_goto(label);</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      }</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        hook == <a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cafbebfa99d3aea18c32d58b1246025854">dfcc_funt::WRITE_SET_HAVOC_OBJECT_WHOLE</a> ||</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        hook == <a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca86b5994305b4e31cd7d39d5c94db81d5">dfcc_funt::WRITE_SET_HAVOC_SLICE</a>)</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      {</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <span class="comment">// ```</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="comment">// CALL havoc_hook(set, next_idx);</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="comment">// ```</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        havoc_program.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a>(call, location));</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      }</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      {</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      }</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      ++next_idx;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    }</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  }</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  nof_targets = next_idx;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;}</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
-<div class="line"><a name="l00246"></a><span class="lineno"><a class="line" href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">  246</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">dfcc_spec_functionst::to_spec_assigns_function</a>(</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  std::size_t &amp;nof_targets)</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;{</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="keyword">auto</span> &amp;goto_function = <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.at(function_id);</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  <span class="comment">// add write_set parameter</span></div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> write_set_to_fill =</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <a class="code" href="structdfcc__utilst.html#ab991d0556f4491f44d7f31245e4464f0">dfcc_utilst::add_parameter</a>(</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>,</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      function_id,</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      <span class="stringliteral">&quot;__write_set_to_fill&quot;</span>,</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#ac7712832fdd39b8df8039e790cbc41d5">dfcc_type</a>[<a class="code" href="dfcc__library_8h.html#afa825bddfe01a78991bfae7f91471a52ae87f4506b2a8ac93aa498e1df617ef4f">dfcc_typet::WRITE_SET_PTR</a>])</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      .symbol_expr();</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">to_spec_assigns_instructions</a>(</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    write_set_to_fill,</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <a class="code" href="structdfcc__utilst.html#a08b499aabec45d79656652e18a32b7f9">dfcc_utilst::get_function_symbol</a>(<a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, function_id).<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>,</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    goto_function.body,</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    nof_targets);</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.at(function_id).make_hidden();</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;}</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
-<div class="line"><a name="l00272"></a><span class="lineno"><a class="line" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">  272</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">dfcc_spec_functionst::to_spec_assigns_instructions</a>(</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;write_set_to_fill,</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;language_mode,</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;program,</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  std::size_t &amp;nof_targets)</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;{</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  <span class="comment">// counts the number of calls to built-ins to get an over approximation</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <span class="comment">// of the size of the set</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  std::size_t next_idx = 0;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  <span class="comment">// rewrite calls</span></div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(ins_it, program)</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  {</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordflow">if</span>(ins_it-&gt;is_function_call())</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    {</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;      <span class="keywordflow">if</span>(ins_it-&gt;call_function().id() != ID_symbol)</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      {</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a>(</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;          <span class="stringliteral">&quot;Function pointer calls are not supported in assigns clauses &#39;&quot;</span> +</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;            <a class="code" href="language__util_8cpp.html#ad3e3aac4aad0c66909f71aba070b6e21">from_expr_using_mode</a>(<a class="code" href="classdfcc__spec__functionst.html#a706fa853860be05ddeb5a70caf537d46">ns</a>, language_mode, ins_it-&gt;call_function()) +</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;            <span class="stringliteral">&quot;&#39;&quot;</span>,</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;          ins_it-&gt;source_location());</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;      }</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160; </div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;callee_id =</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(ins_it-&gt;call_function()).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160; </div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      <span class="comment">// Only process built-in functions that specify assignable targets</span></div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      <span class="comment">// and error-out on any other function call</span></div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160; </div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      <span class="comment">// Find the corresponding instrumentation hook</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#a4344ee9423b3135843a9087094531155">is_front_end_builtin</a>(callee_id),</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        <span class="stringliteral">&quot;dfcc_spec_functionst::to_spec_assigns_function: function calls must &quot;</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <span class="stringliteral">&quot;be inlined before calling this function&quot;</span>);</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160; </div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keyword">auto</span> hook = <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#aad1f51440ca240db850a0f757310ca75">get_hook</a>(callee_id);</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      <span class="comment">// redirect the call to the hook</span></div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      ins_it-&gt;call_function() = <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_fun_symbol</a>.at(hook).symbol_expr();</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      <span class="comment">// insert insertion index argument</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      ins_it-&gt;call_arguments().insert(</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        ins_it-&gt;call_arguments().begin(), <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(next_idx, <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a>()));</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      <span class="comment">// insert write set argument</span></div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      ins_it-&gt;call_arguments().insert(</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        ins_it-&gt;call_arguments().begin(), write_set_to_fill);</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160; </div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      <span class="comment">// remove the is_pointer_to_pointer argument which is not used in the</span></div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      <span class="comment">// hook for insert assignable</span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      <span class="keywordflow">if</span>(hook == <a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca273f34957eaf853e509e7e27c78b3780">dfcc_funt::WRITE_SET_INSERT_ASSIGNABLE</a>)</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        ins_it-&gt;call_arguments().pop_back();</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      ++next_idx;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    }</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  }</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  nof_targets = next_idx;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;}</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
-<div class="line"><a name="l00329"></a><span class="lineno"><a class="line" href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">  329</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">dfcc_spec_functionst::to_spec_frees_function</a>(</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  std::size_t &amp;nof_targets)</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;{</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;  <span class="keyword">auto</span> &amp;goto_function = <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.at(function_id);</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  <span class="comment">// add __dfcc_set parameter</span></div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;write_set_to_fill =</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <a class="code" href="structdfcc__utilst.html#ab991d0556f4491f44d7f31245e4464f0">dfcc_utilst::add_parameter</a>(</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>,</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      function_id,</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      <span class="stringliteral">&quot;__write_set_to_fill&quot;</span>,</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#ac7712832fdd39b8df8039e790cbc41d5">dfcc_type</a>[<a class="code" href="dfcc__library_8h.html#afa825bddfe01a78991bfae7f91471a52ae87f4506b2a8ac93aa498e1df617ef4f">dfcc_typet::WRITE_SET_PTR</a>])</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;      .symbol_expr();</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160; </div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">to_spec_frees_instructions</a>(</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    write_set_to_fill,</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <a class="code" href="structdfcc__utilst.html#a08b499aabec45d79656652e18a32b7f9">dfcc_utilst::get_function_symbol</a>(<a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, function_id).<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>,</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    goto_function.body,</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    nof_targets);</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160; </div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160; </div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.at(function_id).make_hidden();</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;}</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160; </div>
-<div class="line"><a name="l00355"></a><span class="lineno"><a class="line" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">  355</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">dfcc_spec_functionst::to_spec_frees_instructions</a>(</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;write_set_to_fill,</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;language_mode,</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;program,</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  std::size_t &amp;nof_targets)</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;{</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  <span class="comment">// counts the number of calls to the `freeable` builtin</span></div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;  std::size_t next_idx = 0;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(ins_it, program)</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  {</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="keywordflow">if</span>(ins_it-&gt;is_function_call())</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    {</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      <span class="keywordflow">if</span>(ins_it-&gt;call_function().id() != ID_symbol)</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      {</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a>(</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;          <span class="stringliteral">&quot;Function pointer calls are not supported in frees clauses: &#39;&quot;</span> +</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            <a class="code" href="language__util_8cpp.html#ad3e3aac4aad0c66909f71aba070b6e21">from_expr_using_mode</a>(<a class="code" href="classdfcc__spec__functionst.html#a706fa853860be05ddeb5a70caf537d46">ns</a>, language_mode, ins_it-&gt;call_function()) +</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            <span class="stringliteral">&quot;&#39;&quot;</span>,</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;          ins_it-&gt;source_location());</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      }</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160; </div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;callee_id =</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(ins_it-&gt;call_function()).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      <span class="comment">// only process the built-in `freeable` function</span></div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;      <span class="comment">// error out on any other function call</span></div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;        callee_id == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;freeable&quot;</span>,</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        <span class="stringliteral">&quot;dfcc_spec_functionst::to_spec_frees_function: function calls must &quot;</span></div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        <span class="stringliteral">&quot;be inlined before calling this function&quot;</span>);</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160; </div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      ins_it-&gt;call_function() =</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_fun_symbol</a>[<a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac2f123da3706a017744c12aa71959518">dfcc_funt::WRITE_SET_ADD_FREEABLE</a>]</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;          .symbol_expr();</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      ins_it-&gt;call_arguments().insert(</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;        ins_it-&gt;call_arguments().begin(), write_set_to_fill);</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;      ++next_idx;</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    }</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  }</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160; </div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  nof_targets = next_idx;</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;}</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <span class="keyword">auto</span> label =</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;          havoc_program.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a2b23788636b4b51d252a3b9506adfd29">goto_programt::make_dead</a>(target_expr, location));</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        goto_instruction-&gt;complete_goto(label);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      }</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        hook == <a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cafbebfa99d3aea18c32d58b1246025854">dfcc_funt::WRITE_SET_HAVOC_OBJECT_WHOLE</a> ||</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        hook == <a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca86b5994305b4e31cd7d39d5c94db81d5">dfcc_funt::WRITE_SET_HAVOC_SLICE</a>)</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      {</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="comment">// ```</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="comment">// CALL havoc_hook(set, next_idx);</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        <span class="comment">// ```</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        havoc_program.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a>(call, location));</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      }</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      {</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      }</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      ++next_idx;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    }</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  }</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  nof_targets = next_idx;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;}</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
+<div class="line"><a name="l00247"></a><span class="lineno"><a class="line" href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">  247</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">dfcc_spec_functionst::to_spec_assigns_function</a>(</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  std::size_t &amp;nof_targets)</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;{</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="keyword">auto</span> &amp;goto_function = <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.at(function_id);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="comment">// add write_set parameter</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> write_set_to_fill =</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <a class="code" href="structdfcc__utilst.html#ab991d0556f4491f44d7f31245e4464f0">dfcc_utilst::add_parameter</a>(</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>,</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      function_id,</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <span class="stringliteral">&quot;__write_set_to_fill&quot;</span>,</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#ac7712832fdd39b8df8039e790cbc41d5">dfcc_type</a>[<a class="code" href="dfcc__library_8h.html#afa825bddfe01a78991bfae7f91471a52ae87f4506b2a8ac93aa498e1df617ef4f">dfcc_typet::WRITE_SET_PTR</a>])</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      .symbol_expr();</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">to_spec_assigns_instructions</a>(</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    write_set_to_fill,</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <a class="code" href="structdfcc__utilst.html#a08b499aabec45d79656652e18a32b7f9">dfcc_utilst::get_function_symbol</a>(<a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, function_id).<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>,</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    goto_function.body,</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    nof_targets);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.at(function_id).make_hidden();</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;}</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
+<div class="line"><a name="l00273"></a><span class="lineno"><a class="line" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">  273</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">dfcc_spec_functionst::to_spec_assigns_instructions</a>(</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;write_set_to_fill,</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;language_mode,</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;program,</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  std::size_t &amp;nof_targets)</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;{</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <span class="comment">// counts the number of calls to built-ins to get an over approximation</span></div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  <span class="comment">// of the size of the set</span></div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  std::size_t next_idx = 0;</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <span class="comment">// rewrite calls</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(ins_it, program)</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  {</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keywordflow">if</span>(ins_it-&gt;is_function_call())</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    {</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      <span class="keywordflow">if</span>(ins_it-&gt;call_function().id() != ID_symbol)</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      {</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a>(</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;          <span class="stringliteral">&quot;Function pointer calls are not supported in assigns clauses &#39;&quot;</span> +</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;            <a class="code" href="language__util_8cpp.html#ad3e3aac4aad0c66909f71aba070b6e21">from_expr_using_mode</a>(<a class="code" href="classdfcc__spec__functionst.html#a706fa853860be05ddeb5a70caf537d46">ns</a>, language_mode, ins_it-&gt;call_function()) +</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;            <span class="stringliteral">&quot;&#39;&quot;</span>,</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;          ins_it-&gt;source_location());</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      }</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160; </div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;callee_id =</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(ins_it-&gt;call_function()).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160; </div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      <span class="comment">// Only process built-in functions that specify assignable targets</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      <span class="comment">// and error-out on any other function call</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160; </div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      <span class="comment">// Find the corresponding instrumentation hook</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#a4344ee9423b3135843a9087094531155">is_front_end_builtin</a>(callee_id),</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <span class="stringliteral">&quot;dfcc_spec_functionst::to_spec_assigns_function: function calls must &quot;</span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <span class="stringliteral">&quot;be inlined before calling this function&quot;</span>);</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      <span class="keyword">auto</span> hook = <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#aad1f51440ca240db850a0f757310ca75">get_hook</a>(callee_id);</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      <span class="comment">// redirect the call to the hook</span></div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      ins_it-&gt;call_function() = <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_fun_symbol</a>.at(hook).symbol_expr();</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      <span class="comment">// insert insertion index argument</span></div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      ins_it-&gt;call_arguments().insert(</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        ins_it-&gt;call_arguments().begin(), <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(next_idx, <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a>()));</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      <span class="comment">// insert write set argument</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      ins_it-&gt;call_arguments().insert(</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        ins_it-&gt;call_arguments().begin(), write_set_to_fill);</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160; </div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      <span class="comment">// remove the is_pointer_to_pointer argument which is not used in the</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      <span class="comment">// hook for insert assignable</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;      <span class="keywordflow">if</span>(hook == <a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca273f34957eaf853e509e7e27c78b3780">dfcc_funt::WRITE_SET_INSERT_ASSIGNABLE</a>)</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        ins_it-&gt;call_arguments().pop_back();</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160; </div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;      ++next_idx;</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    }</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  }</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  nof_targets = next_idx;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;}</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
+<div class="line"><a name="l00330"></a><span class="lineno"><a class="line" href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">  330</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">dfcc_spec_functionst::to_spec_frees_function</a>(</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  std::size_t &amp;nof_targets)</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;{</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  <span class="keyword">auto</span> &amp;goto_function = <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.at(function_id);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160; </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  <span class="comment">// add __dfcc_set parameter</span></div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;write_set_to_fill =</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <a class="code" href="structdfcc__utilst.html#ab991d0556f4491f44d7f31245e4464f0">dfcc_utilst::add_parameter</a>(</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>,</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      function_id,</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      <span class="stringliteral">&quot;__write_set_to_fill&quot;</span>,</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;      <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#ac7712832fdd39b8df8039e790cbc41d5">dfcc_type</a>[<a class="code" href="dfcc__library_8h.html#afa825bddfe01a78991bfae7f91471a52ae87f4506b2a8ac93aa498e1df617ef4f">dfcc_typet::WRITE_SET_PTR</a>])</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      .symbol_expr();</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160; </div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">to_spec_frees_instructions</a>(</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    write_set_to_fill,</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <a class="code" href="structdfcc__utilst.html#a08b499aabec45d79656652e18a32b7f9">dfcc_utilst::get_function_symbol</a>(<a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, function_id).<a class="code" href="classsymbolt.html#aeac110ec1d8838902a5541dbf1a3bda2">mode</a>,</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    goto_function.body,</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    nof_targets);</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160; </div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160; </div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  <a class="code" href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">goto_model</a>.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.at(function_id).make_hidden();</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;}</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
+<div class="line"><a name="l00356"></a><span class="lineno"><a class="line" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">  356</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">dfcc_spec_functionst::to_spec_frees_instructions</a>(</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;write_set_to_fill,</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;language_mode,</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;program,</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  std::size_t &amp;nof_targets)</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;{</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;  <span class="comment">// counts the number of calls to the `freeable` builtin</span></div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  std::size_t next_idx = 0;</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(ins_it, program)</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  {</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="keywordflow">if</span>(ins_it-&gt;is_function_call())</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    {</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      <span class="keywordflow">if</span>(ins_it-&gt;call_function().id() != ID_symbol)</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;      {</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a>(</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;          <span class="stringliteral">&quot;Function pointer calls are not supported in frees clauses: &#39;&quot;</span> +</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            <a class="code" href="language__util_8cpp.html#ad3e3aac4aad0c66909f71aba070b6e21">from_expr_using_mode</a>(<a class="code" href="classdfcc__spec__functionst.html#a706fa853860be05ddeb5a70caf537d46">ns</a>, language_mode, ins_it-&gt;call_function()) +</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;            <span class="stringliteral">&quot;&#39;&quot;</span>,</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;          ins_it-&gt;source_location());</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      }</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160; </div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;callee_id =</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(ins_it-&gt;call_function()).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160; </div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;      <span class="comment">// only process the built-in `freeable` function</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;      <span class="comment">// error out on any other function call</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        callee_id == <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;freeable&quot;</span>,</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        <span class="stringliteral">&quot;dfcc_spec_functionst::to_spec_frees_function: function calls must &quot;</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        <span class="stringliteral">&quot;be inlined before calling this function&quot;</span>);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      ins_it-&gt;call_function() =</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;        <a class="code" href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">library</a>.<a class="code" href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_fun_symbol</a>[<a class="code" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac2f123da3706a017744c12aa71959518">dfcc_funt::WRITE_SET_ADD_FREEABLE</a>]</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;          .symbol_expr();</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      ins_it-&gt;call_arguments().insert(</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        ins_it-&gt;call_arguments().begin(), write_set_to_fill);</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      ++next_idx;</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    }</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  }</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160; </div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  nof_targets = next_idx;</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="ac__types_8cpp_html_a875507bd5fb82fbd7b6640ac105aa8b0"><div class="ttname"><a href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a></div><div class="ttdeci">pointer_typet pointer_type(const typet &amp;subtype)</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8cpp_source.html#l00240">c_types.cpp:240</a></div></div>
 <div class="ttc" id="aclasscode__function__callt_html"><div class="ttname"><a href="classcode__function__callt.html">code_function_callt</a></div><div class="ttdoc">goto_instruction_codet representation of a function call statement.</div><div class="ttdef"><b>Definition:</b> <a href="goto__instruction__code_8h_source.html#l00270">goto_instruction_code.h:271</a></div></div>
@@ -502,18 +503,18 @@ $(document).ready(function(){initNavTree('dfcc__spec__functions_8cpp_source.html
 <div class="ttc" id="aclassdfcc__libraryt_html_ac7712832fdd39b8df8039e790cbc41d5"><div class="ttname"><a href="classdfcc__libraryt.html#ac7712832fdd39b8df8039e790cbc41d5">dfcc_libraryt::dfcc_type</a></div><div class="ttdeci">std::map&lt; dfcc_typet, typet &gt; dfcc_type</div><div class="ttdoc">Maps enum values to the actual types (dynamically loaded)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__library_8h_source.html#l00215">dfcc_library.h:215</a></div></div>
 <div class="ttc" id="aclassdfcc__libraryt_html_ae7148509a34eb7846fc747751f45735b"><div class="ttname"><a href="classdfcc__libraryt.html#ae7148509a34eb7846fc747751f45735b">dfcc_libraryt::get_havoc_hook</a></div><div class="ttdeci">optionalt&lt; dfcc_funt &gt; get_havoc_hook(const irep_idt &amp;function_id) const</div><div class="ttdoc">Returns the library instrumentation hook for the given built-in.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__library_8cpp_source.html#l00207">dfcc_library.cpp:207</a></div></div>
 <div class="ttc" id="aclassdfcc__libraryt_html_ae916015349046afe273bf50f03bc85df"><div class="ttname"><a href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_libraryt::dfcc_fun_symbol</a></div><div class="ttdeci">std::map&lt; dfcc_funt, symbolt &gt; dfcc_fun_symbol</div><div class="ttdoc">Maps enum values to the actual function symbols (dynamically loaded)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__library_8h_source.html#l00218">dfcc_library.h:218</a></div></div>
-<div class="ttc" id="aclassdfcc__spec__functionst_html_a150d81017334f45e3152527c64a6213d"><div class="ttname"><a href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">dfcc_spec_functionst::to_spec_assigns_function</a></div><div class="ttdeci">void to_spec_assigns_function(const irep_idt &amp;function_id, std::size_t &amp;nof_targets)</div><div class="ttdoc">Transforms (in place) a function.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00246">dfcc_spec_functions.cpp:246</a></div></div>
-<div class="ttc" id="aclassdfcc__spec__functionst_html_a30c9a683159e9ac5863c075641f73fcc"><div class="ttname"><a href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">dfcc_spec_functionst::to_spec_frees_instructions</a></div><div class="ttdeci">void to_spec_frees_instructions(const exprt &amp;write_set_to_fill, const irep_idt &amp;language_mode, goto_programt &amp;program, std::size_t &amp;nof_targets)</div><div class="ttdoc">Rewrites in place program expressed in terms of built-ins specifying freeable targets declaratively u...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00355">dfcc_spec_functions.cpp:355</a></div></div>
+<div class="ttc" id="aclassdfcc__spec__functionst_html_a150d81017334f45e3152527c64a6213d"><div class="ttname"><a href="classdfcc__spec__functionst.html#a150d81017334f45e3152527c64a6213d">dfcc_spec_functionst::to_spec_assigns_function</a></div><div class="ttdeci">void to_spec_assigns_function(const irep_idt &amp;function_id, std::size_t &amp;nof_targets)</div><div class="ttdoc">Transforms (in place) a function.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00247">dfcc_spec_functions.cpp:247</a></div></div>
+<div class="ttc" id="aclassdfcc__spec__functionst_html_a30c9a683159e9ac5863c075641f73fcc"><div class="ttname"><a href="classdfcc__spec__functionst.html#a30c9a683159e9ac5863c075641f73fcc">dfcc_spec_functionst::to_spec_frees_instructions</a></div><div class="ttdeci">void to_spec_frees_instructions(const exprt &amp;write_set_to_fill, const irep_idt &amp;language_mode, goto_programt &amp;program, std::size_t &amp;nof_targets)</div><div class="ttdoc">Rewrites in place program expressed in terms of built-ins specifying freeable targets declaratively u...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00356">dfcc_spec_functions.cpp:356</a></div></div>
 <div class="ttc" id="aclassdfcc__spec__functionst_html_a4aa878468b43f3e46395eeccfd1a24ca"><div class="ttname"><a href="classdfcc__spec__functionst.html#a4aa878468b43f3e46395eeccfd1a24ca">dfcc_spec_functionst::generate_havoc_function</a></div><div class="ttdeci">void generate_havoc_function(const irep_idt &amp;function_id, const irep_idt &amp;havoc_function_id, std::size_t &amp;nof_targets)</div><div class="ttdoc">From a function:</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00044">dfcc_spec_functions.cpp:44</a></div></div>
 <div class="ttc" id="aclassdfcc__spec__functionst_html_a5b1160ac1b3e26b05875d58e2083e065"><div class="ttname"><a href="classdfcc__spec__functionst.html#a5b1160ac1b3e26b05875d58e2083e065">dfcc_spec_functionst::generate_havoc_instructions</a></div><div class="ttdeci">void generate_havoc_instructions(const irep_idt &amp;function_id, const goto_programt &amp;original_program, const exprt &amp;write_set_to_havoc, goto_programt &amp;havoc_program, std::size_t &amp;nof_targets)</div><div class="ttdoc">Translates original_program that specifies assignable targets into a program that havocs the targets.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00144">dfcc_spec_functions.cpp:144</a></div></div>
 <div class="ttc" id="aclassdfcc__spec__functionst_html_a706fa853860be05ddeb5a70caf537d46"><div class="ttname"><a href="classdfcc__spec__functionst.html#a706fa853860be05ddeb5a70caf537d46">dfcc_spec_functionst::ns</a></div><div class="ttdeci">namespacet ns</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8h_source.html#l00206">dfcc_spec_functions.h:206</a></div></div>
 <div class="ttc" id="aclassdfcc__spec__functionst_html_a7189a0794691a9eaaeae4211cf94fe50"><div class="ttname"><a href="classdfcc__spec__functionst.html#a7189a0794691a9eaaeae4211cf94fe50">dfcc_spec_functionst::message_handler</a></div><div class="ttdeci">message_handlert &amp; message_handler</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8h_source.html#l00203">dfcc_spec_functions.h:203</a></div></div>
-<div class="ttc" id="aclassdfcc__spec__functionst_html_a82522c6484e8f0e3fd58625ddaf72228"><div class="ttname"><a href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">dfcc_spec_functionst::to_spec_assigns_instructions</a></div><div class="ttdeci">void to_spec_assigns_instructions(const exprt &amp;write_set_to_fill, const irep_idt &amp;language_mode, goto_programt &amp;program, std::size_t &amp;nof_targets)</div><div class="ttdoc">Rewrites in place program expressed in terms of built-ins specifying assignable targets declaratively...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00272">dfcc_spec_functions.cpp:272</a></div></div>
+<div class="ttc" id="aclassdfcc__spec__functionst_html_a82522c6484e8f0e3fd58625ddaf72228"><div class="ttname"><a href="classdfcc__spec__functionst.html#a82522c6484e8f0e3fd58625ddaf72228">dfcc_spec_functionst::to_spec_assigns_instructions</a></div><div class="ttdeci">void to_spec_assigns_instructions(const exprt &amp;write_set_to_fill, const irep_idt &amp;language_mode, goto_programt &amp;program, std::size_t &amp;nof_targets)</div><div class="ttdoc">Rewrites in place program expressed in terms of built-ins specifying assignable targets declaratively...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00273">dfcc_spec_functions.cpp:273</a></div></div>
 <div class="ttc" id="aclassdfcc__spec__functionst_html_a8dc17481afa9c09553f7dfce188cb00b"><div class="ttname"><a href="classdfcc__spec__functionst.html#a8dc17481afa9c09553f7dfce188cb00b">dfcc_spec_functionst::goto_model</a></div><div class="ttdeci">goto_modelt &amp; goto_model</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8h_source.html#l00202">dfcc_spec_functions.h:202</a></div></div>
 <div class="ttc" id="aclassdfcc__spec__functionst_html_aa5feac9ec8c880aa8c4d0d548bd84245"><div class="ttname"><a href="classdfcc__spec__functionst.html#aa5feac9ec8c880aa8c4d0d548bd84245">dfcc_spec_functionst::get_target_type</a></div><div class="ttdeci">const typet &amp; get_target_type(const exprt &amp;expr)</div><div class="ttdoc">Extracts the type of an assigns clause target expression The expression must be of the form: expr = c...</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00034">dfcc_spec_functions.cpp:34</a></div></div>
 <div class="ttc" id="aclassdfcc__spec__functionst_html_acf46fea9e65293103445baa51367ab78"><div class="ttname"><a href="classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78">dfcc_spec_functionst::library</a></div><div class="ttdeci">dfcc_libraryt &amp; library</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8h_source.html#l00205">dfcc_spec_functions.h:205</a></div></div>
 <div class="ttc" id="aclassdfcc__spec__functionst_html_ae01cd450e354bad745285d7676da5a25"><div class="ttname"><a href="classdfcc__spec__functionst.html#ae01cd450e354bad745285d7676da5a25">dfcc_spec_functionst::dfcc_spec_functionst</a></div><div class="ttdeci">dfcc_spec_functionst(goto_modelt &amp;goto_model, message_handlert &amp;message_handler, dfcc_libraryt &amp;library)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00022">dfcc_spec_functions.cpp:22</a></div></div>
-<div class="ttc" id="aclassdfcc__spec__functionst_html_aee89c7ad74728f279407a672d8393ec7"><div class="ttname"><a href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">dfcc_spec_functionst::to_spec_frees_function</a></div><div class="ttdeci">void to_spec_frees_function(const irep_idt &amp;function_id, std::size_t &amp;nof_targets)</div><div class="ttdoc">Transforms (in place) a function.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00329">dfcc_spec_functions.cpp:329</a></div></div>
+<div class="ttc" id="aclassdfcc__spec__functionst_html_aee89c7ad74728f279407a672d8393ec7"><div class="ttname"><a href="classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7">dfcc_spec_functionst::to_spec_frees_function</a></div><div class="ttdeci">void to_spec_frees_function(const irep_idt &amp;function_id, std::size_t &amp;nof_targets)</div><div class="ttdoc">Transforms (in place) a function.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__spec__functions_8cpp_source.html#l00330">dfcc_spec_functions.cpp:330</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
 <div class="ttc" id="aclassempty__typet_html"><div class="ttname"><a href="classempty__typet.html">empty_typet</a></div><div class="ttdoc">The empty type.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00050">std_types.h:51</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
