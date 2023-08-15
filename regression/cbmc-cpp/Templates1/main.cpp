@@ -1,3 +1,5 @@
+#include <cassert>
+
 template <typename T>
 void f(T x)
 {
