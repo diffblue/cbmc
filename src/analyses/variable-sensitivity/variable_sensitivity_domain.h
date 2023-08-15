@@ -87,7 +87,7 @@
   "value tracking\n"                                                           \
   " {y--vsd-structs} [{ytop-bottom}|{yevery-field}] \t "                       \
   "struct field sensitive analysis\n"                                          \
-  " {y--vsd-arrays} [[ytop-bottom}|{ysmash}|{yup-to-n-elements}|"              \
+  " {y--vsd-arrays} [{ytop-bottom}|{ysmash}|{yup-to-n-elements}|"              \
   "{yevery-element}] \t "                                                      \
   "array entry sensitive analysis\n"                                           \
   " {y--vsd-array-max-elements} {uN} \t "                                      \

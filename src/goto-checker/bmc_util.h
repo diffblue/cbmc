@@ -227,7 +227,7 @@ void run_property_decider(
   " {y--unwinding-assertions} \t generate unwinding assertions (cannot be "    \
   "used with {y--cover})\n"                                                    \
   " {y--partial-loops} \t permit paths with partial loops\n"                   \
-  " {y--no-self-loops-to-assumptions} \t do not simplify while(1){} to "       \
+  " {y--no-self-loops-to-assumptions} \t do not simplify while(1){ {}} to "    \
   "assume(0)\n"                                                                \
   " {y--symex-complexity-limit} {uN} \t "                                      \
   "how complex ({uN}) a path can become before symex abandons it. Currently "  \
