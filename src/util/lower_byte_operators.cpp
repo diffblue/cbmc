@@ -1111,8 +1111,14 @@ static exprt lower_byte_extract_array_vector(
   if(num_elements.has_value())
   {
     exprt::operandst operands;
+    // Work around spurious GCC warning about num_elements being uninitialised.
+#pragma GCC diagnostic push
+#ifndef __clang__
+#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     operands.reserve(*num_elements);
     for(std::size_t i = 0; i < *num_elements; ++i)
+#pragma GCC diagnostic pop
     {
       plus_exprt new_offset(
         unpacked.offset(),
