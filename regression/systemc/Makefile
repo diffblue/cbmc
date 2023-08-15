@@ -10,7 +10,7 @@ else
 endif
 
 ifeq ($(BUILD_ENV_),MSVC)
-	excluded_tests = -X gcc-only -X winbug
+	excluded_tests = -X gcc-only
 else
 ifeq ($(BUILD_ENV_),OSX)
 	# In MacOS, a change in the assert.h header file

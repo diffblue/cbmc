@@ -1,6 +1,6 @@
-CORE winbug
+CORE
 test.c
---export-symex-ready-goto ""
+--export-symex-ready-goto ''
 ^ERROR: Please provide a filename to write the goto-binary to.$
 ^EXIT=6$
 ^SIGNAL=0$
