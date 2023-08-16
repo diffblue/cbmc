@@ -669,10 +669,7 @@ void goto_convertt::do_havoc_slice(
   // char nondet_contents[argument[1]];
   // __CPROVER_array_replace(p, nondet_contents);
 
-  symbol_exprt deallocated =
-    ns.lookup(CPROVER_PREFIX "deallocated").symbol_expr();
-  symbol_exprt dead = ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
-  prophecy_w_ok_exprt ok_expr{arguments[0], arguments[1], deallocated, dead};
+  r_or_w_ok_exprt ok_expr(ID_w_ok, arguments[0], arguments[1]);
   ok_expr.add_source_location() = source_location;
   source_locationt annotated_location = source_location;
   annotated_location.set("user-provided", false);

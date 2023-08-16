@@ -65,6 +65,7 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   options.set_option("show-properties", cmdline.isset("show-properties"));
 
   // Options for process_goto_program
+  options.set_option("rewrite-rw-ok", false);
   options.set_option("rewrite-union", true);
 }
 

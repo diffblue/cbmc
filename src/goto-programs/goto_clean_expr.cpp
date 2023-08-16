@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
-#include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
@@ -70,15 +69,6 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
   if(
     expr.id() == ID_side_effect || expr.id() == ID_compound_literal ||
     expr.id() == ID_comma)
-  {
-    return true;
-  }
-
-  // Rewrite rw_ok and pointer_in_range front-end expressions into ones
-  // including prophecy expressions.
-  if(
-    can_cast_expr<r_or_w_ok_exprt>(expr) ||
-    can_cast_expr<pointer_in_range_exprt>(expr))
   {
     return true;
   }
@@ -445,32 +435,6 @@ void goto_convertt::clean_expr(
     DATA_INVARIANT(
       expr.operands().size() == 1, "ID_compound_literal has a single operand");
     expr = to_unary_expr(expr).op();
-  }
-  else if(auto r_or_w_ok = expr_try_dynamic_cast<r_or_w_ok_exprt>(expr))
-  {
-    const auto &id = expr.id();
-    expr =
-      prophecy_r_or_w_ok_exprt{
-        id == ID_r_ok   ? ID_prophecy_r_ok
-        : id == ID_w_ok ? ID_prophecy_w_ok
-                        : ID_prophecy_rw_ok,
-        r_or_w_ok->pointer(),
-        r_or_w_ok->size(),
-        ns.lookup(CPROVER_PREFIX "deallocated").symbol_expr(),
-        ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr()}
-        .with_source_location<exprt>(expr);
-  }
-  else if(
-    auto pointer_in_range = expr_try_dynamic_cast<pointer_in_range_exprt>(expr))
-  {
-    expr =
-      prophecy_pointer_in_range_exprt{
-        pointer_in_range->lower_bound(),
-        pointer_in_range->pointer(),
-        pointer_in_range->upper_bound(),
-        ns.lookup(CPROVER_PREFIX "deallocated").symbol_expr(),
-        ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr()}
-        .with_source_location<exprt>(expr);
   }
 }
 
