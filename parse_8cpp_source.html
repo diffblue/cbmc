@@ -2972,7 +2972,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l02880"></a><span class="lineno"> 2880</span>&#160;    bit_field_type.<a class="code" href="classtypet.html#a2cc7f1c7cdae0a9303a6d7ff78866f9e">add_subtype</a>().<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
 <div class="line"><a name="l02881"></a><span class="lineno"> 2881</span>&#160;    <a class="code" href="class_parser.html#ae6d386fd82dd4e38be715aaf2f50c998">set_location</a>(bit_field_type, tk);</div>
 <div class="line"><a name="l02882"></a><span class="lineno"> 2882</span>&#160; </div>
-<div class="line"><a name="l02883"></a><span class="lineno"> 2883</span>&#160;    <a class="code" href="class_parser.html#acbdf29a0b8625718f9bb056ba91ef6ab">merge_types</a>(bit_field_type, dw.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l02883"></a><span class="lineno"> 2883</span>&#160;    dw.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() = std::move(bit_field_type);</div>
 <div class="line"><a name="l02884"></a><span class="lineno"> 2884</span>&#160; </div>
 <div class="line"><a name="l02885"></a><span class="lineno"> 2885</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l02886"></a><span class="lineno"> 2886</span>&#160;  }</div>
