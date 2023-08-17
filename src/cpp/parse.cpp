@@ -2880,7 +2880,7 @@ bool Parser::rDeclaratorWithInit(
     bit_field_type.add_subtype().make_nil();
     set_location(bit_field_type, tk);
 
-    merge_types(bit_field_type, dw.type());
+    dw.type() = std::move(bit_field_type);
 
     return true;
   }
