@@ -1,0 +1,9 @@
+CORE
+main.c
+other.c
+file main.c line 9 function main
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+We previously lost the location attached to the call of `foo` in function main.

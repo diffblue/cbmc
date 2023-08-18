@@ -100,6 +100,11 @@ bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 
   const exprt &e = it->second;
 
+  source_locationt previous_source_location{s.source_location()};
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    previous_source_location.is_not_nil(),
+    "front-ends should construct symbol expressions with source locations",
+    s.pretty());
   if(e.type().id() != ID_array && e.type().id() != ID_code)
   {
     typet type = s.type();
@@ -107,6 +112,7 @@ bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
   }
   else
     static_cast<exprt &>(s) = e;
+  s.add_source_location() = std::move(previous_source_location);
 
   return false;
 }

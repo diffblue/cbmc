@@ -51,7 +51,12 @@ bool replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
     s.type() == it->second.type(),
     "types to be replaced should match. s.type:\n" + s.type().pretty() +
       "\nit->second.type:\n" + it->second.type().pretty());
+  source_locationt previous_source_location{s.source_location()};
   static_cast<exprt &>(s) = it->second;
+  // back-end generated or internal symbols (like rounding mode) might not have
+  // a source location
+  if(s.source_location().is_nil() && previous_source_location.is_not_nil())
+    s.add_source_location() = std::move(previous_source_location);
 
   return false;
 }
@@ -334,7 +339,12 @@ bool unchecked_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
   if(it == expr_map.end())
     return true;
 
+  source_locationt previous_source_location{s.source_location()};
   static_cast<exprt &>(s) = it->second;
+  // back-end generated or internal symbols (like rounding mode) might not have
+  // a source location
+  if(s.source_location().is_nil() && previous_source_location.is_not_nil())
+    s.add_source_location() = std::move(previous_source_location);
 
   return false;
 }
@@ -415,7 +425,12 @@ bool address_of_aware_replace_symbolt::replace_symbol_expr(
 
   // Note s_copy is no longer a symbol_exprt due to the replace operation,
   // and after this line `s` won't be either
+  source_locationt previous_source_location{s.source_location()};
   s = s_copy;
+  // back-end generated or internal symbols (like rounding mode) might not have
+  // a source location
+  if(s.source_location().is_nil() && previous_source_location.is_not_nil())
+    s.add_source_location() = std::move(previous_source_location);
 
   return false;
 }
