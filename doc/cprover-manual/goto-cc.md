@@ -132,9 +132,6 @@ most important architectural parameters are:
     `sizeof(long int)` on various machines.
 -   The width of pointers; for example, compare the value of `sizeof(int *)` on
     various machines.
--   The number of bits in a pointer which are used to differentiate between
-    different objects. The remaining bits of a pointer are used for offsets
-    within objects.
 -   The [endianness](http://en.wikipedia.org/wiki/Endianness) of
     the architecture.
 
@@ -152,8 +149,6 @@ following command-line arguments can be passed to the CPROVER tools:
 -   The word-width can be set with `--16`, `--32`, `--64`.
 -   The endianness can be defined with `--little-endian` and
     `--big-endian`.
--   The number of bits in a pointer used to differentiate between different
-    objects can be set using `--object-bits x`. Where `x` is the number of bits.
 
 When using a goto binary, CBMC and the other tools read the
 configuration from the binary. The setting when running goto-cc is

@@ -96,9 +96,10 @@ files.
 .TP
 \fB\-\-print\-rejected\-preprocessed\-source\fR \fIfile\fR
 Copy failing (preprocessed) source to \fIfile\fR.
-.TP
-\fB\-\-object\-bits\fR \fIN\fR
-Configure the number of bits used for object numbering in CBMC's pointer encoding.
+.SH BACKWARD COMPATIBILITY
+.B goto\-cc
+will warn and ignore the use of \fB\-\-object\-bits\fR, which previous versions
+processed. This option now instead needs to be passed to \fBcbmc\fR(1).
 .SH ENVIRONMENT
 All tools honor the TMPDIR environment variable when generating temporary
 files and directories.

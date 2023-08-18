@@ -7,7 +7,6 @@
 #define __CPROVER_contracts_library_defined
 
 // external dependencies
-extern __CPROVER_size_t __CPROVER_max_malloc_size;
 const void *__CPROVER_alloca_object = 0;
 extern const void *__CPROVER_deallocated;
 const void *__CPROVER_new_object = 0;

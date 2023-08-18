@@ -13,6 +13,7 @@ Author: Qinheping Hu
 #include <util/unicode.h>
 #include <util/version.h>
 
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
@@ -72,6 +73,8 @@ int goto_synthesizer_parse_optionst::doit()
     gcc_version.get("gcc");
     configure_gcc(gcc_version);
   }
+
+  update_max_malloc_size(goto_model, ui_message_handler);
 
   // Get options for the backend verifier and preprocess `goto_model`.
   const auto &options = get_options();
