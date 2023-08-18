@@ -74,7 +74,6 @@ void goto_cc_modet::help()
     "symbols\n"
     " {y--print-rejected-preprocessed-source} {ufile} \t "
     "copy failing (preprocessed) source to file\n"
-    " {y--object-bits} {N} \t number of bits used for object addresses\n"
     "\n");
 }
 

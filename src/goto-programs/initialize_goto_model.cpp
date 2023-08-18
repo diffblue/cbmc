@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "initialize_goto_model.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/message.h>
@@ -22,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 #include <langapi/language_file.h>
 #include <langapi/mode.h>
+#include <linking/static_lifetime_init.h>
 
 #include "goto_convert_functions.h"
 #include "read_goto_binary.h"
@@ -235,4 +238,30 @@ goto_modelt initialize_goto_model(
     goto_model.symbol_table);
 
   return goto_model;
+}
+
+void update_max_malloc_size(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  if(!goto_model.symbol_table.has_symbol(CPROVER_PREFIX "max_malloc_size"))
+    return;
+
+  const auto previous_max_malloc_size_value = numeric_cast<mp_integer>(
+    goto_model.symbol_table.lookup_ref(CPROVER_PREFIX "max_malloc_size").value);
+  const mp_integer current_max_malloc_size = config.max_malloc_size();
+
+  if(
+    !previous_max_malloc_size_value.has_value() ||
+    *previous_max_malloc_size_value != current_max_malloc_size)
+  {
+    symbolt &max_malloc_size_sym = goto_model.symbol_table.get_writeable_ref(
+      CPROVER_PREFIX "max_malloc_size");
+    max_malloc_size_sym.value =
+      from_integer(current_max_malloc_size, size_type());
+    max_malloc_size_sym.value.set(ID_C_no_nondet_initialization, true);
+
+    if(goto_model.can_produce_function(INITIALIZE_FUNCTION))
+      recreate_initialize_function(goto_model, message_handler);
+  }
 }
