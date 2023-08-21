@@ -1,6 +1,5 @@
 var NAVTREEINDEX135 =
 {
-"structnumeric__castt_3_01mp__integer_01_4.html#a75011a649d3ed6142630559ddb025e70":[8,0,878,0],
 "structobject__creation__infot.html":[8,0,881],
 "structobject__creation__infot.html#a02ebda8b90f0536196b49f85f17998f6":[8,0,881,0],
 "structobject__creation__infot.html#a7eb78a4168ea3cfe99d8504e5be83a70":[8,0,881,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX135 =
 "structsmt__bit__vector__theoryt_1_1andt.html":[8,0,1097,1],
 "structsmt__bit__vector__theoryt_1_1andt.html#a4397d6bf5dc871f7190497355826c2ef":[8,0,1097,1,1],
 "structsmt__bit__vector__theoryt_1_1andt.html#a7cb5afd0e1d5882d8b7a24aaa5361c21":[8,0,1097,1,2],
-"structsmt__bit__vector__theoryt_1_1andt.html#a7f7647853978749ded2b079a8dfb379a":[8,0,1097,1,0]
+"structsmt__bit__vector__theoryt_1_1andt.html#a7f7647853978749ded2b079a8dfb379a":[8,0,1097,1,0],
+"structsmt__bit__vector__theoryt_1_1arithmetic__shift__rightt.html":[8,0,1097,2]
 };
