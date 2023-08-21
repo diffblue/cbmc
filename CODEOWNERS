@@ -45,7 +45,7 @@
 /src/analyses/ @martin-cs @peterschrammel
 /src/pointer-analysis/ @martin-cs @peterschrammel
 /src/libcprover-cpp @NlightNFotis @thomasspriggs @esteffin @TGWDB @peterschrammel
-/src/libcprover-rust @NlightNFotis @thomasspriggs @TGWDB @peterschrammel
+/src/libcprover-rust @NlightNFotis @thomasspriggs @TGWDB @peterschrammel @esteffin
 
 # These files change frequently and changes are medium-risk
 
@@ -64,8 +64,8 @@
 /jbmc/src/jdiff/ @peterschrammel
 /src/cpp/ @kroening @tautschnig @peterschrammel
 /src/solvers/smt2 @kroening @martin-cs @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
-/src/solvers/smt2_incremental @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
-/src/solvers/Makefile @kroening @tautschnig @peterschrammel @thomasspriggs @NlightNFotis @TGWDB
+/src/solvers/smt2_incremental @peterschrammel @thomasspriggs @NlightNFotis @TGWDB @esteffin
+/src/solvers/Makefile @kroening @tautschnig @peterschrammel @thomasspriggs @NlightNFotis @TGWDB @esteffin
 /src/statement-list/ @kroening @tautschnig @peterschrammel
 
 /cmake/        @diffblue/diffblue-opensource
