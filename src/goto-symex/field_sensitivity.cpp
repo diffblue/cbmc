@@ -9,8 +9,10 @@ Author: Michael Tautschnig
 #include "field_sensitivity.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
@@ -419,14 +421,24 @@ void field_sensitivityt::field_assignments_rec(
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(const auto &comp : components)
     {
-      const exprt member_rhs = apply(
-        ns,
-        state,
-        simplify_opt(
-          make_byte_extract(
-            ssa_rhs, from_integer(0, c_index_type()), comp.type()),
-          ns),
-        false);
+      exprt extract;
+      if(
+        comp.type().id() != ID_c_bit_field ||
+        to_c_bit_field_type(comp.type()).get_width() %
+            config.ansi_c.char_width ==
+          0)
+      {
+        extract = make_byte_extract(
+          ssa_rhs, from_integer(0, c_index_type()), comp.type());
+      }
+      else
+      {
+        const auto upper = to_c_bit_field_type(comp.type()).get_width() - 1;
+        extract = extractbits_exprt(ssa_rhs, upper, 0, comp.type());
+      }
+
+      const exprt member_rhs =
+        apply(ns, state, simplify_opt(extract, ns), false);
 
       const exprt &member_lhs = *fs_it;
       if(
