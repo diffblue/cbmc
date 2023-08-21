@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_assign.h"
 
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/pointer_expr.h>
 #include <util/range.h>
@@ -113,6 +114,22 @@ void symex_assignt::assign_rec(
           lhs.id()==ID_byte_extract_big_endian)
   {
     assign_byte_extract(to_byte_extract_expr(lhs), full_lhs, rhs, guard);
+  }
+  else if(lhs.id() == ID_extractbits)
+  {
+    // extractbits(typecast(obj, bv), idx, type) = value
+    // becomes typecast(obj, bv) = update_bits(typecast(obj, bv), idx, value)
+    const auto &extractbits_lhs = to_extractbits_expr(lhs);
+    // Ensure the value has the exact bit width that update_bits
+    // needs to know how many bits to replace. Use a bitvector type
+    // that the simplifier won't strip away.
+    const auto bf_width = to_bitvector_type(lhs.type()).get_width();
+    exprt typed_rhs = typecast_exprt{rhs, bv_typet{bf_width}};
+    const update_bits_exprt new_rhs{
+      extractbits_lhs.src(), extractbits_lhs.index(), typed_rhs};
+    const expr_skeletont new_skeleton =
+      full_lhs.compose(expr_skeletont::remove_op0(lhs));
+    assign_rec(extractbits_lhs.src(), new_skeleton, new_rhs, guard);
   }
   else if(lhs.id() == ID_complex_real)
   {

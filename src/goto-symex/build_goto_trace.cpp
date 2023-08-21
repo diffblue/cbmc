@@ -14,6 +14,7 @@ Author: Daniel Kroening
 #include "build_goto_trace.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
@@ -109,6 +110,12 @@ static exprt build_full_lhs_rec(
       decision_procedure, ns, tmp.op(), to_byte_extract_expr(src_ssa).op());
 
     // re-write into big case-split
+  }
+  else if(id == ID_extractbits)
+  {
+    extractbits_exprt tmp = to_extractbits_expr(src_original);
+    tmp.src() = build_full_lhs_rec(
+      decision_procedure, ns, tmp.src(), to_extractbits_expr(src_ssa).src());
   }
 
   return src_original;
