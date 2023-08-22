@@ -37,6 +37,17 @@ irep_idt extract_field_name(const exprt &string_expr);
 /// \param type The followed type of expr.
 void clean_pointer_expr(exprt &expr, const typet &type);
 
+// TODO: Daxygen
+exprt deref_expr(const exprt &expr);
+
+// TODO: DOxYGEN
+void log_set_field(
+  const namespacet &ns,
+  const messaget &log,
+  const irep_idt &field_name,
+  const exprt &expr,
+  const exprt &value);
+
 // TODO: doxygen
 void log_get_field(
   const namespacet &ns,
@@ -99,6 +110,10 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
   bool &exact_match);
 
 // TODO: doxygen
+const typet &
+get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state);
+
+// TODO: doxygen
 bool contains_null_or_invalid(
   const std::vector<exprt> &value_set,
   const exprt &address);
@@ -122,5 +137,23 @@ exprt compute_max_over_cells(
 // TODO: doxygen?
 exprt build_if_else_expr(
   const std::vector<std::pair<exprt, exprt>> &conds_values);
+
+// TODO: improve?
+/// returns true if we attempt to set/get a field on a NULL pointer
+bool set_field_check_null(
+  const namespacet &ns,
+  const messaget &log,
+  const std::vector<exprt> &value_set,
+  const exprt &expr);
+
+// TODO: improve?
+/// Used for set_field and shadow memory copy
+optionalt<exprt> get_shadow_memory(
+  const exprt &expr,
+  const std::vector<exprt> &value_set,
+  const std::vector<shadow_memory_statet::shadowed_addresst> &addresses,
+  const namespacet &ns,
+  const messaget &log,
+  size_t &mux_size);
 
 #endif // CPROVER_GOTO_SYMEX_SHADOW_MEMORY_UTIL_H

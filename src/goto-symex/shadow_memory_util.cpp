@@ -18,7 +18,7 @@ Author: Peter Schrammel
 #include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
-#include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
 
@@ -54,6 +54,16 @@ static void remove_array_type_l2(typet &type)
   size.remove_level_2();
 }
 
+exprt deref_expr(const exprt &expr)
+{
+  if(expr.id() == ID_address_of)
+  {
+    return to_address_of_expr(expr).object();
+  }
+
+  return dereference_exprt(expr);
+}
+
 void clean_pointer_expr(exprt &expr, const typet &type)
 {
   if(
@@ -79,6 +89,21 @@ void clean_pointer_expr(exprt &expr, const typet &type)
     expr = address_of_exprt(expr);
   }
   POSTCONDITION(expr.type().id() == ID_pointer);
+}
+
+void log_set_field(
+  const namespacet &ns,
+  const messaget &log,
+  const irep_idt &field_name,
+  const exprt &expr,
+  const exprt &value)
+{
+  log.conditional_output(
+    log.debug(), [field_name, ns, expr, value](messaget::mstreamt &mstream) {
+      mstream << "Shadow memory: set_field: " << id2string(field_name)
+              << " for " << format(expr) << " to " << format(value)
+              << messaget::eom;
+    });
 }
 
 void log_get_field(
@@ -229,6 +254,13 @@ get_field_init_expr(const irep_idt &field_name, const goto_symex_statet &state)
   field_type_it = state.shadow_memory.fields.global_fields.find(field_name);
   CHECK_RETURN(field_type_it != state.shadow_memory.fields.global_fields.end());
   return field_type_it->second;
+}
+
+const typet &
+get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state)
+{
+  const exprt &field_init_expr = get_field_init_expr(field_name, state);
+  return field_init_expr.type();
 }
 
 /// Given a pointer expression `address` checks if any expr in value_set is
@@ -827,4 +859,240 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
     }
   }
   return result;
+}
+
+// TODO: doxygen?
+// Unfortunately.
+static object_descriptor_exprt
+normalize(const object_descriptor_exprt &expr, const namespacet &ns)
+{
+  if(expr.object().id() == ID_symbol)
+  {
+    return expr;
+  }
+  if(expr.offset().id() == ID_unknown)
+  {
+    return expr;
+  }
+
+  object_descriptor_exprt result = expr;
+  mp_integer offset =
+    numeric_cast_v<mp_integer>(to_constant_expr(expr.offset()));
+  exprt object = expr.object();
+
+  while(true)
+  {
+    if(object.id() == ID_index)
+    {
+      const index_exprt &index_expr = to_index_expr(object);
+      mp_integer index =
+        numeric_cast_v<mp_integer>(to_constant_expr(index_expr.index()));
+
+      offset += *pointer_offset_size(index_expr.type(), ns) * index;
+      object = index_expr.array();
+    }
+    else if(object.id() == ID_member)
+    {
+      const member_exprt &member_expr = to_member_expr(object);
+      const struct_typet &struct_type =
+        to_struct_type(ns.follow(member_expr.struct_op().type()));
+      offset +=
+        *member_offset(struct_type, member_expr.get_component_name(), ns);
+      object = member_expr.struct_op();
+    }
+    else
+    {
+      break;
+    }
+  }
+  result.object() = object;
+  result.offset() = from_integer(offset, expr.offset().type());
+  return result;
+}
+
+bool set_field_check_null(
+  const namespacet &ns,
+  const messaget &log,
+  const std::vector<exprt> &value_set,
+  const exprt &expr)
+{
+  const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
+  if(value_set.size() == 1 && contains_null_or_invalid(value_set, null_pointer))
+  {
+    // TODO: duplicated in log_value_set_match
+#ifdef DEBUG_SM
+    log.conditional_output(
+      log.debug(), [ns, null_pointer, expr](messaget::mstreamt &mstream) {
+        mstream << "Shadow memory: value set match: " << format(null_pointer)
+                << " <-- " << format(expr) << messaget::eom;
+        mstream << "Shadow memory: ignoring set field on NULL object"
+                << messaget::eom;
+      });
+#endif
+    return true;
+  }
+  return false;
+}
+
+/// Used for set_field and shadow memory copy
+static std::vector<std::pair<exprt, exprt>>
+get_shadow_memory_for_matched_object(
+  const exprt &expr,
+  const exprt &matched_object,
+  const std::vector<shadow_memory_statet::shadowed_addresst> &addresses,
+  const namespacet &ns,
+  const messaget &log,
+  bool &exact_match)
+{
+  std::vector<std::pair<exprt, exprt>> result;
+  for(const auto &shadowed_address : addresses)
+  {
+    log_try_shadow_address(ns, log, shadowed_address);
+
+    if(!are_types_compatible(expr.type(), shadowed_address.address.type()))
+    {
+#ifdef DEBUG_SM
+      log.debug() << "Shadow memory: incompatible types "
+                  << from_type(ns, "", expr.type()) << ", "
+                  << from_type(ns, "", shadowed_address.address.type())
+                  << messaget::eom;
+#endif
+      continue;
+    }
+
+    object_descriptor_exprt matched_base_descriptor =
+      normalize(to_object_descriptor_expr(matched_object), ns);
+
+    value_set_dereferencet::valuet dereference =
+      value_set_dereferencet::build_reference_to(
+        matched_base_descriptor, expr, ns);
+
+    exprt matched_base_address =
+      address_of_exprt(matched_base_descriptor.object());
+    clean_string_constant(to_address_of_expr(matched_base_address).op());
+
+    // NULL has already been handled in the caller; skip.
+    if(matched_base_descriptor.object().id() == ID_null_object)
+    {
+      continue;
+    }
+    const value_set_dereferencet::valuet shadow_dereference =
+      get_shadow_dereference(
+        shadowed_address.shadow, matched_base_descriptor, expr, ns, log);
+    log_value_set_match(
+      ns,
+      log,
+      shadowed_address,
+      matched_base_address,
+      dereference,
+      expr,
+      shadow_dereference);
+
+    const exprt base_cond = get_matched_base_cond(
+      shadowed_address.address, matched_base_address, ns, log);
+    log_cond(ns, log, "base_cond", base_cond);
+    if(base_cond.is_false())
+    {
+      continue;
+    }
+
+    const exprt expr_cond =
+      get_matched_expr_cond(dereference.pointer, expr, ns, log);
+    if(expr_cond.is_false())
+    {
+      continue;
+    }
+
+    if(base_cond.is_true() && expr_cond.is_true())
+    {
+#ifdef DEBUG_SM
+      log.debug() << "exact match" << messaget::eom;
+#endif
+      exact_match = true;
+      result.clear();
+      result.push_back({base_cond, shadow_dereference.pointer});
+      break;
+    }
+
+    if(base_cond.is_true())
+    {
+      // No point looking at further shadow addresses
+      // as only one of them can match.
+#ifdef DEBUG_SM
+      log.debug() << "base match" << messaget::eom;
+#endif
+      result.clear();
+      result.emplace_back(expr_cond, shadow_dereference.pointer);
+      break;
+    }
+    else
+    {
+#ifdef DEBUG_SM
+      log.debug() << "conditional match" << messaget::eom;
+#endif
+      result.emplace_back(
+        and_exprt(base_cond, expr_cond), shadow_dereference.pointer);
+    }
+  }
+  return result;
+}
+
+optionalt<exprt> get_shadow_memory(
+  const exprt &expr,
+  const std::vector<exprt> &value_set,
+  const std::vector<shadow_memory_statet::shadowed_addresst> &addresses,
+  const namespacet &ns,
+  const messaget &log,
+  size_t &mux_size)
+{
+  std::vector<std::pair<exprt, exprt>> conds_values;
+  for(const auto &matched_object : value_set)
+  {
+    if(matched_object.id() != ID_object_descriptor)
+    {
+      log.warning() << "Shadow memory: value set contains unknown for "
+                    << format(expr) << messaget::eom;
+      continue;
+    }
+    if(
+      to_object_descriptor_expr(matched_object).root_object().id() ==
+      ID_integer_address)
+    {
+      log.warning() << "Shadow memory: value set contains integer_address for "
+                    << format(expr) << messaget::eom;
+      continue;
+    }
+    if(matched_object.type().get_bool(ID_C_is_failed_symbol))
+    {
+      log.warning() << "Shadow memory: value set contains failed symbol for "
+                    << format(expr) << messaget::eom;
+      continue;
+    }
+
+    bool exact_match = false;
+    auto per_value_set_conds_values = get_shadow_memory_for_matched_object(
+      expr, matched_object, addresses, ns, log, exact_match);
+
+    if(!per_value_set_conds_values.empty())
+    {
+      if(exact_match)
+      {
+        conds_values.clear();
+      }
+      conds_values.insert(
+        conds_values.begin(),
+        per_value_set_conds_values.begin(),
+        per_value_set_conds_values.end());
+      mux_size += conds_values.size() - 1;
+      if(exact_match)
+      {
+        break;
+      }
+    }
+  }
+  if(!conds_values.empty())
+  {
+    return build_if_else_expr(conds_values);
+  }
+  return {};
 }
