@@ -128,6 +128,10 @@ Functions</h2></td></tr>
 <tr class="memitem:ac7c04fbb203b47a5ce29a4b76fbcf880"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#ac7c04fbb203b47a5ce29a4b76fbcf880">clean_pointer_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="memdesc:ac7c04fbb203b47a5ce29a4b76fbcf880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean the given pointer expression so that it has the right shape for being used for identifying shadow memory.  <a href="shadow__memory__util_8h.html#ac7c04fbb203b47a5ce29a4b76fbcf880">More...</a><br /></td></tr>
 <tr class="separator:ac7c04fbb203b47a5ce29a4b76fbcf880"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2452eaf7cfa3f9d3d3e3182b48db9505"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#a2452eaf7cfa3f9d3d3e3182b48db9505">deref_expr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:a2452eaf7cfa3f9d3d3e3182b48db9505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41419f9bdf8576e7c674960ec7653cb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#a41419f9bdf8576e7c674960ec7653cb6">log_set_field</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="classmessaget.html">messaget</a> &amp;log, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;field_name, const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classexprt.html">exprt</a> &amp;value)</td></tr>
+<tr class="separator:a41419f9bdf8576e7c674960ec7653cb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a48d6908604d71260e734673b2c6b03"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#a2a48d6908604d71260e734673b2c6b03">log_get_field</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="classmessaget.html">messaget</a> &amp;log, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;field_name, const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="separator:a2a48d6908604d71260e734673b2c6b03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af61c8f8b42a93a29998fc2a6b044583e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#af61c8f8b42a93a29998fc2a6b044583e">log_value_set</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="classmessaget.html">messaget</a> &amp;log, const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;value_set)</td></tr>
@@ -146,6 +150,8 @@ Functions</h2></td></tr>
 <tr class="separator:a58bb583f5280212d2b263f81562d8ef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a415504940fb0400e08c374448246fc"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#a6a415504940fb0400e08c374448246fc">get_shadow_dereference_candidates</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="classmessaget.html">messaget</a> &amp;log, const <a class="el" href="classexprt.html">exprt</a> &amp;matched_object, const std::vector&lt; <a class="el" href="structshadow__memory__statet_1_1shadowed__addresst.html">shadow_memory_statet::shadowed_addresst</a> &gt; &amp;addresses, const <a class="el" href="classtypet.html">typet</a> &amp;field_type, const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classtypet.html">typet</a> &amp;lhs_type, bool &amp;exact_match)</td></tr>
 <tr class="separator:a6a415504940fb0400e08c374448246fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57e8b1a2da1ba74762afdf1ccca49240"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#a57e8b1a2da1ba74762afdf1ccca49240">get_field_init_type</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;field_name, const <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state)</td></tr>
+<tr class="separator:a57e8b1a2da1ba74762afdf1ccca49240"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2909c4734476f16c5091a0b767ebc6fc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#a2909c4734476f16c5091a0b767ebc6fc">contains_null_or_invalid</a> (const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;value_set, const <a class="el" href="classexprt.html">exprt</a> &amp;address)</td></tr>
 <tr class="memdesc:a2909c4734476f16c5091a0b767ebc6fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a pointer expression <code>address</code> checks if any expr in value_set is compatible.  <a href="shadow__memory__util_8h.html#a2909c4734476f16c5091a0b767ebc6fc">More...</a><br /></td></tr>
 <tr class="separator:a2909c4734476f16c5091a0b767ebc6fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,6 +161,12 @@ Functions</h2></td></tr>
 <tr class="separator:aa1658abe0304c7cdb1a0eb6e9f9408a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0380d6d898750c64eefae4f0e306bf3d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#a0380d6d898750c64eefae4f0e306bf3d">build_if_else_expr</a> (const std::vector&lt; std::pair&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classexprt.html">exprt</a> &gt;&gt; &amp;conds_values)</td></tr>
 <tr class="separator:a0380d6d898750c64eefae4f0e306bf3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa302d945649894f9f0dd703032ed3369"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#aa302d945649894f9f0dd703032ed3369">set_field_check_null</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="classmessaget.html">messaget</a> &amp;log, const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;value_set, const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:aa302d945649894f9f0dd703032ed3369"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true if we attempt to set/get a field on a NULL pointer  <a href="shadow__memory__util_8h.html#aa302d945649894f9f0dd703032ed3369">More...</a><br /></td></tr>
+<tr class="separator:aa302d945649894f9f0dd703032ed3369"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cc17ee4223dddad60a4bed4dce65093"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8h.html#a5cc17ee4223dddad60a4bed4dce65093">get_shadow_memory</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;value_set, const std::vector&lt; <a class="el" href="structshadow__memory__statet_1_1shadowed__addresst.html">shadow_memory_statet::shadowed_addresst</a> &gt; &amp;addresses, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="classmessaget.html">messaget</a> &amp;log, size_t &amp;mux_size)</td></tr>
+<tr class="memdesc:a5cc17ee4223dddad60a4bed4dce65093"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used for set_field and shadow memory copy.  <a href="shadow__memory__util_8h.html#a5cc17ee4223dddad60a4bed4dce65093">More...</a><br /></td></tr>
+<tr class="separator:a5cc17ee4223dddad60a4bed4dce65093"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Symex Shadow Memory Instrumentation Utilities. </p>
@@ -177,7 +189,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00512">512</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00544">544</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -216,7 +228,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00057">57</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00067">67</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -264,7 +276,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00456">456</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00488">488</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -312,7 +324,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00332">332</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00364">364</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +356,27 @@ Functions</h2></td></tr>
 
 <p>Given a pointer expression <code>address</code> checks if any expr in value_set is compatible. </p>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00236">236</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00268">268</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a2452eaf7cfa3f9d3d3e3182b48db9505"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2452eaf7cfa3f9d3d3e3182b48db9505">&#9670;&nbsp;</a></span>deref_expr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> deref_expr </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00057">57</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -403,7 +435,37 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00222">222</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00247">247</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a57e8b1a2da1ba74762afdf1ccca49240"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57e8b1a2da1ba74762afdf1ccca49240">&#9670;&nbsp;</a></span>get_field_init_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classtypet.html">typet</a>&amp; get_field_init_type </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>field_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;&#160;</td>
+          <td class="paramname"><em>state</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00260">260</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -469,7 +531,63 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00703">703</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00735">735</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5cc17ee4223dddad60a4bed4dce65093"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cc17ee4223dddad60a4bed4dce65093">&#9670;&nbsp;</a></span>get_shadow_memory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="classexprt.html">exprt</a>&gt; get_shadow_memory </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>value_set</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structshadow__memory__statet_1_1shadowed__addresst.html">shadow_memory_statet::shadowed_addresst</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>addresses</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classmessaget.html">messaget</a> &amp;&#160;</td>
+          <td class="paramname"><em>log</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t &amp;&#160;</td>
+          <td class="paramname"><em>mux_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Used for set_field and shadow memory copy. </p>
+
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l01040">1040</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -511,7 +629,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00174">174</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00199">199</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -553,7 +671,55 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00084">84</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00109">109</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a41419f9bdf8576e7c674960ec7653cb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41419f9bdf8576e7c674960ec7653cb6">&#9670;&nbsp;</a></span>log_set_field()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void log_set_field </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classmessaget.html">messaget</a> &amp;&#160;</td>
+          <td class="paramname"><em>log</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>field_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00094">94</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -589,7 +755,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00160">160</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00185">185</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -625,7 +791,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00097">97</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00122">122</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -667,7 +833,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00144">144</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00169">169</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -727,7 +893,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00113">113</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00138">138</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -747,7 +913,51 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00203">203</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00228">228</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa302d945649894f9f0dd703032ed3369"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa302d945649894f9f0dd703032ed3369">&#9670;&nbsp;</a></span>set_field_check_null()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool set_field_check_null </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classmessaget.html">messaget</a> &amp;&#160;</td>
+          <td class="paramname"><em>log</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>value_set</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true if we attempt to set/get a field on a NULL pointer </p>
+
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00913">913</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
