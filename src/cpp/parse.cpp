@@ -267,7 +267,7 @@ protected:
   bool optStorageSpec(cpp_storage_spect &);
   bool optCvQualify(typet &);
   bool optAlignas(typet &);
-  bool rAttribute(typet &);
+  bool rGCCAttribute(typet &);
   bool optAttribute(typet &);
   bool optIntegralTypeOrClassSpec(typet &);
   bool rConstructorDecl(
@@ -852,15 +852,9 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   // inline namespace __cxx11 __attribute__((__abi_tag__ ("cxx11"))) { }
   // which occurs in glibc. Obviously we need to better than just throw attribs
   // away like this in the future.
-  if(lex.LookAhead(0)==TOK_GCC_ATTRIBUTE)
-  {
-    cpp_tokent tk;
-    lex.get_token(tk);
-
-    typet discard;
-    if(!rAttribute(discard))
-      return false;
-  }
+  typet discard;
+  if(!optAttribute(discard))
+    return false;
 
   switch(lex.LookAhead(0))
   {
@@ -1417,6 +1411,10 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
 
   if(!optCvQualify(cv_q))
     return false;
+
+  if(member_spec.is_empty())
+    if(!optMemberSpec(member_spec))
+      return false;
 
   // added these two to do "const static volatile int i=1;"
   if(!optStorageSpec(storage_spec))
@@ -2073,7 +2071,7 @@ bool Parser::optCvQualify(typet &cv)
         break;
 
       case TOK_GCC_ATTRIBUTE:
-        if(!rAttribute(cv))
+        if(!rGCCAttribute(cv))
           return false;
         break;
 
@@ -2162,11 +2160,11 @@ bool Parser::optAlignas(typet &cv)
   return false;
 }
 
-bool Parser::rAttribute(typet &t)
+bool Parser::rGCCAttribute(typet &t)
 {
 #ifdef DEBUG
   indenter _i;
-  std::cout << std::string(__indent, ' ') << "Parser::rAttribute "
+  std::cout << std::string(__indent, ' ') << "Parser::rGCCAttribute "
             << lex.LookAhead(0);
 #endif
   cpp_tokent tk;
@@ -2176,7 +2174,7 @@ bool Parser::rAttribute(typet &t)
   {
   case '(':
     if(lex.LookAhead(0)!=')')
-      rAttribute(t);
+      rGCCAttribute(t);
 
     if(lex.LookAhead(0)!=')')
       return false;
@@ -2360,11 +2358,19 @@ bool Parser::rAttribute(typet &t)
   if(lex.LookAhead(0)==')')
     return true;
 
-  return rAttribute(t);
+  return rGCCAttribute(t);
 }
 
 bool Parser::optAttribute(typet &t)
 {
+  if(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
+  {
+    lex.get_token();
+
+    if(!rGCCAttribute(t))
+      return false;
+  }
+
   if(lex.LookAhead(0)!='[' ||
      lex.LookAhead(1)!='[')
     return true;
@@ -4487,13 +4493,8 @@ bool Parser::rClassSpec(typet &spec)
     if(!optAlignas(spec))
       return false;
 
-    if(lex.LookAhead(0)==TOK_GCC_ATTRIBUTE)
-    {
-      lex.get_token(tk);
-
-      if(!rAttribute(spec))
-        return false;
-    }
+    if(!optAttribute(spec))
+      return false;
 
     irept name;
 

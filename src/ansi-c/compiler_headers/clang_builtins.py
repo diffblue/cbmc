@@ -43,7 +43,7 @@ typespec_map = {
         'v': 'void',
         'w': 'wchar_t',
         'x': '_Float16',
-        'y': '_Float16', # would be '__bf16', but we don't support that yet
+        'y': '__bf16',
         'z': '__CPROVER_size_t'
         }
 

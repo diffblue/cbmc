@@ -19,6 +19,7 @@ Date: July 2018
 class ms_link_cmdlinet : public goto_cc_cmdlinet
 {
 public:
+  using cmdlinet::parse;
   virtual bool parse(int, const char **);
 
   ms_link_cmdlinet()

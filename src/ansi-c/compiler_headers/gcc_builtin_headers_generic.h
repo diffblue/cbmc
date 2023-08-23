@@ -44,6 +44,7 @@ long __builtin_expect_with_probability(long, long, double);
 void __builtin_clear_padding();
 void __builtin_speculation_safe_value();
 void* __builtin_speculation_safe_value_ptr(void*, ...);
+_Bool __builtin_is_constant_evaluated(void);
 
 void* __builtin_dwarf_cfa();
 unsigned __builtin_dwarf_sp_column();
