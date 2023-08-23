@@ -31,6 +31,7 @@ var gcc__builtin__headers__generic_8h =
     [ "__builtin_fork", "gcc__builtin__headers__generic_8h.html#af8288bcbe84a79492dfcd90fc0d4745b", null ],
     [ "__builtin_FUNCTION", "gcc__builtin__headers__generic_8h.html#a74130e20ce84bf5b37db013c60f82cb3", null ],
     [ "__builtin_init_dwarf_reg_size_table", "gcc__builtin__headers__generic_8h.html#ad31415d2149a7626b468bd7f36113fa7", null ],
+    [ "__builtin_is_constant_evaluated", "gcc__builtin__headers__generic_8h.html#a3d22dd7ce291e1ad1c117697094d3358", null ],
     [ "__builtin_LINE", "gcc__builtin__headers__generic_8h.html#a186ce09cb97bf5f3a74558e82636deb7", null ],
     [ "__builtin_longjmp", "gcc__builtin__headers__generic_8h.html#af84e43cc22130a4ec205f551916b3fb6", null ],
     [ "__builtin_ms_va_end", "gcc__builtin__headers__generic_8h.html#ae0d077d0db39ad3ae3cb263a4e48e617", null ],
