@@ -1047,7 +1047,7 @@ __CPROVER_HIDE:;
 
   (void)*format;
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
-        __CPROVER_OBJECT_SIZE(arg))
+        __CPROVER_OBJECT_SIZE(*(void **)&arg))
   {
     void *a = va_arg(arg, void *);
     __CPROVER_havoc_object(a);
@@ -1210,7 +1210,7 @@ __CPROVER_HIDE:;
   (void)*s;
   (void)*format;
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
-        __CPROVER_OBJECT_SIZE(arg))
+        __CPROVER_OBJECT_SIZE(*(void **)&arg))
   {
     void *a = va_arg(arg, void *);
     __CPROVER_havoc_object(a);
