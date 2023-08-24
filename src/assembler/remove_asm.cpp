@@ -23,6 +23,7 @@ Date:   December 2014
 #include <util/string_constant.h>
 
 #include <goto-programs/goto_model.h>
+#include <goto-programs/language_features.h>
 #include <goto-programs/remove_skip.h>
 
 #include "assembler_parser.h"
@@ -39,6 +40,8 @@ public:
   {
     for(auto &f : goto_functions.function_map)
       process_function(f.first, f.second);
+
+    clear_language_feature(symbol_table, ID_asm);
   }
 
 protected:
