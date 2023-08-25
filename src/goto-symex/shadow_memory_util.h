@@ -37,10 +37,11 @@ irep_idt extract_field_name(const exprt &string_expr);
 /// \param type The followed type of expr.
 void clean_pointer_expr(exprt &expr, const typet &type);
 
-// TODO: Daxygen
+/// Converts a given expression into a dereference_exprt.
 exprt deref_expr(const exprt &expr);
 
-// TODO: DOxYGEN
+/// Logs setting a value to a given shadow field. Mainly for use for
+/// debugging purposes.
 void log_set_field(
   const namespacet &ns,
   const messaget &log,
@@ -48,20 +49,22 @@ void log_set_field(
   const exprt &expr,
   const exprt &value);
 
-// TODO: doxygen
+/// Logs setting a value to a given shadow field. Mainly for use for
+/// debugging purposes.
 void log_get_field(
   const namespacet &ns,
   const messaget &log,
   const irep_idt &field_name,
   const exprt &expr);
 
-// TODO: doxygen
+/// Logs the retrieval of the value associated with a given shadow
+/// memory field. Mainly for use for debugging purposes. Dual to log_get_field.
 void log_value_set(
   const namespacet &ns,
   const messaget &log,
   const std::vector<exprt> &value_set);
 
-// TODO: doxygen
+/// Log a match between a value in the value set of a given expression, and
 void log_value_set_match(
   const namespacet &ns,
   const messaget &log,
