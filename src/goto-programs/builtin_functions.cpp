@@ -704,19 +704,18 @@ void goto_convertt::do_alloca(
   const irep_idt &mode)
 {
   const source_locationt &source_location = function.source_location();
+  const auto alloca_type = to_code_type(function.type());
+
   exprt new_lhs = lhs;
 
   // make sure we have a left-hand side to track the allocation even when the
   // original program did not
   if(lhs.is_nil())
   {
-    new_lhs = new_tmp_symbol(
-                to_code_type(function.type()).return_type(),
-                "alloca",
-                dest,
-                source_location,
-                mode)
-                .symbol_expr();
+    new_lhs =
+      new_tmp_symbol(
+        alloca_type.return_type(), "alloca", dest, source_location, mode)
+        .symbol_expr();
   }
 
   // do the actual function call
@@ -740,7 +739,7 @@ void goto_convertt::do_alloca(
   // NULL
   symbol_exprt this_alloca_ptr =
     get_fresh_aux_symbol(
-      to_code_type(function.type()).return_type(),
+      alloca_type.return_type(),
       id2string(function.source_location().get_function()),
       "tmp_alloca",
       source_location,
