@@ -325,7 +325,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a <code>valuet</code> object containing <code>guard</code> and <code>value</code> fields. The guard is an appropriate check to determine whether <code>pointer_expr</code> really points to <code>what</code>; for example <code>pointer_expr == &amp;what</code>. The value corresponds to the dereferenced pointer_expr assuming it is pointing to the object described by <code>what</code>. For example, we might return <code>{.value = global, .pointer_guard = (pointer_expr == &amp;global)}</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00454">454</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00455">455</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +364,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00142">142</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00143">143</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +417,7 @@ Private Attributes</h2></td></tr>
 <li>object_type=(int *), dereference_type=(void **) is not ok; </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00338">338</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00339">339</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -455,7 +455,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00291">291</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00292">292</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -493,7 +493,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00214">214</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00215">215</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -546,7 +546,7 @@ Private Attributes</h2></td></tr>
 <p>Replace <code>value</code> by an expression of type <code>to_type</code> corresponding to the value at memory address <code>value + offset</code>. </p>
 <p>If <code>value</code> is a bitvector or pointer of the same size as <code>to_type</code>, make <code>value</code> into the typecast expression <code>(to_type)value</code>. Otherwise perform the same operation as <a class="el" href="classvalue__set__dereferencet.html#a12a8eda24dfd0858c882b59a7a7b8fcc" title="Replace value by an expression of type to_type corresponding to the value at memory address value + o...">value_set_dereferencet::memory_model_bytes</a> </p><dl class="section return"><dt>Returns</dt><dd>true on success </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00689">689</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00703">703</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -599,7 +599,7 @@ Private Attributes</h2></td></tr>
 <p>Replace <code>value</code> by an expression of type <code>to_type</code> corresponding to the value at memory address <code>value + offset</code>. </p>
 <p>If the type of value is an array of bitvectors of size 1 byte, and <code>to_type</code> also is bitvector of size 1 byte, then the resulting expression is <code>value[offset]</code> or <code>(to_type)value[offset]</code> when typecast is required. Otherwise the expression is <code>byte_extract(value, offset)</code>. </p><dl class="section return"><dt>Returns</dt><dd>false if the conversion cannot be made </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00736">736</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00750">750</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
@@ -654,7 +654,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if <code>what</code> should be ignored as a possible alias </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00417">417</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__dereference_8cpp_source.html#l00418">418</a> of file <a class="el" href="value__set__dereference_8cpp_source.html">value_set_dereference.cpp</a>.</p>
 
 </div>
 </div>
