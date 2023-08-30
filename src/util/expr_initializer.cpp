@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "bitvector_expr.h"
+#include "byte_operators.h"
 #include "c_types.h"
 #include "config.h"
 #include "magic.h"
@@ -344,6 +345,27 @@ optionalt<exprt> expr_initializer(
   return expr_initializert(ns)(type, source_location, init_byte_expr);
 }
 
+/// Typecast the input to the output if this is a signed/unsigned bv.
+/// Perform a reinterpret cast using byte_extract otherwise.
+/// @param expr the expression to be casted if necessary.
+/// @param out_type the type to cast the expression to.
+/// @return the casted or reinterpreted expression.
+static exprt cast_or_reinterpret(const exprt &expr, const typet &out_type)
+{
+  // Same type --> no cast
+  if(expr.type() == out_type)
+  {
+    return expr;
+  }
+  if(
+    can_cast_type<signedbv_typet>(out_type) ||
+    can_cast_type<unsignedbv_typet>(out_type))
+  {
+    return typecast_exprt::conditional_cast(expr, out_type);
+  }
+  return make_byte_extract(expr, from_integer(0, char_type()), out_type);
+}
+
 /// Builds an expression of the given output type with each of its bytes
 /// initialized to the given initialization expression.
 /// Integer bitvector types are currently supported.
@@ -375,7 +397,7 @@ exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
       const auto init_size = init_type_as_bitvector->get_width();
       const irep_idt init_value = to_constant_expr(init_byte_expr).get_value();
 
-      // Create a new BV od `output_type` size with its representation being the
+      // Create a new BV of `output_type` size with its representation being the
       // replication of the init_byte_expr (padded with 0) enough times to fill.
       const auto output_value =
         make_bvrep(out_width, [&init_size, &init_value](std::size_t index) {
@@ -400,6 +422,11 @@ exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
     {
       operation_type = unsignedbv_typet{ptr_type->get_width()};
     }
+    if(
+      const auto float_type = type_try_dynamic_cast<floatbv_typet>(output_type))
+    {
+      operation_type = unsignedbv_typet{float_type->get_width()};
+    }
     // Let's cast init_byte_expr to output_type.
     const exprt casted_init_byte_expr =
       typecast_exprt::conditional_cast(init_byte_expr, operation_type);
@@ -410,10 +437,10 @@ exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
         casted_init_byte_expr,
         from_integer(config.ansi_c.char_width * i, size_type())));
     }
-    if(values.size() == 1)
-      return typecast_exprt::conditional_cast(values[0], output_type);
-    return typecast_exprt::conditional_cast(
-      multi_ary_exprt(ID_bitor, values, operation_type), output_type);
+    return cast_or_reinterpret(
+      values.size() == 1 ? values[0]
+                         : multi_ary_exprt(ID_bitor, values, operation_type),
+      output_type);
   }
 
   // Anything else. We don't know what to do with it. So, just cast.
