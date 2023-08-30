@@ -706,6 +706,23 @@ void goto_convertt::do_alloca(
   const source_locationt &source_location = function.source_location();
   const auto alloca_type = to_code_type(function.type());
 
+  if(alloca_type.return_type() != pointer_type(void_type()))
+  {
+    error().source_location = source_location;
+    error() << "'alloca' function called, but 'alloca' has not been declared "
+            << "with expected 'void *' return type." << eom;
+    throw 0;
+  }
+  if(
+    alloca_type.parameters().size() != 1 ||
+    alloca_type.parameters()[0].type() != size_type())
+  {
+    error().source_location = source_location;
+    error() << "'alloca' function called, but 'alloca' has not been declared "
+            << "with expected single 'size_t' parameter." << eom;
+    throw 0;
+  }
+
   exprt new_lhs = lhs;
 
   // make sure we have a left-hand side to track the allocation even when the
