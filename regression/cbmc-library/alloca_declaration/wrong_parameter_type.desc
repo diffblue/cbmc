@@ -1,0 +1,11 @@
+CORE
+wrong_parameter_type.c
+
+file wrong_parameter_type\.c line 10 function main: 'alloca' function called, but 'alloca' has not been declared with expected single 'size_t' parameter\.
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This is a test for C front end to confirm an appropriate error message is
+generated if `alloca` is called when it is declared with too many parameters.
