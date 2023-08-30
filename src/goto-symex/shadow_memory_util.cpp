@@ -22,17 +22,16 @@ Author: Peter Schrammel
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
 
-#include <langapi/language_util.h> // IWYU pragma: keep
 
 // TODO: change DEBUG_SM to DEBUG_SHADOW_MEMORY (it also appears in other files)
 
 irep_idt extract_field_name(const exprt &string_expr)
 {
-  if(string_expr.id() == ID_typecast)
+  if(can_cast_expr<typecast_exprt>(string_expr))
     return extract_field_name(to_typecast_expr(string_expr).op());
-  else if(string_expr.id() == ID_address_of)
+  else if(can_cast_expr<address_of_exprt>(string_expr))
     return extract_field_name(to_address_of_expr(string_expr).object());
-  else if(string_expr.id() == ID_index)
+  else if(can_cast_expr<index_exprt>(string_expr))
     return extract_field_name(to_index_expr(string_expr).array());
   else if(string_expr.id() == ID_string_constant)
   {
@@ -42,8 +41,8 @@ irep_idt extract_field_name(const exprt &string_expr)
     UNREACHABLE;
 }
 
-/// If the given type is an array type, then remove the L2 level
-/// renaming from its size.
+/// If the given type is an array type, then remove the L2 level renaming
+/// from its size.
 /// \param type Type to be modified
 static void remove_array_type_l2(typet &type)
 {
@@ -56,7 +55,7 @@ static void remove_array_type_l2(typet &type)
 
 exprt deref_expr(const exprt &expr)
 {
-  if(expr.id() == ID_address_of)
+  if(can_cast_expr<address_of_exprt>(expr))
   {
     return to_address_of_expr(expr).object();
   }
@@ -67,7 +66,7 @@ exprt deref_expr(const exprt &expr)
 void clean_pointer_expr(exprt &expr, const typet &type)
 {
   if(
-    type.id() == ID_array && expr.id() == ID_symbol &&
+    can_cast_type<array_typet>(type) && can_cast_expr<symbol_exprt>(expr) &&
     to_array_type(type).size().get_bool(ID_C_SSA_symbol))
   {
     remove_array_type_l2(expr.type());
@@ -80,7 +79,7 @@ void clean_pointer_expr(exprt &expr, const typet &type)
     expr = address_of_exprt(expr);
     expr.type() = pointer_type(char_type());
   }
-  else if(expr.id() == ID_dereference)
+  else if(can_cast_expr<dereference_exprt>(expr))
   {
     expr = to_dereference_expr(expr).pointer();
   }
@@ -88,7 +87,7 @@ void clean_pointer_expr(exprt &expr, const typet &type)
   {
     expr = address_of_exprt(expr);
   }
-  POSTCONDITION(expr.type().id() == ID_pointer);
+  POSTCONDITION(can_cast_type<pointer_typet>(expr.type()));
 }
 
 void log_set_field(
@@ -691,7 +690,16 @@ static exprt get_matched_expr_cond(
   return expr_cond;
 }
 
-// TODO: doxygen?
+/// Retrieve the shadow value a pointer expression may point to.
+/// \param shadow The shadow expression.
+/// \param matched_base_descriptor The base descriptor for the shadow object.
+/// \param expr The pointer expression.
+/// \param ns The namespace within which we're going to perform symbol lookups.
+/// \param log The message log to which we're going to print debugging messages,
+///   if debugging is set.
+/// \returns A `valuet` object denoting the dereferenced object within shadow
+///   memory, guarded by a appropriate condition (of the form
+///   pointer == &shadow_object).
 static value_set_dereferencet::valuet get_shadow_dereference(
   const exprt &shadow,
   const object_descriptor_exprt &matched_base_descriptor,

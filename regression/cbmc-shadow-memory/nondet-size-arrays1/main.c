@@ -1,6 +1,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#ifdef _WIN32
+void *alloca(size_t alloca_size);
+#endif
+
 int main()
 {
   __CPROVER_field_decl_local("field1", (char)0);

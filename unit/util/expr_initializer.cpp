@@ -177,6 +177,18 @@ TEST_CASE(
       from_integer(init_expr_value, signedbv_typet{init_expr_size}),
       output_type);
     REQUIRE(result_with_signed_init_type == result);
+
+    // Check that replicating a pointer_value is same as unsigned_bv.
+    const pointer_typet pointer_type{bool_typet{}, output_size};
+    const auto result_with_pointer_type = duplicate_per_byte(
+      from_integer(init_expr_value, signedbv_typet{init_expr_size}),
+      pointer_type);
+    auto pointer_typed_expected =
+      from_integer(output_expected_value, unsignedbv_typet{output_size});
+    // Forcing the type to be pointer_typet otherwise from_integer fails when
+    // the init value is not 0 (NULL).
+    pointer_typed_expected.type() = pointer_type;
+    REQUIRE(result_with_pointer_type == pointer_typed_expected);
   }
 }
 
@@ -212,6 +224,21 @@ TEST_CASE(
       replicate_expression(casted_init_expr, output_type, replication_count);
 
     REQUIRE(result == expected);
+
+    // Check that replicating a pointer_value is same as unsigned_bv modulo a
+    // typecast outside.
+    const pointer_typet pointer_type{bool_typet{}, output_size};
+    const auto pointer_typed_result =
+      duplicate_per_byte(init_expr, pointer_type);
+    const auto pointer_unsigned_corr_type = unsignedbv_typet{output_size};
+    const auto pointer_init_expr =
+      typecast_exprt::conditional_cast(init_expr, pointer_unsigned_corr_type);
+    const auto pointer_expected = typecast_exprt::conditional_cast(
+      replicate_expression(
+        pointer_init_expr, pointer_unsigned_corr_type, replication_count),
+      pointer_type);
+
+    REQUIRE(pointer_typed_result == pointer_expected);
   }
 }
 
@@ -307,6 +334,53 @@ TEST_CASE(
       REQUIRE(result.has_value());
       const auto expected =
         duplicate_per_byte(init_value, unsignedbv_typet{input_type_size});
+      REQUIRE(result.value() == expected);
+    }
+  }
+}
+
+TEST_CASE(
+  "expr_initializer on variable-bit pointer type",
+  "[core][util][expr_initializer]")
+{
+  auto test = expr_initializer_test_environmentt::make();
+  const std::size_t input_type_size = GENERATE(3, 8, 16, 20);
+  SECTION(
+    "Testing with expected type as unsigned_bv of size " +
+    std::to_string(input_type_size))
+  {
+    typet input_type = pointer_typet{bool_typet{}, input_type_size};
+    SECTION("nondet_initializer works")
+    {
+      const auto result = nondet_initializer(input_type, test.loc, test.ns);
+      REQUIRE(result.has_value());
+      const auto expected = side_effect_expr_nondett{
+        pointer_typet{bool_typet{}, input_type_size}, test.loc};
+      REQUIRE(result.value() == expected);
+      const auto expr_result =
+        expr_initializer(input_type, test.loc, test.ns, exprt(ID_nondet));
+      REQUIRE(expr_result == result);
+    }
+    SECTION("zero_initializer works")
+    {
+      const auto result = zero_initializer(input_type, test.loc, test.ns);
+      REQUIRE(result.has_value());
+      auto expected =
+        from_integer(0, pointer_typet{bool_typet{}, input_type_size});
+      REQUIRE(result.value() == expected);
+      const auto expr_result = expr_initializer(
+        input_type, test.loc, test.ns, constant_exprt(ID_0, char_type()));
+      REQUIRE(expr_result == result);
+    }
+    SECTION("expr_initializer calls duplicate_per_byte")
+    {
+      const exprt init_value =
+        from_integer(0x0A, unsignedbv_typet{config.ansi_c.char_width});
+      const auto result =
+        expr_initializer(input_type, test.loc, test.ns, init_value);
+      REQUIRE(result.has_value());
+      const auto expected = duplicate_per_byte(
+        init_value, pointer_typet{bool_typet{}, input_type_size});
       REQUIRE(result.value() == expected);
     }
   }

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "magic.h"
 #include "namespace.h" // IWYU pragma: keep
 #include "std_code.h"
+#include "symbol_table.h"
 
 class expr_initializert
 {
@@ -393,9 +394,15 @@ exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
 
     // We haven't got a constant. So, build the expression using shift-and-or.
     exprt::operandst values;
+
+    typet operation_type = output_type;
+    if(const auto ptr_type = type_try_dynamic_cast<pointer_typet>(output_type))
+    {
+      operation_type = unsignedbv_typet{ptr_type->get_width()};
+    }
     // Let's cast init_byte_expr to output_type.
     const exprt casted_init_byte_expr =
-      typecast_exprt::conditional_cast(init_byte_expr, output_type);
+      typecast_exprt::conditional_cast(init_byte_expr, operation_type);
     values.push_back(casted_init_byte_expr);
     for(size_t i = 1; i < size; ++i)
     {
@@ -404,8 +411,9 @@ exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
         from_integer(config.ansi_c.char_width * i, size_type())));
     }
     if(values.size() == 1)
-      return values[0];
-    return multi_ary_exprt(ID_bitor, values, output_type);
+      return typecast_exprt::conditional_cast(values[0], output_type);
+    return typecast_exprt::conditional_cast(
+      multi_ary_exprt(ID_bitor, values, operation_type), output_type);
   }
 
   // Anything else. We don't know what to do with it. So, just cast.
