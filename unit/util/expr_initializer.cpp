@@ -143,7 +143,7 @@ std::string to_hex(unsigned int value)
 }
 
 TEST_CASE(
-  "duplicate_per_byte on unsigned_bv with constant",
+  "duplicate_per_byte on bitvector types with constant",
   "[core][util][duplicate_per_byte]")
 {
   auto test = expr_initializer_test_environmentt::make();
@@ -162,47 +162,73 @@ TEST_CASE(
       rowt{0xAB, 8, 0xABAB, 16},   // smaller-type constant gets replicated
       rowt{0xAB, 8, 0xBABAB, 20}); // smaller-type constant gets replicated
   SECTION(
-    "Testing with output size " + std::to_string(output_size) + " init value " +
-    to_hex(init_expr_value) + " of size " + std::to_string(init_expr_size))
+    "Testing with init value " + to_hex(init_expr_value) + " of size " +
+    std::to_string(init_expr_size))
   {
-    typet output_type = unsignedbv_typet{output_size};
-    const auto result = duplicate_per_byte(
-      from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
-      output_type);
-    const auto expected =
-      from_integer(output_expected_value, unsignedbv_typet{output_size});
-    REQUIRE(result == expected);
-
-    // Check that signed-bv values are replicated including the sign bit.
-    const auto result_with_signed_init_type = duplicate_per_byte(
-      from_integer(init_expr_value, signedbv_typet{init_expr_size}),
-      output_type);
-    REQUIRE(result_with_signed_init_type == result);
-
-    // Check that replicating a pointer_value is same as unsigned_bv.
-    const pointer_typet pointer_type{bool_typet{}, output_size};
-    const auto result_with_pointer_type = duplicate_per_byte(
-      from_integer(init_expr_value, signedbv_typet{init_expr_size}),
-      pointer_type);
-    auto pointer_typed_expected =
-      from_integer(output_expected_value, unsignedbv_typet{output_size});
-    // Forcing the type to be pointer_typet otherwise from_integer fails when
-    // the init value is not 0 (NULL).
-    pointer_typed_expected.type() = pointer_type;
-    REQUIRE(result_with_pointer_type == pointer_typed_expected);
-
-    // Check that replicating to a float_value is same as unsigned_bv.
-    const auto result_with_float_type = duplicate_per_byte(
-      from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
-      float_type());
-    const auto expected_unsigned_value =
-      expr_try_dynamic_cast<constant_exprt>(duplicate_per_byte(
+    SECTION("filling unsignedbv of size " + std::to_string(output_size))
+    {
+      typet output_type = unsignedbv_typet{output_size};
+      const auto result = duplicate_per_byte(
         from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
-        unsignedbv_typet{float_type().get_width()}));
-    REQUIRE(expected_unsigned_value);
-    const auto float_typed_expected =
-      constant_exprt{expected_unsigned_value->get_value(), float_type()};
-    REQUIRE(result_with_float_type == float_typed_expected);
+        output_type);
+      const auto expected =
+        from_integer(output_expected_value, unsignedbv_typet{output_size});
+      REQUIRE(result == expected);
+
+      // Check that signed-bv values are replicated including the sign bit.
+      const auto result_with_signed_init_type = duplicate_per_byte(
+        from_integer(init_expr_value, signedbv_typet{init_expr_size}),
+        output_type);
+      REQUIRE(result_with_signed_init_type == result);
+    }
+
+    SECTION("filling signedbv of size " + std::to_string(output_size))
+    {
+      typet output_type = signedbv_typet{output_size};
+      const auto result = duplicate_per_byte(
+        from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
+        output_type);
+      const auto expected =
+        from_integer(output_expected_value, signedbv_typet{output_size});
+      REQUIRE(result == expected);
+
+      // Check that signed-bv values are replicated including the sign bit.
+      const auto result_with_signed_init_type = duplicate_per_byte(
+        from_integer(init_expr_value, signedbv_typet{init_expr_size}),
+        output_type);
+      REQUIRE(result_with_signed_init_type == result);
+    }
+
+    SECTION("filling pointer of size " + std::to_string(output_size))
+    {
+      // Check that replicating a pointer_value is same as unsigned_bv.
+      const pointer_typet output_type{bool_typet{}, output_size};
+      const auto result = duplicate_per_byte(
+        from_integer(init_expr_value, signedbv_typet{init_expr_size}),
+        output_type);
+      auto expected =
+        from_integer(output_expected_value, unsignedbv_typet{output_size});
+      // Forcing the type to be pointer_typet otherwise from_integer fails when
+      // the init value is not 0 (NULL).
+      expected.type() = output_type;
+      REQUIRE(result == expected);
+    }
+
+    SECTION("filling float")
+    {
+      // Check that replicating to a float_value is same as unsigned_bv.
+      const auto result = duplicate_per_byte(
+        from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
+        float_type());
+      const auto expected_unsigned_value =
+        expr_try_dynamic_cast<constant_exprt>(duplicate_per_byte(
+          from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
+          unsignedbv_typet{float_type().get_width()}));
+      REQUIRE(expected_unsigned_value);
+      const auto expected =
+        constant_exprt{expected_unsigned_value->get_value(), float_type()};
+      REQUIRE(result == expected);
+    }
   }
 }
 
@@ -221,57 +247,78 @@ TEST_CASE(
     rowt{8, 2, 1},   // bigger type gets truncated
     rowt{8, 16, 2},  // replicated twice
     rowt{8, 20, 3}); // replicated three times and truncated
-  SECTION(
-    "Testing with output size " + std::to_string(output_size) + " init size " +
-    std::to_string(init_expr_size))
+  SECTION("Testing with init size " + std::to_string(init_expr_size))
   {
-    typet output_type = signedbv_typet{output_size};
-
     const auto init_expr = plus_exprt{
       from_integer(1, unsignedbv_typet{init_expr_size}),
       from_integer(2, unsignedbv_typet{init_expr_size})};
-    const auto result = duplicate_per_byte(init_expr, output_type);
+    SECTION("filling signedbv of size " + std::to_string(output_size))
+    {
+      typet output_type = signedbv_typet{output_size};
 
-    const auto casted_init_expr =
-      typecast_exprt::conditional_cast(init_expr, output_type);
-    const auto expected =
-      replicate_expression(casted_init_expr, output_type, replication_count);
+      const auto result = duplicate_per_byte(init_expr, output_type);
 
-    REQUIRE(result == expected);
+      const auto casted_init_expr =
+        typecast_exprt::conditional_cast(init_expr, output_type);
+      const auto expected =
+        replicate_expression(casted_init_expr, output_type, replication_count);
 
-    // Check that replicating a pointer_value is same as unsigned_bv modulo a
-    // typecast outside.
-    const pointer_typet pointer_type{bool_typet{}, output_size};
-    const auto pointer_typed_result =
-      duplicate_per_byte(init_expr, pointer_type);
-    const auto pointer_unsigned_corr_type = unsignedbv_typet{output_size};
-    const auto pointer_init_expr =
-      typecast_exprt::conditional_cast(init_expr, pointer_unsigned_corr_type);
-    const auto pointer_expected = make_byte_extract(
-      replicate_expression(
-        pointer_init_expr, pointer_unsigned_corr_type, replication_count),
-      from_integer(0, char_type()),
-      pointer_type);
+      REQUIRE(result == expected);
+    }
 
-    REQUIRE(pointer_typed_result == pointer_expected);
+    SECTION("filling unsignedbv of size " + std::to_string(output_size))
+    {
+      typet output_type = unsignedbv_typet{output_size};
+      const auto result = duplicate_per_byte(init_expr, output_type);
 
-    // Check that replicating a float is same as unsigned_bv modulo a typecast
-    // outside.
-    const std::size_t float_replication_count =
-      (float_type().get_width() + config.ansi_c.char_width - 1) /
-      config.ansi_c.char_width;
-    const auto float_typed_result = duplicate_per_byte(init_expr, float_type());
-    const auto float_unsigned_corr_type =
-      unsignedbv_typet{float_type().get_width()};
-    const auto float_init_expr =
-      typecast_exprt::conditional_cast(init_expr, float_unsigned_corr_type);
-    const auto float_expected = make_byte_extract(
-      replicate_expression(
-        float_init_expr, float_unsigned_corr_type, float_replication_count),
-      from_integer(0, char_type()),
-      float_type());
+      const auto casted_init_expr =
+        typecast_exprt::conditional_cast(init_expr, output_type);
+      const auto expected =
+        replicate_expression(casted_init_expr, output_type, replication_count);
 
-    REQUIRE(float_typed_result == float_expected);
+      REQUIRE(result == expected);
+    }
+
+    SECTION("filling pointer of size " + std::to_string(output_size))
+    {
+      // Check that replicating a pointer_value is same as unsigned_bv modulo a
+      // byte_extract outside.
+      const pointer_typet output_type{bool_typet{}, output_size};
+      const auto result = duplicate_per_byte(init_expr, output_type);
+      const auto unsigned_corr_type = unsignedbv_typet{output_size};
+      const auto unsigned_init_expr =
+        typecast_exprt::conditional_cast(init_expr, unsigned_corr_type);
+      const auto expected = make_byte_extract(
+        replicate_expression(
+          unsigned_init_expr, unsigned_corr_type, replication_count),
+        from_integer(0, char_type()),
+        output_type);
+
+      REQUIRE(result == expected);
+    }
+
+    SECTION("filling float")
+    {
+      // Check that replicating a float is same as unsigned_bv modulo a
+      // byte_extract outside.
+      // We ignore the output size and replication_count passed above as float
+      // size is constant
+      const std::size_t float_replication_count =
+        (float_type().get_width() + config.ansi_c.char_width - 1) /
+        config.ansi_c.char_width;
+      const auto result = duplicate_per_byte(init_expr, float_type());
+      const auto unsigned_corr_type =
+        unsignedbv_typet{float_type().get_width()};
+      const auto unsigned_init_expr =
+        typecast_exprt::conditional_cast(init_expr, unsigned_corr_type);
+      const auto expected = make_byte_extract(
+        replicate_expression(
+          unsigned_init_expr, unsigned_corr_type, float_replication_count),
+        from_integer(0, char_type()),
+        float_type());
+
+      REQUIRE(result == expected);
+    }
   }
 }
 
@@ -439,8 +486,7 @@ TEST_CASE("expr_initializer on float type", "[core][util][expr_initializer]")
     {
       const auto result = zero_initializer(input_type, test.loc, test.ns);
       REQUIRE(result.has_value());
-      auto expected =
-        from_integer(0, float_type());
+      auto expected = from_integer(0, float_type());
       REQUIRE(result.value() == expected);
       const auto expr_result = expr_initializer(
         input_type, test.loc, test.ns, constant_exprt(ID_0, char_type()));
@@ -453,8 +499,7 @@ TEST_CASE("expr_initializer on float type", "[core][util][expr_initializer]")
       const auto result =
         expr_initializer(input_type, test.loc, test.ns, init_value);
       REQUIRE(result.has_value());
-      const auto expected = duplicate_per_byte(
-        init_value, float_type());
+      const auto expected = duplicate_per_byte(init_value, float_type());
       REQUIRE(result.value() == expected);
     }
   }
