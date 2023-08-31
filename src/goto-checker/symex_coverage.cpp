@@ -24,6 +24,7 @@ Date: March 2016
 #include <linking/static_lifetime_init.h>
 
 #include <chrono> // IWYU pragma: keep
+#include <ctime>  // IWYU pragma: keep - For std::time_t
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
 
