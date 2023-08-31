@@ -3,6 +3,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
@@ -189,6 +190,19 @@ TEST_CASE(
     // the init value is not 0 (NULL).
     pointer_typed_expected.type() = pointer_type;
     REQUIRE(result_with_pointer_type == pointer_typed_expected);
+
+    // Check that replicating to a float_value is same as unsigned_bv.
+    const auto result_with_float_type = duplicate_per_byte(
+      from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
+      float_type());
+    const auto expected_unsigned_value =
+      expr_try_dynamic_cast<constant_exprt>(duplicate_per_byte(
+        from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
+        unsignedbv_typet{float_type().get_width()}));
+    REQUIRE(expected_unsigned_value);
+    const auto float_typed_expected =
+      constant_exprt{expected_unsigned_value->get_value(), float_type()};
+    REQUIRE(result_with_float_type == float_typed_expected);
   }
 }
 
@@ -233,12 +247,31 @@ TEST_CASE(
     const auto pointer_unsigned_corr_type = unsignedbv_typet{output_size};
     const auto pointer_init_expr =
       typecast_exprt::conditional_cast(init_expr, pointer_unsigned_corr_type);
-    const auto pointer_expected = typecast_exprt::conditional_cast(
+    const auto pointer_expected = make_byte_extract(
       replicate_expression(
         pointer_init_expr, pointer_unsigned_corr_type, replication_count),
+      from_integer(0, char_type()),
       pointer_type);
 
     REQUIRE(pointer_typed_result == pointer_expected);
+
+    // Check that replicating a float is same as unsigned_bv modulo a typecast
+    // outside.
+    const std::size_t float_replication_count =
+      (float_type().get_width() + config.ansi_c.char_width - 1) /
+      config.ansi_c.char_width;
+    const auto float_typed_result = duplicate_per_byte(init_expr, float_type());
+    const auto float_unsigned_corr_type =
+      unsignedbv_typet{float_type().get_width()};
+    const auto float_init_expr =
+      typecast_exprt::conditional_cast(init_expr, float_unsigned_corr_type);
+    const auto float_expected = make_byte_extract(
+      replicate_expression(
+        float_init_expr, float_unsigned_corr_type, float_replication_count),
+      from_integer(0, char_type()),
+      float_type());
+
+    REQUIRE(float_typed_result == float_expected);
   }
 }
 
@@ -381,6 +414,47 @@ TEST_CASE(
       REQUIRE(result.has_value());
       const auto expected = duplicate_per_byte(
         init_value, pointer_typet{bool_typet{}, input_type_size});
+      REQUIRE(result.value() == expected);
+    }
+  }
+}
+
+TEST_CASE("expr_initializer on float type", "[core][util][expr_initializer]")
+{
+  auto test = expr_initializer_test_environmentt::make();
+  SECTION("Testing with expected type as float")
+  {
+    const typet input_type = float_type();
+    SECTION("nondet_initializer works")
+    {
+      const auto result = nondet_initializer(input_type, test.loc, test.ns);
+      REQUIRE(result.has_value());
+      const auto expected = side_effect_expr_nondett{float_type(), test.loc};
+      REQUIRE(result.value() == expected);
+      const auto expr_result =
+        expr_initializer(input_type, test.loc, test.ns, exprt(ID_nondet));
+      REQUIRE(expr_result == result);
+    }
+    SECTION("zero_initializer works")
+    {
+      const auto result = zero_initializer(input_type, test.loc, test.ns);
+      REQUIRE(result.has_value());
+      auto expected =
+        from_integer(0, float_type());
+      REQUIRE(result.value() == expected);
+      const auto expr_result = expr_initializer(
+        input_type, test.loc, test.ns, constant_exprt(ID_0, char_type()));
+      REQUIRE(expr_result == result);
+    }
+    SECTION("expr_initializer calls duplicate_per_byte")
+    {
+      const exprt init_value =
+        from_integer(0x0A, unsignedbv_typet{config.ansi_c.char_width});
+      const auto result =
+        expr_initializer(input_type, test.loc, test.ns, init_value);
+      REQUIRE(result.has_value());
+      const auto expected = duplicate_per_byte(
+        init_value, float_type());
       REQUIRE(result.value() == expected);
     }
   }
