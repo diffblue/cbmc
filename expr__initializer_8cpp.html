@@ -101,6 +101,7 @@ $(document).ready(function(){initNavTree('expr__initializer_8cpp.html',''); init
 <div class="textblock"><code>#include &quot;<a class="el" href="expr__initializer_8h_source.html">expr_initializer.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="byte__operators_8h_source.html">byte_operators.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="c__types_8h_source.html">c_types.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="config_8h_source.html">config.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="magic_8h_source.html">magic.h</a>&quot;</code><br />
@@ -112,7 +113,7 @@ $(document).ready(function(){initNavTree('expr__initializer_8cpp.html',''); init
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="expr__initializer_8cpp__incl.svg" width="1688" height="874"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="expr__initializer_8cpp__incl.svg" width="1746" height="874"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -134,6 +135,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a92fd18361f0f1ee9858632bc2db83017"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__initializer_8cpp.html#a92fd18361f0f1ee9858632bc2db83017">expr_initializer</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="classexprt.html">exprt</a> &amp;init_byte_expr)</td></tr>
 <tr class="memdesc:a92fd18361f0f1ee9858632bc2db83017"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a value for type <code>type</code>, with all subtype bytes initialized to the given value.  <a href="expr__initializer_8cpp.html#a92fd18361f0f1ee9858632bc2db83017">More...</a><br /></td></tr>
 <tr class="separator:a92fd18361f0f1ee9858632bc2db83017"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79536f30b33546da3eea28aaf46c5379"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">cast_or_reinterpret</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classtypet.html">typet</a> &amp;out_type)</td></tr>
+<tr class="memdesc:a79536f30b33546da3eea28aaf46c5379"><td class="mdescLeft">&#160;</td><td class="mdescRight">Typecast the input to the output if this is a signed/unsigned bv.  <a href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">More...</a><br /></td></tr>
+<tr class="separator:a79536f30b33546da3eea28aaf46c5379"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaf8f32797afa729f395ab3ee35caddb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">duplicate_per_byte</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;init_byte_expr, const <a class="el" href="classtypet.html">typet</a> &amp;output_type)</td></tr>
 <tr class="memdesc:aaaf8f32797afa729f395ab3ee35caddb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds an expression of the given output type with each of its bytes initialized to the given initialization expression.  <a href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">More...</a><br /></td></tr>
 <tr class="separator:aaaf8f32797afa729f395ab3ee35caddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -143,6 +147,54 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a79536f30b33546da3eea28aaf46c5379"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79536f30b33546da3eea28aaf46c5379">&#9670;&nbsp;</a></span>cast_or_reinterpret()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classexprt.html">exprt</a> cast_or_reinterpret </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
+          <td class="paramname"><em>out_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Typecast the input to the output if this is a signed/unsigned bv. </p>
+<p>Perform a reinterpret cast using byte_extract otherwise. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>the expression to be casted if necessary. </td></tr>
+    <tr><td class="paramname">out_type</td><td>the type to cast the expression to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the casted or reinterpreted expression. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00353">353</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
+
+</div>
+</div>
 <a id="aaaf8f32797afa729f395ab3ee35caddb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaaf8f32797afa729f395ab3ee35caddb">&#9670;&nbsp;</a></span>duplicate_per_byte()</h2>
 
@@ -180,7 +232,7 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The built expression </dd></dl>
 <dl class="section note"><dt>Note</dt><dd><code>init_byte_expr</code> must be a boolean or a bitvector and must be of at most <code>size &lt;= config.ansi_c.char_width</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00357">357</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00379">379</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -234,7 +286,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An expression if a byte-initialized expression of the input type can be built. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00338">338</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00339">339</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -281,7 +333,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An expression if a non-deterministic expression of the input type can be built. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00322">322</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00323">323</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
 
 </div>
 </div>
@@ -328,7 +380,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An expression if a constant expression of the input type can be built. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00306">306</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__initializer_8cpp_source.html#l00307">307</a> of file <a class="el" href="expr__initializer_8cpp_source.html">expr_initializer.cpp</a>.</p>
 
 </div>
 </div>
