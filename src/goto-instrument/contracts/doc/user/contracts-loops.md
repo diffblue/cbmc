@@ -4,7 +4,7 @@ Back to @ref contracts-user
 
 @tableofcontents
 
-CBMC offers support for loop contracts, which includes three basic clauses:
+CBMC offers support for loop contracts, which includes four basic clauses:
 - an _invariant_ clause for establishing safety properties,
 - a _decreases_ clause for establishing termination,
 - an _assigns_ clause for declaring the memory locations assignable by the loop,
