@@ -17,8 +17,9 @@ Date:   September 2009
 #include <util/std_expr.h>
 #include <util/suffix.h>
 
-#include "goto_model.h"
+#include <goto-symex/shadow_memory.h>
 
+#include "goto_model.h"
 #include "remove_skip.h"
 
 #define RETURN_VALUE_SUFFIX "#return_value"
@@ -225,7 +226,10 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
         findit != goto_functions.function_map.end(),
         "called function `" + id2string(function_id) +
           "' should have an entry in the function map");
-      return !findit->second.body_available();
+      return !findit->second.body_available() &&
+             function_id != CPROVER_PREFIX SHADOW_MEMORY_FIELD_DECL &&
+             function_id != CPROVER_PREFIX SHADOW_MEMORY_GET_FIELD &&
+             function_id != CPROVER_PREFIX SHADOW_MEMORY_SET_FIELD;
     };
 
     replace_returns(gf_entry.first, gf_entry.second);
