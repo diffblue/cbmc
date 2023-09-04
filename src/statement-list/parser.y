@@ -26,8 +26,8 @@
 int yystatement_listlex();
 extern char *yystatement_listtext;
 
-#define YYSTYPE unsigned
-#define YYSTYPE_IS_TRIVIAL 1
+#define YYSTATEMENT_LISTSTYPE unsigned
+#define YYSTATEMENT_LISTSTYPE_IS_TRIVIAL 1
 
 #include "statement_list_y.tab.h"
 

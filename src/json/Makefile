@@ -19,7 +19,7 @@ json$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
 json_y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) -pyyjson parser.y --defines=json_y.tab.h -o $@
+	$(YACC) $(YFLAGS) -Dapi.prefix={yyjson} parser.y --defines=json_y.tab.h -o $@
 
 json_y.tab.h: json_y.tab.cpp
 

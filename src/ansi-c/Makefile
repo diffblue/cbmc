@@ -85,7 +85,7 @@ all: ansi-c$(LIBEXT)
 ###############################################################################
 
 ansi_c_y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) -pyyansi_c parser.y --defines=ansi_c_y.tab.h -o $@
+	$(YACC) $(YFLAGS) -Dapi.prefix={yyansi_c} parser.y --defines=ansi_c_y.tab.h -o $@
 
 ansi_c_y.tab.h: ansi_c_y.tab.cpp
 

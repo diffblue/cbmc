@@ -28,7 +28,7 @@ jsil$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
 jsil_y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) -pyyjsil parser.y --defines=jsil_y.tab.h -o $@
+	$(YACC) $(YFLAGS) -Dapi.prefix={yyjsil} parser.y --defines=jsil_y.tab.h -o $@
 
 jsil_y.tab.h: jsil_y.tab.cpp
 

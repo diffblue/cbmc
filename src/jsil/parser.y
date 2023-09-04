@@ -8,8 +8,8 @@
 int yyjsillex();
 extern char *yyjsiltext;
 
-#define YYSTYPE unsigned
-#define YYSTYPE_IS_TRIVIAL 1
+#define YYJSILSTYPE unsigned
+#define YYJSILSTYPE_IS_TRIVIAL 1
 
 #include <goto-programs/goto_instruction_code.h>
 

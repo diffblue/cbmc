@@ -39,7 +39,7 @@ static int isatty(int) { return 0; }
 #include "literals/unescape_string.h"
 
 #define PARSER ansi_c_parser
-#define YYSTYPE unsigned
+#define YYANSI_CSTYPE unsigned
 #undef  ECHO
 #define ECHO
 

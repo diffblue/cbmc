@@ -45,7 +45,7 @@ static int isatty(int) { return 0; }
 
 // Sets the type of yystatement_listlval so that it can be used as the stack 
 // index.
-#define YYSTYPE unsigned
+#define YYSTATEMENT_LISTSTYPE unsigned
 
 // For access to the stack and the parser itself.
 #include "statement_list_parser.h"

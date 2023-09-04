@@ -18,7 +18,7 @@
 #include <ansi-c/literals/convert_string_literal.h>
 
 #define PARSER jsil_parser
-#define YYSTYPE unsigned
+#define YYJSILSTYPE unsigned
 
 #include "jsil_parser.h"
 #include "jsil_y.tab.h"
