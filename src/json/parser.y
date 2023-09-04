@@ -12,6 +12,9 @@
 #pragma warning(disable:4702)
 #endif
 
+#define yyalloc yyjsonalloc
+#define yysymbol_kind_t yyjsonsymbol_kind_t
+
 // Strictly follows http://www.json.org/
 %}
 

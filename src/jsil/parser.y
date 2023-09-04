@@ -10,6 +10,8 @@ extern char *yyjsiltext;
 
 #define YYJSILSTYPE unsigned
 #define YYJSILSTYPE_IS_TRIVIAL 1
+#define yyalloc yyjsilalloc
+#define yysymbol_kind_t yyjsilsymbol_kind_t
 
 #include <goto-programs/goto_instruction_code.h>
 

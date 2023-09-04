@@ -24,6 +24,10 @@ int yyxmlerror(const std::string &error)
 // unreachable code
 #pragma warning(disable:4702)
 #endif
+
+#define yyalloc yyxmlalloc
+#define yysymbol_kind_t yyxmlsymbol_kind_t
+
 %}
 
 %union {char *s;}

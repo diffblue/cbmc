@@ -6,6 +6,8 @@
 
 #define YYANSI_CSTYPE unsigned
 #define YYANSI_CSTYPE_IS_TRIVIAL 1
+#define yyalloc yyansi_calloc
+#define yysymbol_kind_t yyansi_csymbol_kind_t
 
 #define mto(x, y) parser_stack(x).add_to_operands(std::move(parser_stack(y)))
 #define mts(x, y) (to_type_with_subtypes(stack_type(x)).move_to_subtypes(stack_type(y)))

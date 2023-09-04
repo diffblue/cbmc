@@ -28,6 +28,8 @@ extern char *yystatement_listtext;
 
 #define YYSTATEMENT_LISTSTYPE unsigned
 #define YYSTATEMENT_LISTSTYPE_IS_TRIVIAL 1
+#define yyalloc yystatement_listalloc
+#define yysymbol_kind_t yystatement_listsymbol_kind_t
 
 #include "statement_list_y.tab.h"
 
