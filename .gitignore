@@ -31,28 +31,30 @@ Release/*
 *.lib
 src/ansi-c/converter_input.txt
 src/util/version.cpp
-src/ansi-c/arm_builtin_headers.inc
-src/ansi-c/clang_builtin_headers.inc
 src/ansi-c/cprover_builtin_headers.inc
 src/ansi-c/cprover_library.inc
-src/ansi-c/cw_builtin_headers.inc
-src/ansi-c/gcc_builtin_headers_types.inc
-src/ansi-c/gcc_builtin_headers_alpha.inc
-src/ansi-c/gcc_builtin_headers_arm.inc
-src/ansi-c/gcc_builtin_headers_generic.inc
-src/ansi-c/gcc_builtin_headers_ia32-2.inc
-src/ansi-c/gcc_builtin_headers_ia32-3.inc
-src/ansi-c/gcc_builtin_headers_ia32-4.inc
-src/ansi-c/gcc_builtin_headers_ia32-5.inc
-src/ansi-c/gcc_builtin_headers_ia32.inc
-src/ansi-c/gcc_builtin_headers_math.inc
-src/ansi-c/gcc_builtin_headers_mem_string.inc
-src/ansi-c/gcc_builtin_headers_omp.inc
-src/ansi-c/gcc_builtin_headers_tm.inc
-src/ansi-c/gcc_builtin_headers_mips.inc
-src/ansi-c/gcc_builtin_headers_power.inc
-src/ansi-c/gcc_builtin_headers_ubsan.inc
-src/ansi-c/windows_builtin_headers.inc
+src/ansi-c/compiler_headers/arm_builtin_headers.inc
+src/ansi-c/compiler_headers/clang_builtin_headers.inc
+src/ansi-c/compiler_headers/cw_builtin_headers.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_alpha.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_arm.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_generic.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_ia32-2.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_ia32-3.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_ia32-4.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_ia32-5.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_ia32-6.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_ia32.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_math.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_mem_string.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_mips.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_omp.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_power.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_tm.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_types.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_types_gcc7plus.inc
+src/ansi-c/compiler_headers/gcc_builtin_headers_ubsan.inc
+src/ansi-c/compiler_headers/windows_builtin_headers.inc
 src/cpp/cprover_library.inc
 
 # regression/test files
@@ -63,8 +65,13 @@ regression/**/*.goto-cc-saved
 regression/**/*.gb
 regression/**/*.smt2
 regression/solver-hardness/solver-hardness-simple/solver_hardness.json
+regression/goto-instrument-wmm-core/*/*.txt
+regression/goto-instrument-wmm-core/*/*.dot
 jbmc/regression/**/tests.log
 jbmc/regression/**/tests-symex-driven-loading.log
+unit/memory-analyzer/input.inc
+unit/memory-analyzer/test.inc
+unit/gdb.txt
 
 # regression/coverage file
 /regression/coverage_**
@@ -112,6 +119,8 @@ src/cprover/cprover
 src/crangler/crangler
 src/goto-analyzer/goto-analyzer
 src/goto-analyzer/goto-analyzer.exe
+src/goto-bmc
+src/goto-bmc.exe
 src/goto-cc/goto-cc
 src/goto-cc/goto-gcc
 src/goto-cc/goto-ld
@@ -119,8 +128,12 @@ src/goto-cc/goto-cc.exe
 src/goto-cc/goto-cl.exe
 src/goto-harness/goto-harness
 src/goto-harness/goto-harness.exe
+src/goto-inspect/goto-inspect
+src/goto-inspect/goto-inspect.exe
 src/goto-instrument/goto-instrument
 src/goto-instrument/goto-instrument.exe
+src/goto-synthesizer/goto-synthesizer
+src/goto-synthesizer/goto-synthesizer.exe
 src/solvers/smt2_solver
 src/solvers/smt2_solver.exe
 src/memory-analyzer/memory-analyzer
