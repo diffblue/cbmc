@@ -53,7 +53,7 @@ void arrays_and_pointers_into_arrays()
 {
   int A[5];
 
-  z = &(A[4]);
+  int *z = &(A[4]);
 
   assert(__CPROVER_get_field(z, "field1") == 0);
   assert(__CPROVER_get_field(z, "field2") == 0);
@@ -111,7 +111,7 @@ void structs_and_pointers_into_structs()
   __CPROVER_set_field(&(m.B1[j]), "field1", 44);
   assert(__CPROVER_get_field(&(m.B1[j]), "field1") == 44);
 
-  z = &(m.B1[j]);
+  int *z = &(m.B1[j]);
   __CPROVER_set_field(z, "field1", 45);
   assert(__CPROVER_get_field(z, "field1") == 45);
 }
@@ -123,7 +123,7 @@ void arrays_of_structs_and_pointers_into_them()
   assert(__CPROVER_get_field(&(n[1].x1), "field1") == 0);
   assert(__CPROVER_get_field(&(n[1].B1[1]), "field2") == 0);
 
-  p = &(n[2]);
+  struct STRUCTNAME *p = &(n[2]);
 
   __CPROVER_set_field(&(n[1].x1), "field1", 1);
   __CPROVER_set_field(&(p->x1), "field1", 2);
@@ -135,7 +135,7 @@ void arrays_of_structs_and_pointers_into_them()
   assert(__CPROVER_get_field(&(n[1].B1[1]), "field2") == 3);
   assert(__CPROVER_get_field(&(p->B1[1]), "field2") == 4);
 
-  q = &(n[1].x1);
+  int *q = &(n[1].x1);
   assert(__CPROVER_get_field(q, "field1") == 1);
   __CPROVER_set_field(q, "field1", 5);
   assert(__CPROVER_get_field(q, "field1") == 5);
@@ -147,10 +147,12 @@ void arrays_of_structs_and_pointers_into_them()
 
   int k;
   __CPROVER_assume(0 <= k && k < 3);
+  int j;
+  __CPROVER_assume(0 <= j && j < 3);
   __CPROVER_set_field(&(n[k].B1[j]), "field1", 46);
   assert(__CPROVER_get_field(&(n[k].B1[j]), "field1") == 46);
 
-  z = &(n[k].B1[j]);
+  int *z = &(n[k].B1[j]);
   __CPROVER_set_field(z, "field1", 47);
   assert(__CPROVER_get_field(z, "field1") == 47);
 }
