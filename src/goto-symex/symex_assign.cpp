@@ -228,7 +228,9 @@ void symex_assignt::assign_non_struct_symbol(
   state.record_events.pop();
 
   auto current_assignment_type =
-    ns.lookup(l2_lhs.get_object_name()).is_auxiliary
+    ns.lookup(l2_lhs.get_object_name()).is_auxiliary &&
+        id2string(l2_lhs.get_object_name()).find(SHADOW_MEMORY_SYMBOL_PREFIX) !=
+          std::string::npos
       ? symex_targett::assignment_typet::HIDDEN
       : assignment_type;
 

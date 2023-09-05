@@ -23,6 +23,7 @@ Author: Peter Schrammel
 #define SHADOW_MEMORY_LOCAL_SCOPE "_local"
 #define SHADOW_MEMORY_GET_FIELD "get_field"
 #define SHADOW_MEMORY_SET_FIELD "set_field"
+#define SHADOW_MEMORY_SYMBOL_PREFIX "__SM"
 
 class code_function_callt;
 class abstract_goto_modelt;
