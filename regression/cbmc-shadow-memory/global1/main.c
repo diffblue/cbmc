@@ -155,7 +155,7 @@ void dynamically_allocated_structs()
   assert(__CPROVER_get_field(&(p->B1[1]), "field2") == 2);
   assert(__CPROVER_get_field(&(p->B1[2]), "field1") == 0);
 
-  q = &(p->B1[2]);
+  int *q = &(p->B1[2]);
   assert(__CPROVER_get_field(q, "field1") == 0);
   __CPROVER_set_field(q, "field1", 7);
   assert(__CPROVER_get_field(q, "field1") == 7);
@@ -187,7 +187,7 @@ void arrays_of_structs_and_pointers_into_them()
   assert(__CPROVER_get_field(&(n[1].B1[1]), "field2") == 3);
   assert(__CPROVER_get_field(&(p->B1[1]), "field2") == 4);
 
-  q = &(n[1].x1);
+  int *q = &(n[1].x1);
   assert(__CPROVER_get_field(q, "field1") == 1);
   __CPROVER_set_field(q, "field1", 5);
   assert(__CPROVER_get_field(q, "field1") == 5);
@@ -197,6 +197,8 @@ void arrays_of_structs_and_pointers_into_them()
   __CPROVER_set_field(q, "field2", 6);
   assert(__CPROVER_get_field(q, "field2") == 6);
 
+  int k;
+  __CPROVER_assume(0 <= k && k < 3);
   int x;
   __CPROVER_assume(0 <= x && x < 3);
   __CPROVER_set_field(&(n[k].B1[x]), "field1", 46);
@@ -226,7 +228,7 @@ void dynamically_allocated_arrays_of_structs()
   assert(__CPROVER_get_field(&(u[1].B1[1]), "field2") == 3);
   assert(__CPROVER_get_field(&(p->B1[1]), "field2") == 4);
 
-  q = &(u[1].x1);
+  int *q = &(u[1].x1);
   assert(__CPROVER_get_field(q, "field1") == 1);
   __CPROVER_set_field(q, "field1", 5);
   assert(__CPROVER_get_field(q, "field1") == 5);
@@ -236,6 +238,8 @@ void dynamically_allocated_arrays_of_structs()
   __CPROVER_set_field(q, "field2", 6);
   assert(__CPROVER_get_field(q, "field2") == 6);
 
+  int k;
+  __CPROVER_assume(0 <= k && k < 3);
   int t;
   __CPROVER_assume(0 <= t && t < 3);
   __CPROVER_set_field(&(u[k].B1[t]), "field1", 46);
