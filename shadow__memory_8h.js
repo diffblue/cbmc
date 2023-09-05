@@ -6,5 +6,6 @@ var shadow__memory_8h =
     [ "SHADOW_MEMORY_GLOBAL_SCOPE", "shadow__memory_8h.html#a41742227b95f94b411a812cc8829c02d", null ],
     [ "SHADOW_MEMORY_LOCAL_SCOPE", "shadow__memory_8h.html#a5fb6c17fc7b62379b9c46f750c3872ac", null ],
     [ "SHADOW_MEMORY_PREFIX", "shadow__memory_8h.html#ac939647c83de0fe9a0c7a38a6be9cbf9", null ],
-    [ "SHADOW_MEMORY_SET_FIELD", "shadow__memory_8h.html#a5ab1fbe03cdf188a77262ba315a0dc4d", null ]
+    [ "SHADOW_MEMORY_SET_FIELD", "shadow__memory_8h.html#a5ab1fbe03cdf188a77262ba315a0dc4d", null ],
+    [ "SHADOW_MEMORY_SYMBOL_PREFIX", "shadow__memory_8h.html#aab3c841921ebf33b4e4e4aabba5b7fa0", null ]
 ];
