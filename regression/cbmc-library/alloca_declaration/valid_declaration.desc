@@ -1,0 +1,11 @@
+CORE
+valid_declaration.c
+
+^VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This is a test for C front end to confirm that if `alloca` is declared as
+expected then no error is generated.

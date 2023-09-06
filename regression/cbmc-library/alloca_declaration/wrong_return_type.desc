@@ -1,0 +1,12 @@
+CORE
+wrong_return_type.c
+
+file wrong_return_type\.c line 10 function main: 'alloca' function called, but 'alloca' has not been declared with expected 'void \*' return type\.
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This is a test for C front end to confirm an appropriate error message is
+generated if `alloca` is called when it is declared with a different return
+type from the type expected.
