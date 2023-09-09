@@ -12,9 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "show_value_sets.h"
 #include "value_set_analysis.h"
 
-#include <goto-programs/goto_model.h>
-
-#include <util/invariant.h>
 #include <util/xml.h>
 
 #include <iostream>

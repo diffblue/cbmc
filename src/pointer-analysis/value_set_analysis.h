@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/ai.h>
 
-#include "value_set_domain.h"
+#include "value_set_domain.h" // IWYU pragma: keep
 #include "value_sets.h"
 
 /// This template class implements a data-flow analysis which keeps track of
