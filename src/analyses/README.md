@@ -8,9 +8,8 @@ static analyses that instantiate them.
 
 \section analyses-frameworks Frameworks:
 
-There are currently three abstract interpretation frameworks provided in this
-directory. \ref analyses-ait, \ref analyses-flow-insensitive-analysis, and the
-deprecated and obsolete \ref analyses-static-analysist.
+There are currently two abstract interpretation frameworks provided in this
+directory. \ref analyses-ait and \ref analyses-flow-insensitive-analysis.
 
 \subsection analyses-ait Abstract interpreter framework (ait)
 
@@ -21,14 +20,6 @@ is provided by \ref ait. This analysis framework is currently location sensitive
 (meaning there is one abstract domain per code location) and is designed to be
 run after the function pointer removal and return removal passes. There is
 ongoing work to make this framework also support context sensitivity.
-
-\subsection analyses-static-analysist Old Abstract interpreter framework (static_analysist)
-
-The obsolete static analysis framework \ref static_analysist is only used by
-\ref value_set_analysist. This abstract interpretation framework is deprecated in
-favour of \ref analyses-ait, and should not be used as the basis for new code.
-This framework is location sensitive (one domain per code location), but is able
-to be run before function pointer removal and return removal phases.
 
 \subsection analyses-flow-insensitive-analysis Flow-insensitive analysis (flow_insensitive_analysist)
 
