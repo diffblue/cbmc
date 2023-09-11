@@ -1,6 +1,5 @@
 var NAVTREEINDEX131 =
 {
-"structdatat.html#af2d4a7cb72d7b3989627812c02d50fbb":[8,0,349,6],
 "structdecision__procedure__objectt.html":[8,0,351],
 "structdecision__procedure__objectt.html#a686fe5dba418fe2355ab78d5d625311f":[8,0,351,0],
 "structdecision__procedure__objectt.html#a6a2604daf0577c670a93333f4078df18":[8,0,351,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX131 =
 "structgdb__value__extractort_1_1memory__scopet.html#a78c87a4be95edd5ba4dfb36fb7d5413d":[8,0,526,0,2],
 "structgdb__value__extractort_1_1memory__scopet.html#a7eb3d07c7ded21b8ac3f3673f5f25289":[8,0,526,0,9],
 "structgdb__value__extractort_1_1memory__scopet.html#a949bb7d8fe060fc937e709db6ffa9c08":[8,0,526,0,0],
-"structgdb__value__extractort_1_1memory__scopet.html#aaf147f2bbe1fb8cd3fb12bb2ca28e8f0":[8,0,526,0,6]
+"structgdb__value__extractort_1_1memory__scopet.html#aaf147f2bbe1fb8cd3fb12bb2ca28e8f0":[8,0,526,0,6],
+"structgdb__value__extractort_1_1memory__scopet.html#ac0c8f05b9c96ff5a77e21070f34f0f9d":[8,0,526,0,3]
 };
