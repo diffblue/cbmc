@@ -69,11 +69,6 @@ public:
     bottom=false;
   }
 
-  void make_entry() final override
-  {
-    make_top();
-  }
-
   bool is_bottom() const override final
   {
     #if 0

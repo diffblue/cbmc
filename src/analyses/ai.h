@@ -280,6 +280,28 @@ public:
     const goto_programt &goto_program,
     std::ostream &out) const;
 
+  /// Output the abstract states for a single function as JSON
+  /// \param ns: The namespace
+  /// \param goto_program: The goto program
+  /// \param function_id: The identifier used to find a symbol to
+  ///   identify the source language
+  /// \return The JSON object
+  virtual jsont output_json(
+    const namespacet &ns,
+    const irep_idt &function_id,
+    const goto_programt &goto_program) const;
+
+  /// Output the abstract states for a single function as XML
+  /// \param ns: The namespace
+  /// \param goto_program: The goto program
+  /// \param function_id: The identifier used to find a symbol to
+  ///   identify the source language
+  /// \return The XML object
+  virtual xmlt output_xml(
+    const namespacet &ns,
+    const irep_idt &function_id,
+    const goto_programt &goto_program) const;
+
   /// Output the abstract states for a whole program
   virtual void output(
     const namespacet &ns,
@@ -388,28 +410,6 @@ protected:
   /// Set the abstract state of the entry location of a whole program to the
   /// entry state required by the analysis
   trace_ptrt entry_state(const goto_functionst &goto_functions);
-
-  /// Output the abstract states for a single function as JSON
-  /// \param ns: The namespace
-  /// \param goto_program: The goto program
-  /// \param function_id: The identifier used to find a symbol to
-  ///   identify the source language
-  /// \return The JSON object
-  virtual jsont output_json(
-    const namespacet &ns,
-    const irep_idt &function_id,
-    const goto_programt &goto_program) const;
-
-  /// Output the abstract states for a single function as XML
-  /// \param ns: The namespace
-  /// \param goto_program: The goto program
-  /// \param function_id: The identifier used to find a symbol to
-  ///   identify the source language
-  /// \return The XML object
-  virtual xmlt output_xml(
-    const namespacet &ns,
-    const irep_idt &function_id,
-    const goto_programt &goto_program) const;
 
   /// The work queue, sorted using the history's ordering operator
   typedef trace_sett working_sett;

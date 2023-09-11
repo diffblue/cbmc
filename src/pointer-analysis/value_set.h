@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_sets.h"
 
 class namespacet;
+class xmlt;
 
 /// State type in value_set_domaint, used in value-set analysis and goto-symex.
 /// Represents a mapping from expressions to the addresses that may be stored
@@ -286,6 +287,9 @@ public:
   /// \param [out] out: stream to write to
   /// \param indent: string to use for indentation of the output
   void output(std::ostream &out, const std::string &indent = "") const;
+
+  /// Output the value set formatted as XML
+  xmlt output_xml(void) const;
 
   /// Stores the LHS ID -> RHS expression set map. See `valuest` documentation
   /// for more detail.

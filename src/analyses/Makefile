@@ -29,7 +29,6 @@ SRC = ai.cpp \
       locals.cpp \
       reaching_definitions.cpp \
       sese_regions.cpp \
-      static_analysis.cpp \
       uncaught_exceptions_analysis.cpp \
       uninitialized_domain.cpp \
       variable-sensitivity/abstract_environment.cpp \

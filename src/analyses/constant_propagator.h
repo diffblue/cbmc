@@ -65,11 +65,6 @@ public:
     values.set_to_top();
   }
 
-  virtual void make_entry() final override
-  {
-    make_top();
-  }
-
   virtual bool is_bottom() const final override
   {
     return values.is_bot();
