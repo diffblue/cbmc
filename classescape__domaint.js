@@ -15,7 +15,6 @@ var classescape__domaint =
     [ "is_top", "classescape__domaint.html#a3ade9149a16ac05dbd597597bcdeab9c", null ],
     [ "is_tracked", "classescape__domaint.html#ab2b157529ad409422f3161b152b09e75", null ],
     [ "make_bottom", "classescape__domaint.html#a097b473f0706f126a76de557d61082a5", null ],
-    [ "make_entry", "classescape__domaint.html#ad8bd11c2048ae03269cd9e02769c983f", null ],
     [ "make_top", "classescape__domaint.html#a78579c66bee03b46e1170bbdc214329e", null ],
     [ "merge", "classescape__domaint.html#a3d7de6228c44ab7133e4914695833373", null ],
     [ "output", "classescape__domaint.html#acc4cc783fe98a1207f485336420a4896", null ],

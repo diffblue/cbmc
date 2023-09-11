@@ -196,6 +196,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5d23e0a4fbdcf66269214b0b15b642c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a5d23e0a4fbdcf66269214b0b15b642c3">output</a> (std::ostream &amp;out, const std::string &amp;indent=&quot;&quot;) const</td></tr>
 <tr class="memdesc:a5d23e0a4fbdcf66269214b0b15b642c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pretty-print this value-set.  <a href="classvalue__sett.html#a5d23e0a4fbdcf66269214b0b15b642c3">More...</a><br /></td></tr>
 <tr class="separator:a5d23e0a4fbdcf66269214b0b15b642c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a534ceedfe16eb592724ccdd68aa86c53"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classxmlt.html">xmlt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#a534ceedfe16eb592724ccdd68aa86c53">output_xml</a> (void) const</td></tr>
+<tr class="memdesc:a534ceedfe16eb592724ccdd68aa86c53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output the value set formatted as XML.  <a href="classvalue__sett.html#a534ceedfe16eb592724ccdd68aa86c53">More...</a><br /></td></tr>
+<tr class="separator:a534ceedfe16eb592724ccdd68aa86c53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac94623f20dbda91eda2fa875c6bbacbe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__sett.html#ac94623f20dbda91eda2fa875c6bbacbe">make_union</a> (<a class="el" href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">object_mapt</a> &amp;dest, const <a class="el" href="classvalue__sett.html#abb2dc066654abb235711fa84799fc148">object_mapt</a> &amp;src) const</td></tr>
 <tr class="memdesc:ac94623f20dbda91eda2fa875c6bbacbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges two RHS expression sets.  <a href="classvalue__sett.html#ac94623f20dbda91eda2fa875c6bbacbe">More...</a><br /></td></tr>
 <tr class="separator:ac94623f20dbda91eda2fa875c6bbacbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -299,7 +302,7 @@ dynamic_object1.field1 -&gt; { &lt;dynamic_object2, 0&gt; }
 dynamic_object1.field2 -&gt; { * (unknown) }
 </pre><p> LHS expressions can be either symbols or fields thereof, and are stored as strings; RHS expressions may be symbols, dynamic objects, integer addresses (as in <code>(int*)0x1234</code>) or unknown (printed as <code>*</code>), and are stored as pairs of an <code>exprt</code> and an optional offset if known (0 for both dynamic objects in the example given above). RHS expressions are represented using numbering to avoid storing redundant duplicate expressions. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00042">42</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00043">43</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="af92a5fe9e1495ee3c3396b02e9b2ace6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af92a5fe9e1495ee3c3396b02e9b2ace6">&#9670;&nbsp;</a></span>object_map_dt</h2>
@@ -316,7 +319,7 @@ dynamic_object1.field2 -&gt; { * (unknown) }
 <p>Represents a set of expressions (<code>exprt</code> instances) with corresponding offsets (<code>offsett</code> instances). </p>
 <p>This is the RHS set of a single row of the enclosing <code><a class="el" href="classvalue__sett.html" title="State type in value_set_domaint, used in value-set analysis and goto-symex.">value_sett</a></code>, such as <code>{ null, dynamic_object1 }</code>. The set is represented as a map from numbered <code>exprt</code>s to <code>offsett</code> instead of a set of pairs to make lookup by <code>exprt</code> easier. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00087">87</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00088">88</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -340,7 +343,7 @@ y = new B;
   y -&gt; { dynamic_object2 }
 </pre><p> Then the set { dynamic_object1 }, represented by an <code>object_map_dt</code>, can be shared between the two <code><a class="el" href="classvalue__sett.html" title="State type in value_set_domaint, used in value-set analysis and goto-symex.">value_sett</a></code> instances. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00109">109</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00110">110</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -358,7 +361,7 @@ y = new B;
 
 <p>Represents the offset into an object: either a unique integer offset, or an unknown value, represented by <code>!offset</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00080">80</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00081">81</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -383,7 +386,7 @@ y = new B;
     }
 </pre><p> The components of the ID are thus duplicated in the <code>valuest</code> key and in <code>entryt</code> fields. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00244">244</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00245">245</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -413,7 +416,7 @@ y = new B;
 <tr><td class="fieldname"><a id="ad59a616b46a7d5e0bc3e188565392483ab50339a10e1de285ac99d4c3990b8693"></a>NONE&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00168">168</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00169">169</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -441,7 +444,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00045">45</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00046">46</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -469,7 +472,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00049">49</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00050">50</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -568,7 +571,7 @@ y = new B;
 <p>Subclass customisation point to filter or otherwise alter the value-set returned from get_value_set before it is passed into assign. </p>
 <p>For example, this is used in one subclass to tag and thus differentiate values that originated in a particular place, vs. those that have been copied. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00510">510</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00514">514</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -615,7 +618,7 @@ y = new B;
 <p>Subclass customisation point to apply global side-effects to this domain, after RHS values are read but before they are written. </p>
 <p>For example, this is used in a recency-analysis plugin to demote existing most-recent objects to general case ones. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00524">524</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00528">528</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -662,7 +665,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00334">334</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00338">338</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -702,7 +705,7 @@ y = new B;
 
 <p>Subclass customisation point for applying code to this domain: </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01761">1761</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01795">1795</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -762,7 +765,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01431">1431</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01465">1465</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -821,7 +824,7 @@ y = new B;
 <p>Subclass customisation point for recursion over LHS expression: </p>
 <p>Do not take a reference to object_numbering's storage as we may call object_numbering.number(), which may reallocate it.</p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01575">1575</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01609">1609</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -849,7 +852,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00254">254</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00255">255</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -889,7 +892,7 @@ y = new B;
 
 <p>Sets <code>dest</code> to <code>src</code> with any wrapping typecasts removed. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01236">1236</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01270">1270</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -928,7 +931,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01749">1749</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01783">1783</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -974,7 +977,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01703">1703</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01737">1737</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1018,7 +1021,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01953">1953</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01987">1987</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1048,7 +1051,7 @@ y = new B;
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01991">1991</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l02025">2025</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1092,7 +1095,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01973">1973</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l02007">2007</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1131,7 +1134,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01918">1918</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01952">1952</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1171,7 +1174,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if any offset expression was successfully replaced. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00305">305</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00339">339</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1212,7 +1215,7 @@ y = new B;
 <p>Determines whether an identifier of a given type should have its fields distinguished. </p>
 <p>Virtual so that subclasses can override this behaviour. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00046">46</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00047">47</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1241,7 +1244,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a constant pointer to an entry if found, or null otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00058">58</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00059">59</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1295,7 +1298,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The index if the symbol is known, else <code>nullopt</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00418">418</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00452">452</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1333,7 +1336,7 @@ y = new B;
 
 <p>Determines what would happen if object number <code>n</code> was inserted into map <code>dest</code> with offset <code>offset</code> &ndash; the possibilities being, nothing (the entry is already present), a new entry would be inserted (no existing entry with number <code>n</code> was found), or an existing entry's offset would be reset (indicating there is already an entry with number <code>n</code>, but with differing offset). </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00103">103</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00104">104</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1380,7 +1383,7 @@ y = new B;
 <p>See the other overload of <code>get_reference_set</code>. </p>
 <p>This one returns object numbers and offsets instead of expressions. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00444">444</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00448">448</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -1426,7 +1429,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01251">1251</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01285">1285</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1472,7 +1475,7 @@ y = new B;
 
 <p>See get_reference_set. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01266">1266</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01300">1300</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1512,7 +1515,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>list of expressions that <code>expr</code> may point to. These expressions are <a class="el" href="classobject__descriptor__exprt.html" title="Split an expression into a base object and a (byte) offset.">object_descriptor_exprt</a> or have id ID_invalid or ID_unknown. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00357">357</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00391">391</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1567,7 +1570,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the set of object numbers pointed to </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00364">364</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00398">398</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1643,7 +1646,7 @@ y = new B;
 </dl>
 <p>Do not take a reference to object_numbering's storage as we may call object_numbering.number(), which may reallocate it.</p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00472">472</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00506">506</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1682,7 +1685,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01886">1886</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l01920">1920</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1736,7 +1739,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00192">192</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00193">193</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -1783,7 +1786,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00137">137</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00138">138</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -1837,7 +1840,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00148">148</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00149">149</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -1884,7 +1887,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00127">127</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00128">128</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -1930,7 +1933,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00123">123</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00124">124</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -1961,7 +1964,7 @@ y = new B;
 <p>Merges an entire existing <a class="el" href="classvalue__sett.html" title="State type in value_set_domaint, used in value-set analysis and goto-symex.">value_sett</a>'s data into this one. </p>
 <dl class="section return"><dt>Returns</dt><dd>true if anything changed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00314">314</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00318">318</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -1990,7 +1993,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if anything changed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00240">240</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00274">274</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -2030,7 +2033,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if anything changed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00290">290</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00324">324</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -2070,7 +2073,7 @@ y = new B;
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if anything changed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00272">272</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00306">306</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -2124,7 +2127,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00060">60</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00061">61</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -2163,7 +2166,29 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00141">141</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00142">142</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a534ceedfe16eb592724ccdd68aa86c53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a534ceedfe16eb592724ccdd68aa86c53">&#9670;&nbsp;</a></span>output_xml()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classxmlt.html">xmlt</a> value_sett::output_xml </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Output the value set formatted as XML. </p>
+
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00221">221</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -2210,7 +2235,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00116">116</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00117">117</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -2232,7 +2257,7 @@ y = new B;
 
 <p>Converts an <code>object_map_dt</code> element <code>object_number -&gt; offset</code> into an <code><a class="el" href="classobject__descriptor__exprt.html" title="Split an expression into a base object and a (byte) offset.">object_descriptor_exprt</a></code> with <code>.object() == object_numbering.at(object_number)</code> and <code>.offset() == offset</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00220">220</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00254">254</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -2285,7 +2310,7 @@ y = new B;
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00064">64</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8cpp_source.html#l00065">65</a> of file <a class="el" href="value__set_8cpp_source.html">value_set.cpp</a>.</p>
 
 </div>
 </div>
@@ -2310,7 +2335,7 @@ y = new B;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00089">89</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00090">90</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -2328,7 +2353,7 @@ y = new B;
 
 <p>Matches the location_number field of the instruction that corresponds to this <a class="el" href="classvalue__sett.html" title="State type in value_set_domaint, used in value-set analysis and goto-symex.">value_sett</a> instance in value_set_domaint's state map. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00072">72</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00073">73</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -2354,7 +2379,7 @@ y = new B;
 
 <p>Global shared object numbering, used to abbreviate expressions stored in value sets. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00076">76</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00077">77</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>
@@ -2373,7 +2398,7 @@ y = new B;
 <p>Stores the LHS ID -&gt; RHS expression set map. </p>
 <p>See <code>valuest</code> documentation for more detail. </p>
 
-<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00292">292</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set_8h_source.html#l00296">296</a> of file <a class="el" href="value__set_8h_source.html">value_set.h</a>.</p>
 
 </div>
 </div>

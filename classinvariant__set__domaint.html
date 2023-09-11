@@ -127,13 +127,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ac12dd3b07c2453ace8c3e32e60906774"><td class="mdescLeft">&#160;</td><td class="mdescRight">how function calls are treated: a) there is an edge from each call site to the function head b) there is an edge from the last instruction (END_FUNCTION) of the function to the instruction <em>following</em> the call site (this also needs to set the LHS, if applicable)  <a href="classinvariant__set__domaint.html#ac12dd3b07c2453ace8c3e32e60906774">More...</a><br /></td></tr>
 <tr class="separator:ac12dd3b07c2453ace8c3e32e60906774"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4804babab2b7ad20c494dafc1b754a85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinvariant__set__domaint.html#a4804babab2b7ad20c494dafc1b754a85">make_top</a> () final override</td></tr>
-<tr class="memdesc:a4804babab2b7ad20c494dafc1b754a85"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this, and domains may refuse to implement it.  <a href="classinvariant__set__domaint.html#a4804babab2b7ad20c494dafc1b754a85">More...</a><br /></td></tr>
+<tr class="memdesc:a4804babab2b7ad20c494dafc1b754a85"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it.  <a href="classinvariant__set__domaint.html#a4804babab2b7ad20c494dafc1b754a85">More...</a><br /></td></tr>
 <tr class="separator:a4804babab2b7ad20c494dafc1b754a85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7443de903d30cb4ec299d75810ddc45e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinvariant__set__domaint.html#a7443de903d30cb4ec299d75810ddc45e">make_bottom</a> () final override</td></tr>
 <tr class="memdesc:a7443de903d30cb4ec299d75810ddc45e"><td class="mdescLeft">&#160;</td><td class="mdescRight">no states  <a href="classinvariant__set__domaint.html#a7443de903d30cb4ec299d75810ddc45e">More...</a><br /></td></tr>
 <tr class="separator:a7443de903d30cb4ec299d75810ddc45e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6abb54c859214561beb415975ce78d11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinvariant__set__domaint.html#a6abb54c859214561beb415975ce78d11">make_entry</a> () final override</td></tr>
-<tr class="memdesc:a6abb54c859214561beb415975ce78d11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state.  <a href="classinvariant__set__domaint.html#a6abb54c859214561beb415975ce78d11">More...</a><br /></td></tr>
+<tr class="memdesc:a6abb54c859214561beb415975ce78d11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state For most domains top is sufficient.  <a href="classinvariant__set__domaint.html#a6abb54c859214561beb415975ce78d11">More...</a><br /></td></tr>
 <tr class="separator:a6abb54c859214561beb415975ce78d11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72f329967687962af5ec686f74cefaea"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinvariant__set__domaint.html#a72f329967687962af5ec686f74cefaea">is_top</a> () const override final</td></tr>
 <tr class="separator:a72f329967687962af5ec686f74cefaea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -339,9 +339,9 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Make this domain a reasonable entry-point state. </p>
+<p>Make this domain a reasonable entry-point state For most domains top is sufficient. </p>
 
-<p>Implements <a class="el" href="classai__domain__baset.html#acb094653215ef8ed1e7b5e4bf78c59ef">ai_domain_baset</a>.</p>
+<p>Reimplemented from <a class="el" href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">ai_domain_baset</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="invariant__set__domain_8h_source.html#l00076">76</a> of file <a class="el" href="invariant__set__domain_8h_source.html">invariant_set_domain.h</a>.</p>
 
@@ -370,7 +370,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>all states &ndash; the analysis doesn't use this, and domains may refuse to implement it. </p>
+<p>all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it. </p>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a5f3087dc907a0d35baec30549a04281f">ai_domain_baset</a>.</p>
 

@@ -82,6 +82,9 @@ var hierarchy =
         [ "ait< custom_bitvector_domaint >", "classait.html", [
           [ "custom_bitvector_analysist", "classcustom__bitvector__analysist.html", null ]
         ] ],
+        [ "ait< VSDT >", "classait.html", [
+          [ "value_set_analysis_templatet< VSDT >", "classvalue__set__analysis__templatet.html", null ]
+        ] ],
         [ "ait< dep_graph_domaint >", "classait.html", [
           [ "dependence_grapht", "classdependence__grapht.html", null ]
         ] ],
@@ -107,6 +110,7 @@ var hierarchy =
       [ "is_threaded_domaint", "classis__threaded__domaint.html", null ],
       [ "rd_range_domaint", "classrd__range__domaint.html", null ],
       [ "uninitialized_domaint", "classuninitialized__domaint.html", null ],
+      [ "value_set_domain_templatet< VST >", "classvalue__set__domain__templatet.html", null ],
       [ "variable_sensitivity_domaint", "classvariable__sensitivity__domaint.html", [
         [ "variable_sensitivity_dependence_domaint", "classvariable__sensitivity__dependence__domaint.html", null ]
       ] ]
@@ -128,7 +132,8 @@ var hierarchy =
         [ "dep_graph_domain_factoryt", "classdep__graph__domain__factoryt.html", null ]
       ] ],
       [ "ai_domain_factoryt< domainT >", "classai__domain__factoryt.html", [
-        [ "ai_domain_factory_default_constructort< domainT >", "classai__domain__factory__default__constructort.html", null ]
+        [ "ai_domain_factory_default_constructort< domainT >", "classai__domain__factory__default__constructort.html", null ],
+        [ "ai_domain_factory_location_constructort< domainT >", "classai__domain__factory__location__constructort.html", null ]
       ] ]
     ] ],
     [ "ai_history_baset", "classai__history__baset.html", [
@@ -462,9 +467,6 @@ var hierarchy =
     [ "document_propertiest::doc_claimt", "structdocument__propertiest_1_1doc__claimt.html", null ],
     [ "document_propertiest", "classdocument__propertiest.html", null ],
     [ "does_remove_constt", "classdoes__remove__constt.html", null ],
-    [ "domain_baset", "classdomain__baset.html", [
-      [ "value_set_domain_templatet< VST >", "classvalue__set__domain__templatet.html", null ]
-    ] ],
     [ "dott", "classdott.html", null ],
     [ "dstring_hash", "structdstring__hash.html", null ],
     [ "dstringt", "classdstringt.html", null ],
@@ -1939,14 +1941,6 @@ var hierarchy =
     [ "check_call_sequencet::statet", "structcheck__call__sequencet_1_1statet.html", null ],
     [ "help_formattert::statet", "structhelp__formattert_1_1statet.html", null ],
     [ "nfat< T >::statet", "structnfat_1_1statet.html", null ],
-    [ "static_analysis_baset", "classstatic__analysis__baset.html", [
-      [ "static_analysist< VSDT >", "classstatic__analysist.html", [
-        [ "value_set_analysis_templatet< VSDT >", "classvalue__set__analysis__templatet.html", null ]
-      ] ],
-      [ "static_analysist< T >", "classstatic__analysist.html", [
-        [ "concurrency_aware_static_analysist< T >", "classconcurrency__aware__static__analysist.html", null ]
-      ] ]
-    ] ],
     [ "static_verifier_resultt", "classstatic__verifier__resultt.html", null ],
     [ "clauset::stept", "structclauset_1_1stept.html", null ],
     [ "statement_list_typecheckt::stl_jump_locationt", "structstatement__list__typecheckt_1_1stl__jump__locationt.html", null ],

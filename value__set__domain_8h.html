@@ -90,7 +90,6 @@ $(document).ready(function(){initNavTree('value__set__domain_8h.html',''); initR
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
 <div class="title">value_set_domain.h File Reference</div>  </div>
@@ -99,14 +98,15 @@ $(document).ready(function(){initNavTree('value__set__domain_8h.html',''); initR
 
 <p>Value Set.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="static__analysis_8h_source.html">analyses/static_analysis.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="src_2util_2invariant_8h_source.html">util/invariant.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="ai_8h_source.html">analyses/ai.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="value__set_8h_source.html">value_set.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for value_set_domain.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="value__set__domain_8h__incl.svg" width="3294" height="1142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="value__set__domain_8h__incl.svg" width="3283" height="918"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -126,38 +126,34 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is the domain for a value set analysis.  <a href="classvalue__set__domain__templatet.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:abec019142109073b86ec13280083c890"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="value__set__domain_8h.html#abec019142109073b86ec13280083c890">USE_DEPRECATED_STATIC_ANALYSIS_H</a></td></tr>
-<tr class="separator:abec019142109073b86ec13280083c890"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:aefb6e15b6627aa97c4b2a857da9f1a06"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classvalue__set__domain__templatet.html">value_set_domain_templatet</a>&lt; <a class="el" href="classvalue__sett.html">value_sett</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="value__set__domain_8h.html#aefb6e15b6627aa97c4b2a857da9f1a06">value_set_domaint</a></td></tr>
 <tr class="separator:aefb6e15b6627aa97c4b2a857da9f1a06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42e72c636bcef1eb3e874e02f1e9c877"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classai__domain__factory__location__constructort.html">ai_domain_factory_location_constructort</a>&lt; <a class="el" href="value__set__domain_8h.html#aefb6e15b6627aa97c4b2a857da9f1a06">value_set_domaint</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="value__set__domain_8h.html#a42e72c636bcef1eb3e874e02f1e9c877">value_set_domain_factoryt</a></td></tr>
+<tr class="separator:a42e72c636bcef1eb3e874e02f1e9c877"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Value Set. </p>
 
 <p class="definition">Definition in file <a class="el" href="value__set__domain_8h_source.html">value_set_domain.h</a>.</p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="abec019142109073b86ec13280083c890"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abec019142109073b86ec13280083c890">&#9670;&nbsp;</a></span>USE_DEPRECATED_STATIC_ANALYSIS_H</h2>
+</div><h2 class="groupheader">Typedef Documentation</h2>
+<a id="a42e72c636bcef1eb3e874e02f1e9c877"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42e72c636bcef1eb3e874e02f1e9c877">&#9670;&nbsp;</a></span>value_set_domain_factoryt</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define USE_DEPRECATED_STATIC_ANALYSIS_H</td>
+          <td class="memname">typedef <a class="el" href="classai__domain__factory__location__constructort.html">ai_domain_factory_location_constructort</a>&lt;<a class="el" href="value__set__domain_8h.html#aefb6e15b6627aa97c4b2a857da9f1a06">value_set_domaint</a>&gt; <a class="el" href="value__set__domain_8h.html#a42e72c636bcef1eb3e874e02f1e9c877">value_set_domain_factoryt</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set__domain_8h_source.html#l00015">15</a> of file <a class="el" href="value__set__domain_8h_source.html">value_set_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__domain_8h_source.html#l00182">182</a> of file <a class="el" href="value__set__domain_8h_source.html">value_set_domain.h</a>.</p>
 
 </div>
 </div>
-<h2 class="groupheader">Typedef Documentation</h2>
 <a id="aefb6e15b6627aa97c4b2a857da9f1a06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aefb6e15b6627aa97c4b2a857da9f1a06">&#9670;&nbsp;</a></span>value_set_domaint</h2>
 
@@ -170,7 +166,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set__domain_8h_source.html#l00063">63</a> of file <a class="el" href="value__set__domain_8h_source.html">value_set_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__domain_8h_source.html#l00117">117</a> of file <a class="el" href="value__set__domain_8h_source.html">value_set_domain.h</a>.</p>
 
 </div>
 </div>

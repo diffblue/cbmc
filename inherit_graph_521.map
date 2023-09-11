@@ -1,9 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classloop__analysist.html" title=" " alt="" coords="5,202,176,229"/>
-<area shape="rect" id="node2" href="$classnatural__loops__templatet.html" title=" " alt="" coords="224,5,477,76"/>
-<area shape="rect" id="node4" href="$classnatural__loops__templatet.html" title=" " alt="" coords="241,100,461,171"/>
-<area shape="rect" id="node5" href="$classlexical__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any lexical loops." alt="" coords="261,195,440,236"/>
-<area shape="rect" id="node6" href="$classlinked__loop__analysist.html" title=" " alt="" coords="269,260,432,301"/>
-<area shape="rect" id="node7" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="260,325,441,367"/>
-<area shape="rect" id="node3" href="$classnatural__loopst.html" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;" alt="" coords="525,27,640,54"/>
+<area shape="rect" id="node1" href="$classloop__contracts__synthesizer__baset.html" title="A base class for loop contracts synthesizers." alt="" coords="5,5,204,47"/>
+<area shape="rect" id="node2" href="$classenumerative__loop__contracts__synthesizert.html" title="Enumerative loop contracts synthesizers." alt="" coords="252,5,459,47"/>
 </map>

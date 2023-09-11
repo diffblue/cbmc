@@ -149,11 +149,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ada9e8cd22ab2268dbfca64a754dc5c85"><td class="mdescLeft">&#160;</td><td class="mdescRight">no states  <a href="classcustom__bitvector__domaint.html#ada9e8cd22ab2268dbfca64a754dc5c85">More...</a><br /></td></tr>
 <tr class="separator:ada9e8cd22ab2268dbfca64a754dc5c85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a624338d7dc4a140e11a9b8ce1c791d90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a624338d7dc4a140e11a9b8ce1c791d90">make_top</a> () final override</td></tr>
-<tr class="memdesc:a624338d7dc4a140e11a9b8ce1c791d90"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this, and domains may refuse to implement it.  <a href="classcustom__bitvector__domaint.html#a624338d7dc4a140e11a9b8ce1c791d90">More...</a><br /></td></tr>
+<tr class="memdesc:a624338d7dc4a140e11a9b8ce1c791d90"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it.  <a href="classcustom__bitvector__domaint.html#a624338d7dc4a140e11a9b8ce1c791d90">More...</a><br /></td></tr>
 <tr class="separator:a624338d7dc4a140e11a9b8ce1c791d90"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf9978c54f87ce209a050e8f3c0dee0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#abf9978c54f87ce209a050e8f3c0dee0e">make_entry</a> () final override</td></tr>
-<tr class="memdesc:abf9978c54f87ce209a050e8f3c0dee0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state.  <a href="classcustom__bitvector__domaint.html#abf9978c54f87ce209a050e8f3c0dee0e">More...</a><br /></td></tr>
-<tr class="separator:abf9978c54f87ce209a050e8f3c0dee0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54b20869bf174ec9d88ff0a1b6134a54"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a54b20869bf174ec9d88ff0a1b6134a54">is_bottom</a> () const final override</td></tr>
 <tr class="separator:a54b20869bf174ec9d88ff0a1b6134a54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5bb60d5b5aeb73951276a4b4ef32aac7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcustom__bitvector__domaint.html#a5bb60d5b5aeb73951276a4b4ef32aac7">is_top</a> () const final override</td></tr>
@@ -181,6 +178,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5f1421c25ecc35be6239a6c3d32761b6 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a489adca61b5aeadbe9a7515bc4c95c2e inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classxmlt.html">xmlt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a489adca61b5aeadbe9a7515bc4c95c2e">output_xml</a> (const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="separator:a489adca61b5aeadbe9a7515bc4c95c2e inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">make_entry</a> ()</td></tr>
+<tr class="memdesc:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state For most domains top is sufficient.  <a href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">More...</a><br /></td></tr>
+<tr class="separator:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae34120fbb2c54f5739f7d990caf87802 inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#ae34120fbb2c54f5739f7d990caf87802">ai_simplify</a> (<a class="el" href="classexprt.html">exprt</a> &amp;condition, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;) const</td></tr>
 <tr class="memdesc:ae34120fbb2c54f5739f7d990caf87802 inherit pub_methods_classai__domain__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">also add  <a href="classai__domain__baset.html#ae34120fbb2c54f5739f7d990caf87802">More...</a><br /></td></tr>
 <tr class="separator:ae34120fbb2c54f5739f7d990caf87802 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -263,7 +263,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00076">76</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00071">71</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -279,7 +279,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00078">78</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00073">73</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -310,7 +310,7 @@ Additional Inherited Members</h2></td></tr>
 <tr><td class="fieldname"><a id="a9956e190f6a662d42d2cd412df40502fa4b0a606e1b0bef217d92b26cc54ae112"></a>CLEAR_MAY&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00122">122</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00117">117</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -338,7 +338,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00112">112</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00107">107</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -485,7 +485,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00132">132</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00127">127</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -583,7 +583,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00138">138</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00133">133</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -680,7 +680,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a0b92089f54aad3fe5e54068f005f9aab">ai_domain_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00058">58</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00053">53</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -709,7 +709,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#ad8ee906f2cdbfcde3b6c11c81d76e65f">ai_domain_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00066">66</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00061">61</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -744,37 +744,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="abf9978c54f87ce209a050e8f3c0dee0e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf9978c54f87ce209a050e8f3c0dee0e">&#9670;&nbsp;</a></span>make_entry()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void custom_bitvector_domaint::make_entry </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Make this domain a reasonable entry-point state. </p>
-
-<p>Implements <a class="el" href="classai__domain__baset.html#acb094653215ef8ed1e7b5e4bf78c59ef">ai_domain_baset</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00053">53</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
-
-</div>
-</div>
 <a id="a624338d7dc4a140e11a9b8ce1c791d90"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a624338d7dc4a140e11a9b8ce1c791d90">&#9670;&nbsp;</a></span>make_top()</h2>
 
@@ -798,7 +767,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>all states &ndash; the analysis doesn't use this, and domains may refuse to implement it. </p>
+<p>all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it. </p>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a5f3087dc907a0d35baec30549a04281f">ai_domain_baset</a>.</p>
 
@@ -876,7 +845,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00088">88</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00083">83</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -988,7 +957,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00127">127</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00122">122</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -1163,7 +1132,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00110">110</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00105">105</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -1179,7 +1148,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00096">96</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00091">91</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>
@@ -1195,7 +1164,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00096">96</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="custom__bitvector__analysis_8h_source.html#l00091">91</a> of file <a class="el" href="custom__bitvector__analysis_8h_source.html">custom_bitvector_analysis.h</a>.</p>
 
 </div>
 </div>

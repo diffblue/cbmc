@@ -14,7 +14,6 @@ var classrd__range__domaint =
     [ "kill", "classrd__range__domaint.html#ae7a7c5402ef8f88bcecdfbfd92190002", null ],
     [ "kill_inf", "classrd__range__domaint.html#a28b45b643e5873c08d33fc455666dd96", null ],
     [ "make_bottom", "classrd__range__domaint.html#acf0b78f258ad82672daac59afdd272d5", null ],
-    [ "make_entry", "classrd__range__domaint.html#a345325edc0ca453ee00bd9c7a949fefb", null ],
     [ "make_top", "classrd__range__domaint.html#a20bec846c323fc6e66ee3259d7deae13", null ],
     [ "merge", "classrd__range__domaint.html#ab556a22d2c58abc550ac6752ede692a0", null ],
     [ "merge_inner", "classrd__range__domaint.html#ad4ba2d479b90c28ddfd9b0f5399eb68a", null ],

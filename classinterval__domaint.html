@@ -133,11 +133,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a166d3733332b6301e85d1bea1821f65d"><td class="mdescLeft">&#160;</td><td class="mdescRight">no states  <a href="classinterval__domaint.html#a166d3733332b6301e85d1bea1821f65d">More...</a><br /></td></tr>
 <tr class="separator:a166d3733332b6301e85d1bea1821f65d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73ffd5422b0f95d1300658bf04789067"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a73ffd5422b0f95d1300658bf04789067">make_top</a> () final override</td></tr>
-<tr class="memdesc:a73ffd5422b0f95d1300658bf04789067"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this, and domains may refuse to implement it.  <a href="classinterval__domaint.html#a73ffd5422b0f95d1300658bf04789067">More...</a><br /></td></tr>
+<tr class="memdesc:a73ffd5422b0f95d1300658bf04789067"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it.  <a href="classinterval__domaint.html#a73ffd5422b0f95d1300658bf04789067">More...</a><br /></td></tr>
 <tr class="separator:a73ffd5422b0f95d1300658bf04789067"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa47b8062289f2c05198b87c26e21018d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#aa47b8062289f2c05198b87c26e21018d">make_entry</a> () final override</td></tr>
-<tr class="memdesc:aa47b8062289f2c05198b87c26e21018d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state.  <a href="classinterval__domaint.html#aa47b8062289f2c05198b87c26e21018d">More...</a><br /></td></tr>
-<tr class="separator:aa47b8062289f2c05198b87c26e21018d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1230588308ae2b35b50d9626a1d8fe83"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a1230588308ae2b35b50d9626a1d8fe83">is_bottom</a> () const override final</td></tr>
 <tr class="separator:a1230588308ae2b35b50d9626a1d8fe83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f78252f72cde1d75558bcbae1be00b9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterval__domaint.html#a4f78252f72cde1d75558bcbae1be00b9">is_top</a> () const override final</td></tr>
@@ -156,6 +153,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5f1421c25ecc35be6239a6c3d32761b6 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a489adca61b5aeadbe9a7515bc4c95c2e inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classxmlt.html">xmlt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a489adca61b5aeadbe9a7515bc4c95c2e">output_xml</a> (const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="separator:a489adca61b5aeadbe9a7515bc4c95c2e inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">make_entry</a> ()</td></tr>
+<tr class="memdesc:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state For most domains top is sufficient.  <a href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">More...</a><br /></td></tr>
+<tr class="separator:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8526392412dc599207eb841c7b4fbc90 inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a8526392412dc599207eb841c7b4fbc90">ai_simplify_lhs</a> (<a class="el" href="classexprt.html">exprt</a> &amp;condition, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="memdesc:a8526392412dc599207eb841c7b4fbc90 inherit pub_methods_classai__domain__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simplifies the expression but keeps it as an l-value.  <a href="classai__domain__baset.html#a8526392412dc599207eb841c7b4fbc90">More...</a><br /></td></tr>
 <tr class="separator:a8526392412dc599207eb841c7b4fbc90 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,7 +243,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00115">115</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00110">110</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>
@@ -267,7 +267,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00114">114</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00109">109</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>
@@ -599,7 +599,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a0b92089f54aad3fe5e54068f005f9aab">ai_domain_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00077">77</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00072">72</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>
@@ -627,7 +627,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00102">102</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00097">97</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>
@@ -655,7 +655,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00097">97</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00092">92</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>
@@ -684,7 +684,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#ad8ee906f2cdbfcde3b6c11c81d76e65f">ai_domain_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00088">88</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00083">83</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>
@@ -754,37 +754,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="aa47b8062289f2c05198b87c26e21018d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa47b8062289f2c05198b87c26e21018d">&#9670;&nbsp;</a></span>make_entry()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void interval_domaint::make_entry </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Make this domain a reasonable entry-point state. </p>
-
-<p>Implements <a class="el" href="classai__domain__baset.html#acb094653215ef8ed1e7b5e4bf78c59ef">ai_domain_baset</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00072">72</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
-
-</div>
-</div>
 <a id="a66e4fdbbaf015e79ef08f5570ce4a228"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a66e4fdbbaf015e79ef08f5570ce4a228">&#9670;&nbsp;</a></span>make_expression()</h2>
 
@@ -828,7 +797,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>all states &ndash; the analysis doesn't use this, and domains may refuse to implement it. </p>
+<p>all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it. </p>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a5f3087dc907a0d35baec30549a04281f">ai_domain_baset</a>.</p>
 
@@ -1017,7 +986,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00112">112</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00107">107</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>
@@ -1041,7 +1010,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00118">118</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00113">113</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>
@@ -1065,7 +1034,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00117">117</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="interval__domain_8h_source.html#l00112">112</a> of file <a class="el" href="interval__domain_8h_source.html">interval_domain.h</a>.</p>
 
 </div>
 </div>

@@ -8,7 +8,6 @@ var classglobal__may__alias__domaint =
     [ "is_bottom", "classglobal__may__alias__domaint.html#a139c68b198780cb540cf525901ccc0a6", null ],
     [ "is_top", "classglobal__may__alias__domaint.html#ae74a3e8b2aab2af3e12f46147f4da436", null ],
     [ "make_bottom", "classglobal__may__alias__domaint.html#a41b123378fdc606bdbd6c66842791402", null ],
-    [ "make_entry", "classglobal__may__alias__domaint.html#aede8e468a71b0cd4b556bebf90370ba4", null ],
     [ "make_top", "classglobal__may__alias__domaint.html#a4daf54efe46dee7b44edf08fb46ba1b7", null ],
     [ "merge", "classglobal__may__alias__domaint.html#ab2cf9287db6d3e6e5b998b01aba5cc42", null ],
     [ "output", "classglobal__may__alias__domaint.html#a9b38d85f53179e75a7cdad20af02e37e", null ],

@@ -17,7 +17,6 @@ var classinterval__domaint =
     [ "is_top", "classinterval__domaint.html#a4f78252f72cde1d75558bcbae1be00b9", null ],
     [ "join", "classinterval__domaint.html#a6118662c6ef48697c6474398cdd7a05a", null ],
     [ "make_bottom", "classinterval__domaint.html#a166d3733332b6301e85d1bea1821f65d", null ],
-    [ "make_entry", "classinterval__domaint.html#aa47b8062289f2c05198b87c26e21018d", null ],
     [ "make_expression", "classinterval__domaint.html#a66e4fdbbaf015e79ef08f5570ce4a228", null ],
     [ "make_top", "classinterval__domaint.html#a73ffd5422b0f95d1300658bf04789067", null ],
     [ "merge", "classinterval__domaint.html#aa0e16c94dde01269b5f769573f38002a", null ],

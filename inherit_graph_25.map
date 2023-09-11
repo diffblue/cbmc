@@ -1,26 +1,33 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="5,260,83,287"/>
-<area shape="rect" id="node2" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="131,260,343,287"/>
-<area shape="rect" id="node3" href="$classait.html" title=" " alt="" coords="402,5,578,32"/>
-<area shape="rect" id="node5" href="$classait.html" title=" " alt="" coords="421,57,559,98"/>
-<area shape="rect" id="node7" href="$classait.html" title=" " alt="" coords="406,122,574,163"/>
-<area shape="rect" id="node9" href="$classait.html" title=" " alt="" coords="396,187,584,229"/>
-<area shape="rect" id="node11" href="$classait.html" title=" " alt="" coords="423,253,557,294"/>
-<area shape="rect" id="node12" href="$classait.html" title=" " alt="" coords="407,318,573,359"/>
-<area shape="rect" id="node14" href="$classait.html" title=" " alt="" coords="391,384,589,411"/>
-<area shape="rect" id="node16" href="$classai__three__way__merget.html" title=" " alt="" coords="409,485,571,512"/>
-<area shape="rect" id="node18" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="427,587,553,613"/>
-<area shape="rect" id="node4" href="$classescape__analysist.html" title=" " alt="" coords="671,5,806,32"/>
-<area shape="rect" id="node6" href="$classinvariant__propagationt.html" title=" " alt="" coords="653,64,824,91"/>
-<area shape="rect" id="node8" href="$classglobal__may__alias__analysist.html" title="This is a may analysis (i.e." alt="" coords="637,129,840,156"/>
-<area shape="rect" id="node10" href="$classconstant__propagator__ait.html" title=" " alt="" coords="649,195,829,221"/>
-<area shape="rect" id="node13" href="$classcustom__bitvector__analysist.html" title=" " alt="" coords="638,325,839,352"/>
-<area shape="rect" id="node15" href="$classdependence__grapht.html" title=" " alt="" coords="663,405,814,432"/>
-<area shape="rect" id="node17" href="$classvariable__sensitivity__dependence__grapht.html" title=" " alt="" coords="660,487,817,529"/>
-<area shape="rect" id="node19" href="$classconcurrency__aware__ait.html" title=" " alt="" coords="653,570,825,611"/>
-<area shape="rect" id="node21" href="$classconcurrency__aware__ait.html" title="Base class for concurrency&#45;aware abstract interpretation." alt="" coords="653,635,825,677"/>
-<area shape="rect" id="node20" href="$classreaching__definitions__analysist.html" title=" " alt="" coords="888,635,1041,677"/>
-<area shape="rect" id="node22" href="$classgrapht.html" title=" " alt="" coords="409,435,571,461"/>
-<area shape="rect" id="node23" href="$classgrapht.html" title=" " alt="" coords="398,536,582,563"/>
-<area shape="rect" id="node24" href="$classsparse__bitvector__analysist.html" title=" " alt="" coords="641,701,837,742"/>
+<area shape="rect" id="node1" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="5,389,83,415"/>
+<area shape="rect" id="node2" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="131,389,343,415"/>
+<area shape="rect" id="node3" href="$classait.html" title=" " alt="" coords="418,129,594,155"/>
+<area shape="rect" id="node5" href="$classait.html" title=" " alt="" coords="437,180,575,221"/>
+<area shape="rect" id="node7" href="$classait.html" title=" " alt="" coords="422,348,590,389"/>
+<area shape="rect" id="node9" href="$classait.html" title=" " alt="" coords="412,413,600,455"/>
+<area shape="rect" id="node11" href="$classait.html" title=" " alt="" coords="439,632,573,673"/>
+<area shape="rect" id="node12" href="$classait.html" title=" " alt="" coords="423,749,589,791"/>
+<area shape="rect" id="node14" href="$classait.html" title=" " alt="" coords="454,581,558,607"/>
+<area shape="rect" id="node16" href="$classait.html" title=" " alt="" coords="407,479,605,506"/>
+<area shape="rect" id="node18" href="$classai__three__way__merget.html" title=" " alt="" coords="425,297,587,323"/>
+<area shape="rect" id="node20" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="443,78,569,105"/>
+<area shape="rect" id="node4" href="$classescape__analysist.html" title=" " alt="" coords="703,137,838,163"/>
+<area shape="rect" id="node6" href="$classinvariant__propagationt.html" title=" " alt="" coords="685,187,856,214"/>
+<area shape="rect" id="node8" href="$classglobal__may__alias__analysist.html" title="This is a may analysis (i.e." alt="" coords="669,355,872,382"/>
+<area shape="rect" id="node10" href="$classconstant__propagator__ait.html" title=" " alt="" coords="681,421,861,447"/>
+<area shape="rect" id="node13" href="$classcustom__bitvector__analysist.html" title=" " alt="" coords="670,757,871,783"/>
+<area shape="rect" id="node15" href="$classvalue__set__analysis__templatet.html" title="This template class implements a data&#45;flow analysis which keeps track of what values different variab..." alt="" coords="691,636,850,677"/>
+<area shape="rect" id="node17" href="$classdependence__grapht.html" title=" " alt="" coords="695,505,846,531"/>
+<area shape="rect" id="node19" href="$classvariable__sensitivity__dependence__grapht.html" title=" " alt="" coords="692,264,849,305"/>
+<area shape="rect" id="node21" href="$classconcurrency__aware__ait.html" title=" " alt="" coords="685,71,857,112"/>
+<area shape="rect" id="node23" href="$classconcurrency__aware__ait.html" title="Base class for concurrency&#45;aware abstract interpretation." alt="" coords="685,5,857,47"/>
+<area shape="rect" id="node22" href="$classreaching__definitions__analysist.html" title=" " alt="" coords="920,465,1073,507"/>
+<area shape="rect" id="node24" href="$classflow__insensitive__analysis__baset.html" title=" " alt="" coords="143,844,331,885"/>
+<area shape="rect" id="node25" href="$classflow__insensitive__analysist.html" title=" " alt="" coords="409,815,603,856"/>
+<area shape="rect" id="node27" href="$classflow__insensitive__analysist.html" title=" " alt="" coords="391,881,621,907"/>
+<area shape="rect" id="node26" href="$classvalue__set__analysis__fit.html" title=" " alt="" coords="687,807,854,834"/>
+<area shape="rect" id="node28" href="$classgrapht.html" title=" " alt="" coords="425,530,587,557"/>
+<area shape="rect" id="node29" href="$classgrapht.html" title=" " alt="" coords="414,246,598,273"/>
+<area shape="rect" id="node30" href="$classsparse__bitvector__analysist.html" title=" " alt="" coords="673,859,869,900"/>
+<area shape="rect" id="node31" href="$classvalue__setst.html" title=" " alt="" coords="457,698,555,725"/>
 </map>

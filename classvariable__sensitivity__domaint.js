@@ -10,7 +10,6 @@ var classvariable__sensitivity__domaint =
     [ "is_bottom", "classvariable__sensitivity__domaint.html#ab02abb1b24ba82e4b6aeef8d8828fb10", null ],
     [ "is_top", "classvariable__sensitivity__domaint.html#aedbe5df1af9e464073aa052c81abb30b", null ],
     [ "make_bottom", "classvariable__sensitivity__domaint.html#a0cf0394a132d08654675655239675d34", null ],
-    [ "make_entry", "classvariable__sensitivity__domaint.html#af76621d2a134d39b5dda90de6ea7abef", null ],
     [ "make_top", "classvariable__sensitivity__domaint.html#a3bc259fbd0b8f8184b4ef833264551b5", null ],
     [ "merge", "classvariable__sensitivity__domaint.html#acfc942c1a442d0a48e9642ee4cb50cfe", null ],
     [ "merge_three_way_function_return", "classvariable__sensitivity__domaint.html#ab540b4fb434c00a46268abd74a984161", null ],

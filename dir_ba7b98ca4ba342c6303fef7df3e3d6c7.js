@@ -13,7 +13,8 @@ var dir_ba7b98ca4ba342c6303fef7df3e3d6c7 =
       [ "ai_domain_baset", "classai__domain__baset.html", "classai__domain__baset" ],
       [ "ai_domain_factory_baset", "classai__domain__factory__baset.html", "classai__domain__factory__baset" ],
       [ "ai_domain_factoryt", "classai__domain__factoryt.html", "classai__domain__factoryt" ],
-      [ "ai_domain_factory_default_constructort", "classai__domain__factory__default__constructort.html", "classai__domain__factory__default__constructort" ]
+      [ "ai_domain_factory_default_constructort", "classai__domain__factory__default__constructort.html", "classai__domain__factory__default__constructort" ],
+      [ "ai_domain_factory_location_constructort", "classai__domain__factory__location__constructort.html", "classai__domain__factory__location__constructort" ]
     ] ],
     [ "ai_history.cpp", "ai__history_8cpp.html", null ],
     [ "ai_history.h", "ai__history_8h.html", [
@@ -161,13 +162,6 @@ var dir_ba7b98ca4ba342c6303fef7df3e3d6c7 =
     [ "sese_regions.cpp", "sese__regions_8cpp.html", "sese__regions_8cpp" ],
     [ "sese_regions.h", "sese__regions_8h.html", [
       [ "sese_region_analysist", "classsese__region__analysist.html", "classsese__region__analysist" ]
-    ] ],
-    [ "static_analysis.cpp", "static__analysis_8cpp.html", "static__analysis_8cpp" ],
-    [ "static_analysis.h", "static__analysis_8h.html", [
-      [ "domain_baset", "classdomain__baset.html", "classdomain__baset" ],
-      [ "static_analysis_baset", "classstatic__analysis__baset.html", "classstatic__analysis__baset" ],
-      [ "static_analysist", "classstatic__analysist.html", "classstatic__analysist" ],
-      [ "concurrency_aware_static_analysist", "classconcurrency__aware__static__analysist.html", "classconcurrency__aware__static__analysist" ]
     ] ],
     [ "uncaught_exceptions_analysis.cpp", "uncaught__exceptions__analysis_8cpp.html", "uncaught__exceptions__analysis_8cpp" ],
     [ "uncaught_exceptions_analysis.h", "uncaught__exceptions__analysis_8h.html", "uncaught__exceptions__analysis_8h" ],

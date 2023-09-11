@@ -145,11 +145,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:adc80a619cca100bec40d44ca77e29b9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">no states  <a href="classvariable__sensitivity__dependence__domaint.html#adc80a619cca100bec40d44ca77e29b9b">More...</a><br /></td></tr>
 <tr class="separator:adc80a619cca100bec40d44ca77e29b9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72e564d130c52dd7d5da7a3cc5b5e3a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__dependence__domaint.html#a72e564d130c52dd7d5da7a3cc5b5e3a2">make_top</a> () override</td></tr>
-<tr class="memdesc:a72e564d130c52dd7d5da7a3cc5b5e3a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this, and domains may refuse to implement it.  <a href="classvariable__sensitivity__dependence__domaint.html#a72e564d130c52dd7d5da7a3cc5b5e3a2">More...</a><br /></td></tr>
+<tr class="memdesc:a72e564d130c52dd7d5da7a3cc5b5e3a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it.  <a href="classvariable__sensitivity__dependence__domaint.html#a72e564d130c52dd7d5da7a3cc5b5e3a2">More...</a><br /></td></tr>
 <tr class="separator:a72e564d130c52dd7d5da7a3cc5b5e3a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e58cabf4e30fd76507cd0d28c0e1c17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__dependence__domaint.html#a2e58cabf4e30fd76507cd0d28c0e1c17">make_entry</a> () override</td></tr>
-<tr class="memdesc:a2e58cabf4e30fd76507cd0d28c0e1c17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state.  <a href="classvariable__sensitivity__dependence__domaint.html#a2e58cabf4e30fd76507cd0d28c0e1c17">More...</a><br /></td></tr>
-<tr class="separator:a2e58cabf4e30fd76507cd0d28c0e1c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c648da1d109fe8f56bff468c2e59a94"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__dependence__domaint.html#a1c648da1d109fe8f56bff468c2e59a94">is_bottom</a> () const override</td></tr>
 <tr class="separator:a1c648da1d109fe8f56bff468c2e59a94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22ba8a18ad111f45510ff44433e9171c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__dependence__domaint.html#a22ba8a18ad111f45510ff44433e9171c">is_top</a> () const override</td></tr>
@@ -182,9 +179,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3bc259fbd0b8f8184b4ef833264551b5 inherit pub_methods_classvariable__sensitivity__domaint"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#a3bc259fbd0b8f8184b4ef833264551b5">make_top</a> () override</td></tr>
 <tr class="memdesc:a3bc259fbd0b8f8184b4ef833264551b5 inherit pub_methods_classvariable__sensitivity__domaint"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the domain to top (all states).  <a href="classvariable__sensitivity__domaint.html#a3bc259fbd0b8f8184b4ef833264551b5">More...</a><br /></td></tr>
 <tr class="separator:a3bc259fbd0b8f8184b4ef833264551b5 inherit pub_methods_classvariable__sensitivity__domaint"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af76621d2a134d39b5dda90de6ea7abef inherit pub_methods_classvariable__sensitivity__domaint"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#af76621d2a134d39b5dda90de6ea7abef">make_entry</a> () override</td></tr>
-<tr class="memdesc:af76621d2a134d39b5dda90de6ea7abef inherit pub_methods_classvariable__sensitivity__domaint"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a reasonable entry-point state.  <a href="classvariable__sensitivity__domaint.html#af76621d2a134d39b5dda90de6ea7abef">More...</a><br /></td></tr>
-<tr class="separator:af76621d2a134d39b5dda90de6ea7abef inherit pub_methods_classvariable__sensitivity__domaint"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27c40993c131dad0a3d9d11ba33fb4c8 inherit pub_methods_classvariable__sensitivity__domaint"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#a27c40993c131dad0a3d9d11ba33fb4c8">output</a> (std::ostream &amp;out, const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const override</td></tr>
 <tr class="memdesc:a27c40993c131dad0a3d9d11ba33fb4c8 inherit pub_methods_classvariable__sensitivity__domaint"><td class="mdescLeft">&#160;</td><td class="mdescRight">Basic text output of the abstract domain.  <a href="classvariable__sensitivity__domaint.html#a27c40993c131dad0a3d9d11ba33fb4c8">More...</a><br /></td></tr>
 <tr class="separator:a27c40993c131dad0a3d9d11ba33fb4c8 inherit pub_methods_classvariable__sensitivity__domaint"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -211,6 +205,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae94f6de2e78f602182accd0066c44a9a inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a489adca61b5aeadbe9a7515bc4c95c2e inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classxmlt.html">xmlt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a489adca61b5aeadbe9a7515bc4c95c2e">output_xml</a> (const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="separator:a489adca61b5aeadbe9a7515bc4c95c2e inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">make_entry</a> ()</td></tr>
+<tr class="memdesc:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state For most domains top is sufficient.  <a href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">More...</a><br /></td></tr>
+<tr class="separator:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8526392412dc599207eb841c7b4fbc90 inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a8526392412dc599207eb841c7b4fbc90">ai_simplify_lhs</a> (<a class="el" href="classexprt.html">exprt</a> &amp;condition, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="memdesc:a8526392412dc599207eb841c7b4fbc90 inherit pub_methods_classai__domain__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simplifies the expression but keeps it as an l-value.  <a href="classai__domain__baset.html#a8526392412dc599207eb841c7b4fbc90">More...</a><br /></td></tr>
 <tr class="separator:a8526392412dc599207eb841c7b4fbc90 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -291,7 +288,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00194">194</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00189">189</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -315,7 +312,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00189">189</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00184">184</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -339,7 +336,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00184">184</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00179">179</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -363,7 +360,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00179">179</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00174">174</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -612,7 +609,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00154">154</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00149">149</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -641,7 +638,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a0b92089f54aad3fe5e54068f005f9aab">ai_domain_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00124">124</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00119">119</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -670,7 +667,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#ad8ee906f2cdbfcde3b6c11c81d76e65f">ai_domain_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00129">129</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00124">124</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -705,37 +702,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a2e58cabf4e30fd76507cd0d28c0e1c17"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e58cabf4e30fd76507cd0d28c0e1c17">&#9670;&nbsp;</a></span>make_entry()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void variable_sensitivity_dependence_domaint::make_entry </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Make this domain a reasonable entry-point state. </p>
-
-<p>Implements <a class="el" href="classai__domain__baset.html#acb094653215ef8ed1e7b5e4bf78c59ef">ai_domain_baset</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00119">119</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
-
-</div>
-</div>
 <a id="a72e564d130c52dd7d5da7a3cc5b5e3a2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a72e564d130c52dd7d5da7a3cc5b5e3a2">&#9670;&nbsp;</a></span>make_top()</h2>
 
@@ -759,7 +725,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>all states &ndash; the analysis doesn't use this, and domains may refuse to implement it. </p>
+<p>all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it. </p>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a5f3087dc907a0d35baec30549a04281f">ai_domain_baset</a>.</p>
 
@@ -1173,7 +1139,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00196">196</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00191">191</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -1197,7 +1163,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00195">195</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00190">190</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -1221,7 +1187,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00190">190</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00185">185</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -1245,7 +1211,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00185">185</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00180">180</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -1269,7 +1235,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00180">180</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00175">175</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -1293,7 +1259,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00165">165</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00160">160</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -1317,7 +1283,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00164">164</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00159">159</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -1341,7 +1307,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00163">163</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html#l00158">158</a> of file <a class="el" href="variable__sensitivity__dependence__graph_8h_source.html">variable_sensitivity_dependence_graph.h</a>.</p>
 
 </div>
 </div>

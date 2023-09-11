@@ -6,7 +6,6 @@ var classuninitialized__domaint =
     [ "is_bottom", "classuninitialized__domaint.html#aa7a9c8efc96d2cf156b279648bde9837", null ],
     [ "is_top", "classuninitialized__domaint.html#aa1de2d3f4b3dc0e25f5d8bf26763f4fd", null ],
     [ "make_bottom", "classuninitialized__domaint.html#afd64acba791e1e1318af780483d49e94", null ],
-    [ "make_entry", "classuninitialized__domaint.html#aedb7b6e3bb06db8a3f638c35a0c16e8b", null ],
     [ "make_top", "classuninitialized__domaint.html#a269ea5933f74553aa3e36dc6683213e9", null ],
     [ "merge", "classuninitialized__domaint.html#ae0515b49fcdbe4cbd1f1707dc5a09c73", null ],
     [ "output", "classuninitialized__domaint.html#aed2e9d8cbe75ebfed4d9de2957130111", null ],

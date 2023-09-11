@@ -126,10 +126,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a91d45f8a5715f66ed169b95d2f2a75e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">no states  <a href="classis__threaded__domaint.html#a91d45f8a5715f66ed169b95d2f2a75e4">More...</a><br /></td></tr>
 <tr class="separator:a91d45f8a5715f66ed169b95d2f2a75e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab70c65e195bf2a34dbad002c9be4e24f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classis__threaded__domaint.html#ab70c65e195bf2a34dbad002c9be4e24f">make_top</a> () final override</td></tr>
-<tr class="memdesc:ab70c65e195bf2a34dbad002c9be4e24f"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this, and domains may refuse to implement it.  <a href="classis__threaded__domaint.html#ab70c65e195bf2a34dbad002c9be4e24f">More...</a><br /></td></tr>
+<tr class="memdesc:ab70c65e195bf2a34dbad002c9be4e24f"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it.  <a href="classis__threaded__domaint.html#ab70c65e195bf2a34dbad002c9be4e24f">More...</a><br /></td></tr>
 <tr class="separator:ab70c65e195bf2a34dbad002c9be4e24f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5793d8722cece4ffe336d0eeb388e40"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classis__threaded__domaint.html#ab5793d8722cece4ffe336d0eeb388e40">make_entry</a> () final override</td></tr>
-<tr class="memdesc:ab5793d8722cece4ffe336d0eeb388e40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state.  <a href="classis__threaded__domaint.html#ab5793d8722cece4ffe336d0eeb388e40">More...</a><br /></td></tr>
+<tr class="memdesc:ab5793d8722cece4ffe336d0eeb388e40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state For most domains top is sufficient.  <a href="classis__threaded__domaint.html#ab5793d8722cece4ffe336d0eeb388e40">More...</a><br /></td></tr>
 <tr class="separator:ab5793d8722cece4ffe336d0eeb388e40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a559ce4d05477379c1fc190b65a8fe95c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classis__threaded__domaint.html#a559ce4d05477379c1fc190b65a8fe95c">is_bottom</a> () const override final</td></tr>
 <tr class="separator:a559ce4d05477379c1fc190b65a8fe95c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -320,9 +320,9 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Make this domain a reasonable entry-point state. </p>
+<p>Make this domain a reasonable entry-point state For most domains top is sufficient. </p>
 
-<p>Implements <a class="el" href="classai__domain__baset.html#acb094653215ef8ed1e7b5e4bf78c59ef">ai_domain_baset</a>.</p>
+<p>Reimplemented from <a class="el" href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">ai_domain_baset</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="is__threaded_8cpp_source.html#l00075">75</a> of file <a class="el" href="is__threaded_8cpp_source.html">is_threaded.cpp</a>.</p>
 
@@ -351,7 +351,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>all states &ndash; the analysis doesn't use this, and domains may refuse to implement it. </p>
+<p>all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it. </p>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a5f3087dc907a0d35baec30549a04281f">ai_domain_baset</a>.</p>
 

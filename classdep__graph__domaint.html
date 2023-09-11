@@ -144,13 +144,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a9567ee7e3e6ef4f1e0858829b8314556"><td class="mdescLeft">&#160;</td><td class="mdescRight">Outputs the current value of the domain.  <a href="classdep__graph__domaint.html#a9567ee7e3e6ef4f1e0858829b8314556">More...</a><br /></td></tr>
 <tr class="separator:a9567ee7e3e6ef4f1e0858829b8314556"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7136e2eb5a9b827847855ec34606b7d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#ad7136e2eb5a9b827847855ec34606b7d">make_top</a> () final override</td></tr>
-<tr class="memdesc:ad7136e2eb5a9b827847855ec34606b7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this, and domains may refuse to implement it.  <a href="classdep__graph__domaint.html#ad7136e2eb5a9b827847855ec34606b7d">More...</a><br /></td></tr>
+<tr class="memdesc:ad7136e2eb5a9b827847855ec34606b7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it.  <a href="classdep__graph__domaint.html#ad7136e2eb5a9b827847855ec34606b7d">More...</a><br /></td></tr>
 <tr class="separator:ad7136e2eb5a9b827847855ec34606b7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a770b97f8c3b74a75ce8b96099c12b948"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#a770b97f8c3b74a75ce8b96099c12b948">make_bottom</a> () final override</td></tr>
 <tr class="memdesc:a770b97f8c3b74a75ce8b96099c12b948"><td class="mdescLeft">&#160;</td><td class="mdescRight">no states  <a href="classdep__graph__domaint.html#a770b97f8c3b74a75ce8b96099c12b948">More...</a><br /></td></tr>
 <tr class="separator:a770b97f8c3b74a75ce8b96099c12b948"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad931a792d0ca8736c1c043b1d5d85fdb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#ad931a792d0ca8736c1c043b1d5d85fdb">make_entry</a> () final override</td></tr>
-<tr class="memdesc:ad931a792d0ca8736c1c043b1d5d85fdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state.  <a href="classdep__graph__domaint.html#ad931a792d0ca8736c1c043b1d5d85fdb">More...</a><br /></td></tr>
+<tr class="memdesc:ad931a792d0ca8736c1c043b1d5d85fdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state For most domains top is sufficient.  <a href="classdep__graph__domaint.html#ad931a792d0ca8736c1c043b1d5d85fdb">More...</a><br /></td></tr>
 <tr class="separator:ad931a792d0ca8736c1c043b1d5d85fdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a123e623fe7509a86020b1124c474a740"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdep__graph__domaint.html#a123e623fe7509a86020b1124c474a740">is_top</a> () const final override</td></tr>
 <tr class="separator:a123e623fe7509a86020b1124c474a740"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -538,9 +538,9 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Make this domain a reasonable entry-point state. </p>
+<p>Make this domain a reasonable entry-point state For most domains top is sufficient. </p>
 
-<p>Implements <a class="el" href="classai__domain__baset.html#acb094653215ef8ed1e7b5e4bf78c59ef">ai_domain_baset</a>.</p>
+<p>Reimplemented from <a class="el" href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">ai_domain_baset</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00119">119</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
@@ -569,7 +569,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>all states &ndash; the analysis doesn't use this, and domains may refuse to implement it. </p>
+<p>all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it. </p>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a5f3087dc907a0d35baec30549a04281f">ai_domain_baset</a>.</p>
 

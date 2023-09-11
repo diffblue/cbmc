@@ -52,6 +52,7 @@ var classvalue__sett =
     [ "operator=", "classvalue__sett.html#a530754f88f23f8a8e4647a15ec821f59", null ],
     [ "operator=", "classvalue__sett.html#a209536b19d2b974977ee9d57239bb605", null ],
     [ "output", "classvalue__sett.html#a5d23e0a4fbdcf66269214b0b15b642c3", null ],
+    [ "output_xml", "classvalue__sett.html#a534ceedfe16eb592724ccdd68aa86c53", null ],
     [ "set", "classvalue__sett.html#ac6c4ecc60fb12f317308265ab3e6ef98", null ],
     [ "to_expr", "classvalue__sett.html#aab70716871ae95e6d940604c52aea687", null ],
     [ "update_entry", "classvalue__sett.html#ab09f67bc259d304d8bbbb62cf260e9a1", null ],

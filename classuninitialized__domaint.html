@@ -138,14 +138,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aed2e9d8cbe75ebfed4d9de2957130111"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classuninitialized__domaint.html#aed2e9d8cbe75ebfed4d9de2957130111">output</a> (std::ostream &amp;out, const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const final</td></tr>
 <tr class="separator:aed2e9d8cbe75ebfed4d9de2957130111"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a269ea5933f74553aa3e36dc6683213e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classuninitialized__domaint.html#a269ea5933f74553aa3e36dc6683213e9">make_top</a> () final override</td></tr>
-<tr class="memdesc:a269ea5933f74553aa3e36dc6683213e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this, and domains may refuse to implement it.  <a href="classuninitialized__domaint.html#a269ea5933f74553aa3e36dc6683213e9">More...</a><br /></td></tr>
+<tr class="memdesc:a269ea5933f74553aa3e36dc6683213e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it.  <a href="classuninitialized__domaint.html#a269ea5933f74553aa3e36dc6683213e9">More...</a><br /></td></tr>
 <tr class="separator:a269ea5933f74553aa3e36dc6683213e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd64acba791e1e1318af780483d49e94"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classuninitialized__domaint.html#afd64acba791e1e1318af780483d49e94">make_bottom</a> () final override</td></tr>
 <tr class="memdesc:afd64acba791e1e1318af780483d49e94"><td class="mdescLeft">&#160;</td><td class="mdescRight">no states  <a href="classuninitialized__domaint.html#afd64acba791e1e1318af780483d49e94">More...</a><br /></td></tr>
 <tr class="separator:afd64acba791e1e1318af780483d49e94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedb7b6e3bb06db8a3f638c35a0c16e8b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classuninitialized__domaint.html#aedb7b6e3bb06db8a3f638c35a0c16e8b">make_entry</a> () final override</td></tr>
-<tr class="memdesc:aedb7b6e3bb06db8a3f638c35a0c16e8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state.  <a href="classuninitialized__domaint.html#aedb7b6e3bb06db8a3f638c35a0c16e8b">More...</a><br /></td></tr>
-<tr class="separator:aedb7b6e3bb06db8a3f638c35a0c16e8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1de2d3f4b3dc0e25f5d8bf26763f4fd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classuninitialized__domaint.html#aa1de2d3f4b3dc0e25f5d8bf26763f4fd">is_top</a> () const override final</td></tr>
 <tr class="separator:aa1de2d3f4b3dc0e25f5d8bf26763f4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7a9c8efc96d2cf156b279648bde9837"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classuninitialized__domaint.html#aa7a9c8efc96d2cf156b279648bde9837">is_bottom</a> () const override final</td></tr>
@@ -159,6 +156,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5f1421c25ecc35be6239a6c3d32761b6 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a489adca61b5aeadbe9a7515bc4c95c2e inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classxmlt.html">xmlt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a489adca61b5aeadbe9a7515bc4c95c2e">output_xml</a> (const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="separator:a489adca61b5aeadbe9a7515bc4c95c2e inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">make_entry</a> ()</td></tr>
+<tr class="memdesc:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make this domain a reasonable entry-point state For most domains top is sufficient.  <a href="classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361">More...</a><br /></td></tr>
+<tr class="separator:a3fffb98a2b579dbd1364a22cee893361 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae34120fbb2c54f5739f7d990caf87802 inherit pub_methods_classai__domain__baset"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai__domain__baset.html#ae34120fbb2c54f5739f7d990caf87802">ai_simplify</a> (<a class="el" href="classexprt.html">exprt</a> &amp;condition, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;) const</td></tr>
 <tr class="memdesc:ae34120fbb2c54f5739f7d990caf87802 inherit pub_methods_classai__domain__baset"><td class="mdescLeft">&#160;</td><td class="mdescRight">also add  <a href="classai__domain__baset.html#ae34120fbb2c54f5739f7d990caf87802">More...</a><br /></td></tr>
 <tr class="separator:ae34120fbb2c54f5739f7d990caf87802 inherit pub_methods_classai__domain__baset"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -296,7 +296,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a0b92089f54aad3fe5e54068f005f9aab">ai_domain_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="uninitialized__domain_8h_source.html#l00069">69</a> of file <a class="el" href="uninitialized__domain_8h_source.html">uninitialized_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="uninitialized__domain_8h_source.html#l00064">64</a> of file <a class="el" href="uninitialized__domain_8h_source.html">uninitialized_domain.h</a>.</p>
 
 </div>
 </div>
@@ -325,7 +325,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#ad8ee906f2cdbfcde3b6c11c81d76e65f">ai_domain_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="uninitialized__domain_8h_source.html#l00062">62</a> of file <a class="el" href="uninitialized__domain_8h_source.html">uninitialized_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="uninitialized__domain_8h_source.html#l00057">57</a> of file <a class="el" href="uninitialized__domain_8h_source.html">uninitialized_domain.h</a>.</p>
 
 </div>
 </div>
@@ -360,37 +360,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="aedb7b6e3bb06db8a3f638c35a0c16e8b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aedb7b6e3bb06db8a3f638c35a0c16e8b">&#9670;&nbsp;</a></span>make_entry()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uninitialized_domaint::make_entry </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">final</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Make this domain a reasonable entry-point state. </p>
-
-<p>Implements <a class="el" href="classai__domain__baset.html#acb094653215ef8ed1e7b5e4bf78c59ef">ai_domain_baset</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="uninitialized__domain_8h_source.html#l00057">57</a> of file <a class="el" href="uninitialized__domain_8h_source.html">uninitialized_domain.h</a>.</p>
-
-</div>
-</div>
 <a id="a269ea5933f74553aa3e36dc6683213e9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a269ea5933f74553aa3e36dc6683213e9">&#9670;&nbsp;</a></span>make_top()</h2>
 
@@ -414,7 +383,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>all states &ndash; the analysis doesn't use this, and domains may refuse to implement it. </p>
+<p>all states &ndash; the analysis doesn't use this directly (see make_entry) and domains may refuse to implement it. </p>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a5f3087dc907a0d35baec30549a04281f">ai_domain_baset</a>.</p>
 
@@ -596,7 +565,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="uninitialized__domain_8h_source.html#l00081">81</a> of file <a class="el" href="uninitialized__domain_8h_source.html">uninitialized_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="uninitialized__domain_8h_source.html#l00076">76</a> of file <a class="el" href="uninitialized__domain_8h_source.html">uninitialized_domain.h</a>.</p>
 
 </div>
 </div>

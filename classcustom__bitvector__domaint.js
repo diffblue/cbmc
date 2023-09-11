@@ -23,7 +23,6 @@ var classcustom__bitvector__domaint =
     [ "is_bottom", "classcustom__bitvector__domaint.html#a54b20869bf174ec9d88ff0a1b6134a54", null ],
     [ "is_top", "classcustom__bitvector__domaint.html#a5bb60d5b5aeb73951276a4b4ef32aac7", null ],
     [ "make_bottom", "classcustom__bitvector__domaint.html#ada9e8cd22ab2268dbfca64a754dc5c85", null ],
-    [ "make_entry", "classcustom__bitvector__domaint.html#abf9978c54f87ce209a050e8f3c0dee0e", null ],
     [ "make_top", "classcustom__bitvector__domaint.html#a624338d7dc4a140e11a9b8ce1c791d90", null ],
     [ "merge", "classcustom__bitvector__domaint.html#a249043d35efc72b921f2695b20c1c2d9", null ],
     [ "merge", "classcustom__bitvector__domaint.html#af52603086339b6824b8c98b560e618da", null ],

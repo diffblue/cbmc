@@ -10,7 +10,7 @@ var classai__domain__baset =
     [ "is_bottom", "classai__domain__baset.html#a0b92089f54aad3fe5e54068f005f9aab", null ],
     [ "is_top", "classai__domain__baset.html#ad8ee906f2cdbfcde3b6c11c81d76e65f", null ],
     [ "make_bottom", "classai__domain__baset.html#a19e267294b968ab0e0589659b54eca0b", null ],
-    [ "make_entry", "classai__domain__baset.html#acb094653215ef8ed1e7b5e4bf78c59ef", null ],
+    [ "make_entry", "classai__domain__baset.html#a3fffb98a2b579dbd1364a22cee893361", null ],
     [ "make_top", "classai__domain__baset.html#a5f3087dc907a0d35baec30549a04281f", null ],
     [ "output", "classai__domain__baset.html#a9fd94f048cb70ce00d642d4f16ab8521", null ],
     [ "output_json", "classai__domain__baset.html#a5f1421c25ecc35be6239a6c3d32761b6", null ],

@@ -90,9 +90,7 @@ $(document).ready(function(){initNavTree('value__set__analysis_8h.html',''); ini
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
 <div class="title">value_set_analysis.h File Reference</div>  </div>
 </div><!--header-->
@@ -100,7 +98,7 @@ $(document).ready(function(){initNavTree('value__set__analysis_8h.html',''); ini
 
 <p>Value Set Propagation.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="static__analysis_8h_source.html">analyses/static_analysis.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="ai_8h_source.html">analyses/ai.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="value__set__domain_8h_source.html">value_set_domain.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="value__sets_8h_source.html">value_sets.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -108,7 +106,7 @@ $(document).ready(function(){initNavTree('value__set__analysis_8h.html',''); ini
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="value__set__analysis_8h__incl.svg" width="2986" height="1216"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="value__set__analysis_8h__incl.svg" width="2763" height="1067"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -128,47 +126,16 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This template class implements a data-flow analysis which keeps track of what values different variables might have at different points in the program.  <a href="classvalue__set__analysis__templatet.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:abec019142109073b86ec13280083c890"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="value__set__analysis_8h.html#abec019142109073b86ec13280083c890">USE_DEPRECATED_STATIC_ANALYSIS_H</a></td></tr>
-<tr class="separator:abec019142109073b86ec13280083c890"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a39b39e38c9c3e60e3a1fb667659bce56"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classvalue__set__analysis__templatet.html">value_set_analysis_templatet</a>&lt; <a class="el" href="classvalue__set__domain__templatet.html">value_set_domain_templatet</a>&lt; <a class="el" href="classvalue__sett.html">value_sett</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="value__set__analysis_8h.html#a39b39e38c9c3e60e3a1fb667659bce56">value_set_analysist</a></td></tr>
 <tr class="separator:a39b39e38c9c3e60e3a1fb667659bce56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:ac4292cf6774554eab8defe7abc985fc3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="value__set__analysis_8h.html#ac4292cf6774554eab8defe7abc985fc3">value_sets_to_xml</a> (const std::function&lt; const <a class="el" href="classvalue__sett.html">value_sett</a> &amp;(<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>)&gt; &amp;get_value_set, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classxmlt.html">xmlt</a> &amp;dest)</td></tr>
-<tr class="separator:ac4292cf6774554eab8defe7abc985fc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5605f06d48e2cc3c141a8e32a0b4359"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="value__set__analysis_8h.html#ab5605f06d48e2cc3c141a8e32a0b4359">convert</a> (const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions, const <a class="el" href="value__set__analysis_8h.html#a39b39e38c9c3e60e3a1fb667659bce56">value_set_analysist</a> &amp;value_set_analysis, <a class="el" href="classxmlt.html">xmlt</a> &amp;dest)</td></tr>
-<tr class="separator:ab5605f06d48e2cc3c141a8e32a0b4359"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3711a1ca01939149218a7d5622cb01e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="value__set__analysis_8h.html#ab3711a1ca01939149218a7d5622cb01e">convert</a> (const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const <a class="el" href="value__set__analysis_8h.html#a39b39e38c9c3e60e3a1fb667659bce56">value_set_analysist</a> &amp;value_set_analysis, <a class="el" href="classxmlt.html">xmlt</a> &amp;dest)</td></tr>
-<tr class="separator:ab3711a1ca01939149218a7d5622cb01e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Value Set Propagation. </p>
 
 <p class="definition">Definition in file <a class="el" href="value__set__analysis_8h_source.html">value_set_analysis.h</a>.</p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="abec019142109073b86ec13280083c890"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abec019142109073b86ec13280083c890">&#9670;&nbsp;</a></span>USE_DEPRECATED_STATIC_ANALYSIS_H</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define USE_DEPRECATED_STATIC_ANALYSIS_H</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="value__set__analysis_8h_source.html#l00015">15</a> of file <a class="el" href="value__set__analysis_8h_source.html">value_set_analysis.h</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Typedef Documentation</h2>
+</div><h2 class="groupheader">Typedef Documentation</h2>
 <a id="a39b39e38c9c3e60e3a1fb667659bce56"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a39b39e38c9c3e60e3a1fb667659bce56">&#9670;&nbsp;</a></span>value_set_analysist</h2>
 
@@ -181,116 +148,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="value__set__analysis_8h_source.html#l00077">77</a> of file <a class="el" href="value__set__analysis_8h_source.html">value_set_analysis.h</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="ab5605f06d48e2cc3c141a8e32a0b4359"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5605f06d48e2cc3c141a8e32a0b4359">&#9670;&nbsp;</a></span>convert() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void convert </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_functions</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="value__set__analysis_8h.html#a39b39e38c9c3e60e3a1fb667659bce56">value_set_analysist</a> &amp;&#160;</td>
-          <td class="paramname"><em>value_set_analysis</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classxmlt.html">xmlt</a> &amp;&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="value__set__analysis_8cpp_source.html#l00068">68</a> of file <a class="el" href="value__set__analysis_8cpp_source.html">value_set_analysis.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ab3711a1ca01939149218a7d5622cb01e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3711a1ca01939149218a7d5622cb01e">&#9670;&nbsp;</a></span>convert() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void convert </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_program</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="value__set__analysis_8h.html#a39b39e38c9c3e60e3a1fb667659bce56">value_set_analysist</a> &amp;&#160;</td>
-          <td class="paramname"><em>value_set_analysis</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classxmlt.html">xmlt</a> &amp;&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="value__set__analysis_8cpp_source.html#l00086">86</a> of file <a class="el" href="value__set__analysis_8cpp_source.html">value_set_analysis.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ac4292cf6774554eab8defe7abc985fc3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac4292cf6774554eab8defe7abc985fc3">&#9670;&nbsp;</a></span>value_sets_to_xml()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void value_sets_to_xml </td>
-          <td>(</td>
-          <td class="paramtype">const std::function&lt; const <a class="el" href="classvalue__sett.html">value_sett</a> &amp;(<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>)&gt; &amp;&#160;</td>
-          <td class="paramname"><em>get_value_set</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_program</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classxmlt.html">xmlt</a> &amp;&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="value__set__analysis_8cpp_source.html#l00016">16</a> of file <a class="el" href="value__set__analysis_8cpp_source.html">value_set_analysis.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="value__set__analysis_8h_source.html#l00053">53</a> of file <a class="el" href="value__set__analysis_8h_source.html">value_set_analysis.h</a>.</p>
 
 </div>
 </div>

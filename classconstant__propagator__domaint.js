@@ -6,7 +6,6 @@ var classconstant__propagator__domaint =
     [ "is_bottom", "classconstant__propagator__domaint.html#a148c5e72e72f0866cb4b2a0b43e9ab59", null ],
     [ "is_top", "classconstant__propagator__domaint.html#a3aba68cd241ecd1cb2cbf87cbbc6a671", null ],
     [ "make_bottom", "classconstant__propagator__domaint.html#aff7b8994cc28685c4363c51231873a29", null ],
-    [ "make_entry", "classconstant__propagator__domaint.html#ae28e95666e96402f82876b6f9de8dd95", null ],
     [ "make_top", "classconstant__propagator__domaint.html#ada8150d544748f172ebfb44c47ee6b0b", null ],
     [ "merge", "classconstant__propagator__domaint.html#aefbd8941111dd0ead3a8554abb4eff11", null ],
     [ "output", "classconstant__propagator__domaint.html#ab984fec2973087fa5d343c90a07683a0", null ],

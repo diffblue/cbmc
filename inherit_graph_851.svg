@@ -11,10 +11,10 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="structstatement__list__typecheckt_1_1nesting__stack__entryt.html" target="_top" xlink:title="Every time branching occurs inside of a boolean expression string in STL, the current value of the RL...">
+<g id="a_node1"><a xlink:href="structstatement__list__typecheckt_1_1stl__label__locationt.html" target="_top" xlink:title="Holds information about the instruction and the nesting depth to which a label points.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 146,-30.5 146,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">statement_list_typecheckt</text>
-<text text-anchor="middle" x="73" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::nesting_stack_entryt</text>
+<text text-anchor="middle" x="73" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::stl_label_locationt</text>
 </a>
 </g>
 </g>
