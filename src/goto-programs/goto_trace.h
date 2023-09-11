@@ -278,7 +278,7 @@ void show_goto_trace(
 
 #define HELP_GOTO_TRACE                                                        \
   " {y--trace-json-extended} \t add rawLhs property to trace\n"                \
-  " {y-trace-show-function-calls} \t show function calls in plain trace\n"     \
+  " {y--trace-show-function-calls} \t show function calls in plain trace\n"    \
   " {y--trace-show-code} \t show original code in plain trace\n"               \
   " {y--trace-hex} \t represent plain trace values in hex\n"                   \
   " {y--compact-trace} \t give a compact trace\n"                              \
