@@ -2186,60 +2186,6 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
   return (x - *iptr);
 }
 
-
-
-/* FUNCTION: __sort_of_CPROVER_remainder */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
-  
-double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y)
-{
-  if (x == 0.0 || __CPROVER_isinfd(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-/* FUNCTION: __sort_of_CPROVER_remainderf */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
-
-float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y)
-{
-  if (x == 0.0f || __CPROVER_isinff(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-/* FUNCTION: __sort_of_CPROVER_remainderl */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
-
-long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y)
-{
-  if (x == 0.0 || __CPROVER_isinfld(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-
-
 /* ISO 9899:2011
  *
  * The fmod functions return the value x - ny, for some
@@ -2320,15 +2266,10 @@ long double fmodl(long double x, long double y)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y);
-
-double remainder(double x, double y) { return __sort_of_CPROVER_remainder(FE_TONEAREST, x, y); }
-
+double remainder(double x, double y)
+{
+  return __CPROVER_remainder(x, y);
+}
 
 /* FUNCTION: remainderf */
 
@@ -2337,15 +2278,10 @@ double remainder(double x, double y) { return __sort_of_CPROVER_remainder(FE_TON
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y);
-
-float remainderf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TONEAREST, x, y); }
-
+float remainderf(float x, float y)
+{
+  return __CPROVER_remainderf(x, y);
+}
 
 /* FUNCTION: remainderl */
 
@@ -2354,17 +2290,10 @@ float remainderf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TONE
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y);
-
-long double remainderl(long double x, long double y) { return __sort_of_CPROVER_remainderl(FE_TONEAREST, x, y); }
-
-
-
+long double remainderl(long double x, long double y)
+{
+  return __CPROVER_remainderl(x, y);
+}
 
 /* ISO 9899:2011
  * The copysign functions produce a value with the magnitude of x and

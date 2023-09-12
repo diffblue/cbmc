@@ -133,6 +133,16 @@ exprt float_bvt::convert(const exprt &expr) const
       float_expr.rounding_mode(),
       get_spec(expr));
   }
+  else if(expr.id() == ID_floatbv_mod)
+  {
+    const auto &float_expr = to_binary_expr(expr);
+    return mod(float_expr.lhs(), float_expr.rhs());
+  }
+  else if(expr.id() == ID_floatbv_rem)
+  {
+    const auto &float_expr = to_binary_expr(expr);
+    return rem(float_expr.lhs(), float_expr.rhs());
+  }
   else if(expr.id()==ID_isnan)
   {
     const auto &op = to_unary_expr(expr).op();
@@ -818,6 +828,49 @@ exprt float_bvt::div(
       result.fraction);
 
   return rounder(result, rm, spec);
+}
+
+exprt float_bvt::mod(const exprt &x, const exprt &y) const
+{
+  PRECONDITION(x.type() == y.type());
+  const floatbv_typet &type = to_floatbv_type(x.type());
+  const ieee_float_spect spec{type};
+
+  // x - round-to-integer-towards-zero(x / y) * y
+  const constant_exprt round_to_zero =
+    from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet{2});
+
+  exprt div = convert(ieee_float_op_exprt{x, ID_floatbv_div, y, round_to_zero});
+  exprt round_to_int = from_signed_integer(
+    to_signed_integer(div, type.get_width(), round_to_zero, spec),
+    round_to_zero,
+    spec);
+  exprt mul = convert(ieee_float_op_exprt{
+    std::move(round_to_int), ID_floatbv_mult, y, round_to_zero});
+  return convert(
+    ieee_float_op_exprt{x, ID_floatbv_minus, std::move(mul), round_to_zero});
+}
+
+exprt float_bvt::rem(const exprt &x, const exprt &y) const
+{
+  PRECONDITION(x.type() == y.type());
+  const floatbv_typet &type = to_floatbv_type(x.type());
+  const ieee_float_spect spec{type};
+
+  // x - round-to-integer-towards-even(x / y) * y
+  const constant_exprt round_to_even =
+    from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet{2});
+
+  exprt div = convert(ieee_float_op_exprt{x, ID_floatbv_div, y, round_to_even});
+  // TODO: to_signed_integer ignores rounding mode and defaults to round-to-zero
+  exprt round_to_int = from_signed_integer(
+    to_signed_integer(div, type.get_width(), round_to_even, spec),
+    round_to_even,
+    spec);
+  exprt mul = convert(ieee_float_op_exprt{
+    std::move(round_to_int), ID_floatbv_mult, y, round_to_even});
+  return convert(
+    ieee_float_op_exprt{x, ID_floatbv_minus, std::move(mul), round_to_even});
 }
 
 exprt float_bvt::relation(
