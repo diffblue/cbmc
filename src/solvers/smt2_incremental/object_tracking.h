@@ -40,7 +40,7 @@
 struct decision_procedure_objectt
 {
   /// The expression for the root of the object. This is expression equivalent
-  /// to deferencing a pointer to this object with a zero offset.
+  /// to dereferencing a pointer to this object with a zero offset.
   exprt base_expression;
   /// Number which uniquely identifies this particular object.
   std::size_t unique_id = 0;
