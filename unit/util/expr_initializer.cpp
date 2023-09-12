@@ -113,7 +113,8 @@ TEST_CASE(
     const cbmc_invariants_should_throwt invariants_throw;
 
     REQUIRE_THROWS_MATCHES(
-      duplicate_per_byte(array_of_exprt{true_exprt{}, array_type}, input_type),
+      duplicate_per_byte(
+        array_of_exprt{true_exprt{}, array_type}, input_type, test.ns),
       invariant_failedt,
       invariant_failure_containing(
         "Condition: (init_type_as_bitvector && "
@@ -128,7 +129,8 @@ TEST_CASE(
     const cbmc_invariants_should_throwt invariants_throw;
 
     REQUIRE_THROWS_MATCHES(
-      duplicate_per_byte(from_integer(0, unsignedbv_typet{10}), input_type),
+      duplicate_per_byte(
+        from_integer(0, unsignedbv_typet{10}), input_type, test.ns),
       invariant_failedt,
       invariant_failure_containing(
         "init_type_as_bitvector->get_width() <= config.ansi_c.char_width"));
@@ -170,7 +172,8 @@ TEST_CASE(
       typet output_type = unsignedbv_typet{output_size};
       const auto result = duplicate_per_byte(
         from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
-        output_type);
+        output_type,
+        test.ns);
       const auto expected =
         from_integer(output_expected_value, unsignedbv_typet{output_size});
       REQUIRE(result == expected);
@@ -178,7 +181,8 @@ TEST_CASE(
       // Check that signed-bv values are replicated including the sign bit.
       const auto result_with_signed_init_type = duplicate_per_byte(
         from_integer(init_expr_value, signedbv_typet{init_expr_size}),
-        output_type);
+        output_type,
+        test.ns);
       REQUIRE(result_with_signed_init_type == result);
     }
 
@@ -187,7 +191,8 @@ TEST_CASE(
       typet output_type = signedbv_typet{output_size};
       const auto result = duplicate_per_byte(
         from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
-        output_type);
+        output_type,
+        test.ns);
       const auto expected =
         from_integer(output_expected_value, signedbv_typet{output_size});
       REQUIRE(result == expected);
@@ -195,7 +200,8 @@ TEST_CASE(
       // Check that signed-bv values are replicated including the sign bit.
       const auto result_with_signed_init_type = duplicate_per_byte(
         from_integer(init_expr_value, signedbv_typet{init_expr_size}),
-        output_type);
+        output_type,
+        test.ns);
       REQUIRE(result_with_signed_init_type == result);
     }
 
@@ -205,7 +211,8 @@ TEST_CASE(
       const pointer_typet output_type{bool_typet{}, output_size};
       const auto result = duplicate_per_byte(
         from_integer(init_expr_value, signedbv_typet{init_expr_size}),
-        output_type);
+        output_type,
+        test.ns);
       auto expected =
         from_integer(output_expected_value, unsignedbv_typet{output_size});
       // Forcing the type to be pointer_typet otherwise from_integer fails when
@@ -219,11 +226,13 @@ TEST_CASE(
       // Check that replicating to a float_value is same as unsigned_bv.
       const auto result = duplicate_per_byte(
         from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
-        float_type());
+        float_type(),
+        test.ns);
       const auto expected_unsigned_value =
         expr_try_dynamic_cast<constant_exprt>(duplicate_per_byte(
           from_integer(init_expr_value, unsignedbv_typet{init_expr_size}),
-          unsignedbv_typet{float_type().get_width()}));
+          unsignedbv_typet{float_type().get_width()},
+          test.ns));
       REQUIRE(expected_unsigned_value);
       const auto expected =
         constant_exprt{expected_unsigned_value->get_value(), float_type()};
@@ -250,13 +259,13 @@ TEST_CASE(
   SECTION("Testing with init size " + std::to_string(init_expr_size))
   {
     const auto init_expr = plus_exprt{
-      from_integer(1, unsignedbv_typet{init_expr_size}),
+      symbol_exprt{"a_symbol", unsignedbv_typet{init_expr_size}},
       from_integer(2, unsignedbv_typet{init_expr_size})};
     SECTION("filling signedbv of size " + std::to_string(output_size))
     {
       typet output_type = signedbv_typet{output_size};
 
-      const auto result = duplicate_per_byte(init_expr, output_type);
+      const auto result = duplicate_per_byte(init_expr, output_type, test.ns);
 
       const auto casted_init_expr =
         typecast_exprt::conditional_cast(init_expr, output_type);
@@ -269,7 +278,7 @@ TEST_CASE(
     SECTION("filling unsignedbv of size " + std::to_string(output_size))
     {
       typet output_type = unsignedbv_typet{output_size};
-      const auto result = duplicate_per_byte(init_expr, output_type);
+      const auto result = duplicate_per_byte(init_expr, output_type, test.ns);
 
       const auto casted_init_expr =
         typecast_exprt::conditional_cast(init_expr, output_type);
@@ -284,7 +293,7 @@ TEST_CASE(
       // Check that replicating a pointer_value is same as unsigned_bv modulo a
       // byte_extract outside.
       const pointer_typet output_type{bool_typet{}, output_size};
-      const auto result = duplicate_per_byte(init_expr, output_type);
+      const auto result = duplicate_per_byte(init_expr, output_type, test.ns);
       const auto unsigned_corr_type = unsignedbv_typet{output_size};
       const auto unsigned_init_expr =
         typecast_exprt::conditional_cast(init_expr, unsigned_corr_type);
@@ -306,7 +315,7 @@ TEST_CASE(
       const std::size_t float_replication_count =
         (float_type().get_width() + config.ansi_c.char_width - 1) /
         config.ansi_c.char_width;
-      const auto result = duplicate_per_byte(init_expr, float_type());
+      const auto result = duplicate_per_byte(init_expr, float_type(), test.ns);
       const auto unsigned_corr_type =
         unsignedbv_typet{float_type().get_width()};
       const auto unsigned_init_expr =
@@ -412,8 +421,8 @@ TEST_CASE(
       const auto result =
         expr_initializer(input_type, test.loc, test.ns, init_value);
       REQUIRE(result.has_value());
-      const auto expected =
-        duplicate_per_byte(init_value, unsignedbv_typet{input_type_size});
+      const auto expected = duplicate_per_byte(
+        init_value, unsignedbv_typet{input_type_size}, test.ns);
       REQUIRE(result.value() == expected);
     }
   }
@@ -460,7 +469,7 @@ TEST_CASE(
         expr_initializer(input_type, test.loc, test.ns, init_value);
       REQUIRE(result.has_value());
       const auto expected = duplicate_per_byte(
-        init_value, pointer_typet{bool_typet{}, input_type_size});
+        init_value, pointer_typet{bool_typet{}, input_type_size}, test.ns);
       REQUIRE(result.value() == expected);
     }
   }
@@ -499,7 +508,8 @@ TEST_CASE("expr_initializer on float type", "[core][util][expr_initializer]")
       const auto result =
         expr_initializer(input_type, test.loc, test.ns, init_value);
       REQUIRE(result.has_value());
-      const auto expected = duplicate_per_byte(init_value, float_type());
+      const auto expected =
+        duplicate_per_byte(init_value, float_type(), test.ns);
       REQUIRE(result.value() == expected);
     }
   }
@@ -562,13 +572,13 @@ TEST_CASE(
       from_integer(0xAB, signedbv_typet{config.ansi_c.char_width});
     const auto result =
       expr_initializer(enum_type, test.loc, test.ns, init_value);
-    const auto expected = duplicate_per_byte(init_value, enum_type);
+    const auto expected = duplicate_per_byte(init_value, enum_type, test.ns);
     REQUIRE(result.has_value());
     REQUIRE(result.value() == expected);
 
     const auto tag_result =
       expr_initializer(c_enum_tag_type, test.loc, test.ns, init_value);
-    auto tag_expected = duplicate_per_byte(init_value, enum_type);
+    auto tag_expected = duplicate_per_byte(init_value, enum_type, test.ns);
     tag_expected.type() = c_enum_tag_type;
     REQUIRE(tag_result.has_value());
     REQUIRE(tag_result.value() == tag_expected);
@@ -624,7 +634,7 @@ TEST_CASE(
       expr_initializer(array_type, test.loc, test.ns, init_value);
     REQUIRE(result.has_value());
     std::vector<exprt> array_values{
-      elem_count, duplicate_per_byte(init_value, inner_type)};
+      elem_count, duplicate_per_byte(init_value, inner_type, test.ns)};
     const auto expected = array_exprt{
       array_values,
       array_typet{
@@ -678,7 +688,7 @@ TEST_CASE(
       expr_initializer(array_type, test.loc, test.ns, init_value);
     REQUIRE(result.has_value());
     const auto expected = array_of_exprt{
-      duplicate_per_byte(init_value, inner_type),
+      duplicate_per_byte(init_value, inner_type, test.ns),
       array_typet{
         inner_type, side_effect_expr_nondett{signedbv_typet{8}, test.loc}}};
     REQUIRE(result.value() == expected);
@@ -750,7 +760,7 @@ TEST_CASE(
       expr_initializer(array_type, test.loc, test.ns, init_value);
     REQUIRE(result.has_value());
     std::vector<exprt> inner_array_values{
-      elem_count, duplicate_per_byte(init_value, inner_type)};
+      elem_count, duplicate_per_byte(init_value, inner_type, test.ns)};
     const auto inner_expected = array_exprt{
       inner_array_values,
       array_typet{
@@ -847,12 +857,13 @@ TEST_CASE(
       expr_initializer(struct_type, test.loc, test.ns, init_value);
     REQUIRE(result.has_value());
     const exprt::operandst expected_inner_struct_fields{
-      duplicate_per_byte(init_value, signedbv_typet{32}),
-      duplicate_per_byte(init_value, unsignedbv_typet{16})};
+      duplicate_per_byte(init_value, signedbv_typet{32}, test.ns),
+      duplicate_per_byte(init_value, unsignedbv_typet{16}, test.ns)};
     const struct_exprt expected_inner_struct_expr{
       expected_inner_struct_fields, inner_struct_type};
     const exprt::operandst expected_struct_fields{
-      duplicate_per_byte(init_value, bool_typet{}), expected_inner_struct_expr};
+      duplicate_per_byte(init_value, bool_typet{}, test.ns),
+      expected_inner_struct_expr};
     const struct_exprt expected_struct_expr{
       expected_struct_fields, struct_type};
     REQUIRE(result.value() == expected_struct_expr);
@@ -935,7 +946,9 @@ TEST_CASE("expr_initializer on union type", "[core][util][expr_initializer]")
       expr_initializer(union_type, test.loc, test.ns, init_value);
     REQUIRE(result.has_value());
     const union_exprt expected_union{
-      "foo", duplicate_per_byte(init_value, signedbv_typet{256}), union_type};
+      "foo",
+      duplicate_per_byte(init_value, signedbv_typet{256}, test.ns),
+      union_type};
     REQUIRE(result.value() == expected_union);
 
     const auto union_tag_type =
@@ -945,7 +958,7 @@ TEST_CASE("expr_initializer on union type", "[core][util][expr_initializer]")
     REQUIRE(tag_result.has_value());
     const union_exprt expected_union_tag{
       "foo",
-      duplicate_per_byte(init_value, signedbv_typet{256}),
+      duplicate_per_byte(init_value, signedbv_typet{256}, test.ns),
       union_tag_type};
     REQUIRE(tag_result.value() == expected_union_tag);
   }
@@ -1024,7 +1037,8 @@ TEST_CASE("expr_initializer on string type", "[core][util][expr_initializer]")
     const auto result =
       expr_initializer(string_type, test.loc, test.ns, init_value);
     REQUIRE(result.has_value());
-    const auto expected_string = duplicate_per_byte(init_value, string_type);
+    const auto expected_string =
+      duplicate_per_byte(init_value, string_type, test.ns);
     REQUIRE(result.value() == expected_string);
   }
 }

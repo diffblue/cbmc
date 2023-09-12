@@ -33,6 +33,9 @@ optionalt<exprt> expr_initializer(
   const namespacet &ns,
   const exprt &init_byte_expr);
 
-exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type);
+exprt duplicate_per_byte(
+  const exprt &init_byte_expr,
+  const typet &output_type,
+  const namespacet &ns);
 
 #endif // CPROVER_UTIL_EXPR_INITIALIZER_H
