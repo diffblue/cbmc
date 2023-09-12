@@ -57,7 +57,7 @@ struct decision_procedure_objectt
 /// assigned.
 exprt find_object_base_expression(const address_of_exprt &address_of);
 
-/// Arbitary expressions passed to the decision procedure may have multiple
+/// Arbitrary expressions passed to the decision procedure may have multiple
 /// address of operations as its sub expressions. This means the overall
 /// expression may contain multiple base objects which need to be assigned
 /// unique identifiers.
