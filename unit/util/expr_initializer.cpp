@@ -242,6 +242,50 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "duplicate_per_byte calls simplify",
+  "[core][util][duplicate_per_byte]")
+{
+  auto test = expr_initializer_test_environmentt::make();
+  // elements are init_expr, expected_value
+  using rowt = std::tuple<exprt, std::size_t>;
+  exprt init_expr;
+  std::size_t expected_value;
+  std::tie(init_expr, expected_value) = GENERATE(
+    rowt{
+      from_integer(0xAB, char_type()), 0xABAB}, // char type, no simplification
+    rowt{
+      typecast_exprt::conditional_cast(
+        from_integer(0xAAB, unsignedbv_typet{24}), char_type()),
+      0xABAB}, // cast to smaller type (truncating
+    rowt{
+      typecast_exprt::conditional_cast(
+        from_integer(0xA, unsignedbv_typet{4}), unsignedbv_typet(8)),
+      0x0A0A}, // cast to bigger type (zero-extended)
+    rowt{
+      plus_exprt{
+        from_integer(0x0B, char_type()), from_integer(0xA0, char_type())},
+      0xABAB}, // arithmetic operation on char type
+    rowt{
+      typecast_exprt::conditional_cast(
+        plus_exprt{
+          from_integer(0x0B, unsignedbv_typet{24}),
+          from_integer(0xAA0, unsignedbv_typet(24))},
+        char_type()),
+      0xABAB}); // arithmetic operation with narrowing cast to char type
+
+  SECTION("Testing with expression")
+  {
+    const auto output_type = unsignedbv_typet{config.ansi_c.char_width * 2};
+
+    const auto result = duplicate_per_byte(init_expr, output_type, test.ns);
+
+    const auto expected = from_integer(expected_value, output_type);
+
+    REQUIRE(result == expected);
+  }
+}
+
+TEST_CASE(
   "duplicate_per_byte on unsigned_bv with non-constant expr",
   "[core][util][duplicate_per_byte]")
 {
