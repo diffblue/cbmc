@@ -235,6 +235,8 @@ protected:
   virtual code_blockt instantiate_gcc_polymorphic_builtin(
     const irep_idt &identifier,
     const symbol_exprt &function_symbol);
+  virtual optionalt<symbol_exprt>
+  typecheck_shadow_memory_builtin(const side_effect_expr_function_callt &expr);
   virtual exprt
   typecheck_shuffle_vector(const side_effect_expr_function_callt &expr);
   void disallow_subexpr_by_id(

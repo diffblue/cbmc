@@ -132,4 +132,5 @@ void __CPROVER_object_whole(void *ptr);
 void __CPROVER_object_from(void *ptr);
 void __CPROVER_object_upto(void *ptr, __CPROVER_size_t size);
 void __CPROVER_freeable(void *ptr);
+
 // clang-format on

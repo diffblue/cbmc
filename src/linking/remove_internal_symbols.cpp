@@ -149,6 +149,10 @@ void remove_internal_symbols(
   special.insert(CPROVER_PREFIX "freeable");
   special.insert(CPROVER_PREFIX "is_freeable");
   special.insert(CPROVER_PREFIX "was_freed");
+  special.insert(CPROVER_PREFIX "field_decl_global");
+  special.insert(CPROVER_PREFIX "field_decl_local");
+  special.insert(CPROVER_PREFIX "get_field");
+  special.insert(CPROVER_PREFIX "set_field");
   special.insert(rounding_mode_identifier());
   special.insert("__new");
   special.insert("__new_array");
