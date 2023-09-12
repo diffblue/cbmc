@@ -1,0 +1,22 @@
+diff --git a/scripts/make-build-header.sh b/scripts/make-build-header.sh
+index e8f6746..1290024 100755
+--- a/scripts/make-build-header.sh
++++ b/scripts/make-build-header.sh
+@@ -20,7 +20,7 @@ warning () {
+ 
+ #--------------------------------------------------------------------------#
+ 
+-[ ! -f VERSION -a ! -f ../VERSION ] && \
++[ ! -f VERSION.txt -a ! -f ../VERSION.txt ] && \
+ die "needs to be called from build sub-directory"
+ 
+ [ -f makefile ] || \
+@@ -29,7 +29,7 @@ warning "could not find 'makefile'"
+ #--------------------------------------------------------------------------#
+ # The version.
+ #
+-VERSION="`cat ../VERSION`"
++VERSION="`cat ../VERSION.txt`"
+ if [ x"$VERSION" = x ]
+ then
+   warning "could not determine 'VERSION'"
