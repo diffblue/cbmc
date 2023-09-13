@@ -40,6 +40,8 @@ static smt_responset get_response_to_command(
     return response;
 }
 
+/// Returns a message string describing the problem in the case where the
+/// response from the solver is an error status. Returns empty otherwise.
 static optionalt<std::string>
 get_problem_messages(const smt_responset &response)
 {
