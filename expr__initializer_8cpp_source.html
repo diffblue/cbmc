@@ -110,398 +110,407 @@ $(document).ready(function(){initNavTree('expr__initializer_8cpp_source.html',''
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="config_8h.html">config.h</a>&quot;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="magic_8h.html">magic.h</a>&quot;</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="namespace_8h.html">namespace.h</a>&quot;</span> <span class="comment">// IWYU pragma: keep</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="std__code_8h.html">std_code.h</a>&quot;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="symbol__table_8h.html">symbol_table.h</a>&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="classexpr__initializert.html">   24</a></span>&#160;<span class="keyword">class </span><a class="code" href="classexpr__initializert.html">expr_initializert</a></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classexpr__initializert.html#adcdcb45ef33e2634ad85411a19d24789">   27</a></span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classexpr__initializert.html#adcdcb45ef33e2634ad85411a19d24789">expr_initializert</a>(<span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;_ns) : <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>(_ns)</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classexpr__initializert.html#ae7d80673a26d6670017d56404f6072ca">   31</a></span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="classexpr__initializert.html#ae7d80673a26d6670017d56404f6072ca">operator()</a>(</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_expr)</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(type, source_location, init_expr);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  }</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">   40</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;<a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_expr);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;};</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">   48</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializert::expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_expr)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;{</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;type_id=type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>();</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">if</span>(type_id==ID_unsignedbv ||</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;     type_id==ID_signedbv ||</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;     type_id==ID_pointer ||</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;     type_id==ID_c_enum ||</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;     type_id==ID_c_bit_field ||</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;     type_id==ID_bool ||</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;     type_id==ID_c_bool ||</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;     type_id==ID_floatbv ||</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;     type_id==ID_fixedbv)</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      result = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, type);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">duplicate_per_byte</a>(init_expr, type);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_rational ||</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;          type_id==ID_real)</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      result = <a class="code" href="classconstant__exprt.html">constant_exprt</a>(ID_0, type);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">duplicate_per_byte</a>(init_expr, type);</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  }</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_verilog_signedbv ||</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;          type_id==ID_verilog_unsignedbv)</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  {</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keyword">const</span> std::size_t width = <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(type).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      std::string value(width, <span class="charliteral">&#39;0&#39;</span>);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      result = <a class="code" href="classconstant__exprt.html">constant_exprt</a>(value, type);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">duplicate_per_byte</a>(init_expr, type);</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  }</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_complex)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    {</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <span class="keyword">auto</span> sub_zero = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type).subtype(), source_location, init_expr);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="keywordflow">if</span>(!sub_zero.has_value())</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      result = <a class="code" href="classcomplex__exprt.html">complex_exprt</a>(*sub_zero, *sub_zero, <a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type));</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    }</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">duplicate_per_byte</a>(init_expr, type);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  }</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_array)</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  {</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;array_type=<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">if</span>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>().<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    {</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      <span class="comment">// we initialize this with an empty array</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <a class="code" href="classarray__exprt.html">array_exprt</a> value({}, array_type);</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      value.<a class="code" href="classarray__exprt.html#acd85cef9856a213910f55ea32be4a4ee">type</a>().<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>() = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a>());</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      value.add_source_location()=source_location;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      <span class="keywordflow">return</span> std::move(value);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    }</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="keyword">auto</span> tmpval = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>(), source_location, init_expr);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;      <span class="keywordflow">if</span>(!tmpval.has_value())</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> array_size = numeric_cast&lt;mp_integer&gt;(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>());</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_infinity || !array_size.has_value() ||</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        *array_size &gt; <a class="code" href="magic_8h.html#acccea33b4efa621ef858464235c693e7">MAX_FLATTENED_ARRAY_SIZE</a>)</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      {</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        <a class="code" href="classarray__of__exprt.html">array_of_exprt</a> value(*tmpval, array_type);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        value.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="keywordflow">return</span> std::move(value);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      }</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <span class="keywordflow">if</span>(*array_size &lt; 0)</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <a class="code" href="classarray__exprt.html">array_exprt</a> value({}, array_type);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      value.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().resize(</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        numeric_cast_v&lt;std::size_t&gt;(*array_size), *tmpval);</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      value.add_source_location()=source_location;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      <span class="keywordflow">return</span> std::move(value);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    }</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  }</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_vector)</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  {</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keyword">const</span> <a class="code" href="classvector__typet.html">vector_typet</a> &amp;vector_type=<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keyword">auto</span> tmpval = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      vector_type.<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>(), source_location, init_expr);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">if</span>(!tmpval.has_value())</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> vector_size =</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      numeric_cast_v&lt;mp_integer&gt;(vector_type.<a class="code" href="classvector__typet.html#aa6ddea165503b9ced5f6591314a48a75">size</a>());</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">if</span>(vector_size &lt; 0)</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <a class="code" href="classvector__exprt.html">vector_exprt</a> value({}, vector_type);</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    value.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().resize(numeric_cast_v&lt;std::size_t&gt;(vector_size), *tmpval);</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    value.add_source_location()=source_location;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">return</span> std::move(value);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  }</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_struct)</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  {</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_typet::componentst</a> &amp;components=</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      <a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(type).<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <a class="code" href="classstruct__exprt.html">struct_exprt</a> value({}, type);</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    value.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().reserve(components.size());</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;c : components)</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        c.type().id() != ID_code, <span class="stringliteral">&quot;struct member must not be of code type&quot;</span>);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> member =</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(c.type(), source_location, init_expr);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordflow">if</span>(!member.has_value())</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      value.add_to_operands(std::move(*member));</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    }</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    value.add_source_location()=source_location;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">return</span> std::move(value);</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  }</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_union)</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keyword">const</span> <a class="code" href="classunion__typet.html">union_typet</a> &amp;union_type = <a class="code" href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a>(type);</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keywordflow">if</span>(union_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().empty())</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    {</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      <a class="code" href="classempty__union__exprt.html">empty_union_exprt</a> value{type};</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      value.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>() = source_location;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      <span class="keywordflow">return</span> std::move(value);</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    }</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;widest_member = union_type.<a class="code" href="classunion__typet.html#a5262c291bd43d6cd758fef66c2d4e573">find_widest_union_component</a>(<a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>);</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">if</span>(!widest_member.has_value())</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keyword">auto</span> component_value = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      widest_member-&gt;first.type(), source_location, init_expr);</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordflow">if</span>(!component_value.has_value())</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <a class="code" href="classunion__exprt.html">union_exprt</a> value{widest_member-&gt;first.get_name(), *component_value, type};</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    value.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>() = source_location;</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">return</span> std::move(value);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  }</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_c_enum_tag)</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#aa14679493b0ac7bea8197a3ac6d1bf7f">to_c_enum_tag_type</a>(type)), source_location, init_expr);</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordflow">if</span>(!result.has_value())</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="comment">// use the tag type</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    result-&gt;type() = type;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordflow">return</span> *result;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  }</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_struct_tag)</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  {</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;      <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="std__types_8h.html#aa35ea2a7438d5541e95f4bd50f4e0006">to_struct_tag_type</a>(type)), source_location, init_expr);</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="keywordflow">if</span>(!result.has_value())</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160; </div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="comment">// use the tag type</span></div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    result-&gt;type() = type;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keywordflow">return</span> *result;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  }</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_union_tag)</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  {</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#a6558000ad89576ccc4c7b92d6de5432c">to_union_tag_type</a>(type)), source_location, init_expr);</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keywordflow">if</span>(!result.has_value())</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="comment">// use the tag type</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    result-&gt;type() = type;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keywordflow">return</span> *result;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  }</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_string)</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  {</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      result = <a class="code" href="classconstant__exprt.html">constant_exprt</a>(<a class="code" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(), type);</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">duplicate_per_byte</a>(init_expr, type);</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160; </div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  }</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;}</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160; </div>
-<div class="line"><a name="l00307"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a38bf6df567f41f2d732138536e43b227">  307</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="expr__initializer_8cpp.html#a38bf6df567f41f2d732138536e43b227">zero_initializer</a>(</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;{</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr__initializert.html">expr_initializert</a>(ns)(</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    type, source_location, <a class="code" href="classconstant__exprt.html">constant_exprt</a>(ID_0, <a class="code" href="c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164">char_type</a>()));</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;}</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a7a8db7d5f5394eaba1653fd8cb4b9bbc">  323</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="expr__initializer_8cpp.html#a7a8db7d5f5394eaba1653fd8cb4b9bbc">nondet_initializer</a>(</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;{</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr__initializert.html">expr_initializert</a>(ns)(type, source_location, <a class="code" href="classexprt.html">exprt</a>(ID_nondet));</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;}</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
-<div class="line"><a name="l00339"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a92fd18361f0f1ee9858632bc2db83017">  339</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="expr__initializer_8cpp.html#a92fd18361f0f1ee9858632bc2db83017">expr_initializer</a>(</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_byte_expr)</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;{</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr__initializert.html">expr_initializert</a>(ns)(type, source_location, init_byte_expr);</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;}</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160; </div>
-<div class="line"><a name="l00353"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">  353</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">cast_or_reinterpret</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr, <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;out_type)</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;{</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <span class="comment">// Same type --&gt; no cast</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == out_type)</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  {</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="keywordflow">return</span> expr;</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  }</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <a class="code" href="bitvector__types_8h.html#a41f8a86e0dc96cd82d1eba8f6d53f482">can_cast_type&lt;signedbv_typet&gt;</a>(out_type) ||</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <a class="code" href="bitvector__types_8h.html#ab64a256612be8353858c862a2cbffdcb">can_cast_type&lt;unsignedbv_typet&gt;</a>(out_type))</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  {</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(expr, out_type);</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  }</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="byte__operators_8cpp.html#aae938949b73282792a89ff21cdbd4935">make_byte_extract</a>(expr, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164">char_type</a>()), out_type);</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;}</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160; </div>
-<div class="line"><a name="l00379"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">  379</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">duplicate_per_byte</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_byte_expr, <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;output_type)</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;{</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> init_type_as_bitvector =</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    type_try_dynamic_cast&lt;bitvector_typet&gt;(init_byte_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  <span class="comment">// Fail if `init_byte_expr` is not a bitvector of maximum 8 bits or a boolean.</span></div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    (init_type_as_bitvector &amp;&amp;</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;     init_type_as_bitvector-&gt;get_width() &lt;= <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>) ||</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    init_byte_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_bool);</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> output_bv = type_try_dynamic_cast&lt;bitvector_typet&gt;(output_type))</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  {</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> out_width = output_bv-&gt;get_width();</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="comment">// Replicate `init_byte_expr` enough times until it completely fills</span></div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="comment">// `output_type`.</span></div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <span class="comment">// We&#39;ve got a constant. So, precompute the value of the constant.</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keywordflow">if</span>(init_byte_expr.<a class="code" href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">is_constant</a>())</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    {</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> init_size = init_type_as_bitvector-&gt;get_width();</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> init_value = <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(init_byte_expr).<a class="code" href="classconstant__exprt.html#a364195bb848744c45ede7fc4877acabe">get_value</a>();</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160; </div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;      <span class="comment">// Create a new BV of `output_type` size with its representation being the</span></div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;      <span class="comment">// replication of the init_byte_expr (padded with 0) enough times to fill.</span></div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> output_value =</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;        <a class="code" href="arith__tools_8cpp.html#a18174caf9f9c9856324582e7936b6318">make_bvrep</a>(out_width, [&amp;init_size, &amp;init_value](std::size_t index) {</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;          <span class="comment">// Index modded by 8 to access the i-th bit of init_value</span></div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;          <span class="keyword">const</span> <span class="keyword">auto</span> source_index = index % <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;          <span class="comment">// If the modded i-th bit exists get it, otherwise add 0 padding.</span></div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;          <span class="keywordflow">return</span> source_index &lt; init_size &amp;&amp;</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;                 <a class="code" href="arith__tools_8cpp.html#a94aad2c2b250c696a03398149d4d78a1">get_bvrep_bit</a>(init_value, init_size, source_index);</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        });</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160; </div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>{output_value, output_type};</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    }</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160; </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> size =</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;      (out_width + <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a> - 1) / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160; </div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    <span class="comment">// We haven&#39;t got a constant. So, build the expression using shift-and-or.</span></div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> values;</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160; </div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <a class="code" href="classtypet.html">typet</a> operation_type = output_type;</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> ptr_type = type_try_dynamic_cast&lt;pointer_typet&gt;(output_type))</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    {</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;      operation_type = <a class="code" href="classunsignedbv__typet.html">unsignedbv_typet</a>{ptr_type-&gt;<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>()};</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    }</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46">float_type</a> = type_try_dynamic_cast&lt;floatbv_typet&gt;(output_type))</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    {</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;      operation_type = <a class="code" href="classunsignedbv__typet.html">unsignedbv_typet</a>{<a class="code" href="c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46">float_type</a>-&gt;<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>()};</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    }</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="comment">// Let&#39;s cast init_byte_expr to output_type.</span></div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> casted_init_byte_expr =</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;      <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(init_byte_expr, operation_type);</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    values.push_back(casted_init_byte_expr);</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 1; i &lt; size; ++i)</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    {</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      values.push_back(<a class="code" href="classshl__exprt.html">shl_exprt</a>(</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;        casted_init_byte_expr,</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a> * i, <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a>())));</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="simplify__expr_8h.html">simplify_expr.h</a>&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="std__code_8h.html">std_code.h</a>&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="symbol__table_8h.html">symbol_table.h</a>&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="classexpr__initializert.html">   25</a></span>&#160;<span class="keyword">class </span><a class="code" href="classexpr__initializert.html">expr_initializert</a></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;{</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classexpr__initializert.html#adcdcb45ef33e2634ad85411a19d24789">   28</a></span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classexpr__initializert.html#adcdcb45ef33e2634ad85411a19d24789">expr_initializert</a>(<span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;_ns) : <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>(_ns)</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  {</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  }</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classexpr__initializert.html#ae7d80673a26d6670017d56404f6072ca">   32</a></span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="classexpr__initializert.html#ae7d80673a26d6670017d56404f6072ca">operator()</a>(</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_expr)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(type, source_location, init_expr);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">   41</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;<a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_expr);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">   49</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializert::expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_expr)</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;{</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;type_id=type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>();</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordflow">if</span>(type_id==ID_unsignedbv ||</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;     type_id==ID_signedbv ||</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;     type_id==ID_pointer ||</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;     type_id==ID_c_enum ||</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;     type_id==ID_c_bit_field ||</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;     type_id==ID_bool ||</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;     type_id==ID_c_bool ||</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;     type_id==ID_floatbv ||</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;     type_id==ID_fixedbv)</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  {</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      result = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, type);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8">duplicate_per_byte</a>(init_expr, type, <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_rational ||</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;          type_id==ID_real)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      result = <a class="code" href="classconstant__exprt.html">constant_exprt</a>(ID_0, type);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8">duplicate_per_byte</a>(init_expr, type, <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  }</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_verilog_signedbv ||</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;          type_id==ID_verilog_unsignedbv)</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  {</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    {</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <span class="keyword">const</span> std::size_t width = <a class="code" href="bitvector__types_8h.html#a433c459efaa932bc95c4736b8363bce5">to_bitvector_type</a>(type).<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>();</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      std::string value(width, <span class="charliteral">&#39;0&#39;</span>);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      result = <a class="code" href="classconstant__exprt.html">constant_exprt</a>(value, type);</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8">duplicate_per_byte</a>(init_expr, type, <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  }</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_complex)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <span class="keyword">auto</span> sub_zero = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type).subtype(), source_location, init_expr);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      <span class="keywordflow">if</span>(!sub_zero.has_value())</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      result = <a class="code" href="classcomplex__exprt.html">complex_exprt</a>(*sub_zero, *sub_zero, <a class="code" href="std__types_8h.html#a82e51a7f7337c84b845d710a61871071">to_complex_type</a>(type));</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8">duplicate_per_byte</a>(init_expr, type, <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  }</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_array)</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  {</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">const</span> <a class="code" href="classarray__typet.html">array_typet</a> &amp;array_type=<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(type);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordflow">if</span>(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>().<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    {</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <span class="comment">// we initialize this with an empty array</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <a class="code" href="classarray__exprt.html">array_exprt</a> value({}, array_type);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      value.<a class="code" href="classarray__exprt.html#acd85cef9856a213910f55ea32be4a4ee">type</a>().<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>() = <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a>());</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      value.add_source_location()=source_location;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">return</span> std::move(value);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    {</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keyword">auto</span> tmpval = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        array_type.<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>(), source_location, init_expr);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;      <span class="keywordflow">if</span>(!tmpval.has_value())</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> array_size = numeric_cast&lt;mp_integer&gt;(array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>());</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;      <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        array_type.<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_infinity || !array_size.has_value() ||</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        *array_size &gt; <a class="code" href="magic_8h.html#acccea33b4efa621ef858464235c693e7">MAX_FLATTENED_ARRAY_SIZE</a>)</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      {</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <a class="code" href="classarray__of__exprt.html">array_of_exprt</a> value(*tmpval, array_type);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        value.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keywordflow">return</span> std::move(value);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      }</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keywordflow">if</span>(*array_size &lt; 0)</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <a class="code" href="classarray__exprt.html">array_exprt</a> value({}, array_type);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      value.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().resize(</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        numeric_cast_v&lt;std::size_t&gt;(*array_size), *tmpval);</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      value.add_source_location()=source_location;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">return</span> std::move(value);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    }</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_vector)</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  {</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keyword">const</span> <a class="code" href="classvector__typet.html">vector_typet</a> &amp;vector_type=<a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(type);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keyword">auto</span> tmpval = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      vector_type.<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>(), source_location, init_expr);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">if</span>(!tmpval.has_value())</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> vector_size =</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      numeric_cast_v&lt;mp_integer&gt;(vector_type.<a class="code" href="classvector__typet.html#aa6ddea165503b9ced5f6591314a48a75">size</a>());</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">if</span>(vector_size &lt; 0)</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <a class="code" href="classvector__exprt.html">vector_exprt</a> value({}, vector_type);</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    value.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().resize(numeric_cast_v&lt;std::size_t&gt;(vector_size), *tmpval);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    value.add_source_location()=source_location;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">return</span> std::move(value);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  }</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_struct)</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_typet::componentst</a> &amp;components=</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      <a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(type).<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <a class="code" href="classstruct__exprt.html">struct_exprt</a> value({}, type);</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    value.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().reserve(components.size());</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;c : components)</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    {</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        c.type().id() != ID_code, <span class="stringliteral">&quot;struct member must not be of code type&quot;</span>);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> member =</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(c.type(), source_location, init_expr);</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <span class="keywordflow">if</span>(!member.has_value())</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      value.add_to_operands(std::move(*member));</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    }</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    value.add_source_location()=source_location;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keywordflow">return</span> std::move(value);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  }</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_union)</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  {</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keyword">const</span> <a class="code" href="classunion__typet.html">union_typet</a> &amp;union_type = <a class="code" href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a>(type);</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keywordflow">if</span>(union_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>().empty())</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      <a class="code" href="classempty__union__exprt.html">empty_union_exprt</a> value{type};</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      value.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>() = source_location;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      <span class="keywordflow">return</span> std::move(value);</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    }</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;widest_member = union_type.<a class="code" href="classunion__typet.html#a5262c291bd43d6cd758fef66c2d4e573">find_widest_union_component</a>(<a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">if</span>(!widest_member.has_value())</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keyword">auto</span> component_value = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      widest_member-&gt;first.type(), source_location, init_expr);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordflow">if</span>(!component_value.has_value())</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <a class="code" href="classunion__exprt.html">union_exprt</a> value{widest_member-&gt;first.get_name(), *component_value, type};</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    value.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>() = source_location;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keywordflow">return</span> std::move(value);</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_c_enum_tag)</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#aa14679493b0ac7bea8197a3ac6d1bf7f">to_c_enum_tag_type</a>(type)), source_location, init_expr);</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keywordflow">if</span>(!result.has_value())</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">// use the tag type</span></div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    result-&gt;type() = type;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordflow">return</span> *result;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  }</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_struct_tag)</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  {</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="std__types_8h.html#aa35ea2a7438d5541e95f4bd50f4e0006">to_struct_tag_type</a>(type)), source_location, init_expr);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keywordflow">if</span>(!result.has_value())</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="comment">// use the tag type</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    result-&gt;type() = type;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordflow">return</span> *result;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_union_tag)</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  {</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializer_rec</a>(</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#a6558000ad89576ccc4c7b92d6de5432c">to_union_tag_type</a>(type)), source_location, init_expr);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">if</span>(!result.has_value())</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="comment">// use the tag type</span></div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    result-&gt;type() = type;</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="keywordflow">return</span> *result;</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  }</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type_id==ID_string)</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  {</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result;</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <span class="keywordflow">if</span>(init_expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_nondet)</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      result = <a class="code" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a>(type, source_location);</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(init_expr.<a class="code" href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">is_zero</a>())</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;      result = <a class="code" href="classconstant__exprt.html">constant_exprt</a>(<a class="code" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>(), type);</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      result = <a class="code" href="expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8">duplicate_per_byte</a>(init_expr, type, <a class="code" href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">ns</a>);</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160; </div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    result.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=source_location;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  }</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;}</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160; </div>
+<div class="line"><a name="l00308"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a38bf6df567f41f2d732138536e43b227">  308</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="expr__initializer_8cpp.html#a38bf6df567f41f2d732138536e43b227">zero_initializer</a>(</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;{</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr__initializert.html">expr_initializert</a>(ns)(</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    type, source_location, <a class="code" href="classconstant__exprt.html">constant_exprt</a>(ID_0, <a class="code" href="c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164">char_type</a>()));</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;}</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
+<div class="line"><a name="l00324"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a7a8db7d5f5394eaba1653fd8cb4b9bbc">  324</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="expr__initializer_8cpp.html#a7a8db7d5f5394eaba1653fd8cb4b9bbc">nondet_initializer</a>(</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;{</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr__initializert.html">expr_initializert</a>(ns)(type, source_location, <a class="code" href="classexprt.html">exprt</a>(ID_nondet));</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;}</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160; </div>
+<div class="line"><a name="l00340"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a92fd18361f0f1ee9858632bc2db83017">  340</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="expr__initializer_8cpp.html#a92fd18361f0f1ee9858632bc2db83017">expr_initializer</a>(</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_byte_expr)</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;{</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classexpr__initializert.html">expr_initializert</a>(ns)(type, source_location, init_byte_expr);</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;}</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160; </div>
+<div class="line"><a name="l00354"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">  354</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">cast_or_reinterpret</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr, <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;out_type)</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;{</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  <span class="comment">// Same type --&gt; no cast</span></div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>() == out_type)</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;  {</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <span class="keywordflow">return</span> expr;</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  }</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <a class="code" href="bitvector__types_8h.html#a41f8a86e0dc96cd82d1eba8f6d53f482">can_cast_type&lt;signedbv_typet&gt;</a>(out_type) ||</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <a class="code" href="bitvector__types_8h.html#ab64a256612be8353858c862a2cbffdcb">can_cast_type&lt;unsignedbv_typet&gt;</a>(out_type))</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  {</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(expr, out_type);</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  }</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="byte__operators_8cpp.html#aae938949b73282792a89ff21cdbd4935">make_byte_extract</a>(expr, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(0, <a class="code" href="c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164">char_type</a>()), out_type);</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;}</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
+<div class="line"><a name="l00381"></a><span class="lineno"><a class="line" href="expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8">  381</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8">duplicate_per_byte</a>(</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;init_byte_expr,</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;output_type,</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;{</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> init_type_as_bitvector =</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    type_try_dynamic_cast&lt;bitvector_typet&gt;(init_byte_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="comment">// Fail if `init_byte_expr` is not a bitvector of maximum 8 bits or a boolean.</span></div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    (init_type_as_bitvector &amp;&amp;</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;     init_type_as_bitvector-&gt;get_width() &lt;= <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>) ||</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    init_byte_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_bool);</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  <span class="comment">// Simplify init_expr to enable faster duplication when simplifiable to a</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  <span class="comment">// constant expr</span></div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> simplified_init_expr = <a class="code" href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a>(init_byte_expr, ns);</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> output_bv = type_try_dynamic_cast&lt;bitvector_typet&gt;(output_type))</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  {</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> out_width = output_bv-&gt;get_width();</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="comment">// Replicate `simplified_init_expr` enough times until it completely fills</span></div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <span class="comment">// `output_type`.</span></div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160; </div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="comment">// We&#39;ve got a constant. So, precompute the value of the constant.</span></div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keywordflow">if</span>(simplified_init_expr.is_constant())</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    {</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> init_size = init_type_as_bitvector-&gt;get_width();</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;      <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> init_value =</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;        <a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(simplified_init_expr).<a class="code" href="classconstant__exprt.html#a364195bb848744c45ede7fc4877acabe">get_value</a>();</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;      <span class="comment">// Create a new BV of `output_type` size with its representation being the</span></div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      <span class="comment">// replication of the simplified_init_expr (padded with 0) enough times to</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      <span class="comment">// fill.</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> output_value =</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        <a class="code" href="arith__tools_8cpp.html#a18174caf9f9c9856324582e7936b6318">make_bvrep</a>(out_width, [&amp;init_size, &amp;init_value](std::size_t index) {</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;          <span class="comment">// Index modded by 8 to access the i-th bit of init_value</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;          <span class="keyword">const</span> <span class="keyword">auto</span> source_index = index % <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;          <span class="comment">// If the modded i-th bit exists get it, otherwise add 0 padding.</span></div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;          <span class="keywordflow">return</span> source_index &lt; init_size &amp;&amp;</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;                 <a class="code" href="arith__tools_8cpp.html#a94aad2c2b250c696a03398149d4d78a1">get_bvrep_bit</a>(init_value, init_size, source_index);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        });</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160; </div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classconstant__exprt.html">constant_exprt</a>{output_value, output_type};</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    }</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160; </div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> size =</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;      (out_width + <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a> - 1) / <a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a>;</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160; </div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="comment">// We haven&#39;t got a constant. So, build the expression using shift-and-or.</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> values;</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160; </div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <a class="code" href="classtypet.html">typet</a> operation_type = output_type;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> ptr_type = type_try_dynamic_cast&lt;pointer_typet&gt;(output_type))</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    {</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;      operation_type = <a class="code" href="classunsignedbv__typet.html">unsignedbv_typet</a>{ptr_type-&gt;<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>()};</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    }</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46">float_type</a> = type_try_dynamic_cast&lt;floatbv_typet&gt;(output_type))</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    {</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;      operation_type = <a class="code" href="classunsignedbv__typet.html">unsignedbv_typet</a>{<a class="code" href="c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46">float_type</a>-&gt;<a class="code" href="classbitvector__typet.html#a58a53462090549eb112cdf4ef6e49ac4">get_width</a>()};</div>
 <div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    }</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">cast_or_reinterpret</a>(</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;      values.size() == 1 ? values[0]</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;                         : <a class="code" href="classmulti__ary__exprt.html">multi_ary_exprt</a>(ID_bitor, values, operation_type),</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;      output_type);</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  }</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160; </div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  <span class="comment">// Anything else. We don&#39;t know what to do with it. So, just cast.</span></div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(init_byte_expr, output_type);</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;}</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="comment">// Let&#39;s cast simplified_init_expr to output_type.</span></div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> casted_init_byte_expr =</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;      <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(init_byte_expr, operation_type);</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    values.push_back(casted_init_byte_expr);</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 1; i &lt; size; ++i)</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    {</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;      values.push_back(<a class="code" href="classshl__exprt.html">shl_exprt</a>(</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        casted_init_byte_expr,</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(<a class="code" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.<a class="code" href="structconfigt_1_1ansi__ct.html#ae62af562ffa05e2308ed32a616c55126">char_width</a> * i, <a class="code" href="unistd_8c.html#adead3ef83e9181db3b1d4d7d098a18c0">size_type</a>())));</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    }</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">cast_or_reinterpret</a>(</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;      values.size() == 1 ? values[0]</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;                         : <a class="code" href="classmulti__ary__exprt.html">multi_ary_exprt</a>(ID_bitor, values, operation_type),</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;      output_type);</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  }</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160; </div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <span class="comment">// Anything else. We don&#39;t know what to do with it. So, just cast.</span></div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(init_byte_expr, output_type);</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;}</div>
 <div class="ttc" id="aapi_8cpp_html_ad2957e882e3568503e4f786a480f2bfe"><div class="ttname"><a href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></div><div class="ttdeci">configt config</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l00025">config.cpp:25</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a18174caf9f9c9856324582e7936b6318"><div class="ttname"><a href="arith__tools_8cpp.html#a18174caf9f9c9856324582e7936b6318">make_bvrep</a></div><div class="ttdeci">irep_idt make_bvrep(const std::size_t width, const std::function&lt; bool(std::size_t)&gt; f)</div><div class="ttdoc">construct a bit-vector representation from a functor</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00306">arith_tools.cpp:306</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
@@ -532,17 +541,16 @@ $(document).ready(function(){initNavTree('expr__initializer_8cpp_source.html',''
 <div class="ttc" id="aclassconstant__exprt_html_a364195bb848744c45ede7fc4877acabe"><div class="ttname"><a href="classconstant__exprt.html#a364195bb848744c45ede7fc4877acabe">constant_exprt::get_value</a></div><div class="ttdeci">const irep_idt &amp; get_value() const</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02950">std_expr.h:2950</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
 <div class="ttc" id="aclassempty__union__exprt_html"><div class="ttname"><a href="classempty__union__exprt.html">empty_union_exprt</a></div><div class="ttdoc">Union constructor to support unions without any member (a GCC/Clang feature).</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01773">std_expr.h:1774</a></div></div>
-<div class="ttc" id="aclassexpr__initializert_html"><div class="ttname"><a href="classexpr__initializert.html">expr_initializert</a></div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00024">expr_initializer.cpp:25</a></div></div>
-<div class="ttc" id="aclassexpr__initializert_html_a6f912f337dd6ab4499fb744106485ac6"><div class="ttname"><a href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializert::expr_initializer_rec</a></div><div class="ttdeci">optionalt&lt; exprt &gt; expr_initializer_rec(const typet &amp;type, const source_locationt &amp;source_location, const exprt &amp;init_expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00048">expr_initializer.cpp:48</a></div></div>
-<div class="ttc" id="aclassexpr__initializert_html_ad79b2d3bb8cc333d6ca007ebff8337c4"><div class="ttname"><a href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">expr_initializert::ns</a></div><div class="ttdeci">const namespacet &amp; ns</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00040">expr_initializer.cpp:40</a></div></div>
-<div class="ttc" id="aclassexpr__initializert_html_adcdcb45ef33e2634ad85411a19d24789"><div class="ttname"><a href="classexpr__initializert.html#adcdcb45ef33e2634ad85411a19d24789">expr_initializert::expr_initializert</a></div><div class="ttdeci">expr_initializert(const namespacet &amp;_ns)</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00027">expr_initializer.cpp:27</a></div></div>
-<div class="ttc" id="aclassexpr__initializert_html_ae7d80673a26d6670017d56404f6072ca"><div class="ttname"><a href="classexpr__initializert.html#ae7d80673a26d6670017d56404f6072ca">expr_initializert::operator()</a></div><div class="ttdeci">optionalt&lt; exprt &gt; operator()(const typet &amp;type, const source_locationt &amp;source_location, const exprt &amp;init_expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00031">expr_initializer.cpp:31</a></div></div>
+<div class="ttc" id="aclassexpr__initializert_html"><div class="ttname"><a href="classexpr__initializert.html">expr_initializert</a></div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00025">expr_initializer.cpp:26</a></div></div>
+<div class="ttc" id="aclassexpr__initializert_html_a6f912f337dd6ab4499fb744106485ac6"><div class="ttname"><a href="classexpr__initializert.html#a6f912f337dd6ab4499fb744106485ac6">expr_initializert::expr_initializer_rec</a></div><div class="ttdeci">optionalt&lt; exprt &gt; expr_initializer_rec(const typet &amp;type, const source_locationt &amp;source_location, const exprt &amp;init_expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00049">expr_initializer.cpp:49</a></div></div>
+<div class="ttc" id="aclassexpr__initializert_html_ad79b2d3bb8cc333d6ca007ebff8337c4"><div class="ttname"><a href="classexpr__initializert.html#ad79b2d3bb8cc333d6ca007ebff8337c4">expr_initializert::ns</a></div><div class="ttdeci">const namespacet &amp; ns</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00041">expr_initializer.cpp:41</a></div></div>
+<div class="ttc" id="aclassexpr__initializert_html_adcdcb45ef33e2634ad85411a19d24789"><div class="ttname"><a href="classexpr__initializert.html#adcdcb45ef33e2634ad85411a19d24789">expr_initializert::expr_initializert</a></div><div class="ttdeci">expr_initializert(const namespacet &amp;_ns)</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00028">expr_initializer.cpp:28</a></div></div>
+<div class="ttc" id="aclassexpr__initializert_html_ae7d80673a26d6670017d56404f6072ca"><div class="ttname"><a href="classexpr__initializert.html#ae7d80673a26d6670017d56404f6072ca">expr_initializert::operator()</a></div><div class="ttdeci">optionalt&lt; exprt &gt; operator()(const typet &amp;type, const source_locationt &amp;source_location, const exprt &amp;init_expr)</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00032">expr_initializer.cpp:32</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
 <div class="ttc" id="aclassexprt_html_a10c073e5cdd14b181d56cf53def8b378"><div class="ttname"><a href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a></div><div class="ttdeci">std::vector&lt; exprt &gt; operandst</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00058">expr.h:58</a></div></div>
 <div class="ttc" id="aclassexprt_html_a4f28296a5ed6b9fa5f2a40c57b3ac4b8"><div class="ttname"><a href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">exprt::add_source_location</a></div><div class="ttdeci">source_locationt &amp; add_source_location()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00228">expr.h:228</a></div></div>
 <div class="ttc" id="aclassexprt_html_a847cfca1ba40ed1ed04683e3b6788096"><div class="ttname"><a href="classexprt.html#a847cfca1ba40ed1ed04683e3b6788096">exprt::is_zero</a></div><div class="ttdeci">bool is_zero() const</div><div class="ttdoc">Return whether the expression is a constant representing 0.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00047">expr.cpp:47</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
-<div class="ttc" id="aclassexprt_html_aa0da0eed1e748681d28c8fe3a50ffda5"><div class="ttname"><a href="classexprt.html#aa0da0eed1e748681d28c8fe3a50ffda5">exprt::is_constant</a></div><div class="ttdeci">bool is_constant() const</div><div class="ttdoc">Return whether the expression is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00204">expr.h:204</a></div></div>
 <div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
 <div class="ttc" id="aclassirept_html_afa2098e6870bd6fb415025781a3a5db1"><div class="ttname"><a href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">irept::is_nil</a></div><div class="ttdeci">bool is_nil() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00376">irep.h:376</a></div></div>
@@ -567,16 +575,18 @@ $(document).ready(function(){initNavTree('expr__initializer_8cpp_source.html',''
 <div class="ttc" id="aclassvector__typet_html_aa6ddea165503b9ced5f6591314a48a75"><div class="ttname"><a href="classvector__typet.html#aa6ddea165503b9ced5f6591314a48a75">vector_typet::size</a></div><div class="ttdeci">const constant_exprt &amp; size() const</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8cpp_source.html#l00269">std_types.cpp:269</a></div></div>
 <div class="ttc" id="aclassvector__typet_html_ad382a3b88f4f2a79391ec112868db54a"><div class="ttname"><a href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">vector_typet::element_type</a></div><div class="ttdeci">const typet &amp; element_type() const</div><div class="ttdoc">The type of the elements of the vector.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l01024">std_types.h:1024</a></div></div>
 <div class="ttc" id="aconfig_8h_html"><div class="ttname"><a href="config_8h.html">config.h</a></div></div>
-<div class="ttc" id="aexpr__initializer_8cpp_html_a38bf6df567f41f2d732138536e43b227"><div class="ttname"><a href="expr__initializer_8cpp.html#a38bf6df567f41f2d732138536e43b227">zero_initializer</a></div><div class="ttdeci">optionalt&lt; exprt &gt; zero_initializer(const typet &amp;type, const source_locationt &amp;source_location, const namespacet &amp;ns)</div><div class="ttdoc">Create the equivalent of zero for type type.</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00307">expr_initializer.cpp:307</a></div></div>
-<div class="ttc" id="aexpr__initializer_8cpp_html_a79536f30b33546da3eea28aaf46c5379"><div class="ttname"><a href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">cast_or_reinterpret</a></div><div class="ttdeci">static exprt cast_or_reinterpret(const exprt &amp;expr, const typet &amp;out_type)</div><div class="ttdoc">Typecast the input to the output if this is a signed/unsigned bv.</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00353">expr_initializer.cpp:353</a></div></div>
-<div class="ttc" id="aexpr__initializer_8cpp_html_a7a8db7d5f5394eaba1653fd8cb4b9bbc"><div class="ttname"><a href="expr__initializer_8cpp.html#a7a8db7d5f5394eaba1653fd8cb4b9bbc">nondet_initializer</a></div><div class="ttdeci">optionalt&lt; exprt &gt; nondet_initializer(const typet &amp;type, const source_locationt &amp;source_location, const namespacet &amp;ns)</div><div class="ttdoc">Create a non-deterministic value for type type, with all subtypes independently expanded as non-deter...</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00323">expr_initializer.cpp:323</a></div></div>
-<div class="ttc" id="aexpr__initializer_8cpp_html_a92fd18361f0f1ee9858632bc2db83017"><div class="ttname"><a href="expr__initializer_8cpp.html#a92fd18361f0f1ee9858632bc2db83017">expr_initializer</a></div><div class="ttdeci">optionalt&lt; exprt &gt; expr_initializer(const typet &amp;type, const source_locationt &amp;source_location, const namespacet &amp;ns, const exprt &amp;init_byte_expr)</div><div class="ttdoc">Create a value for type type, with all subtype bytes initialized to the given value.</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00339">expr_initializer.cpp:339</a></div></div>
-<div class="ttc" id="aexpr__initializer_8cpp_html_aaaf8f32797afa729f395ab3ee35caddb"><div class="ttname"><a href="expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb">duplicate_per_byte</a></div><div class="ttdeci">exprt duplicate_per_byte(const exprt &amp;init_byte_expr, const typet &amp;output_type)</div><div class="ttdoc">Builds an expression of the given output type with each of its bytes initialized to the given initial...</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00379">expr_initializer.cpp:379</a></div></div>
+<div class="ttc" id="aexpr__initializer_8cpp_html_a35df199a917b890a21425fe2fe1aaad8"><div class="ttname"><a href="expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8">duplicate_per_byte</a></div><div class="ttdeci">exprt duplicate_per_byte(const exprt &amp;init_byte_expr, const typet &amp;output_type, const namespacet &amp;ns)</div><div class="ttdoc">Builds an expression of the given output type with each of its bytes initialized to the given initial...</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00381">expr_initializer.cpp:381</a></div></div>
+<div class="ttc" id="aexpr__initializer_8cpp_html_a38bf6df567f41f2d732138536e43b227"><div class="ttname"><a href="expr__initializer_8cpp.html#a38bf6df567f41f2d732138536e43b227">zero_initializer</a></div><div class="ttdeci">optionalt&lt; exprt &gt; zero_initializer(const typet &amp;type, const source_locationt &amp;source_location, const namespacet &amp;ns)</div><div class="ttdoc">Create the equivalent of zero for type type.</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00308">expr_initializer.cpp:308</a></div></div>
+<div class="ttc" id="aexpr__initializer_8cpp_html_a79536f30b33546da3eea28aaf46c5379"><div class="ttname"><a href="expr__initializer_8cpp.html#a79536f30b33546da3eea28aaf46c5379">cast_or_reinterpret</a></div><div class="ttdeci">static exprt cast_or_reinterpret(const exprt &amp;expr, const typet &amp;out_type)</div><div class="ttdoc">Typecast the input to the output if this is a signed/unsigned bv.</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00354">expr_initializer.cpp:354</a></div></div>
+<div class="ttc" id="aexpr__initializer_8cpp_html_a7a8db7d5f5394eaba1653fd8cb4b9bbc"><div class="ttname"><a href="expr__initializer_8cpp.html#a7a8db7d5f5394eaba1653fd8cb4b9bbc">nondet_initializer</a></div><div class="ttdeci">optionalt&lt; exprt &gt; nondet_initializer(const typet &amp;type, const source_locationt &amp;source_location, const namespacet &amp;ns)</div><div class="ttdoc">Create a non-deterministic value for type type, with all subtypes independently expanded as non-deter...</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00324">expr_initializer.cpp:324</a></div></div>
+<div class="ttc" id="aexpr__initializer_8cpp_html_a92fd18361f0f1ee9858632bc2db83017"><div class="ttname"><a href="expr__initializer_8cpp.html#a92fd18361f0f1ee9858632bc2db83017">expr_initializer</a></div><div class="ttdeci">optionalt&lt; exprt &gt; expr_initializer(const typet &amp;type, const source_locationt &amp;source_location, const namespacet &amp;ns, const exprt &amp;init_byte_expr)</div><div class="ttdoc">Create a value for type type, with all subtype bytes initialized to the given value.</div><div class="ttdef"><b>Definition:</b> <a href="expr__initializer_8cpp_source.html#l00340">expr_initializer.cpp:340</a></div></div>
 <div class="ttc" id="aexpr__initializer_8h_html"><div class="ttname"><a href="expr__initializer_8h.html">expr_initializer.h</a></div><div class="ttdoc">Expression Initialization.</div></div>
 <div class="ttc" id="amagic_8h_html"><div class="ttname"><a href="magic_8h.html">magic.h</a></div><div class="ttdoc">Magic numbers used throughout the codebase.</div></div>
 <div class="ttc" id="amagic_8h_html_acccea33b4efa621ef858464235c693e7"><div class="ttname"><a href="magic_8h.html#acccea33b4efa621ef858464235c693e7">MAX_FLATTENED_ARRAY_SIZE</a></div><div class="ttdeci">const std::size_t MAX_FLATTENED_ARRAY_SIZE</div><div class="ttdef"><b>Definition:</b> <a href="magic_8h_source.html#l00011">magic.h:11</a></div></div>
 <div class="ttc" id="anamespace_8h_html"><div class="ttname"><a href="namespace_8h.html">namespace.h</a></div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
+<div class="ttc" id="asimplify__expr_8cpp_html_adebe9c3e4a7aac67777c20e448f6f2bc"><div class="ttname"><a href="simplify__expr_8cpp.html#adebe9c3e4a7aac67777c20e448f6f2bc">simplify_expr</a></div><div class="ttdeci">exprt simplify_expr(exprt src, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03115">simplify_expr.cpp:3115</a></div></div>
+<div class="ttc" id="asimplify__expr_8h_html"><div class="ttname"><a href="simplify__expr_8h.html">simplify_expr.h</a></div></div>
 <div class="ttc" id="asmt__terms_8h_html_a68a9c335b3b75c987bf5d42b3cc8b0e0"><div class="ttname"><a href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a></div><div class="ttdeci">BigInt mp_integer</div><div class="ttdef"><b>Definition:</b> <a href="smt__terms_8h_source.html#l00018">smt_terms.h:18</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00534">invariant.h:534</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>

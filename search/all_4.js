@@ -589,7 +589,7 @@ var searchData=
   ['duplicate_5fcode_5fsymbol_10030',['duplicate_code_symbol',['../classlinkingt.html#ad7d80d4ad4379a6852330f7c5e0581ce',1,'linkingt']]],
   ['duplicate_5fnon_5ftype_5fsymbol_10031',['duplicate_non_type_symbol',['../classlinkingt.html#a0119897371f9ced79a7e12097c5ae08a',1,'linkingt']]],
   ['duplicate_5fobject_5fsymbol_10032',['duplicate_object_symbol',['../classlinkingt.html#a86d154bc6b438bd97a8669dfb1c24903',1,'linkingt']]],
-  ['duplicate_5fper_5fbyte_10033',['duplicate_per_byte',['../expr__initializer_8h.html#aaaf8f32797afa729f395ab3ee35caddb',1,'duplicate_per_byte(const exprt &amp;init_byte_expr, const typet &amp;output_type):&#160;expr_initializer.cpp'],['../expr__initializer_8cpp.html#aaaf8f32797afa729f395ab3ee35caddb',1,'duplicate_per_byte(const exprt &amp;init_byte_expr, const typet &amp;output_type):&#160;expr_initializer.cpp']]],
+  ['duplicate_5fper_5fbyte_10033',['duplicate_per_byte',['../expr__initializer_8h.html#a35df199a917b890a21425fe2fe1aaad8',1,'duplicate_per_byte(const exprt &amp;init_byte_expr, const typet &amp;output_type, const namespacet &amp;ns):&#160;expr_initializer.cpp'],['../expr__initializer_8cpp.html#a35df199a917b890a21425fe2fe1aaad8',1,'duplicate_per_byte(const exprt &amp;init_byte_expr, const typet &amp;output_type, const namespacet &amp;ns):&#160;expr_initializer.cpp']]],
   ['duplicate_5ftype_5fsymbol_10034',['duplicate_type_symbol',['../classlinkingt.html#ab3750dc57bd502927cad002edb67e68f',1,'linkingt']]],
   ['duplicated_5fbodies_10035',['duplicated_bodies',['../classevent__grapht.html#ac1cac1a22d3e9258c5129c95e97ce243',1,'event_grapht']]],
   ['duplicated_5fprevious_5fstep_10036',['duplicated_previous_step',['../show__program_8cpp.html#a769160446f4ca35594bb7a876b32f51e',1,'show_program.cpp']]],
