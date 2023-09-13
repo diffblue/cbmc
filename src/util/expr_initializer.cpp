@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 #include "magic.h"
 #include "namespace.h" // IWYU pragma: keep
+#include "simplify_expr.h"
 #include "std_code.h"
 #include "symbol_table.h"
 
@@ -68,7 +69,7 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
     else if(init_expr.is_zero())
       result = from_integer(0, type);
     else
-      result = duplicate_per_byte(init_expr, type);
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -82,7 +83,7 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
     else if(init_expr.is_zero())
       result = constant_exprt(ID_0, type);
     else
-      result = duplicate_per_byte(init_expr, type);
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -101,7 +102,7 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
       result = constant_exprt(value, type);
     }
     else
-      result = duplicate_per_byte(init_expr, type);
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -121,7 +122,7 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
       result = complex_exprt(*sub_zero, *sub_zero, to_complex_type(type));
     }
     else
-      result = duplicate_per_byte(init_expr, type);
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -289,7 +290,7 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
     else if(init_expr.is_zero())
       result = constant_exprt(irep_idt(), type);
     else
-      result = duplicate_per_byte(init_expr, type);
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -373,10 +374,14 @@ static exprt cast_or_reinterpret(const exprt &expr, const typet &out_type)
 /// output type.
 /// \param init_byte_expr The initialization expression
 /// \param output_type The output type
+/// \param ns Namespace to perform type symbol/tag lookups
 /// \return The built expression
 /// \note `init_byte_expr` must be a boolean or a bitvector and must be of at
 ///  most `size <= config.ansi_c.char_width`
-exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
+exprt duplicate_per_byte(
+  const exprt &init_byte_expr,
+  const typet &output_type,
+  const namespacet &ns)
 {
   const auto init_type_as_bitvector =
     type_try_dynamic_cast<bitvector_typet>(init_byte_expr.type());
@@ -385,20 +390,25 @@ exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
     (init_type_as_bitvector &&
      init_type_as_bitvector->get_width() <= config.ansi_c.char_width) ||
     init_byte_expr.type().id() == ID_bool);
+  // Simplify init_expr to enable faster duplication when simplifiable to a
+  // constant expr
+  const auto simplified_init_expr = simplify_expr(init_byte_expr, ns);
   if(const auto output_bv = type_try_dynamic_cast<bitvector_typet>(output_type))
   {
     const auto out_width = output_bv->get_width();
-    // Replicate `init_byte_expr` enough times until it completely fills
+    // Replicate `simplified_init_expr` enough times until it completely fills
     // `output_type`.
 
     // We've got a constant. So, precompute the value of the constant.
-    if(init_byte_expr.is_constant())
+    if(simplified_init_expr.is_constant())
     {
       const auto init_size = init_type_as_bitvector->get_width();
-      const irep_idt init_value = to_constant_expr(init_byte_expr).get_value();
+      const irep_idt init_value =
+        to_constant_expr(simplified_init_expr).get_value();
 
       // Create a new BV of `output_type` size with its representation being the
-      // replication of the init_byte_expr (padded with 0) enough times to fill.
+      // replication of the simplified_init_expr (padded with 0) enough times to
+      // fill.
       const auto output_value =
         make_bvrep(out_width, [&init_size, &init_value](std::size_t index) {
           // Index modded by 8 to access the i-th bit of init_value
@@ -427,7 +437,7 @@ exprt duplicate_per_byte(const exprt &init_byte_expr, const typet &output_type)
     {
       operation_type = unsignedbv_typet{float_type->get_width()};
     }
-    // Let's cast init_byte_expr to output_type.
+    // Let's cast simplified_init_expr to output_type.
     const exprt casted_init_byte_expr =
       typecast_exprt::conditional_cast(init_byte_expr, operation_type);
     values.push_back(casted_init_byte_expr);
