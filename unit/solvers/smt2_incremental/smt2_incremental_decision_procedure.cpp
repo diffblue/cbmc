@@ -732,6 +732,30 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "smt2_incremental_decision_proceduret function pointer support.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const code_typet function_type{{}, void_type()};
+  const symbolt function{"opaque", function_type, ID_C};
+  test.symbol_table.insert(function);
+  const address_of_exprt function_pointer{function.symbol_expr()};
+  const equal_exprt equals_null{
+    function_pointer, null_pointer_exprt{pointer_typet{function_type, 32}}};
+
+  test.sent_commands.clear();
+  test.procedure.set_to(equals_null, false);
+
+  const std::vector<smt_commandt> expected_commands{
+    smt_assert_commandt{smt_core_theoryt::make_not(smt_core_theoryt::equal(
+      smt_bit_vector_theoryt::concat(
+        smt_bit_vector_constant_termt{2, 8},
+        smt_bit_vector_constant_termt{0, 24}),
+      smt_bit_vector_constant_termt{0, 32}))}};
+  REQUIRE(test.sent_commands == expected_commands);
+}
+
+TEST_CASE(
   "smt2_incremental_decision_proceduret multi-ary with_exprt introduces "
   "correct number of indexes.",
   "[core][smt2_incremental]")
