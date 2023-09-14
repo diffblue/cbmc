@@ -1477,28 +1477,31 @@ TEST_CASE(
   const symbol_exprt bar{"bar", unsignedbv_typet{32}};
   SECTION("Address of symbol")
   {
-    const address_of_exprt address_of_foo{foo};
-    track_expression_objects(address_of_foo, ns, test.object_map);
-    INFO("Expression " + address_of_foo.pretty(1, 0));
-    SECTION("8 object bits")
+    SECTION("bit vector symbol")
     {
-      config.bv_encoding.object_bits = 8;
-      const auto converted = test.convert(address_of_foo);
-      CHECK(test.object_map.at(foo).unique_id == 2);
-      CHECK(
-        converted == smt_bit_vector_theoryt::concat(
-                       smt_bit_vector_constant_termt{2, 8},
-                       smt_bit_vector_constant_termt{0, 56}));
-    }
-    SECTION("16 object bits")
-    {
-      config.bv_encoding.object_bits = 16;
-      const auto converted = test.convert(address_of_foo);
-      CHECK(test.object_map.at(foo).unique_id == 2);
-      CHECK(
-        converted == smt_bit_vector_theoryt::concat(
-                       smt_bit_vector_constant_termt{2, 16},
-                       smt_bit_vector_constant_termt{0, 48}));
+      const address_of_exprt address_of_foo{foo};
+      track_expression_objects(address_of_foo, ns, test.object_map);
+      INFO("Expression " + address_of_foo.pretty(1, 0));
+      SECTION("8 object bits")
+      {
+        config.bv_encoding.object_bits = 8;
+        const auto converted = test.convert(address_of_foo);
+        CHECK(test.object_map.at(foo).unique_id == 2);
+        CHECK(
+          converted == smt_bit_vector_theoryt::concat(
+                         smt_bit_vector_constant_termt{2, 8},
+                         smt_bit_vector_constant_termt{0, 56}));
+      }
+      SECTION("16 object bits")
+      {
+        config.bv_encoding.object_bits = 16;
+        const auto converted = test.convert(address_of_foo);
+        CHECK(test.object_map.at(foo).unique_id == 2);
+        CHECK(
+          converted == smt_bit_vector_theoryt::concat(
+                         smt_bit_vector_constant_termt{2, 16},
+                         smt_bit_vector_constant_termt{0, 48}));
+      }
     }
   }
   SECTION("Invariant checks")
