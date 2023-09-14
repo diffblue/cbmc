@@ -1503,6 +1503,20 @@ TEST_CASE(
                          smt_bit_vector_constant_termt{0, 48}));
       }
     }
+    SECTION("Code symbol")
+    {
+      config.bv_encoding.object_bits = 8;
+      const symbol_exprt function{"opaque", code_typet{{}, void_type()}};
+      const address_of_exprt function_pointer{function};
+      track_expression_objects(function_pointer, ns, test.object_map);
+      INFO("Expression " + function_pointer.pretty(1, 0));
+      const auto converted = test.convert(function_pointer);
+      CHECK(test.object_map.at(function).unique_id == 2);
+      CHECK(
+        converted == smt_bit_vector_theoryt::concat(
+                       smt_bit_vector_constant_termt{2, 8},
+                       smt_bit_vector_constant_termt{0, 56}));
+    }
   }
   SECTION("Invariant checks")
   {
