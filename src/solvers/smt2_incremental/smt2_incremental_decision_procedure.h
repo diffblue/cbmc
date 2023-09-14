@@ -94,6 +94,9 @@ protected:
   /// \brief Defines any functions which \p expr depends on, which have not yet
   ///   been defined, along with their dependencies in turn.
   void define_dependent_functions(const exprt &expr);
+  /// If a function has not been defined for handling \p expr, then a new
+  /// function is defined. If the corresponding function exists already, then
+  /// no action is taken.
   void ensure_handle_for_expr_defined(const exprt &expr);
   /// \brief Add objects in \p expr to object_map if needed and convert to smt.
   /// \note This function is non-const because it mutates the object_map.
