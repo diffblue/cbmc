@@ -45,6 +45,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/restrict_function_pointers.h>
+#include <goto-programs/rewrite_rw_ok.h>
 #include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
@@ -569,6 +570,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-reaching-definitions"))
     {
       do_indirect_call_and_rtti_removal();
+      rewrite_rw_ok(goto_model);
 
       const namespacet ns(goto_model.symbol_table);
       reaching_definitions_analysist rd_analysis(ns);
@@ -581,6 +583,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-dependence-graph"))
     {
       do_indirect_call_and_rtti_removal();
+      rewrite_rw_ok(goto_model);
 
       const namespacet ns(goto_model.symbol_table);
       dependence_grapht dependence_graph(ns);
@@ -1767,6 +1770,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
     do_remove_returns();
+    rewrite_rw_ok(goto_model);
 
     log.warning() << "**** WARNING: Experimental option --full-slice, "
                   << "analysis results may be unsound. See "

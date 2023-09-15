@@ -4865,6 +4865,30 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
     !has_byte_operator(lowered_expr),
     "lower_byte_operators should remove all byte operators");
 
+  // Perform rewrites that may introduce new symbols
+  for(auto it = lowered_expr.depth_begin(), itend = lowered_expr.depth_end();
+      it != itend;) // no ++it
+  {
+    if(
+      auto prophecy_r_or_w_ok =
+        expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(*it))
+    {
+      exprt lowered = simplify_expr(prophecy_r_or_w_ok->lower(ns), ns);
+      it.mutate() = lowered;
+      it.next_sibling_or_parent();
+    }
+    else if(
+      auto prophecy_pointer_in_range =
+        expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(*it))
+    {
+      exprt lowered = simplify_expr(prophecy_pointer_in_range->lower(ns), ns);
+      it.mutate() = lowered;
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
+
   // Now create symbols for all composite expressions present in lowered_expr:
   find_symbols(lowered_expr);
 

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/simplify_expr.h>
 
 /// Map bytes according to the configured endianness. The key difference to
 /// endianness_mapt is that bv_endianness_mapt is aware of the bit-level
@@ -203,6 +204,18 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
           offset_bv1,
           bv_utilst::representationt::UNSIGNED));
     }
+  }
+  else if(
+    auto prophecy_r_or_w_ok =
+      expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(expr))
+  {
+    return convert(simplify_expr(prophecy_r_or_w_ok->lower(ns), ns));
+  }
+  else if(
+    auto prophecy_pointer_in_range =
+      expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
+  {
+    return convert(simplify_expr(prophecy_pointer_in_range->lower(ns), ns));
   }
 
   return SUB::convert_rest(expr);

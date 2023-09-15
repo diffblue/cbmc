@@ -199,6 +199,7 @@ optionst goto_synthesizer_parse_optionst::get_options()
   options.set_option("depth", UINT32_MAX);
   options.set_option("exploration-strategy", "lifo");
   options.set_option("symex-cache-dereferences", false);
+  options.set_option("rewrite-rw-ok", true);
   options.set_option("rewrite-union", true);
   options.set_option("self-loops-to-assumptions", true);
 

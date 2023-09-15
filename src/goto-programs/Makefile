@@ -56,6 +56,7 @@ SRC = allocate_objects.cpp \
       remove_vector.cpp \
       remove_virtual_functions.cpp \
       restrict_function_pointers.cpp \
+      rewrite_rw_ok.cpp \
       rewrite_union.cpp \
       resolve_inherited_component.cpp \
       safety_checker.cpp \

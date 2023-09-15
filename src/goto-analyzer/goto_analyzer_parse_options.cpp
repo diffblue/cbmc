@@ -393,6 +393,7 @@ int goto_analyzer_parse_optionst::doit()
 
   // Preserve backwards compatibility in processing
   options.set_option("partial-inline", true);
+  options.set_option("rewrite-rw-ok", false);
   options.set_option("rewrite-union", false);
   options.set_option("remove-returns", true);
 

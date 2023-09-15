@@ -2993,6 +2993,18 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
   {
     r = simplify_bitreverse(to_bitreverse_expr(expr));
   }
+  else if(
+    const auto prophecy_r_or_w_ok =
+      expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(expr))
+  {
+    r = simplify_prophecy_r_or_w_ok(*prophecy_r_or_w_ok);
+  }
+  else if(
+    const auto prophecy_pointer_in_range =
+      expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
+  {
+    r = simplify_prophecy_pointer_in_range(*prophecy_pointer_in_range);
+  }
 
   if(!no_change_join_operands)
     r = changed(r);

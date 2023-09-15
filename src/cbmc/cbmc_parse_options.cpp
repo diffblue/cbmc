@@ -406,6 +406,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 
   // Options for process_goto_program
+  options.set_option("rewrite-rw-ok", true);
   options.set_option("rewrite-union", true);
 
   if(cmdline.isset("smt1"))

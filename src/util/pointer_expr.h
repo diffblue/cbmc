@@ -447,6 +447,94 @@ inline pointer_in_range_exprt &to_pointer_in_range_expr(exprt &expr)
   return static_cast<pointer_in_range_exprt &>(expr);
 }
 
+/// pointer_in_range (see \ref pointer_in_range_exprt) with prophecy expressions
+/// to encode whether a pointer refers to a deallocated or out-of-scope object.
+class prophecy_pointer_in_range_exprt : public expr_protectedt
+{
+public:
+  prophecy_pointer_in_range_exprt(
+    exprt a,
+    exprt b,
+    exprt c,
+    exprt is_deallocated,
+    exprt is_dead)
+    : expr_protectedt(
+        ID_prophecy_pointer_in_range,
+        bool_typet{},
+        {std::move(a),
+         std::move(b),
+         std::move(c),
+         std::move(is_deallocated),
+         std::move(is_dead)})
+  {
+    PRECONDITION(op0().type().id() == ID_pointer);
+    PRECONDITION(op1().type().id() == ID_pointer);
+    PRECONDITION(op2().type().id() == ID_pointer);
+  }
+
+  const exprt &lower_bound() const
+  {
+    return op0();
+  }
+
+  const exprt &pointer() const
+  {
+    return op1();
+  }
+
+  const exprt &upper_bound() const
+  {
+    return op2();
+  }
+
+  const exprt &deallocated_ptr() const
+  {
+    return op3();
+  }
+
+  const exprt &dead_ptr() const
+  {
+    return operands()[4];
+  }
+
+  // translate into equivalent conjunction
+  exprt lower(const namespacet &ns) const;
+};
+
+template <>
+inline bool can_cast_expr<prophecy_pointer_in_range_exprt>(const exprt &base)
+{
+  return base.id() == ID_prophecy_pointer_in_range;
+}
+
+inline void validate_expr(const prophecy_pointer_in_range_exprt &value)
+{
+  validate_operands(
+    value, 5, "prophecy_pointer_in_range must have five operands");
+}
+
+inline const prophecy_pointer_in_range_exprt &
+to_prophecy_pointer_in_range_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_prophecy_pointer_in_range);
+  DATA_INVARIANT(
+    expr.operands().size() == 5,
+    "prophecy_pointer_in_range must have five operands");
+  return static_cast<const prophecy_pointer_in_range_exprt &>(expr);
+}
+
+/// \copydoc to_prophecy_pointer_in_range_expr(const exprt &)
+/// \ingroup gr_std_expr
+inline prophecy_pointer_in_range_exprt &
+to_prophecy_pointer_in_range_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_prophecy_pointer_in_range);
+  DATA_INVARIANT(
+    expr.operands().size() == 5,
+    "prophecy_pointer_in_range must have five operands");
+  return static_cast<prophecy_pointer_in_range_exprt &>(expr);
+}
+
 /// \brief Operator to return the address of an object
 class address_of_exprt : public unary_exprt
 {
@@ -921,6 +1009,191 @@ inline const w_ok_exprt &to_w_ok_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_w_ok);
   const w_ok_exprt &ret = static_cast<const w_ok_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief A base class for a predicate that indicates that an
+/// address range is ok to read or write or both
+class prophecy_r_or_w_ok_exprt : public expr_protectedt
+{
+public:
+  prophecy_r_or_w_ok_exprt(
+    irep_idt id,
+    exprt pointer,
+    exprt size,
+    exprt is_deallocated,
+    exprt is_dead)
+    : expr_protectedt(
+        id,
+        bool_typet{},
+        {std::move(pointer),
+         std::move(size),
+         std::move(is_deallocated),
+         std::move(is_dead)})
+  {
+  }
+
+  prophecy_r_or_w_ok_exprt(irep_idt id, exprt pointer, exprt size)
+    : prophecy_r_or_w_ok_exprt(
+        id,
+        std::move(pointer),
+        std::move(size),
+        nil_exprt{},
+        nil_exprt{})
+  {
+  }
+
+  const exprt &pointer() const
+  {
+    return op0();
+  }
+
+  const exprt &size() const
+  {
+    return op1();
+  }
+
+  const exprt &deallocated_ptr() const
+  {
+    return op2();
+  }
+
+  exprt &deallocated_ptr()
+  {
+    return op2();
+  }
+
+  const exprt &dead_ptr() const
+  {
+    return op3();
+  }
+
+  exprt &dead_ptr()
+  {
+    return op3();
+  }
+
+  /// Lower an r_or_w_ok_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower(const namespacet &ns) const;
+};
+
+template <>
+inline bool can_cast_expr<prophecy_r_or_w_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_prophecy_r_ok || base.id() == ID_prophecy_w_ok ||
+         base.id() == ID_prophecy_rw_ok;
+}
+
+inline void validate_expr(const prophecy_r_or_w_ok_exprt &value)
+{
+  validate_operands(value, 4, "r_or_w_ok must have four operands");
+}
+
+inline const prophecy_r_or_w_ok_exprt &
+to_prophecy_r_or_w_ok_expr(const exprt &expr)
+{
+  PRECONDITION(
+    expr.id() == ID_prophecy_r_ok || expr.id() == ID_prophecy_w_ok ||
+    expr.id() == ID_prophecy_rw_ok);
+  auto &ret = static_cast<const prophecy_r_or_w_ok_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief A predicate that indicates that an address range is ok to read
+class prophecy_r_ok_exprt : public prophecy_r_or_w_ok_exprt
+{
+public:
+  prophecy_r_ok_exprt(
+    exprt pointer,
+    exprt size,
+    exprt is_deallocated,
+    exprt is_dead)
+    : prophecy_r_or_w_ok_exprt(
+        ID_prophecy_r_ok,
+        std::move(pointer),
+        std::move(size),
+        std::move(is_deallocated),
+        std::move(is_dead))
+  {
+  }
+
+  prophecy_r_ok_exprt(exprt pointer, exprt size)
+    : prophecy_r_ok_exprt(
+        std::move(pointer),
+        std::move(size),
+        nil_exprt{},
+        nil_exprt{})
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<prophecy_r_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_prophecy_r_ok;
+}
+
+inline void validate_expr(const prophecy_r_ok_exprt &value)
+{
+  validate_operands(value, 4, "r_ok must have four operands");
+}
+
+inline const prophecy_r_ok_exprt &to_prophecy_r_ok_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_prophecy_r_ok);
+  const prophecy_r_ok_exprt &ret =
+    static_cast<const prophecy_r_ok_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief A predicate that indicates that an address range is ok to write
+class prophecy_w_ok_exprt : public prophecy_r_or_w_ok_exprt
+{
+public:
+  prophecy_w_ok_exprt(
+    exprt pointer,
+    exprt size,
+    exprt is_deallocated,
+    exprt is_dead)
+    : prophecy_r_or_w_ok_exprt(
+        ID_prophecy_w_ok,
+        std::move(pointer),
+        std::move(size),
+        std::move(is_deallocated),
+        std::move(is_dead))
+  {
+  }
+
+  prophecy_w_ok_exprt(exprt pointer, exprt size)
+    : prophecy_w_ok_exprt(
+        std::move(pointer),
+        std::move(size),
+        nil_exprt{},
+        nil_exprt{})
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<prophecy_w_ok_exprt>(const exprt &base)
+{
+  return base.id() == ID_prophecy_w_ok;
+}
+
+inline void validate_expr(const prophecy_w_ok_exprt &value)
+{
+  validate_operands(value, 4, "w_ok must have four operands");
+}
+
+inline const prophecy_w_ok_exprt &to_prophecy_w_ok_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_prophecy_w_ok);
+  const prophecy_w_ok_exprt &ret =
+    static_cast<const prophecy_w_ok_exprt &>(expr);
   validate_expr(ret);
   return ret;
 }

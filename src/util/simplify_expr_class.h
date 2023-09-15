@@ -65,6 +65,8 @@ class plus_exprt;
 class pointer_object_exprt;
 class pointer_offset_exprt;
 class popcount_exprt;
+class prophecy_pointer_in_range_exprt;
+class prophecy_r_or_w_ok_exprt;
 class refined_string_exprt;
 class shift_exprt;
 class sign_exprt;
@@ -227,6 +229,14 @@ public:
 
   /// Try to simplify find-first-set to a constant expression.
   NODISCARD resultt<> simplify_ffs(const find_first_set_exprt &);
+
+  /// Try to simplify prophecy_{r,w,rw}_ok to a constant expression.
+  NODISCARD resultt<>
+  simplify_prophecy_r_or_w_ok(const prophecy_r_or_w_ok_exprt &);
+
+  /// Try to simplify prophecy_pointer_in_range to a constant expression.
+  NODISCARD resultt<>
+  simplify_prophecy_pointer_in_range(const prophecy_pointer_in_range_exprt &);
 
   // auxiliary
   bool simplify_if_implies(

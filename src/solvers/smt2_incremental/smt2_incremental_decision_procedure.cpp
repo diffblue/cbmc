@@ -7,6 +7,7 @@
 #include <util/namespace.h>
 #include <util/nodiscard.h>
 #include <util/range.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
 #include <util/symbol.h>
@@ -273,6 +274,25 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
   solver_process->send(smt_set_logic_commandt{smt_logic_allt{}});
   solver_process->send(object_size_function.declaration);
   solver_process->send(is_dynamic_object_function.declaration);
+}
+
+static exprt lower_rw_ok_pointer_in_range(exprt expr, const namespacet &ns)
+{
+  expr.visit_pre([&ns](exprt &expr) {
+    if(
+      auto prophecy_r_or_w_ok =
+        expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(expr))
+    {
+      expr = simplify_expr(prophecy_r_or_w_ok->lower(ns), ns);
+    }
+    else if(
+      auto prophecy_pointer_in_range =
+        expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
+    {
+      expr = simplify_expr(prophecy_pointer_in_range->lower(ns), ns);
+    }
+  });
+  return expr;
 }
 
 void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
@@ -625,8 +645,9 @@ void smt2_incremental_decision_proceduret::define_object_properties()
 
 exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
 {
-  const exprt lowered = struct_encoding.encode(
-    lower_enum(lower_byte_operators(expression, ns), ns));
+  const exprt lowered = struct_encoding.encode(lower_enum(
+    lower_byte_operators(lower_rw_ok_pointer_in_range(expression, ns), ns),
+    ns));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     if(lowered != expression)
       debug << "lowered to -\n  " << lowered.pretty(2, 0) << messaget::eom;
