@@ -1520,422 +1520,452 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp_source.htm
 <div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;    count_trailing_zeros.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
 <div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;}</div>
 <div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160; </div>
-<div class="line"><a name="l01466"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0"> 1466</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classsmt__termt.html">smt_termt</a> <a class="code" href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0">dispatch_expr_to_smt_conversion</a>(</div>
-<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;  <span class="keyword">const</span> <a class="code" href="convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20">sub_expression_mapt</a> &amp;converted,</div>
-<div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;  <span class="keyword">const</span> <a class="code" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map,</div>
-<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;  <span class="keyword">const</span> <a class="code" href="type__size__mapping_8h.html#a75319e37b6206e23f94a56ca388322f5">type_size_mapt</a> &amp;pointer_sizes,</div>
-<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_object_sizet::make_applicationt</a> &amp;call_object_size,</div>
-<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_is_dynamic_objectt::make_applicationt</a> &amp;apply_is_dynamic_object)</div>
-<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;{</div>
-<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> symbol = expr_try_dynamic_cast&lt;symbol_exprt&gt;(expr))</div>
-<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160;  {</div>
-<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*symbol);</div>
-<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;  }</div>
-<div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> nondet = expr_try_dynamic_cast&lt;nondet_symbol_exprt&gt;(expr))</div>
-<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;  {</div>
-<div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*nondet, converted);</div>
-<div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160;  }</div>
-<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> cast = expr_try_dynamic_cast&lt;typecast_exprt&gt;(expr))</div>
-<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;  {</div>
-<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*cast, converted);</div>
-<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;  }</div>
-<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> float_cast = expr_try_dynamic_cast&lt;floatbv_typecast_exprt&gt;(expr))</div>
-<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;  {</div>
-<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*float_cast, converted);</div>
-<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;  }</div>
-<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> struct_construction = expr_try_dynamic_cast&lt;struct_exprt&gt;(expr))</div>
-<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;  {</div>
-<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*struct_construction, converted);</div>
-<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160;  }</div>
-<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> union_construction = expr_try_dynamic_cast&lt;union_exprt&gt;(expr))</div>
-<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;  {</div>
-<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*union_construction, converted);</div>
-<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;  }</div>
-<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> constant_literal = expr_try_dynamic_cast&lt;constant_exprt&gt;(expr))</div>
-<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;  {</div>
-<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*constant_literal);</div>
-<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;  }</div>
-<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> concatenation = expr_try_dynamic_cast&lt;concatenation_exprt&gt;(expr))</div>
-<div class="line"><a name="l01505"></a><span class="lineno"> 1505</span>&#160;  {</div>
-<div class="line"><a name="l01506"></a><span class="lineno"> 1506</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*concatenation, converted);</div>
-<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160;  }</div>
-<div class="line"><a name="l01508"></a><span class="lineno"> 1508</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> bitwise_and_expr = expr_try_dynamic_cast&lt;bitand_exprt&gt;(expr))</div>
-<div class="line"><a name="l01509"></a><span class="lineno"> 1509</span>&#160;  {</div>
-<div class="line"><a name="l01510"></a><span class="lineno"> 1510</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*bitwise_and_expr, converted);</div>
-<div class="line"><a name="l01511"></a><span class="lineno"> 1511</span>&#160;  }</div>
-<div class="line"><a name="l01512"></a><span class="lineno"> 1512</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> bitwise_or_expr = expr_try_dynamic_cast&lt;bitor_exprt&gt;(expr))</div>
-<div class="line"><a name="l01513"></a><span class="lineno"> 1513</span>&#160;  {</div>
-<div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*bitwise_or_expr, converted);</div>
-<div class="line"><a name="l01515"></a><span class="lineno"> 1515</span>&#160;  }</div>
-<div class="line"><a name="l01516"></a><span class="lineno"> 1516</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="mp__arith_8cpp.html#a90ece0bd60c9aa9fe978c5907b6c75c5">bitwise_xor</a> = expr_try_dynamic_cast&lt;bitxor_exprt&gt;(expr))</div>
-<div class="line"><a name="l01517"></a><span class="lineno"> 1517</span>&#160;  {</div>
-<div class="line"><a name="l01518"></a><span class="lineno"> 1518</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="mp__arith_8cpp.html#a90ece0bd60c9aa9fe978c5907b6c75c5">bitwise_xor</a>, converted);</div>
-<div class="line"><a name="l01519"></a><span class="lineno"> 1519</span>&#160;  }</div>
-<div class="line"><a name="l01520"></a><span class="lineno"> 1520</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> bitwise_not = expr_try_dynamic_cast&lt;bitnot_exprt&gt;(expr))</div>
-<div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160;  {</div>
-<div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*bitwise_not, converted);</div>
-<div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;  }</div>
-<div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> unary_minus = expr_try_dynamic_cast&lt;unary_minus_exprt&gt;(expr))</div>
-<div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160;  {</div>
-<div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*unary_minus, converted);</div>
-<div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;  }</div>
-<div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> unary_plus = expr_try_dynamic_cast&lt;unary_plus_exprt&gt;(expr))</div>
-<div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;  {</div>
-<div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*unary_plus, converted);</div>
-<div class="line"><a name="l01531"></a><span class="lineno"> 1531</span>&#160;  }</div>
-<div class="line"><a name="l01532"></a><span class="lineno"> 1532</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_negative = expr_try_dynamic_cast&lt;sign_exprt&gt;(expr))</div>
-<div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;  {</div>
-<div class="line"><a name="l01534"></a><span class="lineno"> 1534</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_negative, converted);</div>
-<div class="line"><a name="l01535"></a><span class="lineno"> 1535</span>&#160;  }</div>
-<div class="line"><a name="l01536"></a><span class="lineno"> 1536</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> if_expression = expr_try_dynamic_cast&lt;if_exprt&gt;(expr))</div>
-<div class="line"><a name="l01537"></a><span class="lineno"> 1537</span>&#160;  {</div>
-<div class="line"><a name="l01538"></a><span class="lineno"> 1538</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*if_expression, converted);</div>
-<div class="line"><a name="l01539"></a><span class="lineno"> 1539</span>&#160;  }</div>
-<div class="line"><a name="l01540"></a><span class="lineno"> 1540</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> and_expression = expr_try_dynamic_cast&lt;and_exprt&gt;(expr))</div>
-<div class="line"><a name="l01541"></a><span class="lineno"> 1541</span>&#160;  {</div>
-<div class="line"><a name="l01542"></a><span class="lineno"> 1542</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*and_expression, converted);</div>
-<div class="line"><a name="l01543"></a><span class="lineno"> 1543</span>&#160;  }</div>
-<div class="line"><a name="l01544"></a><span class="lineno"> 1544</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> or_expression = expr_try_dynamic_cast&lt;or_exprt&gt;(expr))</div>
-<div class="line"><a name="l01545"></a><span class="lineno"> 1545</span>&#160;  {</div>
-<div class="line"><a name="l01546"></a><span class="lineno"> 1546</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*or_expression, converted);</div>
-<div class="line"><a name="l01547"></a><span class="lineno"> 1547</span>&#160;  }</div>
-<div class="line"><a name="l01548"></a><span class="lineno"> 1548</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> xor_expression = expr_try_dynamic_cast&lt;xor_exprt&gt;(expr))</div>
-<div class="line"><a name="l01549"></a><span class="lineno"> 1549</span>&#160;  {</div>
-<div class="line"><a name="l01550"></a><span class="lineno"> 1550</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*xor_expression, converted);</div>
-<div class="line"><a name="l01551"></a><span class="lineno"> 1551</span>&#160;  }</div>
-<div class="line"><a name="l01552"></a><span class="lineno"> 1552</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> implies = expr_try_dynamic_cast&lt;implies_exprt&gt;(expr))</div>
-<div class="line"><a name="l01553"></a><span class="lineno"> 1553</span>&#160;  {</div>
-<div class="line"><a name="l01554"></a><span class="lineno"> 1554</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*implies, converted);</div>
-<div class="line"><a name="l01555"></a><span class="lineno"> 1555</span>&#160;  }</div>
-<div class="line"><a name="l01556"></a><span class="lineno"> 1556</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> logical_not = expr_try_dynamic_cast&lt;not_exprt&gt;(expr))</div>
-<div class="line"><a name="l01557"></a><span class="lineno"> 1557</span>&#160;  {</div>
-<div class="line"><a name="l01558"></a><span class="lineno"> 1558</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*logical_not, converted);</div>
-<div class="line"><a name="l01559"></a><span class="lineno"> 1559</span>&#160;  }</div>
-<div class="line"><a name="l01560"></a><span class="lineno"> 1560</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> equal = expr_try_dynamic_cast&lt;equal_exprt&gt;(expr))</div>
-<div class="line"><a name="l01561"></a><span class="lineno"> 1561</span>&#160;  {</div>
-<div class="line"><a name="l01562"></a><span class="lineno"> 1562</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*equal, converted);</div>
-<div class="line"><a name="l01563"></a><span class="lineno"> 1563</span>&#160;  }</div>
-<div class="line"><a name="l01564"></a><span class="lineno"> 1564</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> not_equal = expr_try_dynamic_cast&lt;notequal_exprt&gt;(expr))</div>
-<div class="line"><a name="l01565"></a><span class="lineno"> 1565</span>&#160;  {</div>
-<div class="line"><a name="l01566"></a><span class="lineno"> 1566</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*not_equal, converted);</div>
-<div class="line"><a name="l01567"></a><span class="lineno"> 1567</span>&#160;  }</div>
-<div class="line"><a name="l01568"></a><span class="lineno"> 1568</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01569"></a><span class="lineno"> 1569</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> float_equal =</div>
-<div class="line"><a name="l01570"></a><span class="lineno"> 1570</span>&#160;      expr_try_dynamic_cast&lt;ieee_float_equal_exprt&gt;(expr))</div>
+<div class="line"><a name="l01466"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#a9d1df801ca4b94848a7d042ae7b3bce8"> 1466</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classsmt__termt.html">smt_termt</a> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(</div>
+<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  <span class="keyword">const</span> <a class="code" href="classprophecy__r__or__w__ok__exprt.html">prophecy_r_or_w_ok_exprt</a> &amp;prophecy_r_or_w_ok,</div>
+<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;  <span class="keyword">const</span> <a class="code" href="convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20">sub_expression_mapt</a> &amp;converted)</div>
+<div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;{</div>
+<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#af74d5ce38d0812bbe162fc4edbde7134">UNREACHABLE_BECAUSE</a>(</div>
+<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160;    <span class="stringliteral">&quot;prophecy_r_or_w_ok expression should have been lowered by the decision &quot;</span></div>
+<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160;    <span class="stringliteral">&quot;procedure before conversion to smt terms&quot;</span>);</div>
+<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;}</div>
+<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160; </div>
+<div class="line"><a name="l01475"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#ae9f426fff2f1bcb763885cb5638f9931"> 1475</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classsmt__termt.html">smt_termt</a> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(</div>
+<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;  <span class="keyword">const</span> <a class="code" href="classprophecy__pointer__in__range__exprt.html">prophecy_pointer_in_range_exprt</a> &amp;prophecy_pointer_in_range,</div>
+<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;  <span class="keyword">const</span> <a class="code" href="convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20">sub_expression_mapt</a> &amp;converted)</div>
+<div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;{</div>
+<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#af74d5ce38d0812bbe162fc4edbde7134">UNREACHABLE_BECAUSE</a>(</div>
+<div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;    <span class="stringliteral">&quot;prophecy_pointer_in_range expression should have been lowered by the &quot;</span></div>
+<div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160;    <span class="stringliteral">&quot;decision procedure before conversion to smt terms&quot;</span>);</div>
+<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;}</div>
+<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160; </div>
+<div class="line"><a name="l01484"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0"> 1484</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classsmt__termt.html">smt_termt</a> <a class="code" href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0">dispatch_expr_to_smt_conversion</a>(</div>
+<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;  <span class="keyword">const</span> <a class="code" href="convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20">sub_expression_mapt</a> &amp;converted,</div>
+<div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160;  <span class="keyword">const</span> <a class="code" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map,</div>
+<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;  <span class="keyword">const</span> <a class="code" href="type__size__mapping_8h.html#a75319e37b6206e23f94a56ca388322f5">type_size_mapt</a> &amp;pointer_sizes,</div>
+<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_object_sizet::make_applicationt</a> &amp;call_object_size,</div>
+<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_is_dynamic_objectt::make_applicationt</a> &amp;apply_is_dynamic_object)</div>
+<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;{</div>
+<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> symbol = expr_try_dynamic_cast&lt;symbol_exprt&gt;(expr))</div>
+<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160;  {</div>
+<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*symbol);</div>
+<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;  }</div>
+<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> nondet = expr_try_dynamic_cast&lt;nondet_symbol_exprt&gt;(expr))</div>
+<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160;  {</div>
+<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*nondet, converted);</div>
+<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;  }</div>
+<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> cast = expr_try_dynamic_cast&lt;typecast_exprt&gt;(expr))</div>
+<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;  {</div>
+<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*cast, converted);</div>
+<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;  }</div>
+<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01505"></a><span class="lineno"> 1505</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> float_cast = expr_try_dynamic_cast&lt;floatbv_typecast_exprt&gt;(expr))</div>
+<div class="line"><a name="l01506"></a><span class="lineno"> 1506</span>&#160;  {</div>
+<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*float_cast, converted);</div>
+<div class="line"><a name="l01508"></a><span class="lineno"> 1508</span>&#160;  }</div>
+<div class="line"><a name="l01509"></a><span class="lineno"> 1509</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> struct_construction = expr_try_dynamic_cast&lt;struct_exprt&gt;(expr))</div>
+<div class="line"><a name="l01510"></a><span class="lineno"> 1510</span>&#160;  {</div>
+<div class="line"><a name="l01511"></a><span class="lineno"> 1511</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*struct_construction, converted);</div>
+<div class="line"><a name="l01512"></a><span class="lineno"> 1512</span>&#160;  }</div>
+<div class="line"><a name="l01513"></a><span class="lineno"> 1513</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> union_construction = expr_try_dynamic_cast&lt;union_exprt&gt;(expr))</div>
+<div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160;  {</div>
+<div class="line"><a name="l01515"></a><span class="lineno"> 1515</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*union_construction, converted);</div>
+<div class="line"><a name="l01516"></a><span class="lineno"> 1516</span>&#160;  }</div>
+<div class="line"><a name="l01517"></a><span class="lineno"> 1517</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> constant_literal = expr_try_dynamic_cast&lt;constant_exprt&gt;(expr))</div>
+<div class="line"><a name="l01518"></a><span class="lineno"> 1518</span>&#160;  {</div>
+<div class="line"><a name="l01519"></a><span class="lineno"> 1519</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*constant_literal);</div>
+<div class="line"><a name="l01520"></a><span class="lineno"> 1520</span>&#160;  }</div>
+<div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> concatenation = expr_try_dynamic_cast&lt;concatenation_exprt&gt;(expr))</div>
+<div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;  {</div>
+<div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*concatenation, converted);</div>
+<div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160;  }</div>
+<div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> bitwise_and_expr = expr_try_dynamic_cast&lt;bitand_exprt&gt;(expr))</div>
+<div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;  {</div>
+<div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*bitwise_and_expr, converted);</div>
+<div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;  }</div>
+<div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> bitwise_or_expr = expr_try_dynamic_cast&lt;bitor_exprt&gt;(expr))</div>
+<div class="line"><a name="l01531"></a><span class="lineno"> 1531</span>&#160;  {</div>
+<div class="line"><a name="l01532"></a><span class="lineno"> 1532</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*bitwise_or_expr, converted);</div>
+<div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;  }</div>
+<div class="line"><a name="l01534"></a><span class="lineno"> 1534</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="mp__arith_8cpp.html#a90ece0bd60c9aa9fe978c5907b6c75c5">bitwise_xor</a> = expr_try_dynamic_cast&lt;bitxor_exprt&gt;(expr))</div>
+<div class="line"><a name="l01535"></a><span class="lineno"> 1535</span>&#160;  {</div>
+<div class="line"><a name="l01536"></a><span class="lineno"> 1536</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="mp__arith_8cpp.html#a90ece0bd60c9aa9fe978c5907b6c75c5">bitwise_xor</a>, converted);</div>
+<div class="line"><a name="l01537"></a><span class="lineno"> 1537</span>&#160;  }</div>
+<div class="line"><a name="l01538"></a><span class="lineno"> 1538</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> bitwise_not = expr_try_dynamic_cast&lt;bitnot_exprt&gt;(expr))</div>
+<div class="line"><a name="l01539"></a><span class="lineno"> 1539</span>&#160;  {</div>
+<div class="line"><a name="l01540"></a><span class="lineno"> 1540</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*bitwise_not, converted);</div>
+<div class="line"><a name="l01541"></a><span class="lineno"> 1541</span>&#160;  }</div>
+<div class="line"><a name="l01542"></a><span class="lineno"> 1542</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> unary_minus = expr_try_dynamic_cast&lt;unary_minus_exprt&gt;(expr))</div>
+<div class="line"><a name="l01543"></a><span class="lineno"> 1543</span>&#160;  {</div>
+<div class="line"><a name="l01544"></a><span class="lineno"> 1544</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*unary_minus, converted);</div>
+<div class="line"><a name="l01545"></a><span class="lineno"> 1545</span>&#160;  }</div>
+<div class="line"><a name="l01546"></a><span class="lineno"> 1546</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> unary_plus = expr_try_dynamic_cast&lt;unary_plus_exprt&gt;(expr))</div>
+<div class="line"><a name="l01547"></a><span class="lineno"> 1547</span>&#160;  {</div>
+<div class="line"><a name="l01548"></a><span class="lineno"> 1548</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*unary_plus, converted);</div>
+<div class="line"><a name="l01549"></a><span class="lineno"> 1549</span>&#160;  }</div>
+<div class="line"><a name="l01550"></a><span class="lineno"> 1550</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_negative = expr_try_dynamic_cast&lt;sign_exprt&gt;(expr))</div>
+<div class="line"><a name="l01551"></a><span class="lineno"> 1551</span>&#160;  {</div>
+<div class="line"><a name="l01552"></a><span class="lineno"> 1552</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_negative, converted);</div>
+<div class="line"><a name="l01553"></a><span class="lineno"> 1553</span>&#160;  }</div>
+<div class="line"><a name="l01554"></a><span class="lineno"> 1554</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> if_expression = expr_try_dynamic_cast&lt;if_exprt&gt;(expr))</div>
+<div class="line"><a name="l01555"></a><span class="lineno"> 1555</span>&#160;  {</div>
+<div class="line"><a name="l01556"></a><span class="lineno"> 1556</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*if_expression, converted);</div>
+<div class="line"><a name="l01557"></a><span class="lineno"> 1557</span>&#160;  }</div>
+<div class="line"><a name="l01558"></a><span class="lineno"> 1558</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> and_expression = expr_try_dynamic_cast&lt;and_exprt&gt;(expr))</div>
+<div class="line"><a name="l01559"></a><span class="lineno"> 1559</span>&#160;  {</div>
+<div class="line"><a name="l01560"></a><span class="lineno"> 1560</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*and_expression, converted);</div>
+<div class="line"><a name="l01561"></a><span class="lineno"> 1561</span>&#160;  }</div>
+<div class="line"><a name="l01562"></a><span class="lineno"> 1562</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> or_expression = expr_try_dynamic_cast&lt;or_exprt&gt;(expr))</div>
+<div class="line"><a name="l01563"></a><span class="lineno"> 1563</span>&#160;  {</div>
+<div class="line"><a name="l01564"></a><span class="lineno"> 1564</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*or_expression, converted);</div>
+<div class="line"><a name="l01565"></a><span class="lineno"> 1565</span>&#160;  }</div>
+<div class="line"><a name="l01566"></a><span class="lineno"> 1566</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> xor_expression = expr_try_dynamic_cast&lt;xor_exprt&gt;(expr))</div>
+<div class="line"><a name="l01567"></a><span class="lineno"> 1567</span>&#160;  {</div>
+<div class="line"><a name="l01568"></a><span class="lineno"> 1568</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*xor_expression, converted);</div>
+<div class="line"><a name="l01569"></a><span class="lineno"> 1569</span>&#160;  }</div>
+<div class="line"><a name="l01570"></a><span class="lineno"> 1570</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> implies = expr_try_dynamic_cast&lt;implies_exprt&gt;(expr))</div>
 <div class="line"><a name="l01571"></a><span class="lineno"> 1571</span>&#160;  {</div>
-<div class="line"><a name="l01572"></a><span class="lineno"> 1572</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*float_equal, converted);</div>
+<div class="line"><a name="l01572"></a><span class="lineno"> 1572</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*implies, converted);</div>
 <div class="line"><a name="l01573"></a><span class="lineno"> 1573</span>&#160;  }</div>
-<div class="line"><a name="l01574"></a><span class="lineno"> 1574</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01575"></a><span class="lineno"> 1575</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> float_not_equal =</div>
-<div class="line"><a name="l01576"></a><span class="lineno"> 1576</span>&#160;      expr_try_dynamic_cast&lt;ieee_float_notequal_exprt&gt;(expr))</div>
-<div class="line"><a name="l01577"></a><span class="lineno"> 1577</span>&#160;  {</div>
-<div class="line"><a name="l01578"></a><span class="lineno"> 1578</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*float_not_equal, converted);</div>
-<div class="line"><a name="l01579"></a><span class="lineno"> 1579</span>&#160;  }</div>
-<div class="line"><a name="l01580"></a><span class="lineno"> 1580</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01581"></a><span class="lineno"> 1581</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> converted_relational =</div>
-<div class="line"><a name="l01582"></a><span class="lineno"> 1582</span>&#160;      <a class="code" href="convert__expr__to__smt_8cpp.html#a76064b8e5595b6c431702fc6d25c5ba1">try_relational_conversion</a>(expr, converted))</div>
+<div class="line"><a name="l01574"></a><span class="lineno"> 1574</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> logical_not = expr_try_dynamic_cast&lt;not_exprt&gt;(expr))</div>
+<div class="line"><a name="l01575"></a><span class="lineno"> 1575</span>&#160;  {</div>
+<div class="line"><a name="l01576"></a><span class="lineno"> 1576</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*logical_not, converted);</div>
+<div class="line"><a name="l01577"></a><span class="lineno"> 1577</span>&#160;  }</div>
+<div class="line"><a name="l01578"></a><span class="lineno"> 1578</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> equal = expr_try_dynamic_cast&lt;equal_exprt&gt;(expr))</div>
+<div class="line"><a name="l01579"></a><span class="lineno"> 1579</span>&#160;  {</div>
+<div class="line"><a name="l01580"></a><span class="lineno"> 1580</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*equal, converted);</div>
+<div class="line"><a name="l01581"></a><span class="lineno"> 1581</span>&#160;  }</div>
+<div class="line"><a name="l01582"></a><span class="lineno"> 1582</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> not_equal = expr_try_dynamic_cast&lt;notequal_exprt&gt;(expr))</div>
 <div class="line"><a name="l01583"></a><span class="lineno"> 1583</span>&#160;  {</div>
-<div class="line"><a name="l01584"></a><span class="lineno"> 1584</span>&#160;    <span class="keywordflow">return</span> *converted_relational;</div>
+<div class="line"><a name="l01584"></a><span class="lineno"> 1584</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*not_equal, converted);</div>
 <div class="line"><a name="l01585"></a><span class="lineno"> 1585</span>&#160;  }</div>
-<div class="line"><a name="l01586"></a><span class="lineno"> 1586</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> plus = expr_try_dynamic_cast&lt;plus_exprt&gt;(expr))</div>
-<div class="line"><a name="l01587"></a><span class="lineno"> 1587</span>&#160;  {</div>
-<div class="line"><a name="l01588"></a><span class="lineno"> 1588</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*plus, converted, pointer_sizes);</div>
-<div class="line"><a name="l01589"></a><span class="lineno"> 1589</span>&#160;  }</div>
-<div class="line"><a name="l01590"></a><span class="lineno"> 1590</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> minus = expr_try_dynamic_cast&lt;minus_exprt&gt;(expr))</div>
-<div class="line"><a name="l01591"></a><span class="lineno"> 1591</span>&#160;  {</div>
-<div class="line"><a name="l01592"></a><span class="lineno"> 1592</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*minus, converted, pointer_sizes);</div>
-<div class="line"><a name="l01593"></a><span class="lineno"> 1593</span>&#160;  }</div>
-<div class="line"><a name="l01594"></a><span class="lineno"> 1594</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> divide = expr_try_dynamic_cast&lt;div_exprt&gt;(expr))</div>
+<div class="line"><a name="l01586"></a><span class="lineno"> 1586</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01587"></a><span class="lineno"> 1587</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> float_equal =</div>
+<div class="line"><a name="l01588"></a><span class="lineno"> 1588</span>&#160;      expr_try_dynamic_cast&lt;ieee_float_equal_exprt&gt;(expr))</div>
+<div class="line"><a name="l01589"></a><span class="lineno"> 1589</span>&#160;  {</div>
+<div class="line"><a name="l01590"></a><span class="lineno"> 1590</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*float_equal, converted);</div>
+<div class="line"><a name="l01591"></a><span class="lineno"> 1591</span>&#160;  }</div>
+<div class="line"><a name="l01592"></a><span class="lineno"> 1592</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01593"></a><span class="lineno"> 1593</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> float_not_equal =</div>
+<div class="line"><a name="l01594"></a><span class="lineno"> 1594</span>&#160;      expr_try_dynamic_cast&lt;ieee_float_notequal_exprt&gt;(expr))</div>
 <div class="line"><a name="l01595"></a><span class="lineno"> 1595</span>&#160;  {</div>
-<div class="line"><a name="l01596"></a><span class="lineno"> 1596</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*divide, converted);</div>
+<div class="line"><a name="l01596"></a><span class="lineno"> 1596</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*float_not_equal, converted);</div>
 <div class="line"><a name="l01597"></a><span class="lineno"> 1597</span>&#160;  }</div>
 <div class="line"><a name="l01598"></a><span class="lineno"> 1598</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01599"></a><span class="lineno"> 1599</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> float_operation =</div>
-<div class="line"><a name="l01600"></a><span class="lineno"> 1600</span>&#160;      expr_try_dynamic_cast&lt;ieee_float_op_exprt&gt;(expr))</div>
+<div class="line"><a name="l01599"></a><span class="lineno"> 1599</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> converted_relational =</div>
+<div class="line"><a name="l01600"></a><span class="lineno"> 1600</span>&#160;      <a class="code" href="convert__expr__to__smt_8cpp.html#a76064b8e5595b6c431702fc6d25c5ba1">try_relational_conversion</a>(expr, converted))</div>
 <div class="line"><a name="l01601"></a><span class="lineno"> 1601</span>&#160;  {</div>
-<div class="line"><a name="l01602"></a><span class="lineno"> 1602</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*float_operation, converted);</div>
+<div class="line"><a name="l01602"></a><span class="lineno"> 1602</span>&#160;    <span class="keywordflow">return</span> *converted_relational;</div>
 <div class="line"><a name="l01603"></a><span class="lineno"> 1603</span>&#160;  }</div>
-<div class="line"><a name="l01604"></a><span class="lineno"> 1604</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> truncation_modulo = expr_try_dynamic_cast&lt;mod_exprt&gt;(expr))</div>
+<div class="line"><a name="l01604"></a><span class="lineno"> 1604</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> plus = expr_try_dynamic_cast&lt;plus_exprt&gt;(expr))</div>
 <div class="line"><a name="l01605"></a><span class="lineno"> 1605</span>&#160;  {</div>
-<div class="line"><a name="l01606"></a><span class="lineno"> 1606</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*truncation_modulo, converted);</div>
+<div class="line"><a name="l01606"></a><span class="lineno"> 1606</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*plus, converted, pointer_sizes);</div>
 <div class="line"><a name="l01607"></a><span class="lineno"> 1607</span>&#160;  }</div>
-<div class="line"><a name="l01608"></a><span class="lineno"> 1608</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01609"></a><span class="lineno"> 1609</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> euclidean_modulo =</div>
-<div class="line"><a name="l01610"></a><span class="lineno"> 1610</span>&#160;      expr_try_dynamic_cast&lt;euclidean_mod_exprt&gt;(expr))</div>
-<div class="line"><a name="l01611"></a><span class="lineno"> 1611</span>&#160;  {</div>
-<div class="line"><a name="l01612"></a><span class="lineno"> 1612</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*euclidean_modulo, converted);</div>
-<div class="line"><a name="l01613"></a><span class="lineno"> 1613</span>&#160;  }</div>
-<div class="line"><a name="l01614"></a><span class="lineno"> 1614</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> multiply = expr_try_dynamic_cast&lt;mult_exprt&gt;(expr))</div>
-<div class="line"><a name="l01615"></a><span class="lineno"> 1615</span>&#160;  {</div>
-<div class="line"><a name="l01616"></a><span class="lineno"> 1616</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*multiply, converted);</div>
-<div class="line"><a name="l01617"></a><span class="lineno"> 1617</span>&#160;  }</div>
-<div class="line"><a name="l01618"></a><span class="lineno"> 1618</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l01619"></a><span class="lineno"> 1619</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_floatbv_rem)</div>
-<div class="line"><a name="l01620"></a><span class="lineno"> 1620</span>&#160;  {</div>
-<div class="line"><a name="l01621"></a><span class="lineno"> 1621</span>&#160;    convert_floatbv_rem(<a class="code" href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a>(expr));</div>
-<div class="line"><a name="l01622"></a><span class="lineno"> 1622</span>&#160;  }</div>
-<div class="line"><a name="l01623"></a><span class="lineno"> 1623</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01624"></a><span class="lineno"> 1624</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> address_of = expr_try_dynamic_cast&lt;address_of_exprt&gt;(expr))</div>
-<div class="line"><a name="l01625"></a><span class="lineno"> 1625</span>&#160;  {</div>
-<div class="line"><a name="l01626"></a><span class="lineno"> 1626</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*address_of, converted, object_map);</div>
-<div class="line"><a name="l01627"></a><span class="lineno"> 1627</span>&#160;  }</div>
-<div class="line"><a name="l01628"></a><span class="lineno"> 1628</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> array_of = expr_try_dynamic_cast&lt;array_of_exprt&gt;(expr))</div>
+<div class="line"><a name="l01608"></a><span class="lineno"> 1608</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> minus = expr_try_dynamic_cast&lt;minus_exprt&gt;(expr))</div>
+<div class="line"><a name="l01609"></a><span class="lineno"> 1609</span>&#160;  {</div>
+<div class="line"><a name="l01610"></a><span class="lineno"> 1610</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*minus, converted, pointer_sizes);</div>
+<div class="line"><a name="l01611"></a><span class="lineno"> 1611</span>&#160;  }</div>
+<div class="line"><a name="l01612"></a><span class="lineno"> 1612</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> divide = expr_try_dynamic_cast&lt;div_exprt&gt;(expr))</div>
+<div class="line"><a name="l01613"></a><span class="lineno"> 1613</span>&#160;  {</div>
+<div class="line"><a name="l01614"></a><span class="lineno"> 1614</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*divide, converted);</div>
+<div class="line"><a name="l01615"></a><span class="lineno"> 1615</span>&#160;  }</div>
+<div class="line"><a name="l01616"></a><span class="lineno"> 1616</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01617"></a><span class="lineno"> 1617</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> float_operation =</div>
+<div class="line"><a name="l01618"></a><span class="lineno"> 1618</span>&#160;      expr_try_dynamic_cast&lt;ieee_float_op_exprt&gt;(expr))</div>
+<div class="line"><a name="l01619"></a><span class="lineno"> 1619</span>&#160;  {</div>
+<div class="line"><a name="l01620"></a><span class="lineno"> 1620</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*float_operation, converted);</div>
+<div class="line"><a name="l01621"></a><span class="lineno"> 1621</span>&#160;  }</div>
+<div class="line"><a name="l01622"></a><span class="lineno"> 1622</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> truncation_modulo = expr_try_dynamic_cast&lt;mod_exprt&gt;(expr))</div>
+<div class="line"><a name="l01623"></a><span class="lineno"> 1623</span>&#160;  {</div>
+<div class="line"><a name="l01624"></a><span class="lineno"> 1624</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*truncation_modulo, converted);</div>
+<div class="line"><a name="l01625"></a><span class="lineno"> 1625</span>&#160;  }</div>
+<div class="line"><a name="l01626"></a><span class="lineno"> 1626</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01627"></a><span class="lineno"> 1627</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> euclidean_modulo =</div>
+<div class="line"><a name="l01628"></a><span class="lineno"> 1628</span>&#160;      expr_try_dynamic_cast&lt;euclidean_mod_exprt&gt;(expr))</div>
 <div class="line"><a name="l01629"></a><span class="lineno"> 1629</span>&#160;  {</div>
-<div class="line"><a name="l01630"></a><span class="lineno"> 1630</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*array_of, converted);</div>
+<div class="line"><a name="l01630"></a><span class="lineno"> 1630</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*euclidean_modulo, converted);</div>
 <div class="line"><a name="l01631"></a><span class="lineno"> 1631</span>&#160;  }</div>
-<div class="line"><a name="l01632"></a><span class="lineno"> 1632</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01633"></a><span class="lineno"> 1633</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> array_comprehension =</div>
-<div class="line"><a name="l01634"></a><span class="lineno"> 1634</span>&#160;      expr_try_dynamic_cast&lt;array_comprehension_exprt&gt;(expr))</div>
-<div class="line"><a name="l01635"></a><span class="lineno"> 1635</span>&#160;  {</div>
-<div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*array_comprehension, converted);</div>
-<div class="line"><a name="l01637"></a><span class="lineno"> 1637</span>&#160;  }</div>
-<div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> index = expr_try_dynamic_cast&lt;index_exprt&gt;(expr))</div>
-<div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160;  {</div>
-<div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*index, converted);</div>
-<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;  }</div>
-<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> shift = expr_try_dynamic_cast&lt;shift_exprt&gt;(expr))</div>
+<div class="line"><a name="l01632"></a><span class="lineno"> 1632</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> multiply = expr_try_dynamic_cast&lt;mult_exprt&gt;(expr))</div>
+<div class="line"><a name="l01633"></a><span class="lineno"> 1633</span>&#160;  {</div>
+<div class="line"><a name="l01634"></a><span class="lineno"> 1634</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*multiply, converted);</div>
+<div class="line"><a name="l01635"></a><span class="lineno"> 1635</span>&#160;  }</div>
+<div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160;<span class="preprocessor">#if 0</span></div>
+<div class="line"><a name="l01637"></a><span class="lineno"> 1637</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_floatbv_rem)</div>
+<div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160;  {</div>
+<div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160;    convert_floatbv_rem(<a class="code" href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a>(expr));</div>
+<div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160;  }</div>
+<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> address_of = expr_try_dynamic_cast&lt;address_of_exprt&gt;(expr))</div>
 <div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160;  {</div>
-<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*shift, converted);</div>
+<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*address_of, converted, object_map);</div>
 <div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;  }</div>
-<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> with = expr_try_dynamic_cast&lt;with_exprt&gt;(expr))</div>
+<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> array_of = expr_try_dynamic_cast&lt;array_of_exprt&gt;(expr))</div>
 <div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160;  {</div>
-<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*with, converted);</div>
+<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*array_of, converted);</div>
 <div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160;  }</div>
-<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> update = expr_try_dynamic_cast&lt;update_exprt&gt;(expr))</div>
-<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160;  {</div>
-<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*update, converted);</div>
-<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160;  }</div>
-<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> member_extraction = expr_try_dynamic_cast&lt;member_exprt&gt;(expr))</div>
-<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;  {</div>
-<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*member_extraction, converted);</div>
-<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;  }</div>
-<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="pointer__predicates_8cpp.html#a03b416de1d698416f9155220667b0c49">pointer_offset</a> =</div>
-<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;      expr_try_dynamic_cast&lt;pointer_offset_exprt&gt;(expr))</div>
+<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> array_comprehension =</div>
+<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160;      expr_try_dynamic_cast&lt;array_comprehension_exprt&gt;(expr))</div>
+<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160;  {</div>
+<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*array_comprehension, converted);</div>
+<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;  }</div>
+<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> index = expr_try_dynamic_cast&lt;index_exprt&gt;(expr))</div>
+<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;  {</div>
+<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*index, converted);</div>
+<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;  }</div>
+<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> shift = expr_try_dynamic_cast&lt;shift_exprt&gt;(expr))</div>
 <div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160;  {</div>
-<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="pointer__predicates_8cpp.html#a03b416de1d698416f9155220667b0c49">pointer_offset</a>, converted);</div>
+<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*shift, converted);</div>
 <div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;  }</div>
-<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="pointer__predicates_8cpp.html#aedc5ba32dfea1977d44bc0cad99f9763">pointer_object</a> =</div>
-<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;      expr_try_dynamic_cast&lt;pointer_object_exprt&gt;(expr))</div>
-<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160;  {</div>
-<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="pointer__predicates_8cpp.html#aedc5ba32dfea1977d44bc0cad99f9763">pointer_object</a>, converted);</div>
-<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160;  }</div>
-<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> is_dynamic_object =</div>
-<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;      expr_try_dynamic_cast&lt;is_dynamic_object_exprt&gt;(expr))</div>
+<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> with = expr_try_dynamic_cast&lt;with_exprt&gt;(expr))</div>
+<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;  {</div>
+<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*with, converted);</div>
+<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160;  }</div>
+<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> update = expr_try_dynamic_cast&lt;update_exprt&gt;(expr))</div>
+<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160;  {</div>
+<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*update, converted);</div>
+<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160;  }</div>
+<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> member_extraction = expr_try_dynamic_cast&lt;member_exprt&gt;(expr))</div>
 <div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160;  {</div>
-<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(</div>
-<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;      *is_dynamic_object, converted, apply_is_dynamic_object);</div>
-<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;  }</div>
-<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> is_invalid_pointer =</div>
-<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;      expr_try_dynamic_cast&lt;is_invalid_pointer_exprt&gt;(expr))</div>
-<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160;  {</div>
-<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_invalid_pointer, object_map, converted);</div>
-<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;  }</div>
-<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> string_constant = expr_try_dynamic_cast&lt;string_constantt&gt;(expr))</div>
-<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160;  {</div>
-<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*string_constant, converted);</div>
-<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;  }</div>
-<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> extract_bit = expr_try_dynamic_cast&lt;extractbit_exprt&gt;(expr))</div>
-<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;  {</div>
-<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*extract_bit, converted);</div>
-<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;  }</div>
-<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> extract_bits = expr_try_dynamic_cast&lt;extractbits_exprt&gt;(expr))</div>
-<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;  {</div>
-<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*extract_bits, converted);</div>
+<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*member_extraction, converted);</div>
+<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;  }</div>
+<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="pointer__predicates_8cpp.html#a03b416de1d698416f9155220667b0c49">pointer_offset</a> =</div>
+<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160;      expr_try_dynamic_cast&lt;pointer_offset_exprt&gt;(expr))</div>
+<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;  {</div>
+<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="pointer__predicates_8cpp.html#a03b416de1d698416f9155220667b0c49">pointer_offset</a>, converted);</div>
+<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;  }</div>
+<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="pointer__predicates_8cpp.html#aedc5ba32dfea1977d44bc0cad99f9763">pointer_object</a> =</div>
+<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160;      expr_try_dynamic_cast&lt;pointer_object_exprt&gt;(expr))</div>
+<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160;  {</div>
+<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="pointer__predicates_8cpp.html#aedc5ba32dfea1977d44bc0cad99f9763">pointer_object</a>, converted);</div>
+<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;  }</div>
+<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> is_dynamic_object =</div>
+<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;      expr_try_dynamic_cast&lt;is_dynamic_object_exprt&gt;(expr))</div>
+<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;  {</div>
+<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(</div>
+<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;      *is_dynamic_object, converted, apply_is_dynamic_object);</div>
 <div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160;  }</div>
-<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> replication = expr_try_dynamic_cast&lt;replication_exprt&gt;(expr))</div>
-<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160;  {</div>
-<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*replication, converted);</div>
-<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160;  }</div>
-<div class="line"><a name="l01699"></a><span class="lineno"> 1699</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> byte_extraction =</div>
-<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;      expr_try_dynamic_cast&lt;byte_extract_exprt&gt;(expr))</div>
+<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> is_invalid_pointer =</div>
+<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160;      expr_try_dynamic_cast&lt;is_invalid_pointer_exprt&gt;(expr))</div>
+<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160;  {</div>
+<div class="line"><a name="l01699"></a><span class="lineno"> 1699</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_invalid_pointer, object_map, converted);</div>
+<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160;  }</div>
+<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> string_constant = expr_try_dynamic_cast&lt;string_constantt&gt;(expr))</div>
 <div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160;  {</div>
-<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*byte_extraction, converted);</div>
+<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*string_constant, converted);</div>
 <div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;  }</div>
-<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> byte_update = expr_try_dynamic_cast&lt;byte_update_exprt&gt;(expr))</div>
+<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> extract_bit = expr_try_dynamic_cast&lt;extractbit_exprt&gt;(expr))</div>
 <div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;  {</div>
-<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*byte_update, converted);</div>
+<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*extract_bit, converted);</div>
 <div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160;  }</div>
-<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> absolute_value_of = expr_try_dynamic_cast&lt;abs_exprt&gt;(expr))</div>
+<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> extract_bits = expr_try_dynamic_cast&lt;extractbits_exprt&gt;(expr))</div>
 <div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160;  {</div>
-<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*absolute_value_of, converted);</div>
+<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*extract_bits, converted);</div>
 <div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;  }</div>
-<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_nan_expr = expr_try_dynamic_cast&lt;isnan_exprt&gt;(expr))</div>
+<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> replication = expr_try_dynamic_cast&lt;replication_exprt&gt;(expr))</div>
 <div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;  {</div>
-<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_nan_expr, converted);</div>
+<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*replication, converted);</div>
 <div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;  }</div>
-<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_finite_expr = expr_try_dynamic_cast&lt;isfinite_exprt&gt;(expr))</div>
-<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160;  {</div>
-<div class="line"><a name="l01719"></a><span class="lineno"> 1719</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_finite_expr, converted);</div>
-<div class="line"><a name="l01720"></a><span class="lineno"> 1720</span>&#160;  }</div>
-<div class="line"><a name="l01721"></a><span class="lineno"> 1721</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_infinite_expr = expr_try_dynamic_cast&lt;isinf_exprt&gt;(expr))</div>
-<div class="line"><a name="l01722"></a><span class="lineno"> 1722</span>&#160;  {</div>
-<div class="line"><a name="l01723"></a><span class="lineno"> 1723</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_infinite_expr, converted);</div>
-<div class="line"><a name="l01724"></a><span class="lineno"> 1724</span>&#160;  }</div>
-<div class="line"><a name="l01725"></a><span class="lineno"> 1725</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_normal_expr = expr_try_dynamic_cast&lt;isnormal_exprt&gt;(expr))</div>
-<div class="line"><a name="l01726"></a><span class="lineno"> 1726</span>&#160;  {</div>
-<div class="line"><a name="l01727"></a><span class="lineno"> 1727</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_normal_expr, converted);</div>
-<div class="line"><a name="l01728"></a><span class="lineno"> 1728</span>&#160;  }</div>
-<div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01730"></a><span class="lineno"> 1730</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> plus_overflow = expr_try_dynamic_cast&lt;plus_overflow_exprt&gt;(expr))</div>
-<div class="line"><a name="l01731"></a><span class="lineno"> 1731</span>&#160;  {</div>
-<div class="line"><a name="l01732"></a><span class="lineno"> 1732</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*plus_overflow, converted);</div>
-<div class="line"><a name="l01733"></a><span class="lineno"> 1733</span>&#160;  }</div>
-<div class="line"><a name="l01734"></a><span class="lineno"> 1734</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01735"></a><span class="lineno"> 1735</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> minus_overflow =</div>
-<div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160;      expr_try_dynamic_cast&lt;minus_overflow_exprt&gt;(expr))</div>
-<div class="line"><a name="l01737"></a><span class="lineno"> 1737</span>&#160;  {</div>
-<div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*minus_overflow, converted);</div>
-<div class="line"><a name="l01739"></a><span class="lineno"> 1739</span>&#160;  }</div>
-<div class="line"><a name="l01740"></a><span class="lineno"> 1740</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> mult_overflow = expr_try_dynamic_cast&lt;mult_overflow_exprt&gt;(expr))</div>
-<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;  {</div>
-<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*mult_overflow, converted);</div>
-<div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160;  }</div>
-<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> shl_overflow = expr_try_dynamic_cast&lt;shl_overflow_exprt&gt;(expr))</div>
-<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160;  {</div>
-<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*shl_overflow, converted);</div>
-<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160;  }</div>
-<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> array_construction = expr_try_dynamic_cast&lt;array_exprt&gt;(expr))</div>
-<div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;  {</div>
-<div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*array_construction, converted);</div>
-<div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160;  }</div>
-<div class="line"><a name="l01753"></a><span class="lineno"> 1753</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> literal = expr_try_dynamic_cast&lt;literal_exprt&gt;(expr))</div>
-<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;  {</div>
-<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*literal, converted);</div>
-<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160;  }</div>
-<div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> for_all = expr_try_dynamic_cast&lt;forall_exprt&gt;(expr))</div>
-<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;  {</div>
-<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*for_all, converted);</div>
-<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160;  }</div>
-<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="mini_b_d_d_8cpp.html#a6e93ddc3e57dc5ff55990225d7a495ef">exists</a> = expr_try_dynamic_cast&lt;exists_exprt&gt;(expr))</div>
-<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;  {</div>
-<div class="line"><a name="l01763"></a><span class="lineno"> 1763</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="mini_b_d_d_8cpp.html#a6e93ddc3e57dc5ff55990225d7a495ef">exists</a>, converted);</div>
-<div class="line"><a name="l01764"></a><span class="lineno"> 1764</span>&#160;  }</div>
-<div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> vector = expr_try_dynamic_cast&lt;vector_exprt&gt;(expr))</div>
-<div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;  {</div>
-<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*vector, converted);</div>
-<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;  }</div>
-<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a> = expr_try_dynamic_cast&lt;object_size_exprt&gt;(expr))</div>
-<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;  {</div>
-<div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>, converted, call_object_size);</div>
-<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160;  }</div>
-<div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> let = expr_try_dynamic_cast&lt;let_exprt&gt;(expr))</div>
-<div class="line"><a name="l01774"></a><span class="lineno"> 1774</span>&#160;  {</div>
-<div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*let, converted);</div>
-<div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;  }</div>
-<div class="line"><a name="l01777"></a><span class="lineno"> 1777</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_constraint_select_one,</div>
-<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160;    <span class="stringliteral">&quot;constraint_select_one is not expected in smt conversion: &quot;</span> +</div>
-<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;      expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
-<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> byte_swap = expr_try_dynamic_cast&lt;bswap_exprt&gt;(expr))</div>
-<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;  {</div>
-<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*byte_swap, converted);</div>
-<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;  }</div>
-<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> population_count = expr_try_dynamic_cast&lt;popcount_exprt&gt;(expr))</div>
-<div class="line"><a name="l01786"></a><span class="lineno"> 1786</span>&#160;  {</div>
-<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*population_count, converted);</div>
-<div class="line"><a name="l01788"></a><span class="lineno"> 1788</span>&#160;  }</div>
-<div class="line"><a name="l01789"></a><span class="lineno"> 1789</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> count_leading_zeros =</div>
-<div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;      expr_try_dynamic_cast&lt;count_leading_zeros_exprt&gt;(expr))</div>
+<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> byte_extraction =</div>
+<div class="line"><a name="l01719"></a><span class="lineno"> 1719</span>&#160;      expr_try_dynamic_cast&lt;byte_extract_exprt&gt;(expr))</div>
+<div class="line"><a name="l01720"></a><span class="lineno"> 1720</span>&#160;  {</div>
+<div class="line"><a name="l01721"></a><span class="lineno"> 1721</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*byte_extraction, converted);</div>
+<div class="line"><a name="l01722"></a><span class="lineno"> 1722</span>&#160;  }</div>
+<div class="line"><a name="l01723"></a><span class="lineno"> 1723</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> byte_update = expr_try_dynamic_cast&lt;byte_update_exprt&gt;(expr))</div>
+<div class="line"><a name="l01724"></a><span class="lineno"> 1724</span>&#160;  {</div>
+<div class="line"><a name="l01725"></a><span class="lineno"> 1725</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*byte_update, converted);</div>
+<div class="line"><a name="l01726"></a><span class="lineno"> 1726</span>&#160;  }</div>
+<div class="line"><a name="l01727"></a><span class="lineno"> 1727</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> absolute_value_of = expr_try_dynamic_cast&lt;abs_exprt&gt;(expr))</div>
+<div class="line"><a name="l01728"></a><span class="lineno"> 1728</span>&#160;  {</div>
+<div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*absolute_value_of, converted);</div>
+<div class="line"><a name="l01730"></a><span class="lineno"> 1730</span>&#160;  }</div>
+<div class="line"><a name="l01731"></a><span class="lineno"> 1731</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_nan_expr = expr_try_dynamic_cast&lt;isnan_exprt&gt;(expr))</div>
+<div class="line"><a name="l01732"></a><span class="lineno"> 1732</span>&#160;  {</div>
+<div class="line"><a name="l01733"></a><span class="lineno"> 1733</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_nan_expr, converted);</div>
+<div class="line"><a name="l01734"></a><span class="lineno"> 1734</span>&#160;  }</div>
+<div class="line"><a name="l01735"></a><span class="lineno"> 1735</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_finite_expr = expr_try_dynamic_cast&lt;isfinite_exprt&gt;(expr))</div>
+<div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160;  {</div>
+<div class="line"><a name="l01737"></a><span class="lineno"> 1737</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_finite_expr, converted);</div>
+<div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160;  }</div>
+<div class="line"><a name="l01739"></a><span class="lineno"> 1739</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_infinite_expr = expr_try_dynamic_cast&lt;isinf_exprt&gt;(expr))</div>
+<div class="line"><a name="l01740"></a><span class="lineno"> 1740</span>&#160;  {</div>
+<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_infinite_expr, converted);</div>
+<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;  }</div>
+<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> is_normal_expr = expr_try_dynamic_cast&lt;isnormal_exprt&gt;(expr))</div>
+<div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160;  {</div>
+<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*is_normal_expr, converted);</div>
+<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160;  }</div>
+<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> plus_overflow = expr_try_dynamic_cast&lt;plus_overflow_exprt&gt;(expr))</div>
+<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;  {</div>
+<div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*plus_overflow, converted);</div>
+<div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160;  }</div>
+<div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01753"></a><span class="lineno"> 1753</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> minus_overflow =</div>
+<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;      expr_try_dynamic_cast&lt;minus_overflow_exprt&gt;(expr))</div>
+<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;  {</div>
+<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*minus_overflow, converted);</div>
+<div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160;  }</div>
+<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> mult_overflow = expr_try_dynamic_cast&lt;mult_overflow_exprt&gt;(expr))</div>
+<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160;  {</div>
+<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*mult_overflow, converted);</div>
+<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;  }</div>
+<div class="line"><a name="l01763"></a><span class="lineno"> 1763</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> shl_overflow = expr_try_dynamic_cast&lt;shl_overflow_exprt&gt;(expr))</div>
+<div class="line"><a name="l01764"></a><span class="lineno"> 1764</span>&#160;  {</div>
+<div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*shl_overflow, converted);</div>
+<div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;  }</div>
+<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> array_construction = expr_try_dynamic_cast&lt;array_exprt&gt;(expr))</div>
+<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;  {</div>
+<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*array_construction, converted);</div>
+<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;  }</div>
+<div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> literal = expr_try_dynamic_cast&lt;literal_exprt&gt;(expr))</div>
+<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160;  {</div>
+<div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*literal, converted);</div>
+<div class="line"><a name="l01774"></a><span class="lineno"> 1774</span>&#160;  }</div>
+<div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> for_all = expr_try_dynamic_cast&lt;forall_exprt&gt;(expr))</div>
+<div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;  {</div>
+<div class="line"><a name="l01777"></a><span class="lineno"> 1777</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*for_all, converted);</div>
+<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;  }</div>
+<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="mini_b_d_d_8cpp.html#a6e93ddc3e57dc5ff55990225d7a495ef">exists</a> = expr_try_dynamic_cast&lt;exists_exprt&gt;(expr))</div>
+<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;  {</div>
+<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="mini_b_d_d_8cpp.html#a6e93ddc3e57dc5ff55990225d7a495ef">exists</a>, converted);</div>
+<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;  }</div>
+<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> vector = expr_try_dynamic_cast&lt;vector_exprt&gt;(expr))</div>
+<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;  {</div>
+<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*vector, converted);</div>
+<div class="line"><a name="l01786"></a><span class="lineno"> 1786</span>&#160;  }</div>
+<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a> = expr_try_dynamic_cast&lt;object_size_exprt&gt;(expr))</div>
+<div class="line"><a name="l01788"></a><span class="lineno"> 1788</span>&#160;  {</div>
+<div class="line"><a name="l01789"></a><span class="lineno"> 1789</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*<a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>, converted, call_object_size);</div>
+<div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160;  }</div>
+<div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> let = expr_try_dynamic_cast&lt;let_exprt&gt;(expr))</div>
 <div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;  {</div>
-<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*count_leading_zeros, converted);</div>
+<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*let, converted);</div>
 <div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;  }</div>
-<div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160;  <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> count_trailing_zeros =</div>
-<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;      expr_try_dynamic_cast&lt;count_trailing_zeros_exprt&gt;(expr))</div>
-<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160;  {</div>
-<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*count_trailing_zeros, converted);</div>
-<div class="line"><a name="l01800"></a><span class="lineno"> 1800</span>&#160;  }</div>
-<div class="line"><a name="l01801"></a><span class="lineno"> 1801</span>&#160; </div>
-<div class="line"><a name="l01802"></a><span class="lineno"> 1802</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df">UNIMPLEMENTED_FEATURE</a>(</div>
-<div class="line"><a name="l01803"></a><span class="lineno"> 1803</span>&#160;    <span class="stringliteral">&quot;Generation of SMT formula for unknown kind of expression: &quot;</span> +</div>
-<div class="line"><a name="l01804"></a><span class="lineno"> 1804</span>&#160;    expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
-<div class="line"><a name="l01805"></a><span class="lineno"> 1805</span>&#160;}</div>
-<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160; </div>
-<div class="line"><a name="l01807"></a><span class="lineno"> 1807</span>&#160;<span class="preprocessor">#ifndef CPROVER_INVARIANT_DO_NOT_CHECK</span></div>
-<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> functiont&gt;</div>
-<div class="line"><a name="l01809"></a><span class="lineno"><a class="line" href="structat__scope__exitt.html"> 1809</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structat__scope__exitt.html">at_scope_exitt</a></div>
-<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160;{</div>
-<div class="line"><a name="l01811"></a><span class="lineno"><a class="line" href="structat__scope__exitt.html#ad443e34db8b8451c12c08d12375e4a35"> 1811</a></span>&#160;  <span class="keyword">explicit</span> <a class="code" href="structat__scope__exitt.html#ad443e34db8b8451c12c08d12375e4a35">at_scope_exitt</a>(<a class="code" href="structfunctiont.html">functiont</a> <a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>)</div>
-<div class="line"><a name="l01812"></a><span class="lineno"> 1812</span>&#160;    : <a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>(<a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>)</div>
-<div class="line"><a name="l01813"></a><span class="lineno"> 1813</span>&#160;  {</div>
-<div class="line"><a name="l01814"></a><span class="lineno"> 1814</span>&#160;  }</div>
-<div class="line"><a name="l01815"></a><span class="lineno"><a class="line" href="structat__scope__exitt.html#a22e7c41f43de15ae68a921ac2abd96e6"> 1815</a></span>&#160;  <a class="code" href="structat__scope__exitt.html#a22e7c41f43de15ae68a921ac2abd96e6">~at_scope_exitt</a>()</div>
+<div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
+<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160;    expr.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_constraint_select_one,</div>
+<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;    <span class="stringliteral">&quot;constraint_select_one is not expected in smt conversion: &quot;</span> +</div>
+<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160;      expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> byte_swap = expr_try_dynamic_cast&lt;bswap_exprt&gt;(expr))</div>
+<div class="line"><a name="l01800"></a><span class="lineno"> 1800</span>&#160;  {</div>
+<div class="line"><a name="l01801"></a><span class="lineno"> 1801</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*byte_swap, converted);</div>
+<div class="line"><a name="l01802"></a><span class="lineno"> 1802</span>&#160;  }</div>
+<div class="line"><a name="l01803"></a><span class="lineno"> 1803</span>&#160;  <span class="keywordflow">if</span>(<span class="keyword">const</span> <span class="keyword">auto</span> population_count = expr_try_dynamic_cast&lt;popcount_exprt&gt;(expr))</div>
+<div class="line"><a name="l01804"></a><span class="lineno"> 1804</span>&#160;  {</div>
+<div class="line"><a name="l01805"></a><span class="lineno"> 1805</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*population_count, converted);</div>
+<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160;  }</div>
+<div class="line"><a name="l01807"></a><span class="lineno"> 1807</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> count_leading_zeros =</div>
+<div class="line"><a name="l01809"></a><span class="lineno"> 1809</span>&#160;      expr_try_dynamic_cast&lt;count_leading_zeros_exprt&gt;(expr))</div>
+<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160;  {</div>
+<div class="line"><a name="l01811"></a><span class="lineno"> 1811</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*count_leading_zeros, converted);</div>
+<div class="line"><a name="l01812"></a><span class="lineno"> 1812</span>&#160;  }</div>
+<div class="line"><a name="l01813"></a><span class="lineno"> 1813</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01814"></a><span class="lineno"> 1814</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> count_trailing_zeros =</div>
+<div class="line"><a name="l01815"></a><span class="lineno"> 1815</span>&#160;      expr_try_dynamic_cast&lt;count_trailing_zeros_exprt&gt;(expr))</div>
 <div class="line"><a name="l01816"></a><span class="lineno"> 1816</span>&#160;  {</div>
-<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160;    <a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>();</div>
+<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*count_trailing_zeros, converted);</div>
 <div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;  }</div>
-<div class="line"><a name="l01819"></a><span class="lineno"><a class="line" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a"> 1819</a></span>&#160;  <a class="code" href="structfunctiont.html">functiont</a> <a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>;</div>
-<div class="line"><a name="l01820"></a><span class="lineno"> 1820</span>&#160;};</div>
-<div class="line"><a name="l01821"></a><span class="lineno"> 1821</span>&#160; </div>
-<div class="line"><a name="l01822"></a><span class="lineno"> 1822</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> functiont&gt;</div>
-<div class="line"><a name="l01823"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2"> 1823</a></span>&#160;<a class="code" href="structat__scope__exitt.html">at_scope_exitt&lt;functiont&gt;</a> <a class="code" href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2">at_scope_exit</a>(<a class="code" href="structfunctiont.html">functiont</a> exit_function)</div>
-<div class="line"><a name="l01824"></a><span class="lineno"> 1824</span>&#160;{</div>
-<div class="line"><a name="l01825"></a><span class="lineno"> 1825</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="structat__scope__exitt.html">at_scope_exitt&lt;functiont&gt;</a>(exit_function);</div>
-<div class="line"><a name="l01826"></a><span class="lineno"> 1826</span>&#160;}</div>
-<div class="line"><a name="l01827"></a><span class="lineno"> 1827</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01828"></a><span class="lineno"> 1828</span>&#160; </div>
-<div class="line"><a name="l01829"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1"> 1829</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a>(<a class="code" href="classexprt.html">exprt</a> expr)</div>
-<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160;{</div>
-<div class="line"><a name="l01831"></a><span class="lineno"> 1831</span>&#160;  expr.<a class="code" href="classexprt.html#a8a4ea14980805786fbf1a3b05a51e620">visit_pre</a>([](<a class="code" href="classexprt.html">exprt</a> &amp;expr) {</div>
-<div class="line"><a name="l01832"></a><span class="lineno"> 1832</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> address_of_expr = expr_try_dynamic_cast&lt;address_of_exprt&gt;(expr);</div>
-<div class="line"><a name="l01833"></a><span class="lineno"> 1833</span>&#160;    <span class="keywordflow">if</span>(!address_of_expr)</div>
-<div class="line"><a name="l01834"></a><span class="lineno"> 1834</span>&#160;      <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01835"></a><span class="lineno"> 1835</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> array_index_expr =</div>
-<div class="line"><a name="l01836"></a><span class="lineno"> 1836</span>&#160;      expr_try_dynamic_cast&lt;index_exprt&gt;(address_of_expr-&gt;object());</div>
-<div class="line"><a name="l01837"></a><span class="lineno"> 1837</span>&#160;    <span class="keywordflow">if</span>(!array_index_expr)</div>
-<div class="line"><a name="l01838"></a><span class="lineno"> 1838</span>&#160;      <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01839"></a><span class="lineno"> 1839</span>&#160;    expr = <a class="code" href="classplus__exprt.html">plus_exprt</a>{</div>
-<div class="line"><a name="l01840"></a><span class="lineno"> 1840</span>&#160;      <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>{</div>
-<div class="line"><a name="l01841"></a><span class="lineno"> 1841</span>&#160;        array_index_expr-&gt;array(),</div>
-<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160;        type_checked_cast&lt;pointer_typet&gt;(address_of_expr-&gt;type())},</div>
-<div class="line"><a name="l01843"></a><span class="lineno"> 1843</span>&#160;      array_index_expr-&gt;index()};</div>
-<div class="line"><a name="l01844"></a><span class="lineno"> 1844</span>&#160;  });</div>
-<div class="line"><a name="l01845"></a><span class="lineno"> 1845</span>&#160;  <span class="keywordflow">return</span> expr;</div>
-<div class="line"><a name="l01846"></a><span class="lineno"> 1846</span>&#160;}</div>
-<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160; </div>
-<div class="line"><a name="l01848"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#a1dac4b42620b5c3c98d25f77401cfec0"> 1848</a></span>&#160;<a class="code" href="classsmt__termt.html">smt_termt</a> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(</div>
-<div class="line"><a name="l01849"></a><span class="lineno"> 1849</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
-<div class="line"><a name="l01850"></a><span class="lineno"> 1850</span>&#160;  <span class="keyword">const</span> <a class="code" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map,</div>
-<div class="line"><a name="l01851"></a><span class="lineno"> 1851</span>&#160;  <span class="keyword">const</span> <a class="code" href="type__size__mapping_8h.html#a75319e37b6206e23f94a56ca388322f5">type_size_mapt</a> &amp;pointer_sizes,</div>
-<div class="line"><a name="l01852"></a><span class="lineno"> 1852</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_object_sizet::make_applicationt</a> &amp;<a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>,</div>
-<div class="line"><a name="l01853"></a><span class="lineno"> 1853</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_is_dynamic_objectt::make_applicationt</a> &amp;is_dynamic_object)</div>
+<div class="line"><a name="l01819"></a><span class="lineno"> 1819</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01820"></a><span class="lineno"> 1820</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> prophecy_r_or_w_ok =</div>
+<div class="line"><a name="l01821"></a><span class="lineno"> 1821</span>&#160;      expr_try_dynamic_cast&lt;prophecy_r_or_w_ok_exprt&gt;(expr))</div>
+<div class="line"><a name="l01822"></a><span class="lineno"> 1822</span>&#160;  {</div>
+<div class="line"><a name="l01823"></a><span class="lineno"> 1823</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*prophecy_r_or_w_ok, converted);</div>
+<div class="line"><a name="l01824"></a><span class="lineno"> 1824</span>&#160;  }</div>
+<div class="line"><a name="l01825"></a><span class="lineno"> 1825</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01826"></a><span class="lineno"> 1826</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> prophecy_pointer_in_range =</div>
+<div class="line"><a name="l01827"></a><span class="lineno"> 1827</span>&#160;      expr_try_dynamic_cast&lt;prophecy_pointer_in_range_exprt&gt;(expr))</div>
+<div class="line"><a name="l01828"></a><span class="lineno"> 1828</span>&#160;  {</div>
+<div class="line"><a name="l01829"></a><span class="lineno"> 1829</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(*prophecy_pointer_in_range, converted);</div>
+<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160;  }</div>
+<div class="line"><a name="l01831"></a><span class="lineno"> 1831</span>&#160; </div>
+<div class="line"><a name="l01832"></a><span class="lineno"> 1832</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a163e7c1c82cc098987e5478ee28535df">UNIMPLEMENTED_FEATURE</a>(</div>
+<div class="line"><a name="l01833"></a><span class="lineno"> 1833</span>&#160;    <span class="stringliteral">&quot;Generation of SMT formula for unknown kind of expression: &quot;</span> +</div>
+<div class="line"><a name="l01834"></a><span class="lineno"> 1834</span>&#160;    expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>());</div>
+<div class="line"><a name="l01835"></a><span class="lineno"> 1835</span>&#160;}</div>
+<div class="line"><a name="l01836"></a><span class="lineno"> 1836</span>&#160; </div>
+<div class="line"><a name="l01837"></a><span class="lineno"> 1837</span>&#160;<span class="preprocessor">#ifndef CPROVER_INVARIANT_DO_NOT_CHECK</span></div>
+<div class="line"><a name="l01838"></a><span class="lineno"> 1838</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> functiont&gt;</div>
+<div class="line"><a name="l01839"></a><span class="lineno"><a class="line" href="structat__scope__exitt.html"> 1839</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structat__scope__exitt.html">at_scope_exitt</a></div>
+<div class="line"><a name="l01840"></a><span class="lineno"> 1840</span>&#160;{</div>
+<div class="line"><a name="l01841"></a><span class="lineno"><a class="line" href="structat__scope__exitt.html#ad443e34db8b8451c12c08d12375e4a35"> 1841</a></span>&#160;  <span class="keyword">explicit</span> <a class="code" href="structat__scope__exitt.html#ad443e34db8b8451c12c08d12375e4a35">at_scope_exitt</a>(<a class="code" href="structfunctiont.html">functiont</a> <a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>)</div>
+<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160;    : <a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>(<a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>)</div>
+<div class="line"><a name="l01843"></a><span class="lineno"> 1843</span>&#160;  {</div>
+<div class="line"><a name="l01844"></a><span class="lineno"> 1844</span>&#160;  }</div>
+<div class="line"><a name="l01845"></a><span class="lineno"><a class="line" href="structat__scope__exitt.html#a22e7c41f43de15ae68a921ac2abd96e6"> 1845</a></span>&#160;  <a class="code" href="structat__scope__exitt.html#a22e7c41f43de15ae68a921ac2abd96e6">~at_scope_exitt</a>()</div>
+<div class="line"><a name="l01846"></a><span class="lineno"> 1846</span>&#160;  {</div>
+<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160;    <a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>();</div>
+<div class="line"><a name="l01848"></a><span class="lineno"> 1848</span>&#160;  }</div>
+<div class="line"><a name="l01849"></a><span class="lineno"><a class="line" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a"> 1849</a></span>&#160;  <a class="code" href="structfunctiont.html">functiont</a> <a class="code" href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">exit_function</a>;</div>
+<div class="line"><a name="l01850"></a><span class="lineno"> 1850</span>&#160;};</div>
+<div class="line"><a name="l01851"></a><span class="lineno"> 1851</span>&#160; </div>
+<div class="line"><a name="l01852"></a><span class="lineno"> 1852</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> functiont&gt;</div>
+<div class="line"><a name="l01853"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2"> 1853</a></span>&#160;<a class="code" href="structat__scope__exitt.html">at_scope_exitt&lt;functiont&gt;</a> <a class="code" href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2">at_scope_exit</a>(<a class="code" href="structfunctiont.html">functiont</a> exit_function)</div>
 <div class="line"><a name="l01854"></a><span class="lineno"> 1854</span>&#160;{</div>
-<div class="line"><a name="l01855"></a><span class="lineno"> 1855</span>&#160;<span class="preprocessor">#ifndef CPROVER_INVARIANT_DO_NOT_CHECK</span></div>
-<div class="line"><a name="l01856"></a><span class="lineno"> 1856</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">bool</span> in_conversion = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01857"></a><span class="lineno"> 1857</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a name="l01858"></a><span class="lineno"> 1858</span>&#160;    !in_conversion,</div>
-<div class="line"><a name="l01859"></a><span class="lineno"> 1859</span>&#160;    <span class="stringliteral">&quot;Conversion of expr to smt should be non-recursive. &quot;</span></div>
-<div class="line"><a name="l01860"></a><span class="lineno"> 1860</span>&#160;    <span class="stringliteral">&quot;Re-entrance found in conversion of &quot;</span> +</div>
-<div class="line"><a name="l01861"></a><span class="lineno"> 1861</span>&#160;      expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>(1, 0));</div>
-<div class="line"><a name="l01862"></a><span class="lineno"> 1862</span>&#160;  in_conversion = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l01863"></a><span class="lineno"> 1863</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> end_conversion = <a class="code" href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2">at_scope_exit</a>([&amp;]() { in_conversion = <span class="keyword">false</span>; });</div>
-<div class="line"><a name="l01864"></a><span class="lineno"> 1864</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;  <a class="code" href="convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20">sub_expression_mapt</a> sub_expression_map;</div>
-<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> lowered_expr = <a class="code" href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a>(expr);</div>
-<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;  lowered_expr.visit_post([&amp;](<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr) {</div>
-<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> find_result = sub_expression_map.find(expr);</div>
-<div class="line"><a name="l01869"></a><span class="lineno"> 1869</span>&#160;    <span class="keywordflow">if</span>(find_result != sub_expression_map.cend())</div>
-<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;      <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160;    <a class="code" href="classsmt__termt.html">smt_termt</a> term = <a class="code" href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0">dispatch_expr_to_smt_conversion</a>(</div>
-<div class="line"><a name="l01872"></a><span class="lineno"> 1872</span>&#160;      expr,</div>
-<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;      sub_expression_map,</div>
-<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160;      object_map,</div>
-<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160;      pointer_sizes,</div>
-<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160;      <a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>,</div>
-<div class="line"><a name="l01877"></a><span class="lineno"> 1877</span>&#160;      is_dynamic_object);</div>
-<div class="line"><a name="l01878"></a><span class="lineno"> 1878</span>&#160;    sub_expression_map.emplace_hint(find_result, expr, std::move(term));</div>
-<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160;  });</div>
-<div class="line"><a name="l01880"></a><span class="lineno"> 1880</span>&#160;  <span class="keywordflow">return</span> std::move(sub_expression_map.at(lowered_expr));</div>
-<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;}</div>
+<div class="line"><a name="l01855"></a><span class="lineno"> 1855</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="structat__scope__exitt.html">at_scope_exitt&lt;functiont&gt;</a>(exit_function);</div>
+<div class="line"><a name="l01856"></a><span class="lineno"> 1856</span>&#160;}</div>
+<div class="line"><a name="l01857"></a><span class="lineno"> 1857</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01858"></a><span class="lineno"> 1858</span>&#160; </div>
+<div class="line"><a name="l01859"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1"> 1859</a></span>&#160;<a class="code" href="classexprt.html">exprt</a> <a class="code" href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a>(<a class="code" href="classexprt.html">exprt</a> expr)</div>
+<div class="line"><a name="l01860"></a><span class="lineno"> 1860</span>&#160;{</div>
+<div class="line"><a name="l01861"></a><span class="lineno"> 1861</span>&#160;  expr.<a class="code" href="classexprt.html#a8a4ea14980805786fbf1a3b05a51e620">visit_pre</a>([](<a class="code" href="classexprt.html">exprt</a> &amp;expr) {</div>
+<div class="line"><a name="l01862"></a><span class="lineno"> 1862</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> address_of_expr = expr_try_dynamic_cast&lt;address_of_exprt&gt;(expr);</div>
+<div class="line"><a name="l01863"></a><span class="lineno"> 1863</span>&#160;    <span class="keywordflow">if</span>(!address_of_expr)</div>
+<div class="line"><a name="l01864"></a><span class="lineno"> 1864</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> array_index_expr =</div>
+<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160;      expr_try_dynamic_cast&lt;index_exprt&gt;(address_of_expr-&gt;object());</div>
+<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;    <span class="keywordflow">if</span>(!array_index_expr)</div>
+<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01869"></a><span class="lineno"> 1869</span>&#160;    expr = <a class="code" href="classplus__exprt.html">plus_exprt</a>{</div>
+<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;      <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>{</div>
+<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160;        array_index_expr-&gt;array(),</div>
+<div class="line"><a name="l01872"></a><span class="lineno"> 1872</span>&#160;        type_checked_cast&lt;pointer_typet&gt;(address_of_expr-&gt;type())},</div>
+<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;      array_index_expr-&gt;index()};</div>
+<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160;  });</div>
+<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160;  <span class="keywordflow">return</span> expr;</div>
+<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160;}</div>
+<div class="line"><a name="l01877"></a><span class="lineno"> 1877</span>&#160; </div>
+<div class="line"><a name="l01878"></a><span class="lineno"><a class="line" href="convert__expr__to__smt_8cpp.html#a1dac4b42620b5c3c98d25f77401cfec0"> 1878</a></span>&#160;<a class="code" href="classsmt__termt.html">smt_termt</a> <a class="code" href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a>(</div>
+<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr,</div>
+<div class="line"><a name="l01880"></a><span class="lineno"> 1880</span>&#160;  <span class="keyword">const</span> <a class="code" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map,</div>
+<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;  <span class="keyword">const</span> <a class="code" href="type__size__mapping_8h.html#a75319e37b6206e23f94a56ca388322f5">type_size_mapt</a> &amp;pointer_sizes,</div>
+<div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_object_sizet::make_applicationt</a> &amp;<a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>,</div>
+<div class="line"><a name="l01883"></a><span class="lineno"> 1883</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsmt__function__application__termt_1_1factoryt.html">smt_is_dynamic_objectt::make_applicationt</a> &amp;is_dynamic_object)</div>
+<div class="line"><a name="l01884"></a><span class="lineno"> 1884</span>&#160;{</div>
+<div class="line"><a name="l01885"></a><span class="lineno"> 1885</span>&#160;<span class="preprocessor">#ifndef CPROVER_INVARIANT_DO_NOT_CHECK</span></div>
+<div class="line"><a name="l01886"></a><span class="lineno"> 1886</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">bool</span> in_conversion = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
+<div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160;    !in_conversion,</div>
+<div class="line"><a name="l01889"></a><span class="lineno"> 1889</span>&#160;    <span class="stringliteral">&quot;Conversion of expr to smt should be non-recursive. &quot;</span></div>
+<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;    <span class="stringliteral">&quot;Re-entrance found in conversion of &quot;</span> +</div>
+<div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160;      expr.<a class="code" href="classirept.html#a0fd0f0b7d9f7e9a01f503d596333eb06">pretty</a>(1, 0));</div>
+<div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;  in_conversion = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> end_conversion = <a class="code" href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2">at_scope_exit</a>([&amp;]() { in_conversion = <span class="keyword">false</span>; });</div>
+<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;  <a class="code" href="convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20">sub_expression_mapt</a> sub_expression_map;</div>
+<div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> lowered_expr = <a class="code" href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a>(expr);</div>
+<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;  lowered_expr.visit_post([&amp;](<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr) {</div>
+<div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> find_result = sub_expression_map.find(expr);</div>
+<div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160;    <span class="keywordflow">if</span>(find_result != sub_expression_map.cend())</div>
+<div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01901"></a><span class="lineno"> 1901</span>&#160;    <a class="code" href="classsmt__termt.html">smt_termt</a> term = <a class="code" href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0">dispatch_expr_to_smt_conversion</a>(</div>
+<div class="line"><a name="l01902"></a><span class="lineno"> 1902</span>&#160;      expr,</div>
+<div class="line"><a name="l01903"></a><span class="lineno"> 1903</span>&#160;      sub_expression_map,</div>
+<div class="line"><a name="l01904"></a><span class="lineno"> 1904</span>&#160;      object_map,</div>
+<div class="line"><a name="l01905"></a><span class="lineno"> 1905</span>&#160;      pointer_sizes,</div>
+<div class="line"><a name="l01906"></a><span class="lineno"> 1906</span>&#160;      <a class="code" href="pointer__predicates_8cpp.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>,</div>
+<div class="line"><a name="l01907"></a><span class="lineno"> 1907</span>&#160;      is_dynamic_object);</div>
+<div class="line"><a name="l01908"></a><span class="lineno"> 1908</span>&#160;    sub_expression_map.emplace_hint(find_result, expr, std::move(term));</div>
+<div class="line"><a name="l01909"></a><span class="lineno"> 1909</span>&#160;  });</div>
+<div class="line"><a name="l01910"></a><span class="lineno"> 1910</span>&#160;  <span class="keywordflow">return</span> std::move(sub_expression_map.at(lowered_expr));</div>
+<div class="line"><a name="l01911"></a><span class="lineno"> 1911</span>&#160;}</div>
 <div class="ttc" id="aapi_8cpp_html_ad2957e882e3568503e4f786a480f2bfe"><div class="ttname"><a href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></div><div class="ttdeci">configt config</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l00025">config.cpp:25</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a0d723e7fcdf6ef8322b386bc05abd6ad"><div class="ttname"><a href="arith__tools_8cpp.html#a0d723e7fcdf6ef8322b386bc05abd6ad">bvrep2integer</a></div><div class="ttdeci">mp_integer bvrep2integer(const irep_idt &amp;src, std::size_t width, bool is_signed)</div><div class="ttdoc">convert a bit-vector representation (possibly signed) to integer</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00402">arith_tools.cpp:402</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a5902666fb744db615dbf736ad4c19a26"><div class="ttname"><a href="arith__tools_8cpp.html#a5902666fb744db615dbf736ad4c19a26">address_bits</a></div><div class="ttdeci">std::size_t address_bits(const mp_integer &amp;size)</div><div class="ttdoc">ceil(log2(size))</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00177">arith_tools.cpp:177</a></div></div>
@@ -1953,8 +1983,8 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp_source.htm
 <div class="ttc" id="ac__types_8cpp_html_aaec9388a77b8d7832e9c8dfe29443202"><div class="ttname"><a href="c__types_8cpp.html#aaec9388a77b8d7832e9c8dfe29443202">c_bool_type</a></div><div class="ttdeci">typet c_bool_type()</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8cpp_source.html#l00105">c_types.cpp:105</a></div></div>
 <div class="ttc" id="ac__types_8h_html"><div class="ttname"><a href="c__types_8h.html">c_types.h</a></div></div>
 <div class="ttc" id="aclassabs__exprt_html"><div class="ttname"><a href="classabs__exprt.html">abs_exprt</a></div><div class="ttdoc">Absolute value.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00378">std_expr.h:379</a></div></div>
-<div class="ttc" id="aclassaddress__of__exprt_html"><div class="ttname"><a href="classaddress__of__exprt.html">address_of_exprt</a></div><div class="ttdoc">Operator to return the address of an object.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00451">pointer_expr.h:452</a></div></div>
-<div class="ttc" id="aclassaddress__of__exprt_html_ad81853a6acc7627a48fcfa8087e3aa5d"><div class="ttname"><a href="classaddress__of__exprt.html#ad81853a6acc7627a48fcfa8087e3aa5d">address_of_exprt::object</a></div><div class="ttdeci">exprt &amp; object()</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00461">pointer_expr.h:461</a></div></div>
+<div class="ttc" id="aclassaddress__of__exprt_html"><div class="ttname"><a href="classaddress__of__exprt.html">address_of_exprt</a></div><div class="ttdoc">Operator to return the address of an object.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00539">pointer_expr.h:540</a></div></div>
+<div class="ttc" id="aclassaddress__of__exprt_html_ad81853a6acc7627a48fcfa8087e3aa5d"><div class="ttname"><a href="classaddress__of__exprt.html#ad81853a6acc7627a48fcfa8087e3aa5d">address_of_exprt::object</a></div><div class="ttdeci">exprt &amp; object()</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00549">pointer_expr.h:549</a></div></div>
 <div class="ttc" id="aclassanalysis__exceptiont_html"><div class="ttname"><a href="classanalysis__exceptiont.html">analysis_exceptiont</a></div><div class="ttdoc">Thrown when an unexpected error occurs during the analysis (e.g., when the SAT solver returns an erro...</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8h_source.html#l00153">exception_utils.h:154</a></div></div>
 <div class="ttc" id="aclassand__exprt_html"><div class="ttname"><a href="classand__exprt.html">and_exprt</a></div><div class="ttdoc">Boolean AND.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02070">std_expr.h:2071</a></div></div>
 <div class="ttc" id="aclassarray__comprehension__exprt_html"><div class="ttname"><a href="classarray__comprehension__exprt.html">array_comprehension_exprt</a></div><div class="ttdoc">Expression to define a mapping from an argument (index) to elements.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03357">std_expr.h:3358</a></div></div>
@@ -2035,15 +2065,17 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp_source.htm
 <div class="ttc" id="aclassnondet__symbol__exprt_html_a7e8fad41f6afddc9e6af5297f306c1a8"><div class="ttname"><a href="classnondet__symbol__exprt.html#a7e8fad41f6afddc9e6af5297f306c1a8">nondet_symbol_exprt::get_identifier</a></div><div class="ttdeci">const irep_idt &amp; get_identifier() const</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00270">std_expr.h:270</a></div></div>
 <div class="ttc" id="aclassnot__exprt_html"><div class="ttname"><a href="classnot__exprt.html">not_exprt</a></div><div class="ttdoc">Boolean negation.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02277">std_expr.h:2278</a></div></div>
 <div class="ttc" id="aclassnotequal__exprt_html"><div class="ttname"><a href="classnotequal__exprt.html">notequal_exprt</a></div><div class="ttdoc">Disequality.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01364">std_expr.h:1365</a></div></div>
-<div class="ttc" id="aclassobject__size__exprt_html"><div class="ttname"><a href="classobject__size__exprt.html">object_size_exprt</a></div><div class="ttdoc">Expression for finding the size (in bytes) of the object a pointer points to.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l01125">pointer_expr.h:1126</a></div></div>
+<div class="ttc" id="aclassobject__size__exprt_html"><div class="ttname"><a href="classobject__size__exprt.html">object_size_exprt</a></div><div class="ttdoc">Expression for finding the size (in bytes) of the object a pointer points to.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l01398">pointer_expr.h:1399</a></div></div>
 <div class="ttc" id="aclassor__exprt_html"><div class="ttname"><a href="classor__exprt.html">or_exprt</a></div><div class="ttdoc">Boolean OR.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02178">std_expr.h:2179</a></div></div>
 <div class="ttc" id="aclassplus__exprt_html"><div class="ttname"><a href="classplus__exprt.html">plus_exprt</a></div><div class="ttdoc">The plus expression Associativity is not specified.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00946">std_expr.h:947</a></div></div>
 <div class="ttc" id="aclassplus__overflow__exprt_html"><div class="ttname"><a href="classplus__overflow__exprt.html">plus_overflow_exprt</a></div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00797">bitvector_expr.h:798</a></div></div>
-<div class="ttc" id="aclasspointer__object__exprt_html"><div class="ttname"><a href="classpointer__object__exprt.html">pointer_object_exprt</a></div><div class="ttdoc">A numerical identifier for the object a pointer points to.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l01066">pointer_expr.h:1067</a></div></div>
-<div class="ttc" id="aclasspointer__offset__exprt_html"><div class="ttname"><a href="classpointer__offset__exprt.html">pointer_offset_exprt</a></div><div class="ttdoc">The offset (in bytes) of a pointer relative to the object.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l01008">pointer_expr.h:1009</a></div></div>
+<div class="ttc" id="aclasspointer__object__exprt_html"><div class="ttname"><a href="classpointer__object__exprt.html">pointer_object_exprt</a></div><div class="ttdoc">A numerical identifier for the object a pointer points to.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l01339">pointer_expr.h:1340</a></div></div>
+<div class="ttc" id="aclasspointer__offset__exprt_html"><div class="ttname"><a href="classpointer__offset__exprt.html">pointer_offset_exprt</a></div><div class="ttdoc">The offset (in bytes) of a pointer relative to the object.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l01281">pointer_expr.h:1282</a></div></div>
 <div class="ttc" id="aclasspointer__typet_html"><div class="ttname"><a href="classpointer__typet.html">pointer_typet</a></div><div class="ttdoc">The pointer type These are both 'bitvector_typet' (they have a width) and 'type_with_subtypet' (they ...</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00023">pointer_expr.h:24</a></div></div>
 <div class="ttc" id="aclasspointer__typet_html_a8670ac230937c81124d9a84965f27717"><div class="ttname"><a href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">pointer_typet::base_type</a></div><div class="ttdeci">const typet &amp; base_type() const</div><div class="ttdoc">The type of the data what we point to.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00035">pointer_expr.h:35</a></div></div>
 <div class="ttc" id="aclasspopcount__exprt_html"><div class="ttname"><a href="classpopcount__exprt.html">popcount_exprt</a></div><div class="ttdoc">The popcount (counting the number of bits set to 1) expression.</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00650">bitvector_expr.h:651</a></div></div>
+<div class="ttc" id="aclassprophecy__pointer__in__range__exprt_html"><div class="ttname"><a href="classprophecy__pointer__in__range__exprt.html">prophecy_pointer_in_range_exprt</a></div><div class="ttdoc">pointer_in_range (see pointer_in_range_exprt) with prophecy expressions to encode whether a pointer r...</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00452">pointer_expr.h:453</a></div></div>
+<div class="ttc" id="aclassprophecy__r__or__w__ok__exprt_html"><div class="ttname"><a href="classprophecy__r__or__w__ok__exprt.html">prophecy_r_or_w_ok_exprt</a></div><div class="ttdoc">A base class for a predicate that indicates that an address range is ok to read or write or both.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l01018">pointer_expr.h:1019</a></div></div>
 <div class="ttc" id="aclassreplication__exprt_html"><div class="ttname"><a href="classreplication__exprt.html">replication_exprt</a></div><div class="ttdoc">Bit-vector replication.</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00535">bitvector_expr.h:536</a></div></div>
 <div class="ttc" id="aclassshift__exprt_html"><div class="ttname"><a href="classshift__exprt.html">shift_exprt</a></div><div class="ttdoc">A base class for shift and rotate operators.</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00229">bitvector_expr.h:230</a></div></div>
 <div class="ttc" id="aclassshl__overflow__exprt_html"><div class="ttname"><a href="classshl__overflow__exprt.html">shl_overflow_exprt</a></div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00854">bitvector_expr.h:855</a></div></div>
@@ -2117,7 +2149,7 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp_source.htm
 <div class="ttc" id="aclassxor__exprt_html"><div class="ttname"><a href="classxor__exprt.html">xor_exprt</a></div><div class="ttdoc">Boolean XOR.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02241">std_expr.h:2242</a></div></div>
 <div class="ttc" id="aconfig_8h_html"><div class="ttname"><a href="config_8h.html">config.h</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_a16546d182c0aefd461cafc27dcb9bd26"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#a16546d182c0aefd461cafc27dcb9bd26">extension_for_type</a></div><div class="ttdeci">static std::function&lt; std::function&lt; smt_termt(smt_termt)&gt;std::size_t)&gt; extension_for_type(const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00160">convert_expr_to_smt.cpp:160</a></div></div>
-<div class="ttc" id="aconvert__expr__to__smt_8cpp_html_a4a1246264a6dd3069e480a3610ed80e1"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a></div><div class="ttdeci">exprt lower_address_of_array_index(exprt expr)</div><div class="ttdoc">Lower the address_of(array[idx]) sub expressions in expr to idx + address_of(array),...</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01829">convert_expr_to_smt.cpp:1829</a></div></div>
+<div class="ttc" id="aconvert__expr__to__smt_8cpp_html_a4a1246264a6dd3069e480a3610ed80e1"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a></div><div class="ttdeci">exprt lower_address_of_array_index(exprt expr)</div><div class="ttdoc">Lower the address_of(array[idx]) sub expressions in expr to idx + address_of(array),...</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01859">convert_expr_to_smt.cpp:1859</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_a4d9464a050ce46f8fe110323e5f41648"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#a4d9464a050ce46f8fe110323e5f41648">convert_bit_vector_cast</a></div><div class="ttdeci">static smt_termt convert_bit_vector_cast(const smt_termt &amp;from_term, const typet &amp;from_type, const bitvector_typet &amp;to_type)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00240">convert_expr_to_smt.cpp:240</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_a68055c6868f80c64612c7d765aa04f36"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#a68055c6868f80c64612c7d765aa04f36">most_significant_bit_is_set</a></div><div class="ttdeci">static smt_termt most_significant_bit_is_set(const smt_termt &amp;input)</div><div class="ttdoc">Constructs a term which is true if the most significant bit of input is set.</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01195">convert_expr_to_smt.cpp:1195</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_a69c80d94e891764911197b76e52dc56e"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#a69c80d94e891764911197b76e52dc56e">convert_array_update_to_smt</a></div><div class="ttdeci">static smt_termt convert_array_update_to_smt(const with_exprt &amp;with, const sub_expression_mapt &amp;converted)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01003">convert_expr_to_smt.cpp:1003</a></div></div>
@@ -2127,10 +2159,10 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp_source.htm
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_a8e696bd2d5f8fd0fba993cf587399f20"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20">sub_expression_mapt</a></div><div class="ttdeci">std::unordered_map&lt; exprt, smt_termt, irep_hash &gt; sub_expression_mapt</div><div class="ttdoc">Post order visitation is used in order to construct the the smt terms bottom upwards without using re...</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00037">convert_expr_to_smt.cpp:37</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_a902f906c119ae4b143c23bc8a3251dd9"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#a902f906c119ae4b143c23bc8a3251dd9">make_not_zero</a></div><div class="ttdeci">static smt_termt make_not_zero(const smt_termt &amp;input, const typet &amp;source_type)</div><div class="ttdoc">Makes a term which is true if input is not 0 / false.</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00134">convert_expr_to_smt.cpp:134</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_aa66daa4704d6732d47b30f006d47a73f"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#aa66daa4704d6732d47b30f006d47a73f">convert_relational_to_smt</a></div><div class="ttdeci">static smt_termt convert_relational_to_smt(const binary_relation_exprt &amp;binary_relation, const unsigned_factory_typet &amp;unsigned_factory, const signed_factory_typet &amp;signed_factory, const sub_expression_mapt &amp;converted)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00551">convert_expr_to_smt.cpp:551</a></div></div>
-<div class="ttc" id="aconvert__expr__to__smt_8cpp_html_aa9679ae401be39dcfcd7be83b0ba45c0"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0">dispatch_expr_to_smt_conversion</a></div><div class="ttdeci">static smt_termt dispatch_expr_to_smt_conversion(const exprt &amp;expr, const sub_expression_mapt &amp;converted, const smt_object_mapt &amp;object_map, const type_size_mapt &amp;pointer_sizes, const smt_object_sizet::make_applicationt &amp;call_object_size, const smt_is_dynamic_objectt::make_applicationt &amp;apply_is_dynamic_object)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01466">convert_expr_to_smt.cpp:1466</a></div></div>
+<div class="ttc" id="aconvert__expr__to__smt_8cpp_html_aa9679ae401be39dcfcd7be83b0ba45c0"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0">dispatch_expr_to_smt_conversion</a></div><div class="ttdeci">static smt_termt dispatch_expr_to_smt_conversion(const exprt &amp;expr, const sub_expression_mapt &amp;converted, const smt_object_mapt &amp;object_map, const type_size_mapt &amp;pointer_sizes, const smt_object_sizet::make_applicationt &amp;call_object_size, const smt_is_dynamic_objectt::make_applicationt &amp;apply_is_dynamic_object)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01484">convert_expr_to_smt.cpp:1484</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_abfe70c257e0bd02d1e9b562205ed3448"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#abfe70c257e0bd02d1e9b562205ed3448">convert_to_smt_shift</a></div><div class="ttdeci">static smt_termt convert_to_smt_shift(const factoryt &amp;factory, const shiftt &amp;shift, const sub_expression_mapt &amp;converted)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00935">convert_expr_to_smt.cpp:935</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_ac198171e63f7727687ccd38ea799f70a"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#ac198171e63f7727687ccd38ea799f70a">convert_type_to_smt_sort</a></div><div class="ttdeci">static smt_sortt convert_type_to_smt_sort(const bool_typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00082">convert_expr_to_smt.cpp:82</a></div></div>
-<div class="ttc" id="aconvert__expr__to__smt_8cpp_html_ac495613f13bab1346a8a0a75b95f1af2"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2">at_scope_exit</a></div><div class="ttdeci">at_scope_exitt&lt; functiont &gt; at_scope_exit(functiont exit_function)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01823">convert_expr_to_smt.cpp:1823</a></div></div>
+<div class="ttc" id="aconvert__expr__to__smt_8cpp_html_ac495613f13bab1346a8a0a75b95f1af2"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2">at_scope_exit</a></div><div class="ttdeci">at_scope_exitt&lt; functiont &gt; at_scope_exit(functiont exit_function)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01853">convert_expr_to_smt.cpp:1853</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_acd4c6145bbdfc630ef36d416d768cd20"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#acd4c6145bbdfc630ef36d416d768cd20">convert_c_bool_cast</a></div><div class="ttdeci">static smt_termt convert_c_bool_cast(const smt_termt &amp;from_term, const typet &amp;from_type, const bitvector_typet &amp;to_type)</div><div class="ttdoc">Returns a cast to C bool expressed in smt terms.</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00147">convert_expr_to_smt.cpp:147</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_adf1348cd9f8868b468b9a13dfebeeb2d"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#adf1348cd9f8868b468b9a13dfebeeb2d">operands_are_of_type</a></div><div class="ttdeci">static bool operands_are_of_type(const exprt &amp;expr)</div><div class="ttdoc">Ensures that all operands of the argument expression have related types.</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00074">convert_expr_to_smt.cpp:74</a></div></div>
 <div class="ttc" id="aconvert__expr__to__smt_8cpp_html_ae91c6da17c1454d962ae2e0c85206e93"><div class="ttname"><a href="convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93">convert_expr_to_smt</a></div><div class="ttdeci">static smt_termt convert_expr_to_smt(const symbol_exprt &amp;symbol_expr)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00116">convert_expr_to_smt.cpp:116</a></div></div>
@@ -2167,6 +2199,7 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp_source.htm
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_acf66747571c51ea60ec08d649437c3d9"><div class="ttname"><a href="src_2util_2invariant_8h.html#acf66747571c51ea60ec08d649437c3d9">UNHANDLED_CASE</a></div><div class="ttdeci">#define UNHANDLED_CASE</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00559">invariant.h:559</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_af412a86f47d5f02756ad5ec97066364c"><div class="ttname"><a href="src_2util_2invariant_8h.html#af412a86f47d5f02756ad5ec97066364c">POSTCONDITION</a></div><div class="ttdeci">#define POSTCONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00479">invariant.h:479</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_af74d5ce38d0812bbe162fc4edbde7134"><div class="ttname"><a href="src_2util_2invariant_8h.html#af74d5ce38d0812bbe162fc4edbde7134">UNREACHABLE_BECAUSE</a></div><div class="ttdeci">#define UNREACHABLE_BECAUSE(REASON)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00526">invariant.h:526</a></div></div>
 <div class="ttc" id="astd__expr_8h_html"><div class="ttname"><a href="std__expr_8h.html">std_expr.h</a></div><div class="ttdoc">API to expression classes.</div></div>
 <div class="ttc" id="astd__expr_8h_html_a8fde3eed9e33fa5845c048d8c613d9bd"><div class="ttname"><a href="std__expr_8h.html#a8fde3eed9e33fa5845c048d8c613d9bd">to_binary_expr</a></div><div class="ttdeci">const binary_exprt &amp; to_binary_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a binary_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00660">std_expr.h:660</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_ab732b1d384f4dd5bfc303c051b8dc5da"><div class="ttname"><a href="std__expr_8h.html#ab732b1d384f4dd5bfc303c051b8dc5da">to_unary_expr</a></div><div class="ttdeci">const unary_exprt &amp; to_unary_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a unary_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00361">std_expr.h:361</a></div></div>
@@ -2176,10 +2209,10 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp_source.htm
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
 <div class="ttc" id="astring__expr_8h_html_a01efc714b08b4851e4899606ff085861"><div class="ttname"><a href="string__expr_8h.html#a01efc714b08b4851e4899606ff085861">less_than</a></div><div class="ttdeci">binary_relation_exprt less_than(exprt lhs, exprt rhs)</div><div class="ttdef"><b>Definition:</b> <a href="string__expr_8h_source.html#l00049">string_expr.h:49</a></div></div>
 <div class="ttc" id="astring__expr_8h_html_abf321d48391c43728814fe234572d3f0"><div class="ttname"><a href="string__expr_8h.html#abf321d48391c43728814fe234572d3f0">greater_than</a></div><div class="ttdeci">binary_relation_exprt greater_than(exprt lhs, exprt rhs)</div><div class="ttdef"><b>Definition:</b> <a href="string__expr_8h_source.html#l00026">string_expr.h:26</a></div></div>
-<div class="ttc" id="astructat__scope__exitt_html"><div class="ttname"><a href="structat__scope__exitt.html">at_scope_exitt</a></div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01809">convert_expr_to_smt.cpp:1810</a></div></div>
-<div class="ttc" id="astructat__scope__exitt_html_a17084e8580b949381385c7333b53026a"><div class="ttname"><a href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">at_scope_exitt::exit_function</a></div><div class="ttdeci">functiont exit_function</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01819">convert_expr_to_smt.cpp:1819</a></div></div>
-<div class="ttc" id="astructat__scope__exitt_html_a22e7c41f43de15ae68a921ac2abd96e6"><div class="ttname"><a href="structat__scope__exitt.html#a22e7c41f43de15ae68a921ac2abd96e6">at_scope_exitt::~at_scope_exitt</a></div><div class="ttdeci">~at_scope_exitt()</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01815">convert_expr_to_smt.cpp:1815</a></div></div>
-<div class="ttc" id="astructat__scope__exitt_html_ad443e34db8b8451c12c08d12375e4a35"><div class="ttname"><a href="structat__scope__exitt.html#ad443e34db8b8451c12c08d12375e4a35">at_scope_exitt::at_scope_exitt</a></div><div class="ttdeci">at_scope_exitt(functiont exit_function)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01811">convert_expr_to_smt.cpp:1811</a></div></div>
+<div class="ttc" id="astructat__scope__exitt_html"><div class="ttname"><a href="structat__scope__exitt.html">at_scope_exitt</a></div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01839">convert_expr_to_smt.cpp:1840</a></div></div>
+<div class="ttc" id="astructat__scope__exitt_html_a17084e8580b949381385c7333b53026a"><div class="ttname"><a href="structat__scope__exitt.html#a17084e8580b949381385c7333b53026a">at_scope_exitt::exit_function</a></div><div class="ttdeci">functiont exit_function</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01849">convert_expr_to_smt.cpp:1849</a></div></div>
+<div class="ttc" id="astructat__scope__exitt_html_a22e7c41f43de15ae68a921ac2abd96e6"><div class="ttname"><a href="structat__scope__exitt.html#a22e7c41f43de15ae68a921ac2abd96e6">at_scope_exitt::~at_scope_exitt</a></div><div class="ttdeci">~at_scope_exitt()</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01845">convert_expr_to_smt.cpp:1845</a></div></div>
+<div class="ttc" id="astructat__scope__exitt_html_ad443e34db8b8451c12c08d12375e4a35"><div class="ttname"><a href="structat__scope__exitt.html#ad443e34db8b8451c12c08d12375e4a35">at_scope_exitt::at_scope_exitt</a></div><div class="ttdeci">at_scope_exitt(functiont exit_function)</div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l01841">convert_expr_to_smt.cpp:1841</a></div></div>
 <div class="ttc" id="astructconfigt_1_1bv__encodingt_html_adf5bb3f857b4c899264fc7ff9b4cb843"><div class="ttname"><a href="structconfigt_1_1bv__encodingt.html#adf5bb3f857b4c899264fc7ff9b4cb843">configt::bv_encodingt::object_bits</a></div><div class="ttdeci">std::size_t object_bits</div><div class="ttdef"><b>Definition:</b> <a href="config_8h_source.html#l00346">config.h:346</a></div></div>
 <div class="ttc" id="astructfunctiont_html"><div class="ttname"><a href="structfunctiont.html">functiont</a></div><div class="ttdef"><b>Definition:</b> <a href="contracts__wrangler_8h_source.html#l00052">contracts_wrangler.h:53</a></div></div>
 <div class="ttc" id="astructsort__based__cast__to__bit__vector__convertert_html"><div class="ttname"><a href="structsort__based__cast__to__bit__vector__convertert.html">sort_based_cast_to_bit_vector_convertert</a></div><div class="ttdef"><b>Definition:</b> <a href="convert__expr__to__smt_8cpp_source.html#l00200">convert_expr_to_smt.cpp:202</a></div></div>

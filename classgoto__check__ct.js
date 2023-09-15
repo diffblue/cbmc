@@ -34,7 +34,6 @@ var classgoto__check__ct =
     [ "conversion_check", "classgoto__check__ct.html#a8a69a4cdf029dbe3cf7706648fd69464", null ],
     [ "div_by_zero_check", "classgoto__check__ct.html#aba715e5152e4c1dfeea1f286f3abb844", null ],
     [ "enum_range_check", "classgoto__check__ct.html#a465329dae8d97a6de4a64c25f7250051", null ],
-    [ "expand_pointer_checks", "classgoto__check__ct.html#ac5e6602f587e76a548c38b9308f80b8c", null ],
     [ "float_overflow_check", "classgoto__check__ct.html#a4af35b3ac886381587b270f4352cd165", null ],
     [ "get_pointer_dereferenceable_conditions", "classgoto__check__ct.html#a6c52773e455b83cdda895615dda1a248", null ],
     [ "get_pointer_is_null_condition", "classgoto__check__ct.html#a7872959dc723f85a109c9c0204738e20", null ],

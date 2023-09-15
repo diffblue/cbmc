@@ -1629,6 +1629,11 @@ var hierarchy =
             [ "predicate_exprt", "classpredicate__exprt.html", [
               [ "literal_exprt", "classliteral__exprt.html", null ]
             ] ],
+            [ "prophecy_pointer_in_range_exprt", "classprophecy__pointer__in__range__exprt.html", null ],
+            [ "prophecy_r_or_w_ok_exprt", "classprophecy__r__or__w__ok__exprt.html", [
+              [ "prophecy_r_ok_exprt", "classprophecy__r__ok__exprt.html", null ],
+              [ "prophecy_w_ok_exprt", "classprophecy__w__ok__exprt.html", null ]
+            ] ],
             [ "ternary_exprt", "classternary__exprt.html", [
               [ "allocate_exprt", "classallocate__exprt.html", null ],
               [ "byte_update_exprt", "classbyte__update__exprt.html", null ],

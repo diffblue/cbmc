@@ -67,6 +67,8 @@ var classsimplify__exprt =
     [ "simplify_pointer_offset", "classsimplify__exprt.html#acb1f095b6c91e193720bdcd2f9b3b58b", null ],
     [ "simplify_popcount", "classsimplify__exprt.html#a4877e4ea8311a707cfb0006ed9aecc8e", null ],
     [ "simplify_power", "classsimplify__exprt.html#a0b8aa370b2a679588537b94a158ec765", null ],
+    [ "simplify_prophecy_pointer_in_range", "classsimplify__exprt.html#a593fbffe8e85cc5a4f0a20a09b4c8747", null ],
+    [ "simplify_prophecy_r_or_w_ok", "classsimplify__exprt.html#a3f276636c12a79a535f544cf4d00cb54", null ],
     [ "simplify_rec", "classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423", null ],
     [ "simplify_shifts", "classsimplify__exprt.html#a7b701da4ded3c35513c096e143cb3954", null ],
     [ "simplify_sign", "classsimplify__exprt.html#afa8fb811e6cb143aab8ecf14d92e3c96", null ],

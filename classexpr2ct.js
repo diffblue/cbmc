@@ -85,6 +85,8 @@ var classexpr2ct =
     [ "convert_predicate_symbol", "classexpr2ct.html#af1f5d74229e5c27462a36da427f756b5", null ],
     [ "convert_prob_coin", "classexpr2ct.html#a84ea345ac4f8c3313b8a89abe95c292b", null ],
     [ "convert_prob_uniform", "classexpr2ct.html#afd9480771afc7fc0a52c72841110a591", null ],
+    [ "convert_prophecy_pointer_in_range", "classexpr2ct.html#a60de2897778ff7fabb7f1a05e798d469", null ],
+    [ "convert_prophecy_r_or_w_ok", "classexpr2ct.html#af31a3453c0a602c9505d576d1a406e69", null ],
     [ "convert_quantified_symbol", "classexpr2ct.html#a3015354dc4a690adfc6525e71b8c55e5", null ],
     [ "convert_r_or_w_ok", "classexpr2ct.html#a66b4664e756d1f8e1160fee03a10340e", null ],
     [ "convert_rec", "classexpr2ct.html#a9306ebf30046a29d235f2ecab556acd2", null ],
