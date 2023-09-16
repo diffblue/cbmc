@@ -1,0 +1,1334 @@
+<html>
+
+<p>
+This follows appendix J.2 ("Undefined behavior") of <a
+href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf">N1570</a>
+(C11) precisely. All meanings are as in the standard.
+</p>
+
+<style>
+td { vertical-align: top; }
+th { text-align: left; }
+</style>
+
+<table style="">
+
+<tr><th width="50%">C11 J.2</th>
+<th>Checked?</th>
+</tr>
+
+<tr><td>
+&ndash; A &ldquo;shall&rdquo; or &ldquo;shall not&rdquo; requirement that appears outside of a constraint is violated
+(clause 4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A nonempty source file does not end in a new-line character which is not immediately
+preceded by a backslash character or ends in a partial preprocessing token or
+comment (5.1.1.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Token concatenation produces a character sequence matching the syntax of a
+universal character name (5.1.1.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A program in a hosted environment does not define a function named main using one
+of the specified forms (5.1.2.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The execution of a program contains a data race (5.1.2.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A character not in the basic source character set is encountered in a source file, except
+in an identifier, a character constant, a string literal, a header name, a comment, or a
+preprocessing token that is never converted to a token (5.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An identifier, comment, string literal, character constant, or header name contains an
+invalid multibyte character or does not begin and end in the initial shift state (5.2.1.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The same identifier has both internal and external linkage in the same translation unit
+(6.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An object is referred to outside of its lifetime (6.2.4).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The value of a pointer to an object whose lifetime has ended is used (6.2.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of an object with automatic storage duration is used while it is
+indeterminate (6.2.4, 6.7.9, 6.8).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A trap representation is read by an lvalue expression that does not have character type
+(6.2.6.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A trap representation is produced by a side effect that modifies any part of the object
+using an lvalue expression that does not have character type (6.2.6.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The operands to certain operators are such that they could produce a negative zero
+result, but the implementation does not support negative zeros (6.2.6.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Two declarations of the same object or function specify types that are not compatible
+(6.2.7).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; A program requires the formation of a composite type from a variable length array
+type whose size is specified by an expression that is not evaluated (6.2.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Conversion to or from an integer type produces a value outside the range that can be
+represented (6.3.1.4).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; Demotion of one real floating type to another produces a value outside the range that
+can be represented (6.3.1.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An lvalue does not designate an object when evaluated (6.3.2.1).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; A non-array lvalue with an incomplete type is used in a context that requires the value
+of the designated object (6.3.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An lvalue designating an object of automatic storage duration that could have been
+declared with the register storage class is used in a context that requires the value
+of the designated object, but the object is uninitialized. (6.3.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An lvalue having array type is converted to a pointer to the initial element of the
+array, and the array object has register storage class (6.3.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An attempt is made to use the value of a void expression, or an implicit or explicit
+conversion (except to void) is applied to a void expression (6.3.2.2).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; Conversion of a pointer to an integer type produces a value outside the range that can
+be represented (6.3.2.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Conversion between two pointer types produces a result that is incorrectly aligned
+(6.3.2.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A pointer is used to call a function whose type is not compatible with the referenced
+type (6.3.2.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An unmatched ' or " character is encountered on a logical source line during
+tokenization (6.4).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; A reserved keyword token is used in translation phase 7 or 8 for some purpose other
+than as a keyword (6.4.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A universal character name in an identifier does not designate a character whose
+encoding falls into one of the specified ranges (6.4.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The initial character of an identifier is a universal character name designating a digit
+(6.4.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Two identifiers differ only in nonsignificant characters (6.4.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The identifier <code>__func__</code> is explicitly declared (6.4.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The program attempts to modify a string literal (6.4.5).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The characters ', \, ", //, or /* occur in the sequence between the &lt; and &gt;
+delimiters, or the characters ', \, //, or /* occur in the sequence between the "
+delimiters, in a header name preprocessing token (6.4.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A side effect on a scalar object is unsequenced relative to either a different side effect
+on the same scalar object or a value computation using the value of the same scalar
+object (6.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An exceptional condition occurs during the evaluation of an expression (6.5).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; An object has its stored value accessed other than by an lvalue of an allowable type
+(6.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; For a call to a function without a function prototype in scope, the number of
+arguments does not equal the number of parameters (6.5.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; For call to a function without a function prototype in scope where the function is
+defined with a function prototype, either the prototype ends with an ellipsis or the
+types of the arguments after promotion are not compatible with the types of the
+parameters (6.5.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; For a call to a function without a function prototype in scope where the function is not
+defined with a function prototype, the types of the arguments after promotion are not
+compatible with those of the parameters after promotion (with certain exceptions)
+(6.5.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A function is defined with a type that is not compatible with the type (of the
+expression) pointed to by the expression that denotes the called function (6.5.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A member of an atomic structure or union is accessed (6.5.2.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The operand of the unary * operator has an invalid value (6.5.3.2).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; A pointer is converted to other than an integer or pointer type (6.5.4).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The value of the second operand of the / or % operator is zero (6.5.5).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; Addition or subtraction of a pointer into, or just beyond, an array object and an
+integer type produces a result that does not point into, or just beyond, the same array
+object (6.5.6).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Addition or subtraction of a pointer into, or just beyond, an array object and an
+integer type produces a result that points just beyond the array object and is used as
+the operand of a unary * operator that is evaluated (6.5.6).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; Pointers that do not point into, or just beyond, the same array object are subtracted
+(6.5.6).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; An array subscript is out of range, even if an object is apparently accessible with the
+given subscript (as in the lvalue expression <code>a[1][7]</code> given the declaration
+<code int a[4][5]</code>) (6.5.6).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The result of subtracting two pointers is not representable in an object of type
+<code>ptrdiff_t</code> (6.5.6).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An expression is shifted by a negative number or by an amount greater than or equal
+to the width of the promoted expression (6.5.7).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; An expression having signed promoted type is left-shifted and either the value of the
+expression is negative or the result of shifting would be not be representable in the
+promoted type (6.5.7).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; Pointers that do not point to the same aggregate or union (nor just beyond the same
+array object) are compared using relational operators (6.5.8).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; An object is assigned to an inexactly overlapping object or to an exactly overlapping
+object with incompatible type (6.5.16.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An expression that is required to be an integer constant expression does not have an
+integer type; has operands that are not integer constants, enumeration constants,
+character constants, sizeof expressions whose results are integer constants,
+<code>_Alignof</code> expressions, or immediately-cast floating constants; or contains casts
+(outside operands to sizeof and <code>_Alignof</code> operators) other than conversions of
+arithmetic types to integer types (6.6).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; A constant expression in an initializer is not, or does not evaluate to, one of the
+following: an arithmetic constant expression, a null pointer constant, an address
+constant, or an address constant for a complete object type plus or minus an integer
+constant expression (6.6).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; An arithmetic constant expression does not have arithmetic type; has operands that
+are not integer constants, floating constants, enumeration constants, character
+constants, sizeof expressions whose results are integer constants, or <code>_Alignof</code>
+expressions; or contains casts (outside operands to sizeof or <code>_Alignof</code> operators)
+other than conversions of arithmetic types to arithmetic types (6.6).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The value of an object is accessed by an array-subscript
+<code>[]</code>, member-access <code>.</code> or <code>-&gt;</code>,
+address <code>&amp;</code>, or indirection <code>*</code> operator
+or a pointer cast in creating an address constant (6.6).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; An identifier for an object is declared with no linkage and the type of the object is
+incomplete after its declarator, or after its init-declarator if it has an initializer (6.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A function is declared at block scope with an explicit storage-class specifier other
+than extern (6.7.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A structure or union is defined without any named members (including those
+specified indirectly via anonymous structures and unions) (6.7.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An attempt is made to access, or generate a pointer to just past, a flexible array
+member of a structure when the referenced object provides no elements for that array
+(6.7.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; When the complete type is needed, an incomplete structure or union type is not
+completed in the same scope by another declaration of the tag that defines the content
+(6.7.2.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An attempt is made to modify an object defined with a const-qualified type through
+use of an lvalue with non-const-qualified type (6.7.3).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; An attempt is made to refer to an object defined with a volatile-qualified type through
+use of an lvalue with non-volatile-qualified type (6.7.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The specification of a function type includes any type qualifiers (6.7.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Two qualified types that are required to be compatible do not have the identically
+qualified version of a compatible type (6.7.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An object which has been modified is accessed through a restrict-qualified pointer to
+a const-qualified type, or through a restrict-qualified pointer and another pointer that
+are not both based on the same object (6.7.3.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A restrict-qualified pointer is assigned a value based on another restricted pointer
+whose associated block neither began execution before the block associated with this
+pointer, nor ended before the assignment (6.7.3.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A function with external linkage is declared with an inline function specifier, but is
+not also defined in the same translation unit (6.7.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A function declared with a <code>_Noreturn</code> function specifier returns to its caller (6.7.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The definition of an object has an alignment specifier and another declaration of that
+object has a different alignment specifier (6.7.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Declarations of an object in different translation units have different alignment
+specifiers (6.7.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Two pointer types that are required to be compatible are not identically qualified, or
+are not pointers to compatible types (6.7.6.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The size expression in an array declaration is not a constant expression and evaluates
+at program execution time to a nonpositive value (6.7.6.2).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; In a context requiring two array types to be compatible, they do not have compatible
+element types, or their size specifiers evaluate to unequal values (6.7.6.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A declaration of an array parameter includes the keyword static within the
+<code>[</code> and <code>]</code> and the corresponding argument does not provide access to the first element of an
+array with at least the specified number of elements (6.7.6.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A storage-class specifier or type qualifier modifies the keyword
+<code>void</code> as a function parameter type list (6.7.6.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; In a context requiring two function types to be compatible, they do not have
+compatible return types, or their parameters disagree in use of the ellipsis terminator
+or the number and type of parameters (after default argument promotion, when there
+is no parameter type list or when one type is specified by a function definition with an
+identifier list) (6.7.6.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of an unnamed member of a structure or union is used (6.7.9).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The initializer for a scalar is neither a single expression nor a single expression
+enclosed in braces (6.7.9).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The initializer for a structure or union object that has automatic storage duration is
+neither an initializer list nor a single expression that has compatible structure or union
+type (6.7.9).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The initializer for an aggregate or union, other than an array initialized by a string
+literal, is not a brace-enclosed list of initializers for its elements or members (6.7.9).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; An identifier with external linkage is used, but in the program there does not exist
+exactly one external definition for the identifier, or the identifier is not used and there
+exist multiple external definitions for the identifier (6.9).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A function definition includes an identifier list, but the types of the parameters are not
+declared in a following declaration list (6.9.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An adjusted parameter type in a function definition is not a complete object type
+(6.9.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A function that accepts a variable number of arguments is defined without a
+parameter type list that ends with the ellipsis notation (6.9.1).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>}</code> that terminates a function is reached, and the value of the function call is used
+by the caller (6.9.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An identifier for an object with internal linkage and an incomplete type is declared
+with a tentative definition (6.9.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The token defined is generated during the expansion of a
+<code>#if</code> or <code>#elif</code>
+preprocessing directive, or the use of the defined unary operator does not match
+one of the two specified forms prior to macro replacement (6.10.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>#include</code> preprocessing directive that results after expansion does not match
+one of the two header name forms (6.10.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The character sequence in an <code>#include</code> preprocessing directive does not start with a
+letter (6.10.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; There are sequences of preprocessing tokens within the list of macro arguments that
+would otherwise act as preprocessing directives (6.10.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The result of the preprocessing operator <code>#</code> is not a valid character string literal
+(6.10.3.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The result of the preprocessing operator <code>##</code> is not a valid preprocessing token
+(6.10.3.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>#line</code> preprocessing directive that results after expansion does not match one of
+the two well-defined forms, or its digit sequence specifies zero or a number greater
+than 2147483647 (6.10.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A non-STDC <code>#pragma</code> preprocessing directive that is documented as causing
+translation failure or some other form of undefined behavior is encountered (6.10.6).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A <code>#pragma</code> STDC preprocessing directive does not match one of the well-defined
+forms (6.10.6).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The name of a predefined macro, or the identifier defined, is the subject of a
+<code>#define</code> or <code>#undef</code> preprocessing directive (6.10.8).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An attempt is made to copy an object to an overlapping object by use of a library
+function, other than as explicitly allowed (e.g., <code>memmove</code>) (clause 7).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; A file with the same name as one of the standard headers, not provided as part of the
+implementation, is placed in any of the standard places that are searched for included
+source files (7.1.2).</td>
+<td></td>
+</tr>
+
+<tr><td>
+&ndash; A header is included within an external declaration or definition (7.1.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A function, object, type, or macro that is specified as being declared or defined by
+some standard header is used before any header that declares or defines it is included
+(7.1.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A standard header is included while a macro is defined with the same name as a
+keyword (7.1.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The program attempts to declare a library function itself, rather than via a standard
+header, but the declaration does not have external linkage (7.1.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The program declares or defines a reserved identifier, other than as allowed by 7.1.4
+(7.1.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The program removes the definition of a macro whose name begins with an
+underscore and either an uppercase letter or another underscore (7.1.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An argument to a library function has an invalid value or a type not expected by a
+function with variable number of arguments (7.1.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The pointer passed to a library function array parameter does not have a value such
+that all address computations and object accesses are valid (7.1.4).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The macro definition of assert is suppressed in order to access an actual function
+(7.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The argument to the assert macro does not have a scalar type (7.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>CX_LIMITED_RANGE</code>, <code>FENV_ACCESS</code>, or
+<code>FP_CONTRACT</code> pragma is used in
+any context other than outside all external declarations or preceding all explicit
+declarations and statements inside a compound statement (7.3.4, 7.6.1, 7.12.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of an argument to a character handling function is neither equal to the value
+of EOF nor representable as an unsigned char (7.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A macro definition of errno is suppressed in order to access an actual object, or the
+program defines an identifier with the name <code>errno</code> (7.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Part of the program tests floating-point status flags, sets floating-point control modes,
+or runs under non-default mode settings, but was translated with the state for the
+<code>FENV_ACCESS</code> pragma &ldquo;off&rdquo; (7.6.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The exception-mask argument for one of the functions that provide access to the
+floating-point status flags has a nonzero value not obtained by bitwise OR of the
+floating-point exception macros (7.6.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>fesetexceptflag</code> function is used to set floating-point status flags that were
+not specified in the call to the <code>fegetexceptflag</code> function that provided the value
+of the corresponding <code>fexcept_t</code> object (7.6.2.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The argument to <code>fesetenv</code> or <code>feupdateenv</code> is neither an object set by a call to
+<code>fegetenv</code> or <code>feholdexcept</code>, nor is it an environment macro (7.6.4.3, 7.6.4.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of the result of an integer arithmetic or conversion function cannot be
+represented (7.8.2.1, 7.8.2.2, 7.8.2.3, 7.8.2.4, 7.22.6.1, 7.22.6.2, 7.22.1).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The program modifies the string pointed to by the value returned by the
+<code>setlocale</code> function (7.11.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The program modifies the structure pointed to by the value returned by the
+<code>localeconv</code> function (7.11.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A macro definition of <code>math_errhandling</code> is suppressed or the program defines
+an identifier with the name <code>math_errhandling</code> (7.12).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An argument to a floating-point classification or comparison macro is not of real
+floating type (7.12.3, 7.12.14).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A macro definition of <code>setjmp</code> is suppressed in order to access an actual function, or
+the program defines an external identifier with the name <code>setjmp</code> (7.13).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An invocation of the <code>setjmp</code> macro occurs other than in an allowed context
+(7.13.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>longjmp</code> function is invoked to restore a nonexistent environment (7.13.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; After a <code>longjmp</code>, there is an attempt to access the value of an object of automatic
+storage duration that does not have volatile-qualified type, local to the function
+containing the invocation of the corresponding <code>setjmp</code> macro, that was changed
+between the <code>setjmp</code> invocation and <code>longjmp</code> call (7.13.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The program specifies an invalid pointer to a signal handler function (7.14.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A signal handler returns when the signal corresponded to a computational exception
+(7.14.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A signal handler called in response to <code>SIGFPE</code>,
+<code>SIGILL</code>, <code>SIGSEGV</code>, or any other
+implementation-defined value corresponding to a computational exception returns
+(7.14.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A signal occurs as the result of calling the abort or raise function, and the signal
+handler calls the raise function (7.14.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A signal occurs other than as the result of calling the abort or raise function, and
+the signal handler refers to an object with static or thread storage duration that is not a
+lock-free atomic object other than by assigning a value to an object declared as
+<code>volatile sig_atomic_t</code>, or calls any function in the standard library other
+than the <code>abort</code> function, the <code>_Exit</code> function, the
+<code>quick_exit</code> function, or the <code>signal</code> function (for the same
+signal number) (7.14.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of <code>errno</code> is referred to after a signal occurred other than as the result of
+calling the abort or raise function and the corresponding signal handler obtained
+a <code>SIG_ERR</code> return from a call to the signal function (7.14.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A signal is generated by an asynchronous signal handler (7.14.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The signal function is used in a multi-threaded program (7.14.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A function with a variable number of arguments attempts to access its varying
+arguments other than through a properly declared and initialized
+<code>va_list</code> object, or before the <code>va_start</code> macro is invoked
+(7.16, 7.16.1.1, 7.16.1.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The macro <code>va_arg</code> is invoked using the parameter
+<code>ap</code> that was passed to a function
+that invoked the macro <code>va_arg</code> with the same parameter (7.16).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A macro definition of <code>va_start</code>, <code>va_arg</code>,
+<code>va_copy</code>, or <code>va_end</code> is suppressed in
+order to access an actual function, or the program defines an external identifier with
+the name <code>va_copy</code> or <code>va_end</code> (7.16.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>va_start</code> or <code>va_copy</code> macro is invoked without a
+corresponding invocation of the <code>va_end</code> macro in the same function, or
+vice versa (7.16.1, 7.16.1.2, 7.16.1.3, 7.16.1.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The type parameter to the <code>va_arg</code> macro is not such that a pointer
+to an object of that type can be obtained simply by postfixing a
+<code>*</code> (7.16.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>va_arg</code> macro is invoked when there is no actual next argument, or with a
+specified type that is not compatible with the promoted type of the actual next
+argument, with certain exceptions (7.16.1.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>va_copy</code> or <code>va_start</code> macro is called to initialize
+a <code>va_list</code> that was previously initialized by either macro without an
+intervening invocation of the <code>va_end</code> macro for the same
+<code>va_list</code> (7.16.1.2, 7.16.1.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The parameter parmN of a <code>va_start</code> macro is declared with the register
+storage class, with a function or array type, or with a type that is not compatible with
+the type that results after application of the default argument promotions (7.16.1.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The member designator parameter of an <code>offsetof</code> macro is an invalid right
+operand of the <code>.</code> operator for the type parameter, or designates a bit-field (7.19).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The argument in an instance of one of the integer-constant macros is not a decimal,
+octal, or hexadecimal constant, or it has a value that exceeds the limits for the
+corresponding type (7.20.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A byte input/output function is applied to a wide-oriented stream, or a wide character
+input/output function is applied to a byte-oriented stream (7.21.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; Use is made of any portion of a file beyond the most recent wide character written to
+a wide-oriented stream (7.21.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of a pointer to a <code>FILE</code> object is used after the associated file is closed
+(7.21.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The stream for the <code>fflush</code> function points to an input stream or to an update stream
+in which the most recent operation was input (7.21.5.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The string pointed to by the mode argument in a call to the
+<code>fopen</code> function does not
+exactly match one of the specified character sequences (7.21.5.3).</td>
+<td>mo</td>
+</tr>
+
+<tr><td>
+&ndash; An output operation on an update stream is followed by an input operation without an
+intervening call to the <code>fflush</code> function or a file positioning function, or an input
+operation on an update stream is followed by an output operation with an intervening
+call to a file positioning function (7.21.5.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An attempt is made to use the contents of the array that was supplied in a call to the
+<code>setvbuf</code> function (7.21.5.6).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; There are insufficient arguments for the format in a call to one of the formatted
+input/output functions, or an argument does not have an appropriate type (7.21.6.1,
+7.21.6.2, 7.29.2.1, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The format in a call to one of the formatted input/output functions or to the
+<code>strftime</code> or <code>wcsftime</code> function is not a valid multibyte character sequence that
+begins and ends in its initial shift state (7.21.6.1, 7.21.6.2, 7.27.3.5, 7.29.2.1, 7.29.2.2,
+7.29.5.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; In a call to one of the formatted output functions, a precision appears with a
+conversion specifier other than those described (7.21.6.1, 7.29.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A conversion specification for a formatted output function uses an asterisk to denote
+an argument-supplied field width or precision, but the corresponding argument is not
+provided (7.21.6.1, 7.29.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A conversion specification for a formatted output function uses a
+<code>#</code> or <code>0</code> flag with a
+conversion specifier other than those described (7.21.6.1, 7.29.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A conversion specification for one of the formatted input/output functions uses a
+length modifier with a conversion specifier other than those described (7.21.6.1,
+7.21.6.2, 7.29.2.1, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An s conversion specifier is encountered by one of the formatted output functions,
+and the argument is missing the null terminator (unless a precision is specified that
+does not require null termination) (7.21.6.1, 7.29.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An n conversion specification for one of the formatted input/output functions includes
+any flags, an assignment-suppressing character, a field width, or a precision (7.21.6.1,
+7.21.6.2, 7.29.2.1, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A <code>%</code> conversion specifier is encountered by one of the formatted input/output
+functions, but the complete conversion specification is not exactly %% (7.21.6.1,
+7.21.6.2, 7.29.2.1, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An invalid conversion specification is found in the format for one of the formatted
+input/output functions, or the <code>strftime</code> or
+<code>wcsftime</code> function (7.21.6.1, 7.21.6.2,
+7.27.3.5, 7.29.2.1, 7.29.2.2, 7.29.5.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The number of characters or wide characters transmitted by a formatted output
+function (or written to an array, or that would have been written to an array) is greater
+than <code>INT_MAX</code> (7.21.6.1, 7.29.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The number of input items assigned by a formatted input function is greater than
+<code>INT_MAX</code> (7.21.6.2, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The result of a conversion by one of the formatted input functions cannot be
+represented in the corresponding object, or the receiving object does not have an
+appropriate type (7.21.6.2, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A <code>c</code>, <code>s</code>, or <code>[</code> conversion specifier is
+encountered by one of the formatted input functions, and the array pointed to by the
+corresponding argument is not large enough to accept the input sequence (and a null
+terminator if the conversion specifier is <code>s</code> or <code>[</code>)
+(7.21.6.2, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A <code>c</code>, <code>s</code>, or <code>[</code> conversion specifier with an
+<code>l</code> qualifier is encountered by one of the
+formatted input functions, but the input is not a valid multibyte character sequence
+that begins in the initial shift state (7.21.6.2, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The input item for a <code>%p</code> conversion by one of the formatted input
+functions is not a value converted earlier during the same program execution
+(7.21.6.2, 7.29.2.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>vfprintf</code>, <code>vfscanf</code>,
+<code>vprintf</code>, <code>vscanf</code>, <code>vsnprintf</code>,
+<code>vsprintf</code>, <code>vsscanf</code>, <code>vfwprintf</code>,
+<code>vfwscanf</code>, <code>vswprintf</code>, <code>vswscanf</code>,
+<code>vwprintf</code>, or <code>vwscanf</code> function is called with an
+improperly initialized <code>va_list</code> argument, or
+the argument is used (other than in an invocation of <code>va_end</code>)
+after the function returns (7.21.6.8, 7.21.6.9, 7.21.6.10, 7.21.6.11, 7.21.6.12, 7.21.6.13, 7.21.6.14,
+7.29.2.5, 7.29.2.6, 7.29.2.7, 7.29.2.8, 7.29.2.9, 7.29.2.10).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The contents of the array supplied in a call to the
+<code>fgets</code> or <code>fgetws</code> function are
+used after a read error occurred (7.21.7.2, 7.29.3.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The file position indicator for a binary stream is used after a call to the
+<code>ungetc</code> function where its value was zero before the call (7.21.7.10).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The file position indicator for a stream is used after an error occurred during a call to
+the <code>fread</code> or <code>fwrite</code> function (7.21.8.1, 7.21.8.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A partial element read by a call to the <code>fread</code> function is used (7.21.8.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>fseek</code> function is called for a text stream with a nonzero offset and either the
+offset was not returned by a previous successful call to the
+<code>ftell</code> function on a stream associated with the same file or whence is not
+<code>SEEK_SET</code> (7.21.9.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The fsetpos function is called to set a position that was not returned by a previous
+successful call to the <code>fgetpos</code> function on a stream associated with the same file
+(7.21.9.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A non-null pointer returned by a call to the <code>calloc</code>,
+<code>malloc</code>, or <code>realloc</code> function
+with a zero requested size is used to access an object (7.22.3).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of a pointer that refers to space deallocated by a call to the
+<code>free</code> or <code>realloc</code> function is used (7.22.3).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The alignment requested of the <code>aligned_alloc</code> function is not valid or not
+supported by the implementation, or the size requested is not an integral multiple of
+the alignment (7.22.3.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The pointer argument to the <code>free</code> or
+<code>realloc</code> function does not match a pointer
+earlier returned by a memory management function, or the space has been deallocated
+by a call to <code>free</code> or <code>realloc</code> (7.22.3.3, 7.22.3.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of the object allocated by the <code>malloc</code> function is used (7.22.3.4).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of any bytes in a new object allocated by the
+<code>realloc</code> function beyond
+the size of the old object are used (7.22.3.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The program calls the <code>exit</code> or <code>quick_exit</code> function more
+than once, or calls both functions (7.22.4.4, 7.22.4.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; During the call to a function registered with the
+<code>atexit</code> or <code>at_quick_exit</code> function, a call is made to the
+<code>longjmp</code> function that would terminate the call to the
+registered function (7.22.4.4, 7.22.4.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The string set up by the <code>getenv</code> or
+<code>strerror</code> function is modified by the program
+(7.22.4.6, 7.24.6.2).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A signal is raised while the <code>quick_exit</code> function is executing (7.22.4.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A command is executed through the system function in a way that is documented as
+causing termination or some other form of undefined behavior (7.22.4.8).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A searching or sorting utility function is called with an invalid pointer argument, even
+if the number of elements is zero (7.22.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The comparison function called by a searching or sorting utility function alters the
+contents of the array being searched or sorted, or returns ordering values
+inconsistently (7.22.5).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The array being searched by the <code>bsearch</code> function does not have its
+elements in proper order (7.22.5.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The current conversion state is used by a multibyte/wide character conversion
+function after changing the <code>LC_CTYPE</code> category (7.22.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A string or wide string utility function is instructed to access an array beyond the end
+of an object (7.24.1, 7.29.4).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; A string or wide string utility function is called with an invalid pointer argument, even
+if the length is zero (7.24.1, 7.29.4).</td>
+<td>yes</td>
+</tr>
+
+<tr><td>
+&ndash; The contents of the destination array are used after a call to the
+<code>strxfrm</code>, <code>strftime</code>, <code>wcsxfrm</code>, or
+<code>wcsftime</code> function in which the specified length was
+too small to hold the entire null-terminated result (7.24.4.5, 7.27.3.5, 7.29.4.4.4,
+7.29.5.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The first argument in the very first call to the <code>strtok</code> or
+<code>wcstok</code> is a null pointer (7.24.5.8, 7.29.4.5.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The type of an argument to a type-generic macro is not compatible with the type of
+the corresponding parameter of the selected function (7.25).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; A complex argument is supplied for a generic parameter of a type-generic macro that
+has no corresponding complex function (7.25).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; At least one member of the broken-down time passed to
+<code>asctime</code> contains a value outside its normal range, or the calculated year
+exceeds four digits or is less than the year 1000 (7.27.3.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The argument corresponding to an <code>s</code> specifier without an
+<code>l</code> qualifier in a call to the <code>fwprintf</code> function does
+not point to a valid multibyte character sequence that begins in the initial
+shift state (7.29.2.11).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; In a call to the <code>wcstok</code> function, the object pointed to by
+<code>ptr</code> does not have the value stored by the previous call for the
+same wide string (7.29.4.5.7).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; An <code>mbstate_t</code> object is used inappropriately (7.29.6).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The value of an argument of type <code>wint_t</code> to a wide character
+classification or case mapping function is neither equal to the value of
+<code>WEOF</code> nor representable as a <code>wchar_t</code> (7.30.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>iswctype</code> function is called using a different
+<code>LC_CTYPE</code> category from the one in effect for the call to the
+<code>wctype</code> function that returned the description (7.30.2.2.1).</td>
+<td>no</td>
+</tr>
+
+<tr><td>
+&ndash; The <code>towctrans</code> function is called using a different
+<code>LC_CTYPE</code> category from the one in effect for the call to the
+<code>wctrans</code> function that returned the description
+(7.30.3.2.1).</td>
+<td>no</td>
+</tr>
+
+</table>
+
+</html>
