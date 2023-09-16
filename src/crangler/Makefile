@@ -15,7 +15,7 @@ OBJ += ../big-int/big-int$(LIBEXT) \
 INCLUDES= -I ..
 
 include ../config.inc
-include ../../$(CPROVER_DIR)/src/common
+include ../common
 
 CLEANFILES = crangler$(LIBEXT) \
   c_lex.yy.cpp \
