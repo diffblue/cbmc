@@ -53,8 +53,8 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       std::max(address_bits(src_bv_width), index_bv_width);
     unsignedbv_typet index_type(index_width);
 
-    equal_exprt equality(
-      typecast_exprt::conditional_cast(index, index_type), exprt());
+    const auto index_casted =
+      typecast_exprt::conditional_cast(index, index_type);
 
     if(prop.has_set_to())
     {
@@ -64,7 +64,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       // add implications
       for(std::size_t i = 0; i < src_bv.size(); i++)
       {
-        equality.rhs()=from_integer(i, index_type);
+        equal_exprt equality(index_casted, from_integer(i, index_type));
         literalt equal = prop.lequal(literal, src_bv[i]);
         prop.l_set_to_true(prop.limplies(convert(equality), equal));
       }
@@ -77,7 +77,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
 
       for(std::size_t i = 0; i < src_bv.size(); i++)
       {
-        equality.rhs()=from_integer(i, index_type);
+        equal_exprt equality(index_casted, from_integer(i, index_type));
         literal = prop.lselect(convert(equality), src_bv[i], literal);
       }
 
