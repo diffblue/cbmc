@@ -107,11 +107,7 @@ inline void show_natural_loops(const goto_modelt &goto_model, std::ostream &out)
 template <class P, class T, typename C>
 void natural_loops_templatet<P, T, C>::compute(P &program)
 {
-  cfg_dominators(program);
-
-#ifdef DEBUG
-  cfg_dominators.output(std::cout);
-#endif
+  bool no_cycle_currently = true;
 
   // find back-edges m->n
   for(T m_it=program.instructions.begin();
@@ -124,6 +120,17 @@ void natural_loops_templatet<P, T, C>::compute(P &program)
 
       if(target->location_number<=m_it->location_number)
       {
+        if(no_cycle_currently)
+        {
+          cfg_dominators(program);
+          
+          no_cycle_currently = false;
+          
+        #ifdef DEBUG
+          cfg_dominators.output(std::cout);
+        #endif
+        }
+
         #ifdef DEBUG
         std::cout << "Computing loop for "
                   << m_it->location_number << " -> "
