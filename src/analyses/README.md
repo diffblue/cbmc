@@ -69,7 +69,7 @@ apply the dominator algorithm to its Java bytecode representation.
 `cfg_dominators_templatet::output` is a good place to check how to query the
 dominators it has found.
 
-\subsection analyses-constant-propagation Constant propagation (\ref constant_propagator_ait)
+\subsection analyses-constant-propagation Constant propagation (constant_propagator_ait)
 
 A simple, unsound constant propagator. Replaces RHS symbol expressions (variable
 reads) with their values when they appear to have a unique value at a particular
@@ -241,10 +241,6 @@ To be documented.
 To be documented.
 
 \section analyses-transformations Transformations (arguably in the wrong directory):
-
-\subsection analyses-goto-checkt Pointer / overflow / other check insertion (goto_checkt)
-
-To be documented.
 
 \subsection analyses-interval-analysis Integer interval analysis -- both an analysis and a transformation
 
