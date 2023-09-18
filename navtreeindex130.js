@@ -1,6 +1,5 @@
 var NAVTREEINDEX130 =
 {
-"structc__wranglert_1_1function__contract__clauset.html#aed46383628acf6f93a9f51e596f135bb":[8,0,157,1,1],
 "structc__wranglert_1_1functiont.html":[8,0,157,2],
 "structc__wranglert_1_1functiont.html#a005d725c42100a68acab5eb862f7bda6":[8,0,157,2,2],
 "structc__wranglert_1_1functiont.html#a28efa1f2fb7a3d1c3a4d6f3715444cda":[8,0,157,2,3],
@@ -249,5 +248,6 @@ var NAVTREEINDEX130 =
 "structcontract__clausest.html":[8,0,275],
 "structcontract__clausest.html#a3d2b4951ac91f457d5c2af2b401820bb":[8,0,275,2],
 "structcontract__clausest.html#ac3e892e8f3be5a7030117ba29836f95b":[8,0,275,0],
-"structcontract__clausest.html#ac46b94e7ad54b16bbd62b788fb540372":[8,0,275,1]
+"structcontract__clausest.html#ac46b94e7ad54b16bbd62b788fb540372":[8,0,275,1],
+"structcontract__clausest.html#af60c9ec062dfa1ccfd51e338c628faba":[8,0,275,3]
 };

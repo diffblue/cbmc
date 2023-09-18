@@ -114,128 +114,132 @@ $(document).ready(function(){initNavTree('goto__cc__mode_8cpp_source.html',''); 
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="exception__utils_8h.html">util/exception_utils.h</a>&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="src_2util_2message_8h.html">util/message.h</a>&gt;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="parse__options_8h.html">util/parse_options.h</a>&gt;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="version_8h.html">util/version.h</a>&gt;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__cc__cmdline_8h.html">goto_cc_cmdline.h</a>&quot;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#a195d68b9c7bd7ea2a3bb9608580a7d5f">   32</a></span>&#160;<a class="code" href="classgoto__cc__modet.html#a195d68b9c7bd7ea2a3bb9608580a7d5f">goto_cc_modet::goto_cc_modet</a>(</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="classgoto__cc__cmdlinet.html">goto_cc_cmdlinet</a> &amp;_cmdline,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">const</span> std::string &amp;_base_name,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;_message_handler)</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  : cmdline(_cmdline), base_name(_base_name), message_handler(_message_handler)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <a class="code" href="classgoto__cc__modet.html#aab7770703331ea322892fb5c81f6a2c2">register_languages</a>();</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#a009ce47e31bbbc60901118bd1653cbb8">   42</a></span>&#160;<a class="code" href="classgoto__cc__modet.html#a009ce47e31bbbc60901118bd1653cbb8">goto_cc_modet::~goto_cc_modet</a>()</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;}</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#ab563b6cf7ef46393b3ea806586f2d0f0">   47</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__cc__modet.html#ab563b6cf7ef46393b3ea806586f2d0f0">goto_cc_modet::help</a>()</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="comment">// clang-format off</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  std::cout &lt;&lt; <span class="charliteral">&#39;\n&#39;</span> &lt;&lt; <a class="code" href="parse__options_8cpp.html#a6bb96dff7c967555d14049749086134d">banner_string</a>(<span class="stringliteral">&quot;goto-cc&quot;</span>, <a class="code" href="version_8h.html#a1a24d8124c3c2a9ed466d3ff1a63b92d">CBMC_VERSION</a>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            &lt;&lt; <a class="code" href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a>(<span class="stringliteral">&quot;Copyright (C) 2006-2018&quot;</span>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            &lt;&lt; <a class="code" href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a>(<span class="stringliteral">&quot;Daniel Kroening, Michael Tautschnig,&quot;</span>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span> <span class="comment">// NOLINT(*)</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            &lt;&lt; <a class="code" href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a>(<span class="stringliteral">&quot;Christoph Wintersteiger&quot;</span>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            &lt;&lt;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classgoto__cc__modet.html#a3d9eeb22b384b6564aa15dfbbbc5dc7b">help_mode</a>();</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="help__formatter_8h.html">util/help_formatter.h</a>&gt;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="src_2util_2message_8h.html">util/message.h</a>&gt;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="parse__options_8h.html">util/parse_options.h</a>&gt;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="version_8h.html">util/version.h</a>&gt;</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__cc__cmdline_8h.html">goto_cc_cmdline.h</a>&quot;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#a195d68b9c7bd7ea2a3bb9608580a7d5f">   33</a></span>&#160;<a class="code" href="classgoto__cc__modet.html#a195d68b9c7bd7ea2a3bb9608580a7d5f">goto_cc_modet::goto_cc_modet</a>(</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <a class="code" href="classgoto__cc__cmdlinet.html">goto_cc_cmdlinet</a> &amp;_cmdline,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">const</span> std::string &amp;_base_name,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;_message_handler)</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  : cmdline(_cmdline), base_name(_base_name), message_handler(_message_handler)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <a class="code" href="classgoto__cc__modet.html#aab7770703331ea322892fb5c81f6a2c2">register_languages</a>();</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;}</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#a009ce47e31bbbc60901118bd1653cbb8">   43</a></span>&#160;<a class="code" href="classgoto__cc__modet.html#a009ce47e31bbbc60901118bd1653cbb8">goto_cc_modet::~goto_cc_modet</a>()</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;}</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#ab563b6cf7ef46393b3ea806586f2d0f0">   48</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__cc__modet.html#ab563b6cf7ef46393b3ea806586f2d0f0">goto_cc_modet::help</a>()</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;{</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="comment">// clang-format off</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  std::cout &lt;&lt; <span class="charliteral">&#39;\n&#39;</span> &lt;&lt; <a class="code" href="parse__options_8cpp.html#a6bb96dff7c967555d14049749086134d">banner_string</a>(<span class="stringliteral">&quot;goto-cc&quot;</span>, <a class="code" href="version_8h.html#a1a24d8124c3c2a9ed466d3ff1a63b92d">CBMC_VERSION</a>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            &lt;&lt; <a class="code" href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a>(<span class="stringliteral">&quot;Copyright (C) 2006-2018&quot;</span>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            &lt;&lt; <a class="code" href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a>(<span class="stringliteral">&quot;Daniel Kroening, Michael Tautschnig,&quot;</span>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span> <span class="comment">// NOLINT(*)</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            &lt;&lt; <a class="code" href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a>(<span class="stringliteral">&quot;Christoph Wintersteiger&quot;</span>) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            &lt;&lt;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="comment">// clang-format on</span></div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  std::cout &lt;&lt;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="stringliteral">&quot;Usage:                       Purpose:\n&quot;</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="stringliteral">&quot; --verbosity #               verbosity level\n&quot;</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="stringliteral">&quot; --function name             set entry point to name\n&quot;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="stringliteral">&quot; --native-compiler cmd       command to invoke as preprocessor/compiler\n&quot;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="stringliteral">&quot; --native-linker cmd         command to invoke as linker\n&quot;</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="stringliteral">&quot; --native-assembler cmd      command to invoke as assembler (goto-as only)\n&quot;</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="stringliteral">&quot; --export-file-local-symbols\n&quot;</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="stringliteral">&quot;                             name-mangle and export file-local symbols\n&quot;</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="stringliteral">&quot; --mangle-suffix suffix      append suffix to exported file-local symbols\n&quot;</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="stringliteral">&quot; --print-rejected-preprocessed-source file\n&quot;</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="stringliteral">&quot;                             copy failing (preprocessed) source to file\n&quot;</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="stringliteral">&quot; --object-bits               number of bits used for object addresses\n&quot;</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// clang-format on</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#ab7139fa520b88177e7b16d9bfa165e93">   79</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classgoto__cc__modet.html#ab7139fa520b88177e7b16d9bfa165e93">goto_cc_modet::main</a>(<span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> **argv)</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;{</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a95a4345d50b129c42be7188a83580ca0">parse</a>(argc, argv))</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="classgoto__cc__modet.html#aa1522acf25c7748cf029ec817efd7051">usage_error</a>();</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">return</span> EX_USAGE;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classgoto__cc__modet.html#a145af8953ea223efddd4d159d57c140a">doit</a>();</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <span class="keywordtype">char</span> *e)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  {</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    log.error() &lt;&lt; e &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  }</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::string &amp;e)</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  {</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    log.error() &lt;&lt; e &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  }</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keywordflow">catch</span>(<span class="keywordtype">int</span>)</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  {</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  }</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::bad_alloc &amp;)</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    log.error() &lt;&lt; <span class="stringliteral">&quot;Out of memory&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  }</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a> &amp;e)</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  {</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    log.error().source_location = e.get_source_location();</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    log.error() &lt;&lt; e.get_reason() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  }</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classcprover__exception__baset.html">cprover_exception_baset</a> &amp;e)</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    log.error() &lt;&lt; e.what() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;}</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00135"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#aa1522acf25c7748cf029ec817efd7051">  135</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__cc__modet.html#aa1522acf25c7748cf029ec817efd7051">goto_cc_modet::usage_error</a>()</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;{</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  std::cerr &lt;&lt; <span class="stringliteral">&quot;Usage error!\n\n&quot;</span>;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <a class="code" href="classgoto__cc__modet.html#ab563b6cf7ef46393b3ea806586f2d0f0">help</a>();</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;}</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <a class="code" href="classgoto__cc__modet.html#a3d9eeb22b384b6564aa15dfbbbc5dc7b">help_mode</a>();</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  std::cout &lt;&lt; <a class="code" href="help__formatter_8h.html#a4acde3ef7739289b9c7f10a0eb48bc2e">help_formatter</a>(</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="stringliteral">&quot;Usage:                     \tPurpose:\n&quot;</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="stringliteral">&quot; {y--verbosity} {u#} \t verbosity level\n&quot;</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="stringliteral">&quot; {y--function} {uname} \t set entry point to name\n&quot;</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="stringliteral">&quot; {y--native-compiler} {ucmd} \t command to invoke as &quot;</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="stringliteral">&quot;preprocessor/compiler\n&quot;</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="stringliteral">&quot; {y--native-linker} {ucmd} \t command to invoke as linker\n&quot;</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="stringliteral">&quot; {y--native-assembler} {ucmd} \t command to invoke as assembler &quot;</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="stringliteral">&quot;(goto-as only)\n&quot;</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="stringliteral">&quot; {y--export-file-local-symbols} \t &quot;</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="stringliteral">&quot;name-mangle and export file-local symbols\n&quot;</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="stringliteral">&quot; {y--mangle-suffix} {usuffix} \t append suffix to exported file-local &quot;</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="stringliteral">&quot;symbols\n&quot;</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="stringliteral">&quot; {y--print-rejected-preprocessed-source} {ufile} \t &quot;</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="stringliteral">&quot;copy failing (preprocessed) source to file\n&quot;</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="stringliteral">&quot; {y--object-bits} {N} \t number of bits used for object addresses\n&quot;</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;}</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#ab7139fa520b88177e7b16d9bfa165e93">   83</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classgoto__cc__modet.html#ab7139fa520b88177e7b16d9bfa165e93">goto_cc_modet::main</a>(<span class="keywordtype">int</span> argc, <span class="keyword">const</span> <span class="keywordtype">char</span> **argv)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;{</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a95a4345d50b129c42be7188a83580ca0">parse</a>(argc, argv))</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  {</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="classgoto__cc__modet.html#aa1522acf25c7748cf029ec817efd7051">usage_error</a>();</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">return</span> EX_USAGE;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  }</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classgoto__cc__modet.html#a145af8953ea223efddd4d159d57c140a">doit</a>();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  }</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <span class="keywordtype">char</span> *e)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    log.error() &lt;&lt; e &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  }</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::string &amp;e)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  {</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    log.error() &lt;&lt; e &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  }</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keywordflow">catch</span>(<span class="keywordtype">int</span>)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  }</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::bad_alloc &amp;)</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    log.error() &lt;&lt; <span class="stringliteral">&quot;Out of memory&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a> &amp;e)</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  {</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    log.error().source_location = e.get_source_location();</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    log.error() &lt;&lt; e.get_reason() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classcprover__exception__baset.html">cprover_exception_baset</a> &amp;e)</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  {</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">message_handler</a>};</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    log.error() &lt;&lt; e.what() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordflow">return</span> EX_SOFTWARE;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  }</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;}</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno"><a class="line" href="classgoto__cc__modet.html#aa1522acf25c7748cf029ec817efd7051">  139</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgoto__cc__modet.html#aa1522acf25c7748cf029ec817efd7051">goto_cc_modet::usage_error</a>()</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;{</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  std::cerr &lt;&lt; <span class="stringliteral">&quot;Usage error!\n\n&quot;</span>;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  <a class="code" href="classgoto__cc__modet.html#ab563b6cf7ef46393b3ea806586f2d0f0">help</a>();</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;}</div>
 <div class="ttc" id="aclasscprover__exception__baset_html"><div class="ttname"><a href="classcprover__exception__baset.html">cprover_exception_baset</a></div><div class="ttdoc">Base class for exceptions thrown in the cprover project.</div><div class="ttdef"><b>Definition:</b> <a href="c__errors_8h_source.html#l00063">c_errors.h:64</a></div></div>
 <div class="ttc" id="aclassgoto__cc__cmdlinet_html"><div class="ttname"><a href="classgoto__cc__cmdlinet.html">goto_cc_cmdlinet</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__cmdline_8h_source.html#l00019">goto_cc_cmdline.h:20</a></div></div>
 <div class="ttc" id="aclassgoto__cc__cmdlinet_html_a95a4345d50b129c42be7188a83580ca0"><div class="ttname"><a href="classgoto__cc__cmdlinet.html#a95a4345d50b129c42be7188a83580ca0">goto_cc_cmdlinet::parse</a></div><div class="ttdeci">virtual bool parse(int argc, const char **argv)=0</div></div>
-<div class="ttc" id="aclassgoto__cc__modet_html_a009ce47e31bbbc60901118bd1653cbb8"><div class="ttname"><a href="classgoto__cc__modet.html#a009ce47e31bbbc60901118bd1653cbb8">goto_cc_modet::~goto_cc_modet</a></div><div class="ttdeci">~goto_cc_modet()</div><div class="ttdoc">constructor</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00042">goto_cc_mode.cpp:42</a></div></div>
+<div class="ttc" id="aclassgoto__cc__modet_html_a009ce47e31bbbc60901118bd1653cbb8"><div class="ttname"><a href="classgoto__cc__modet.html#a009ce47e31bbbc60901118bd1653cbb8">goto_cc_modet::~goto_cc_modet</a></div><div class="ttdeci">~goto_cc_modet()</div><div class="ttdoc">constructor</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00043">goto_cc_mode.cpp:43</a></div></div>
 <div class="ttc" id="aclassgoto__cc__modet_html_a145af8953ea223efddd4d159d57c140a"><div class="ttname"><a href="classgoto__cc__modet.html#a145af8953ea223efddd4d159d57c140a">goto_cc_modet::doit</a></div><div class="ttdeci">virtual int doit()=0</div></div>
-<div class="ttc" id="aclassgoto__cc__modet_html_a195d68b9c7bd7ea2a3bb9608580a7d5f"><div class="ttname"><a href="classgoto__cc__modet.html#a195d68b9c7bd7ea2a3bb9608580a7d5f">goto_cc_modet::goto_cc_modet</a></div><div class="ttdeci">goto_cc_modet(goto_cc_cmdlinet &amp;, const std::string &amp;_base_name, message_handlert &amp;)</div><div class="ttdoc">constructor</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00032">goto_cc_mode.cpp:32</a></div></div>
+<div class="ttc" id="aclassgoto__cc__modet_html_a195d68b9c7bd7ea2a3bb9608580a7d5f"><div class="ttname"><a href="classgoto__cc__modet.html#a195d68b9c7bd7ea2a3bb9608580a7d5f">goto_cc_modet::goto_cc_modet</a></div><div class="ttdeci">goto_cc_modet(goto_cc_cmdlinet &amp;, const std::string &amp;_base_name, message_handlert &amp;)</div><div class="ttdoc">constructor</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00033">goto_cc_mode.cpp:33</a></div></div>
 <div class="ttc" id="aclassgoto__cc__modet_html_a3746986389554b9de5ebd078878f170d"><div class="ttname"><a href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">goto_cc_modet::cmdline</a></div><div class="ttdeci">goto_cc_cmdlinet &amp; cmdline</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8h_source.html#l00038">goto_cc_mode.h:38</a></div></div>
 <div class="ttc" id="aclassgoto__cc__modet_html_a3d9eeb22b384b6564aa15dfbbbc5dc7b"><div class="ttname"><a href="classgoto__cc__modet.html#a3d9eeb22b384b6564aa15dfbbbc5dc7b">goto_cc_modet::help_mode</a></div><div class="ttdeci">virtual void help_mode()=0</div></div>
 <div class="ttc" id="aclassgoto__cc__modet_html_a6254d99e00c4c23e0b70855c92ecbb30"><div class="ttname"><a href="classgoto__cc__modet.html#a6254d99e00c4c23e0b70855c92ecbb30">goto_cc_modet::message_handler</a></div><div class="ttdeci">message_handlert &amp; message_handler</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8h_source.html#l00040">goto_cc_mode.h:40</a></div></div>
-<div class="ttc" id="aclassgoto__cc__modet_html_aa1522acf25c7748cf029ec817efd7051"><div class="ttname"><a href="classgoto__cc__modet.html#aa1522acf25c7748cf029ec817efd7051">goto_cc_modet::usage_error</a></div><div class="ttdeci">virtual void usage_error()</div><div class="ttdoc">Prints a message informing the user about incorrect options.</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00135">goto_cc_mode.cpp:135</a></div></div>
+<div class="ttc" id="aclassgoto__cc__modet_html_aa1522acf25c7748cf029ec817efd7051"><div class="ttname"><a href="classgoto__cc__modet.html#aa1522acf25c7748cf029ec817efd7051">goto_cc_modet::usage_error</a></div><div class="ttdeci">virtual void usage_error()</div><div class="ttdoc">Prints a message informing the user about incorrect options.</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00139">goto_cc_mode.cpp:139</a></div></div>
 <div class="ttc" id="aclassgoto__cc__modet_html_aab7770703331ea322892fb5c81f6a2c2"><div class="ttname"><a href="classgoto__cc__modet.html#aab7770703331ea322892fb5c81f6a2c2">goto_cc_modet::register_languages</a></div><div class="ttdeci">void register_languages()</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__languages_8cpp_source.html#l00023">goto_cc_languages.cpp:23</a></div></div>
-<div class="ttc" id="aclassgoto__cc__modet_html_ab563b6cf7ef46393b3ea806586f2d0f0"><div class="ttname"><a href="classgoto__cc__modet.html#ab563b6cf7ef46393b3ea806586f2d0f0">goto_cc_modet::help</a></div><div class="ttdeci">void help()</div><div class="ttdoc">display command line help</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00047">goto_cc_mode.cpp:47</a></div></div>
-<div class="ttc" id="aclassgoto__cc__modet_html_ab7139fa520b88177e7b16d9bfa165e93"><div class="ttname"><a href="classgoto__cc__modet.html#ab7139fa520b88177e7b16d9bfa165e93">goto_cc_modet::main</a></div><div class="ttdeci">int main(int argc, const char **argv)</div><div class="ttdoc">starts the compiler</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00079">goto_cc_mode.cpp:79</a></div></div>
+<div class="ttc" id="aclassgoto__cc__modet_html_ab563b6cf7ef46393b3ea806586f2d0f0"><div class="ttname"><a href="classgoto__cc__modet.html#ab563b6cf7ef46393b3ea806586f2d0f0">goto_cc_modet::help</a></div><div class="ttdeci">void help()</div><div class="ttdoc">display command line help</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00048">goto_cc_mode.cpp:48</a></div></div>
+<div class="ttc" id="aclassgoto__cc__modet_html_ab7139fa520b88177e7b16d9bfa165e93"><div class="ttname"><a href="classgoto__cc__modet.html#ab7139fa520b88177e7b16d9bfa165e93">goto_cc_modet::main</a></div><div class="ttdeci">int main(int argc, const char **argv)</div><div class="ttdoc">starts the compiler</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__mode_8cpp_source.html#l00083">goto_cc_mode.cpp:83</a></div></div>
 <div class="ttc" id="aclassinvalid__source__file__exceptiont_html"><div class="ttname"><a href="classinvalid__source__file__exceptiont.html">invalid_source_file_exceptiont</a></div><div class="ttdoc">Thrown when we can't handle something in an input source file.</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8h_source.html#l00171">exception_utils.h:172</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:28</a></div></div>
 <div class="ttc" id="aclassmessaget_html"><div class="ttname"><a href="classmessaget.html">messaget</a></div><div class="ttdoc">Class that provides messages with a built-in verbosity 'level'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00154">message.h:155</a></div></div>
@@ -243,6 +247,8 @@ $(document).ready(function(){initNavTree('goto__cc__mode_8cpp_source.html',''); 
 <div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
 <div class="ttc" id="agoto__cc__cmdline_8h_html"><div class="ttname"><a href="goto__cc__cmdline_8h.html">goto_cc_cmdline.h</a></div><div class="ttdoc">Command line interpretation for goto-cc.</div></div>
 <div class="ttc" id="agoto__cc__mode_8h_html"><div class="ttname"><a href="goto__cc__mode_8h.html">goto_cc_mode.h</a></div><div class="ttdoc">Command line interpretation for goto-cc.</div></div>
+<div class="ttc" id="ahelp__formatter_8h_html"><div class="ttname"><a href="help__formatter_8h.html">help_formatter.h</a></div><div class="ttdoc">Help Formatter.</div></div>
+<div class="ttc" id="ahelp__formatter_8h_html_a4acde3ef7739289b9c7f10a0eb48bc2e"><div class="ttname"><a href="help__formatter_8h.html#a4acde3ef7739289b9c7f10a0eb48bc2e">help_formatter</a></div><div class="ttdeci">static help_formattert help_formatter(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="help__formatter_8h_source.html#l00040">help_formatter.h:40</a></div></div>
 <div class="ttc" id="aparse__options_8cpp_html_a397ae5a3df1f9dcf4f6cff3e829e1e59"><div class="ttname"><a href="parse__options_8cpp.html#a397ae5a3df1f9dcf4f6cff3e829e1e59">align_center_with_border</a></div><div class="ttdeci">std::string align_center_with_border(const std::string &amp;text)</div><div class="ttdoc">Utility for displaying help centered messages borderered by &quot;* *&quot;.</div><div class="ttdef"><b>Definition:</b> <a href="parse__options_8cpp_source.html#l00158">parse_options.cpp:158</a></div></div>
 <div class="ttc" id="aparse__options_8cpp_html_a6bb96dff7c967555d14049749086134d"><div class="ttname"><a href="parse__options_8cpp.html#a6bb96dff7c967555d14049749086134d">banner_string</a></div><div class="ttdeci">std::string banner_string(const std::string &amp;front_end, const std::string &amp;version)</div><div class="ttdef"><b>Definition:</b> <a href="parse__options_8cpp_source.html#l00171">parse_options.cpp:171</a></div></div>
 <div class="ttc" id="aparse__options_8h_html"><div class="ttname"><a href="parse__options_8h.html">parse_options.h</a></div></div>
