@@ -794,7 +794,7 @@ void janalyzer_parse_optionst::help()
     "\n"
     "Other options:\n"
     " {y--version} \t show version and exit\n"
-    " {y--verbosity {u#} \t verbosity level\n"
+    " {y--verbosity} {u#} \t verbosity level\n"
     HELP_TIMESTAMP
     "\n");
   // clang-format on

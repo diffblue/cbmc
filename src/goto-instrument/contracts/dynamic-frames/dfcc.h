@@ -55,20 +55,18 @@ class optionst;
 #define FLAG_DFCC "dfcc"
 #define OPT_DFCC "(" FLAG_DFCC "):"
 
-// clang-format off
 #define HELP_DFCC                                                              \
-  " --dfcc <harness>              activate dynamic frame condition checking\n" \
-  "                               for contracts using the given harness as\n"  \
-  "                               entry point\n"
+  " {y--dfcc} {uharness} \t "                                                  \
+  "activate dynamic frame condition checking for contracts using the given "   \
+  "harness as entry point\n"
 
 #define FLAG_ENFORCE_CONTRACT_REC "enforce-contract-rec"
 #define OPT_ENFORCE_CONTRACT_REC "(" FLAG_ENFORCE_CONTRACT_REC "):"
 #define HELP_ENFORCE_CONTRACT_REC                                              \
-  " --enforce-contract-rec <function>[/<contract>]"                            \
-  "                               wrap fun with an assertion of the contract\n"\
-  "                               and assume recursive calls to fun satisfy \n"\
-  "                               the contract\n"
-// clang-format on
+  " {y--enforce-contract-rec} {ufunction}[{y/}{ucontract}] \t "                \
+  "wrap {ufunction} with an assertion of the contract and assume recursive "   \
+  "calls to "                                                                  \
+  "{ufunction} satisfy the contract\n"
 
 /// Exception thrown for bad function/contract specification pairs passed on
 /// the CLI.

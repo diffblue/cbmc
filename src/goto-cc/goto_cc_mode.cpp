@@ -22,6 +22,7 @@ Author: CM Wintersteiger, 2006
 #endif
 
 #include <util/exception_utils.h>
+#include <util/help_formatter.h>
 #include <util/message.h>
 #include <util/parse_options.h>
 #include <util/version.h>
@@ -53,25 +54,28 @@ void goto_cc_modet::help()
             << align_center_with_border("Christoph Wintersteiger") << '\n'
             <<
   "\n";
+  // clang-format on
 
   help_mode();
 
-  std::cout <<
-  "Usage:                       Purpose:\n"
-  "\n"
-  " --verbosity #               verbosity level\n"
-  " --function name             set entry point to name\n"
-  " --native-compiler cmd       command to invoke as preprocessor/compiler\n"
-  " --native-linker cmd         command to invoke as linker\n"
-  " --native-assembler cmd      command to invoke as assembler (goto-as only)\n"
-  " --export-file-local-symbols\n"
-  "                             name-mangle and export file-local symbols\n"
-  " --mangle-suffix suffix      append suffix to exported file-local symbols\n"
-  " --print-rejected-preprocessed-source file\n"
-  "                             copy failing (preprocessed) source to file\n"
-  " --object-bits               number of bits used for object addresses\n"
-  "\n";
-  // clang-format on
+  std::cout << help_formatter(
+    "Usage:                     \tPurpose:\n"
+    "\n"
+    " {y--verbosity} {u#} \t verbosity level\n"
+    " {y--function} {uname} \t set entry point to name\n"
+    " {y--native-compiler} {ucmd} \t command to invoke as "
+    "preprocessor/compiler\n"
+    " {y--native-linker} {ucmd} \t command to invoke as linker\n"
+    " {y--native-assembler} {ucmd} \t command to invoke as assembler "
+    "(goto-as only)\n"
+    " {y--export-file-local-symbols} \t "
+    "name-mangle and export file-local symbols\n"
+    " {y--mangle-suffix} {usuffix} \t append suffix to exported file-local "
+    "symbols\n"
+    " {y--print-rejected-preprocessed-source} {ufile} \t "
+    "copy failing (preprocessed) source to file\n"
+    " {y--object-bits} {N} \t number of bits used for object addresses\n"
+    "\n");
 }
 
 /// starts the compiler
