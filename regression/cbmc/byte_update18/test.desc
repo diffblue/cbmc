@@ -1,0 +1,11 @@
+CORE broken-cprover-smt-backend
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Some bug in our in-tree SMT2 solver makes it report SAT, when Z3 states that the
+same SMT2 formula is (as expected) UNSAT.
