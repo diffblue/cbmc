@@ -117,7 +117,7 @@ Dominator analysis (cfg_dominators_templatet)</h2>
 <p>This analysis defines <code>cfg_dominatorst</code> (dominator analysis) and <code>cfg_post_dominatorst</code> (post-dominator analysis). Run these analyses using <code>operator()(const goto_programt &amp;)</code>. Alternatively, the template can be instantiated with a different type that can be used with <code><a class="el" href="classprocedure__local__cfg__baset.html">procedure_local_cfg_baset</a></code> &ndash; this is done by <code>natural_loops_mutablet</code> using (non-const) <code><a class="el" href="classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function.">goto_programt</a></code>, and by <code><a class="el" href="classjava__bytecode__convert__methodt.html">java_bytecode_convert_methodt</a></code> to apply the dominator algorithm to its Java bytecode representation.</p>
 <p><code><a class="el" href="classcfg__dominators__templatet.html#a7adb5843236067a4153a2786bbf505e6" title="Print the result of the dominator computation.">cfg_dominators_templatet::output</a></code> is a good place to check how to query the dominators it has found.</p>
 <h2><a class="anchor" id="analyses-constant-propagation"></a>
-Constant propagation (\ref constant_propagator_ait)</h2>
+Constant propagation (constant_propagator_ait)</h2>
 <p>A simple, unsound constant propagator. Replaces RHS symbol expressions (variable reads) with their values when they appear to have a unique value at a particular program point. Unsound with respect to pointer operations on the left-hand side of assignments.</p>
 <h2><a class="anchor" id="analyses-taint"></a>
 Taint analysis (custom_bitvector_analysist)</h2>
@@ -198,9 +198,6 @@ Uninitialized locals analysis (uninitialized_analysist)</h2>
 <p>To be documented.</p>
 <h1><a class="anchor" id="analyses-transformations"></a>
 Transformations (arguably in the wrong directory):</h1>
-<h2><a class="anchor" id="analyses-goto-checkt"></a>
-Pointer / overflow / other check insertion (goto_checkt)</h2>
-<p>To be documented.</p>
 <h2><a class="anchor" id="analyses-interval-analysis"></a>
 Integer interval analysis – both an analysis and a transformation</h2>
 <p><a class="el" href="interval__analysis_8h.html#ac596f29ee60594342a0c09a6ad4a1e1c">interval_analysis</a> interprets instructions of the input <a class="el" href="classgoto__modelt.html">goto_modelt</a> over the <a class="el" href="classinterval__domaint.html">interval_domaint</a>, evaluates variables for each program location (as intervals) and instruments the program with assumptions representing the over-approximation of variable values. </p>
