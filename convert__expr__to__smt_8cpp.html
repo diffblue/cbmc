@@ -119,12 +119,13 @@ $(document).ready(function(){initNavTree('convert__expr__to__smt_8cpp.html','');
 <code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;functional&gt;</code><br />
 <code>#include &lt;numeric&gt;</code><br />
+<code>#include &lt;stack&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for convert_expr_to_smt.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="convert__expr__to__smt_8cpp__incl.svg" width="2712" height="1140"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="convert__expr__to__smt_8cpp__incl.svg" width="3040" height="1140"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -341,6 +342,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a4a1246264a6dd3069e480a3610ed80e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">lower_address_of_array_index</a> (<a class="el" href="classexprt.html">exprt</a> expr)</td></tr>
 <tr class="memdesc:a4a1246264a6dd3069e480a3610ed80e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lower the <code>address_of(array[idx])</code> sub expressions in <code>expr</code> to <code>idx + address_of(array)</code>, so that it can be fed to <code>convert_expr_to_smt</code>.  <a href="convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1">More...</a><br /></td></tr>
 <tr class="separator:a4a1246264a6dd3069e480a3610ed80e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2325b851a0bc536e757f7a4f92bc5bec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8cpp.html#a2325b851a0bc536e757f7a4f92bc5bec">filtered_visit_post</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;_expr, std::function&lt; bool(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; filter, std::function&lt; void(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; visitor)</td></tr>
+<tr class="memdesc:a2325b851a0bc536e757f7a4f92bc5bec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post order traversal where the children of a node are only visited if applying the <code>filter</code> function to that node returns true.  <a href="convert__expr__to__smt_8cpp.html#a2325b851a0bc536e757f7a4f92bc5bec">More...</a><br /></td></tr>
+<tr class="separator:a2325b851a0bc536e757f7a4f92bc5bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dac4b42620b5c3c98d25f77401cfec0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsmt__termt.html">smt_termt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="convert__expr__to__smt_8cpp.html#a1dac4b42620b5c3c98d25f77401cfec0">convert_expr_to_smt</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="object__tracking_8h.html#a82f38e2f57d09b07c6804208e832cb8c">smt_object_mapt</a> &amp;object_map, const <a class="el" href="type__size__mapping_8h.html#a75319e37b6206e23f94a56ca388322f5">type_size_mapt</a> &amp;pointer_sizes, const <a class="el" href="structsmt__object__sizet.html#afc1d2382480842c9c589aec7db58dee5">smt_object_sizet::make_applicationt</a> &amp;<a class="el" href="pointer__predicates_8h.html#a4f4f8c2889a0c8ee9c61a7389bd29cbc">object_size</a>, const <a class="el" href="structsmt__is__dynamic__objectt.html#a4b303f515a9ea7af1d50c5f5d77a5a03">smt_is_dynamic_objectt::make_applicationt</a> &amp;is_dynamic_object)</td></tr>
 <tr class="memdesc:a1dac4b42620b5c3c98d25f77401cfec0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts the <code>expression</code> to an smt encoding of the same expression stored as term ast (abstract syntax tree).  <a href="convert__expr__to__smt_8cpp.html#a1dac4b42620b5c3c98d25f77401cfec0">More...</a><br /></td></tr>
 <tr class="separator:a1dac4b42620b5c3c98d25f77401cfec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -364,7 +368,7 @@ Functions</h2></td></tr>
 <li>supporting wider scope for the conversion of specific types of <code>exprt</code>, without inflating the parameter list / scope for all conversions. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00037">37</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00038">38</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -387,7 +391,7 @@ template&lt;typename functiont &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01853">1853</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01854">1854</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -425,7 +429,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01003">1003</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01004">1004</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -469,7 +473,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00240">240</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00241">241</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -515,7 +519,7 @@ template&lt;typename functiont &gt; </div>
 
 <p>Returns a cast to C bool expressed in smt terms. </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00147">147</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00148">148</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -553,7 +557,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01147">1147</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01148">1148</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -598,7 +602,7 @@ template&lt;typename functiont &gt; </div>
 </div><div class="memdoc">
 <p>This conversion constructs a bit vector representation of the memory address. This address is composed of 2 concatenated bit vector components. The first part is the base object's unique identifier. The second is the offset into that object. For address of symbols the offset will be 0. The offset may be non-zero for cases such as the address of a member field of a struct or a the address of a non-zero index into an array. </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00863">863</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00864">864</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -636,7 +640,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00477">477</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00478">478</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -674,7 +678,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00916">916</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00917">917</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -712,7 +716,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01365">1365</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01366">1366</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -750,7 +754,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00906">906</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00907">907</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -788,7 +792,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00367">367</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00368">368</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -826,7 +830,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00418">418</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00419">419</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -864,7 +868,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00384">384</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00385">385</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -902,7 +906,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00401">401</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00402">402</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -940,7 +944,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01430">1430</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01431">1431</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -978,7 +982,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01129">1129</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01130">1130</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1016,7 +1020,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01138">1138</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01139">1139</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1054,7 +1058,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00353">353</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00354">354</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1082,7 +1086,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00327">327</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00328">328</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1120,7 +1124,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01448">1448</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01449">1449</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1158,7 +1162,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01457">1457</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01458">1458</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1196,7 +1200,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00747">747</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00748">748</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1234,7 +1238,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00516">516</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00517">517</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1272,7 +1276,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00825">825</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00826">826</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1310,7 +1314,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01391">1391</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01392">1392</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1360,7 +1364,7 @@ template&lt;typename functiont &gt; </div>
 
 <p>Converts the <code>expression</code> to an smt encoding of the same expression stored as term ast (abstract syntax tree). </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01878">1878</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01919">1919</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1398,7 +1402,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01097">1097</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01098">1098</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1436,7 +1440,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01106">1106</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01107">1107</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1474,7 +1478,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00269">269</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00270">270</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1512,7 +1516,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01383">1383</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01384">1384</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1550,7 +1554,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00532">532</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00533">533</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1588,7 +1592,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00541">541</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00542">542</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1626,7 +1630,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00780">780</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00781">781</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1664,7 +1668,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00467">467</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00468">468</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1702,7 +1706,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00501">501</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00502">502</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1740,7 +1744,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00925">925</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00926">926</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1784,7 +1788,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01046">1046</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01047">1047</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1828,7 +1832,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01062">1062</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01063">1063</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1866,7 +1870,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01165">1165</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01166">1166</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1904,7 +1908,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01174">1174</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01175">1175</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1942,7 +1946,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01156">1156</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01157">1157</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -1980,7 +1984,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01183">1183</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01184">1184</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2018,7 +2022,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01424">1424</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01425">1425</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2056,7 +2060,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01375">1375</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01376">1376</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2094,7 +2098,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01037">1037</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01038">1038</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2138,7 +2142,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00691">691</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00692">692</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2176,7 +2180,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01237">1237</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01238">1238</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2214,7 +2218,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00791">791</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00792">792</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2252,7 +2256,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00834">834</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00835">835</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2290,7 +2294,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01269">1269</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01270">1270</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2328,7 +2332,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00122">122</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00123">123</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2366,7 +2370,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00509">509</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00510">510</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2404,7 +2408,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00524">524</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00525">525</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2448,7 +2452,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01407">1407</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01408">1408</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2486,7 +2490,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00485">485</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00486">486</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2530,7 +2534,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00634">634</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00635">635</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2568,7 +2572,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01208">1208</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01209">1209</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2606,7 +2610,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01312">1312</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01313">1313</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2644,7 +2648,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01335">1335</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01336">1336</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2682,7 +2686,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01439">1439</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01440">1440</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2720,7 +2724,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01475">1475</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01476">1476</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2758,7 +2762,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01466">1466</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01467">1467</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2796,7 +2800,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01120">1120</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01121">1121</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2834,7 +2838,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00975">975</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00976">976</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2872,7 +2876,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01356">1356</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01357">1357</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2910,7 +2914,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00458">458</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00459">459</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2948,7 +2952,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01088">1088</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01089">1089</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -2986,7 +2990,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00278">278</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00279">279</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3014,7 +3018,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00116">116</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00117">117</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3052,7 +3056,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00252">252</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00253">253</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3090,7 +3094,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00433">433</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00434">434</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3128,7 +3132,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00449">449</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00450">450</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3166,7 +3170,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00287">287</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00288">288</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3204,7 +3208,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01029">1029</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01030">1030</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3242,7 +3246,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01399">1399</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01400">1400</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3280,7 +3284,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01017">1017</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01018">1018</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3318,7 +3322,7 @@ template&lt;typename functiont &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00493">493</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00494">494</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3375,7 +3379,7 @@ template&lt;typename factoryt &gt; </div>
 </dl>
 <p>The conversion used is left associative for instances with 3 or more operands. The SMT standard / core theory version 2.6 actually supports applying the <code>and</code>, <code>or</code> and <code>xor</code> to 3 or more operands. However our internal <code><a class="el" href="classsmt__core__theoryt.html">smt_core_theoryt</a></code> does not support this currently and converting to binary application has the advantage of making the order of evaluation explicit. </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00052">52</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00053">53</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3427,7 +3431,7 @@ template&lt;typename unsigned_factory_typet , typename signed_factory_typet &gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00551">551</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00552">552</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3473,7 +3477,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00935">935</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00936">936</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3501,7 +3505,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00092">92</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00093">93</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3529,7 +3533,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00087">87</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00088">88</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3557,7 +3561,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00082">82</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00083">83</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3579,7 +3583,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 
 <p>Converts the <code>type</code> to an smt encoding of the same expression stored as sort ast (abstract syntax tree). </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00099">99</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00100">100</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3641,7 +3645,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01484">1484</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01485">1485</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3669,7 +3673,46 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00160">160</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00161">161</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a2325b851a0bc536e757f7a4f92bc5bec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2325b851a0bc536e757f7a4f92bc5bec">&#9670;&nbsp;</a></span>filtered_visit_post()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void filtered_visit_post </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>_expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; bool(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt;&#160;</td>
+          <td class="paramname"><em>filter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; void(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt;&#160;</td>
+          <td class="paramname"><em>visitor</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Post order traversal where the children of a node are only visited if applying the <code>filter</code> function to that node returns true. </p>
+<p>Note that this function is based on the <code>visit_post_template</code> function. </p>
+
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01882">1882</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3691,7 +3734,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 
 <p>Lower the <code>address_of(array[idx])</code> sub expressions in <code>expr</code> to <code>idx + address_of(array)</code>, so that it can be fed to <code>convert_expr_to_smt</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01859">1859</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01860">1860</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3735,7 +3778,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00171">171</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00172">172</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3775,7 +3818,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 
 <p>Makes a term which is true if <code>input</code> is not 0 / false. </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00134">134</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00135">135</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3805,7 +3848,7 @@ template&lt;typename factoryt , typename shiftt &gt; </div>
 
 <p>Constructs a term which is true if the most significant bit of <code>input</code> is set. </p>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01195">1195</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l01196">1196</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3843,7 +3886,7 @@ template&lt;typename target_typet &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00074">74</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00075">75</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
@@ -3881,7 +3924,7 @@ template&lt;typename target_typet &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00591">591</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="convert__expr__to__smt_8cpp_source.html#l00592">592</a> of file <a class="el" href="convert__expr__to__smt_8cpp_source.html">convert_expr_to_smt.cpp</a>.</p>
 
 </div>
 </div>
