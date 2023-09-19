@@ -1,0 +1,16 @@
+CORE
+intrinsics_warn.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+WARNING: no body for function
+file intrinsics_warn.c line \d+ function main: function '__CPROVER_field_decl_global' is not declared
+file intrinsics_warn.c line \d+ function main: function '__CPROVER_field_decl_local' is not declared
+file intrinsics_warn.c line \d+ function main: function '__CPROVER_set_field' is not declared
+file intrinsics_warn.c line \d+ function main: function '__CPROVER_get_field' is not declared
+--
+This test is making sure that we don't get any of the log messages warning
+for the shadow memory intrinsics being undefined after the type check phase.
