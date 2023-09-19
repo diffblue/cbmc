@@ -63,7 +63,7 @@ void goto_check_c(
   "enable pointer arithmetic over- and underflow checks\n"                     \
   " {y--conversion-check} \t "                                                 \
   "check whether values can be represented after type cast\n"                  \
-  " {y--undefined-shift-check} \t check shift greater than bit-width"          \
+  " {y--undefined-shift-check} \t check shift greater than bit-width\n"        \
   " {y--float-overflow-check} \t check floating-point for +/-Inf\n"            \
   " {y--nan-check} \t check floating-point for NaN\n"                          \
   " {y--enum-range-check} \t "                                                 \
