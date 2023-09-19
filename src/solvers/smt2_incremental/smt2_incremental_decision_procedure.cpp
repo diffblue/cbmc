@@ -4,6 +4,7 @@
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/nodiscard.h>
 #include <util/range.h>
@@ -479,6 +480,17 @@ optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
 }
 
 optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
+  const smt_termt &union_term,
+  const union_tag_typet &type) const
+{
+  const auto encoded_result =
+    get_expr(union_term, struct_encoding.encode(type));
+  if(!encoded_result)
+    return {};
+  return {struct_encoding.decode(*encoded_result, type)};
+}
+
+optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &descriptor,
   const typet &type) const
 {
@@ -491,6 +503,10 @@ optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   if(const auto struct_type = type_try_dynamic_cast<struct_tag_typet>(type))
   {
     return get_expr(descriptor, *struct_type);
+  }
+  if(const auto union_type = type_try_dynamic_cast<union_tag_typet>(type))
+  {
+    return get_expr(descriptor, *union_type);
   }
   const smt_get_value_commandt get_value_command{descriptor};
   const smt_responset response = get_response_to_command(

@@ -871,14 +871,28 @@ TEST_CASE(
   const auto foo_term = smt_identifier_termt{"foo", smt_bit_vector_sortt{32}};
   const auto padding_term =
     smt_identifier_termt{"padding_0", smt_bit_vector_sortt{24}};
-  const std::vector<smt_commandt> expected_commands{
+  const std::vector<smt_commandt> expected_set_commands{
     smt_declare_function_commandt{foo_term, {}},
     smt_declare_function_commandt{padding_term, {}},
     smt_assert_commandt{smt_core_theoryt::equal(
       foo_term,
       smt_bit_vector_theoryt::concat(
         padding_term, smt_bit_vector_constant_termt{12, 8}))}};
-  REQUIRE(test.sent_commands == expected_commands);
+  REQUIRE(test.sent_commands == expected_set_commands);
+
+  INFO("Ensuring decision procedure in suitable state for getting values.");
+  test.mock_responses.push_back(smt_check_sat_responset{smt_sat_responset{}});
+  test.procedure();
+
+  INFO("Getting union typed value.");
+  test.sent_commands.clear();
+  test.mock_responses.push_back(smt_get_value_responset{
+    {{foo_term, smt_bit_vector_constant_termt{~uint32_t{255} | 12, 32}}}});
+  const auto expected_value = union_exprt{"eggs", dozen, union_tag};
+  REQUIRE(test.procedure.get(symbol_expr) == expected_value);
+  const std::vector<smt_commandt> expected_get_commands{
+    smt_get_value_commandt{foo_term}};
+  REQUIRE(test.sent_commands == expected_get_commands);
 }
 
 TEST_CASE(
