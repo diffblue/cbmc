@@ -49,6 +49,12 @@ perl -p -i -e 's/^__CPROVER_deallocate\n//' __functions # free-01
 perl -p -i -e 's/^__builtin_alloca\n//' __functions # alloca-01
 perl -p -i -e 's/^fclose_cleanup\n//' __functions # fopen
 perl -p -i -e 's/^munmap\n//' __functions # mmap-01
+perl -p -i -e 's/^__fgets_chk\n//' __functions # fgets-01/__fgets_chk.desc
+perl -p -i -e 's/^__fprintf_chk\n//' __functions # fprintf-01/__fprintf_chk.desc
+perl -p -i -e 's/^__fread_chk\n//' __functions # fread-01/__fread_chk.desc
+perl -p -i -e 's/^__printf_chk\n//' __functions # printf-01/__printf_chk.desc
+perl -p -i -e 's/^__syslog_chk\n//' __functions # syslog-01/__syslog_chk.desc
+perl -p -i -e 's/^__vfprintf_chk\n//' __functions # vfprintf-01/__vfprintf_chk.desc
 
 # Some functions are covered by tests in other folders:
 perl -p -i -e 's/^__spawned_thread\n//' __functions # any pthread_create tests

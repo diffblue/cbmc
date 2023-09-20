@@ -1,0 +1,14 @@
+KNOWNBUG
+main.c
+--pointer-check --bounds-check -D_FORTIFY_SOURCE=2 -D__OPTIMIZE__=2 --unwindset fgets:0
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[main.assertion.3\] line 16 assertion p\[1\] == 'b': FAILURE
+\*\* 1 of \d+ failed
+--
+^\*\*\*\* WARNING: no body for function __fgets_chk
+^warning: ignoring
+--
+Our asm renaming results in fgets and its alias being one and the same function
+to us, so we end up recursing in glibc's fgets wrapper.
