@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('random_8c_source.html',''); initResiza
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#  endif</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;__CPROVER_bool <a class="code" href="cprover__contracts_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keywordtype">size_t</span> <a class="code" href="getopt_8c.html#a9c5469087c464731b40e587f079e4f16">__VERIFIER_nondet_size_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keywordtype">size_t</span> <a class="code" href="getopt_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a>(<span class="keywordtype">void</span>);</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;ssize_t getrandom(<span class="keywordtype">void</span> *buf, <span class="keywordtype">size_t</span> buflen, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> flags)</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('random_8c_source.html',''); initResiza
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordtype">char</span> bytes[buflen];</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#a62b70a7069642dab96b94d834af4c347">__CPROVER_array_replace</a>(buf, bytes);</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordtype">size_t</span> actual_bytes = <a class="code" href="getopt_8c.html#a9c5469087c464731b40e587f079e4f16">__VERIFIER_nondet_size_t</a>();</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordtype">size_t</span> actual_bytes = <a class="code" href="getopt_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a>();</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(actual_bytes &lt;= buflen);</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">return</span> (ssize_t)actual_bytes;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;}</div>
@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('random_8c_source.html',''); initResiza
 <div class="ttc" id="acprover__builtin__headers_8h_html_a62b70a7069642dab96b94d834af4c347"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a62b70a7069642dab96b94d834af4c347">__CPROVER_array_replace</a></div><div class="ttdeci">void __CPROVER_array_replace(const void *dest, const void *src)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ae5af07e274b573cd0f23ffb9d332bef2"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a></div><div class="ttdeci">void __CPROVER_assume(__CPROVER_bool assumption)</div></div>
 <div class="ttc" id="acprover__contracts_8c_html_a8cb534abb228896759dded0be6ac4351"><div class="ttname"><a href="cprover__contracts_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a></div><div class="ttdeci">__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void)</div></div>
-<div class="ttc" id="agetopt_8c_html_a9c5469087c464731b40e587f079e4f16"><div class="ttname"><a href="getopt_8c.html#a9c5469087c464731b40e587f079e4f16">__VERIFIER_nondet_size_t</a></div><div class="ttdeci">size_t __VERIFIER_nondet_size_t(void)</div></div>
+<div class="ttc" id="agetopt_8c_html_a9dccb3de4f5f2356ce92c1113b9b07e7"><div class="ttname"><a href="getopt_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a></div><div class="ttdeci">size_t __VERIFIER_nondet_size_t(void)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

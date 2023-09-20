@@ -312,15 +312,67 @@ $(document).ready(function(){initNavTree('time_8c_source.html',''); initResizabl
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <span class="keywordflow">return</span> ctime_result;</div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;<span class="preprocessor">  #endif</span></div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="comment">/* FUNCTION: strftime */</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">#ifndef __CPROVER_TIME_H_INCLUDED</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="preprocessor">#  include &lt;time.h&gt;</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="preprocessor">#  define __CPROVER_TIME_H_INCLUDED</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00229"></a><span class="lineno"><a class="line" href="time_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">  229</a></span>&#160;__CPROVER_size_t <a class="code" href="time_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;__CPROVER_size_t</div>
+<div class="line"><a name="l00232"></a><span class="lineno"><a class="line" href="time_8c.html#a799a7d1f07bd22d9426dbf526bb2605a">  232</a></span>&#160;<a class="code" href="time_8c.html#a799a7d1f07bd22d9426dbf526bb2605a">strftime</a>(<span class="keywordtype">char</span> *s, __CPROVER_size_t max, <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, <span class="keyword">const</span> <span class="keyword">struct</span> tm *tm)</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;{</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  (void)*tm;</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#a72964ce84fc78a75781c86abe871557d">__CPROVER_havoc_slice</a>(s, max);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  __CPROVER_size_t length = <a class="code" href="time_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a>();</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="keywordflow">if</span>(length &gt;= max)</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  s[length] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <span class="keywordflow">return</span> length;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;}</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="comment">/* FUNCTION: _strftime */</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor">#ifndef __CPROVER_TIME_H_INCLUDED</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="preprocessor">#  include &lt;time.h&gt;</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="preprocessor">#  define __CPROVER_TIME_H_INCLUDED</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;__CPROVER_size_t <a class="code" href="time_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno"><a class="line" href="time_8c.html#adb76906b468e8401a3c78d3e1b0d2fdb">  253</a></span>&#160;__CPROVER_size_t <a class="code" href="time_8c.html#adb76906b468e8401a3c78d3e1b0d2fdb">_strftime</a>(</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keywordtype">char</span> *s,</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  __CPROVER_size_t max,</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keyword">const</span> <span class="keyword">struct</span> tm *tm)</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;{</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  (void)*tm;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#a72964ce84fc78a75781c86abe871557d">__CPROVER_havoc_slice</a>(s, max);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  __CPROVER_size_t length = <a class="code" href="time_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a>();</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <span class="keywordflow">if</span>(length &gt;= max)</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  s[length] = <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <span class="keywordflow">return</span> length;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;}</div>
+<div class="ttc" id="acprover__builtin__headers_8h_html_a72964ce84fc78a75781c86abe871557d"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a72964ce84fc78a75781c86abe871557d">__CPROVER_havoc_slice</a></div><div class="ttdeci">void __CPROVER_havoc_slice(void *, __CPROVER_size_t)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ad3a2aedad97977b64290f8141eed690c"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ad3a2aedad97977b64290f8141eed690c">__CPROVER_set_must</a></div><div class="ttdeci">void __CPROVER_set_must(const void *, const char *)</div></div>
+<div class="ttc" id="aformat_8h_html_a74b453cb3c0deb818d6f2e0f683996ca"><div class="ttname"><a href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a></div><div class="ttdeci">static format_containert&lt; T &gt; format(const T &amp;o)</div><div class="ttdef"><b>Definition:</b> <a href="format_8h_source.html#l00037">format.h:37</a></div></div>
 <div class="ttc" id="atime_8c_html_a006046b101812bb3b0c3e490673d6607"><div class="ttname"><a href="time_8c.html#a006046b101812bb3b0c3e490673d6607">gmtime_r</a></div><div class="ttdeci">struct tm * gmtime_r(const time_t *clock, struct tm *result)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00096">time.c:96</a></div></div>
 <div class="ttc" id="atime_8c_html_a1de3ee87d6aca904fcc300736bc4814f"><div class="ttname"><a href="time_8c.html#a1de3ee87d6aca904fcc300736bc4814f">__VERIFIER_nondet_time_t</a></div><div class="ttdeci">time_t __VERIFIER_nondet_time_t(void)</div></div>
 <div class="ttc" id="atime_8c_html_a31eb4b8076c94ddffba34e65f8449f4c"><div class="ttname"><a href="time_8c.html#a31eb4b8076c94ddffba34e65f8449f4c">localtime</a></div><div class="ttdeci">struct tm * localtime(const time_t *clock)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00112">time.c:112</a></div></div>
 <div class="ttc" id="atime_8c_html_a3b2175c3f2f091c3032d8bc8575daf50"><div class="ttname"><a href="time_8c.html#a3b2175c3f2f091c3032d8bc8575daf50">timegm</a></div><div class="ttdeci">time_t timegm(struct tm *timeptr)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00173">time.c:173</a></div></div>
 <div class="ttc" id="atime_8c_html_a68a0e9d22417dfcf9c0be64261352e64"><div class="ttname"><a href="time_8c.html#a68a0e9d22417dfcf9c0be64261352e64">asctime</a></div><div class="ttdeci">char * asctime(const struct tm *timeptr)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00187">time.c:187</a></div></div>
+<div class="ttc" id="atime_8c_html_a799a7d1f07bd22d9426dbf526bb2605a"><div class="ttname"><a href="time_8c.html#a799a7d1f07bd22d9426dbf526bb2605a">strftime</a></div><div class="ttdeci">__CPROVER_size_t strftime(char *s, __CPROVER_size_t max, const char *format, const struct tm *tm)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00232">time.c:232</a></div></div>
 <div class="ttc" id="atime_8c_html_a97d22a9fa6306bb3afdf72a31b2f158b"><div class="ttname"><a href="time_8c.html#a97d22a9fa6306bb3afdf72a31b2f158b">ctime</a></div><div class="ttdeci">char * ctime(const time_t *clock)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00208">time.c:208</a></div></div>
 <div class="ttc" id="atime_8c_html_a99ef1cb2c789827dd5db3886dccf9067"><div class="ttname"><a href="time_8c.html#a99ef1cb2c789827dd5db3886dccf9067">time</a></div><div class="ttdeci">time_t time(time_t *tloc)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00012">time.c:12</a></div></div>
+<div class="ttc" id="atime_8c_html_a9dccb3de4f5f2356ce92c1113b9b07e7"><div class="ttname"><a href="time_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a></div><div class="ttdeci">__CPROVER_size_t __VERIFIER_nondet_size_t(void)</div></div>
 <div class="ttc" id="atime_8c_html_abe0e9e1376030435a4046d01a6809b28"><div class="ttname"><a href="time_8c.html#abe0e9e1376030435a4046d01a6809b28">gmtime</a></div><div class="ttdeci">struct tm * gmtime(const time_t *clock)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00071">time.c:71</a></div></div>
+<div class="ttc" id="atime_8c_html_adb76906b468e8401a3c78d3e1b0d2fdb"><div class="ttname"><a href="time_8c.html#adb76906b468e8401a3c78d3e1b0d2fdb">_strftime</a></div><div class="ttdeci">__CPROVER_size_t _strftime(char *s, __CPROVER_size_t max, const char *format, const struct tm *tm)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00253">time.c:253</a></div></div>
 <div class="ttc" id="atime_8c_html_ae01ec245dfa66d8f5df9363015d3c453"><div class="ttname"><a href="time_8c.html#ae01ec245dfa66d8f5df9363015d3c453">localtime_r</a></div><div class="ttdeci">struct tm * localtime_r(const time_t *clock, struct tm *result)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00137">time.c:137</a></div></div>
 <div class="ttc" id="atime_8c_html_ae114b9ba0fce4e2d6297e0e66768bb75"><div class="ttname"><a href="time_8c.html#ae114b9ba0fce4e2d6297e0e66768bb75">mktime</a></div><div class="ttdeci">time_t mktime(struct tm *timeptr)</div><div class="ttdef"><b>Definition:</b> <a href="time_8c_source.html#l00155">time.c:155</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

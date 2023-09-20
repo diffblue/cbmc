@@ -90,7 +90,8 @@ $(document).ready(function(){initNavTree('inet_8c.html',''); initResizable(); })
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">inet.c File Reference</div>  </div>
 </div><!--header-->
@@ -125,6 +126,8 @@ Functions</h2></td></tr>
 <tr class="separator:a04daf060736c4b84b8132b745409c7cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2f09943e0eb15fbc57d7e93711ba546"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="inet_8c.html#ab2f09943e0eb15fbc57d7e93711ba546">inet_aton</a> (const char *cp, struct in_addr *pin)</td></tr>
 <tr class="separator:ab2f09943e0eb15fbc57d7e93711ba546"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08b9fff487151e004d9862cbf34a51ad"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="inet_8c.html#a08b9fff487151e004d9862cbf34a51ad">inet_ntoa</a> (struct in_addr in)</td></tr>
+<tr class="separator:a08b9fff487151e004d9862cbf34a51ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fffb95477764ce19312e9a5ea7b8812"><td class="memItemLeft" align="right" valign="top">in_addr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="inet_8c.html#a7fffb95477764ce19312e9a5ea7b8812">inet_network</a> (const char *cp)</td></tr>
 <tr class="separator:a7fffb95477764ce19312e9a5ea7b8812"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4e124ddc4e2d8f44323321381d3803e"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="inet_8c.html#ac4e124ddc4e2d8f44323321381d3803e">__builtin_bswap32</a> (uint32_t)</td></tr>
@@ -139,6 +142,11 @@ Functions</h2></td></tr>
 <tr class="separator:a84000e0b0345e8bee94fc96c7457f6ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc281d6d0b8d5d6336263eeb2129deff"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="inet_8c.html#abc281d6d0b8d5d6336263eeb2129deff">ntohs</a> (uint16_t netshort)</td></tr>
 <tr class="separator:abc281d6d0b8d5d6336263eeb2129deff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:abd0534dc03d66c4010100ae6adaf328e"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="inet_8c.html#abd0534dc03d66c4010100ae6adaf328e">__inet_ntoa_buffer</a> [16]</td></tr>
+<tr class="separator:abd0534dc03d66c4010100ae6adaf328e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ae3e3a504923bb0cce53ddc7702f42843"></a>
@@ -169,7 +177,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00084">84</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00106">106</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
 
 </div>
 </div>
@@ -262,7 +270,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00091">91</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00113">113</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
 
 </div>
 </div>
@@ -282,7 +290,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00111">111</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00133">133</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
 
 </div>
 </div>
@@ -352,6 +360,26 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00087">87</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
+
+</div>
+</div>
+<a id="a08b9fff487151e004d9862cbf34a51ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08b9fff487151e004d9862cbf34a51ad">&#9670;&nbsp;</a></span>inet_ntoa()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* inet_ntoa </td>
+          <td>(</td>
+          <td class="paramtype">struct in_addr&#160;</td>
+          <td class="paramname"><em>in</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
 <p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00065">65</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
 
 </div>
@@ -372,7 +400,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00132">132</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00154">154</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
 
 </div>
 </div>
@@ -392,7 +420,24 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00153">153</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00175">175</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="abd0534dc03d66c4010100ae6adaf328e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd0534dc03d66c4010100ae6adaf328e">&#9670;&nbsp;</a></span>__inet_ntoa_buffer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char __inet_ntoa_buffer[16]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="inet_8c_source.html#l00063">63</a> of file <a class="el" href="inet_8c_source.html">inet.c</a>.</p>
 
 </div>
 </div>
