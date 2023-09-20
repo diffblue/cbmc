@@ -89,29 +89,14 @@ $(document).ready(function(){initNavTree('syslog_8c.html',''); initResizable(); 
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">syslog.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;syslog.h&gt;</code><br />
-</div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for syslog.c:</div>
-<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="syslog_8c__incl.svg" width="195" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
-</div>
-</div>
+
 <p><a href="syslog_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:af78894ca148ebca4b889d31016ab80f5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syslog_8c.html#af78894ca148ebca4b889d31016ab80f5">__CPROVER_SYSLOG_H_INCLUDED</a></td></tr>
-<tr class="separator:af78894ca148ebca4b889d31016ab80f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a6f1f3704c08cc51ad17680056d67bdf4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syslog_8c.html#a6f1f3704c08cc51ad17680056d67bdf4">openlog</a> (const char *ident, int option, int facility)</td></tr>
@@ -120,25 +105,52 @@ Functions</h2></td></tr>
 <tr class="separator:ae1e4e53707d8c3fbc36bbc523fbbcda3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7951aa517ee754827c26f823564efa3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syslog_8c.html#aa7951aa517ee754827c26f823564efa3">syslog</a> (int priority, const char *<a class="el" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,...)</td></tr>
 <tr class="separator:aa7951aa517ee754827c26f823564efa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd2ce92486c0a3c7e8188cc538610d19"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syslog_8c.html#acd2ce92486c0a3c7e8188cc538610d19">__syslog_chk</a> (int priority, int flag, const char *<a class="el" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,...)</td></tr>
+<tr class="separator:acd2ce92486c0a3c7e8188cc538610d19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="af78894ca148ebca4b889d31016ab80f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af78894ca148ebca4b889d31016ab80f5">&#9670;&nbsp;</a></span>__CPROVER_SYSLOG_H_INCLUDED</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="acd2ce92486c0a3c7e8188cc538610d19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd2ce92486c0a3c7e8188cc538610d19">&#9670;&nbsp;</a></span>__syslog_chk()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define __CPROVER_SYSLOG_H_INCLUDED</td>
+          <td class="memname">void __syslog_chk </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>priority</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="syslog_8c_source.html#l00005">5</a> of file <a class="el" href="syslog_8c_source.html">syslog.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="syslog_8c_source.html#l00026">26</a> of file <a class="el" href="syslog_8c_source.html">syslog.c</a>.</p>
 
 </div>
 </div>
-<h2 class="groupheader">Function Documentation</h2>
 <a id="ae1e4e53707d8c3fbc36bbc523fbbcda3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae1e4e53707d8c3fbc36bbc523fbbcda3">&#9670;&nbsp;</a></span>closelog()</h2>
 
@@ -155,7 +167,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="syslog_8c_source.html#l00022">22</a> of file <a class="el" href="syslog_8c_source.html">syslog.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="syslog_8c_source.html#l00012">12</a> of file <a class="el" href="syslog_8c_source.html">syslog.c</a>.</p>
 
 </div>
 </div>
@@ -191,7 +203,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="syslog_8c_source.html#l00008">8</a> of file <a class="el" href="syslog_8c_source.html">syslog.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="syslog_8c_source.html#l00003">3</a> of file <a class="el" href="syslog_8c_source.html">syslog.c</a>.</p>
 
 </div>
 </div>
@@ -227,7 +239,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="syslog_8c_source.html#l00033">33</a> of file <a class="el" href="syslog_8c_source.html">syslog.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="syslog_8c_source.html#l00018">18</a> of file <a class="el" href="syslog_8c_source.html">syslog.c</a>.</p>
 
 </div>
 </div>

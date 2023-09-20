@@ -94,45 +94,40 @@ $(document).ready(function(){initNavTree('syslog_8c_source.html',''); initResiza
 <div class="contents">
 <a href="syslog_8c.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/* FUNCTION: openlog */</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#ifndef __CPROVER_SYSLOG_H_INCLUDED</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;syslog.h&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno"><a class="line" href="syslog_8c.html#af78894ca148ebca4b889d31016ab80f5">    5</a></span>&#160;<span class="preprocessor">#define __CPROVER_SYSLOG_H_INCLUDED</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="syslog_8c.html#a6f1f3704c08cc51ad17680056d67bdf4">    8</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="syslog_8c.html#a6f1f3704c08cc51ad17680056d67bdf4">openlog</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *ident, <span class="keywordtype">int</span> option, <span class="keywordtype">int</span> facility)</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;{</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  (void)*ident;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  (void)option;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  (void)facility;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;}</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">/* FUNCTION: closelog */</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#ifndef __CPROVER_SYSLOG_H_INCLUDED</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;syslog.h&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#define __CPROVER_SYSLOG_H_INCLUDED</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="syslog_8c.html#ae1e4e53707d8c3fbc36bbc523fbbcda3">   22</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="syslog_8c.html#ae1e4e53707d8c3fbc36bbc523fbbcda3">closelog</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;}</div>
+<div class="line"><a name="l00003"></a><span class="lineno"><a class="line" href="syslog_8c.html#a6f1f3704c08cc51ad17680056d67bdf4">    3</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="syslog_8c.html#a6f1f3704c08cc51ad17680056d67bdf4">openlog</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *ident, <span class="keywordtype">int</span> option, <span class="keywordtype">int</span> facility)</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;{</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;  (void)*ident;</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;  (void)option;</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;  (void)facility;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;}</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">/* FUNCTION: closelog */</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
+<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="syslog_8c.html#ae1e4e53707d8c3fbc36bbc523fbbcda3">   12</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="syslog_8c.html#ae1e4e53707d8c3fbc36bbc523fbbcda3">closelog</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;}</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">/* FUNCTION: syslog */</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="syslog_8c.html#aa7951aa517ee754827c26f823564efa3">   18</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="syslog_8c.html#aa7951aa517ee754827c26f823564efa3">syslog</a>(<span class="keywordtype">int</span> priority, <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, ...)</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  (void)priority;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;}</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">/* FUNCTION: __syslog_chk */</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">/* FUNCTION: syslog */</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#ifndef __CPROVER_SYSLOG_H_INCLUDED</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;syslog.h&gt;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#define __CPROVER_SYSLOG_H_INCLUDED</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="syslog_8c.html#aa7951aa517ee754827c26f823564efa3">   33</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="syslog_8c.html#aa7951aa517ee754827c26f823564efa3">syslog</a>(<span class="keywordtype">int</span> priority, <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, ...)</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;{</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  (void)priority;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;}</div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="syslog_8c.html#acd2ce92486c0a3c7e8188cc538610d19">   26</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="syslog_8c.html#acd2ce92486c0a3c7e8188cc538610d19">__syslog_chk</a>(<span class="keywordtype">int</span> priority, <span class="keywordtype">int</span> flag, <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, ...)</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;{</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  (void)priority;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  (void)flag;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
 <div class="ttc" id="aformat_8h_html_a74b453cb3c0deb818d6f2e0f683996ca"><div class="ttname"><a href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a></div><div class="ttdeci">static format_containert&lt; T &gt; format(const T &amp;o)</div><div class="ttdef"><b>Definition:</b> <a href="format_8h_source.html#l00037">format.h:37</a></div></div>
-<div class="ttc" id="asyslog_8c_html_a6f1f3704c08cc51ad17680056d67bdf4"><div class="ttname"><a href="syslog_8c.html#a6f1f3704c08cc51ad17680056d67bdf4">openlog</a></div><div class="ttdeci">void openlog(const char *ident, int option, int facility)</div><div class="ttdef"><b>Definition:</b> <a href="syslog_8c_source.html#l00008">syslog.c:8</a></div></div>
-<div class="ttc" id="asyslog_8c_html_aa7951aa517ee754827c26f823564efa3"><div class="ttname"><a href="syslog_8c.html#aa7951aa517ee754827c26f823564efa3">syslog</a></div><div class="ttdeci">void syslog(int priority, const char *format,...)</div><div class="ttdef"><b>Definition:</b> <a href="syslog_8c_source.html#l00033">syslog.c:33</a></div></div>
-<div class="ttc" id="asyslog_8c_html_ae1e4e53707d8c3fbc36bbc523fbbcda3"><div class="ttname"><a href="syslog_8c.html#ae1e4e53707d8c3fbc36bbc523fbbcda3">closelog</a></div><div class="ttdeci">void closelog(void)</div><div class="ttdef"><b>Definition:</b> <a href="syslog_8c_source.html#l00022">syslog.c:22</a></div></div>
+<div class="ttc" id="asyslog_8c_html_a6f1f3704c08cc51ad17680056d67bdf4"><div class="ttname"><a href="syslog_8c.html#a6f1f3704c08cc51ad17680056d67bdf4">openlog</a></div><div class="ttdeci">void openlog(const char *ident, int option, int facility)</div><div class="ttdef"><b>Definition:</b> <a href="syslog_8c_source.html#l00003">syslog.c:3</a></div></div>
+<div class="ttc" id="asyslog_8c_html_aa7951aa517ee754827c26f823564efa3"><div class="ttname"><a href="syslog_8c.html#aa7951aa517ee754827c26f823564efa3">syslog</a></div><div class="ttdeci">void syslog(int priority, const char *format,...)</div><div class="ttdef"><b>Definition:</b> <a href="syslog_8c_source.html#l00018">syslog.c:18</a></div></div>
+<div class="ttc" id="asyslog_8c_html_acd2ce92486c0a3c7e8188cc538610d19"><div class="ttname"><a href="syslog_8c.html#acd2ce92486c0a3c7e8188cc538610d19">__syslog_chk</a></div><div class="ttdeci">void __syslog_chk(int priority, int flag, const char *format,...)</div><div class="ttdef"><b>Definition:</b> <a href="syslog_8c_source.html#l00026">syslog.c:26</a></div></div>
+<div class="ttc" id="asyslog_8c_html_ae1e4e53707d8c3fbc36bbc523fbbcda3"><div class="ttname"><a href="syslog_8c.html#ae1e4e53707d8c3fbc36bbc523fbbcda3">closelog</a></div><div class="ttdeci">void closelog(void)</div><div class="ttdef"><b>Definition:</b> <a href="syslog_8c_source.html#l00012">syslog.c:12</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

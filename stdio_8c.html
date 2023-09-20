@@ -140,12 +140,16 @@ Functions</h2></td></tr>
 <tr class="separator:a44c4efdc467f2672636145f559aa0556"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a776c49f4aa8993f1b3f4cbd3cf19cec8"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a776c49f4aa8993f1b3f4cbd3cf19cec8">fgets</a> (char *str, int size, FILE *stream)</td></tr>
 <tr class="separator:a776c49f4aa8993f1b3f4cbd3cf19cec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a853aa0ac185a706df6254b361d73f7b5"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a853aa0ac185a706df6254b361d73f7b5">__fgets_chk</a> (char *str, __CPROVER_size_t bufsize, int size, FILE *stream)</td></tr>
+<tr class="separator:a853aa0ac185a706df6254b361d73f7b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6159fc790f132e169f40e00b5e9053c6"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a6159fc790f132e169f40e00b5e9053c6">__VERIFIER_nondet_char</a> (void)</td></tr>
 <tr class="separator:a6159fc790f132e169f40e00b5e9053c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c5469087c464731b40e587f079e4f16"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a9c5469087c464731b40e587f079e4f16">__VERIFIER_nondet_size_t</a> (void)</td></tr>
 <tr class="separator:a9c5469087c464731b40e587f079e4f16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4603528392d91309fb4ecfbb9ed11131"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a4603528392d91309fb4ecfbb9ed11131">fread</a> (void *ptr, size_t size, size_t nitems, FILE *stream)</td></tr>
 <tr class="separator:a4603528392d91309fb4ecfbb9ed11131"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2b5fc16a1bd3b3cdc398791d06f5de6"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#ac2b5fc16a1bd3b3cdc398791d06f5de6">__fread_chk</a> (void *ptr, size_t ptrlen, size_t size, size_t nitems, FILE *stream)</td></tr>
+<tr class="separator:ac2b5fc16a1bd3b3cdc398791d06f5de6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e71f513ad2496acb5361aedc065e3d8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a9e71f513ad2496acb5361aedc065e3d8">feof</a> (FILE *stream)</td></tr>
 <tr class="separator:a9e71f513ad2496acb5361aedc065e3d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a98383bb54291c2abede7aa28acf597"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a4a98383bb54291c2abede7aa28acf597">ferror</a> (FILE *stream)</td></tr>
@@ -204,10 +208,16 @@ Functions</h2></td></tr>
 <tr class="separator:a5a6cc54b757ba2573c1a1fdc55d8d456"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98631211a4a8aee62f572375d5b637be"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a98631211a4a8aee62f572375d5b637be">printf</a> (const char *<a class="el" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,...)</td></tr>
 <tr class="separator:a98631211a4a8aee62f572375d5b637be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a526487e90af3a3d94287ee4c736ad7cf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a526487e90af3a3d94287ee4c736ad7cf">__printf_chk</a> (int flag, const char *<a class="el" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,...)</td></tr>
+<tr class="separator:a526487e90af3a3d94287ee4c736ad7cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa56947f8b6a370a3728bf5e1a79980d1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#aa56947f8b6a370a3728bf5e1a79980d1">fprintf</a> (FILE *stream, const char *<a class="el" href="mini_b_d_d_8h.html#a5266b2d6d71630146775f0cffbe92cbe">restrict</a> <a class="el" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,...)</td></tr>
 <tr class="separator:aa56947f8b6a370a3728bf5e1a79980d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40a6235df7bbfdaac9304d5af6224380"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a40a6235df7bbfdaac9304d5af6224380">__fprintf_chk</a> (FILE *stream, int flag, const char *<a class="el" href="mini_b_d_d_8h.html#a5266b2d6d71630146775f0cffbe92cbe">restrict</a> <a class="el" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,...)</td></tr>
+<tr class="separator:a40a6235df7bbfdaac9304d5af6224380"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb8790f343e7436fb6eddde04ee159e8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#aeb8790f343e7436fb6eddde04ee159e8">vfprintf</a> (FILE *stream, const char *<a class="el" href="mini_b_d_d_8h.html#a5266b2d6d71630146775f0cffbe92cbe">restrict</a> <a class="el" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, va_list arg)</td></tr>
 <tr class="separator:aeb8790f343e7436fb6eddde04ee159e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf28903b3dd861533359483083bb1699"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#aaf28903b3dd861533359483083bb1699">__vfprintf_chk</a> (FILE *stream, int flag, const char *<a class="el" href="mini_b_d_d_8h.html#a5266b2d6d71630146775f0cffbe92cbe">restrict</a> <a class="el" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, va_list arg)</td></tr>
+<tr class="separator:aaf28903b3dd861533359483083bb1699"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1556f320cb3c2d5c80a0b725531ee3eb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdio_8c.html#a1556f320cb3c2d5c80a0b725531ee3eb">vasprintf</a> (char **ptr, const char *fmt, va_list ap)</td></tr>
 <tr class="separator:a1556f320cb3c2d5c80a0b725531ee3eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -224,7 +234,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00836">836</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00933">933</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -261,6 +271,138 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a853aa0ac185a706df6254b361d73f7b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a853aa0ac185a706df6254b361d73f7b5">&#9670;&nbsp;</a></span>__fgets_chk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* __fgets_chk </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>str</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">__CPROVER_size_t&#160;</td>
+          <td class="paramname"><em>bufsize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00336">336</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a40a6235df7bbfdaac9304d5af6224380"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40a6235df7bbfdaac9304d5af6224380">&#9670;&nbsp;</a></span>__fprintf_chk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int __fprintf_chk </td>
+          <td>(</td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>stream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *<a class="el" href="mini_b_d_d_8h.html#a5266b2d6d71630146775f0cffbe92cbe">restrict</a>&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01447">1447</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="ac2b5fc16a1bd3b3cdc398791d06f5de6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2b5fc16a1bd3b3cdc398791d06f5de6">&#9670;&nbsp;</a></span>__fread_chk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t __fread_chk </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>ptrlen</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>nitems</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00433">433</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
 <a id="a51b16333133106f562b9d31fc1388453"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a51b16333133106f562b9d31fc1388453">&#9670;&nbsp;</a></span>__isoc99_fscanf()</h2>
 
@@ -293,7 +435,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00863">863</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00960">960</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -323,7 +465,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00911">911</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01008">1008</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -359,7 +501,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00959">959</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01056">1056</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -395,7 +537,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01031">1031</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01128">1128</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -425,7 +567,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01149">1149</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01246">1246</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -461,7 +603,43 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01203">1203</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01300">1300</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
+<a id="a526487e90af3a3d94287ee4c736ad7cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a526487e90af3a3d94287ee4c736ad7cf">&#9670;&nbsp;</a></span>__printf_chk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int __printf_chk </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01401">1401</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -555,6 +733,48 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="aaf28903b3dd861533359483083bb1699"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf28903b3dd861533359483083bb1699">&#9670;&nbsp;</a></span>__vfprintf_chk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int __vfprintf_chk </td>
+          <td>(</td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>stream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *<a class="el" href="mini_b_d_d_8h.html#a5266b2d6d71630146775f0cffbe92cbe">restrict</a>&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">va_list&#160;</td>
+          <td class="paramname"><em>arg</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01512">1512</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+
+</div>
+</div>
 <a id="a76370407f9ab0402564c2bb9bc9664e0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a76370407f9ab0402564c2bb9bc9664e0">&#9670;&nbsp;</a></span>fclose()</h2>
 
@@ -639,7 +859,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00374">374</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00471">471</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -659,7 +879,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00406">406</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00503">503</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -679,7 +899,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00510">510</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00607">607</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -699,7 +919,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00567">567</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00664">664</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -755,7 +975,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00438">438</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00535">535</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -821,7 +1041,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01302">1302</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01425">1425</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -841,7 +1061,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00535">535</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00632">632</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -871,7 +1091,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00474">474</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00571">571</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -913,7 +1133,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00336">336</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00393">393</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -985,7 +1205,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00839">839</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00936">936</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1021,7 +1241,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00692">692</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00789">789</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1041,7 +1261,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00722">722</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00819">819</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1083,7 +1303,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00773">773</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00870">870</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1103,7 +1323,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00603">603</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00700">700</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1123,7 +1343,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00639">639</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00736">736</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1143,7 +1363,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00658">658</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00755">755</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1163,7 +1383,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00809">809</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00906">906</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1193,7 +1413,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01279">1279</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01376">1376</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1253,7 +1473,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00748">748</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00845">845</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1283,7 +1503,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00887">887</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00984">984</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1319,7 +1539,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00935">935</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01032">1032</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1355,7 +1575,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01372">1372</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01563">1563</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1391,7 +1611,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01326">1326</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01472">1472</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1427,7 +1647,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l00985">985</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01082">1082</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1457,7 +1677,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01129">1129</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01226">1226</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
@@ -1493,7 +1713,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01171">1171</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stdio_8c_source.html#l01268">1268</a> of file <a class="el" href="stdio_8c_source.html">stdio.c</a>.</p>
 
 </div>
 </div>
