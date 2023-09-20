@@ -51,6 +51,28 @@ int inet_aton(const char *cp, struct in_addr *pin)
 
 #endif
 
+/* FUNCTION: inet_ntoa */
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_INET_H_INCLUDED
+#    include <arpa/inet.h>
+#    define __CPROVER_INET_H_INCLUDED
+#  endif
+
+char __inet_ntoa_buffer[16];
+
+char *inet_ntoa(struct in_addr in)
+{
+__CPROVER_HIDE:;
+  (void)in;
+  // the last byte remains zero to ensure string termination
+  __CPROVER_havoc_slice(__inet_ntoa_buffer, 15);
+  return __inet_ntoa_buffer;
+}
+
+#endif
+
 /* FUNCTION: inet_network */
 
 #ifndef _WIN32
