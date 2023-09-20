@@ -3,7 +3,8 @@ bad2.c
 --function bad_declaration2 --verbosity 10
 ^EXIT=6$
 ^SIGNAL=0$
-^A shadow memory field must be of a bitvector type.
+^file bad2\.c line 7 function bad_declaration2: __CPROVER_field_decl_global argument 2 must be a byte-sized integer, but \(s\) has type `struct STRUCT`
+^CONVERSION ERROR
 --
 --
 Test that a shadow memory declaration of a non-bitvector type is rejected.
