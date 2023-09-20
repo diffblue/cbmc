@@ -117,6 +117,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/smt2_incremental/smt_to_smt2_string.cpp \
        solvers/smt2_incremental/encoding/struct_encoding.cpp \
        solvers/smt2_incremental/encoding/enum_encoding.cpp \
+       solvers/smt2_incremental/encoding/nondet_padding.cpp \
        solvers/smt2_incremental/theories/smt_array_theory.cpp \
        solvers/smt2_incremental/theories/smt_bit_vector_theory.cpp \
        solvers/smt2_incremental/theories/smt_core_theory.cpp \

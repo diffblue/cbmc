@@ -1,0 +1,41 @@
+// Author: Diffblue Ltd.
+
+/// \file
+/// Expressions for use in incremental SMT2 decision procedure
+
+#ifndef CPROVER_SOLVERS_SMT2_INCREMENTAL_ENCODING_NONDET_PADDING_H
+#define CPROVER_SOLVERS_SMT2_INCREMENTAL_ENCODING_NONDET_PADDING_H
+
+#include <util/bitvector_types.h>
+#include <util/expr.h>
+#include <util/invariant.h>
+
+class nondet_padding_exprt;
+void validate_expr(const nondet_padding_exprt &padding);
+
+const irep_idt ID_nondet_padding = "nondet_padding";
+
+class nondet_padding_exprt : public expr_protectedt
+{
+public:
+  explicit nondet_padding_exprt(typet type)
+    : expr_protectedt{ID_nondet_padding, std::move(type)}
+  {
+    validate_expr(*this);
+  }
+};
+
+template <>
+inline bool can_cast_expr<nondet_padding_exprt>(const exprt &base)
+{
+  return base.id() == ID_nondet_padding;
+}
+
+inline void validate_expr(const nondet_padding_exprt &padding)
+{
+  INVARIANT(
+    can_cast_type<bv_typet>(padding.type()),
+    "Nondet padding is expected to pad a bit vector type.");
+}
+
+#endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_ENCODING_NONDET_PADDING_H
