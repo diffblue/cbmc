@@ -218,7 +218,7 @@ void run_property_decider(
   "iteration. If for example it is 1, then the loop will be unwound once, "    \
   "and immediately checked. Note: this means for {y--unwind-min} 1 or 0 all "  \
   "properties are checked.\n"                                                  \
-  " {--unwind-max} {unr} \t stop incremental-loop after {unr} unwindings\n"    \
+  " {y--unwind-max} {unr} \t stop incremental-loop after {unr} unwindings\n"   \
   " {y--ignore-properties-before-unwind-min} \t "                              \
   "do not check properties before unwind-min when using "                      \
   "{y--incremental-loop}\n"                                                    \
