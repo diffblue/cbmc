@@ -67,6 +67,9 @@ _valid_extensions = set([])
 
 __VERSION__ = '1.6.0'
 
+print("Fotis and Enrico have been here...")
+print(sys.executable)
+
 try:
   xrange          # Python 2
 except NameError:
