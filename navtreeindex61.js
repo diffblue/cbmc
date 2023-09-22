@@ -1,6 +1,5 @@
 var NAVTREEINDEX61 =
 {
-"classsmt__command__const__downcast__visitort.html":[8,0,1106],
 "classsmt__command__functiont.html":[8,0,1107],
 "classsmt__command__functiont.html#a2ba5d3983d7495a58f94bfdf12252d11":[8,0,1107,1],
 "classsmt__command__functiont.html#a86d502f915d55927ab570f163f5a61d3":[8,0,1107,6],
@@ -249,5 +248,6 @@ var NAVTREEINDEX61 =
 "classsmt__term__to__string__convertert.html#a6f941485d7e583ef27b18acd4fe00ee8":[8,0,1148,7],
 "classsmt__term__to__string__convertert.html#a94e699f3387138cf735455eab82b39c2":[8,0,1148,17],
 "classsmt__term__to__string__convertert.html#a9ed0a27234fbb50463905eff9e8ec128":[8,0,1148,8],
-"classsmt__term__to__string__convertert.html#aa0a66981495d886009f1a84178c3cb9e":[8,0,1148,5]
+"classsmt__term__to__string__convertert.html#aa0a66981495d886009f1a84178c3cb9e":[8,0,1148,5],
+"classsmt__term__to__string__convertert.html#abbcd14ecc417b3a5f1f85cea28dd1890":[8,0,1148,12]
 };

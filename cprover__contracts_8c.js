@@ -8,7 +8,7 @@ var cprover__contracts_8c =
     [ "__CPROVER_contracts_car_set_ptr_t", "cprover__contracts_8c.html#a4a96f9ed85472fff3969f5a02370a202", null ],
     [ "__CPROVER_contracts_obj_set_ptr_t", "cprover__contracts_8c.html#ab2b0654d17f2eb49dc0e4e2e579617ad", null ],
     [ "__CPROVER_contracts_write_set_ptr_t", "cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6", null ],
-    [ "__builtin_clzll", "cprover__contracts_8c.html#a89a2c9169e35595c9f21567d7881fb7e", null ],
+    [ "__builtin_clzl", "cprover__contracts_8c.html#a5908d26833d22bd6c0b4ca8ffda586f2", null ],
     [ "__CPROVER_contracts_car_create", "cprover__contracts_8c.html#a0650e41e560aba48f470bc03f741230f", null ],
     [ "__CPROVER_contracts_car_set_contains", "cprover__contracts_8c.html#a90523b31ba7dc8d839ba9f6d65afd4e5", null ],
     [ "__CPROVER_contracts_car_set_create", "cprover__contracts_8c.html#a747e352671906d078fedc02550639064", null ],
