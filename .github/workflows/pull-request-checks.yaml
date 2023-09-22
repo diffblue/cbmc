@@ -78,6 +78,8 @@ jobs:
       - uses: nuget/setup-nuget@v1
         with:
           nuget-version: '5.8.x'
+      - name: Fetch python
+        run: choco upgrade python --pre
       - name: Fetch dependencies
         run: |
           choco install -y winflexbison3 strawberryperl wget
@@ -125,7 +127,5 @@ jobs:
         run: clcache -s
       - name: What is in chocolatey
         run: dir C:\ProgramData\chocolatey\bin\
-      - name: Print chocolatey python arg
-        run: C:\ProgramData\chocolatey\bin\python.exe --version
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -C regression/cpp-linter test
