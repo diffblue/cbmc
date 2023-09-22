@@ -54,17 +54,10 @@ jobs:
         run: |
           echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
           echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
-      - name: Configure with cmake
-        run: cmake -S . -B build
-      - name: Build Release
-        run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
-      - name: Print ccache stats
-        run: clcache -s
-      - uses: ilammy/msvc-dev-cmd@v1
-      - name: Test cbmc
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release . -j2
+      - name: What is in chocolatey
+        run: dir C:\ProgramData\chocolatey\bin\
+      - name: Run CBMC regression tests
+        run: make CXX=clcache BUILD_ENV=MSVC -C regression/cpp-linter test
 
   # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
