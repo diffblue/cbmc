@@ -1,6 +1,7 @@
 // Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
@@ -13,6 +14,7 @@
 #include <solvers/smt2_incremental/ast/smt_responses.h>
 #include <solvers/smt2_incremental/ast/smt_sorts.h>
 #include <solvers/smt2_incremental/ast/smt_terms.h>
+#include <solvers/smt2_incremental/encoding/nondet_padding.h>
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
@@ -267,6 +269,28 @@ TEST_CASE(
                 smt_identifier_termt{"second_comparison", smt_bool_sortt{}}),
               smt_identifier_termt{"third_comparison", smt_bool_sortt{}})},
           smt_assert_commandt{comparison_conjunction_term}});
+    }
+    SECTION("Set with nondet_padding")
+    {
+      const exprt to_set = equal_exprt{
+        concatenation_exprt{
+          {nondet_padding_exprt{bv_typet{8}}, from_integer(42, bv_typet{8})},
+          bv_typet{16}},
+        from_integer(42, bv_typet{16})};
+      test.sent_commands.clear();
+      test.procedure.set_to(to_set, true);
+      // (declare-fun padding_0 () (_ BitVec 8))
+      // (assert (= (concat padding_0 (_ bv42 8)) (_ bv42 16)))
+      const auto expected_padding_term =
+        smt_identifier_termt{"padding_0", smt_bit_vector_sortt{8}};
+      REQUIRE(
+        test.sent_commands ==
+        std::vector<smt_commandt>{
+          smt_declare_function_commandt{expected_padding_term, {}},
+          smt_assert_commandt{smt_core_theoryt::equal(
+            smt_bit_vector_theoryt::concat(
+              expected_padding_term, smt_bit_vector_constant_termt{42, 8}),
+            smt_bit_vector_constant_termt{42, 16})}});
     }
     SECTION("Handle of value-less symbol.")
     {

@@ -18,6 +18,7 @@
 #include <solvers/smt2_incremental/construct_value_expr_from_smt.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
 #include <solvers/smt2_incremental/encoding/enum_encoding.h>
+#include <solvers/smt2_incremental/encoding/nondet_padding.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
@@ -364,12 +365,28 @@ void smt2_incremental_decision_proceduret::define_index_identifiers(
   });
 }
 
+exprt smt2_incremental_decision_proceduret::substitute_defined_padding(
+  exprt root_expr)
+{
+  root_expr.visit_pre([&](exprt &node) {
+    if(const auto pad = expr_try_dynamic_cast<nondet_padding_exprt>(node))
+    {
+      const auto instance = "padding_" + std::to_string(padding_sequence());
+      const auto term =
+        smt_identifier_termt{instance, convert_type_to_smt_sort(pad->type())};
+      solver_process->send(smt_declare_function_commandt{term, {}});
+      node = symbol_exprt{instance, node.type()};
+    }
+  });
+  return root_expr;
+}
+
 smt_termt
 smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 {
   define_index_identifiers(expr);
-  const exprt substituted =
-    substitute_identifiers(expr, expression_identifiers);
+  const exprt substituted = substitute_defined_padding(
+    substitute_identifiers(expr, expression_identifiers));
   track_expression_objects(substituted, ns, object_map);
   associate_pointer_sizes(
     substituted,
