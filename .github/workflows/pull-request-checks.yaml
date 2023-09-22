@@ -120,5 +120,7 @@ jobs:
         run: clcache -s
       - name: What is in chocolatey
         run: dir C:\ProgramData\chocolatey\bin\
+      - name: What is in hostedtoolcache
+        run: dir C:\hostedtoolcache\windows\Python\3.7.9\x64\
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -C regression/cpp-linter test
