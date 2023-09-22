@@ -123,7 +123,11 @@ jobs:
           make CXX=clcache -j2 -C jbmc/src setup-submodules
       - name: Print ccache stats
         run: clcache -s
-      - name: Print python version
-        run: python --version || true
+      - name: Print global python version
+        run: python -c 'import sys; print(sys.executable)'
+      - name: Print chocolatey python arg
+        run: C:/ProgramData/chocolatey/bin/python.exe --version
+      - name: Print chocolatey python version
+        run: C:/ProgramData/chocolatey/bin/python.exe -c 'import sys; print(sys.executable)'
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -C regression/cpp-linter test
