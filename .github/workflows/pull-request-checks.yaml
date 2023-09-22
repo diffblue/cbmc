@@ -78,28 +78,6 @@ jobs:
       - uses: nuget/setup-nuget@v1
         with:
           nuget-version: '5.8.x'
-      - name: Fetch dependencies
-        run: |
-          choco install -y winflexbison3 strawberryperl wget
-          if($LastExitCode -ne 0)
-          {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
-          }
-          nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
-          echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-          echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
-          echo "c:\Strawberry\" >> $env:GITHUB_PATH
-          Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
-          Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
-          echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
-          New-Item -ItemType directory "C:\tools\cvc5"
-          wget.exe -O c:\tools\cvc5\cvc5.exe https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe
-          echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Confirm cvc5 solver is available and log the version installed
-        run: cvc5 --version
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
       - name: Initialise Developer Command Line
@@ -123,11 +101,7 @@ jobs:
           make CXX=clcache -j2 -C jbmc/src setup-submodules
       - name: Print ccache stats
         run: clcache -s
-      - name: Print global python version
-        run: python -c 'import sys; print(sys.executable)'
       - name: Print chocolatey python arg
         run: C:/ProgramData/chocolatey/bin/python.exe --version
-      - name: Print chocolatey python version
-        run: C:/ProgramData/chocolatey/bin/python.exe -c 'import sys; print(sys.executable)'
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -C regression/cpp-linter test
