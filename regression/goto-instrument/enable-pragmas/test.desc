@@ -1,7 +1,7 @@
 CORE
 main.c
 
-^\[main.array_bounds.\d+\] line \d+ array 'a' upper bound in a\[\(signed .* int\)2\]: FAILURE
+^\[main.array_bounds.\d+\] line \d+ array 'a' upper bound in a\[(\(signed .* int\))?2\]: FAILURE
 ^VERIFICATION FAILED
 ^EXIT=10$
 ^SIGNAL=0$

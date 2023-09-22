@@ -4,9 +4,9 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[f1.assigns.\d+\].*line 16 Check that \*p->buf is valid: FAILURE$
-^\[f1.assigns.\d+\].*line 18 Check that p->buf\[\(.*\)0\] is assignable: FAILURE$
+^\[f1.assigns.\d+\].*line 18 Check that p->buf\[(\(.*\))?0\] is assignable: FAILURE$
 ^\[f2.assigns.\d+\].*line 21 Check that \*pp->p->buf is valid: FAILURE$
-^\[f2.assigns.\d+\].*line 23 Check that pp->p->buf\[\(.*\)0\] is assignable: FAILURE$
+^\[f2.assigns.\d+\].*line 23 Check that pp->p->buf\[(\(.*\))?0\] is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

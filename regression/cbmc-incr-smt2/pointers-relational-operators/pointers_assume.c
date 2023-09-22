@@ -16,7 +16,6 @@ int main()
   }
 
   __CPROVER_assume(y >= z);
-  __CPROVER_assert(x != y, "x != y: expected successful");
   __CPROVER_assert(x == y, "x == y: expected failure");
 
   __CPROVER_assume(z >= x);

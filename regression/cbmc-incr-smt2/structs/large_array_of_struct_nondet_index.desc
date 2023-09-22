@@ -9,7 +9,7 @@ line 17 assertion struct_array\[x\]\.eggs \+ struct_array\[x\]\.ham != 11\: FAIL
 \{\s*\.eggs=\d+,\s*\.ham=7\s*\}
 \{\s*\.eggs=\d+,\s*\.ham=8\s*\}
 x=\d{1,4}\s
-struct_array\[\(signed (long )+int\)x\]\.eggs=3
+struct_array\[(\(signed (long )+int\))?x\]\.eggs=3
 --
 --
 This test covers support for examples with large arrays of structs using nondet

@@ -17,6 +17,8 @@ Author: Diffblue Ltd.
 #include <pointer-analysis/value_set.h>
 #include <testing-utils/use_catch.h>
 
+#include <climits>
+
 static bool object_descriptor_matches(
   const exprt &descriptor_expr, const exprt &target)
 {
@@ -49,8 +51,9 @@ SCENARIO(
   {
     // Create struct A { A *x; A *y }
 
-    struct_typet struct_A({{"x", pointer_typet(struct_tag_typet("A"), 64)},
-                           {"y", pointer_typet(struct_tag_typet("A"), 64)}});
+    struct_typet struct_A(
+      {{"x", pointer_typet(struct_tag_typet("A"), sizeof(void *) * CHAR_BIT)},
+       {"y", pointer_typet(struct_tag_typet("A"), sizeof(void *) * CHAR_BIT)}});
     struct_A.set_tag("A");
 
     auto &A_x = struct_A.components()[0];
@@ -225,7 +228,7 @@ SCENARIO(
   {
     // Make some global integers i1, i2, i3:
     signedbv_typet int32_type(32);
-    pointer_typet int32_ptr(int32_type, 64);
+    pointer_typet int32_ptr(int32_type, sizeof(void *) * CHAR_BIT);
 
     symbolt i1{"i1", int32_type, irep_idt{}};
     i1.base_name = "i1";

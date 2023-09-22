@@ -5,9 +5,9 @@ line 12 Expected int sizes\.: SUCCESS
 line 13 Size is always 2\. \(Can be disproved\.\): FAILURE
 line 14 Size is always 4\. \(Can be disproved\.\): FAILURE
 line 16 Size of NULL\.: FAILURE
-size=2ul
-size=4ul
-null_size=0ul
+size=2ul*
+size=4ul*
+null_size=0ul*
 ^EXIT=10$
 ^SIGNAL=0$
 --

@@ -103,14 +103,14 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
     rowt{smt_bit_vector_constant_termt{1, 8}, from_integer(1, c_bool_typet(8))},
     rowt{
       smt_bit_vector_constant_termt{0, 64},
-      from_integer(0, pointer_typet(void_type(), 64 /* bits */))},
+      from_integer(0, pointer_typet{empty_typet{}, 64 /* bits */})},
     // The reason for the more intricate elaboration of a pointer with a value
     // of 12 is a limitation in the design of from_integer, which only handles
     // pointers with value 0 (null pointers).
     rowt{
       smt_bit_vector_constant_termt{12, 64},
       constant_exprt(
-        integer2bvrep(12, 64), pointer_typet(void_type(), 64 /* bits */))},
+        integer2bvrep(12, 64), pointer_typet{empty_typet{}, 64 /* bits */})},
     rowt{
       smt_bit_vector_constant_termt{2, 42},
       constant_exprt{"2", c_enum_tag_typet{enum_type_symbol.name}}},
@@ -184,7 +184,7 @@ TEST_CASE(
       "Unexpected conversion of exists quantifier to value expression."},
     rowt{
       smt_bit_vector_constant_termt{0, 16},
-      pointer_typet{unsigned_int_type(), 0},
+      pointer_typet{unsignedbv_typet{32}, 0},
       "Width of smt bit vector term must match the width of pointer type"},
     rowt{
       smt_bit_vector_constant_termt{2, 42},

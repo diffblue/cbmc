@@ -6,17 +6,17 @@ main.c
 ^\[foo.loop_invariant_base.\d+\] line .* Check invariant before entry for loop foo.0: SUCCESS$
 ^\[foo.loop_invariant_step.\d+\] line .* Check invariant after step for loop foo.0: SUCCESS$
 ^\[foo.loop_step_unwinding.\d+\] line .* Check step was unwound for loop foo.0: SUCCESS$
-^\[foo.assigns.\d+\] line .* Check that buf1\[\(.*\)i\] is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line .* Check that buf1\[\(.*\)\(32 - 1\)\] is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line .* Check that buf2\[\(.*\)0\] is assignable: FAILURE$
-^\[foo.assigns.\d+\] line .* Check that buf2\[\(.*\)10\] is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line .* Check that buf2\[\(.*\)11\] is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line .* Check that buf1\[\(.*\)\(32 - 1\)\] is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line .* Check that buf3\[\(.*\)0\] is assignable: FAILURE$
-^\[foo.assigns.\d+\] line .* Check that buf3\[\(.*\)9\] is assignable: FAILURE$
-^\[foo.assigns.\d+\] line .* Check that buf3\[\(.*\)10\] is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line .* Check that buf3\[\(.*\)11\] is assignable: FAILURE$
-^\[foo.assigns.\d+\] line .* Check that buf3\[\(.*\)\(32 - 1\)\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line .* Check that buf1\[(\(.*\))?i\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line .* Check that buf1\[(\(.*\))?\(?32 - 1\)?\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line .* Check that buf2\[(\(.*\))?0\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line .* Check that buf2\[(\(.*\))?10\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line .* Check that buf2\[(\(.*\))?11\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line .* Check that buf1\[(\(.*\))?\(?32 - 1\)?\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line .* Check that buf3\[(\(.*\))?0\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line .* Check that buf3\[(\(.*\))?9\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line .* Check that buf3\[(\(.*\))?10\] is assignable: SUCCESS$
+^\[foo.assigns.\d+\] line .* Check that buf3\[(\(.*\))?11\] is assignable: FAILURE$
+^\[foo.assigns.\d+\] line .* Check that buf3\[(\(.*\))?\(?32 - 1\)?\] is assignable: FAILURE$
 ^\[foo.assigns.\d+\] line .* Check that i is assignable: SUCCESS$
 ^EXIT=10$
 ^SIGNAL=0$

@@ -5,7 +5,8 @@ struct S
 
 int main()
 {
-  unsigned x;
+  int x;
+  __CPROVER_assume(x >= 0);
   __CPROVER_assume(x % sizeof(int) == 0);
   struct S A[x];
   ((char *)A)[x] = 42;

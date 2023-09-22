@@ -1,8 +1,8 @@
 CORE
 main.c
 --enforce-contract f1 --enforce-contract f2 _ --malloc-may-fail --malloc-fail-null --pointer-check
-^\[f1.assigns.\d+\] line \d+ Check that p->buf\[\(.*\)0\] is assignable: SUCCESS$
-^\[f2.assigns.\d+\] line \d+ Check that pp->p->buf\[\(.*\)0\] is assignable: SUCCESS$
+^\[f1.assigns.\d+\] line \d+ Check that p->buf\[(\(.*\))?0\] is assignable: SUCCESS$
+^\[f2.assigns.\d+\] line \d+ Check that pp->p->buf\[(\(.*\))?0\] is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

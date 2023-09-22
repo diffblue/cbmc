@@ -32,7 +32,8 @@ int binary_search(int val, int *buf, int size)
 
 int main()
 {
-  int val, size;
+  int val;
+  char size;
   int *buf = size >= 0 ? malloc(size * sizeof(int)) : NULL;
 
   int idx = binary_search(val, buf, size);

@@ -39,7 +39,7 @@ void check_long(void)
 
 void check_long_long(void)
 {
-  long result;
+  long long result;
   assert(!__builtin_ssubll_overflow(1ll, 1ll, &result));
   assert(result == 0ll);
   assert(__builtin_ssubll_overflow(LLONG_MIN, 1ll, &result));

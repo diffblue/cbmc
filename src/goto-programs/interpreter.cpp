@@ -10,11 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Interpreter for GOTO Programs
 
 #include "interpreter.h"
-
-#include <cctype>
-#include <cstdio>
-#include <fstream>
-#include <algorithm>
+#include "interpreter_class.h"
 
 #include <util/c_types.h>
 #include <util/fixedbv.h>
@@ -29,8 +25,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_container.h>
 
 #include "goto_model.h"
-#include "interpreter_class.h"
 #include "json_goto_trace.h"
+
+#include <algorithm>
+#include <cctype>
+#include <climits>
+#include <cstdio>
+#include <fstream>
 
 const std::size_t interpretert::npos=std::numeric_limits<size_t>::max();
 
@@ -958,13 +959,13 @@ bool interpretert::unbounded_size(const typet &type)
 }
 
 /// Retrieves the actual size of the provided structured type. Unbounded objects
-/// get allocated 2^32 address space each (of a 2^64 sized space).
+/// get allocated 2^(platform bit-width / 2 + 1) address space each.
 /// \param type: a structured type
 /// \return Size of the given type
 mp_integer interpretert::get_size(const typet &type)
 {
   if(unbounded_size(type))
-    return mp_integer(2) << 32;
+    return mp_integer(2) << (sizeof(std::size_t) * CHAR_BIT / 2);
 
   if(type.id()==ID_struct)
   {

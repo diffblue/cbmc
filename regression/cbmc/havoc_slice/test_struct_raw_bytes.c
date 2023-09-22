@@ -36,6 +36,6 @@ void main(void)
   __CPROVER_assert(c[16] == old_c[16], "expecting FAILURE");
   __CPROVER_assert(c[17] == old_c[17], "expecting FAILURE");
   __CPROVER_assert(c[18] == old_c[18], "expecting SUCCESS");
-  __CPROVER_assert(c[19] == old_c[20], "expecting SUCCESS");
+  __CPROVER_assert(c[19] == old_c[19], "expecting SUCCESS");
   return;
 }

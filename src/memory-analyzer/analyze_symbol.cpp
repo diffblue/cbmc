@@ -393,9 +393,9 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
 
     // Check if pointer was dynamically allocated (via malloc). If so we will
     // replace the pointee with a static array filled with values stored at the
-    // expected positions. Since the allocated size is over-approximation we may
-    // end up querying pass the allocated bounds and building larger array with
-    // meaningless values.
+    // expected positions. Since the allocated size is an over-approximation we
+    // may end up querying past the allocated bounds and building a larger array
+    // with meaningless values.
     mp_integer allocated_size = get_malloc_size(c_converter.convert(expr));
     // get the sizeof(target_type) and thus the number of elements
     const auto number_of_elements = allocated_size / get_type_size(target_type);
@@ -406,7 +406,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
       for(size_t i = 0; i < number_of_elements; i++)
       {
         const auto sub_expr_value = get_expr_value(
-          index_exprt{expr, from_integer(i, index_type())},
+          dereference_exprt{plus_exprt{expr, from_integer(i, index_type())}},
           *zero_expr,
           location);
         elements.push_back(sub_expr_value);

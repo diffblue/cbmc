@@ -287,7 +287,8 @@ void gdb_apit::run_gdb_from_core(const std::string &corefile)
 
 void gdb_apit::collect_malloc_calls()
 {
-  // this is what the registers look like at the function call entry:
+#if defined(__x86_64__)
+  // this is what the registers look like at the function call entry for x86-64:
   //
   // reg. name         hex. value   dec. value
   // 0: rax            0xffffffff   4294967295
@@ -303,6 +304,17 @@ void gdb_apit::collect_malloc_calls()
   write_to_gdb("-data-list-register-values d 5");
   auto record = get_most_recent_record("^done", true);
   auto allocated_size = safe_string2size_t(get_register_value(record));
+#elif defined(__i386__)
+  // x86 32-bit Linux calling conventions use the stack to pass arguments. The
+  // top of the stack is the return address, so look at the next element (+4 as
+  // the stack grows downwards).
+  write_to_gdb("-data-evaluate-expression \"*(unsigned long*)($esp + 4)\"");
+  auto record = get_most_recent_record("^done", true);
+  auto allocated_size =
+    safe_string2size_t(get_value_from_record(record, "value"));
+#else
+#  error malloc calling conventions not know for current platform
+#endif
 
   write_to_gdb("-exec-finish");
   if(!most_recent_line_has_tag("*running"))
@@ -324,7 +336,7 @@ void gdb_apit::collect_malloc_calls()
     record = get_most_recent_record("*stopped");
   }
 
-  // now we can read the rax register to the the allocated memory address
+  // now we can read the eax/rax register to the allocated memory address
   write_to_gdb("-data-list-register-values x 0");
   record = get_most_recent_record("^done", true);
   allocated_memory[get_register_value(record)] = allocated_size;
