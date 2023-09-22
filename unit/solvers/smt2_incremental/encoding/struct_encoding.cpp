@@ -501,4 +501,26 @@ TEST_CASE("encoding of union expressions", "[core][smt2_incremental]")
     const auto bv_equal = equal_exprt{symbol_expr_as_bv, partial_union_as_bv};
     REQUIRE(test.struct_encoding.encode(union_equal) == bv_equal);
   }
+  SECTION("member expression selecting a data member of a union")
+  {
+    SECTION("Member which fits the size of the whole union")
+    {
+      const typet field_type = signedbv_typet{32};
+      const exprt zero = from_integer(0, field_type);
+      const exprt input =
+        equal_exprt{zero, member_exprt{symbol_expr, "ham", field_type}};
+      const exprt expected = equal_exprt{
+        zero, extractbits_exprt{symbol_expr_as_bv, 31, 0, field_type}};
+      REQUIRE(test.struct_encoding.encode(input) == expected);
+    }
+    SECTION("Member which is smaller than the union as a whole")
+    {
+      const typet field_type = unsignedbv_typet{8};
+      const exprt input =
+        equal_exprt{dozen, member_exprt{symbol_expr, "eggs", field_type}};
+      const exprt expected = equal_exprt{
+        dozen, extractbits_exprt{symbol_expr_as_bv, 7, 0, field_type}};
+      REQUIRE(test.struct_encoding.encode(input) == expected);
+    }
+  }
 }

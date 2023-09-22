@@ -176,19 +176,26 @@ static std::size_t count_trailing_bit_width(
     trailing_widths.begin(), trailing_widths.end(), std::size_t{0});
 }
 
-/// The member expression selects the value of a field from a struct. The
-/// struct is encoded as a single bitvector where the first field is stored
+/// The member expression selects the value of a field from a struct or union.
+/// Both structs and unions are encoded into a single large bit vector.
+/// The fields of a union are encoded into the lowest bits, with padding in the
+/// highest bits if needed.
+/// Structs are encoded as a single bitvector where the first field is stored
 /// in the highest bits. The second field is stored in the next highest set of
 /// bits and so on. As offsets are indexed from the lowest bit, any field can be
 /// selected by extracting the range of bits starting from an offset based on
 /// the combined width of the fields which follow the field being selected.
 exprt struct_encodingt::encode_member(const member_exprt &member_expr) const
 {
-  const auto &struct_type = type_checked_cast<struct_typet>(
-    ns.get().follow(member_expr.compound().type()));
-  const std::size_t offset_bits = count_trailing_bit_width(
-    struct_type, member_expr.get_component_name(), *boolbv_width);
+  const auto &type = ns.get().follow(member_expr.compound().type());
   const auto member_bits_width = (*boolbv_width)(member_expr.type());
+  const auto offset_bits = [&]() -> std::size_t {
+    if(can_cast_type<union_typet>(type))
+      return 0;
+    const auto &struct_type = type_checked_cast<struct_typet>(type);
+    return count_trailing_bit_width(
+      struct_type, member_expr.get_component_name(), *boolbv_width);
+  }();
   return extractbits_exprt{
     member_expr.compound(),
     offset_bits + member_bits_width - 1,
