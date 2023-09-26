@@ -94,6 +94,7 @@ jobs:
           choco install python311
           Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
           dir
+          python -c "print('[DEBUG] Fotis was here')"
           python example.py
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
