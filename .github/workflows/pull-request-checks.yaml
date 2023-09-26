@@ -746,7 +746,6 @@ jobs:
           }
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-          echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
           echo "c:\Strawberry\" >> $env:GITHUB_PATH
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
