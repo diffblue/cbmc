@@ -1,0 +1,6 @@
+CORE
+login.c
+--show-properties --bounds-check --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+Property main\.array_bounds\.\d

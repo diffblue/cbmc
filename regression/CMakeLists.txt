@@ -92,6 +92,7 @@ add_subdirectory(cbmc-sequentialization)
 add_subdirectory(cpp-linter)
 add_subdirectory(catch-framework)
 add_subdirectory(libcprover-cpp)
+add_subdirectory(book-examples)
 
 if(WITH_MEMORY_ANALYZER)
   add_subdirectory(snapshot-harness)

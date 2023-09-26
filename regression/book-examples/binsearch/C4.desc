@@ -1,0 +1,6 @@
+CORE
+binsearch.c
+--function binsearch --unwind 6 --bounds-check --unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL

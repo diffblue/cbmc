@@ -1,0 +1,6 @@
+CORE
+login.c
+--unwind 20 --bounds-check --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$

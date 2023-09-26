@@ -1,0 +1,6 @@
+CORE
+lock.c
+--unwind 1
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
