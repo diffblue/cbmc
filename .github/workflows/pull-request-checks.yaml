@@ -101,9 +101,9 @@ jobs:
       
       - name: Fetch dependencies 3 
         run: |
-          echo "Before offending: $env:GITHUB_PATH"
+          echo "Before offending: to_json($env:GITHUB_PATH)"
           echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
-          echo "After offending: $env:GITHUB_PATH"
+          echo "After offending: to_json($env:GITHUB_PATH)"
           python -c "import sys; print('Fotis was here 4'); print(sys.version); print(sys.executable)"
           
       - name: Fetch dependencies 3.1
