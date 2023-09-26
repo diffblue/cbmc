@@ -1,5 +1,6 @@
 var NAVTREEINDEX134 =
 {
+"structlanguage__entryt.html#a78f06d9ea312746ed96676a3c349bbf1":[8,0,745,0],
 "structlanguage__entryt.html#a7d52d03029cdafd72734d941f8a0fa5b":[8,0,745,2],
 "structlanguage__entryt.html#ae91dbc02fcfab9e575dcb24977945b1d":[8,0,745,1],
 "structleft__and__right__valuest.html":[8,0,757],
@@ -248,6 +249,5 @@ var NAVTREEINDEX134 =
 "structnumeric__castt_3_01mp__integer_01_4.html":[8,0,877],
 "structnumeric__castt_3_01mp__integer_01_4.html#a025be35481041e74f55b63b70f5a8ae4":[8,0,877,1],
 "structnumeric__castt_3_01mp__integer_01_4.html#a75011a649d3ed6142630559ddb025e70":[8,0,877,0],
-"structobject__creation__infot.html":[8,0,880],
-"structobject__creation__infot.html#a02ebda8b90f0536196b49f85f17998f6":[8,0,880,0]
+"structobject__creation__infot.html":[8,0,880]
 };
