@@ -79,7 +79,7 @@ jobs:
         run: |
           python --version
           python -c "import sys; print('Fotis was here'); print(sys.executable)"
-      - name: Fetch dependencies
+      - name: Fetch dependencies 1
         run: |
           python -c "import sys; print('Fotis was here 0'); print(sys.version); print(sys.executable)"
           
@@ -91,19 +91,24 @@ jobs:
             Write-Output "::error ::Dependency installation via Chocolatey failed."
             exit $LastExitCode
           }
-          
+      - name: Fetch dependencies 2
+        run: |
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           python -c "import sys; print('Fotis was here 2'); print(sys.version); print(sys.executable)"
 
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
           python -c "import sys; print('Fotis was here 3'); print(sys.version); print(sys.executable)"
-          
+      
+      - name: Fetch dependencies 3 
+        run: |
           echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
           python -c "import sys; print('Fotis was here 4'); print(sys.version); print(sys.executable)"
           
           echo "c:\Strawberry\" >> $env:GITHUB_PATH
           python -c "import sys; print('Fotis was here 5'); print(sys.version); print(sys.executable)"
 
+      - name: Fetch dependencies 4
+        run: |
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
