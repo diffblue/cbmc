@@ -739,6 +739,7 @@ jobs:
       - name: Fetch dependencies
         run: |
           choco install -y winflexbison3 strawberryperl wget
+          choco install python311
           if($LastExitCode -ne 0)
           {
             Write-Output "::error ::Dependency installation via Chocolatey failed."
