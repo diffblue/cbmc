@@ -68,13 +68,17 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - name: Canary python
+      - name: Canary python 1
         run: |
           python --version
-          python -c "print('Fotis was here')"
+          python -c "import sys; print('Fotis was here'); print(sys.executable)"
       - uses: nuget/setup-nuget@v1
         with:
           nuget-version: '5.8.x'
+      - name: Canary python 2
+        run: |
+          python --version
+          python -c "import sys; print('Fotis was here'); print(sys.executable)"
       - name: Fetch dependencies
         run: |
           choco install -y winflexbison3 strawberryperl wget
@@ -93,6 +97,10 @@ jobs:
           New-Item -ItemType directory "C:\tools\cvc5"
           wget.exe -O c:\tools\cvc5\cvc5.exe https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe
           echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
+      - name: Canary python 3
+        run: |
+          python --version
+          python -c "import sys; print('Fotis was here'); print(sys.executable)"
       - name: Fetch python
         run: |
           choco uninstall python
