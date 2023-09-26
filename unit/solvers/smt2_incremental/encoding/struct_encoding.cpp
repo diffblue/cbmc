@@ -3,6 +3,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/c_types.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
@@ -68,6 +69,58 @@ TEST_CASE("struct encoding of types", "[core][smt2_incremental]")
     REQUIRE(
       test.struct_encoding.encode(array_of_array_of_struct) ==
       expected_encoded_array);
+  }
+}
+
+TEST_CASE("Encoding of union types", "[core][smt2_incremental]")
+{
+  auto test = struct_encoding_test_environmentt::make();
+  SECTION("Two components")
+  {
+    const struct_union_typet::componentst components{
+      {"foo", unsignedbv_typet{8}}, {"bar", signedbv_typet{16}}};
+    union_typet union_type{components};
+    type_symbolt type_symbol{"my_uniont", union_type, ID_C};
+    test.symbol_table.insert(type_symbol);
+    union_tag_typet union_tag{type_symbol.name};
+    SECTION("Direct union_tag_type encoding")
+    {
+      REQUIRE(test.struct_encoding.encode(union_tag) == bv_typet{16});
+    }
+    SECTION("Array of unions encoding")
+    {
+      const auto index_type = signedbv_typet{32};
+      const auto array_size = from_integer(5, index_type);
+      array_typet array_of_struct{union_tag, array_size};
+      array_typet expected_encoded_array{bv_typet{16}, array_size};
+      REQUIRE(
+        test.struct_encoding.encode(array_of_struct) == expected_encoded_array);
+    }
+    SECTION("Array of array of unions encoding")
+    {
+      const auto index_type = signedbv_typet{32};
+      const auto array_size_inner = from_integer(4, index_type);
+      const auto array_size_outer = from_integer(2, index_type);
+      array_typet array_of_struct{union_tag, array_size_inner};
+      array_typet array_of_array_of_struct{array_of_struct, array_size_outer};
+      array_typet expected_encoded_array{
+        array_typet{bv_typet{16}, array_size_inner}, array_size_outer};
+      REQUIRE(
+        test.struct_encoding.encode(array_of_array_of_struct) ==
+        expected_encoded_array);
+    }
+  }
+  SECTION("Empty union")
+  {
+    const struct_union_typet::componentst components{};
+    union_typet union_type{components};
+    type_symbolt type_symbol{"my_empty_uniont", union_type, ID_C};
+    test.symbol_table.insert(type_symbol);
+    union_tag_typet union_tag{type_symbol.name};
+    SECTION("Direct union_tag_type encoding")
+    {
+      REQUIRE(test.struct_encoding.encode(union_tag) == bv_typet{8});
+    }
   }
 }
 
