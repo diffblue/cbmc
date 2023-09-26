@@ -104,6 +104,9 @@ jobs:
           echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
           python -c "import sys; print('Fotis was here 4'); print(sys.version); print(sys.executable)"
           
+      - name: Fetch dependencies 3.1
+        run: |
+          python -c "import sys; print('Fotis was here 4.after'); print(sys.version); print(sys.executable)"
           echo "c:\Strawberry\" >> $env:GITHUB_PATH
           python -c "import sys; print('Fotis was here 5'); print(sys.version); print(sys.executable)"
 
