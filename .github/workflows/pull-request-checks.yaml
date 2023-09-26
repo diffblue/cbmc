@@ -81,26 +81,43 @@ jobs:
           python -c "import sys; print('Fotis was here'); print(sys.executable)"
       - name: Fetch dependencies
         run: |
+          python -c "import sys; print('Fotis was here 0'); print(sys.version); print(sys.executable)"
+          
           choco install -y winflexbison3 strawberryperl wget
+          python -c "import sys; print('Fotis was here 1'); print(sys.version); print(sys.executable)"
+
           if($LastExitCode -ne 0)
           {
             Write-Output "::error ::Dependency installation via Chocolatey failed."
             exit $LastExitCode
           }
+          
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+          python -c "import sys; print('Fotis was here 2'); print(sys.version); print(sys.executable)"
+
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
+          python -c "import sys; print('Fotis was here 3'); print(sys.version); print(sys.executable)"
+          
           echo "c:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
+          python -c "import sys; print('Fotis was here 4'); print(sys.version); print(sys.executable)"
+          
           echo "c:\Strawberry\" >> $env:GITHUB_PATH
+          python -c "import sys; print('Fotis was here 5'); print(sys.version); print(sys.executable)"
+
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
+          python -c "import sys; print('Fotis was here 6'); print(sys.version); print(sys.executable)"
+          
           New-Item -ItemType directory "C:\tools\cvc5"
           wget.exe -O c:\tools\cvc5\cvc5.exe https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe
           echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
+          python -c "import sys; print('Fotis was here 7'); print(sys.version); print(sys.executable)"
+
       - name: Canary python 3
         run: |
           python --version
-          python -c "import sys; print('Fotis was here'); print(sys.executable)"
+          python -c "import sys; print('Fotis was here'); print(sys.version); print(sys.executable)"
       - name: Fetch python
         run: |
           choco uninstall python
