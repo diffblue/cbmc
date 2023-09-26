@@ -95,10 +95,9 @@ jobs:
           echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
       - name: Fetch python
         run: |
-          choco install python311
-          Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+          choco uninstall python
           dir
-          C:\ProgramData\chocolatey\bin\python3.11.exe -c "print('[DEBUG] Fotis was here')"
+          # C:\ProgramData\chocolatey\bin\python3.11.exe -c "print('[DEBUG] Fotis was here')"
           python -c "print('[DEBUG] Fotis was here')"
           python example.py
       - name: Confirm z3 solver is available and log the version installed
