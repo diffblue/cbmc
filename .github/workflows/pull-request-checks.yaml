@@ -71,13 +71,11 @@ jobs:
       - uses: nuget/setup-nuget@v1
         with:
           nuget-version: '5.8.x'
-      - name: Fetch python
-        run: choco upgrade python --pre
-      - name: Pin python 3.12
-        run: choco pin add --name="'python'" --version="'3.12'"
       - name: Fetch dependencies
         run: |
           choco install -y winflexbison3 strawberryperl wget
+          choco install python311
+          refreshenv
           if($LastExitCode -ne 0)
           {
             Write-Output "::error ::Dependency installation via Chocolatey failed."
