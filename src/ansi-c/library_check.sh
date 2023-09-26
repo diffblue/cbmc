@@ -32,6 +32,7 @@ perl -p -i -e 's/^__CPROVER_contracts_library\n//' __functions
 # Some functions are implicitly covered by running on different operating
 # systems:
 perl -p -i -e 's/^_fopen\n//' __functions # fopen, macOS
+perl -p -i -e 's/^_getopt\n//' __functions # getopt, macOS
 perl -p -i -e 's/^_mmap\n//' __functions # mmap, macOS
 perl -p -i -e 's/^_munmap\n//' __functions # mumap, macOS
 perl -p -i -e 's/^_pipe\n//' __functions # pipe, macOS
