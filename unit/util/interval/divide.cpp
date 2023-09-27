@@ -38,11 +38,16 @@ TEST_CASE("interval::divide", "[core][util][interval][divide]")
 
   SECTION("Single element intervals")
   {
-    const constant_interval_exprt zero_interval(zero);
-    const constant_interval_exprt one_interval(one);
-    const constant_interval_exprt four_interval(four);
-    const constant_interval_exprt eight_interval(eight);
-    const constant_interval_exprt negative_twelve_interval(negative_twelve);
+    const constant_interval_exprt zero_interval =
+      constant_interval_exprt::singleton(zero);
+    const constant_interval_exprt one_interval =
+      constant_interval_exprt::singleton(one);
+    const constant_interval_exprt four_interval =
+      constant_interval_exprt::singleton(four);
+    const constant_interval_exprt eight_interval =
+      constant_interval_exprt::singleton(eight);
+    const constant_interval_exprt negative_twelve_interval =
+      constant_interval_exprt::singleton(negative_twelve);
 
     REQUIRE(value_of(zero_interval.divide(four_interval)) == 0);
     REQUIRE(value_of(four_interval.divide(four_interval)) == 1);
@@ -61,8 +66,10 @@ TEST_CASE("interval::divide", "[core][util][interval][divide]")
 
     SECTION("Max & Min")
     {
-      const constant_interval_exprt min_interval{min_exprt{signed_int_type}};
-      const constant_interval_exprt max_interval{max_exprt{signed_int_type}};
+      const constant_interval_exprt min_interval =
+        constant_interval_exprt::singleton(min_exprt{signed_int_type});
+      const constant_interval_exprt max_interval =
+        constant_interval_exprt::singleton(max_exprt{signed_int_type});
       // TODO: division of single max or min don't work as expected
       // CHECK(max_interval.divide(max_interval).is_top());
       // CHECK(max_interval.divide(min_interval).is_top());
@@ -82,7 +89,8 @@ TEST_CASE("interval::divide", "[core][util][interval][divide]")
     const constant_interval_exprt negative_range(
       negative_sixteen, negative_twelve);
     const constant_interval_exprt range_containing_zero(negative_twelve, four);
-    const constant_interval_exprt zero_interval(zero);
+    const constant_interval_exprt zero_interval =
+      constant_interval_exprt::singleton(zero);
 
     const constant_exprt &two = from_integer(2, signed_int_type);
     REQUIRE(matching_range(

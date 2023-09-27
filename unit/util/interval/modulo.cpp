@@ -19,9 +19,9 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
 {
   GIVEN("Two single element internvals")
   {
-    constant_interval_exprt a(CEV(5));
-    constant_interval_exprt b(CEV(10));
-    constant_interval_exprt zero(CEV(0));
+    constant_interval_exprt a = constant_interval_exprt::singleton(CEV(5));
+    constant_interval_exprt b = constant_interval_exprt::singleton(CEV(10));
+    constant_interval_exprt zero = constant_interval_exprt::singleton(CEV(0));
     const auto a_mod_b = a.modulo(b);
     REQUIRE(V(a_mod_b.get_upper()) == 5);
 
@@ -30,7 +30,7 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
     REQUIRE(V(b_mod_a.get_upper()) == 4);
 
     const auto zero_mod_a = zero.modulo(a);
-    REQUIRE(zero_mod_a == constant_interval_exprt(CEV(0)));
+    REQUIRE(zero_mod_a == constant_interval_exprt::singleton(CEV(0)));
 
     // TODO: this causes an invariant as it is unable to simplify the
     // TODO: simplify(a % 0) == a % 0
@@ -95,7 +95,7 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
           constant_interval_exprt::modulo(
             constant_interval_exprt(CEV(-20), CEV(-10)),
             constant_interval_exprt(CEV(1), CEV(1))) ==
-          constant_interval_exprt(CEV(0)));
+          constant_interval_exprt::singleton(CEV(0)));
 
         REQUIRE(
           constant_interval_exprt::modulo(

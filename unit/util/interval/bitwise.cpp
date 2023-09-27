@@ -15,9 +15,9 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
   {
     const unsignedbv_typet &unsigned_int = unsignedbv_typet(32);
     constant_interval_exprt five =
-      constant_interval_exprt(from_integer(5, unsigned_int));
+      constant_interval_exprt::singleton(from_integer(5, unsigned_int));
     constant_interval_exprt nine =
-      constant_interval_exprt(from_integer(9, unsigned_int));
+      constant_interval_exprt::singleton(from_integer(9, unsigned_int));
 
     constant_interval_exprt five_to_nine(
       from_integer(5, unsigned_int), from_integer(9, unsigned_int));
@@ -26,7 +26,7 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
     {
       REQUIRE(
         constant_interval_exprt::bitwise_or(five, nine) ==
-        constant_interval_exprt(from_integer(13, unsigned_int)));
+        constant_interval_exprt::singleton(from_integer(13, unsigned_int)));
 
       REQUIRE(constant_interval_exprt::bitwise_or(five_to_nine, nine).is_top());
     }
@@ -35,10 +35,10 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
     {
       REQUIRE(
         constant_interval_exprt::bitwise_and(five, nine) ==
-        constant_interval_exprt(from_integer(1, unsigned_int)));
+        constant_interval_exprt::singleton(from_integer(1, unsigned_int)));
       REQUIRE(
         (five & nine) ==
-        constant_interval_exprt(from_integer(1, unsigned_int)));
+        constant_interval_exprt::singleton(from_integer(1, unsigned_int)));
 
       REQUIRE(
         constant_interval_exprt::bitwise_and(five_to_nine, nine).is_top());
@@ -48,7 +48,7 @@ SCENARIO("bitwise interval domain", "[core][analyses][interval][bitwise]")
     {
       REQUIRE(
         constant_interval_exprt::bitwise_xor(five, nine) ==
-        constant_interval_exprt(from_integer(12, unsigned_int)));
+        constant_interval_exprt::singleton(from_integer(12, unsigned_int)));
 
       REQUIRE(
         constant_interval_exprt::bitwise_xor(five_to_nine, nine).is_top());
