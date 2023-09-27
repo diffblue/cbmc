@@ -3,7 +3,8 @@ bad1.c
 --function bad_declaration1 --verbosity 10
 ^EXIT=6$
 ^SIGNAL=0$
-^A shadow memory field must not be larger than 8 bits.
+^file bad1\.c line 3 function bad_declaration1: __CPROVER_field_decl_local argument 2 must be a byte-sized integer, but \(\(signed int\)0\) has type `signed int`
+^CONVERSION ERROR
 --
 --
 Test that a shadow memory declaration of a too large type is rejected.

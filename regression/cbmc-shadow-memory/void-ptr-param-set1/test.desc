@@ -3,6 +3,7 @@ main.c
 
 ^EXIT=6$
 ^SIGNAL=0$
-Shadow memory: cannot set shadow memory via type void\* for f_void_ptr::s
+^file main\.c line 12 function f_void_ptr: __CPROVER_set_field argument 1 must be a non-void pointer, but \(s\) has type `void \*`\. Insert a cast to the type that you want to access\.
+^CONVERSION ERROR
 --
 ^warning: ignoring

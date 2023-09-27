@@ -51,6 +51,7 @@ SRC += analyses/ai/ai.cpp \
        ansi-c/expr2c.cpp \
        ansi-c/max_malloc_size.cpp \
        ansi-c/type2name.cpp \
+       ansi-c/c_typecheck_base.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
        get_goto_model_from_c_test.cpp \

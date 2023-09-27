@@ -1,0 +1,18 @@
+CORE
+typechecking_warning.c
+
+^EXIT=6$
+^SIGNAL=0$
+^CONVERSION ERROR$
+file typechecking_warning\.c line \d function main: __CPROVER_field_decl_local argument 2 must be a byte-sized integer, but \(10ul\) has type `unsigned long int`
+--
+^warning: ignoring
+WARNING: no body for function
+file intrinsics_warn.c line \d+ function main: function '__CPROVER_field_decl_global' is not declared
+file intrinsics_warn.c line \d+ function main: function '__CPROVER_field_decl_local' is not declared
+file intrinsics_warn.c line \d+ function main: function '__CPROVER_set_field' is not declared
+file intrinsics_warn.c line \d+ function main: function '__CPROVER_get_field' is not declared
+--
+This test is part of a suite of tests we have for ensuring that the typechecker
+comes up with proper error messages in the case of shadow memory intrinsics
+failing the typechecking phase.

@@ -2283,6 +2283,38 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         return;
       }
       else if(
+        auto shadow_memory_builtin = typecheck_shadow_memory_builtin(expr))
+      {
+        irep_idt shadow_memory_builtin_id =
+          shadow_memory_builtin->get_identifier();
+
+        const auto builtin_code_type =
+          to_code_type(shadow_memory_builtin->type());
+
+        INVARIANT(
+          builtin_code_type.has_ellipsis() &&
+            builtin_code_type.parameters().empty(),
+          "Shadow memory builtins should be an ellipsis with 0 parameter");
+
+        // Add the symbol to the symbol table if it is not present yet.
+        if(!symbol_table.has_symbol(shadow_memory_builtin_id))
+        {
+          symbolt new_symbol{
+            shadow_memory_builtin_id, shadow_memory_builtin->type(), ID_C};
+          new_symbol.base_name = shadow_memory_builtin_id;
+          new_symbol.location = f_op.source_location();
+          // Add an empty implementation to avoid warnings about missing
+          // implementation later on
+          new_symbol.value = code_blockt{};
+
+          symbol_table.add(new_symbol);
+        }
+
+        // Swap the current `function` field with the newly generated
+        // `shadow_memory_builtin` `symbol_exprt` and carry on with typechecking
+        f_op = std::move(*shadow_memory_builtin);
+      }
+      else if(
         auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
           identifier, expr.arguments(), f_op.source_location()))
       {

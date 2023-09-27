@@ -23,6 +23,7 @@ SRC = anonymous_member.cpp \
       c_typecheck_code.cpp \
       c_typecheck_expr.cpp \
       c_typecheck_gcc_polymorphic_builtins.cpp \
+      c_typecheck_shadow_memory_builtin.cpp \
       c_typecheck_initializer.cpp \
       c_typecheck_type.cpp \
       c_typecheck_typecast.cpp \
