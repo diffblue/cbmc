@@ -845,6 +845,43 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "smt2_incremental_decision_proceduret union support.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  // union foot{ int8_t eggs, uint32_t ham } foo;
+  const struct_union_typet::componentst components{
+    {"eggs", unsignedbv_typet{8}}, {"ham", signedbv_typet{32}}};
+  const type_symbolt type_symbol{"foot", union_typet{components}, ID_C};
+  test.symbol_table.insert(type_symbol);
+  const union_tag_typet union_tag{type_symbol.name};
+  const symbolt union_value_symbol{"foo", union_tag, ID_C};
+  test.symbol_table.insert(union_value_symbol);
+  // assume(foo == foot{ .eggs = 12 });
+  const auto symbol_expr = union_value_symbol.symbol_expr();
+  const auto dozen = from_integer(12, unsignedbv_typet{8});
+  const auto union_needing_padding = union_exprt{"eggs", dozen, union_tag};
+  const auto equals = equal_exprt{symbol_expr, union_needing_padding};
+  test.sent_commands.clear();
+  test.procedure.set_to(equals, true);
+
+  // (declare-fun foo () (_ BitVec 32))
+  // (declare-fun padding_0 () (_ BitVec 24))
+  // (assert (= foo (concat padding_0 (_ bv12 8)))) }
+  const auto foo_term = smt_identifier_termt{"foo", smt_bit_vector_sortt{32}};
+  const auto padding_term =
+    smt_identifier_termt{"padding_0", smt_bit_vector_sortt{24}};
+  const std::vector<smt_commandt> expected_commands{
+    smt_declare_function_commandt{foo_term, {}},
+    smt_declare_function_commandt{padding_term, {}},
+    smt_assert_commandt{smt_core_theoryt::equal(
+      foo_term,
+      smt_bit_vector_theoryt::concat(
+        padding_term, smt_bit_vector_constant_termt{12, 8}))}};
+  REQUIRE(test.sent_commands == expected_commands);
+}
+
+TEST_CASE(
   "smt2_incremental_decision_proceduret byte update-extract commands.",
   "[core][smt2_incremental]")
 {
