@@ -52,9 +52,9 @@ else
   detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
 endif
 
-ifeq ($(detected_OS),Linux)
+ifeq ($(WITH_MEMORY_ANALYZER),1)
   all: memory-analyzer.dir
-else ifeq ($(WITH_MEMORY_ANALYZER),1)
+else ifneq ($(filter-out Windows Darwin,$(detected_OS)),)
   all: memory-analyzer.dir
 endif
 
