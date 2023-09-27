@@ -1,6 +1,5 @@
 var NAVTREEINDEX21 =
 {
-"classcover__decision__instrumentert.html":[8,0,293],
 "classcover__decision__instrumentert.html#a2c4c536cfd8f00a851925ea7b33aaa6a":[8,0,293,0],
 "classcover__decision__instrumentert.html#ac530ef3b8118e502687398710f572e3e":[8,0,293,1],
 "classcover__goals__verifier__with__trace__storaget.html":[8,0,294],
@@ -249,5 +248,6 @@ var NAVTREEINDEX21 =
 "classcpp__linkage__spect.html#a8933eb11520a82d345146586c113d506":[8,0,310,5],
 "classcpp__linkage__spect.html#a99bdc563ebf1fc9c4cc102fa736943b5":[8,0,310,0],
 "classcpp__linkage__spect.html#accc3b5b019ec0a8c427c4154a442f4e4":[8,0,310,1],
-"classcpp__member__spect.html":[8,0,311]
+"classcpp__member__spect.html":[8,0,311],
+"classcpp__member__spect.html#a00cc2d7a6ce4de5f8b92f6b39f3b8605":[8,0,311,8]
 };

@@ -1,6 +1,5 @@
 var NAVTREEINDEX131 =
 {
-"structconstant__propagator__domaint_1_1valuest.html#a3e7baa52fb5da94e61e3284083fcb663":[8,0,270,0,2],
 "structconstant__propagator__domaint_1_1valuest.html#a3e809906c0dfcd1dc19208d6e6c8ce87":[8,0,270,0,6],
 "structconstant__propagator__domaint_1_1valuest.html#a596bc23ffcd7194f3ef8ef36b971007c":[8,0,270,0,7],
 "structconstant__propagator__domaint_1_1valuest.html#a765909ed7881c0ce4a3d499509af7871":[8,0,270,0,8],
@@ -249,5 +248,6 @@ var NAVTREEINDEX131 =
 "structframet_1_1implicationt.html#a045b3c1e169f371b94d10e57f5f54163":[8,0,500,1,1],
 "structframet_1_1implicationt.html#a5cf8e15444de89d55bdafab9c8da33ef":[8,0,500,1,2],
 "structframet_1_1implicationt.html#ab3b98731589d19d80e30a01a2da3e268":[8,0,500,1,0],
-"structframet_1_1implicationt.html#aea363d1fe4319c63b0aca145c7084ff6":[8,0,500,1,3]
+"structframet_1_1implicationt.html#aea363d1fe4319c63b0aca145c7084ff6":[8,0,500,1,3],
+"structframet_1_1loop__infot.html":[8,0,500,2]
 };
