@@ -13,6 +13,10 @@
 class nondet_padding_exprt;
 void validate_expr(const nondet_padding_exprt &padding);
 
+/// This expression serves as a placeholder for the bits which have non
+/// deterministic value in a larger bit vector. It is inserted in contexts where
+/// a subset of the bits are assigned to an expression and the remainder are
+/// left unspecified.
 class nondet_padding_exprt : public expr_protectedt
 {
 public:
