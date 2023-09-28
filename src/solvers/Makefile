@@ -211,6 +211,7 @@ SRC = $(BOOLEFORCE_SRC) \
       smt2_incremental/smt2_incremental_decision_procedure.cpp \
       smt2_incremental/encoding/struct_encoding.cpp \
       smt2_incremental/encoding/enum_encoding.cpp \
+      smt2_incremental/encoding/nondet_padding.cpp \
       smt2_incremental/theories/smt_array_theory.cpp \
       smt2_incremental/theories/smt_bit_vector_theory.cpp \
       smt2_incremental/theories/smt_core_theory.cpp \

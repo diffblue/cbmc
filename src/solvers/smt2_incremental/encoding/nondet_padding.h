@@ -13,11 +13,11 @@
 class nondet_padding_exprt;
 void validate_expr(const nondet_padding_exprt &padding);
 
-const irep_idt ID_nondet_padding = "nondet_padding";
-
 class nondet_padding_exprt : public expr_protectedt
 {
 public:
+  static const irep_idt ID_nondet_padding;
+
   explicit nondet_padding_exprt(typet type)
     : expr_protectedt{ID_nondet_padding, std::move(type)}
   {
@@ -28,7 +28,7 @@ public:
 template <>
 inline bool can_cast_expr<nondet_padding_exprt>(const exprt &base)
 {
-  return base.id() == ID_nondet_padding;
+  return base.id() == nondet_padding_exprt::ID_nondet_padding;
 }
 
 inline void validate_expr(const nondet_padding_exprt &padding)
