@@ -1,14 +1,5 @@
 var NAVTREEINDEX16 =
 {
-"classcharacter__refine__preprocesst.html#a29d6ac3a579b270045c58fe3515e59db":[8,0,180,75],
-"classcharacter__refine__preprocesst.html#a2a79642df37673409cb8258e2af327eb":[8,0,180,77],
-"classcharacter__refine__preprocesst.html#a2cb6949aad4ea31620c47fbda222a688":[8,0,180,90],
-"classcharacter__refine__preprocesst.html#a311f6cd833f83d0b9188f91e6ebabb8b":[8,0,180,103],
-"classcharacter__refine__preprocesst.html#a318c94958c31315c6b8d6f02ccd57e62":[8,0,180,49],
-"classcharacter__refine__preprocesst.html#a3467b0e62b70d4887ae1e5386b489fa4":[8,0,180,67],
-"classcharacter__refine__preprocesst.html#a3beab65d5229f2b1d23e4d5772a89f88":[8,0,180,5],
-"classcharacter__refine__preprocesst.html#a3e277033ae3206feadb997236812b13e":[8,0,180,46],
-"classcharacter__refine__preprocesst.html#a4109e2ac5fd11d1c52f449caba5690a7":[8,0,180,2],
 "classcharacter__refine__preprocesst.html#a420211c4292137431f9483b065d1d260":[8,0,180,71],
 "classcharacter__refine__preprocesst.html#a42ccbeb86d8576165df5c83ba8cc5aec":[8,0,180,79],
 "classcharacter__refine__preprocesst.html#a44cdb27155135db49708b3af6da6bbdd":[8,0,180,16],
@@ -249,5 +240,14 @@ var NAVTREEINDEX16 =
 "classcnf__clause__listt.html#a9f63a8d0fa9db81f89eadb6f01aa3279":[8,0,196,3],
 "classcnf__clause__listt.html#aae92a9b9f203cc7d5c605466e465ddcc":[8,0,196,11],
 "classcnf__clause__listt.html#ae96f22993482f7cbfd664067fa5184aa":[8,0,196,6],
-"classcnf__clause__listt.html#aedc3ad1a976eacb893d53f3e1b98549a":[8,0,196,9]
+"classcnf__clause__listt.html#aedc3ad1a976eacb893d53f3e1b98549a":[8,0,196,9],
+"classcnf__clause__listt.html#afce30511654d6a7ad6815b31057a84aa":[8,0,196,5],
+"classcnf__solvert.html":[8,0,197],
+"classcnf__solvert.html#a39424fed370ef344cf5cde8b66a1e1e3":[8,0,197,4],
+"classcnf__solvert.html#a52a3081aea7075f94d4186e0b79db5b6":[8,0,197,1],
+"classcnf__solvert.html#a7f75253dc56ea4de2f77a3e971615c8b":[8,0,197,2],
+"classcnf__solvert.html#aa8e93be9bb231ffc18ecd8bcb55d4245":[8,0,197,0],
+"classcnf__solvert.html#aa8e93be9bb231ffc18ecd8bcb55d4245a58516af515d5eb19e854c0a1b580c421":[8,0,197,0,2],
+"classcnf__solvert.html#aa8e93be9bb231ffc18ecd8bcb55d4245a684e1388a91900480c702ac5b8f6b4d8":[8,0,197,0,1],
+"classcnf__solvert.html#aa8e93be9bb231ffc18ecd8bcb55d4245abb1ca97ec761fc37101737ba0aa2e7c5":[8,0,197,0,3]
 };
