@@ -241,22 +241,6 @@ private:
   /// \return Returns true if the function should be ignored
   bool ignore_function_call_transform(const irep_idt &function_id) const;
 
-  /// Get symbols that have been modified since this domain and other
-  /// \param other: The domain that things may have been modified in
-  /// \return A list of symbols whose write location is different
-  std::vector<irep_idt>
-  get_modified_symbols(const variable_sensitivity_domaint &other) const;
-
-  /// Given a domain and some symbols, apply those symbols values
-  /// to the current domain
-  /// \param modified_symbols: The symbols to write
-  /// \param target: The domain to take the values from
-  /// \param ns: The global namespace
-  void apply_domain(
-    std::vector<symbol_exprt> modified_symbols,
-    const variable_sensitivity_domaint &target,
-    const namespacet &ns);
-
   void assume(exprt expr, namespacet ns);
 
   abstract_environmentt abstract_state;
