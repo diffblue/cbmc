@@ -102,6 +102,11 @@ protected:
   /// \note This function is non-const because it mutates the object_map.
   smt_termt convert_expr_to_smt(const exprt &expr);
   void define_index_identifiers(const exprt &expr);
+  /// In the case where lowering passes insert instances of the anonymous
+  /// `nondet_padding_exprt`, these need functions declaring for each instance.
+  /// These instances are then substituted for the function identifier in order
+  /// to free the solver to choose a non-det value.
+  exprt substitute_defined_padding(exprt expr);
   /// Sends the solver the definitions of the object sizes and dynamic memory
   /// statuses.
   void define_object_properties();
@@ -135,7 +140,7 @@ protected:
     {
       return next_id++;
     }
-  } handle_sequence, array_sequence, index_sequence;
+  } handle_sequence, array_sequence, index_sequence, padding_sequence;
   /// When the `handle(exprt)` member function is called, the decision procedure
   /// commands the SMT solver to define a new function corresponding to the
   /// given expression. The mapping of the expressions to the function

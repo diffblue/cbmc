@@ -8,6 +8,7 @@
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
+#include <solvers/smt2_incremental/encoding/nondet_padding.h>
 #include <solvers/smt2_incremental/encoding/struct_encoding.h>
 #include <testing-utils/use_catch.h>
 
@@ -451,5 +452,41 @@ TEST_CASE(
     const auto dozen = from_integer(12, signedbv_typet{32});
     const struct_exprt struct_expr{{dozen}, struct_tag};
     REQUIRE(test.struct_encoding.encode(struct_expr) == dozen);
+  }
+}
+
+TEST_CASE("encoding of union expressions", "[core][smt2_incremental]")
+{
+  const struct_union_typet::componentst components{
+    {"eggs", unsignedbv_typet{8}}, {"ham", signedbv_typet{32}}};
+  const type_symbolt type_symbol{"foot", union_typet{components}, ID_C};
+  auto test = struct_encoding_test_environmentt::make();
+  test.symbol_table.insert(type_symbol);
+  const union_tag_typet union_tag{type_symbol.name};
+  const symbolt union_value_symbol{"foo", union_tag, ID_C};
+  test.symbol_table.insert(union_value_symbol);
+  const auto symbol_expr = union_value_symbol.symbol_expr();
+  const auto symbol_expr_as_bv = symbol_exprt{"foo", bv_typet{32}};
+  const auto dozen = from_integer(12, unsignedbv_typet{8});
+  const auto partial_union = union_exprt{"eggs", dozen, union_tag};
+  const auto partial_union_as_bv = concatenation_exprt{
+    {nondet_padding_exprt{bv_typet{24}}, dozen}, bv_typet{32}};
+  SECTION("Union typed symbol expression")
+  {
+    REQUIRE(test.struct_encoding.encode(symbol_expr) == symbol_expr_as_bv);
+  }
+  SECTION("Expression for a union from a component")
+  {
+    REQUIRE(test.struct_encoding.encode(partial_union) == partial_union_as_bv);
+    const auto one = from_integer(1, unsignedbv_typet{32});
+    const auto full_union = union_exprt{"ham", one, union_tag};
+    const auto full_union_as_bv = typecast_exprt{one, bv_typet{32}};
+    REQUIRE(test.struct_encoding.encode(full_union) == full_union_as_bv);
+  }
+  SECTION("Union equality expression")
+  {
+    const auto union_equal = equal_exprt{symbol_expr, partial_union};
+    const auto bv_equal = equal_exprt{symbol_expr_as_bv, partial_union_as_bv};
+    REQUIRE(test.struct_encoding.encode(union_equal) == bv_equal);
   }
 }
