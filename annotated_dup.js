@@ -884,6 +884,7 @@ var annotated_dup =
     [ "non_leaf_enumeratort", "classnon__leaf__enumeratort.html", "classnon__leaf__enumeratort" ],
     [ "non_sharing_treet", "classnon__sharing__treet.html", "classnon__sharing__treet" ],
     [ "nondet_instruction_infot", "classnondet__instruction__infot.html", "classnondet__instruction__infot" ],
+    [ "nondet_padding_exprt", "classnondet__padding__exprt.html", "classnondet__padding__exprt" ],
     [ "nondet_symbol_exprt", "classnondet__symbol__exprt.html", "classnondet__symbol__exprt" ],
     [ "nondet_volatilet", "classnondet__volatilet.html", "classnondet__volatilet" ],
     [ "not_exprt", "classnot__exprt.html", "classnot__exprt" ],
