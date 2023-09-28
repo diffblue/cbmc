@@ -112,16 +112,28 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
   const typet &lhs_type,
   bool &exact_match);
 
-// TODO: doxygen
+/// Retrieves the value of the initialising expression.
+/// \param field_name The name of the field whose value type we want to query.
+/// \param state The symex_state within which the query is executed (the field's
+///    value is looked up).
+/// \returns The type of the value the field was initialised with (actually,
+///    the type of the value the field currently is associated with, but it's
+///    invariant since the declaration).
 const typet &
 get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state);
 
-// TODO: doxygen
+/// Given a pointer expression check to see if it can be a null pointer or an
+/// invalid object within value_set.
+/// \param address A pointer expressions that we are using as the query.
+/// \param value_set The search space for the query.
+/// \returns true if the object can be null or invalid in the value set, false
+///    otherwise.
 bool contains_null_or_invalid(
   const std::vector<exprt> &value_set,
   const exprt &address);
 
-// TODO: doxygen
+/// Performs aggregation of the shadow memory field value over multiple cells
+/// for fields whose type is _Bool.
 exprt compute_or_over_cells(
   const exprt &expr,
   const typet &field_type,
@@ -129,7 +141,9 @@ exprt compute_or_over_cells(
   const messaget &log,
   const bool is_union);
 
-// TODO: doxygen
+/// Performs aggregation of the shadow memory field value over multiple cells
+/// for fields whose type is a signed/unsigned bitvector (where the value is
+/// arbitrary up until the max represented by the bitvector size).
 exprt compute_max_over_cells(
   const exprt &expr,
   const typet &field_type,
@@ -137,20 +151,28 @@ exprt compute_max_over_cells(
   const messaget &log,
   const bool is_union);
 
-// TODO: doxygen?
+/// Build an if-then-else chain from a vector containing pairs of expressions.
+/// \param conds_values Contains pairs <e1, e2>, where `e1` is going to be
+///    used as an antecedent for an if_expr, and `e2` is going to be used
+///    as the consequent.
+/// \returns An if_exprt of the form `if e1 then e2 else <if e3 then e4 else ...`
 exprt build_if_else_expr(
   const std::vector<std::pair<exprt, exprt>> &conds_values);
 
-// TODO: improve?
-/// returns true if we attempt to set/get a field on a NULL pointer
+/// Checks if given expression is a null pointer.
+/// \returns true if expr is a a NULL pointer within value_set.
 bool set_field_check_null(
   const namespacet &ns,
   const messaget &log,
   const std::vector<exprt> &value_set,
   const exprt &expr);
 
-// TODO: improve?
-/// Used for set_field and shadow memory copy
+/// Get shadow memory values for a given expression within a specified value
+/// set.
+/// \returns if potential values are present for that object inside the value
+///    set, then we get back an `if e1 then e2 else (if e3 else e4...` expression,
+///    where `e1`, `e3`, ... are guards (conditions) and `e2`, `e4`, etc are
+///    the possible values of the object within the value set.
 optionalt<exprt> get_shadow_memory(
   const exprt &expr,
   const std::vector<exprt> &value_set,
