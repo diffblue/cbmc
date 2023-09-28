@@ -156,12 +156,15 @@ exprt compute_or_over_cells(
 /// Performs aggregation of the shadow memory field value over multiple cells
 /// for fields whose type is a signed/unsigned bitvector (where the value is
 /// arbitrary up until the max represented by the bitvector size).
+/// \param expr the expression to extract the max from
+/// \param field_type the type of the shadow memory field to return
+/// \param ns the namespace to perform type-lookups into
+/// \return the aggregated max byte-sized value contained in expr
+/// Note that the expr type size must be known at compile time.
 exprt compute_max_over_cells(
   const exprt &expr,
   const typet &field_type,
-  const namespacet &ns,
-  const messaget &log,
-  const bool is_union);
+  const namespacet &ns);
 
 /// Build an if-then-else chain from a vector containing pairs of expressions.
 /// \param conds_values Contains pairs <e1, e2>, where `e1` is going to be
