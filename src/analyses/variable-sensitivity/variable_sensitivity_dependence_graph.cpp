@@ -438,20 +438,9 @@ bool variable_sensitivity_dependence_domaint::merge(
 }
 
 /**
- * Perform a context aware merge of the changes that have been applied
- * between function_start and the current state. Anything that has not been
- * modified will be taken from the \p function_call domain.
- *
- * \param function_call: The local of the merge - values from here will be
- *   taken if they have not been modified
- * \param function_start: The base of the merge - changes that have been made
- *   between here and the end will be retained.
- * \param function_end: The end of the merge - changes that have been made
-///   between the start and here will be retained.
- * \param ns: The global namespace
+ * \copydoc variable_sensitivity_domaint::merge_three_way_function_return
  */
 void variable_sensitivity_dependence_domaint::merge_three_way_function_return(
-  const ai_domain_baset &function_call,
   const ai_domain_baset &function_start,
   const ai_domain_baset &function_end,
   const namespacet &ns)
@@ -462,7 +451,7 @@ void variable_sensitivity_dependence_domaint::merge_three_way_function_return(
   // the three way merge is that the underlying variable sensitivity domain
   // does its three way merge.
   variable_sensitivity_domaint::merge_three_way_function_return(
-    function_call, function_start, function_end, ns);
+    function_start, function_end, ns);
 }
 
 /**
