@@ -385,3 +385,51 @@ __CPROVER_HIDE:;
   // Thus, modelling it as non-deterministic.
   return retval;
 }
+
+/* FUNCTION: syscall */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+long int __VERIFIER_nondet_long_int(void);
+int __VERIFIER_nondet_int(void);
+
+// This overapproximation is based on the syscall specification available at
+// https://man7.org/linux/man-pages/man2/syscall.2.html and
+// https://www.gnu.org/software/libc/manual/html_node/System-Calls.html.
+//
+// sysno is the system call number. The remaining arguments are the arguments
+// for the system call. Each kind of system call has a definite number of
+// arguments, from zero to five. If you code more arguments than the system
+// call takes, the extra ones to the right are ignored.
+#ifdef __APPLE__
+int syscall(int sysno, ...);
+int syscall(int sysno, ...)
+#else
+long int syscall(long int sysno, ...);
+long int syscall(long int sysno, ...)
+#endif
+{
+__CPROVER_HIDE:;
+  (void)sysno;
+
+#ifdef __APPLE__
+  int retval = __VERIFIER_nondet_int();
+#else
+  long int retval = __VERIFIER_nondet_long_int();
+#endif
+
+  if(retval == -1)
+  {
+    // We should keep errno as non-deterministic as possible, since this model
+    // never takes into account any input.
+    errno = __VERIFIER_nondet_int();
+  }
+
+  // The return value is the return value from the system call, unless the
+  // system call failed. This over-approximation doesn't take into account
+  // any system call operation, so we leave the return value as non-det.
+  return retval;
+}
