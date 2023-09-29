@@ -24,8 +24,8 @@ SCENARIO("multiply interval domain", "[core][analyses][interval][multiply]")
 
     WHEN("Single element multiplication")
     {
-      constant_interval_exprt a(CEV(5));
-      constant_interval_exprt b(CEV(10));
+      constant_interval_exprt a = constant_interval_exprt::singleton(CEV(5));
+      constant_interval_exprt b = constant_interval_exprt::singleton(CEV(10));
       const auto a_times_b = a.multiply(b);
       REQUIRE(a_times_b == constant_interval_exprt(CEV(50), CEV(50)));
     }

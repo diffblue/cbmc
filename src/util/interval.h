@@ -11,30 +11,30 @@
 #include <util/std_expr.h>
 #include <util/threeval.h>
 
-#include <iostream>
+#include <iosfwd>
 
 /// +∞ upper bound for intervals
-class max_exprt : public exprt
+class max_exprt : public nullary_exprt
 {
 public:
-  explicit max_exprt(const typet &_type) : exprt(ID_max, _type)
+  explicit max_exprt(const typet &_type) : nullary_exprt(ID_max, _type)
   {
   }
 
-  explicit max_exprt(const exprt &_expr) : exprt(ID_max, _expr.type())
+  explicit max_exprt(const exprt &_expr) : nullary_exprt(ID_max, _expr.type())
   {
   }
 };
 
 /// -∞ upper bound for intervals
-class min_exprt : public exprt
+class min_exprt : public nullary_exprt
 {
 public:
-  explicit min_exprt(const typet &_type) : exprt(ID_min, _type)
+  explicit min_exprt(const typet &_type) : nullary_exprt(ID_min, _type)
   {
   }
 
-  explicit min_exprt(const exprt &_expr) : exprt(ID_min, _expr.type())
+  explicit min_exprt(const exprt &_expr) : nullary_exprt(ID_min, _expr.type())
   {
   }
 };
@@ -47,23 +47,14 @@ public:
 class constant_interval_exprt : public binary_exprt
 {
 public:
-  constant_interval_exprt(
-    const exprt &lower,
-    const exprt &upper,
-    const typet type)
-    : binary_exprt(lower, ID_constant_interval, upper, type)
+  constant_interval_exprt(exprt lower, exprt upper, typet type)
+    : binary_exprt(
+        std::move(lower),
+        ID_constant_interval,
+        std::move(upper),
+        std::move(type))
   {
     PRECONDITION(is_well_formed());
-  }
-
-  constant_interval_exprt(const constant_interval_exprt &x)
-    : constant_interval_exprt(x.get_lower(), x.get_upper(), x.type())
-  {
-  }
-
-  explicit constant_interval_exprt(const exprt &x)
-    : constant_interval_exprt(x, x, x.type())
-  {
   }
 
   explicit constant_interval_exprt(const typet &type)
@@ -74,6 +65,7 @@ public:
   constant_interval_exprt(const exprt &lower, const exprt &upper)
     : constant_interval_exprt(lower, upper, lower.type())
   {
+    PRECONDITION(is_well_formed());
   }
 
   bool is_well_formed() const
@@ -95,6 +87,11 @@ public:
     b &= !is_numeric() || is_bottom() || less_than_or_equal(lower, upper);
 
     return b;
+  }
+
+  static constant_interval_exprt singleton(const exprt &x)
+  {
+    return constant_interval_exprt{x, x, x.type()};
   }
 
   static bool is_valid_bound(const exprt &expr)

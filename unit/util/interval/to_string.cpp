@@ -20,7 +20,8 @@ TEST_CASE("interval::to_string", "[core][analyses][interval]")
     return from_integer(value, unsigned_int_type);
   };
 
-  REQUIRE(constant_interval_exprt(signed_expr(1)).to_string() == "[1,1]");
+  REQUIRE(
+    constant_interval_exprt::singleton(signed_expr(1)).to_string() == "[1,1]");
   REQUIRE(
     constant_interval_exprt(signed_expr(1), signed_expr(2)).to_string() ==
     "[1,2]");

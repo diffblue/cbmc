@@ -14,9 +14,9 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
   WHEN("Negating a boolean interval")
   {
     constant_interval_exprt true_interval =
-      constant_interval_exprt(true_exprt());
+      constant_interval_exprt::singleton(true_exprt());
     constant_interval_exprt false_interval =
-      constant_interval_exprt(false_exprt());
+      constant_interval_exprt::singleton(false_exprt());
     constant_interval_exprt bool_top_interval =
       constant_interval_exprt(bool_typet());
 
@@ -37,11 +37,11 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
   WHEN("Unary operations to an single element interval")
   {
     constant_interval_exprt five =
-      constant_interval_exprt(from_integer(5, signedbv_typet(32)));
+      constant_interval_exprt::singleton(from_integer(5, signedbv_typet(32)));
     const constant_interval_exprt &max_interval =
-      constant_interval_exprt(max_exprt{signedbv_typet(32)});
+      constant_interval_exprt::singleton(max_exprt{signedbv_typet(32)});
     const constant_interval_exprt &min_interval =
-      constant_interval_exprt(min_exprt{signedbv_typet(32)});
+      constant_interval_exprt::singleton(min_exprt{signedbv_typet(32)});
 
     THEN("When we apply unary addition to it, nothing should happen")
     {
@@ -102,7 +102,8 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
 TEST_CASE("binary eval switch", "[core][analyses][interval]")
 {
   const auto interval_of = [](const int value) {
-    return constant_interval_exprt(from_integer(value, signedbv_typet(32)));
+    return constant_interval_exprt::singleton(
+      from_integer(value, signedbv_typet(32)));
   };
 
   const auto interval_from_to = [](const int lower, const int upper) {

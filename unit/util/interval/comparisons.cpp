@@ -121,7 +121,8 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
           constant_interval_exprt(CEV(10), CEV(20)) >
           constant_interval_exprt(CEV(30), CEV(40)));
         REQUIRE(
-          constant_interval_exprt(CEV(10)) < constant_interval_exprt(CEV(30)));
+          constant_interval_exprt::singleton(CEV(10)) <
+          constant_interval_exprt::singleton(CEV(30)));
       }
 
       THEN(
@@ -186,8 +187,8 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
           constant_interval_exprt(CEV(10), CEV(31))
             .less_than_or_equal(constant_interval_exprt(CEV(30), CEV(40))) ==
           tvt::unknown());
-        CHECK(constant_interval_exprt(CEV(10))
-                .less_than_or_equal(constant_interval_exprt(CEV(30)))
+        CHECK(constant_interval_exprt::singleton(CEV(10))
+                .less_than_or_equal(constant_interval_exprt::singleton(CEV(30)))
                 .is_true());
       }
 
@@ -222,7 +223,8 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
         REQUIRE(includes_zero_negative.is_definitely_true().is_unknown());
         REQUIRE(includes_zero_negative.is_definitely_false().is_unknown());
 
-        constant_interval_exprt zero(CEV(0));
+        constant_interval_exprt zero =
+          constant_interval_exprt::singleton(CEV(0));
         REQUIRE(zero.is_definitely_false().is_true());
         REQUIRE(zero.is_definitely_true().is_false());
 
@@ -242,8 +244,8 @@ TEST_CASE("interval::equality", "[core][analyses][interval]")
 {
   SECTION("Single element intervals")
   {
-    constant_interval_exprt two(CEV(2));
-    constant_interval_exprt four(CEV(4));
+    constant_interval_exprt two = constant_interval_exprt::singleton(CEV(2));
+    constant_interval_exprt four = constant_interval_exprt::singleton(CEV(4));
 
     REQUIRE_FALSE(two.equal(four).is_true());
     REQUIRE(two.equal(two).is_true());

@@ -105,8 +105,8 @@ SCENARIO(
 
   WHEN("Subtracting two constant intervals")
   {
-    auto lhs = constant_interval_exprt(get_value(10));
-    auto rhs = constant_interval_exprt(get_value(3));
+    auto lhs = constant_interval_exprt::singleton(get_value(10));
+    auto rhs = constant_interval_exprt::singleton(get_value(3));
     THEN("it should work")
     {
       auto result = constant_interval_exprt::minus(lhs, rhs);
@@ -119,8 +119,8 @@ SCENARIO(
 
   WHEN("Subtracting zero from something")
   {
-    auto lhs = constant_interval_exprt(get_value(10));
-    auto rhs = constant_interval_exprt(get_value(0));
+    auto lhs = constant_interval_exprt::singleton(get_value(10));
+    auto rhs = constant_interval_exprt::singleton(get_value(0));
 
     THEN("it should not give a completely crazy result")
     {
@@ -134,7 +134,7 @@ SCENARIO(
 
   WHEN("Subtracting an non-constant interval containing zero")
   {
-    auto lhs = constant_interval_exprt(get_value(10));
+    auto lhs = constant_interval_exprt::singleton(get_value(10));
     auto rhs = constant_interval_exprt(get_value(0), get_value(1));
     THEN("it should not give a completely crazy result")
     {

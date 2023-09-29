@@ -165,10 +165,11 @@ constant_interval_exprt::modulo(const constant_interval_exprt &o) const
 
   // If the RHS is 1, or -1 (signed only), then return zero.
   if(
-    o == constant_interval_exprt(from_integer(1, o.type())) ||
-    (o.is_signed() && o == constant_interval_exprt(from_integer(-1, o.type()))))
+    o.is_single_value_interval() &&
+    (o.get_lower() == from_integer(1, o.type()) ||
+     (o.is_signed() && o.get_lower() == from_integer(-1, o.type()))))
   {
-    return constant_interval_exprt(zero());
+    return constant_interval_exprt::singleton(zero());
   }
 
   // If other might be modulo by zero, set everything to top.
@@ -179,7 +180,7 @@ constant_interval_exprt::modulo(const constant_interval_exprt &o) const
 
   if(is_zero())
   {
-    return constant_interval_exprt(zero());
+    return constant_interval_exprt::singleton(zero());
   }
 
   exprt lower = min();
@@ -233,12 +234,12 @@ tvt constant_interval_exprt::is_definitely_false() const
     }
   }
 
-  if(equal(constant_interval_exprt(zero())).is_true())
+  if(is_single_value_interval() && get_lower() == zero())
   {
     return tvt(true);
   }
 
-  if(contains(constant_interval_exprt(zero())))
+  if(contains(constant_interval_exprt::singleton(zero())))
   {
     INVARIANT(
       is_positive(get_upper()) || is_negative(get_lower()),
@@ -457,12 +458,14 @@ tvt constant_interval_exprt::not_equal(const constant_interval_exprt &o) const
 
 constant_interval_exprt constant_interval_exprt::increment() const
 {
-  return plus(constant_interval_exprt(from_integer(mp_integer(1), type())));
+  return plus(
+    constant_interval_exprt::singleton(from_integer(mp_integer(1), type())));
 }
 
 constant_interval_exprt constant_interval_exprt::decrement() const
 {
-  return minus(constant_interval_exprt(from_integer(mp_integer(1), type())));
+  return minus(
+    constant_interval_exprt::singleton(from_integer(mp_integer(1), type())));
 }
 
 constant_interval_exprt constant_interval_exprt::get_extremes(
@@ -939,7 +942,7 @@ constant_interval_exprt::handle_constant_unary_expression(
   if(is_single_value_interval())
   {
     auto expr = unary_exprt(op, get_lower());
-    return constant_interval_exprt(simplified_expr(expr));
+    return constant_interval_exprt::singleton(simplified_expr(expr));
   }
   return top();
 }
@@ -951,7 +954,7 @@ constant_interval_exprt::handle_constant_binary_expression(
 {
   PRECONDITION(is_single_value_interval() && other.is_single_value_interval());
   auto expr = binary_exprt(get_lower(), op, other.get_lower());
-  return constant_interval_exprt(simplified_expr(expr));
+  return constant_interval_exprt::singleton(simplified_expr(expr));
 }
 
 exprt constant_interval_exprt::get_max(const exprt &a, const exprt &b)
@@ -1964,11 +1967,11 @@ constant_interval_exprt constant_interval_exprt::tvt_to_interval(const tvt &val)
 {
   if(val.is_true())
   {
-    return constant_interval_exprt(true_exprt());
+    return constant_interval_exprt::singleton(true_exprt());
   }
   else if(val.is_false())
   {
-    return constant_interval_exprt(false_exprt());
+    return constant_interval_exprt::singleton(false_exprt());
   }
   else
   {
