@@ -1,5 +1,6 @@
 var NAVTREEINDEX131 =
 {
+"structconfigt_1_1cppt.html#a83024e69295b3a85b45d91d5cb405ea0":[8,0,255,2,5],
 "structconfigt_1_1cppt.html#a8b1612ea65d0bbdef3b4daa63590b236":[8,0,255,2,2],
 "structconfigt_1_1cppt.html#a9b82fd62e080f30e4c5b780683e8895c":[8,0,255,2,1],
 "structconfigt_1_1cppt.html#ac6251daf1671b433bb178f803d3a7507":[8,0,255,2,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX131 =
 "structfloat__bvt_1_1unpacked__floatt.html#af600642e1a3b0b6a2d20bf881bfbcb6a":[8,0,482,3,5],
 "structfloat__utilst_1_1biased__floatt.html":[8,0,483,0],
 "structfloat__utilst_1_1rounding__mode__bitst.html":[8,0,483,1],
-"structfloat__utilst_1_1rounding__mode__bitst.html#a5718544f5525b313233429a78e22fa35":[8,0,483,1,0],
-"structfloat__utilst_1_1rounding__mode__bitst.html#a6b7efab89f09f95d26bc33b6d824b1db":[8,0,483,1,3]
+"structfloat__utilst_1_1rounding__mode__bitst.html#a5718544f5525b313233429a78e22fa35":[8,0,483,1,0]
 };

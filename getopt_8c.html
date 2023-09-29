@@ -122,6 +122,8 @@ Functions</h2></td></tr>
 <tr class="separator:a8cb534abb228896759dded0be6ac4351"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9dccb3de4f5f2356ce92c1113b9b07e7"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="getopt_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7">__VERIFIER_nondet_size_t</a> (void)</td></tr>
 <tr class="separator:a9dccb3de4f5f2356ce92c1113b9b07e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af161c301814517f5ffbc1f124fe81b40"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="getopt_8c.html#af161c301814517f5ffbc1f124fe81b40">_getopt</a> (int argc, char *const argv[], const char *optstring)</td></tr>
+<tr class="separator:af161c301814517f5ffbc1f124fe81b40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ffa4c677fc71cecd94f140ef9db624c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="getopt_8c.html#a5ffa4c677fc71cecd94f140ef9db624c">getopt</a> (int argc, char *const argv[], const char *optstring)</td></tr>
 <tr class="separator:a5ffa4c677fc71cecd94f140ef9db624c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19a25d4c484d212220cad56a69c426b0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="getopt_8c.html#a19a25d4c484d212220cad56a69c426b0">getopt_long</a> (int argc, char *const argv[], const char *optstring, const struct option *longopts, int *longindex)</td></tr>
@@ -129,9 +131,9 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:adb50a0eab9fed92fc3bfc7dfa4f2c410"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="getopt_8c.html#adb50a0eab9fed92fc3bfc7dfa4f2c410">optarg</a></td></tr>
+<tr class="memitem:adb50a0eab9fed92fc3bfc7dfa4f2c410"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="getopt_8c.html#adb50a0eab9fed92fc3bfc7dfa4f2c410">optarg</a> = NULL</td></tr>
 <tr class="separator:adb50a0eab9fed92fc3bfc7dfa4f2c410"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5e1c16213bbee2d5e8cc363309f418c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="getopt_8c.html#ad5e1c16213bbee2d5e8cc363309f418c">optind</a></td></tr>
+<tr class="memitem:ad5e1c16213bbee2d5e8cc363309f418c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="getopt_8c.html#ad5e1c16213bbee2d5e8cc363309f418c">optind</a> = 1</td></tr>
 <tr class="separator:ad5e1c16213bbee2d5e8cc363309f418c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -147,7 +149,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00061">61</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00094">94</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
 
 </div>
 </div>
@@ -163,7 +165,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00008">8</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00005">5</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
 
 </div>
 </div>
@@ -204,6 +206,42 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="af161c301814517f5ffbc1f124fe81b40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af161c301814517f5ffbc1f124fe81b40">&#9670;&nbsp;</a></span>_getopt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int _getopt </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>argc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *const&#160;</td>
+          <td class="paramname"><em>argv</em>[], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>optstring</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00014">14</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
+
+</div>
+</div>
 <a id="a5ffa4c677fc71cecd94f140ef9db624c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5ffa4c677fc71cecd94f140ef9db624c">&#9670;&nbsp;</a></span>getopt()</h2>
 
@@ -236,7 +274,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00014">14</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00081">81</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
 
 </div>
 </div>
@@ -284,7 +322,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00064">64</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00097">97</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
 
 </div>
 </div>
@@ -294,20 +332,14 @@ Variables</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">char* optarg</td>
+          <td class="memname">char* optarg = NULL</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00008">8</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
 
 </div>
 </div>
@@ -316,20 +348,14 @@ Variables</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int optind</td>
+          <td class="memname">int optind = 1</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="getopt_8c_source.html#l00009">9</a> of file <a class="el" href="getopt_8c_source.html">getopt.c</a>.</p>
 
 </div>
 </div>
