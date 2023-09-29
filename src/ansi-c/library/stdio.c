@@ -6,15 +6,7 @@
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-/* undefine macros in OpenBSD's stdio.h that are problematic to the checker. */
-#if defined(__OpenBSD__)
-#undef getchar
 #undef putchar
-#undef getc
-#undef feof
-#undef ferror
-#undef fileno
-#endif
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
@@ -197,7 +189,8 @@ __CPROVER_HIDE:;
   __CPROVER_set_must(stream, "closed");
 #endif
   int return_value=__VERIFIER_nondet_int();
-  free(stream);
+  if(stream != stdin && stream != stdout && stream != stderr)
+    free(stream);
   return return_value;
 }
 
@@ -213,25 +206,83 @@ __CPROVER_HIDE:;
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 FILE *fdopen(int handle, const char *mode)
 {
   __CPROVER_HIDE:;
-  (void)handle;
+    if(handle < 0)
+    {
+      errno = EBADF;
+      return NULL;
+    }
   (void)*mode;
 #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(mode),
     "fdopen zero-termination of 2nd argument");
 #endif
 
-#if !defined(__linux__) || defined(__GLIBC__)
-  FILE *f=malloc(sizeof(FILE));
+#if defined(_WIN32) || defined(__OpenBSD__) || defined(__NetBSD__)
+  switch(handle)
+  {
+  case 0:
+    return stdin;
+  case 1:
+    return stdout;
+  case 2:
+    return stderr;
+  default:
+  {
+    FILE *f = malloc(sizeof(FILE));
+    __CPROVER_assume(fileno(f) == handle);
+    return f;
+  }
+  }
 #else
-  // libraries need to expose the definition of FILE; this is the
+#  if !defined(__linux__) || defined(__GLIBC__)
+  static FILE stdin_file;
+  static FILE stdout_file;
+  static FILE stderr_file;
+#  else
+  // libraries need not expose the definition of FILE; this is the
   // case for musl
-  FILE *f=malloc(sizeof(int));
-#endif
+  static int stdin_file;
+  static int stdout_file;
+  static int stderr_file;
+#  endif
 
+  FILE *f = NULL;
+  switch(handle)
+  {
+  case 0:
+    stdin = &stdin_file;
+    __CPROVER_havoc_object(&stdin_file);
+    f = &stdin_file;
+    break;
+  case 1:
+    stdout = &stdout_file;
+    __CPROVER_havoc_object(&stdout_file);
+    f = &stdout_file;
+    break;
+  case 2:
+    stderr = &stderr_file;
+    __CPROVER_havoc_object(&stderr_file);
+    f = &stderr_file;
+    break;
+  default:
+#  if !defined(__linux__) || defined(__GLIBC__)
+    f = malloc(sizeof(FILE));
+#  else
+    f = malloc(sizeof(int));
+#  endif
+  }
+
+  __CPROVER_assume(fileno(f) == handle);
   return f;
+#endif
 }
 
 /* FUNCTION: _fdopen */
@@ -251,19 +302,60 @@ FILE *fdopen(int handle, const char *mode)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 #ifdef __APPLE__
+
+#  ifndef LIBRARY_CHECK
+FILE *stdin;
+FILE *stdout;
+FILE *stderr;
+#  endif
+
 FILE *_fdopen(int handle, const char *mode)
 {
   __CPROVER_HIDE:;
-  (void)handle;
+    if(handle < 0)
+    {
+      errno = EBADF;
+      return NULL;
+    }
   (void)*mode;
 #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(mode),
     "fdopen zero-termination of 2nd argument");
 #endif
 
-  FILE *f=malloc(sizeof(FILE));
+  static FILE stdin_file;
+  static FILE stdout_file;
+  static FILE stderr_file;
 
+  FILE *f = NULL;
+  switch(handle)
+  {
+  case 0:
+    stdin = &stdin_file;
+    __CPROVER_havoc_object(&stdin_file);
+    f = &stdin_file;
+    break;
+  case 1:
+    stdout = &stdout_file;
+    __CPROVER_havoc_object(&stdout_file);
+    f = &stdout_file;
+    break;
+  case 2:
+    stderr = &stderr_file;
+    __CPROVER_havoc_object(&stderr_file);
+    f = &stderr_file;
+    break;
+  default:
+    f = malloc(sizeof(FILE));
+  }
+
+  __CPROVER_assume(fileno(f) == handle);
   return f;
 }
 #endif
@@ -466,6 +558,8 @@ __CPROVER_HIDE:;
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
+#undef feof
+
 int __VERIFIER_nondet_int(void);
 
 int feof(FILE *stream)
@@ -498,6 +592,8 @@ int feof(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
+#undef ferror
+
 int __VERIFIER_nondet_int(void);
 
 int ferror(FILE *stream)
@@ -529,6 +625,8 @@ int ferror(FILE *stream)
 #include <stdio.h>
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
+
+#undef fileno
 
 int __VERIFIER_nondet_int(void);
 
@@ -695,6 +793,8 @@ int fgetc(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
+#undef getc
+
 int __VERIFIER_nondet_int(void);
 
 int getc(FILE *stream)
@@ -730,6 +830,8 @@ int getc(FILE *stream)
 #include <stdio.h>
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
+
+#undef getchar
 
 int __VERIFIER_nondet_int(void);
 
@@ -1602,10 +1704,13 @@ FILE *__acrt_iob_func(unsigned fd)
   switch(fd)
   {
   case 0:
+    __CPROVER_havoc_object(&stdin_file);
     return &stdin_file;
   case 1:
+    __CPROVER_havoc_object(&stdout_file);
     return &stdout_file;
   case 2:
+    __CPROVER_havoc_object(&stderr_file);
     return &stderr_file;
   default:
     return (FILE *)0;

@@ -62,6 +62,7 @@ jobs:
             # gmake TAGS='[!shouldfail]' -C jbmc/unit test
             echo "Run regression tests"
             gmake -C regression/cbmc test
+            gmake -C regression/cbmc-library test
             # gmake -C regression test-parallel JOBS=2
             # gmake -C regression/cbmc test-paths-lifo
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
@@ -123,6 +124,10 @@ jobs:
             # gmake TAGS='[!shouldfail]' -C jbmc/unit test
             echo "Run regression tests"
             gmake -C regression/cbmc test
+            # TODO: fileno and *fprintf tests are failing, requires debugging
+            # https://github.com/openbsd/src/blob/master/include/stdio.h may be
+            # useful (likely need to allocate __sF)
+            gmake -C regression/cbmc-library test || true
             # gmake -C regression test-parallel JOBS=2
             # gmake -C regression/cbmc test-paths-lifo
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
@@ -187,6 +192,7 @@ jobs:
             echo "Run regression tests"
             # TODO: we need to model some more library functions
             gmake -C regression/cbmc test || true
+            gmake -C regression/cbmc-library test || true
             # gmake -C regression test-parallel JOBS=2
             # gmake -C regression/cbmc test-paths-lifo
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
