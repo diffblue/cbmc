@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # This script runs CSmith to generate N examples, and for each of them:
 # 1. Compiles the code with the system compiler.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mvn package
 java -cp target/jsonGenerator-1.0-SNAPSHOT-jar-with-dependencies.jar:. org.cprover.JsonGenerator
