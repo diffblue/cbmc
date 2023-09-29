@@ -14,35 +14,39 @@
 #include <iosfwd>
 
 /// +∞ upper bound for intervals
-class max_exprt : public nullary_exprt
+class max_value_exprt : public nullary_exprt
 {
 public:
-  explicit max_exprt(const typet &_type) : nullary_exprt(ID_max, _type)
+  explicit max_value_exprt(const typet &_type)
+    : nullary_exprt(ID_max_value, _type)
   {
   }
 
-  explicit max_exprt(const exprt &_expr) : nullary_exprt(ID_max, _expr.type())
+  explicit max_value_exprt(const exprt &_expr)
+    : nullary_exprt(ID_max_value, _expr.type())
   {
   }
 };
 
 /// -∞ upper bound for intervals
-class min_exprt : public nullary_exprt
+class min_value_exprt : public nullary_exprt
 {
 public:
-  explicit min_exprt(const typet &_type) : nullary_exprt(ID_min, _type)
+  explicit min_value_exprt(const typet &_type)
+    : nullary_exprt(ID_min_value, _type)
   {
   }
 
-  explicit min_exprt(const exprt &_expr) : nullary_exprt(ID_min, _expr.type())
+  explicit min_value_exprt(const exprt &_expr)
+    : nullary_exprt(ID_min_value, _expr.type())
   {
   }
 };
 
 /// Represents an interval of values.
 /// Bounds should be constant expressions
-/// or min_exprt for the lower bound
-/// or max_exprt for the upper bound
+/// or min_value_exprt for the lower bound
+/// or max_value_exprt for the upper bound
 /// Also, lower bound should always be <= upper bound
 class constant_interval_exprt : public binary_exprt
 {
@@ -58,7 +62,10 @@ public:
   }
 
   explicit constant_interval_exprt(const typet &type)
-    : constant_interval_exprt(min_exprt(type), max_exprt(type), type)
+    : constant_interval_exprt(
+        min_value_exprt(type),
+        max_value_exprt(type),
+        type)
   {
   }
 
@@ -100,7 +107,7 @@ public:
 
     bool b = true;
 
-    b &= expr.is_constant() || id == ID_min || id == ID_max;
+    b &= expr.is_constant() || id == ID_min_value || id == ID_max_value;
 
     if(expr.is_boolean() && id == ID_constant)
     {
@@ -347,8 +354,8 @@ public:
   static bool is_max(const exprt &expr);
 
   /* Generate min and max exprt according to current type */
-  min_exprt min() const;
-  max_exprt max() const;
+  min_value_exprt min() const;
+  max_value_exprt max() const;
 
   constant_exprt zero() const;
   static constant_exprt zero(const typet &type);

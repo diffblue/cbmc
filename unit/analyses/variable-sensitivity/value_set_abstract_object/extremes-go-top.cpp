@@ -40,7 +40,9 @@ SCENARIO(
   GIVEN("{min(bool), max(bool)} goes TOP")
   {
     auto boolInterval = make_value_set(
-      {min_exprt(bool_typet()), max_exprt(bool_typet())}, environment, ns);
+      {min_value_exprt(bool_typet()), max_value_exprt(bool_typet())},
+      environment,
+      ns);
 
     EXPECT_TOP(boolInterval);
   }
@@ -58,7 +60,9 @@ SCENARIO(
   {
     auto c_bool_type = bitvector_typet(ID_c_bool, 8);
     auto boolInterval = make_value_set(
-      {min_exprt(c_bool_type), max_exprt(c_bool_type)}, environment, ns);
+      {min_value_exprt(c_bool_type), max_value_exprt(c_bool_type)},
+      environment,
+      ns);
 
     EXPECT_TOP(boolInterval);
   }

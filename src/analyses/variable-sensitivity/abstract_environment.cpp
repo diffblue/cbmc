@@ -787,7 +787,7 @@ exprt assume_less_than_unbounded(
   {
     // TOP < x, so prune range is min->right.upper
     auto pruned_expr = constant_interval_exprt(
-      min_exprt(operands.left->type()),
+      min_value_exprt(operands.left->type()),
       operands.right_interval().get_upper(),
       operands.left->type());
     auto constrained =
@@ -799,7 +799,7 @@ exprt assume_less_than_unbounded(
     // x < TOP, so prune range is left.lower->max
     auto pruned_expr = constant_interval_exprt(
       operands.left_interval().get_lower(),
-      max_exprt(operands.right->type()),
+      max_value_exprt(operands.right->type()),
       operands.right->type());
     auto constrained =
       std::make_shared<interval_abstract_valuet>(pruned_expr, env, ns);

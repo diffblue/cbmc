@@ -48,7 +48,8 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
     WHEN("One contains infinite [2,4]-[6,INF]")
     {
       constant_interval_exprt left(CEV(2), CEV(4));
-      constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
+      constant_interval_exprt right(
+        CEV(6), max_value_exprt(signedbv_typet(32)));
 
       constant_interval_exprt result =
         constant_interval_exprt::minus(left, right);
@@ -72,8 +73,9 @@ SCENARIO("subtract interval domain", "[core][analyses][interval][subtract]")
 
     WHEN("Both contain infinite [2,INF]-[6,INF]")
     {
-      constant_interval_exprt left(CEV(2), max_exprt(signedbv_typet(32)));
-      constant_interval_exprt right(CEV(6), max_exprt(signedbv_typet(32)));
+      constant_interval_exprt left(CEV(2), max_value_exprt(signedbv_typet(32)));
+      constant_interval_exprt right(
+        CEV(6), max_value_exprt(signedbv_typet(32)));
 
       constant_interval_exprt result =
         constant_interval_exprt::minus(left, right);

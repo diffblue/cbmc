@@ -177,9 +177,9 @@ std::string expr_to_str(const exprt &expr)
 {
   if(expr.id() == ID_constant_interval)
     return interval_to_str(to_constant_interval_expr(expr));
-  if(expr.id() == ID_max)
+  if(expr.id() == ID_max_value)
     return "max";
-  if(expr.id() == ID_min)
+  if(expr.id() == ID_min_value)
     return "min";
 
   auto st = symbol_tablet{};

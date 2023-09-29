@@ -34,36 +34,44 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
         REQUIRE_FALSE(constant_interval_exprt::less_than(CEV(-10), CEV(-100)));
         REQUIRE(constant_interval_exprt::less_than(CEV(-10), CEV(-5)));
         REQUIRE(constant_interval_exprt::less_than(
-          CEV(-10), max_exprt(signedbv_typet(32))));
+          CEV(-10), max_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::less_than(
-          CEV(10), max_exprt(signedbv_typet(32))));
+          CEV(10), max_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::less_than(
-          CEV(0), max_exprt(signedbv_typet(32))));
+          CEV(0), max_value_exprt(signedbv_typet(32))));
 
         REQUIRE_FALSE(constant_interval_exprt::less_than(
-          CEV(-10), min_exprt(signedbv_typet(32))));
+          CEV(-10), min_value_exprt(signedbv_typet(32))));
         REQUIRE_FALSE(constant_interval_exprt::less_than(
-          CEV(10), min_exprt(signedbv_typet(32))));
+          CEV(10), min_value_exprt(signedbv_typet(32))));
         REQUIRE_FALSE(constant_interval_exprt::less_than(
-          CEV(0), min_exprt(signedbv_typet(32))));
+          CEV(0), min_value_exprt(signedbv_typet(32))));
 
         REQUIRE_FALSE(constant_interval_exprt::less_than(
-          min_exprt(signedbv_typet(32)), min_exprt(signedbv_typet(32))));
+          min_value_exprt(signedbv_typet(32)),
+          min_value_exprt(signedbv_typet(32))));
         REQUIRE_FALSE(constant_interval_exprt::less_than(
-          max_exprt(signedbv_typet(32)), min_exprt(signedbv_typet(32))));
+          max_value_exprt(signedbv_typet(32)),
+          min_value_exprt(signedbv_typet(32))));
         REQUIRE_FALSE(constant_interval_exprt::less_than(
-          max_exprt(signedbv_typet(32)), max_exprt(signedbv_typet(32))));
+          max_value_exprt(signedbv_typet(32)),
+          max_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::less_than(
-          min_exprt(signedbv_typet(32)), max_exprt(signedbv_typet(32))));
+          min_value_exprt(signedbv_typet(32)),
+          max_value_exprt(signedbv_typet(32))));
 
         REQUIRE(constant_interval_exprt::equal(
-          min_exprt(signedbv_typet(32)), min_exprt(signedbv_typet(32))));
+          min_value_exprt(signedbv_typet(32)),
+          min_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::not_equal(
-          max_exprt(signedbv_typet(32)), min_exprt(signedbv_typet(32))));
+          max_value_exprt(signedbv_typet(32)),
+          min_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::equal(
-          max_exprt(signedbv_typet(32)), max_exprt(signedbv_typet(32))));
+          max_value_exprt(signedbv_typet(32)),
+          max_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::not_equal(
-          min_exprt(signedbv_typet(32)), max_exprt(signedbv_typet(32))));
+          min_value_exprt(signedbv_typet(32)),
+          max_value_exprt(signedbv_typet(32))));
       }
 
       THEN("")
@@ -76,34 +84,40 @@ SCENARIO("comparison interval domain", "[core][analyses][interval][comparison]")
         REQUIRE(constant_interval_exprt::greater_than(CEV(-10), CEV(-100)));
         REQUIRE_FALSE(constant_interval_exprt::greater_than(CEV(-10), CEV(-5)));
         REQUIRE_FALSE(constant_interval_exprt::greater_than(
-          CEV(-10), max_exprt(signedbv_typet(32))));
+          CEV(-10), max_value_exprt(signedbv_typet(32))));
         REQUIRE_FALSE(constant_interval_exprt::greater_than(
-          CEV(10), max_exprt(signedbv_typet(32))));
+          CEV(10), max_value_exprt(signedbv_typet(32))));
         REQUIRE_FALSE(constant_interval_exprt::greater_than(
-          CEV(0), max_exprt(signedbv_typet(32))));
+          CEV(0), max_value_exprt(signedbv_typet(32))));
 
         REQUIRE(constant_interval_exprt::greater_than(
-          CEV(-10), min_exprt(signedbv_typet(32))));
+          CEV(-10), min_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::greater_than(
-          CEV(10), min_exprt(signedbv_typet(32))));
+          CEV(10), min_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::greater_than(
-          CEV(0), min_exprt(signedbv_typet(32))));
+          CEV(0), min_value_exprt(signedbv_typet(32))));
 
         REQUIRE_FALSE(constant_interval_exprt::greater_than(
-          min_exprt(signedbv_typet(32)), min_exprt(signedbv_typet(32))));
+          min_value_exprt(signedbv_typet(32)),
+          min_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::greater_than_or_equal(
-          min_exprt(signedbv_typet(32)), min_exprt(signedbv_typet(32))));
+          min_value_exprt(signedbv_typet(32)),
+          min_value_exprt(signedbv_typet(32))));
 
         REQUIRE(constant_interval_exprt::greater_than(
-          max_exprt(signedbv_typet(32)), min_exprt(signedbv_typet(32))));
+          max_value_exprt(signedbv_typet(32)),
+          min_value_exprt(signedbv_typet(32))));
         REQUIRE(constant_interval_exprt::greater_than_or_equal(
-          max_exprt(signedbv_typet(32)), min_exprt(signedbv_typet(32))));
+          max_value_exprt(signedbv_typet(32)),
+          min_value_exprt(signedbv_typet(32))));
 
         REQUIRE_FALSE(constant_interval_exprt::greater_than(
-          max_exprt(signedbv_typet(32)), max_exprt(signedbv_typet(32))));
+          max_value_exprt(signedbv_typet(32)),
+          max_value_exprt(signedbv_typet(32))));
 
         REQUIRE_FALSE(constant_interval_exprt::greater_than(
-          min_exprt(signedbv_typet(32)), max_exprt(signedbv_typet(32))));
+          min_value_exprt(signedbv_typet(32)),
+          max_value_exprt(signedbv_typet(32))));
       }
     }
 

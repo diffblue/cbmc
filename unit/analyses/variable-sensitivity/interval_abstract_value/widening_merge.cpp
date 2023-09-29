@@ -48,8 +48,8 @@ SCENARIO(
   const exprt val5minus = from_integer(-5, type);
   const exprt val8minus = from_integer(-8, type);
   const exprt val10minus = from_integer(-10, type);
-  auto valMax = max_exprt(type);
-  auto valMin = min_exprt(type);
+  auto valMax = max_value_exprt(type);
+  auto valMin = min_value_exprt(type);
   auto veryLarge = from_integer(2 << 29, type);
   auto veryLargeMinus = from_integer(-(2 << 29), type);
 
@@ -352,7 +352,7 @@ SCENARIO(
 
       THEN("result is [0, MAX]")
       {
-        auto uvalMax = max_exprt(utype);
+        auto uvalMax = max_value_exprt(utype);
         EXPECT_MODIFIED(merged, uval0, uvalMax);
       }
     }

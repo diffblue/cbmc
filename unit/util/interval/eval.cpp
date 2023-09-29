@@ -39,9 +39,9 @@ SCENARIO("Unary eval on intervals", "[core][analyses][interval][eval]")
     constant_interval_exprt five =
       constant_interval_exprt::singleton(from_integer(5, signedbv_typet(32)));
     const constant_interval_exprt &max_interval =
-      constant_interval_exprt::singleton(max_exprt{signedbv_typet(32)});
+      constant_interval_exprt::singleton(max_value_exprt{signedbv_typet(32)});
     const constant_interval_exprt &min_interval =
-      constant_interval_exprt::singleton(min_exprt{signedbv_typet(32)});
+      constant_interval_exprt::singleton(min_value_exprt{signedbv_typet(32)});
 
     THEN("When we apply unary addition to it, nothing should happen")
     {

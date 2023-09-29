@@ -29,7 +29,7 @@ exprt widened_ranget::widen_lower_bound() const
   if(
     constant_interval_exprt::contains_extreme(new_lower_bound) ||
     has_underflowed(new_lower_bound))
-    return min_exprt(lower_bound.type());
+    return min_value_exprt(lower_bound.type());
 
   return new_lower_bound;
 }
@@ -44,7 +44,7 @@ exprt widened_ranget::widen_upper_bound() const
   if(
     constant_interval_exprt::contains_extreme(new_upper_bound) ||
     has_overflowed(new_upper_bound, upper_bound))
-    return max_exprt(upper_bound.type());
+    return max_value_exprt(upper_bound.type());
 
   return new_upper_bound;
 }

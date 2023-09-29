@@ -22,7 +22,8 @@
 static void
 verify_extreme_interval(typet type, abstract_environmentt &env, namespacet &ns)
 {
-  auto interval = make_interval(min_exprt(type), max_exprt(type), env, ns);
+  auto interval =
+    make_interval(min_value_exprt(type), max_value_exprt(type), env, ns);
 
   EXPECT_TOP(interval);
 }
