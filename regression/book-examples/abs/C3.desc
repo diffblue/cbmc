@@ -1,0 +1,6 @@
+CORE
+abs.c
+--function abs --signed-overflow-check --trace
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$

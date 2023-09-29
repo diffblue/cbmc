@@ -1,0 +1,5 @@
+CORE
+abs.c
+--function abs --signed-overflow-check --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
