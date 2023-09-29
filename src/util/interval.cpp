@@ -83,7 +83,7 @@ constant_interval_exprt::plus(const constant_interval_exprt &o) const
 
   if(is_max(get_upper()) || is_max(o.get_upper()))
   {
-    upper = max_exprt(type());
+    upper = max_value_exprt(type());
   }
   else
   {
@@ -95,7 +95,7 @@ constant_interval_exprt::plus(const constant_interval_exprt &o) const
 
   if(is_min(get_lower()) || is_min(o.get_lower()))
   {
-    lower = min_exprt(type());
+    lower = min_value_exprt(type());
   }
   else
   {
@@ -559,11 +559,11 @@ exprt constant_interval_exprt::get_extreme(
   /* Return top */
   if(min_value)
   {
-    return min_exprt(type);
+    return min_value_exprt(type);
   }
   else
   {
-    return max_exprt(type);
+    return max_value_exprt(type);
   }
 
   UNREACHABLE;
@@ -651,8 +651,8 @@ void constant_interval_exprt::append_multiply_expression_max(
     collection.push_back(expr);
   else
   {
-    collection.push_back(max_exprt(expr));
-    collection.push_back(min_exprt(expr));
+    collection.push_back(max_value_exprt(expr));
+    collection.push_back(min_value_exprt(expr));
   }
 }
 
@@ -676,8 +676,8 @@ void constant_interval_exprt::append_multiply_expression_min(
     collection.push_back(other);
   else
   {
-    collection.push_back(min_exprt(min));
-    collection.push_back(max_exprt(min));
+    collection.push_back(min_value_exprt(min));
+    collection.push_back(max_value_exprt(min));
   }
 }
 
@@ -698,7 +698,7 @@ exprt constant_interval_exprt::generate_division_expression(
   {
     if(is_negative(rhs))
     {
-      return min_exprt(lhs);
+      return min_value_exprt(lhs);
     }
 
     return lhs;
@@ -708,7 +708,7 @@ exprt constant_interval_exprt::generate_division_expression(
   {
     if(is_negative(rhs))
     {
-      return max_exprt(lhs);
+      return max_value_exprt(lhs);
     }
 
     return lhs;
@@ -753,7 +753,7 @@ exprt constant_interval_exprt::generate_modulo_expression(
   {
     if(is_negative(rhs))
     {
-      return min_exprt(lhs);
+      return min_value_exprt(lhs);
     }
 
     return lhs;
@@ -763,7 +763,7 @@ exprt constant_interval_exprt::generate_modulo_expression(
   {
     if(is_negative(rhs))
     {
-      return max_exprt(lhs);
+      return max_value_exprt(lhs);
     }
 
     return lhs;
@@ -924,7 +924,7 @@ exprt constant_interval_exprt::generate_shift_expression(
 
   if(is_max(rhs))
   {
-    return min_exprt(rhs);
+    return min_value_exprt(rhs);
   }
 
   INVARIANT(
@@ -1019,14 +1019,14 @@ constant_exprt constant_interval_exprt::zero() const
   return zero(type());
 }
 
-min_exprt constant_interval_exprt::min() const
+min_value_exprt constant_interval_exprt::min() const
 {
-  return min_exprt(type());
+  return min_value_exprt(type());
 }
 
-max_exprt constant_interval_exprt::max() const
+max_value_exprt constant_interval_exprt::max() const
 {
-  return max_exprt(type());
+  return max_value_exprt(type());
 }
 
 bool constant_interval_exprt::is_top() const
@@ -1047,7 +1047,7 @@ constant_interval_exprt constant_interval_exprt::top(const typet &type)
 
 constant_interval_exprt constant_interval_exprt::bottom(const typet &type)
 {
-  return constant_interval_exprt(max_exprt(type), min_exprt(type));
+  return constant_interval_exprt(max_value_exprt(type), min_value_exprt(type));
 }
 
 constant_interval_exprt constant_interval_exprt::top() const
@@ -1215,12 +1215,12 @@ bool constant_interval_exprt::has_no_lower_bound() const
 
 bool constant_interval_exprt::is_max(const exprt &expr)
 {
-  return expr.id() == ID_max;
+  return expr.id() == ID_max_value;
 }
 
 bool constant_interval_exprt::is_min(const exprt &expr)
 {
-  return expr.id() == ID_min;
+  return expr.id() == ID_min_value;
 }
 
 bool constant_interval_exprt::is_positive(const exprt &expr)
@@ -1301,7 +1301,7 @@ exprt constant_interval_exprt::abs(const exprt &expr)
 {
   if(is_signed(expr) && is_min(expr))
   {
-    return max_exprt(expr);
+    return max_value_exprt(expr);
   }
 
   if(is_max(expr) || is_unsigned(expr) || is_zero(expr) || is_positive(expr))
@@ -1641,7 +1641,7 @@ constant_interval_exprt::typecast(const typet &type) const
   else
   {
     auto do_typecast = [&type](exprt e) {
-      if(e.id() == ID_min || e.id() == ID_max)
+      if(e.id() == ID_min_value || e.id() == ID_max_value)
       {
         e.type() = type;
       }

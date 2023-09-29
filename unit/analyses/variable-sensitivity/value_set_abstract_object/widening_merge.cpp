@@ -56,8 +56,8 @@ SCENARIO(
   auto val5minus = from_integer(-5, type);
   auto val8minus = from_integer(-8, type);
   auto val10minus = from_integer(-10, type);
-  auto valMax = max_exprt(type);
-  auto valMin = min_exprt(type);
+  auto valMax = max_value_exprt(type);
+  auto valMin = min_value_exprt(type);
   auto veryLarge = from_integer(2 << 29, type);
   auto veryLargeMinus = from_integer(-(2 << 29), type);
 

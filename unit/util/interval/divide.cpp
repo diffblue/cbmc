@@ -67,9 +67,9 @@ TEST_CASE("interval::divide", "[core][util][interval][divide]")
     SECTION("Max & Min")
     {
       const constant_interval_exprt min_interval =
-        constant_interval_exprt::singleton(min_exprt{signed_int_type});
+        constant_interval_exprt::singleton(min_value_exprt{signed_int_type});
       const constant_interval_exprt max_interval =
-        constant_interval_exprt::singleton(max_exprt{signed_int_type});
+        constant_interval_exprt::singleton(max_value_exprt{signed_int_type});
       // TODO: division of single max or min don't work as expected
       // CHECK(max_interval.divide(max_interval).is_top());
       // CHECK(max_interval.divide(min_interval).is_top());

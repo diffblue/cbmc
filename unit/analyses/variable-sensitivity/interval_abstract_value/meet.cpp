@@ -188,7 +188,7 @@ SCENARIO(
 
       auto result = meet(op1, op2);
 
-      THEN_INTERVAL(result, max_value, max_exprt(max_value.type()));
+      THEN_INTERVAL(result, max_value, max_value_exprt(max_value.type()));
     }
     WHEN("meeting [x >= max] with [10 < x]")
     {
@@ -197,7 +197,7 @@ SCENARIO(
 
       auto result = meet(op1, op2);
 
-      THEN_INTERVAL(result, max_value, max_exprt(max_value.type()));
+      THEN_INTERVAL(result, max_value, max_value_exprt(max_value.type()));
     }
     WHEN("meeting [x <= 10] with [x > max]")
     {

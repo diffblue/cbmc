@@ -106,7 +106,8 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
         // Problems
         REQUIRE(
           constant_interval_exprt::modulo(
-            constant_interval_exprt(CEV(30), max_exprt(signedbv_typet(32))),
+            constant_interval_exprt(
+              CEV(30), max_value_exprt(signedbv_typet(32))),
             constant_interval_exprt(CEV(2), CEV(2))) ==
           constant_interval_exprt(CEV(0), CEV(1)));
       }

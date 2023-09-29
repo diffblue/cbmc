@@ -106,13 +106,13 @@ bvint_value_is_min(const typet &type, const mp_integer &value)
 static inline constant_interval_exprt
 interval_from_x_le_value(const exprt &value)
 {
-  return constant_interval_exprt(min_exprt(value.type()), value);
+  return constant_interval_exprt(min_value_exprt(value.type()), value);
 }
 
 static inline constant_interval_exprt
 interval_from_x_ge_value(const exprt &value)
 {
-  return constant_interval_exprt(value, max_exprt(value.type()));
+  return constant_interval_exprt(value, max_value_exprt(value.type()));
 }
 
 static inline mp_integer force_value_from_expr(const exprt &value)
@@ -129,7 +129,8 @@ interval_from_x_lt_value(const exprt &value)
   mp_integer integer_value = force_value_from_expr(value);
   if(!bvint_value_is_min(value.type(), integer_value))
     return constant_interval_exprt(
-      min_exprt(value.type()), from_integer(integer_value - 1, value.type()));
+      min_value_exprt(value.type()),
+      from_integer(integer_value - 1, value.type()));
   else
     return constant_interval_exprt::bottom(value.type());
 }
@@ -140,7 +141,8 @@ interval_from_x_gt_value(const exprt &value)
   mp_integer integer_value = force_value_from_expr(value);
   if(!bvint_value_is_max(value.type(), integer_value))
     return constant_interval_exprt(
-      from_integer(integer_value + 1, value.type()), max_exprt(value.type()));
+      from_integer(integer_value + 1, value.type()),
+      max_value_exprt(value.type()));
   else
     return constant_interval_exprt::bottom(value.type());
 }
@@ -322,7 +324,7 @@ void interval_abstract_valuet::output(
     std::string lower_string;
     std::string upper_string;
 
-    if(interval.get_lower().id() == ID_min)
+    if(interval.get_lower().id() == ID_min_value)
     {
       lower_string = "-INF";
     }
@@ -334,7 +336,7 @@ void interval_abstract_valuet::output(
         id2string(to_constant_expr(interval.get_lower()).get_value());
     }
 
-    if(interval.get_upper().id() == ID_max)
+    if(interval.get_upper().id() == ID_max_value)
     {
       upper_string = "+INF";
     }
@@ -420,8 +422,12 @@ interval_abstract_valuet::index_range_implementation(const namespacet &ns) const
 {
   if(is_top() || is_bottom() || interval.is_top() || interval.is_bottom())
     return make_empty_index_range();
-  if(interval.get_lower().id() == ID_min || interval.get_upper().id() == ID_max)
+  if(
+    interval.get_lower().id() == ID_min_value ||
+    interval.get_upper().id() == ID_max_value)
+  {
     return make_empty_index_range();
+  }
 
   return make_interval_index_range(interval, ns);
 }
