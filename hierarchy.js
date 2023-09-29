@@ -1615,6 +1615,8 @@ var hierarchy =
               ] ],
               [ "empty_union_exprt", "classempty__union__exprt.html", null ],
               [ "infinity_exprt", "classinfinity__exprt.html", null ],
+              [ "max_exprt", "classmax__exprt.html", null ],
+              [ "min_exprt", "classmin__exprt.html", null ],
               [ "nil_exprt", "classnil__exprt.html", null ],
               [ "nondet_symbol_exprt", "classnondet__symbol__exprt.html", null ],
               [ "object_address_exprt", "classobject__address__exprt.html", null ],
@@ -1700,8 +1702,6 @@ var hierarchy =
           [ "fieldref_exprt", "classfieldref__exprt.html", null ],
           [ "java_string_literal_exprt", "classjava__string__literal__exprt.html", null ],
           [ "jsil_declarationt", "classjsil__declarationt.html", null ],
-          [ "max_exprt", "classmax__exprt.html", null ],
-          [ "min_exprt", "classmin__exprt.html", null ],
           [ "side_effect_exprt", "classside__effect__exprt.html", [
             [ "side_effect_expr_assignt", "classside__effect__expr__assignt.html", null ],
             [ "side_effect_expr_function_callt", "classside__effect__expr__function__callt.html", null ],
