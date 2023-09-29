@@ -96,31 +96,31 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="classmax__exprt.html" target="_top" xlink:title="+∞ upper bound for intervals">
-<polygon fill="none" stroke="black" points="925,-304.5 925,-323.5 994,-323.5 994,-304.5 925,-304.5"/>
-<text text-anchor="middle" x="959.5" y="-311.5" font-family="Helvetica,sans-Serif" font-size="10.00">max_exprt</text>
+<g id="a_node15"><a xlink:href="classmax__value__exprt.html" target="_top" xlink:title="+∞ upper bound for intervals">
+<polygon fill="none" stroke="black" points="909,-304.5 909,-323.5 1010,-323.5 1010,-304.5 909,-304.5"/>
+<text text-anchor="middle" x="959.5" y="-311.5" font-family="Helvetica,sans-Serif" font-size="10.00">max_value_exprt</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node15 -->
 <g id="edge14" class="edge">
 <title>Node1&#45;&gt;Node15</title>
-<path fill="none" stroke="midnightblue" d="M834.27,-271.48C848.83,-279.24 867.56,-288.5 885,-295 897.72,-299.74 912.1,-303.75 924.75,-306.84"/>
+<path fill="none" stroke="midnightblue" d="M834.27,-271.48C848.83,-279.24 867.56,-288.5 885,-295 894.63,-298.59 905.22,-301.76 915.28,-304.43"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="835.82,-268.34 825.36,-266.65 832.49,-274.5 835.82,-268.34"/>
 </g>
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="classmin__exprt.html" target="_top" xlink:title="&#45;∞ upper bound for intervals">
-<polygon fill="none" stroke="black" points="926.5,-266.5 926.5,-285.5 992.5,-285.5 992.5,-266.5 926.5,-266.5"/>
-<text text-anchor="middle" x="959.5" y="-273.5" font-family="Helvetica,sans-Serif" font-size="10.00">min_exprt</text>
+<g id="a_node16"><a xlink:href="classmin__value__exprt.html" target="_top" xlink:title="&#45;∞ upper bound for intervals">
+<polygon fill="none" stroke="black" points="910.5,-266.5 910.5,-285.5 1008.5,-285.5 1008.5,-266.5 910.5,-266.5"/>
+<text text-anchor="middle" x="959.5" y="-273.5" font-family="Helvetica,sans-Serif" font-size="10.00">min_value_exprt</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node16 -->
 <g id="edge15" class="edge">
 <title>Node1&#45;&gt;Node16</title>
-<path fill="none" stroke="midnightblue" d="M858.29,-263.31C880.62,-266.13 906.31,-269.39 926.1,-271.9"/>
+<path fill="none" stroke="midnightblue" d="M858.46,-263.33C875.23,-265.45 893.88,-267.81 910.49,-269.92"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="858.66,-259.83 848.3,-262.04 857.78,-266.77 858.66,-259.83"/>
 </g>
 <!-- Node17 -->

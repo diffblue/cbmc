@@ -2836,31 +2836,31 @@
 <!-- Node159 -->
 <g id="node160" class="node">
 <title>Node159</title>
-<g id="a_node160"><a xlink:href="classmax__exprt.html" target="_top" xlink:title="+∞ upper bound for intervals">
-<polygon fill="none" stroke="black" points="942.5,-2468.5 942.5,-2487.5 1011.5,-2487.5 1011.5,-2468.5 942.5,-2468.5"/>
-<text text-anchor="middle" x="977" y="-2475.5" font-family="Helvetica,sans-Serif" font-size="10.00">max_exprt</text>
+<g id="a_node160"><a xlink:href="classmax__value__exprt.html" target="_top" xlink:title="+∞ upper bound for intervals">
+<polygon fill="none" stroke="black" points="926.5,-2468.5 926.5,-2487.5 1027.5,-2487.5 1027.5,-2468.5 926.5,-2468.5"/>
+<text text-anchor="middle" x="977" y="-2475.5" font-family="Helvetica,sans-Serif" font-size="10.00">max_value_exprt</text>
 </a>
 </g>
 </g>
 <!-- Node150&#45;&gt;Node159 -->
 <g id="edge159" class="edge">
 <title>Node150&#45;&gt;Node159</title>
-<path fill="none" stroke="midnightblue" d="M835.9,-2478C869.43,-2478 912.73,-2478 942.26,-2478"/>
+<path fill="none" stroke="midnightblue" d="M836.16,-2478C864.05,-2478 898.62,-2478 926.41,-2478"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="835.83,-2474.5 825.83,-2478 835.83,-2481.5 835.83,-2474.5"/>
 </g>
 <!-- Node160 -->
 <g id="node161" class="node">
 <title>Node160</title>
-<g id="a_node161"><a xlink:href="classmin__exprt.html" target="_top" xlink:title="&#45;∞ upper bound for intervals">
-<polygon fill="none" stroke="black" points="944,-2430.5 944,-2449.5 1010,-2449.5 1010,-2430.5 944,-2430.5"/>
-<text text-anchor="middle" x="977" y="-2437.5" font-family="Helvetica,sans-Serif" font-size="10.00">min_exprt</text>
+<g id="a_node161"><a xlink:href="classmin__value__exprt.html" target="_top" xlink:title="&#45;∞ upper bound for intervals">
+<polygon fill="none" stroke="black" points="928,-2430.5 928,-2449.5 1026,-2449.5 1026,-2430.5 928,-2430.5"/>
+<text text-anchor="middle" x="977" y="-2437.5" font-family="Helvetica,sans-Serif" font-size="10.00">min_value_exprt</text>
 </a>
 </g>
 </g>
 <!-- Node150&#45;&gt;Node160 -->
 <g id="edge160" class="edge">
 <title>Node150&#45;&gt;Node160</title>
-<path fill="none" stroke="midnightblue" d="M836.06,-2467.99C870.16,-2461.17 914.28,-2452.34 943.78,-2446.44"/>
+<path fill="none" stroke="midnightblue" d="M835.65,-2468.07C864.32,-2462.34 900.19,-2455.16 928.49,-2449.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="834.95,-2464.64 825.83,-2470.03 836.32,-2471.5 834.95,-2464.64"/>
 </g>
 <!-- Node161 -->
