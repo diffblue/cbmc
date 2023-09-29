@@ -73,10 +73,11 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
     }
 
     next_is_target =
-#if 0
-      // Disabled for being too messy
+#if 1
+      // Previously disabled for being too messy.
       it->is_goto() || it->is_function_call() || it->is_assume();
 #else
+      // Disabled for being misleading.
       it->is_goto() || it->is_function_call();
 #endif
   }
