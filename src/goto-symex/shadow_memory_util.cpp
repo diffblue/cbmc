@@ -348,12 +348,12 @@ static void or_elements(
   }
 }
 
-/// Translate a list of values into an or expression. Used here in the implementation
-/// of aggregation of boolean-typed fields.
-/// \param field_type The type of the values of the or expression (expected to be
-///    the same).
+/// Translate a list of values into an or expression. Used here in the
+/// implementation of aggregation of boolean-typed fields.
+/// \param field_type The type of the values of the or expression (expected to
+///    be the same).
 /// \param values A list (std::vector) of values collected previously, passed
-///    through immediatelly to the constructed expression as operands.
+///    through immediately to the constructed expression as operands.
 /// \return A newly constructed or_exprt over the possible values given.
 static exprt or_values(const exprt::operandst &values, const typet &field_type)
 {
@@ -361,7 +361,6 @@ static exprt or_values(const exprt::operandst &values, const typet &field_type)
   {
     return values[0];
   }
-  // TODO: FOTIS: Just `or_exprt`?
   return multi_ary_exprt(ID_bitor, values, field_type);
 }
 
