@@ -28,6 +28,12 @@ if(MINGW)
         ${CMAKE_CURRENT_SOURCE_DIR}/library/err.c
         ${CMAKE_CURRENT_SOURCE_DIR}/library/threads.c
     )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    set(platform_unavail
+        ${CMAKE_CURRENT_SOURCE_DIR}/library/fenv.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/library/java.io.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/library/threads.c
+    )
 else()
     set(platform_unavail
         ${CMAKE_CURRENT_SOURCE_DIR}/library/java.io.c
