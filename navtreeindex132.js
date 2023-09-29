@@ -1,5 +1,13 @@
 var NAVTREEINDEX132 =
 {
+"structfloat__utilst_1_1rounding__mode__bitst.html#a7a5c2a1488e3aa3365ce8299680c0b93":[8,0,483,1,5],
+"structfloat__utilst_1_1rounding__mode__bitst.html#a7cbb9348f91220173fc24066063dfc8f":[8,0,483,1,4],
+"structfloat__utilst_1_1rounding__mode__bitst.html#ab1d3ea312c84fbb1b427434963958d78":[8,0,483,1,2],
+"structfloat__utilst_1_1rounding__mode__bitst.html#abcf15d7a0dca8a533887b74442b82731":[8,0,483,1,1],
+"structfloat__utilst_1_1unbiased__floatt.html":[8,0,483,2],
+"structfloat__utilst_1_1unpacked__floatt.html":[8,0,483,3],
+"structfloat__utilst_1_1unpacked__floatt.html#a4728c7786438e20a2284bb8c4e3baf7b":[8,0,483,3,4],
+"structfloat__utilst_1_1unpacked__floatt.html#a7bc539b236df3c645c9675ce408a3f13":[8,0,483,3,2],
 "structfloat__utilst_1_1unpacked__floatt.html#a7f6f4773a4aa93f3fc157a767d53768c":[8,0,483,3,0],
 "structfloat__utilst_1_1unpacked__floatt.html#a847f9798094dd42833a53b0292998f11":[8,0,483,3,3],
 "structfloat__utilst_1_1unpacked__floatt.html#aa24e2502950e1483e26532c427ca77c6":[8,0,483,3,5],
@@ -241,13 +249,5 @@ var NAVTREEINDEX132 =
 "structinterpretert_1_1function__assignments__contextt.html#a45fc5157bc6e57a3ee58471b413cff46":[8,0,632,0,0],
 "structinterpretert_1_1function__assignments__contextt.html#acc908a6366aead5e29a2f4b52c461b06":[8,0,632,0,2],
 "structinterpretert_1_1function__assignments__contextt.html#ae0ae3976075f2c92dcc626d0b104402e":[8,0,632,0,1],
-"structinterpretert_1_1function__assignments__contextt.html#afd7796f743150763831ffcc47ff69267":[8,0,632,0,3],
-"structinterpretert_1_1function__assignmentt.html":[8,0,632,1],
-"structinterpretert_1_1function__assignmentt.html#a255f5c824b9ceffbd2be2501b45e8308":[8,0,632,1,0],
-"structinterpretert_1_1function__assignmentt.html#ac0ca318b13f53973e350d9d27e024759":[8,0,632,1,1],
-"structinterval.html":[8,0,633],
-"structinterval.html#a175bdecc69f76d36c52afb0354e080de":[8,0,633,1],
-"structinterval.html#abf2f6b69412c1dbfb293ba62333389fc":[8,0,633,0],
-"structinv__object__storet_1_1entryt.html":[8,0,641,0],
-"structinv__object__storet_1_1entryt.html#a1631e03a3cd9404229017955910d2432":[8,0,641,0,1]
+"structinterpretert_1_1function__assignments__contextt.html#afd7796f743150763831ffcc47ff69267":[8,0,632,0,3]
 };

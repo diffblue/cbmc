@@ -22,6 +22,7 @@ var dir_cc2afaf2c956dbb07175fffeb8930b5f =
     [ "netdb.c", "netdb_8c.html", "netdb_8c" ],
     [ "process.c", "process_8c.html", "process_8c" ],
     [ "pthread_lib.c", "pthread__lib_8c.html", "pthread__lib_8c" ],
+    [ "pwd.c", "pwd_8c.html", "pwd_8c" ],
     [ "random.c", "random_8c.html", "random_8c" ],
     [ "semaphore.c", "semaphore_8c.html", "semaphore_8c" ],
     [ "setjmp.c", "setjmp_8c.html", "setjmp_8c" ],
