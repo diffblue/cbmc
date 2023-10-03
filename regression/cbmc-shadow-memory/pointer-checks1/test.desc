@@ -1,0 +1,12 @@
+CORE
+main.c
+--verbosity 10 --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+line 13 dereference failure: pointer outside object bounds.*: FAILURE
+line 16 dereference failure: pointer outside object bounds.*: FAILURE
+--
+^warning: ignoring
+line 11 dereference failure: pointer outside object bounds.*: FAILURE
+line 12 dereference failure: pointer outside object bounds.*: FAILURE

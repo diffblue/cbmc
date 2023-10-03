@@ -1,0 +1,10 @@
+CORE
+main.c
+--verbosity 10 --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+line 10 dereference failure: pointer outside object bounds in \*i.*: FAILURE
+line 13 dereference failure: pointer outside object bounds in \(&a\).*: FAILURE
+line 14 dereference failure: pointer outside object bounds in \*i.*: FAILURE
+--
