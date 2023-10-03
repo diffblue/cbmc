@@ -30,6 +30,7 @@ var classgoto__check__ct =
     [ "check_rec_if", "classgoto__check__ct.html#a933c3e7796f63de068effe46aa52945e", null ],
     [ "check_rec_logical_op", "classgoto__check__ct.html#a10fdf598b5041ab585e413a12e318e9e", null ],
     [ "check_rec_member", "classgoto__check__ct.html#a77923b2c35b5e16f12e958fa26ad0a24", null ],
+    [ "check_shadow_memory_api_calls", "classgoto__check__ct.html#ade8e939a9b5d3d67599b0982c6a416c5", null ],
     [ "collect_allocations", "classgoto__check__ct.html#a2e16e933353d8495f348033f1c3cf70f", null ],
     [ "conversion_check", "classgoto__check__ct.html#a8a69a4cdf029dbe3cf7706648fd69464", null ],
     [ "div_by_zero_check", "classgoto__check__ct.html#aba715e5152e4c1dfeea1f286f3abb844", null ],
