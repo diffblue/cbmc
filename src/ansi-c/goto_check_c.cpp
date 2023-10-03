@@ -103,6 +103,8 @@ protected:
   using guardt = std::function<exprt(exprt)>;
   const guardt identity = [](exprt expr) { return expr; };
 
+  void check_shadow_memory_api_calls(const goto_programt::instructiont &);
+
   /// Check an address-of expression:
   ///  if it is a dereference then check the pointer
   ///  if it is an index then address-check the array and then check the index
@@ -2142,6 +2144,8 @@ void goto_check_ct::goto_check(
       for(const auto &arg : i.call_arguments())
         check(arg);
 
+      check_shadow_memory_api_calls(i);
+
       // the call might invalidate any assertion
       assertions.clear();
     }
@@ -2241,6 +2245,25 @@ void goto_check_ct::goto_check(
 
   if(did_something)
     remove_skip(goto_program);
+}
+
+void goto_check_ct::check_shadow_memory_api_calls(
+  const goto_programt::instructiont &i)
+{
+  if(i.call_function().id() != ID_symbol)
+    return;
+
+  const irep_idt &identifier =
+    to_symbol_expr(i.call_function()).get_identifier();
+
+  if(
+    identifier == CPROVER_PREFIX "get_field" || identifier == CPROVER_PREFIX
+                                                  "set_field")
+  {
+    const exprt &expr = i.call_arguments()[0];
+    PRECONDITION(expr.type().id() == ID_pointer);
+    check(dereference_exprt(expr));
+  }
 }
 
 goto_check_ct::conditionst
