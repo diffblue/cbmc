@@ -306,7 +306,7 @@ static exprt conditional_cast_floatbv_to_unsignedbv(const exprt &value)
 }
 
 // TODO: doxygen?
-static void or_over_bytes(
+static void extract_bytes_of_bv(
   const exprt &value,
   const typet &type,
   const typet &field_type,
@@ -322,7 +322,7 @@ static void or_over_bytes(
 }
 
 // TODO: doxygen?
-static void or_elements(
+static void extract_bytes_of_expr(
   exprt element,
   const typet &field_type,
   const namespacet &ns,
@@ -336,7 +336,7 @@ static void or_elements(
     exprt value = element;
     if(is_union)
     {
-      or_over_bytes(value, element.type(), field_type, values);
+      extract_bytes_of_bv(value, element.type(), field_type, values);
     }
     else
     {
@@ -345,7 +345,7 @@ static void or_elements(
   }
   else
   {
-    exprt value = compute_or_over_cells(element, field_type, ns, log, is_union);
+    exprt value = compute_or_over_bytes(element, field_type, ns, log, is_union);
     values.push_back(typecast_exprt::conditional_cast(value, field_type));
   }
 }
@@ -366,7 +366,7 @@ static exprt or_values(const exprt::operandst &values, const typet &field_type)
   return multi_ary_exprt(ID_bitor, values, field_type);
 }
 
-exprt compute_or_over_cells(
+exprt compute_or_over_bytes(
   const exprt &expr,
   const typet &field_type,
   const namespacet &ns,
@@ -384,7 +384,7 @@ exprt compute_or_over_cells(
       {
         continue;
       }
-      or_elements(
+      extract_bytes_of_expr(
         member_exprt(expr, component), field_type, ns, log, is_union, values);
     }
     return or_values(values, field_type);
@@ -399,7 +399,7 @@ exprt compute_or_over_cells(
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
       for(mp_integer index = 0; index < size; ++index)
       {
-        or_elements(
+        extract_bytes_of_expr(
           index_exprt(expr, from_integer(index, index_type())),
           field_type,
           ns,
@@ -419,7 +419,7 @@ exprt compute_or_over_cells(
   exprt::operandst values;
   if(is_union)
   {
-    or_over_bytes(
+    extract_bytes_of_bv(
       conditional_cast_floatbv_to_unsignedbv(expr), type, field_type, values);
   }
   else
@@ -515,7 +515,7 @@ static exprt create_max_expr(const std::vector<exprt> &values)
   return combine_condition_and_max_values(rows);
 }
 
-exprt compute_max_over_cells(
+exprt compute_max_over_bytes(
   const exprt &expr,
   const typet &field_type,
   const namespacet &ns)
@@ -815,14 +815,14 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
     {
       // Value is of bool type, so aggregate with or.
       value = typecast_exprt::conditional_cast(
-        compute_or_over_cells(
+        compute_or_over_bytes(
           shadow_dereference.value, field_type, ns, log, is_union),
         lhs_type);
     }
     else
     {
       // Value is of other (bitvector) type, so aggregate with max
-      value = compute_max_over_cells(shadow_dereference.value, field_type, ns);
+      value = compute_max_over_bytes(shadow_dereference.value, field_type, ns);
     }
 
     const exprt base_cond = get_matched_base_cond(
@@ -922,7 +922,7 @@ normalize(const object_descriptor_exprt &expr, const namespacet &ns)
   return result;
 }
 
-bool set_field_check_null(
+bool check_value_set_contains_only_null_ptr(
   const namespacet &ns,
   const messaget &log,
   const std::vector<exprt> &value_set,

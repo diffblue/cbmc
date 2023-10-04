@@ -146,7 +146,7 @@ bool contains_null_or_invalid(
 
 /// Performs aggregation of the shadow memory field value over multiple cells
 /// for fields whose type is _Bool.
-exprt compute_or_over_cells(
+exprt compute_or_over_bytes(
   const exprt &expr,
   const typet &field_type,
   const namespacet &ns,
@@ -161,7 +161,7 @@ exprt compute_or_over_cells(
 /// \param ns the namespace to perform type-lookups into
 /// \return the aggregated max byte-sized value contained in expr
 /// Note that the expr type size must be known at compile time.
-exprt compute_max_over_cells(
+exprt compute_max_over_bytes(
   const exprt &expr,
   const typet &field_type,
   const namespacet &ns);
@@ -176,7 +176,7 @@ exprt build_if_else_expr(
 
 /// Checks if given expression is a null pointer.
 /// \returns true if expr is a a NULL pointer within value_set.
-bool set_field_check_null(
+bool check_value_set_contains_only_null_ptr(
   const namespacet &ns,
   const messaget &log,
   const std::vector<exprt> &value_set,

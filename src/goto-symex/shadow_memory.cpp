@@ -116,7 +116,7 @@ void shadow_memoryt::symex_set_field(
 #endif
   std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
   log_value_set(ns, log, value_set);
-  if(set_field_check_null(ns, log, value_set, expr))
+  if(check_value_set_contains_only_null_ptr(ns, log, value_set, expr))
   {
     log.warning() << "Shadow memory: cannot set shadow memory of NULL"
                   << messaget::eom;
