@@ -138,6 +138,9 @@ void log_value_set(
 #endif
 }
 
+/// Log a match between an address and a value the value set. This version of
+/// the function reports more details, including the base address, the pointer
+/// and the shadow value.
 void log_value_set_match(
   const namespacet &ns,
   const messaget &log,
@@ -185,6 +188,9 @@ void log_value_set_match(
 #endif
 }
 
+/// Log trying out a match between an object and a (target) shadow address.
+/// @param shadowed_address The address for which we're currently attempting to
+///   match.
 void log_try_shadow_address(
   const namespacet &ns,
   const messaget &log,
@@ -199,6 +205,9 @@ void log_try_shadow_address(
 #endif
 }
 
+/// Generic logging function that will log depending on the configured
+/// verbosity. Will log a specific message given to it, along with an expression
+/// passed along to it.
 void log_cond(
   const namespacet &ns,
   const messaget &log,
@@ -294,7 +303,9 @@ bool contains_null_or_invalid(
   return false;
 }
 
-// TODO: doxygen?
+/// Casts a given (float) bitvector expression to an unsigned bitvector.
+/// \param value The expression that we are to conditionally cast.
+/// \return An unsigned bitvector expression if eligible - `id` otherwise.
 static exprt conditional_cast_floatbv_to_unsignedbv(const exprt &value)
 {
   if(value.type().id() != ID_floatbv)
@@ -307,7 +318,13 @@ static exprt conditional_cast_floatbv_to_unsignedbv(const exprt &value)
     unsignedbv_typet(to_bitvector_type(value.type()).get_width()));
 }
 
-// TODO: doxygen?
+/// Extract byte-sized elements from the input bitvector-typed expression value
+/// and places them into the array values.
+/// \param value the bitvector typed expression to extract the bytes from
+/// \param type the type of the expression expr (it must be bitvector)
+/// \param field_type the type of the shadow memory
+/// \param values the vector where all the extracted bytes of value will be
+///   placed.
 static void extract_bytes_of_bv(
   const exprt &value,
   const typet &type,
@@ -327,7 +344,16 @@ static void extract_bytes_of_bv(
   }
 }
 
-// TODO: doxygen?
+/// Extract the components from the input expression value and places them into
+/// the array values.
+/// \param element the expression to extract the bytes from
+/// \param field_type the type of the shadow memory
+/// \param ns the namespace within which we're going to perform symbol lookups
+/// \param log the message log to which we're going to print debugging messages,
+///   if debugging is set
+/// \param is_union true if the expression element is part of a union
+/// \param values the vector where all the extracted components of element will
+///   be placed.
 static void extract_bytes_of_expr(
   exprt element,
   const typet &field_type,
@@ -556,7 +582,6 @@ exprt compute_max_over_bytes(
   return max_expr;
 }
 
-// TODO: doxygen?
 exprt build_if_else_expr(
   const std::vector<std::pair<exprt, exprt>> &conds_values)
 {
@@ -577,7 +602,12 @@ exprt build_if_else_expr(
   return result;
 }
 
-// TODO: doxygen?
+/// @brief Checks given types (object type and shadow memory field type) for
+///   equality. We're inspecting only pointer types here - if the two types
+///   given are not pointer types, then we assume it to be vacuously true.
+/// @param expr_type The type of the real object.
+/// @param shadow_type The type of the shadow memory field's value.
+/// @return True if types equal, false otherwise.
 static bool
 are_types_compatible(const typet &expr_type, const typet &shadow_type)
 {
@@ -607,9 +637,9 @@ are_types_compatible(const typet &expr_type, const typet &shadow_type)
   return true;
 }
 
-// TODO: doxygen?
-/// We simplify &string_constant[0] to &string_constant to facilitate expression
+/// Simplify &string_constant[0] to &string_constant to facilitate expression
 /// equality for exact matching.
+/// \note expression expr will be changed.
 static void clean_string_constant(exprt &expr)
 {
   const auto *index_expr = expr_try_dynamic_cast<index_exprt>(expr);
@@ -621,7 +651,10 @@ static void clean_string_constant(exprt &expr)
   }
 }
 
-// TODO: doxygen?
+/// Flattens type of the form `pointer_type(array_type(element_type))` to
+/// `pointer_type(element_type)` and `pointer_type(string_constant_type)` to
+/// `pointer_type(char)`.
+/// \note type `type` will be changed.
 static void adjust_array_types(typet &type)
 {
   auto *pointer_type = type_try_dynamic_cast<pointer_typet>(type);
@@ -641,7 +674,12 @@ static void adjust_array_types(typet &type)
   }
 }
 
-// TODO: doxygen?
+/// Function that compares the two arguments shadowed_address and
+/// matched_base_address, simplifies the comparison expression and if the lhs
+/// and rhs are structurally identical returns true, otherwise returns the
+/// comparison.
+/// \return the comparison expression of shadowed_address and
+/// matched_base_address (or a true_exprt if identical modulo simplification).
 static exprt get_matched_base_cond(
   const exprt &shadowed_address,
   const exprt &matched_base_address,
@@ -676,7 +714,11 @@ static exprt get_matched_base_cond(
   return base_cond;
 }
 
-// TODO: doxygen?
+/// Function that compares the two arguments dereference_pointer and expr,
+/// simplifies the comparison expression and if the lhs and rhs are structurally
+/// identical returns true, otherwise returns the comparison.
+/// \return the comparison expression of dereference_pointer and expr (or a
+/// true_exprt if identical modulo simplification).
 static exprt get_matched_expr_cond(
   const exprt &dereference_pointer,
   const exprt &expr,
@@ -738,7 +780,6 @@ static value_set_dereferencet::valuet get_shadow_dereference(
   return shadow_dereference;
 }
 
-// TODO: doxygen?
 /* foreach shadowed_address in SM:
  *   if(incompatible(shadow.object, object)) continue; // Type incompatibility
  *   base_match = object == shadow_object; // Do the base obj match the SM obj
@@ -886,7 +927,6 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
   return result;
 }
 
-// TODO: doxygen?
 // Unfortunately.
 static object_descriptor_exprt
 normalize(const object_descriptor_exprt &expr, const namespacet &ns)
