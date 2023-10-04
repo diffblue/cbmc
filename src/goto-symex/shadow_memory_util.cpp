@@ -15,6 +15,7 @@ Author: Peter Schrammel
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/namespace.h>
@@ -22,6 +23,7 @@ Author: Peter Schrammel
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
 
+#include <solvers/flattening/boolbv_width.h>
 
 // TODO: change DEBUG_SM to DEBUG_SHADOW_MEMORY (it also appears in other files)
 
@@ -428,119 +430,120 @@ exprt compute_or_over_cells(
   return or_values(values, field_type);
 }
 
-// TODO: doxygen?
-static void
-max_element(const exprt &element, const typet &field_type, exprt &max)
+/// Create an expression comparing the element at `expr_iterator` with the
+/// following elements of the collection (or `nil_exprt`if none) and return a
+/// pair `(condition, element)` such that if the condition is `true`, then the
+/// element is the max of the collection in the interval denoted by
+/// `expr_iterator` and `end`.
+/// \param expr_iterator the iterator pointing at the element to compare to.
+/// \param end the end of collection iterator.
+/// \return A pair (cond, elem) containing the condition and the max element.
+std::pair<exprt, exprt> compare_to_collection(
+  const std::vector<exprt>::const_iterator &expr_iterator,
+  const std::vector<exprt>::const_iterator &end)
 {
-  exprt value = typecast_exprt::conditional_cast(element, field_type);
-  if(max.is_nil())
+  // We need at least an element in the collection
+  INVARIANT(expr_iterator != end, "Cannot compute max of an empty collection");
+  const exprt &current_expr = *expr_iterator;
+
+  // Iterator for the other elements in the collection in the interval denoted
+  // by `expr_iterator` and `end`.
+  std::vector<exprt>::const_iterator expr_to_compare_to =
+    std::next(expr_iterator);
+  if(expr_to_compare_to == end)
   {
-    max = value;
+    return {nil_exprt{}, current_expr};
   }
-  else
+
+  std::vector<exprt> comparisons;
+  for(; expr_to_compare_to != end; ++expr_to_compare_to)
   {
-    max = if_exprt(binary_predicate_exprt(value, ID_gt, max), value, max);
+    // Compare the current element with the n-th following it
+    comparisons.emplace_back(
+      binary_predicate_exprt(current_expr, ID_gt, *expr_to_compare_to));
   }
+
+  return {and_exprt(comparisons), current_expr};
 }
 
-// TODO: doxygen?
-static void max_over_bytes(
-  const exprt &value,
-  const typet &type,
-  const typet &field_type,
-  exprt &max)
+/// Combine each (condition, value) element in the input collection into a
+/// if-then-else expression such as
+/// (cond_1 ? val_1 : (cond_2 ? val_2 : ... : val_n))
+/// \param conditions_and_values collection containing codnition-value pairs
+/// \return the combined max expression
+static exprt combine_condition_and_max_values(
+  const std::vector<std::pair<exprt, exprt>> &conditions_and_values)
 {
-  const size_t size = to_bitvector_type(type).get_width() / 8;
-  max_element(value, field_type, max);
-  for(size_t i = 1; i < size; ++i)
+  // We need at least one element
+  INVARIANT(
+    conditions_and_values.size() > 0,
+    "Cannot compute max of an empty collection");
+
+  // We use reverse-iterator, so the last element is the one in the last else
+  // case.
+  auto reverse_ite = conditions_and_values.rbegin();
+
+  // The last element must have `nil_exprt` as condition
+  INVARIANT(
+    reverse_ite->first == nil_exprt{},
+    "Last element of condition-value list must have nil_exprt condition.");
+
+  exprt res = std::move(reverse_ite->second);
+
+  for(++reverse_ite; reverse_ite != conditions_and_values.rend(); ++reverse_ite)
   {
-    max_element(
-      lshr_exprt(value, from_integer(8 * i, size_type())), field_type, max);
+    res = if_exprt(reverse_ite->first, reverse_ite->second, res);
   }
+
+  return res;
 }
 
-// TODO: doxygen?
-static void max_elements(
-  exprt element,
-  const typet &field_type,
-  const namespacet &ns,
-  const messaget &log,
-  const bool is_union,
-  exprt &max)
+/// Create an expression encoding the max operation over the collection `values`
+/// \param values an `exprt` that encodes the max of `values`
+/// \return an `exprt` encoding the max operation over the collection `values`
+static exprt create_max_expr(const std::vector<exprt> &values)
 {
-  element = conditional_cast_floatbv_to_unsignedbv(element);
-  if(element.type().id() == ID_unsignedbv || element.type().id() == ID_signedbv)
+  std::vector<std::pair<exprt, exprt>> rows;
+  rows.reserve(values.size());
+  for(auto byte_it = values.begin(); byte_it != values.end(); ++byte_it)
   {
-    if(is_union)
-    {
-      max_over_bytes(element, element.type(), field_type, max);
-    }
-    else
-    {
-      max_element(element, field_type, max);
-    }
+    // Create a pair condition-element where the condition is the comparison of
+    // the element with all the ones contained in the rest of the collection.
+    rows.emplace_back(compare_to_collection(byte_it, values.end()));
   }
-  else
-  {
-    exprt value =
-      compute_max_over_cells(element, field_type, ns, log, is_union);
-    max_element(value, field_type, max);
-  }
+
+  return combine_condition_and_max_values(rows);
 }
 
 exprt compute_max_over_cells(
   const exprt &expr,
   const typet &field_type,
-  const namespacet &ns,
-  const messaget &log,
-  const bool is_union)
+  const namespacet &ns)
 {
-  const typet type = ns.follow(expr.type());
+  // Compute the bit-width of the type of `expr`.
+  std::size_t size = boolbv_widtht{ns}(expr.type());
 
-  if(type.id() == ID_struct || type.id() == ID_union)
+  // Compute how many bytes are in `expr`
+  std::size_t byte_count = size / config.ansi_c.char_width;
+
+  // Extract each byte of `expr` by using byte_extract.
+  std::vector<exprt> extracted_bytes;
+  extracted_bytes.reserve(byte_count);
+  for(std::size_t i = 0; i < byte_count; ++i)
   {
-    exprt max = nil_exprt();
-    for(const auto &component : to_struct_union_type(type).components())
-    {
-      if(component.get_is_padding())
-      {
-        continue;
-      }
-      max_elements(
-        member_exprt(expr, component), field_type, ns, log, is_union, max);
-    }
-    return max;
+    extracted_bytes.emplace_back(make_byte_extract(
+      expr, from_integer(i, unsigned_long_int_type()), field_type));
   }
-  else if(type.id() == ID_array)
-  {
-    const array_typet &array_type = to_array_type(type);
-    if(array_type.size().is_constant())
-    {
-      exprt max = nil_exprt();
-      const mp_integer size =
-        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
-      for(mp_integer index = 0; index < size; ++index)
-      {
-        max_elements(
-          index_exprt(expr, from_integer(index, index_type())),
-          field_type,
-          ns,
-          log,
-          is_union,
-          max);
-      }
-      return max;
-    }
-    else
-    {
-      log.warning()
-        << "Shadow memory: cannot compute max over variable-size array "
-        << format(expr) << messaget::eom;
-    }
-  }
-  // TODO: This is incorrect when accessing non-0 offsets of scalars.
-  return typecast_exprt::conditional_cast(
-    conditional_cast_floatbv_to_unsignedbv(expr), field_type);
+
+  // Compute the max of the bytes extracted from `expr`.
+  exprt max_expr = create_max_expr(extracted_bytes);
+
+  INVARIANT(
+    max_expr.type() == field_type,
+    "Aggregated max value type must be the same as shadow memory field's "
+    "type.");
+
+  return max_expr;
 }
 
 // TODO: doxygen?
@@ -819,10 +822,7 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
     else
     {
       // Value is of other (bitvector) type, so aggregate with max
-      value = typecast_exprt::conditional_cast(
-        compute_max_over_cells(
-          shadow_dereference.value, field_type, ns, log, is_union),
-        lhs_type);
+      value = compute_max_over_cells(shadow_dereference.value, field_type, ns);
     }
 
     const exprt base_cond = get_matched_base_cond(

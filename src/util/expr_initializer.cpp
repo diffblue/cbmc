@@ -427,19 +427,19 @@ exprt duplicate_per_byte(
     // We haven't got a constant. So, build the expression using shift-and-or.
     exprt::operandst values;
 
-    typet operation_type = output_type;
-    if(const auto ptr_type = type_try_dynamic_cast<pointer_typet>(output_type))
-    {
-      operation_type = unsignedbv_typet{ptr_type->get_width()};
-    }
-    if(
-      const auto float_type = type_try_dynamic_cast<floatbv_typet>(output_type))
-    {
-      operation_type = unsignedbv_typet{float_type->get_width()};
-    }
-    // Let's cast simplified_init_expr to output_type.
-    const exprt casted_init_byte_expr =
-      typecast_exprt::conditional_cast(init_byte_expr, operation_type);
+    // When doing the replication we extend the init_expr to the output size to
+    // compute the bitwise or. To avoid that the sign is extended too we change
+    // the type of the output to an unsigned bitvector with the same size as the
+    // output type.
+    typet operation_type = unsignedbv_typet{output_bv->get_width()};
+    // To avoid sign-extension during cast we first cast to an unsigned version
+    // of the same bv type, then we extend it to the output type (adding 0
+    // padding).
+    const exprt casted_init_byte_expr = typecast_exprt::conditional_cast(
+      typecast_exprt::conditional_cast(
+        init_byte_expr, unsignedbv_typet{init_type_as_bitvector->get_width()}),
+      operation_type);
+
     values.push_back(casted_init_byte_expr);
     for(size_t i = 1; i < size; ++i)
     {

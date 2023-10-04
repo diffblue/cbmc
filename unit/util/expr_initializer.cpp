@@ -311,10 +311,15 @@ TEST_CASE(
 
       const auto result = duplicate_per_byte(init_expr, output_type, test.ns);
 
-      const auto casted_init_expr =
-        typecast_exprt::conditional_cast(init_expr, output_type);
-      const auto expected =
-        replicate_expression(casted_init_expr, output_type, replication_count);
+      const auto operation_type = unsignedbv_typet{output_size};
+      const auto casted_init_expr = typecast_exprt::conditional_cast(
+        typecast_exprt::conditional_cast(
+          init_expr, unsignedbv_typet{init_expr_size}),
+        operation_type);
+      const auto expected = typecast_exprt::conditional_cast(
+        replicate_expression(
+          casted_init_expr, operation_type, replication_count),
+        output_type);
 
       REQUIRE(result == expected);
     }
