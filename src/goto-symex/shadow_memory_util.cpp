@@ -262,8 +262,6 @@ get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state)
   return field_init_expr.type();
 }
 
-/// Given a pointer expression `address` checks if any expr in value_set is
-/// compatible
 bool contains_null_or_invalid(
   const std::vector<exprt> &value_set,
   const exprt &address)
@@ -350,7 +348,13 @@ static void or_elements(
   }
 }
 
-// TODO: doxygen?
+/// Translate a list of values into an or expression. Used here in the
+/// implementation of aggregation of boolean-typed fields.
+/// \param field_type The type of the values of the or expression (expected to
+///    be the same).
+/// \param values A list (std::vector) of values collected previously, passed
+///    through immediately to the constructed expression as operands.
+/// \return A newly constructed or_exprt over the possible values given.
 static exprt or_values(const exprt::operandst &values, const typet &field_type)
 {
   if(values.size() == 1)
