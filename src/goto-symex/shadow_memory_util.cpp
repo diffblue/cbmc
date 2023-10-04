@@ -23,9 +23,8 @@ Author: Peter Schrammel
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
 
+#include <langapi/language_util.h>
 #include <solvers/flattening/boolbv_width.h>
-
-// TODO: change DEBUG_SM to DEBUG_SHADOW_MEMORY (it also appears in other files)
 
 irep_idt extract_field_name(const exprt &string_expr)
 {
@@ -125,7 +124,7 @@ void log_value_set(
   const messaget &log,
   const std::vector<exprt> &value_set)
 {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
   log.conditional_output(
     log.debug(), [ns, value_set](messaget::mstreamt &mstream) {
       for(const auto &e : value_set)
@@ -145,7 +144,7 @@ void log_value_set_match(
   const exprt &expr,
   const value_set_dereferencet::valuet &shadow_dereference)
 {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
   log.conditional_output(
     log.debug(),
     [ns,
@@ -174,7 +173,7 @@ void log_value_set_match(
   const exprt &expr)
 {
   // Leave guards rename to DEBUG_SHADOW_MEMORY
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
   log.conditional_output(
     log.debug(), [ns, address, expr](messaget::mstreamt &mstream) {
       mstream << "Shadow memory: value_set_match: " << format(address)
@@ -188,7 +187,7 @@ void log_try_shadow_address(
   const messaget &log,
   const shadow_memory_statet::shadowed_addresst &shadowed_address)
 {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
   log.conditional_output(
     log.debug(), [ns, shadowed_address](messaget::mstreamt &mstream) {
       mstream << "Shadow memory: trying shadowed address: "
@@ -203,7 +202,7 @@ void log_cond(
   const char *cond_text,
   const exprt &cond)
 {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
   log.conditional_output(
     log.debug(), [ns, cond_text, cond](messaget::mstreamt &mstream) {
       mstream << "Shadow memory: " << cond_text << ": " << format(cond)
@@ -218,7 +217,7 @@ static void log_are_types_incompatible(
   const shadow_memory_statet::shadowed_addresst &shadowed_address,
   const messaget &log)
 {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
   log.debug() << "Shadow memory: incompatible types "
               << from_type(ns, "", expr.type()) << ", "
               << from_type(ns, "", shadowed_address.address.type())
@@ -718,7 +717,7 @@ static value_set_dereferencet::valuet get_shadow_dereference(
   shadowed_object.object() = shadow;
   value_set_dereferencet::valuet shadow_dereference =
     value_set_dereferencet::build_reference_to(shadowed_object, expr, ns);
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
   log.debug() << "Shadow memory: shadow-deref: "
               << format(shadow_dereference.value) << messaget::eom;
 #endif
@@ -842,7 +841,7 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
 
     if(base_cond.is_true() && expr_cond.is_true())
     {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "exact match" << messaget::eom;
 #endif
       exact_match = true;
@@ -855,7 +854,7 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
     {
       // No point looking at further shadow addresses
       // as only one of them can match.
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "base match" << messaget::eom;
 #endif
       result.clear();
@@ -864,7 +863,7 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
     }
     else
     {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "conditional match" << messaget::eom;
 #endif
       result.emplace_back(and_exprt(base_cond, expr_cond), value);
@@ -932,7 +931,7 @@ bool check_value_set_contains_only_null_ptr(
   if(value_set.size() == 1 && contains_null_or_invalid(value_set, null_pointer))
   {
     // TODO: duplicated in log_value_set_match
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
     log.conditional_output(
       log.debug(), [ns, null_pointer, expr](messaget::mstreamt &mstream) {
         mstream << "Shadow memory: value set match: " << format(null_pointer)
@@ -963,7 +962,7 @@ get_shadow_memory_for_matched_object(
 
     if(!are_types_compatible(expr.type(), shadowed_address.address.type()))
     {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "Shadow memory: incompatible types "
                   << from_type(ns, "", expr.type()) << ", "
                   << from_type(ns, "", shadowed_address.address.type())
@@ -1017,7 +1016,7 @@ get_shadow_memory_for_matched_object(
 
     if(base_cond.is_true() && expr_cond.is_true())
     {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "exact match" << messaget::eom;
 #endif
       exact_match = true;
@@ -1030,7 +1029,7 @@ get_shadow_memory_for_matched_object(
     {
       // No point looking at further shadow addresses
       // as only one of them can match.
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "base match" << messaget::eom;
 #endif
       result.clear();
@@ -1039,7 +1038,7 @@ get_shadow_memory_for_matched_object(
     }
     else
     {
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "conditional match" << messaget::eom;
 #endif
       result.emplace_back(

@@ -111,7 +111,7 @@ void shadow_memoryt::symex_set_field(
 
   // get value set
   replace_invalid_object_by_null(expr);
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
   log_set_field(ns, log, field_name, expr, value);
 #endif
   std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
@@ -143,7 +143,7 @@ void shadow_memoryt::symex_set_field(
                   << messaget::eom;
     }
     const exprt lhs = deref_expr(*maybe_lhs);
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
     log.debug() << "Shadow memory: LHS: " << format(lhs) << messaget::eom;
 #endif
     if(lhs.type().id() == ID_empty)
@@ -168,7 +168,7 @@ void shadow_memoryt::symex_set_field(
       expr_initializer(lhs.type(), expr.source_location(), ns, casted_rhs);
     CHECK_RETURN(per_byte_rhs.has_value());
 
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
     log.debug() << "Shadow memory: RHS: " << format(per_byte_rhs.value())
                 << messaget::eom;
 #endif
@@ -312,7 +312,7 @@ void shadow_memoryt::symex_get_field(
       log.debug() << "Shadow memory: mux size get_field: " << mux_size
                   << messaget::eom;
     }
-#ifdef DEBUG_SM
+#ifdef DEBUG_SHADOW_MEMORY
     log.debug() << "Shadow memory: RHS: " << format(rhs) << messaget::eom;
 #endif
     // TODO: create the assignment of __CPROVER_shadow_memory_get_field

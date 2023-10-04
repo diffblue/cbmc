@@ -19,6 +19,8 @@ Author: Peter Schrammel
 
 #include "goto_symex_state.h" // IWYU pragma: keep
 
+// To enable logging of Shadow Memory functions define DEBUG_SHADOW_MEMORY
+
 class exprt;
 class typet;
 
