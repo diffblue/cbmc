@@ -15,14 +15,53 @@ Author: Peter Schrammel
 #include <util/irep.h>
 #include <util/message.h> // IWYU pragma: keep
 
-#include <pointer-analysis/value_set_dereference.h>
-
 #include "goto_symex_state.h" // IWYU pragma: keep
 
 // To enable logging of Shadow Memory functions define DEBUG_SHADOW_MEMORY
 
 class exprt;
 class typet;
+
+/// Logs setting a value to a given shadow field. Mainly for use for
+/// debugging purposes.
+void shadow_memory_log_set_field(
+  const namespacet &ns,
+  const messaget &log,
+  const irep_idt &field_name,
+  const exprt &expr,
+  const exprt &value);
+
+/// Logs the retrieval of the value associated with a given shadow
+/// memory field. Mainly for use for debugging purposes. Dual to
+/// shadow_memory_log_get_field.
+void shadow_memory_log_value_set(
+  const namespacet &ns,
+  const messaget &log,
+  const std::vector<exprt> &value_set);
+
+/// Logs getting a value corresponding to a shadow memory field. Mainly used for
+/// debugging purposes.
+void shadow_memory_log_get_field(
+  const namespacet &ns,
+  const messaget &log,
+  const irep_idt &field_name,
+  const exprt &expr);
+
+/// Logs a successful match between an address and a value within the value set.
+void shadow_memory_log_value_set_match(
+  const namespacet &ns,
+  const messaget &log,
+  const exprt &address,
+  const exprt &expr);
+
+/// Generic logging function that will log depending on the configured
+/// verbosity. The log will be a specific message given to it, along with an
+/// expression passed along to it.
+void shadow_memory_log_text_and_expr(
+  const namespacet &ns,
+  const messaget &log,
+  const char *text,
+  const exprt &expr);
 
 /// Extracts the field name identifier from a string expression,
 /// e.g. as passed as argument to a __CPROVER_field_decl_local call.
@@ -42,66 +81,6 @@ void clean_pointer_expr(exprt &expr, const typet &type);
 /// Wraps a given expression into a `dereference_exprt` unless it is an
 /// `address_of_exprt` in which case it just unboxes it and returns its content.
 exprt deref_expr(const exprt &expr);
-
-/// Logs setting a value to a given shadow field. Mainly for use for
-/// debugging purposes.
-void log_set_field(
-  const namespacet &ns,
-  const messaget &log,
-  const irep_idt &field_name,
-  const exprt &expr,
-  const exprt &value);
-
-/// Logs getting a value corresponding to a shadow memory field. Mainly for
-/// use for debugging purposes.
-void log_get_field(
-  const namespacet &ns,
-  const messaget &log,
-  const irep_idt &field_name,
-  const exprt &expr);
-
-/// Logs the retrieval of the value associated with a given shadow
-/// memory field. Mainly for use for debugging purposes. Dual to log_get_field.
-void log_value_set(
-  const namespacet &ns,
-  const messaget &log,
-  const std::vector<exprt> &value_set);
-
-/// Log a match between an address and a value the value set. This version of
-/// the function reports more details, including the base address, the pointer
-/// and the shadow value.
-void log_value_set_match(
-  const namespacet &ns,
-  const messaget &log,
-  const shadow_memory_statet::shadowed_addresst &shadowed_address,
-  const exprt &matched_base_address,
-  const value_set_dereferencet::valuet &dereference,
-  const exprt &expr,
-  const value_set_dereferencet::valuet &shadow_dereference);
-
-/// Logs a successful match between an address and a value within the value set.
-void log_value_set_match(
-  const namespacet &ns,
-  const messaget &log,
-  const exprt &address,
-  const exprt &expr);
-
-/// Log trying out a match between an object and a (target) shadow address.
-/// @param shadowed_address The address for which we're currently attempting to
-///   match.
-void log_try_shadow_address(
-  const namespacet &ns,
-  const messaget &log,
-  const shadow_memory_statet::shadowed_addresst &shadowed_address);
-
-/// Generic logging function that will log depending on the configured
-/// verbosity. Will log a specific message given to it, along with an expression
-/// passed along to it.
-void log_cond(
-  const namespacet &ns,
-  const messaget &log,
-  const char *cond_text,
-  const exprt &cond);
 
 /// Replace an invalid object by a null pointer. Works recursively on the
 /// operands (child nodes) of the expression, as well.
