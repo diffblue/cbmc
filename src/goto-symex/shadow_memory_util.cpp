@@ -22,6 +22,7 @@ Author: Peter Schrammel
 #include <util/pointer_offset_size.h>
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 
 #include <langapi/language_util.h>
 #include <solvers/flattening/boolbv_width.h>
@@ -34,12 +35,14 @@ irep_idt extract_field_name(const exprt &string_expr)
     return extract_field_name(to_address_of_expr(string_expr).object());
   else if(can_cast_expr<index_exprt>(string_expr))
     return extract_field_name(to_index_expr(string_expr).array());
-  else if(string_expr.id() == ID_string_constant)
+  else if(can_cast_expr<string_constantt>(string_expr))
   {
     return string_expr.get(ID_value);
   }
   else
-    UNREACHABLE;
+  {
+    UNREACHABLE_BECAUSE("Failed to extract shadow memory field name.");
+  }
 }
 
 /// If the given type is an array type, then remove the L2 level renaming
@@ -311,7 +314,11 @@ static void extract_bytes_of_bv(
   const typet &field_type,
   exprt::operandst &values)
 {
-  const size_t size = to_bitvector_type(type).get_width() / 8;
+  INVARIANT(
+    can_cast_type<bitvector_typet>(type),
+    "Cannot combine with *or* elements of a non-bitvector type.");
+  const size_t size =
+    to_bitvector_type(type).get_width() / config.ansi_c.char_width;
   values.push_back(typecast_exprt::conditional_cast(value, field_type));
   for(size_t i = 1; i < size; ++i)
   {
@@ -372,6 +379,10 @@ exprt compute_or_over_bytes(
   const messaget &log,
   const bool is_union)
 {
+  INVARIANT(
+    can_cast_type<c_bool_typet>(field_type) ||
+      can_cast_type<bool_typet>(field_type),
+    "Can aggregate bytes with *or* only if the shadow memory type is _Bool.");
   const typet type = ns.follow(expr.type());
 
   if(type.id() == ID_struct || type.id() == ID_union)
@@ -601,29 +612,32 @@ are_types_compatible(const typet &expr_type, const typet &shadow_type)
 /// equality for exact matching.
 static void clean_string_constant(exprt &expr)
 {
+  const auto *index_expr = expr_try_dynamic_cast<index_exprt>(expr);
   if(
-    expr.id() == ID_index && to_index_expr(expr).index().is_zero() &&
-    to_index_expr(expr).array().id() == ID_string_constant)
+    index_expr && index_expr->index().is_zero() &&
+    can_cast_expr<string_constantt>(index_expr->array()))
   {
-    expr = to_index_expr(expr).array();
+    expr = index_expr->array();
   }
 }
 
 // TODO: doxygen?
 static void adjust_array_types(typet &type)
 {
-  if(type.id() != ID_pointer)
+  auto *pointer_type = type_try_dynamic_cast<pointer_typet>(type);
+  if(!pointer_type)
   {
     return;
   }
-  const typet &subtype = to_pointer_type(type).base_type();
-  if(subtype.id() == ID_array)
+  if(
+    const auto *array_type =
+      type_try_dynamic_cast<array_typet>(pointer_type->base_type()))
   {
-    to_pointer_type(type).base_type() = to_array_type(subtype).element_type();
+    pointer_type->base_type() = array_type->element_type();
   }
-  if(subtype.id() == ID_string_constant)
+  if(pointer_type->base_type().id() == ID_string_constant)
   {
-    to_pointer_type(type).base_type() = char_type();
+    pointer_type->base_type() = char_type();
   }
 }
 
@@ -927,6 +941,10 @@ bool check_value_set_contains_only_null_ptr(
   const std::vector<exprt> &value_set,
   const exprt &expr)
 {
+  INVARIANT(
+    can_cast_type<pointer_typet>(expr.type()),
+    "Cannot check if value_set contains only NULL as `expr` type is not a "
+    "pointer.");
   const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
   if(value_set.size() == 1 && contains_null_or_invalid(value_set, null_pointer))
   {

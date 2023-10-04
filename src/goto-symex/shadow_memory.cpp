@@ -315,7 +315,8 @@ void shadow_memoryt::symex_get_field(
 #ifdef DEBUG_SHADOW_MEMORY
     log.debug() << "Shadow memory: RHS: " << format(rhs) << messaget::eom;
 #endif
-    // TODO: create the assignment of __CPROVER_shadow_memory_get_field
+
+    // create the assignment of __CPROVER_shadow_memory_get_field
     symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
   }
   else
