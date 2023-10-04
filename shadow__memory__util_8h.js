@@ -2,7 +2,7 @@ var shadow__memory__util_8h =
 [
     [ "build_if_else_expr", "shadow__memory__util_8h.html#a0380d6d898750c64eefae4f0e306bf3d", null ],
     [ "clean_pointer_expr", "shadow__memory__util_8h.html#ac7c04fbb203b47a5ce29a4b76fbcf880", null ],
-    [ "compute_max_over_cells", "shadow__memory__util_8h.html#aa1658abe0304c7cdb1a0eb6e9f9408a2", null ],
+    [ "compute_max_over_cells", "shadow__memory__util_8h.html#a9a6e43c56b8929fd1e00c27c742f06a5", null ],
     [ "compute_or_over_cells", "shadow__memory__util_8h.html#a5b9222cb8a8b8c02d5e0e3be1223fac7", null ],
     [ "contains_null_or_invalid", "shadow__memory__util_8h.html#a2909c4734476f16c5091a0b767ebc6fc", null ],
     [ "deref_expr", "shadow__memory__util_8h.html#a2452eaf7cfa3f9d3d3e3182b48db9505", null ],
