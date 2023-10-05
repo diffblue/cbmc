@@ -15,10 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/run.h>
 #include <util/suffix.h>
 #include <util/tempfile.h>
-
-#ifdef _MSC_VER
-#  include <util/unicode.h>
-#endif
+#include <util/unicode.h>
 
 #include <fstream>
 
@@ -720,11 +717,7 @@ bool c_preprocess_none(
   std::ostream &outstream,
   message_handlert &message_handler)
 {
-  #ifdef _MSC_VER
-  std::ifstream infile(widen(file));
-  #else
-  std::ifstream infile(file);
-  #endif
+  std::ifstream infile(widen_if_needed(file));
 
   if(!infile)
   {

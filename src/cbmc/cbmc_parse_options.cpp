@@ -16,16 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/help_formatter.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
+#include <util/unicode.h>
 #include <util/version.h>
-
-#include <cstdlib> // exit()
-#include <fstream> // IWYU pragma: keep
-#include <iostream>
-#include <memory>
-
-#ifdef _MSC_VER
-#  include <util/unicode.h>
-#endif
 
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
@@ -68,6 +60,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include "c_test_input_generator.h"
+
+#include <cstdlib> // exit()
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
+#include <memory>
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
   : parse_options_baset(
@@ -507,11 +504,7 @@ int cbmc_parse_optionst::doit()
 
     std::string filename=cmdline.args[0];
 
-    #ifdef _MSC_VER
-    std::ifstream infile(widen(filename));
-    #else
-    std::ifstream infile(filename);
-    #endif
+    std::ifstream infile(widen_if_needed(filename));
 
     if(!infile)
     {

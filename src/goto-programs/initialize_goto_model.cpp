@@ -11,25 +11,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "initialize_goto_model.h"
 
-#include <fstream>
-
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/message.h>
 #include <util/options.h>
+#include <util/unicode.h>
 
-#ifdef _MSC_VER
-#  include <util/unicode.h>
-#endif
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <langapi/language.h>
 #include <langapi/language_file.h>
 #include <langapi/mode.h>
 
-#include <goto-programs/rebuild_goto_start_function.h>
-#include <util/exception_utils.h>
-
 #include "goto_convert_functions.h"
 #include "read_goto_binary.h"
+
+#include <fstream>
 
 /// Generate an entry point that calls a function with the given name, based on
 /// the functions language mode in the symbol table
@@ -74,47 +71,42 @@ void initialize_from_source_files(
 
   for(const auto &filename : sources)
   {
-      #ifdef _MSC_VER
-      std::ifstream infile(widen(filename));
-      #else
-      std::ifstream infile(filename);
-      #endif
+    std::ifstream infile(widen_if_needed(filename));
 
-      if(!infile)
-      {
-        throw system_exceptiont(
-          "Failed to open input file '" + filename + '\'');
-      }
-
-      language_filet &lf=language_files.add_file(filename);
-      lf.language=get_language_from_filename(filename);
-
-      if(lf.language==nullptr)
-      {
-        throw invalid_command_line_argument_exceptiont{
-          "Failed to figure out type of file", filename};
-      }
-
-      languaget &language=*lf.language;
-      language.set_message_handler(message_handler);
-      language.set_language_options(options);
-
-      msg.status() << "Parsing " << filename << messaget::eom;
-
-      if(language.parse(infile, filename))
-      {
-        throw invalid_input_exceptiont("PARSING ERROR");
-      }
-
-      lf.get_modules();
-    }
-
-    msg.status() << "Converting" << messaget::eom;
-
-    if(language_files.typecheck(symbol_table, message_handler))
+    if(!infile)
     {
-      throw invalid_input_exceptiont("CONVERSION ERROR");
+      throw system_exceptiont("Failed to open input file '" + filename + '\'');
     }
+
+    language_filet &lf = language_files.add_file(filename);
+    lf.language = get_language_from_filename(filename);
+
+    if(lf.language == nullptr)
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "Failed to figure out type of file", filename};
+    }
+
+    languaget &language = *lf.language;
+    language.set_message_handler(message_handler);
+    language.set_language_options(options);
+
+    msg.status() << "Parsing " << filename << messaget::eom;
+
+    if(language.parse(infile, filename))
+    {
+      throw invalid_input_exceptiont("PARSING ERROR");
+    }
+
+    lf.get_modules();
+  }
+
+  msg.status() << "Converting" << messaget::eom;
+
+  if(language_files.typecheck(symbol_table, message_handler))
+  {
+    throw invalid_input_exceptiont("CONVERSION ERROR");
+  }
 }
 
 void set_up_custom_entry_point(

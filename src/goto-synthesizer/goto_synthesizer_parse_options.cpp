@@ -10,6 +10,7 @@ Author: Qinheping Hu
 
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
+#include <util/unicode.h>
 #include <util/version.h>
 
 #include <goto-programs/read_goto_binary.h>
@@ -24,10 +25,6 @@ Author: Qinheping Hu
 
 #include <fstream>
 #include <iostream>
-
-#ifdef _MSC_VER
-#  include <util/unicode.h>
-#endif
 
 /// invoke main modules
 int goto_synthesizer_parse_optionst::doit()
@@ -84,11 +81,8 @@ int goto_synthesizer_parse_optionst::doit()
     // Output file specified
     if(cmdline.args.size() == 2)
     {
-#ifdef _MSC_VER
-      std::ofstream out(widen(cmdline.args[1]));
-#else
-      std::ofstream out(cmdline.args[1]);
-#endif
+      std::ofstream out(widen_if_needed(cmdline.args[1]));
+
       if(!out)
       {
         log.error() << "failed to write to '" << cmdline.args[1] << "'";

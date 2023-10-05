@@ -18,15 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
+#include <util/unicode.h>
 #include <util/version.h>
-
-#include <fstream> // IWYU pragma: keep
-#include <iostream>
-#include <memory>
-
-#ifdef _MSC_VER
-#  include <util/unicode.h>
-#endif
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/ensure_one_backedge_per_target.h>
@@ -108,6 +101,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "unwind.h"
 #include "value_set_fi_fp_removal.h"
+
+#include <fstream> // IWYU pragma: keep
+#include <iostream>
+#include <memory>
 
 #include "accelerate/accelerate.h"
 
@@ -248,11 +245,8 @@ int goto_instrument_parse_optionst::doit()
 
           if(have_file)
           {
-#ifdef _MSC_VER
-            std::ofstream of(widen(filename));
-#else
-            std::ofstream of(filename);
-#endif
+            std::ofstream of(widen_if_needed(filename));
+
             if(!of)
               throw "failed to open file "+filename;
 
@@ -745,11 +739,8 @@ int goto_instrument_parse_optionst::doit()
 
       if(cmdline.args.size()==2)
       {
-        #ifdef _MSC_VER
-        std::ofstream out(widen(cmdline.args[1]));
-        #else
-        std::ofstream out(cmdline.args[1]);
-        #endif
+        std::ofstream out(widen_if_needed(cmdline.args[1]));
+
         if(!out)
         {
           log.error() << "failed to write to '" << cmdline.args[1] << "'";
@@ -844,11 +835,8 @@ int goto_instrument_parse_optionst::doit()
 
       if(cmdline.args.size()==2)
       {
-        #ifdef _MSC_VER
-        std::ofstream out(widen(cmdline.args[1]));
-        #else
-        std::ofstream out(cmdline.args[1]);
-        #endif
+        std::ofstream out(widen_if_needed(cmdline.args[1]));
+
         if(!out)
         {
           log.error() << "failed to write to " << cmdline.args[1] << "'";
@@ -891,11 +879,7 @@ int goto_instrument_parse_optionst::doit()
 
       if(cmdline.args.size()==2)
       {
-        #ifdef _MSC_VER
-        std::ofstream out(widen(cmdline.args[1]));
-        #else
-        std::ofstream out(cmdline.args[1]);
-        #endif
+        std::ofstream out(widen_if_needed(cmdline.args[1]));
 
         if(!out)
         {
@@ -1338,11 +1322,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
       if(have_file)
       {
-#ifdef _MSC_VER
-        std::ofstream of(widen(filename));
-#else
-        std::ofstream of(filename);
-#endif
+        std::ofstream of(widen_if_needed(filename));
+
         if(!of)
           throw "failed to open file "+filename;
 

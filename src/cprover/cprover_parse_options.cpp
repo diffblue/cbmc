@@ -19,11 +19,8 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/parse_options.h>
 #include <util/signal_catcher.h>
 #include <util/ui_message.h>
+#include <util/unicode.h>
 #include <util/version.h>
-
-#ifdef _WIN32
-#  include <util/unicode.h>
-#endif
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_inline.h>
@@ -236,11 +233,8 @@ int cprover_parse_optionst::main()
       if(cmdline.isset("outfile"))
       {
         auto file_name = cmdline.get_value("outfile");
-#ifdef _WIN32
-        std::ofstream out(widen(file_name));
-#else
-        std::ofstream out(file_name);
-#endif
+        std::ofstream out(widen_if_needed(file_name));
+
         if(!out)
         {
           std::cerr << "failed to open " << file_name << '\n';

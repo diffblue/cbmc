@@ -21,6 +21,13 @@ std::wstring widen(const char *s);
 std::string narrow(const std::wstring &s);
 std::wstring widen(const std::string &s);
 
+// This removes the need to have a #ifdef whenever using std::fstream.
+#ifdef _WIN32
+#  define widen_if_needed(s) widen(s)
+#else
+#  define widen_if_needed(s) (s)
+#endif
+
 std::string
 utf32_native_endian_to_utf8(const std::basic_string<unsigned int> &s);
 
