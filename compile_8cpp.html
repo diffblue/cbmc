@@ -100,9 +100,6 @@ $(document).ready(function(){initNavTree('compile_8cpp.html',''); initResizable(
 <p>Compile and link source and object files.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="compile_8h_source.html">compile.h</a>&quot;</code><br />
-<code>#include &lt;cstring&gt;</code><br />
-<code>#include &lt;fstream&gt;</code><br />
-<code>#include &lt;iostream&gt;</code><br />
 <code>#include &lt;<a class="el" href="cmdline_8h_source.html">util/cmdline.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="config_8h_source.html">util/config.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="file__util_8h_source.html">util/file_util.h</a>&gt;</code><br />
@@ -112,24 +109,28 @@ $(document).ready(function(){initNavTree('compile_8cpp.html',''); initResizable(
 <code>#include &lt;<a class="el" href="symbol__table__builder_8h_source.html">util/symbol_table_builder.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="tempdir_8h_source.html">util/tempdir.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="tempfile_8h_source.html">util/tempfile.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="unicode_8h_source.html">util/unicode.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="version_8h_source.html">util/version.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="ansi__c__entry__point_8h_source.html">ansi-c/ansi_c_entry_point.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="c__object__factory__parameters_8h_source.html">ansi-c/c_object_factory_parameters.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__convert__functions_8h_source.html">goto-programs/goto_convert_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="name__mangler_8h_source.html">goto-programs/name_mangler.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="read__goto__binary_8h_source.html">goto-programs/read_goto_binary.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="write__goto__binary_8h_source.html">goto-programs/write_goto_binary.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="ansi__c__entry__point_8h_source.html">ansi-c/ansi_c_entry_point.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="c__object__factory__parameters_8h_source.html">ansi-c/c_object_factory_parameters.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="language_8h_source.html">langapi/language.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="language__file_8h_source.html">langapi/language_file.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="mode_8h_source.html">langapi/mode.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="linking_8h_source.html">linking/linking.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
+<code>#include &lt;cstring&gt;</code><br />
+<code>#include &lt;fstream&gt;</code><br />
+<code>#include &lt;iostream&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for compile.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="compile_8cpp__incl.svg" width="3432" height="619"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="compile_8cpp__incl.svg" width="3811" height="619"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -183,7 +184,7 @@ Functions</h2></td></tr>
 <div class="line">                          <span class="stringliteral">&quot;size=\&quot;30,40\&quot;;&quot;</span>\</div>
 <div class="line">                          <span class="stringliteral">&quot;ratio=compress;&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="compile_8cpp_source.html#l00050">50</a> of file <a class="el" href="compile_8cpp_source.html">compile.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="compile_8cpp_source.html#l00045">45</a> of file <a class="el" href="compile_8cpp_source.html">compile.cpp</a>.</p>
 
 </div>
 </div>
@@ -217,7 +218,7 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="ab97cdf63ad79b72e3cc59431938fbf3ca276e55a0916afbcd2aea7712a8e65866"></a>ELF_OBJECT&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="compile_8cpp_source.html#l00121">121</a> of file <a class="el" href="compile_8cpp_source.html">compile.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="compile_8cpp_source.html#l00116">116</a> of file <a class="el" href="compile_8cpp_source.html">compile.cpp</a>.</p>
 
 </div>
 </div>
@@ -256,7 +257,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="compile_8cpp_source.html#l00132">132</a> of file <a class="el" href="compile_8cpp_source.html">compile.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="compile_8cpp_source.html#l00127">127</a> of file <a class="el" href="compile_8cpp_source.html">compile.cpp</a>.</p>
 
 </div>
 </div>

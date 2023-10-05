@@ -1,5 +1,6 @@
 var unicode_8h =
 [
+    [ "widen_if_needed", "unicode_8h.html#a54a797d3af974232b7a83cc83845156e", null ],
     [ "codepoint_hex_to_utf16_native_endian", "unicode_8h.html#aaed1f8ccdc4bd74fddee0a06b9d514a3", null ],
     [ "codepoint_hex_to_utf8", "unicode_8h.html#ad716b8e970180c886c32dea86b7229a1", null ],
     [ "narrow", "unicode_8h.html#a029bf76c5dee7c32254d25ebaa1c2cf4", null ],
