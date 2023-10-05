@@ -38,14 +38,7 @@ public:
   int doit() override;
   void help() override;
 
-  goto_synthesizer_parse_optionst(int argc, const char **argv)
-    : parse_options_baset(
-        GOTO_SYNTHESIZER_OPTIONS,
-        argc,
-        argv,
-        "goto-synthesizer")
-  {
-  }
+  goto_synthesizer_parse_optionst(int argc, const char **argv);
 
 protected:
   void register_languages() override;
