@@ -3,30 +3,31 @@
 <area shape="rect" id="node2" href="$string__builtin__function_8cpp.html" title=" " alt="" coords="29,235,228,291"/>
 <area shape="rect" id="node3" href="$string__builtin__function_8h.html" title=" " alt="" coords="510,117,694,173"/>
 <area shape="rect" id="node7" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="873,354,1057,410"/>
-<area shape="rect" id="node22" href="$string__constraint__generator__code__points_8cpp.html" title="Generates string constraints for Java functions dealing with code points." alt="" coords="977,109,1182,180"/>
-<area shape="rect" id="node23" href="$string__constraint__generator__comparison_8cpp.html" title="Generates string constraints for function comparing strings, such as: equals, equalsIgnoreCase,..." alt="" coords="1206,109,1411,180"/>
-<area shape="rect" id="node24" href="$string__constraint__generator__constants_8cpp.html" title="Generates string constraints for constant strings." alt="" coords="1435,109,1641,180"/>
-<area shape="rect" id="node25" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="1665,109,1870,180"/>
-<area shape="rect" id="node26" href="$string__constraint__generator__indexof_8cpp.html" title="Generates string constraints for the family of indexOf and lastIndexOf java functions." alt="" coords="1894,109,2099,180"/>
-<area shape="rect" id="node27" href="$string__constraint__generator__main_8cpp.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="2123,109,2329,180"/>
-<area shape="rect" id="node28" href="$string__constraint__generator__testing_8cpp.html" title="Generates string constraints for string functions that return Boolean values." alt="" coords="2353,109,2558,180"/>
-<area shape="rect" id="node29" href="$string__constraint__generator__transformation_8cpp.html" title="Generates string constraints for string transformations, that is, functions taking one string and ret..." alt="" coords="2582,109,2787,180"/>
-<area shape="rect" id="node30" href="$string__constraint__generator__valueof_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="2811,109,3017,180"/>
+<area shape="rect" id="node23" href="$string__constraint__generator__code__points_8cpp.html" title="Generates string constraints for Java functions dealing with code points." alt="" coords="977,109,1182,180"/>
+<area shape="rect" id="node24" href="$string__constraint__generator__comparison_8cpp.html" title="Generates string constraints for function comparing strings, such as: equals, equalsIgnoreCase,..." alt="" coords="1206,109,1411,180"/>
+<area shape="rect" id="node25" href="$string__constraint__generator__constants_8cpp.html" title="Generates string constraints for constant strings." alt="" coords="1435,109,1641,180"/>
+<area shape="rect" id="node26" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="1665,109,1870,180"/>
+<area shape="rect" id="node27" href="$string__constraint__generator__indexof_8cpp.html" title="Generates string constraints for the family of indexOf and lastIndexOf java functions." alt="" coords="1894,109,2099,180"/>
+<area shape="rect" id="node28" href="$string__constraint__generator__main_8cpp.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="2123,109,2329,180"/>
+<area shape="rect" id="node29" href="$string__constraint__generator__testing_8cpp.html" title="Generates string constraints for string functions that return Boolean values." alt="" coords="2353,109,2558,180"/>
+<area shape="rect" id="node30" href="$string__constraint__generator__transformation_8cpp.html" title="Generates string constraints for string transformations, that is, functions taking one string and ret..." alt="" coords="2582,109,2787,180"/>
+<area shape="rect" id="node31" href="$string__constraint__generator__valueof_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="2811,109,3017,180"/>
 <area shape="rect" id="node4" href="$string__dependencies_8h.html" title="Keeps track of dependencies between strings." alt="" coords="718,235,902,291"/>
-<area shape="rect" id="node16" href="$string__format__builtin__function_8h.html" title="Built&#45;in function for String.format." alt="" coords="251,235,486,291"/>
-<area shape="rect" id="node18" href="$string__insertion__builtin__function_8h.html" title=" " alt="" coords="510,228,694,299"/>
+<area shape="rect" id="node17" href="$string__format__builtin__function_8h.html" title="Built&#45;in function for String.format." alt="" coords="251,235,486,291"/>
+<area shape="rect" id="node19" href="$string__insertion__builtin__function_8h.html" title=" " alt="" coords="510,228,694,299"/>
 <area shape="rect" id="node5" href="$string__dependencies_8cpp.html" title=" " alt="" coords="209,473,395,529"/>
 <area shape="rect" id="node6" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="665,473,849,529"/>
-<area shape="rect" id="node8" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="1426,473,1631,529"/>
-<area shape="rect" id="node12" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="873,473,1057,529"/>
-<area shape="rect" id="node13" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1081,473,1273,529"/>
-<area shape="rect" id="node9" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="1527,591,1789,633"/>
-<area shape="rect" id="node10" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1814,591,2043,633"/>
-<area shape="rect" id="node11" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1297,584,1502,640"/>
-<area shape="rect" id="node14" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1081,584,1273,640"/>
-<area shape="rect" id="node15" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="865,584,1057,640"/>
-<area shape="rect" id="node17" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5,354,255,410"/>
-<area shape="rect" id="node19" href="$string__concatenation__builtin__function_8h.html" title="Builtin functions for string concatenations." alt="" coords="329,347,539,417"/>
-<area shape="rect" id="node21" href="$string__insertion__builtin__function_8cpp.html" title=" " alt="" coords="563,347,747,417"/>
-<area shape="rect" id="node20" href="$string__concatenation__builtin__function_8cpp.html" title="Builtin functions for string concatenations." alt="" coords="419,465,630,536"/>
+<area shape="rect" id="node8" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="1597,473,1802,529"/>
+<area shape="rect" id="node13" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="873,473,1057,529"/>
+<area shape="rect" id="node14" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1081,473,1273,529"/>
+<area shape="rect" id="node9" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="1297,591,1560,633"/>
+<area shape="rect" id="node10" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1585,591,1814,633"/>
+<area shape="rect" id="node11" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1838,584,2043,640"/>
+<area shape="rect" id="node12" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="2068,584,2331,640"/>
+<area shape="rect" id="node15" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="865,584,1057,640"/>
+<area shape="rect" id="node16" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1081,584,1273,640"/>
+<area shape="rect" id="node18" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5,354,255,410"/>
+<area shape="rect" id="node20" href="$string__concatenation__builtin__function_8h.html" title="Builtin functions for string concatenations." alt="" coords="329,347,539,417"/>
+<area shape="rect" id="node22" href="$string__insertion__builtin__function_8cpp.html" title=" " alt="" coords="563,347,747,417"/>
+<area shape="rect" id="node21" href="$string__concatenation__builtin__function_8cpp.html" title="Builtin functions for string concatenations." alt="" coords="419,465,630,536"/>
 </map>

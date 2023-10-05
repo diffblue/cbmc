@@ -1,24 +1,25 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/cover_instrument.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/cover_instrument.h">
-<area shape="rect" id="node1" title="Coverage Instrumentation." alt="" coords="1770,5,1963,61"/>
-<area shape="rect" id="node2" href="$cover_8h.html" title="Coverage Instrumentation." alt="" coords="911,109,1105,165"/>
-<area shape="rect" id="node16" href="$cover__instrument__assume_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="1129,109,1354,165"/>
-<area shape="rect" id="node17" href="$cover__instrument__branch_8cpp.html" title="Coverage Instrumentation for Branches." alt="" coords="1379,109,1597,165"/>
-<area shape="rect" id="node18" href="$cover__instrument__condition_8cpp.html" title="Coverage Instrumentation for Conditions." alt="" coords="1621,109,1856,165"/>
-<area shape="rect" id="node19" href="$cover__instrument__decision_8cpp.html" title="Coverage Instrumentation for Decisions." alt="" coords="1881,109,2109,165"/>
-<area shape="rect" id="node20" href="$cover__instrument__location_8cpp.html" title="Coverage Instrumentation for Location, i.e." alt="" coords="2133,109,2360,165"/>
-<area shape="rect" id="node21" href="$cover__instrument__mcdc_8cpp.html" title="Coverage Instrumentation for MC/DC." alt="" coords="2385,109,2594,165"/>
-<area shape="rect" id="node22" href="$cover__instrument__other_8cpp.html" title="Further coverage instrumentations." alt="" coords="2618,109,2825,165"/>
+<area shape="rect" id="node1" title="Coverage Instrumentation." alt="" coords="2058,5,2251,61"/>
+<area shape="rect" id="node2" href="$cover_8h.html" title="Coverage Instrumentation." alt="" coords="1199,109,1393,165"/>
+<area shape="rect" id="node17" href="$cover__instrument__assume_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="1417,109,1642,165"/>
+<area shape="rect" id="node18" href="$cover__instrument__branch_8cpp.html" title="Coverage Instrumentation for Branches." alt="" coords="1667,109,1885,165"/>
+<area shape="rect" id="node19" href="$cover__instrument__condition_8cpp.html" title="Coverage Instrumentation for Conditions." alt="" coords="1909,109,2144,165"/>
+<area shape="rect" id="node20" href="$cover__instrument__decision_8cpp.html" title="Coverage Instrumentation for Decisions." alt="" coords="2169,109,2397,165"/>
+<area shape="rect" id="node21" href="$cover__instrument__location_8cpp.html" title="Coverage Instrumentation for Location, i.e." alt="" coords="2421,109,2648,165"/>
+<area shape="rect" id="node22" href="$cover__instrument__mcdc_8cpp.html" title="Coverage Instrumentation for MC/DC." alt="" coords="2673,109,2882,165"/>
+<area shape="rect" id="node23" href="$cover__instrument__other_8cpp.html" title="Further coverage instrumentations." alt="" coords="2906,109,3113,165"/>
 <area shape="rect" id="node3" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="5,317,211,373"/>
-<area shape="rect" id="node4" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="437,213,643,269"/>
-<area shape="rect" id="node7" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="776,317,960,373"/>
-<area shape="rect" id="node8" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="916,213,1100,269"/>
-<area shape="rect" id="node11" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="1125,213,1318,269"/>
-<area shape="rect" id="node12" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1400,317,1584,373"/>
-<area shape="rect" id="node13" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="1467,213,1651,269"/>
+<area shape="rect" id="node4" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="535,213,740,269"/>
+<area shape="rect" id="node8" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1064,317,1248,373"/>
+<area shape="rect" id="node9" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1204,213,1388,269"/>
+<area shape="rect" id="node12" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="1413,213,1606,269"/>
+<area shape="rect" id="node13" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1688,317,1872,373"/>
+<area shape="rect" id="node14" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="1755,213,1939,269"/>
 <area shape="rect" id="node5" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="235,325,498,366"/>
 <area shape="rect" id="node6" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="523,325,752,366"/>
-<area shape="rect" id="node9" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="984,317,1168,373"/>
-<area shape="rect" id="node10" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="1192,317,1376,373"/>
-<area shape="rect" id="node14" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="1608,317,1792,373"/>
-<area shape="rect" id="node15" href="$jdiff__main_8cpp.html" title="JDIFF Main Module." alt="" coords="1816,317,2000,373"/>
+<area shape="rect" id="node7" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="777,317,1039,373"/>
+<area shape="rect" id="node10" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="1272,317,1456,373"/>
+<area shape="rect" id="node11" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="1480,317,1664,373"/>
+<area shape="rect" id="node15" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="1896,317,2080,373"/>
+<area shape="rect" id="node16" href="$jdiff__main_8cpp.html" title="JDIFF Main Module." alt="" coords="2104,317,2288,373"/>
 </map>

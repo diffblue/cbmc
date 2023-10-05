@@ -1,54 +1,54 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/parse_options.h" name="/home/runner/work/cbmc/cbmc/src/util/parse_options.h">
-<area shape="rect" id="node1" title=" " alt="" coords="3559,5,3775,47"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="426,95,631,151"/>
-<area shape="rect" id="node6" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="900,95,1091,151"/>
-<area shape="rect" id="node7" href="$crangler__parse__options_8h.html" title="CRANGLER Command Line Option Processing." alt="" coords="1115,95,1313,151"/>
-<area shape="rect" id="node10" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1568,95,1796,151"/>
-<area shape="rect" id="node14" href="$goto__bmc__parse__options_8h.html" title=" " alt="" coords="2150,95,2334,151"/>
-<area shape="rect" id="node17" href="$goto__cc__mode_8cpp.html" title="Command line option container." alt="" coords="2566,95,2750,151"/>
-<area shape="rect" id="node18" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2774,95,2958,151"/>
-<area shape="rect" id="node22" href="$goto__harness__parse__options_8h.html" title=" " alt="" coords="3199,95,3421,151"/>
-<area shape="rect" id="node25" href="$goto__inspect__parse__options_8h.html" title=" " alt="" coords="3558,95,3777,151"/>
-<area shape="rect" id="node28" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="4037,95,4279,151"/>
-<area shape="rect" id="node32" href="$goto__synthesizer__parse__options_8h.html" title="Command Line Parsing." alt="" coords="4805,95,5052,151"/>
-<area shape="rect" id="node36" href="$memory__analyzer__parse__options_8h.html" title="This code does the command line parsing for the memory&#45;analyzer tool." alt="" coords="5443,95,5697,151"/>
-<area shape="rect" id="node39" href="$symtab2gb__parse__options_8h.html" title=" " alt="" coords="5857,95,6096,151"/>
-<area shape="rect" id="node42" href="$parse__options_8cpp.html" title=" " alt="" coords="6120,102,6351,143"/>
-<area shape="rect" id="node43" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="6513,95,6709,151"/>
-<area shape="rect" id="node46" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="6962,95,7154,151"/>
-<area shape="rect" id="node49" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="7498,95,7682,151"/>
+<area shape="rect" id="node1" title=" " alt="" coords="3866,5,4082,47"/>
+<area shape="rect" id="node2" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="546,95,751,151"/>
+<area shape="rect" id="node7" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="1680,95,1871,151"/>
+<area shape="rect" id="node8" href="$crangler__parse__options_8h.html" title="CRANGLER Command Line Option Processing." alt="" coords="1895,95,2093,151"/>
+<area shape="rect" id="node11" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="2341,95,2569,151"/>
+<area shape="rect" id="node15" href="$goto__bmc__parse__options_8h.html" title=" " alt="" coords="2927,95,3111,151"/>
+<area shape="rect" id="node18" href="$goto__cc__mode_8cpp.html" title="Command line option container." alt="" coords="3343,95,3527,151"/>
+<area shape="rect" id="node19" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="3551,95,3735,151"/>
+<area shape="rect" id="node23" href="$goto__harness__parse__options_8h.html" title=" " alt="" coords="3863,95,4085,151"/>
+<area shape="rect" id="node26" href="$goto__inspect__parse__options_8h.html" title=" " alt="" coords="4214,95,4433,151"/>
+<area shape="rect" id="node29" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="4814,95,5057,151"/>
+<area shape="rect" id="node33" href="$goto__synthesizer__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1181,95,1428,151"/>
+<area shape="rect" id="node36" href="$memory__analyzer__parse__options_8h.html" title="This code does the command line parsing for the memory&#45;analyzer tool." alt="" coords="5441,95,5696,151"/>
+<area shape="rect" id="node39" href="$symtab2gb__parse__options_8h.html" title=" " alt="" coords="5856,95,6095,151"/>
+<area shape="rect" id="node42" href="$parse__options_8cpp.html" title=" " alt="" coords="6119,102,6349,143"/>
+<area shape="rect" id="node43" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="6512,95,6708,151"/>
+<area shape="rect" id="node46" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="6961,95,7153,151"/>
+<area shape="rect" id="node49" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="7497,95,7681,151"/>
 <area shape="rect" id="node3" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="5,206,268,247"/>
 <area shape="rect" id="node4" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="293,206,522,247"/>
 <area shape="rect" id="node5" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="546,199,751,255"/>
-<area shape="rect" id="node8" href="$crangler__main_8cpp.html" title="CRANGLER Main Module." alt="" coords="776,199,975,255"/>
-<area shape="rect" id="node9" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="999,199,1197,255"/>
-<area shape="rect" id="node11" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="1222,199,1441,255"/>
-<area shape="rect" id="node12" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="1465,199,1651,255"/>
-<area shape="rect" id="node13" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1675,199,1918,255"/>
-<area shape="rect" id="node15" href="$goto__bmc__main_8cpp.html" title=" " alt="" coords="1942,199,2126,255"/>
-<area shape="rect" id="node16" href="$goto__bmc__parse__options_8cpp.html" title=" " alt="" coords="2150,199,2334,255"/>
-<area shape="rect" id="node19" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="2358,199,2542,255"/>
-<area shape="rect" id="node20" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="2566,199,2750,255"/>
-<area shape="rect" id="node21" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2774,199,2958,255"/>
-<area shape="rect" id="node23" href="$goto__harness__main_8cpp.html" title=" " alt="" coords="2982,199,3166,255"/>
-<area shape="rect" id="node24" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="3191,199,3429,255"/>
-<area shape="rect" id="node26" href="$goto__inspect__main_8cpp.html" title=" " alt="" coords="3454,199,3638,255"/>
-<area shape="rect" id="node27" href="$goto__inspect__parse__options_8cpp.html" title=" " alt="" coords="3662,199,3897,255"/>
-<area shape="rect" id="node29" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="3921,199,4155,255"/>
-<area shape="rect" id="node30" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="4179,199,4379,255"/>
-<area shape="rect" id="node31" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="4403,199,4662,255"/>
-<area shape="rect" id="node33" href="$goto__synthesizer__languages_8cpp.html" title="Language Registration." alt="" coords="4687,199,4925,255"/>
-<area shape="rect" id="node34" href="$goto__synthesizer__main_8cpp.html" title="Main Module." alt="" coords="4949,199,5153,255"/>
-<area shape="rect" id="node35" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="5177,199,5440,255"/>
-<area shape="rect" id="node37" href="$memory__analyzer__main_8cpp.html" title="Memory analyzer interface." alt="" coords="5465,199,5675,255"/>
-<area shape="rect" id="node38" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="5699,199,5969,255"/>
-<area shape="rect" id="node40" href="$symtab2gb__main_8cpp.html" title="symtab2gb Main Module" alt="" coords="5993,199,6232,255"/>
-<area shape="rect" id="node41" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="6256,199,6495,255"/>
-<area shape="rect" id="node44" href="$janalyzer__main_8cpp.html" title="JANALYZER Main Module." alt="" coords="6519,199,6703,255"/>
-<area shape="rect" id="node45" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="6727,199,6938,255"/>
-<area shape="rect" id="node47" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="6962,199,7154,255"/>
-<area shape="rect" id="node48" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="7178,199,7370,255"/>
-<area shape="rect" id="node50" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="7394,199,7578,255"/>
-<area shape="rect" id="node51" href="$jdiff__main_8cpp.html" title="JDIFF Main Module." alt="" coords="7602,199,7786,255"/>
-<area shape="rect" id="node52" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="7810,199,7994,255"/>
+<area shape="rect" id="node6" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="776,199,1039,255"/>
+<area shape="rect" id="node9" href="$crangler__main_8cpp.html" title="CRANGLER Main Module." alt="" coords="1553,199,1752,255"/>
+<area shape="rect" id="node10" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="1776,199,1975,255"/>
+<area shape="rect" id="node12" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="1999,199,2218,255"/>
+<area shape="rect" id="node13" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="2243,199,2428,255"/>
+<area shape="rect" id="node14" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="2453,199,2695,255"/>
+<area shape="rect" id="node16" href="$goto__bmc__main_8cpp.html" title=" " alt="" coords="2719,199,2903,255"/>
+<area shape="rect" id="node17" href="$goto__bmc__parse__options_8cpp.html" title=" " alt="" coords="2927,199,3111,255"/>
+<area shape="rect" id="node20" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="3135,199,3319,255"/>
+<area shape="rect" id="node21" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="3343,199,3527,255"/>
+<area shape="rect" id="node22" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="3551,199,3735,255"/>
+<area shape="rect" id="node24" href="$goto__harness__main_8cpp.html" title=" " alt="" coords="3759,199,3943,255"/>
+<area shape="rect" id="node25" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="3968,199,4207,255"/>
+<area shape="rect" id="node27" href="$goto__inspect__main_8cpp.html" title=" " alt="" coords="4231,199,4415,255"/>
+<area shape="rect" id="node28" href="$goto__inspect__parse__options_8cpp.html" title=" " alt="" coords="4439,199,4674,255"/>
+<area shape="rect" id="node30" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="4698,199,4933,255"/>
+<area shape="rect" id="node31" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="4957,199,5157,255"/>
+<area shape="rect" id="node32" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5181,199,5439,255"/>
+<area shape="rect" id="node34" href="$goto__synthesizer__languages_8cpp.html" title="Language Registration." alt="" coords="1063,199,1301,255"/>
+<area shape="rect" id="node35" href="$goto__synthesizer__main_8cpp.html" title="Main Module." alt="" coords="1325,199,1529,255"/>
+<area shape="rect" id="node37" href="$memory__analyzer__main_8cpp.html" title="Memory analyzer interface." alt="" coords="5463,199,5674,255"/>
+<area shape="rect" id="node38" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="5698,199,5967,255"/>
+<area shape="rect" id="node40" href="$symtab2gb__main_8cpp.html" title="symtab2gb Main Module" alt="" coords="5992,199,6231,255"/>
+<area shape="rect" id="node41" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="6255,199,6493,255"/>
+<area shape="rect" id="node44" href="$janalyzer__main_8cpp.html" title="JANALYZER Main Module." alt="" coords="6518,199,6702,255"/>
+<area shape="rect" id="node45" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="6726,199,6937,255"/>
+<area shape="rect" id="node47" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="6961,199,7153,255"/>
+<area shape="rect" id="node48" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="7177,199,7369,255"/>
+<area shape="rect" id="node50" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="7393,199,7577,255"/>
+<area shape="rect" id="node51" href="$jdiff__main_8cpp.html" title="JDIFF Main Module." alt="" coords="7601,199,7785,255"/>
+<area shape="rect" id="node52" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="7809,199,7993,255"/>
 </map>

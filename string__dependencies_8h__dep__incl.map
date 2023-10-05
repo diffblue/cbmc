@@ -1,14 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/strings/string_dependencies.h" name="/home/runner/work/cbmc/cbmc/src/solvers/strings/string_dependencies.h">
-<area shape="rect" id="node1" title="Keeps track of dependencies between strings." alt="" coords="157,5,341,61"/>
-<area shape="rect" id="node2" href="$string__dependencies_8cpp.html" title=" " alt="" coords="25,109,211,165"/>
-<area shape="rect" id="node3" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="113,213,297,269"/>
-<area shape="rect" id="node4" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="331,109,515,165"/>
-<area shape="rect" id="node5" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="321,213,526,269"/>
-<area shape="rect" id="node9" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="550,213,734,269"/>
-<area shape="rect" id="node10" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="775,213,967,269"/>
+<area shape="rect" id="node1" title="Keeps track of dependencies between strings." alt="" coords="382,5,566,61"/>
+<area shape="rect" id="node2" href="$string__dependencies_8cpp.html" title=" " alt="" coords="250,109,437,165"/>
+<area shape="rect" id="node3" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="338,213,522,269"/>
+<area shape="rect" id="node4" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="557,109,741,165"/>
+<area shape="rect" id="node5" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="546,213,751,269"/>
+<area shape="rect" id="node10" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="775,213,959,269"/>
+<area shape="rect" id="node11" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1063,213,1255,269"/>
 <area shape="rect" id="node6" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="5,325,268,366"/>
 <area shape="rect" id="node7" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="293,325,522,366"/>
 <area shape="rect" id="node8" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="546,317,751,373"/>
-<area shape="rect" id="node11" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="775,317,967,373"/>
-<area shape="rect" id="node12" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="991,317,1183,373"/>
+<area shape="rect" id="node9" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="776,317,1039,373"/>
+<area shape="rect" id="node12" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1063,317,1255,373"/>
+<area shape="rect" id="node13" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1279,317,1471,373"/>
 </map>

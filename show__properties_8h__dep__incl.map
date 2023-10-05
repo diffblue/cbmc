@@ -1,30 +1,31 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/show_properties.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/show_properties.h">
-<area shape="rect" id="node1" title="Show the properties." alt="" coords="1407,5,1591,61"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="13,109,219,165"/>
-<area shape="rect" id="node3" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="243,109,434,165"/>
-<area shape="rect" id="node4" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="5,213,248,269"/>
-<area shape="rect" id="node5" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="510,109,738,165"/>
-<area shape="rect" id="node8" href="$goto__diff__base_8cpp.html" title="GOTO&#45;DIFF Base Class." alt="" coords="800,109,984,165"/>
-<area shape="rect" id="node9" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="725,213,909,269"/>
-<area shape="rect" id="node10" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1059,109,1243,165"/>
-<area shape="rect" id="node13" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="1267,109,1461,165"/>
-<area shape="rect" id="node14" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1349,213,1608,269"/>
-<area shape="rect" id="node15" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1536,109,1779,165"/>
-<area shape="rect" id="node18" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="1803,109,1987,165"/>
-<area shape="rect" id="node19" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="2115,213,2325,269"/>
-<area shape="rect" id="node20" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="2122,109,2318,165"/>
-<area shape="rect" id="node22" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="2557,213,2749,269"/>
-<area shape="rect" id="node23" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="2557,109,2749,165"/>
-<area shape="rect" id="node25" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="2989,213,3173,269"/>
-<area shape="rect" id="node26" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="3093,109,3277,165"/>
-<area shape="rect" id="node6" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="272,213,491,269"/>
-<area shape="rect" id="node7" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="515,213,701,269"/>
-<area shape="rect" id="node11" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="933,213,1117,269"/>
-<area shape="rect" id="node12" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="1141,213,1325,269"/>
-<area shape="rect" id="node16" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="1632,213,1867,269"/>
-<area shape="rect" id="node17" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="1891,213,2091,269"/>
-<area shape="rect" id="node21" href="$janalyzer__main_8cpp.html" title="JANALYZER Main Module." alt="" coords="2349,213,2533,269"/>
-<area shape="rect" id="node24" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="2773,213,2965,269"/>
-<area shape="rect" id="node27" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="3197,213,3381,269"/>
-<area shape="rect" id="node28" href="$jdiff__main_8cpp.html" title="JDIFF Main Module." alt="" coords="3405,213,3589,269"/>
+<area shape="rect" id="node1" title="Show the properties." alt="" coords="1440,5,1624,61"/>
+<area shape="rect" id="node2" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="5,109,211,165"/>
+<area shape="rect" id="node3" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="235,109,426,165"/>
+<area shape="rect" id="node4" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="19,213,261,269"/>
+<area shape="rect" id="node5" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="502,109,730,165"/>
+<area shape="rect" id="node8" href="$goto__diff__base_8cpp.html" title="GOTO&#45;DIFF Base Class." alt="" coords="755,109,939,165"/>
+<area shape="rect" id="node9" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="739,213,923,269"/>
+<area shape="rect" id="node10" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1013,109,1197,165"/>
+<area shape="rect" id="node13" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="1222,109,1415,165"/>
+<area shape="rect" id="node14" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1363,213,1621,269"/>
+<area shape="rect" id="node15" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1491,109,1733,165"/>
+<area shape="rect" id="node18" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="1757,109,1941,165"/>
+<area shape="rect" id="node19" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1966,109,2229,165"/>
+<area shape="rect" id="node20" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="2128,213,2339,269"/>
+<area shape="rect" id="node21" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="2305,109,2501,165"/>
+<area shape="rect" id="node23" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="2571,213,2763,269"/>
+<area shape="rect" id="node24" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="2576,109,2768,165"/>
+<area shape="rect" id="node26" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="3003,213,3187,269"/>
+<area shape="rect" id="node27" href="$jdiff__parse__options_8h.html" title="JDIFF Command Line Option Processing." alt="" coords="3107,109,3291,165"/>
+<area shape="rect" id="node6" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="285,213,504,269"/>
+<area shape="rect" id="node7" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="529,213,714,269"/>
+<area shape="rect" id="node11" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="947,213,1131,269"/>
+<area shape="rect" id="node12" href="$goto__diff__main_8cpp.html" title="GOTO&#45;DIFF Main Module." alt="" coords="1155,213,1339,269"/>
+<area shape="rect" id="node16" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="1645,213,1880,269"/>
+<area shape="rect" id="node17" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="1904,213,2104,269"/>
+<area shape="rect" id="node22" href="$janalyzer__main_8cpp.html" title="JANALYZER Main Module." alt="" coords="2363,213,2547,269"/>
+<area shape="rect" id="node25" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="2787,213,2979,269"/>
+<area shape="rect" id="node28" href="$jdiff__languages_8cpp.html" title="Language Registration." alt="" coords="3211,213,3395,269"/>
+<area shape="rect" id="node29" href="$jdiff__main_8cpp.html" title="JDIFF Main Module." alt="" coords="3419,213,3603,269"/>
 </map>
