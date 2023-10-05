@@ -15,16 +15,31 @@ Author: Qinheping Hu
 
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/set_properties.h>
+#include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_properties.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <ansi-c/gcc_version.h>
+#include <cbmc/cbmc_parse_options.h>
 #include <goto-instrument/contracts/contracts.h>
 #include <goto-instrument/nondet_volatile.h>
+#include <goto-instrument/reachability_slicer.h>
 
 #include "enumerative_loop_contracts_synthesizer.h"
 
 #include <fstream>
 #include <iostream>
+
+goto_synthesizer_parse_optionst::goto_synthesizer_parse_optionst(
+  int argc,
+  const char **argv)
+  : parse_options_baset(
+      GOTO_SYNTHESIZER_OPTIONS CBMC_OPTIONS,
+      argc,
+      argv,
+      "goto-synthesizer")
+{
+}
 
 /// invoke main modules
 int goto_synthesizer_parse_optionst::doit()
@@ -58,7 +73,7 @@ int goto_synthesizer_parse_optionst::doit()
     configure_gcc(gcc_version);
   }
 
-  // Get options and preprocess `goto_model`.
+  // Get options for the backend verifier and preprocess `goto_model`.
   const auto &options = get_options();
 
   // Synthesize loop invariants and annotate them into `goto_model`
@@ -231,7 +246,8 @@ void goto_synthesizer_parse_optionst::help()
     "\n"
     "Main options:\n" HELP_DUMP_LOOP_CONTRACTS HELP_LOOP_CONTRACTS_NO_UNWIND
     "\n"
-    "Backend options:\n" HELP_CONFIG_BACKEND HELP_SOLVER
+    "Accepts all of cbmc's options plus the following backend "
+    "options:\n" HELP_CONFIG_BACKEND HELP_SOLVER
     "\n"
     " {y--arrays-uf-never} \t never turn arrays into uninterpreted functions\n"
     " {y--arrays-uf-always} \t always turn arrays into uninterpreted"
