@@ -9,10 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "show_on_source.h"
 
 #include <util/message.h>
-
-#ifdef _MSC_VER
-#  include <util/unicode.h>
-#endif
+#include <util/unicode.h>
 
 #include <analyses/ai.h>
 
@@ -74,11 +71,7 @@ void show_on_source(
   const ai_baset &ai,
   message_handlert &message_handler)
 {
-#ifdef _MSC_VER
-  std::ifstream in(widen(source_file));
-#else
-  std::ifstream in(source_file);
-#endif
+  std::ifstream in(widen_if_needed(source_file));
 
   messaget message(message_handler);
 

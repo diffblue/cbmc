@@ -8,9 +8,7 @@ Author: Michael Tautschnig
 
 #include "cl_message_handler.h"
 
-#ifdef _MSC_VER
-#  include <util/unicode.h>
-#endif
+#include <util/unicode.h>
 
 #include <fstream>
 
@@ -42,11 +40,8 @@ void cl_message_handlert::print(
 
   if(full_path.has_value() && !line.empty())
   {
-#ifdef _MSC_VER
-    std::ifstream in(widen(full_path.value()));
-#else
-    std::ifstream in(full_path.value());
-#endif
+    std::ifstream in(widen_if_needed(full_path.value()));
+
     if(in)
     {
       const auto line_number = std::stoull(line);

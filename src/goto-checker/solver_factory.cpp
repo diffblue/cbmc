@@ -17,16 +17,10 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/make_unique.h>
 #include <util/message.h>
 #include <util/options.h>
+#include <util/unicode.h>
 #include <util/version.h>
 
-#include <iostream>
-
-#ifdef _MSC_VER
-#include <util/unicode.h>
-#endif
-
-#include <solvers/stack_decision_procedure.h>
-
+#include <goto-symex/solver_hardness.h>
 #include <solvers/flattening/bv_dimacs.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/solver_resource_limits.h>
@@ -36,9 +30,10 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
+#include <solvers/stack_decision_procedure.h>
 #include <solvers/strings/string_refinement.h>
 
-#include <goto-symex/solver_hardness.h>
+#include <iostream>
 
 solver_factoryt::solver_factoryt(
   const optionst &_options,
@@ -450,11 +445,7 @@ std::unique_ptr<std::ofstream> open_outfile_and_check(
   if(filename.empty())
     return nullptr;
 
-#ifdef _MSC_VER
-  auto out = util_make_unique<std::ofstream>(widen(filename));
-#else
-  auto out = util_make_unique<std::ofstream>(filename);
-#endif
+  auto out = util_make_unique<std::ofstream>(widen_if_needed(filename));
 
   if(!*out)
   {

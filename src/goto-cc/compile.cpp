@@ -13,10 +13,6 @@ Date: June 2006
 
 #include "compile.h"
 
-#include <cstring>
-#include <fstream>
-#include <iostream>
-
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/file_util.h>
@@ -26,26 +22,25 @@ Date: June 2006
 #include <util/symbol_table_builder.h>
 #include <util/tempdir.h>
 #include <util/tempfile.h>
+#include <util/unicode.h>
 #include <util/version.h>
-
-#ifdef _MSC_VER
-#  include <util/unicode.h>
-#endif
-
-#include <ansi-c/ansi_c_entry_point.h>
-#include <ansi-c/c_object_factory_parameters.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/name_mangler.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 
+#include <ansi-c/ansi_c_entry_point.h>
+#include <ansi-c/c_object_factory_parameters.h>
 #include <langapi/language.h>
 #include <langapi/language_file.h>
 #include <langapi/mode.h>
-
 #include <linking/linking.h>
 #include <linking/static_lifetime_init.h>
+
+#include <cstring>
+#include <fstream>
+#include <iostream>
 
 #define DOTGRAPHSETTINGS  "color=black;" \
                           "orientation=portrait;" \
@@ -479,11 +474,7 @@ bool compilet::parse(
   if(file_name == "-")
     return parse_stdin(*languagep);
 
-#ifdef _MSC_VER
-  std::ifstream infile(widen(file_name));
-#else
-  std::ifstream infile(file_name);
-#endif
+  std::ifstream infile(widen_if_needed(file_name));
 
   if(!infile)
   {
