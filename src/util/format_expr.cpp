@@ -187,7 +187,7 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     type == ID_unsignedbv || type == ID_signedbv || type == ID_c_bool ||
     type == ID_c_bit_field)
     return os << *numeric_cast<mp_integer>(src);
-  else if(type == ID_integer)
+  else if(type == ID_integer || type == ID_natural)
     return os << src.get_value();
   else if(type == ID_string)
     return os << '"' << escape(id2string(src.get_value())) << '"';
