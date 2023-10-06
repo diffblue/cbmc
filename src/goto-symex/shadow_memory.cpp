@@ -103,7 +103,7 @@ void shadow_memoryt::symex_set_field(
     irep_pretty_diagnosticst{expr_type});
 
   exprt value = arguments[2];
-  log_set_field(ns, log, field_name, expr, value);
+  shadow_memory_log_set_field(ns, log, field_name, expr, value);
   INVARIANT(
     state.shadow_memory.address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
@@ -111,12 +111,12 @@ void shadow_memoryt::symex_set_field(
 
   // get value set
   replace_invalid_object_by_null(expr);
-#ifdef DEBUG_SM
-  log_set_field(ns, log, field_name, expr, value);
-#endif
+
+  shadow_memory_log_set_field(ns, log, field_name, expr, value);
+
   std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
-  log_value_set(ns, log, value_set);
-  if(set_field_check_null(ns, log, value_set, expr))
+  shadow_memory_log_value_set(ns, log, value_set);
+  if(check_value_set_contains_only_null_ptr(ns, log, value_set, expr))
   {
     log.warning() << "Shadow memory: cannot set shadow memory of NULL"
                   << messaget::eom;
@@ -143,9 +143,9 @@ void shadow_memoryt::symex_set_field(
                   << messaget::eom;
     }
     const exprt lhs = deref_expr(*maybe_lhs);
-#ifdef DEBUG_SM
-    log.debug() << "Shadow memory: LHS: " << format(lhs) << messaget::eom;
-#endif
+
+    shadow_memory_log_text_and_expr(ns, log, "LHS", lhs);
+
     if(lhs.type().id() == ID_empty)
     {
       std::stringstream s;
@@ -168,10 +168,7 @@ void shadow_memoryt::symex_set_field(
       expr_initializer(lhs.type(), expr.source_location(), ns, casted_rhs);
     CHECK_RETURN(per_byte_rhs.has_value());
 
-#ifdef DEBUG_SM
-    log.debug() << "Shadow memory: RHS: " << format(per_byte_rhs.value())
-                << messaget::eom;
-#endif
+    shadow_memory_log_text_and_expr(ns, log, "RHS", per_byte_rhs.value());
     symex_assign(
       state,
       lhs,
@@ -206,7 +203,7 @@ void shadow_memoryt::symex_get_field(
   DATA_INVARIANT(
     expr_type.id() == ID_pointer,
     "shadow memory requires a pointer expression");
-  log_get_field(ns, log, field_name, expr);
+  shadow_memory_log_get_field(ns, log, field_name, expr);
 
   INVARIANT(
     state.shadow_memory.address_fields.count(field_name) == 1,
@@ -218,7 +215,7 @@ void shadow_memoryt::symex_get_field(
   replace_invalid_object_by_null(expr);
 
   std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
-  log_value_set(ns, log, value_set);
+  shadow_memory_log_value_set(ns, log, value_set);
 
   std::vector<std::pair<exprt, exprt>> rhs_conds_values;
   const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
@@ -227,7 +224,7 @@ void shadow_memoryt::symex_get_field(
 
   if(contains_null_or_invalid(value_set, null_pointer))
   {
-    log_value_set_match(ns, log, null_pointer, expr);
+    shadow_memory_log_value_set_match(ns, log, null_pointer, expr);
     // If we have an invalid pointer, then return the default value of the
     // shadow memory as dereferencing it would fail
     rhs_conds_values.emplace_back(
@@ -312,10 +309,10 @@ void shadow_memoryt::symex_get_field(
       log.debug() << "Shadow memory: mux size get_field: " << mux_size
                   << messaget::eom;
     }
-#ifdef DEBUG_SM
-    log.debug() << "Shadow memory: RHS: " << format(rhs) << messaget::eom;
-#endif
-    // TODO: create the assignment of __CPROVER_shadow_memory_get_field
+
+    shadow_memory_log_text_and_expr(ns, log, "RHS", rhs);
+
+    // create the assignment of __CPROVER_shadow_memory_get_field
     symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
   }
   else

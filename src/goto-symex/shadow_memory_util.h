@@ -15,12 +15,53 @@ Author: Peter Schrammel
 #include <util/irep.h>
 #include <util/message.h> // IWYU pragma: keep
 
-#include <pointer-analysis/value_set_dereference.h>
-
 #include "goto_symex_state.h" // IWYU pragma: keep
+
+// To enable logging of Shadow Memory functions define DEBUG_SHADOW_MEMORY
 
 class exprt;
 class typet;
+
+/// Logs setting a value to a given shadow field. Mainly for use for
+/// debugging purposes.
+void shadow_memory_log_set_field(
+  const namespacet &ns,
+  const messaget &log,
+  const irep_idt &field_name,
+  const exprt &expr,
+  const exprt &value);
+
+/// Logs the retrieval of the value associated with a given shadow
+/// memory field. Mainly for use for debugging purposes. Dual to
+/// shadow_memory_log_get_field.
+void shadow_memory_log_value_set(
+  const namespacet &ns,
+  const messaget &log,
+  const std::vector<exprt> &value_set);
+
+/// Logs getting a value corresponding to a shadow memory field. Mainly used for
+/// debugging purposes.
+void shadow_memory_log_get_field(
+  const namespacet &ns,
+  const messaget &log,
+  const irep_idt &field_name,
+  const exprt &expr);
+
+/// Logs a successful match between an address and a value within the value set.
+void shadow_memory_log_value_set_match(
+  const namespacet &ns,
+  const messaget &log,
+  const exprt &address,
+  const exprt &expr);
+
+/// Generic logging function that will log depending on the configured
+/// verbosity. The log will be a specific message given to it, along with an
+/// expression passed along to it.
+void shadow_memory_log_text_and_expr(
+  const namespacet &ns,
+  const messaget &log,
+  const char *text,
+  const exprt &expr);
 
 /// Extracts the field name identifier from a string expression,
 /// e.g. as passed as argument to a __CPROVER_field_decl_local call.
@@ -37,66 +78,9 @@ irep_idt extract_field_name(const exprt &string_expr);
 /// \param type The followed type of expr.
 void clean_pointer_expr(exprt &expr, const typet &type);
 
-/// Converts a given expression into a dereference_exprt.
+/// Wraps a given expression into a `dereference_exprt` unless it is an
+/// `address_of_exprt` in which case it just unboxes it and returns its content.
 exprt deref_expr(const exprt &expr);
-
-/// Logs setting a value to a given shadow field. Mainly for use for
-/// debugging purposes.
-void log_set_field(
-  const namespacet &ns,
-  const messaget &log,
-  const irep_idt &field_name,
-  const exprt &expr,
-  const exprt &value);
-
-/// Logs setting a value to a given shadow field. Mainly for use for
-/// debugging purposes.
-void log_get_field(
-  const namespacet &ns,
-  const messaget &log,
-  const irep_idt &field_name,
-  const exprt &expr);
-
-/// Logs the retrieval of the value associated with a given shadow
-/// memory field. Mainly for use for debugging purposes. Dual to log_get_field.
-void log_value_set(
-  const namespacet &ns,
-  const messaget &log,
-  const std::vector<exprt> &value_set);
-
-/// Log a match between an address and a value the value set. This version of
-/// the function reports more details, including the base address, the pointer
-/// and the shadow value.
-void log_value_set_match(
-  const namespacet &ns,
-  const messaget &log,
-  const shadow_memory_statet::shadowed_addresst &shadowed_address,
-  const exprt &matched_base_address,
-  const value_set_dereferencet::valuet &dereference,
-  const exprt &expr,
-  const value_set_dereferencet::valuet &shadow_dereference);
-
-/// Logs a successful match between an address and a value within the value set.
-void log_value_set_match(
-  const namespacet &ns,
-  const messaget &log,
-  const exprt &address,
-  const exprt &expr);
-
-// TODO: doxygen
-void log_try_shadow_address(
-  const namespacet &ns,
-  const messaget &log,
-  const shadow_memory_statet::shadowed_addresst &shadowed_address);
-
-/// Generic logging function that will log depending on the configured
-/// verbosity. Will log a specific message given to it, along with an expression
-/// passed along to it.
-void log_cond(
-  const namespacet &ns,
-  const messaget &log,
-  const char *cond_text,
-  const exprt &cond);
 
 /// Replace an invalid object by a null pointer. Works recursively on the
 /// operands (child nodes) of the expression, as well.
@@ -113,7 +97,11 @@ void replace_invalid_object_by_null(exprt &expr);
 const exprt &
 get_field_init_expr(const irep_idt &field_name, const goto_symex_statet &state);
 
-// TODO: doxygen?
+/// Get a list of `(condition, value)` pairs for a certain pointer from
+/// the shadow memory, where each pair denotes the `value` of the pointer
+/// expression if the `condition` evaluates to `true`.
+/// \return A vector of pair<expr, expr> corresponding to a condition and value.
+///    (See above for explanation).
 std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
   const namespacet &ns,
   const messaget &log,
@@ -124,7 +112,8 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
   const typet &lhs_type,
   bool &exact_match);
 
-/// Retrieves the value of the initialising expression.
+/// Retrieves the type of the shadow memory by returning the type of the shadow
+/// memory initializer value.
 /// \param field_name The name of the field whose value type we want to query.
 /// \param state The symex_state within which the query is executed (the field's
 ///    value is looked up).
@@ -144,9 +133,16 @@ bool contains_null_or_invalid(
   const std::vector<exprt> &value_set,
   const exprt &address);
 
-/// Performs aggregation of the shadow memory field value over multiple cells
+/// Performs aggregation of the shadow memory field value over multiple bytes
 /// for fields whose type is _Bool.
-exprt compute_or_over_cells(
+/// \param expr the type to compute the or over each of its bytes
+/// \param field_type the type of the shadow memory (must be `c_bool` or `bool`)
+/// \param ns the namespace within which we're going to perform symbol lookups
+/// \param log the message log to which we're going to print debugging messages,
+///   if debugging is set
+/// \param is_union `true` if the expression expr is part of a union.
+/// \return the aggregated `or` byte-sized value contained in expr
+exprt compute_or_over_bytes(
   const exprt &expr,
   const typet &field_type,
   const namespacet &ns,
@@ -161,7 +157,7 @@ exprt compute_or_over_cells(
 /// \param ns the namespace to perform type-lookups into
 /// \return the aggregated max byte-sized value contained in expr
 /// Note that the expr type size must be known at compile time.
-exprt compute_max_over_cells(
+exprt compute_max_over_bytes(
   const exprt &expr,
   const typet &field_type,
   const namespacet &ns);
@@ -171,12 +167,21 @@ exprt compute_max_over_cells(
 ///    used as an antecedent for an if_expr, and `e2` is going to be used
 ///    as the consequent.
 /// \returns An if_exprt of the form `if e1 then e2 else if e3 then e4 else ...`
+/// \note the expression created will not have the first condition as the first
+///    element will serve fallback if all the other conditions are `false`.
 exprt build_if_else_expr(
   const std::vector<std::pair<exprt, exprt>> &conds_values);
 
-/// Checks if given expression is a null pointer.
-/// \returns true if expr is a a NULL pointer within value_set.
-bool set_field_check_null(
+/// Checks if value_set contains only a `NULL` pointer expression of the same
+///   type of expr.
+/// \param ns the namespace within which we're going to perform symbol lookups
+/// \param log the message log to which we're going to print debugging messages,
+///   if debugging is set
+/// \param value_set the collection to check if it contains *only* the `NULL`
+///   pointer
+/// \param expr a pointer-typed expression
+/// \return `true` if value_set contains only a `NULL` pointer expression
+bool check_value_set_contains_only_null_ptr(
   const namespacet &ns,
   const messaget &log,
   const std::vector<exprt> &value_set,
