@@ -153,14 +153,9 @@ public:
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns)
     const override;
 
-  /// Gives a Boolean condition that is true for all values represented by the
-  /// domain.  This allows domains to be converted into program invariants.
-  ///
-  /// \return exprt describing the domain
-  exprt to_predicate() const override;
-
-  exprt to_predicate(const exprt &expr, const namespacet &ns) const;
-  exprt to_predicate(const exprt::operandst &exprs, const namespacet &ns) const;
+  /// \copydoc ai_domaint::to_predicate
+  virtual exprt to_predicate(const std::set<exprt> &scope, const namespacet &ns)
+    const override;
 
   /// Computes the join between "this" and "b".
   ///
