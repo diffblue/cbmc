@@ -1,0 +1,9 @@
+CORE new-smt-backend
+address_of_rec.c
+
+\[main\.assertion\.1\] line \d+ expected failure: ref == 'b': FAILURE
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
