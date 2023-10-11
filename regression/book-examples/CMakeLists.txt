@@ -24,7 +24,7 @@ add_test_pl_profile(
 )
 
 add_test_pl_profile(
-    "cbmc-cprover-smt2"
+    "book-examples-cprover-smt2"
     "$<TARGET_FILE:cbmc> --cprover-smt2"
     "-C;-X;broken-smt-backend;-X;thorough-smt-backend;-X;broken-cprover-smt-backend;-X;thorough-cprover-smt-backend;${gcc_only_string}-s;cprover-smt2;${exclude_win_broken_tests_string}"
     "CORE"
@@ -32,7 +32,7 @@ add_test_pl_profile(
 
 # If `-I` (include flag) is passed, test.pl will run only the tests matching the label following it.
 add_test_pl_profile(
-  "cbmc-new-smt-backend"
+  "book-examples-new-smt-backend"
   "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'z3 --smt2 -in'"
   "${gcc_only_string}-I;new-smt-backend;-s;new-smt-backend"
   "CORE"
@@ -41,7 +41,7 @@ add_test_pl_profile(
 # solver appears on the PATH in Windows already
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   set_property(
-    TEST "cbmc-cprover-smt2-CORE"
+    TEST "book-examples-cprover-smt2-CORE"
     PROPERTY ENVIRONMENT
       "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
   )
