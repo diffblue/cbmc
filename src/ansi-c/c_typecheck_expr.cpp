@@ -4568,7 +4568,7 @@ protected:
       e.id() == ID_le || e.id() == ID_gt || e.id() == ID_ge ||
       e.id() == ID_if || e.id() == ID_not || e.id() == ID_and ||
       e.id() == ID_or || e.id() == ID_bitnot || e.id() == ID_bitand ||
-      e.id() == ID_bitor || e.id() == ID_bitxor)
+      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector)
     {
       return std::all_of(
         e.operands().begin(), e.operands().end(), [this](const exprt &op) {
