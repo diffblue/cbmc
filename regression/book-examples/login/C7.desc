@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 login.c
 --unwind 20 --show-vcc --bounds-check --pointer-check
 ^EXIT=0$

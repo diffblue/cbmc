@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 login.c
 --show-properties --bounds-check --pointer-check
 ^EXIT=0$

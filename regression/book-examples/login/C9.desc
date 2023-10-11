@@ -1,4 +1,4 @@
-CORE
+CORE new-smt-backend
 login.c
 --unwind 20 --bounds-check --pointer-check --trace
 ^EXIT=10$
