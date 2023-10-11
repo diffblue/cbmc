@@ -1,0 +1,13 @@
+# CBMC 5.94.0
+
+## What's Changed
+* Add models for C library: getpwnam, getpwuid, and getopt by @tautschnig in https://github.com/diffblue/cbmc/pull/7919 and https://github.com/diffblue/cbmc/pull/7916
+* Shadow memory addresses now also support --pointer-check argument by @esteffin in https://github.com/diffblue/cbmc/pull/7936
+* [DOCS] Add documentation on CBMC Shadow Memory intrinsics and shadow memory functions (via doxygen) by @NlightNFotis in https://github.com/diffblue/cbmc/pull/7913 and https://github.com/diffblue/cbmc/pull/7930
+* [SYNTHESIZER] goto-synthesizer now accepts all CBMC options by @qinheping in https://github.com/diffblue/cbmc/pull/7900
+
+## Bug Fixes
+* Fix problem on array size L2 renaming by @esteffin in https://github.com/diffblue/cbmc/pull/7877
+* Fix shadow memory missing aggregation on non-compound bitvector types by @esteffin in https://github.com/diffblue/cbmc/pull/7935
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.93.0...cbmc-5.94.0
