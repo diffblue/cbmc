@@ -223,10 +223,11 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
       }
       else
       {
-        if(push_dependencies_needed(symbol->value))
+        const exprt lowered = lower(symbol->value);
+        if(push_dependencies_needed(lowered))
           continue;
         const smt_define_function_commandt function{
-          symbol->name, {}, convert_expr_to_smt(symbol->value)};
+          symbol->name, {}, convert_expr_to_smt(lowered)};
         expression_identifiers.emplace(*symbol_expr, function.identifier());
         identifier_table.emplace(identifier, function.identifier());
         solver_process->send(function);
