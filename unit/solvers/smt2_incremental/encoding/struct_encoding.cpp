@@ -169,6 +169,18 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
     const concatenation_exprt expected_result{
       {green_ham.symbol_expr(), forty_two, minus_one}, bv_typet{72}};
     REQUIRE(test.struct_encoding.encode(struct_expr) == expected_result);
+    SECTION("struct containing a single struct")
+    {
+      const struct_typet struct_struct_type{
+        struct_union_typet::componentst{{"inner", struct_tag}}};
+      const type_symbolt struct_struct_type_symbol{
+        "struct_structt", struct_type, ID_C};
+      test.symbol_table.insert(type_symbol);
+      const struct_tag_typet struct_struct_tag{type_symbol.name};
+      const struct_exprt struct_struct{
+        exprt::operandst{struct_expr}, struct_struct_tag};
+      REQUIRE(test.struct_encoding.encode(struct_struct) == expected_result);
+    }
   }
   SECTION("member expression selecting a data member of a struct")
   {
