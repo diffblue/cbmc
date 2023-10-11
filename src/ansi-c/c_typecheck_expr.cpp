@@ -1642,6 +1642,18 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     return;
   }
 
+  if(
+    auto string_constant = expr_try_dynamic_cast<string_constantt>(operands[1]))
+  {
+    implicit_typecast(operands[1], pointer_type(string_constant->char_type()));
+  }
+
+  if(
+    auto string_constant = expr_try_dynamic_cast<string_constantt>(operands[2]))
+  {
+    implicit_typecast(operands[2], pointer_type(string_constant->char_type()));
+  }
+
   if(operands[1].type().id()==ID_pointer &&
      operands[2].type().id()!=ID_pointer)
     implicit_typecast(operands[2], operands[1].type());
