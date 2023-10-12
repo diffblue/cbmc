@@ -9,5 +9,7 @@
 ## Bug Fixes
 * Fix problem on array size L2 renaming by @esteffin in https://github.com/diffblue/cbmc/pull/7877
 * Fix shadow memory missing aggregation on non-compound bitvector types by @esteffin in https://github.com/diffblue/cbmc/pull/7935
+* Fix SMT encoding of structs which contain a single struct field by @thomasspriggs in https://github.com/diffblue/cbmc/pull/7951
+* Fix simplification towards singleton intervals not checking application to only a single variable by @tautschnig in https://github.com/diffblue/cbmc/pull/7954
 
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.93.0...cbmc-5.94.0
