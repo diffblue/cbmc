@@ -43,12 +43,14 @@ void irept::move_to_sub(irept &irep)
 
 const irep_idt &irept::get(const irep_idt &name) const
 {
+  static const irep_idt empty;
+  if(is_leaf_only())
+    return empty;
   const named_subt &s = get_named_sub();
   named_subt::const_iterator it=s.find(name);
 
   if(it==s.end())
   {
-    static const irep_idt empty;
     return empty;
   }
   return it->second.id();
@@ -92,6 +94,8 @@ void irept::remove(const irep_idt &name)
 
 const irept &irept::find(const irep_idt &name) const
 {
+  if(is_leaf_only())
+    return get_nil_irep();
   const named_subt &s = get_named_sub();
   auto it = s.find(name);
 
@@ -102,12 +106,16 @@ const irept &irept::find(const irep_idt &name) const
 
 irept &irept::add(const irep_idt &name)
 {
+  if(is_leaf_only())
+    promote_to_non_leaf();
   named_subt &s = get_named_sub();
   return s[name];
 }
 
 irept &irept::add(const irep_idt &name, irept irep)
 {
+  if(is_leaf_only())
+    promote_to_non_leaf();
   named_subt &s = get_named_sub();
 
 #if NAMED_SUB_IS_FORWARD_LIST
@@ -415,7 +423,7 @@ std::size_t irept::number_of_non_comments(const named_subt &named_sub)
 std::size_t irept::hash() const
 {
 #if HASH_CODE
-  if(read().hash_code!=0)
+  if(!is_leaf_only() && read().hash_code!=0)
     return read().hash_code;
   #endif
 
@@ -442,7 +450,8 @@ std::size_t irept::hash() const
   result = hash_finalize(result, sub.size() + number_of_named_ireps);
 
 #if HASH_CODE
-  read().hash_code=result;
+  if(!is_leaf_only())
+    read().hash_code=result;
 #endif
 #ifdef IREP_HASH_STATS
   ++irep_hash_cnt;

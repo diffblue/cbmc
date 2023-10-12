@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "invariant.h"
 #include "irep_ids.h"
@@ -143,24 +144,62 @@ public:
   /// Used to refer to this class from derived classes
   using tree_implementationt = sharing_treet;
 
-  explicit sharing_treet(irep_idt _id) : data(new dt(std::move(_id)))
+protected:
+  struct flagged_idt
+  {
+    bool is_leaf : 1;
+    unsigned padding : 31;
+    irep_idt id;
+
+    explicit flagged_idt(irep_idt id = {}) :
+        is_leaf{true},
+        padding{0},
+        id{std::move(id)}
+    {
+      static_assert(sizeof(flagged_idt) == sizeof(dt *),
+                    "Sizes should match for optimisation to apply.");
+    }
+  };
+
+  union pointer_or_idt
+  {
+    flagged_idt flagged_id;
+    dt * pointer;
+  };
+
+  union const_pointer_or_idt
+  {
+    dt * const pointer;
+    flagged_idt flagged_id;
+  };
+
+  static dt *as_pointer(irep_idt id)
+  {
+    pointer_or_idt pointer_or_id{ flagged_idt{id} };
+    return pointer_or_id.pointer;
+  }
+
+public:
+  explicit sharing_treet(irep_idt _id) : data(as_pointer(_id))
   {
   }
 
   sharing_treet(irep_idt _id, named_subt _named_sub, subt _sub)
-    : data(new dt(std::move(_id), std::move(_named_sub), std::move(_sub)))
+    : data(
+        _named_sub.empty() && _sub.empty() ? as_pointer(_id)
+        : new dt(std::move(_id), std::move(_named_sub), std::move(_sub)))
   {
   }
 
   // constructor for blank irep
-  sharing_treet() : data(&empty_d)
+  sharing_treet() : data(empty_d)
   {
   }
 
   // copy constructor
   sharing_treet(const sharing_treet &irep) : data(irep.data)
   {
-    if(data!=&empty_d)
+    if(!is_leaf_only())
     {
       PRECONDITION(data->ref_count != 0);
       data->ref_count++;
@@ -178,7 +217,7 @@ public:
 #ifdef IREP_DEBUG
     std::cout << "COPY MOVE\n";
 #endif
-    irep.data=&empty_d;
+    irep.data=empty_d;
   }
 
   sharing_treet &operator=(const sharing_treet &irep)
@@ -187,10 +226,18 @@ public:
     std::cout << "ASSIGN\n";
 #endif
 
+    if(this->is_leaf_only())
+    {
+      data = irep.data;
+      if(!is_leaf_only())
+        ++data->ref_count;
+      return *this;
+    }
+
     // Ordering is very important here!
     // Consider self-assignment, which may destroy 'irep'
     dt *irep_data=irep.data;
-    if(irep_data!=&empty_d)
+    if(!irep.is_leaf_only())
       irep_data->ref_count++;
 
     remove_ref(data); // this may kill 'irep'
@@ -213,12 +260,28 @@ public:
 
   ~sharing_treet()
   {
-    remove_ref(data);
+    if(!is_leaf_only())
+      remove_ref(data);
   }
 
 protected:
   dt *data;
-  static dt empty_d;
+  static dt * const empty_d;
+  static const subt empty_sub;
+  static const named_subt empty_named_sub;
+
+  /// Checks out if data is actually a pointer or an id.
+  bool is_leaf_only() const
+  {
+    const_pointer_or_idt pointer_or_id{ data };
+    return pointer_or_id.flagged_id.is_leaf;
+  }
+
+  void promote_to_non_leaf()
+  {
+    const_pointer_or_idt pointer_or_id{ data };
+    data = new dt(pointer_or_id.flagged_id.id);
+  }
 
   static void remove_ref(dt *old_data);
   static void nonrecursive_destructor(dt *old_data);
@@ -238,12 +301,37 @@ public:
 #endif
     return *data;
   }
+
+  const irep_idt &id() const
+  {
+    const auto pointer_or_id =
+      reinterpret_cast<const pointer_or_idt *>(&data);
+    return is_leaf_only() ? pointer_or_id->flagged_id.id : read().data;
+  }
+
+  void id(const irep_idt &_data)
+  {
+    if(is_leaf_only())
+      data = as_pointer(_data);
+    else
+      write().data=_data;
+  }
+
 };
 
 // Static field initialization
 template <typename derivedt, typename named_subtreest>
-typename sharing_treet<derivedt, named_subtreest>::dt
-  sharing_treet<derivedt, named_subtreest>::empty_d;
+typename sharing_treet<derivedt, named_subtreest>::dt * const
+  sharing_treet<derivedt, named_subtreest>::empty_d =
+    sharing_treet<derivedt, named_subtreest>::as_pointer(irep_idt{});
+
+template <typename derivedt, typename named_subtreest>
+  const typename sharing_treet<derivedt, named_subtreest>::subt
+    sharing_treet<derivedt, named_subtreest>::empty_sub = {};
+
+template <typename derivedt, typename named_subtreest>
+  const typename sharing_treet<derivedt, named_subtreest>::named_subt
+    sharing_treet<derivedt, named_subtreest>::empty_named_sub = {};
 
 /// There are a large number of kinds of tree structured or tree-like data in
 /// CPROVER. \ref irept provides a single, unified representation for all of
@@ -333,14 +421,8 @@ public:
 
   irept() = default;
 
-  const irep_idt &id() const
-  { return read().data; }
-
   const std::string &id_string() const
-  { return id2string(read().data); }
-
-  void id(const irep_idt &_data)
-  { write().data=_data; }
+  { return id2string(id()); }
 
   const irept &find(const irep_idt &name) const;
   irept &add(const irep_idt &name);
@@ -393,10 +475,29 @@ public:
 
   void make_nil() { *this=get_nil_irep(); }
 
-  subt &get_sub() { return write().sub; } // DANGEROUS
-  const subt &get_sub() const { return read().sub; }
-  named_subt &get_named_sub() { return write().named_sub; } // DANGEROUS
-  const named_subt &get_named_sub() const { return read().named_sub; }
+  subt &get_sub() {
+    if(is_leaf_only())
+      promote_to_non_leaf();
+    return write().sub;
+  } // DANGEROUS
+
+  const subt &get_sub() const {
+    if(is_leaf_only())
+      return empty_sub;
+    return read().sub;
+  }
+
+  named_subt &get_named_sub() {
+    if(is_leaf_only())
+      promote_to_non_leaf();
+    return write().named_sub;
+  } // DANGEROUS
+
+  const named_subt &get_named_sub() const {
+    if(is_leaf_only())
+      return empty_named_sub;
+    return read().named_sub;
+  }
 
   std::size_t hash() const;
   std::size_t full_hash() const;
@@ -457,19 +558,14 @@ struct diagnostics_helpert<irep_pretty_diagnosticst>
 template <typename derivedt, typename named_subtreest>
 void sharing_treet<derivedt, named_subtreest>::detach()
 {
+  if(is_leaf_only())
+    return;
+
 #ifdef IREP_DEBUG
   std::cout << "DETACH1: " << data << '\n';
 #endif
 
-  if(data == &empty_d)
-  {
-    data = new dt;
-
-#ifdef IREP_DEBUG
-    std::cout << "ALLOCATED " << data << '\n';
-#endif
-  }
-  else if(data->ref_count > 1)
+  if(data->ref_count > 1)
   {
     dt *old_data(data);
     data = new dt(*old_data);
@@ -492,7 +588,8 @@ void sharing_treet<derivedt, named_subtreest>::detach()
 template <typename derivedt, typename named_subtreest>
 void sharing_treet<derivedt, named_subtreest>::remove_ref(dt *old_data)
 {
-  if(old_data == &empty_d)
+  const const_pointer_or_idt pointer_or_id{ old_data };
+  if(pointer_or_id.flagged_id.is_leaf)
     return;
 
 #if 0
