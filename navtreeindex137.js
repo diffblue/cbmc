@@ -1,5 +1,6 @@
 var NAVTREEINDEX137 =
 {
+"structsort__based__cast__to__bit__vector__convertert.html#a7c5e9011131c31a108a77384f4c4fa67":[8,0,1159,4],
 "structsort__based__cast__to__bit__vector__convertert.html#a82df5a46b9b0a9fa568088a4891993af":[8,0,1159,0],
 "structsort__based__cast__to__bit__vector__convertert.html#a8449c8d2575431fa980b67de42e6de7c":[8,0,1159,3],
 "structsort__based__cast__to__bit__vector__convertert.html#aaa728313ae860b1b2f922fee59016a8d":[8,0,1159,7],
@@ -248,6 +249,5 @@ var NAVTREEINDEX137 =
 "structtinfl__decompressor__tag.html#a98139fb01bb5d503cb24acbd23af33a1":[8,0,1271,12],
 "structtinfl__decompressor__tag.html#a9e1f3aec5562c9b6fe92d96ad70b6d29":[8,0,1271,9],
 "structtinfl__decompressor__tag.html#aa20c2fae45d99a1ae97fb7d58fefcd48":[8,0,1271,16],
-"structtinfl__decompressor__tag.html#aa27988907a00d70bbeb36f4c4c09a2cf":[8,0,1271,7],
-"structtinfl__decompressor__tag.html#aab03536da4b49c3125b11f8c7e999895":[8,0,1271,14]
+"structtinfl__decompressor__tag.html#aa27988907a00d70bbeb36f4c4c09a2cf":[8,0,1271,7]
 };
