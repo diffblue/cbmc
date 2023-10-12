@@ -151,6 +151,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
       {
         mp_integer lower;
         mp_integer higher;
+        exprt non_const_value;
       };
       boundst bounds;
 
@@ -177,6 +178,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
             auto int_opt =
               numeric_cast<mp_integer>(to_constant_expr(ge_expr->rhs())))
           {
+            bounds.non_const_value = ge_expr->lhs();
             bounds.lower = *int_opt;
             return true;
           }
@@ -198,6 +200,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
             // If the rhs() is not constant, it has a different structure
             // (e.g. i >= j)
             if(!ge_expr->rhs().is_constant())
+              return false;
+            if(ge_expr->lhs() != bounds.non_const_value)
               return false;
             if(
               auto int_opt =

@@ -1,0 +1,10 @@
+CORE new-smt-backend
+main.c
+
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Simplification must not spuriously turn the second assumption into an equality.
