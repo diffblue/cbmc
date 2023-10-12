@@ -1,5 +1,6 @@
 var NAVTREEINDEX24 =
 {
+"classcustom__bitvector__analysist.html#a8b89bc3749b6b78d2de05c36a4e552bb":[8,0,341,2],
 "classcustom__bitvector__analysist.html#a9d609032b6115a7d7db72433ab98871b":[8,0,341,8],
 "classcustom__bitvector__analysist.html#aa24fa6eaba82ca4ac09af0846b27cd4d":[8,0,341,0],
 "classcustom__bitvector__analysist.html#aaaf7b876efd5f914d83ef46cf46e0748":[8,0,341,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX24 =
 "classdepth__iteratort.html#a3226b30be7b42822884c8a9320839b66":[8,0,363,3],
 "classdepth__iteratort.html#a637b0df48386032bbdc8e4c2541243f8":[8,0,363,0],
 "classdepth__iteratort.html#aa8209d3fe245b41addb123f17cad1587":[8,0,363,4],
-"classdereference__callbackt.html":[8,0,364],
-"classdereference__callbackt.html#a12090062d6770077a6316978defcc254":[8,0,364,0]
+"classdereference__callbackt.html":[8,0,364]
 };
