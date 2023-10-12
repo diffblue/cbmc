@@ -45,7 +45,7 @@ public:
       result.begin(),
       result.end(),
       [](counterst::const_iterator a, counterst::const_iterator b) -> bool {
-        return a->second >= b->second;
+        return a->second > b->second;
       });
     return result;
   }

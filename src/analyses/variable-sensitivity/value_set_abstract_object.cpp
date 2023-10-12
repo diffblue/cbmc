@@ -493,6 +493,7 @@ static abstract_object_sett compact_values(const abstract_object_sett &values)
 static exprt eval_expr(const exprt &e);
 static bool is_eq(const exprt &lhs, const exprt &rhs);
 static bool is_le(const exprt &lhs, const exprt &rhs);
+static bool is_lt(const exprt &lhs, const exprt &rhs);
 static abstract_object_sett collapse_values_in_intervals(
   const abstract_object_sett &values,
   const std::vector<constant_interval_exprt> &intervals);
@@ -525,8 +526,8 @@ void collapse_overlapping_intervals(
     intervals.end(),
     [](constant_interval_exprt const &lhs, constant_interval_exprt const &rhs) {
       if(is_eq(lhs.get_lower(), rhs.get_lower()))
-        return is_le(lhs.get_upper(), rhs.get_upper());
-      return is_le(lhs.get_lower(), rhs.get_lower());
+        return is_lt(lhs.get_upper(), rhs.get_upper());
+      return is_lt(lhs.get_lower(), rhs.get_lower());
     });
 
   size_t index = 1;
@@ -644,6 +645,11 @@ static bool is_eq(const exprt &lhs, const exprt &rhs)
 static bool is_le(const exprt &lhs, const exprt &rhs)
 {
   return constant_interval_exprt::less_than_or_equal(lhs, rhs);
+}
+
+static bool is_lt(const exprt &lhs, const exprt &rhs)
+{
+  return constant_interval_exprt::less_than(lhs, rhs);
 }
 
 static abstract_object_sett widen_value_set(
