@@ -203,19 +203,31 @@ exprt struct_encodingt::encode(exprt expr) const
   while(!work_queue.empty())
   {
     exprt &current = *work_queue.front();
-    work_queue.pop();
     // Note that "with" expressions are handled before type encoding in order to
     // facilitate checking that they are applied to structs rather than arrays.
     if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(current))
       if(can_cast_type<struct_tag_typet>(current.type()))
         current = ::encode(*with_expr, ns);
     current.type() = encode(current.type());
+    optionalt<exprt> update;
     if(const auto struct_expr = expr_try_dynamic_cast<struct_exprt>(current))
-      current = ::encode(*struct_expr);
+      update = ::encode(*struct_expr);
     if(const auto union_expr = expr_try_dynamic_cast<union_exprt>(current))
-      current = ::encode(*union_expr, *boolbv_width);
+      update = ::encode(*union_expr, *boolbv_width);
     if(const auto member_expr = expr_try_dynamic_cast<member_exprt>(current))
-      current = encode_member(*member_expr);
+      update = encode_member(*member_expr);
+    if(update)
+    {
+      INVARIANT(
+        current != *update,
+        "Updates in struct encoding are expected to be a change of state.");
+      current = std::move(*update);
+      // Repeat on the updated node until we reach a fixed point. This is needed
+      // because the encoding of an outer struct/union may be initially
+      // expressed in terms of an inner struct/union which it contains.
+      continue;
+    }
+    work_queue.pop();
     for(auto &operand : current.operands())
       work_queue.push(&operand);
   }
