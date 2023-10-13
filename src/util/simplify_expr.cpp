@@ -1709,63 +1709,53 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   if(!offset.has_value() || *offset < 0)
     return unchanged(expr);
 
-  // byte_extract(byte_update(root, offset_u, value), offset_e) so that the
-  // update does not affect what is being extracted simplifies to
-  // byte_extract(root, offset_e)
-  if(
-    expr.op().id() == ID_byte_update_big_endian ||
-    expr.op().id() == ID_byte_update_little_endian)
+  // try to simplify byte_extract(byte_update(...))
+  auto const bu = expr_try_dynamic_cast<byte_update_exprt>(expr.op());
+  optionalt<mp_integer> update_offset;
+  if(bu)
+    update_offset = numeric_cast<mp_integer>(bu->offset());
+  if(bu && el_size.has_value() && update_offset.has_value())
   {
-    const byte_update_exprt &bu = to_byte_update_expr(expr.op());
-    const auto update_offset = numeric_cast<mp_integer>(bu.offset());
-    if(el_size.has_value() && update_offset.has_value())
+    // byte_extract(byte_update(root, offset_u, value), offset_e) so that the
+    // update does not affect what is being extracted simplifies to
+    // byte_extract(root, offset_e)
+    //
+    // byte_extract(byte_update(root, offset_u, value), offset_e) so that the
+    // extracted range fully lies within the update value simplifies to
+    // byte_extract(value, offset_e - offset_u)
+    if(
+      *offset * expr.get_bits_per_byte() + *el_size <=
+      *update_offset * bu->get_bits_per_byte())
+    {
+      // extracting before the update
+      auto tmp = expr;
+      tmp.op() = bu->op();
+      return changed(simplify_byte_extract(tmp)); // recursive call
+    }
+    else if(
+      const auto update_size = pointer_offset_bits(bu->value().type(), ns))
     {
       if(
-        *offset * expr.get_bits_per_byte() + *el_size <=
-        *update_offset * bu.get_bits_per_byte())
+        *offset * expr.get_bits_per_byte() >=
+        *update_offset * bu->get_bits_per_byte() + *update_size)
       {
+        // extracting after the update
         auto tmp = expr;
-        tmp.op() = bu.op();
+        tmp.op() = bu->op();
         return changed(simplify_byte_extract(tmp)); // recursive call
       }
-      else
+      else if(
+        *offset >= *update_offset &&
+        *offset * expr.get_bits_per_byte() + *el_size <=
+          *update_offset * bu->get_bits_per_byte() + *update_size)
       {
-        const auto update_size = pointer_offset_bits(bu.value().type(), ns);
-        if(
-          update_size.has_value() &&
-          *offset * expr.get_bits_per_byte() >=
-            *update_offset * bu.get_bits_per_byte() + *update_size)
-        {
-          auto tmp = expr;
-          tmp.op() = bu.op();
-          return changed(simplify_byte_extract(tmp)); // recursive call
-        }
+        // extracting from the update
+        auto tmp = expr;
+        tmp.op() = bu->value();
+        tmp.offset() =
+          from_integer(*offset - *update_offset, expr.offset().type());
+        return changed(simplify_byte_extract(tmp)); // recursive call
       }
-    }
-  }
-
-  // byte_extract(byte_update(root, offset_u, value), offset_e) so that the
-  // extracted range fully lies within the update value simplifies to
-  // byte_extract(value, offset_e - offset_u)
-  if(
-    expr.op().id() == ID_byte_update_big_endian ||
-    expr.op().id() == ID_byte_update_little_endian)
-  {
-    const byte_update_exprt &bu = to_byte_update_expr(expr.op());
-    const auto update_offset = numeric_cast<mp_integer>(bu.offset());
-    const auto update_size = pointer_offset_bits(bu.value().type(), ns);
-
-    if(
-      el_size.has_value() && update_offset.has_value() &&
-      update_size.has_value() && *offset >= *update_offset &&
-      *offset * expr.get_bits_per_byte() + *el_size <=
-        *update_offset * bu.get_bits_per_byte() + *update_size)
-    {
-      auto tmp = expr;
-      tmp.op() = bu.value();
-      tmp.offset() =
-        from_integer(*offset - *update_offset, expr.offset().type());
-      return changed(simplify_byte_extract(tmp)); // recursive call
     }
   }
 
