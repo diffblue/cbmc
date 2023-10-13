@@ -201,16 +201,17 @@ SRC += analyses/ai/ai.cpp \
        util/xml.cpp \
        # Empty last line
 
-ifeq ($(OS),Windows_NT)
-    detected_OS := Windows
-else
+ifndef WITH_MEMORY_ANALYZER
+  ifeq ($(OS),Windows_NT)
+    WITH_MEMORY_ANALYZER = 0
+  else
     detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
-endif
-
-ifeq ($(detected_OS),Linux)
-  ifneq ($(WITH_MEMORY_ANALYZER),0)
-    # only set if it wasn't explicitly unset
-    WITH_MEMORY_ANALYZER=1
+    detected_ARCH := $(shell sh -c 'uname -m 2>/dev/null || echo Unknown')
+    ifeq ($(filter-out Linux_x86_64 Linux_i386,$(detected_OS)_$(detected_ARCH)),)
+      WITH_MEMORY_ANALYZER = 1
+    else
+      WITH_MEMORY_ANALYZER = 0
+    endif
   endif
 endif
 
