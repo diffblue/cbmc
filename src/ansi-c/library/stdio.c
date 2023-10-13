@@ -1644,3 +1644,51 @@ int __stdio_common_vfprintf(
 }
 
 #endif
+
+/* FUNCTION: __srget */
+
+#ifdef __FreeBSD__
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+int __VERIFIER_nondet_int(void);
+
+int __srget(FILE *stream)
+{
+  (void)*stream;
+
+  // FreeBSD's implementation returns a character or EOF; __VERIFIER_nondet_int
+  // will capture all these options
+  return __VERIFIER_nondet_int();
+}
+
+#endif
+
+/* FUNCTION: __swbuf */
+
+#ifdef __FreeBSD__
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+
+int __swbuf(int c, FILE *stream)
+{
+  (void)c;
+  (void)*stream;
+
+  // FreeBSD's implementation returns `c` or or EOF in case writing failed; we
+  // just non-deterministically choose between these
+  if(__VERIFIER_nondet___CPROVER_bool())
+    return EOF;
+  else
+    return c;
+}
+
+#endif

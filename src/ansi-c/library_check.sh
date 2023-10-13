@@ -45,6 +45,8 @@ perl -p -i -e 's/^__isoc99_v?sscanf\n//' __functions # sscanf, Linux
 perl -p -i -e 's/^__sigsetjmp\n//' __functions # sigsetjmp, Linux
 perl -p -i -e 's/^__stdio_common_vfscanf\n//' __functions # fscanf, Windows
 perl -p -i -e 's/^__stdio_common_vsscanf\n//' __functions # sscanf, Windows
+perl -p -i -e 's/^__srget\n//' __functions # gets, FreeBSD
+perl -p -i -e 's/^__swbuf\n//' __functions # putc, FreeBSD
 
 # Some functions are covered by existing tests:
 perl -p -i -e 's/^__CPROVER_deallocate\n//' __functions # free-01
