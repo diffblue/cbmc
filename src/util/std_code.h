@@ -1858,7 +1858,7 @@ public:
   }
 
   exception_listt &exception_list() {
-    return (exception_listt &)find(ID_exception_list).get_sub();
+    return (exception_listt &)add(ID_exception_list).get_sub();
   }
 
   const exception_listt &exception_list() const {

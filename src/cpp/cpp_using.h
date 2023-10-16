@@ -28,7 +28,7 @@ public:
 
   const cpp_namet &name() const
   {
-    return (cpp_namet &)find(ID_name);
+    return (const cpp_namet &)find(ID_name);
   }
 
   bool get_namespace() const
