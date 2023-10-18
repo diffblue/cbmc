@@ -172,7 +172,6 @@ var NAVTREEINDEX80 =
 "functions_func_i.html":[8,2,1,9],
 "functions_func_j.html":[8,2,1,10],
 "functions_func_k.html":[8,2,1,11],
-"":[7,0,11],
 "functions_func_l.html":[8,2,1,12],
 "functions_func_m.html":[8,2,1,13],
 "functions_func_n.html":[8,2,1,14],
@@ -249,5 +248,6 @@ var NAVTREEINDEX80 =
 "functions_vars_o.html":[8,2,2,15],
 "functions_vars_p.html":[8,2,2,16],
 "functions_vars_q.html":[8,2,2,17],
-"functions_vars_r.html":[8,2,2,18]
+"functions_vars_r.html":[8,2,2,18],
+"functions_vars_s.html":[8,2,2,19]
 };

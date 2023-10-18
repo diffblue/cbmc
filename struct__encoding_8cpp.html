@@ -129,8 +129,11 @@ Functions</h2></td></tr>
 <tr class="separator:affdd2d8bf12da97b18d7945e842d41b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f884ff13ac8f98ed17dab3e5fed335d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#a4f884ff13ac8f98ed17dab3e5fed335d">encode</a> (const <a class="el" href="classwith__exprt.html">with_exprt</a> &amp;with, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="separator:a4f884ff13ac8f98ed17dab3e5fed335d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1aaa6d4999f64c7f34ca43b9d010d4cc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#a1aaa6d4999f64c7f34ca43b9d010d4cc">empty_encoding</a> ()</td></tr>
+<tr class="memdesc:a1aaa6d4999f64c7f34ca43b9d010d4cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty structs and unions are encoded as a zero byte.  <a href="struct__encoding_8cpp.html#a1aaa6d4999f64c7f34ca43b9d010d4cc">More...</a><br /></td></tr>
+<tr class="separator:a1aaa6d4999f64c7f34ca43b9d010d4cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0424907d2e9dd13f9e263bc89d73e12a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">encode</a> (const <a class="el" href="classstruct__exprt.html">struct_exprt</a> &amp;struct_expr)</td></tr>
-<tr class="memdesc:a0424907d2e9dd13f9e263bc89d73e12a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Non-empty structs are flattened into a large bit vector using concatenation to express all the member operands of <code>struct_expr</code>.  <a href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">More...</a><br /></td></tr>
+<tr class="memdesc:a0424907d2e9dd13f9e263bc89d73e12a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structs are flattened into a large bit vector using concatenation to express all the member operands of <code>struct_expr</code>.  <a href="struct__encoding_8cpp.html#a0424907d2e9dd13f9e263bc89d73e12a">More...</a><br /></td></tr>
 <tr class="separator:a0424907d2e9dd13f9e263bc89d73e12a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fbf8c6a27e76629dfe03397c5583367"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#a8fbf8c6a27e76629dfe03397c5583367">encode</a> (const <a class="el" href="classunion__exprt.html">union_exprt</a> &amp;union_expr, const <a class="el" href="classboolbv__widtht.html">boolbv_widtht</a> &amp;bit_width)</td></tr>
 <tr class="separator:a8fbf8c6a27e76629dfe03397c5583367"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,7 +181,40 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00156">156</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00163">163</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a1aaa6d4999f64c7f34ca43b9d010d4cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1aaa6d4999f64c7f34ca43b9d010d4cc">&#9670;&nbsp;</a></span>empty_encoding()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classexprt.html">exprt</a> empty_encoding </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Empty structs and unions are encoded as a zero byte. </p>
+<p>This has useful properties such as -</p><ul>
+<li>A zero byte is valid SMT, unlike zero length bit vectors.</li>
+<li>Any two zero byte instances are always equal. This property would not be true of two instances of a non-det byte for instance. </li>
+</ul>
+
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00130">130</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -206,13 +242,9 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Non-empty structs are flattened into a large bit vector using concatenation to express all the member operands of <code>struct_expr</code>. </p>
-<p>Empty structs are encoded as a zero byte. This has useful properties such as -</p><ul>
-<li>A zero byte is valid SMT, unlike zero length bit vectors.</li>
-<li>Any two zero byte instances are always equal. This property would not be true of two instances of a non-det byte for instance. </li>
-</ul>
+<p>Structs are flattened into a large bit vector using concatenation to express all the member operands of <code>struct_expr</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00131">131</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00138">138</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -250,7 +282,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00141">141</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00148">148</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
