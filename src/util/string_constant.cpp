@@ -21,10 +21,10 @@ static array_typet make_type(const irep_idt &value)
 string_constantt::string_constantt(const irep_idt &_value)
   : nullary_exprt(ID_string_constant, make_type(_value))
 {
-  set_value(_value);
+  value(_value);
 }
 
-void string_constantt::set_value(const irep_idt &_value)
+void string_constantt::value(const irep_idt &_value)
 {
   exprt::type() = make_type(_value);
   set(ID_value, _value);
