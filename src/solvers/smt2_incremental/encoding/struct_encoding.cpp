@@ -122,16 +122,23 @@ static exprt encode(const with_exprt &with, const namespacet &ns)
   return struct_exprt{components, tag_type};
 }
 
-/// Non-empty structs are flattened into a large bit vector using concatenation
-/// to express all the member operands of \p struct_expr. Empty structs are
-/// encoded as a zero byte. This has useful properties such as -
+/// Empty structs and unions are encoded as a zero byte. This has useful
+/// properties such as -
 ///   * A zero byte is valid SMT, unlike zero length bit vectors.
 ///   * Any two zero byte instances are always equal. This property would not
 ///     be true of two instances of a non-det byte for instance.
+static exprt empty_encoding()
+{
+  static auto empty_byte = from_integer(0, bv_typet{8});
+  return empty_byte;
+}
+
+/// Structs are flattened into a large bit vector using concatenation to express
+/// all the member operands of \p struct_expr.
 static exprt encode(const struct_exprt &struct_expr)
 {
   if(struct_expr.operands().empty())
-    return from_integer(0, bv_typet{8});
+    return empty_encoding();
   if(struct_expr.operands().size() == 1)
     return struct_expr.operands().front();
   return concatenation_exprt{struct_expr.operands(), struct_expr.type()};
@@ -221,6 +228,8 @@ exprt struct_encodingt::encode(exprt expr) const
       update = ::encode(*struct_expr);
     if(const auto union_expr = expr_try_dynamic_cast<union_exprt>(current))
       update = ::encode(*union_expr, *boolbv_width);
+    if(can_cast_expr<empty_union_exprt>(current))
+      update = ::empty_encoding();
     if(const auto member_expr = expr_try_dynamic_cast<member_exprt>(current))
       update = encode_member(*member_expr);
     if(update)

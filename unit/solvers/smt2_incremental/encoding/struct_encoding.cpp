@@ -122,6 +122,17 @@ TEST_CASE("Encoding of union types", "[core][smt2_incremental]")
     {
       REQUIRE(test.struct_encoding.encode(union_tag) == bv_typet{8});
     }
+    SECTION("Value enoding")
+    {
+      const symbolt symbol{"my_empty_union", union_tag, ID_C};
+      test.symbol_table.insert(symbol);
+      const auto symbol_is_empty =
+        equal_exprt{symbol.symbol_expr(), empty_union_exprt{union_tag}};
+      const auto expected = equal_exprt{
+        symbol_exprt{"my_empty_union", bv_typet{8}},
+        from_integer(0, bv_typet{8})};
+      REQUIRE(test.struct_encoding.encode(symbol_is_empty) == expected);
+    }
   }
 }
 
