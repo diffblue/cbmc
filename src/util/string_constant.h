@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class string_constantt : public nullary_exprt
 {
 public:
-  explicit string_constantt(const irep_idt &value);
+  explicit string_constantt(const irep_idt &);
 
-  void set_value(const irep_idt &value);
+  void set_value(const irep_idt &);
 
   const irep_idt &get_value() const
   {
@@ -24,6 +24,14 @@ public:
   }
 
   array_exprt to_array_expr() const;
+
+  const typet &char_type() const
+  {
+    return type().element_type();
+  }
+
+  const array_typet &type() const;
+  array_typet &type();
 };
 
 template <>
