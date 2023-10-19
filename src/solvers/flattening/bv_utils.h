@@ -227,6 +227,31 @@ protected:
   NODISCARD std::pair<bvt, literalt>
   adder(const bvt &op0, const bvt &op1, literalt carry_in);
 
+  NODISCARD std::pair<bvt, literalt> optimized_ripple_carry_adder(
+    const bvt &op0,
+    const bvt &op1,
+    literalt carry_in);
+
+  NODISCARD std::pair<bvt, literalt>
+  carry_lookahead_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  NODISCARD std::pair<bvt, literalt>
+  simple_ripple_carry_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  NODISCARD std::pair<bvt, literalt> carry_lookahead_4_bit_adder(
+    const bvt &op0,
+    const bvt &op1,
+    literalt carry_in);
+
+  NODISCARD std::pair<bvt, literalt>
+  kogge_stone_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  NODISCARD std::pair<bvt, literalt>
+  brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  NODISCARD std::pair<bvt, literalt>
+  sklansky_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
   NODISCARD bvt adder_no_overflow(
     const bvt &op0,
     const bvt &op1,
