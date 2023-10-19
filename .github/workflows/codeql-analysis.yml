@@ -37,9 +37,13 @@ jobs:
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
 
-    - run: |
+    - name: Install dependencies
+      run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -yq maven flex bison
+
+    - name: Build
+      run: |
         make -C src minisat2-download
         make -C src       -j2
         make -C unit      -j2
