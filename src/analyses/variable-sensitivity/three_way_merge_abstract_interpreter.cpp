@@ -160,22 +160,21 @@ bool ai_three_way_merget::visit_edge_function_call(
       *this,
       ns);
 
-    // TODO : this is probably needed to avoid three_way_merge modifying one of
-    // its arguments as it goes.  A better solution would be to refactor
-    // merge_three_way_function_return.
-    const std::unique_ptr<statet> ptr_s_working_copy(
-      make_temporary_state(s_working));
+    // The base for the three way merge is the call site
+    const std::unique_ptr<statet> ptr_call_site_working(
+      make_temporary_state(get_state(p_call_site)));
+    auto tmp2 =
+      dynamic_cast<variable_sensitivity_domaint *>(&(*ptr_call_site_working));
+    INVARIANT(tmp2 != nullptr, "Three-way merge requires domain support");
+    variable_sensitivity_domaint &s_call_site_working = *tmp2;
 
     log.progress() << "three way merge... ";
-    s_working.merge_three_way_function_return(
-      get_state(p_call_site),
-      get_state(p_callee_start),
-      *ptr_s_working_copy,
-      ns);
+    s_call_site_working.merge_three_way_function_return(
+      get_state(p_callee_start), s_working, ns);
 
     log.progress() << "merging... ";
     if(
-      merge(s_working, p_callee_end, p_return_site) ||
+      merge(s_call_site_working, p_callee_end, p_return_site) ||
       (return_step.first == ai_history_baset::step_statust::NEW &&
        !s_working.is_bottom()))
     {

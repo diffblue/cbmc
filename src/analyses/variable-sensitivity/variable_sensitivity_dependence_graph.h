@@ -132,7 +132,6 @@ public:
     trace_ptrt to) override;
 
   void merge_three_way_function_return(
-    const ai_domain_baset &function_call,
     const ai_domain_baset &function_start,
     const ai_domain_baset &function_end,
     const namespacet &ns) override;
