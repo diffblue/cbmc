@@ -17,7 +17,7 @@ var classvariable__sensitivity__dependence__domaint =
     [ "make_top", "classvariable__sensitivity__dependence__domaint.html#a72e564d130c52dd7d5da7a3cc5b5e3a2", null ],
     [ "merge", "classvariable__sensitivity__dependence__domaint.html#a9efd5db641058a004f24e1992a902699", null ],
     [ "merge_control_dependencies", "classvariable__sensitivity__dependence__domaint.html#a88679bbcc74face2648a6d6d8515f712", null ],
-    [ "merge_three_way_function_return", "classvariable__sensitivity__dependence__domaint.html#aa5d41d1787c212d227f84e28f7e17441", null ],
+    [ "merge_three_way_function_return", "classvariable__sensitivity__dependence__domaint.html#a83d03cf69072b0fb15b3ff0739f6dd95", null ],
     [ "output", "classvariable__sensitivity__dependence__domaint.html#ab930e053294d7935cfbfbde7e2922f27", null ],
     [ "output_json", "classvariable__sensitivity__dependence__domaint.html#add17f92cd1f5e0070a68536c4f5f257b", null ],
     [ "populate_dep_graph", "classvariable__sensitivity__dependence__domaint.html#a2c760416f5ce771682da37c1ecfdebbf", null ],

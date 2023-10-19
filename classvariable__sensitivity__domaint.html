@@ -142,9 +142,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acfc942c1a442d0a48e9642ee4cb50cfe"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#acfc942c1a442d0a48e9642ee4cb50cfe">merge</a> (const <a class="el" href="classvariable__sensitivity__domaint.html">variable_sensitivity_domaint</a> &amp;b, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> from, <a class="el" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> to)</td></tr>
 <tr class="memdesc:acfc942c1a442d0a48e9642ee4cb50cfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the join between "this" and "b".  <a href="classvariable__sensitivity__domaint.html#acfc942c1a442d0a48e9642ee4cb50cfe">More...</a><br /></td></tr>
 <tr class="separator:acfc942c1a442d0a48e9642ee4cb50cfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab540b4fb434c00a46268abd74a984161"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#ab540b4fb434c00a46268abd74a984161">merge_three_way_function_return</a> (const <a class="el" href="classai__domain__baset.html">ai_domain_baset</a> &amp;function_call, const <a class="el" href="classai__domain__baset.html">ai_domain_baset</a> &amp;function_start, const <a class="el" href="classai__domain__baset.html">ai_domain_baset</a> &amp;function_end, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:ab540b4fb434c00a46268abd74a984161"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a context aware merge of the changes that have been applied between function_start and the current state.  <a href="classvariable__sensitivity__domaint.html#ab540b4fb434c00a46268abd74a984161">More...</a><br /></td></tr>
-<tr class="separator:ab540b4fb434c00a46268abd74a984161"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88c30d3d1d36390526b946fcf6edec58"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#a88c30d3d1d36390526b946fcf6edec58">merge_three_way_function_return</a> (const <a class="el" href="classai__domain__baset.html">ai_domain_baset</a> &amp;function_start, const <a class="el" href="classai__domain__baset.html">ai_domain_baset</a> &amp;function_end, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a88c30d3d1d36390526b946fcf6edec58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges just the things that have changes between "function_start" and "function_end" into "this".  <a href="classvariable__sensitivity__domaint.html#a88c30d3d1d36390526b946fcf6edec58">More...</a><br /></td></tr>
+<tr class="separator:a88c30d3d1d36390526b946fcf6edec58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a029f29c6d91e542b6af4a89f2eed6013"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#a029f29c6d91e542b6af4a89f2eed6013">ai_simplify</a> (<a class="el" href="classexprt.html">exprt</a> &amp;condition, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const override</td></tr>
 <tr class="memdesc:a029f29c6d91e542b6af4a89f2eed6013"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use the information in the domain to simplify the expression with respect to the current location.  <a href="classvariable__sensitivity__domaint.html#a029f29c6d91e542b6af4a89f2eed6013">More...</a><br /></td></tr>
 <tr class="separator:a029f29c6d91e542b6af4a89f2eed6013"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,12 +178,6 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:af3a6162d575d55e8663bc36b57e1e7cf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#af3a6162d575d55e8663bc36b57e1e7cf">ignore_function_call_transform</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id) const</td></tr>
 <tr class="memdesc:af3a6162d575d55e8663bc36b57e1e7cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to specify which CPROVER internal functions should be skipped over when doing function call transforms.  <a href="classvariable__sensitivity__domaint.html#af3a6162d575d55e8663bc36b57e1e7cf">More...</a><br /></td></tr>
 <tr class="separator:af3a6162d575d55e8663bc36b57e1e7cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa3859293c79da04e1096082bde138c1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#aaa3859293c79da04e1096082bde138c1">get_modified_symbols</a> (const <a class="el" href="classvariable__sensitivity__domaint.html">variable_sensitivity_domaint</a> &amp;other) const</td></tr>
-<tr class="memdesc:aaa3859293c79da04e1096082bde138c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get symbols that have been modified since this domain and other.  <a href="classvariable__sensitivity__domaint.html#aaa3859293c79da04e1096082bde138c1">More...</a><br /></td></tr>
-<tr class="separator:aaa3859293c79da04e1096082bde138c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43d12cc07a3608ff41bf5728a9ad1a00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#a43d12cc07a3608ff41bf5728a9ad1a00">apply_domain</a> (std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; modified_symbols, const <a class="el" href="classvariable__sensitivity__domaint.html">variable_sensitivity_domaint</a> &amp;target, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:a43d12cc07a3608ff41bf5728a9ad1a00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a domain and some symbols, apply those symbols values to the current domain.  <a href="classvariable__sensitivity__domaint.html#a43d12cc07a3608ff41bf5728a9ad1a00">More...</a><br /></td></tr>
-<tr class="separator:a43d12cc07a3608ff41bf5728a9ad1a00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3aaa412feec37cc0438e19cd057ec62"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvariable__sensitivity__domaint.html#ae3aaa412feec37cc0438e19cd057ec62">assume</a> (<a class="el" href="classexprt.html">exprt</a> expr, <a class="el" href="classnamespacet.html">namespacet</a> ns)</td></tr>
 <tr class="separator:ae3aaa412feec37cc0438e19cd057ec62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -303,60 +297,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a43d12cc07a3608ff41bf5728a9ad1a00"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43d12cc07a3608ff41bf5728a9ad1a00">&#9670;&nbsp;</a></span>apply_domain()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void variable_sensitivity_domaint::apply_domain </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td>
-          <td class="paramname"><em>modified_symbols</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classvariable__sensitivity__domaint.html">variable_sensitivity_domaint</a> &amp;&#160;</td>
-          <td class="paramname"><em>target</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
-          <td class="paramname"><em>ns</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Given a domain and some symbols, apply those symbols values to the current domain. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">modified_symbols</td><td>The symbols to write </td></tr>
-    <tr><td class="paramname">target</td><td>The domain to take the values from </td></tr>
-    <tr><td class="paramname">ns</td><td>The global namespace </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00458">458</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
-
-</div>
-</div>
 <a id="ae3aaa412feec37cc0438e19cd057ec62"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae3aaa412feec37cc0438e19cd057ec62">&#9670;&nbsp;</a></span>assume()</h2>
 
@@ -391,7 +331,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00470">470</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00452">452</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
 
 </div>
 </div>
@@ -429,44 +369,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00212">212</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
-
-</div>
-</div>
-<a id="aaa3859293c79da04e1096082bde138c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa3859293c79da04e1096082bde138c1">&#9670;&nbsp;</a></span>get_modified_symbols()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; variable_sensitivity_domaint::get_modified_symbols </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classvariable__sensitivity__domaint.html">variable_sensitivity_domaint</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get symbols that have been modified since this domain and other. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>The domain that things may have been modified in </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A list of symbols whose write location is different </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00278">278</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00211">211</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
 
 </div>
 </div>
@@ -503,7 +406,7 @@ Additional Inherited Members</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns true if the function should be ignored </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00410">410</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00403">403</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
 
 </div>
 </div>
@@ -690,8 +593,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ab540b4fb434c00a46268abd74a984161"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab540b4fb434c00a46268abd74a984161">&#9670;&nbsp;</a></span>merge_three_way_function_return()</h2>
+<a id="a88c30d3d1d36390526b946fcf6edec58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88c30d3d1d36390526b946fcf6edec58">&#9670;&nbsp;</a></span>merge_three_way_function_return()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -702,12 +605,6 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void variable_sensitivity_domaint::merge_three_way_function_return </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classai__domain__baset.html">ai_domain_baset</a> &amp;&#160;</td>
-          <td class="paramname"><em>function_call</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const <a class="el" href="classai__domain__baset.html">ai_domain_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>function_start</em>, </td>
         </tr>
@@ -736,20 +633,19 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Perform a context aware merge of the changes that have been applied between function_start and the current state. </p>
-<p>Anything that has not been modified will be taken from the <code>function_call</code> domain. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Merges just the things that have changes between "function_start" and "function_end" into "this". </p>
+<p>To be used correctly "this" must be derived from the function call site. Anything that is not modified in the function (such as globals) will not be changed. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">function_call</td><td>The local of the merge - values from here will be taken if they have not been modified </td></tr>
-    <tr><td class="paramname">function_start</td><td>The base of the merge - changes that have been made between here and the end will be retained. </td></tr>
+    <tr><td class="paramname">function_start</td><td>The base of the diff - changes that have been made between here and the end will be retained. </td></tr>
     <tr><td class="paramname">function_end</td><td>The end of the merge - changes that have been made between the start and here will be retained. </td></tr>
     <tr><td class="paramname">ns</td><td>The global namespace </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classvariable__sensitivity__dependence__domaint.html#aa5d41d1787c212d227f84e28f7e17441">variable_sensitivity_dependence_domaint</a>.</p>
+<p>Reimplemented in <a class="el" href="classvariable__sensitivity__dependence__domaint.html#a83d03cf69072b0fb15b3ff0739f6dd95">variable_sensitivity_dependence_domaint</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00426">426</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00419">419</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
 
 </div>
 </div>
@@ -1039,7 +935,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00285">285</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8cpp_source.html#l00278">278</a> of file <a class="el" href="variable__sensitivity__domain_8cpp_source.html">variable_sensitivity_domain.cpp</a>.</p>
 
 </div>
 </div>
@@ -1064,7 +960,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00262">262</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00245">245</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
 
 </div>
 </div>
@@ -1088,7 +984,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00263">263</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="variable__sensitivity__domain_8h_source.html#l00246">246</a> of file <a class="el" href="variable__sensitivity__domain_8h_source.html">variable_sensitivity_domain.h</a>.</p>
 
 </div>
 </div>

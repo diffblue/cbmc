@@ -1,7 +1,5 @@
 var NAVTREEINDEX110 =
 {
-"jsil__typecheck_8h.html#a9bf7f20f304c419db2e35b8a48f09921":[9,0,2,19,15,1],
-"jsil__typecheck_8h.html#ab347e1ed87cdc37dbe8ac2a045f0c6e8":[9,0,2,19,15,2],
 "jsil__typecheck_8h_source.html":[9,0,2,19,15],
 "jsil__types_8cpp.html":[9,0,2,19,16],
 "jsil__types_8cpp.html#a0878f72577caf60275665bb4153c2302":[9,0,2,19,16,0],
@@ -249,5 +247,7 @@ var NAVTREEINDEX110 =
 "lift__clinit__calls_8h.html":[9,0,1,0,1,97],
 "lift__clinit__calls_8h.html#af3451a522ee32cb64d9cca2e31c17278":[9,0,1,0,1,97,0],
 "lift__clinit__calls_8h_source.html":[9,0,1,0,1,97],
-"link__goto__model_8cpp.html":[9,0,2,16,66]
+"link__goto__model_8cpp.html":[9,0,2,16,66],
+"link__goto__model_8cpp.html#a1a920869eb018ef3e9fd7a72e95cdfd6":[9,0,2,16,66,2],
+"link__goto__model_8cpp.html#a46329b121b45ae786aa24b67165caa36":[9,0,2,16,66,3]
 };
