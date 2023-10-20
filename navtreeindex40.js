@@ -1,5 +1,6 @@
 var NAVTREEINDEX40 =
 {
+"classinstrumentert_1_1cfg__visitort.html#a3a3d7bdc2d8fd3aeb106e3e00227c372":[8,0,627,0,8],
 "classinstrumentert_1_1cfg__visitort.html#a3c1f5660471f559232fe749771764da7":[8,0,627,0,17],
 "classinstrumentert_1_1cfg__visitort.html#a468d8c5b1a136e155ddd71f2bb91552c":[8,0,627,0,0],
 "classinstrumentert_1_1cfg__visitort.html#a47d9be361c077c7f2d740565cce59519":[8,0,627,0,9],
@@ -248,6 +249,5 @@ var NAVTREEINDEX40 =
 "classinterval__templatet.html#a9e1babb0746c9663f525d2aa6e256e5c":[8,0,639,18],
 "classinterval__templatet.html#aadae7d49589adc53677ee32e3d4cd349":[8,0,639,8],
 "classinterval__templatet.html#ab0d6f5d3a6af906696e42745f09b1771":[8,0,639,2],
-"classinterval__templatet.html#ac035f6260615983b4472c6573323d806":[8,0,639,3],
-"classinterval__templatet.html#acdaeb31112f5e85592a55012d3a5c549":[8,0,639,7]
+"classinterval__templatet.html#ac035f6260615983b4472c6573323d806":[8,0,639,3]
 };

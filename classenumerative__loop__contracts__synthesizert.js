@@ -16,6 +16,7 @@ var classenumerative__loop__contracts__synthesizert =
     [ "neg_guards", "classenumerative__loop__contracts__synthesizert.html#ad87b5d994544f7affaa9b54e8ba0f049", null ],
     [ "ns", "classenumerative__loop__contracts__synthesizert.html#a6b303809c556be8b7427248bcd09cf21", null ],
     [ "options", "classenumerative__loop__contracts__synthesizert.html#aecea81b41c570f76c9ba7f3aa82ddfc4", null ],
+    [ "original_symbol_table", "classenumerative__loop__contracts__synthesizert.html#a448fbb8a8c12048f025e617f3013cb46", null ],
     [ "pos_invariant_clause_map", "classenumerative__loop__contracts__synthesizert.html#acb6116577334005b2bde35bd202578e3", null ],
     [ "tmp_post_map", "classenumerative__loop__contracts__synthesizert.html#ab91eded4f622f77ced656f7281b04849", null ]
 ];
