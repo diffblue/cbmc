@@ -122,6 +122,6 @@ add_subdirectory(symtab2gb)
 add_subdirectory(libcprover-cpp)
 add_subdirectory(goto-bmc)
 
-if((NOT WIN32 AND NOT APPLE) OR WITH_MEMORY_ANALYZER)
+if(WITH_MEMORY_ANALYZER)
 add_subdirectory(memory-analyzer)
 endif()
