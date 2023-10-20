@@ -36,7 +36,8 @@ public:
     messaget &log)
     : loop_contracts_synthesizer_baset(goto_model, log),
       options(options),
-      ns(goto_model.symbol_table)
+      ns(goto_model.symbol_table),
+      original_symbol_table(goto_model.symbol_table)
   {
   }
 
@@ -97,6 +98,9 @@ private:
 
   /// Map from tmp_post variables to their original variables.
   std::unordered_map<exprt, exprt, irep_hash> tmp_post_map;
+
+  /// Symbol table of the input goto model
+  const symbol_tablet original_symbol_table;
 };
 
 // NOLINTNEXTLINE(whitespace/line_length)
