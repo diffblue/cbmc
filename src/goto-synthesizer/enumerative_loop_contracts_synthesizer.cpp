@@ -49,6 +49,12 @@ void replace_tmp_post(
 
 std::vector<exprt> construct_terminals(const std::set<symbol_exprt> &symbols)
 {
+  // Construct a vector of terminal expressions.
+  // Terminals include:
+  //   1: scalar type variables and their loop_entry version.
+  //   2: offsets of pointers and loop_entry of pointers.
+  //   3: constants 0 and 1.
+
   std::vector<exprt> result;
   for(const auto &e : symbols)
   {
@@ -243,6 +249,18 @@ enumerative_loop_contracts_synthesizert::compute_dependent_symbols(
   std::set<symbol_exprt> result;
   for(const auto &e : live_vars)
     find_symbols(e, result);
+
+  // Erase all variables added during loop transformations---they are not in
+  // the original symbol table.
+  for(auto it = result.begin(); it != result.end();)
+  {
+    if(original_symbol_table.lookup(it->get_identifier()) == nullptr)
+    {
+      it = result.erase(it);
+    }
+    else
+      it++;
+  }
 
   return result;
 }
