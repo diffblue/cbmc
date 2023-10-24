@@ -664,14 +664,15 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
       INVARIANT(a.size() == b.size(), "groups should be of equal size");
       INVARIANT(a.size() == c.size(), "groups should be of equal size");
 
-      bvt s(a.size()), t(a.size());
+      bvt s, t(a.size(), const_literal(false));
+      s.reserve(a.size());
 
       for(std::size_t bit=0; bit<a.size(); bit++)
       {
-        // \todo reformulate using full_adder
-        s[bit]=prop.lxor(a[bit], prop.lxor(b[bit], c[bit]));
-        t[bit]=(bit==0)?const_literal(false):
-               carry(a[bit-1], b[bit-1], c[bit-1]);
+        literalt carry_out;
+        s.push_back(full_adder(a[bit], b[bit], c[bit], carry_out));
+        if(bit + 1 < a.size())
+          t[bit + 1] = carry_out;
       }
 
       new_pps.push_back(std::move(s));
@@ -690,6 +691,136 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
 // Wallace tree multiplier. This is disabled, as runtimes have
 // been observed to go up by 5%-10%, and on some models even by 20%.
 // #define WALLACE_TREE
+
+// The following examples demonstrate the performance differences (with a
+// time-out of 7200 seconds):
+//
+// #ifndef BITWIDTH
+// #define BITWIDTH 8
+// #endif
+//
+// int main()
+// {
+//   __CPROVER_bitvector[BITWIDTH] a, b;
+//   __CPROVER_assert(a * 3 == a + a + a, "multiplication by 3");
+//   __CPROVER_assert(3 * a == a + a + a, "multiplication by 3");
+//   __CPROVER_bitvector[BITWIDTH] ab = a * b;
+//   __CPROVER_bitvector[BITWIDTH * 2] ab_check =
+//     (__CPROVER_bitvector[BITWIDTH * 2])a *
+//     (__CPROVER_bitvector[BITWIDTH * 2])b;
+//   __CPROVER_assert(
+//     ab == (__CPROVER_bitvector[BITWIDTH])ab_check, "should pass");
+// }
+//
+// |----|-------------------|-------------------|
+// |    |       CaDiCaL     |      MiniSat2     |
+// |----|-------------------|-------------------|
+// | n  | No tree | Wallace | No tree | Wallace |
+// |----|---------|---------|---------|---------|
+// |  1 |    0.00 |    0.00 |    0.00 |    0.00 |
+// |  2 |    0.00 |    0.00 |    0.00 |    0.00 |
+// |  3 |    0.01 |    0.01 |    0.00 |    0.00 |
+// |  4 |    0.01 |    0.01 |    0.01 |    0.01 |
+// |  5 |    0.04 |    0.04 |    0.01 |    0.01 |
+// |  6 |    0.11 |    0.13 |    0.04 |    0.05 |
+// |  7 |    0.28 |    0.46 |    0.15 |    0.27 |
+// |  8 |    0.50 |    1.55 |    0.90 |    1.06 |
+// |  9 |    2.22 |    3.63 |    3.40 |    5.85 |
+// | 10 |    2.79 |    4.81 |    4.32 |   28.41 |
+// | 11 |    8.48 |    4.45 |   38.24 |   98.55 |
+// | 12 |   14.52 |    4.86 |  115.00 |  140.11 |
+// | 13 |   33.62 |    5.56 |  210.24 |  805.59 |
+// | 14 |   37.23 |    6.11 |  776.75 |  689.96 |
+// | 15 |  108.65 |    7.86 | 1048.92 | 1421.74 |
+// | 16 |  102.61 |   14.08 | 1628.01 | timeout |
+// | 17 |  117.89 |   18.53 | 4148.73 | timeout |
+// | 18 |  209.40 |    7.97 | 2760.51 | timeout |
+// | 19 |  168.21 |   18.04 | 2514.21 | timeout |
+// | 20 |  566.76 |   12.68 | 2609.09 | timeout |
+// | 21 |  786.31 |   23.80 | 2232.77 | timeout |
+// | 22 |  817.74 |   17.64 | 3866.70 | timeout |
+// | 23 | 1102.76 |   24.19 | timeout | timeout |
+// | 24 | 1319.59 |   27.37 | timeout | timeout |
+// | 25 | 1786.11 |   27.10 | timeout | timeout |
+// | 26 | 1952.18 |   31.08 | timeout | timeout |
+// | 27 | 6908.48 |   27.92 | timeout | timeout |
+// | 28 | 6919.34 |   36.63 | timeout | timeout |
+// | 29 | timeout |   27.95 | timeout | timeout |
+// | 30 | timeout |   36.94 | timeout | timeout |
+// | 31 | timeout |   38.41 | timeout | timeout |
+// | 32 | timeout |   33.06 | timeout | timeout |
+// |----|---------|---------|---------|---------|
+//
+// In summary, Wallace tree reduction is substantially more efficient with
+// CaDiCaL on the above code for all bit width >= 11, but somewhat slower with
+// MiniSat.
+//
+// #ifndef BITWIDTH
+// #define BITWIDTH 8
+// #endif
+//
+// int main()
+// {
+//   __CPROVER_bitvector[BITWIDTH] a, b, c, ab, bc, abc;
+//   ab = a * b;
+//   __CPROVER_bitvector[BITWIDTH * 2] ab_check =
+//     (__CPROVER_bitvector[BITWIDTH * 2])a *
+//     (__CPROVER_bitvector[BITWIDTH * 2])b;
+//   __CPROVER_assume(ab == ab_check);
+//   bc = b * c;
+//   __CPROVER_bitvector[BITWIDTH * 2] bc_check =
+//     (__CPROVER_bitvector[BITWIDTH * 2])b *
+//     (__CPROVER_bitvector[BITWIDTH * 2])c;
+//   __CPROVER_assume(bc == bc_check);
+//   abc = ab * c;
+//   __CPROVER_bitvector[BITWIDTH * 2] abc_check =
+//     (__CPROVER_bitvector[BITWIDTH * 2])ab *
+//     (__CPROVER_bitvector[BITWIDTH * 2])c;
+//   __CPROVER_assume(abc == abc_check);
+//   __CPROVER_assert(abc == a * bc, "associativity");
+// }
+//
+// |----|-------------------|-------------------|
+// |    |       CaDiCaL     |      MiniSat2     |
+// |----|-------------------|-------------------|
+// | n  | No tree | Wallace | No tree | Wallace |
+// |----|---------|---------|---------|---------|
+// |  1 |    0.00 |    0.00 |    0.01 |    0.01 |
+// |  2 |    0.01 |    0.01 |    0.01 |    0.01 |
+// |  3 |    0.02 |    0.03 |    0.01 |    0.01 |
+// |  4 |    0.05 |    0.07 |    0.02 |    0.02 |
+// |  5 |    0.17 |    0.18 |    0.04 |    0.04 |
+// |  6 |    0.50 |    0.63 |    0.13 |    0.14 |
+// |  7 |    1.01 |    1.15 |    0.43 |    0.47 |
+// |  8 |    1.56 |    1.76 |    3.35 |    2.39 |
+// |  9 |    2.07 |    2.48 |   11.20 |   12.64 |
+// | 10 |    3.58 |    3.88 |   20.23 |   23.49 |
+// | 11 |    5.84 |    7.46 |   49.32 |   39.86 |
+// | 12 |   11.71 |   16.85 |   69.32 |  156.57 |
+// | 13 |   33.22 |   41.95 |  250.91 |  294.73 |
+// | 14 |   76.27 |  109.59 |  226.98 |  259.84 |
+// | 15 |  220.01 |  330.10 |  783.73 | 1160.47 |
+// | 16 |  591.91 |  981.16 | 2712.20 | 4286.60 |
+// | 17 | 1634.97 | 2574.81 | timeout | timeout |
+// | 18 | 4680.16 | timeout | timeout | timeout |
+// | 19 | timeout | timeout | timeout | timeout |
+// | 20 | timeout | timeout | timeout | timeout |
+// | 21 | timeout | timeout | timeout | timeout |
+// | 22 | timeout | timeout | timeout | timeout |
+// | 23 | timeout | timeout | timeout | timeout |
+// | 24 | timeout | timeout | timeout | timeout |
+// | 25 | timeout | timeout | timeout | timeout |
+// | 26 | timeout | timeout | timeout | timeout |
+// | 27 | timeout | timeout | timeout | timeout |
+// | 28 | timeout | timeout | timeout | timeout |
+// | 29 | timeout | timeout | timeout | timeout |
+// | 30 | timeout | timeout | timeout | timeout |
+// | 31 | timeout | timeout | timeout | timeout |
+// | 32 | timeout | timeout | timeout | timeout |
+// |----|---------|---------|---------|---------|
+//
+// In summary, Wallace tree reduction is slower for both solvers and all
+// bit widths (except BITWIDTH==8 with MiniSat2).
 
 bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 {
