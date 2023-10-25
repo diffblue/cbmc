@@ -687,66 +687,51 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
   }
 }
 
+// Wallace tree multiplier. This is disabled, as runtimes have
+// been observed to go up by 5%-10%, and on some models even by 20%.
+// #define WALLACE_TREE
+
 bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 {
-  #if 1
   bvt op0=_op0, op1=_op1;
 
   if(is_constant(op1))
     std::swap(op0, op1);
-
-  bvt product;
-  product.resize(op0.size());
-
-  for(std::size_t i=0; i<product.size(); i++)
-    product[i]=const_literal(false);
-
-  for(std::size_t sum=0; sum<op0.size(); sum++)
-    if(op0[sum]!=const_literal(false))
-    {
-      bvt tmpop = zeros(sum);
-      tmpop.reserve(op0.size());
-
-      for(std::size_t idx=sum; idx<op0.size(); idx++)
-        tmpop.push_back(prop.land(op1[idx-sum], op0[sum]));
-
-      product=add(product, tmpop);
-    }
-
-  return product;
-  #else
-  // Wallace tree multiplier. This is disabled, as runtimes have
-  // been observed to go up by 5%-10%, and on some models even by 20%.
 
   // build the usual quadratic number of partial products
-
-  bvt op0=_op0, op1=_op1;
-
-  if(is_constant(op1))
-    std::swap(op0, op1);
-
   std::vector<bvt> pps;
   pps.reserve(op0.size());
 
   for(std::size_t bit=0; bit<op0.size(); bit++)
-    if(op0[bit]!=const_literal(false))
-    {
-      // zeros according to weight
-      bvt pp = zeros(bit);
-      pp.reserve(op0.size());
+  {
+    if(op0[bit] == const_literal(false))
+      continue;
 
-      for(std::size_t idx=bit; idx<op0.size(); idx++)
-        pp.push_back(prop.land(op1[idx-bit], op0[bit]));
+    // zeros according to weight
+    bvt pp = zeros(bit);
+    pp.reserve(op0.size());
 
-      pps.push_back(pp);
-    }
+    for(std::size_t idx = bit; idx < op0.size(); idx++)
+      pp.push_back(prop.land(op1[idx - bit], op0[bit]));
+
+    pps.push_back(pp);
+  }
 
   if(pps.empty())
     return zeros(op0.size());
   else
+  {
+#ifdef WALLACE_TREE
     return wallace_tree(pps);
+#else
+    bvt product = pps.front();
 
-  #endif
+    for(auto it = std::next(pps.begin()); it != pps.end(); ++it)
+      product = add(product, *it);
+
+    return product;
+#endif
+  }
 }
 
 bvt bv_utilst::unsigned_multiplier_no_overflow(
