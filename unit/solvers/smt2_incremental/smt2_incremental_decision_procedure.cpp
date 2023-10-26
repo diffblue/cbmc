@@ -1144,3 +1144,75 @@ TEST_CASE(
     smt_get_value_commandt{expected_foo}};
   CHECK(test.sent_commands == expected_get_commands);
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret getting value of struct-symbols with "
+  "value in the symbol table",
+  "[core][util][expr_initializer]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+
+  const struct_union_typet::componentst inner_struct_type_components{
+    {"foo", signedbv_typet{32}}, {"bar", unsignedbv_typet{16}}};
+  const struct_typet inner_struct_type{inner_struct_type_components};
+  const type_symbolt inner_struct_type_symbol{
+    "inner_struct_type_symbol", inner_struct_type, ID_C};
+  test.symbol_table.insert(inner_struct_type_symbol);
+  const struct_tag_typet inner_struct_type_tag{inner_struct_type_symbol.name};
+
+  const struct_union_typet::componentst struct_components{
+    {"fizz", c_bool_type()}, {"bar", inner_struct_type_tag}};
+  const struct_typet struct_type{struct_components};
+  const type_symbolt struct_type_symbol{
+    "struct_type_symbol", struct_type, ID_C};
+  test.symbol_table.insert(struct_type_symbol);
+  const struct_tag_typet struct_tag{struct_type_symbol.name};
+
+  const exprt::operandst inner_struct_operands{
+    from_integer(10, signedbv_typet{32}),
+    from_integer(23, unsignedbv_typet{16})};
+  const struct_exprt inner_struct_expr{
+    inner_struct_operands, inner_struct_type_tag};
+  symbolt inner_symbol_with_value{
+    "inner_symbol_with_value", inner_struct_type_tag, ID_C};
+  inner_symbol_with_value.value = inner_struct_expr;
+  test.symbol_table.insert(inner_symbol_with_value);
+  const symbol_exprt inner_symbol_expr{
+    inner_symbol_with_value.name, inner_symbol_with_value.type};
+
+  const exprt::operandst struct_operands{
+    from_integer(1, c_bool_type()), inner_symbol_expr};
+  const struct_exprt struct_expr{struct_operands, struct_tag};
+
+  symbolt symbol_with_value{"symbol_with_value", struct_tag, ID_C};
+  symbol_with_value.value = struct_expr;
+  test.symbol_table.insert(symbol_with_value);
+
+  const symbol_exprt symbol_expr{
+    symbol_with_value.name, symbol_with_value.type};
+
+  const equal_exprt equal_expr{symbol_expr, symbol_expr};
+
+  test.sent_commands.clear();
+  test.procedure.set_to(equal_expr, true);
+
+  std::vector<smt_commandt> expected_commands{
+    smt_define_function_commandt(
+      inner_symbol_with_value.name,
+      {},
+      smt_bit_vector_theoryt::concat(
+        smt_bit_vector_constant_termt{10, 32},
+        smt_bit_vector_constant_termt{23, 16})),
+    smt_define_function_commandt(
+      symbol_with_value.name,
+      {},
+      smt_bit_vector_theoryt::concat(
+        smt_bit_vector_constant_termt{1, config.ansi_c.bool_width},
+        smt_identifier_termt{
+          inner_symbol_with_value.name, smt_bit_vector_sortt{48}})),
+    smt_assert_commandt{smt_core_theoryt::equal(
+      smt_identifier_termt{symbol_with_value.name, smt_bit_vector_sortt{56}},
+      smt_identifier_termt{symbol_with_value.name, smt_bit_vector_sortt{56}})}};
+
+  CHECK(test.sent_commands == expected_commands);
+}

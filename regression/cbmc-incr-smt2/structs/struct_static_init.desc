@@ -1,0 +1,11 @@
+CORE
+struct_static_init.c
+
+Passing problem to incremental SMT2 solving
+line \d+ assertion p->w != 0xdead: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that statically initialised variables of struct type (whose values are
+stored in the symbolt_table) are lowered correctly.
