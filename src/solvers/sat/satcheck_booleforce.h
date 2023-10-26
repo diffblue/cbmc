@@ -26,7 +26,7 @@ public:
   void lcnf(const bvt &bv) override;
 
 protected:
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &assumptions) override;
 };
 
 class satcheck_booleforcet:public satcheck_booleforce_baset

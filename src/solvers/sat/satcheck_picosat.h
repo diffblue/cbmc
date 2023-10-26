@@ -28,8 +28,7 @@ public:
   void set_assignment(literalt a, bool value) override;
 
   bool is_in_conflict(literalt a) const override;
-  void set_assumptions(const bvt &_assumptions) override;
-  bool has_set_assumptions() const override
+  bool has_assumptions() const override
   {
     return true;
   }
@@ -39,9 +38,7 @@ public:
   }
 
 protected:
-  resultt do_prop_solve() override;
-
-  bvt assumptions;
+  resultt do_prop_solve(const bvt &assumptions) override;
 
 private:
   PicoSAT *picosat;

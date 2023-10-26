@@ -38,8 +38,15 @@ bvt propt::new_variables(std::size_t width)
 
 propt::resultt propt::prop_solve()
 {
+  static const bvt empty_assumptions;
   ++number_of_solver_calls;
-  return do_prop_solve();
+  return do_prop_solve(empty_assumptions);
+}
+
+propt::resultt propt::prop_solve(const bvt &assumptions)
+{
+  ++number_of_solver_calls;
+  return do_prop_solve(assumptions);
 }
 
 std::size_t propt::get_number_of_solver_calls() const

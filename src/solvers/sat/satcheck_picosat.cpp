@@ -65,7 +65,7 @@ void satcheck_picosatt::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_picosatt::do_prop_solve()
+propt::resultt satcheck_picosatt::do_prop_solve(const bvt &assumptions)
 {
   PRECONDITION(status != ERROR);
 
@@ -79,7 +79,8 @@ propt::resultt satcheck_picosatt::do_prop_solve()
   std::string msg;
 
   for(const auto &literal : assumptions)
-    picosat_assume(picosat, literal.dimacs());
+    if(!literal.is_true())
+      picosat_assume(picosat, literal.dimacs());
 
   const int res=picosat_sat(picosat, -1);
   if(res==PICOSAT_SATISFIABLE)
@@ -122,16 +123,4 @@ bool satcheck_picosatt::is_in_conflict(literalt a) const
   PRECONDITION(!a.is_constant());
 
   return picosat_failed_assumption(picosat, a.dimacs())!=0;
-}
-
-void satcheck_picosatt::set_assumptions(const bvt &bv)
-{
-  assumptions=bv;
-
-  INVARIANT(
-    std::all_of(
-      assumptions.begin(),
-      assumptions.end(),
-      [](const literalt &l) { return !l.is_constant(); }),
-    "assumptions should be non-constant");
 }

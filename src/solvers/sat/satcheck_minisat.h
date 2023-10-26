@@ -31,11 +31,8 @@ public:
 
   void set_assignment(literalt a, bool value) override;
 
-  // extra MiniSat feature: solve with assumptions
-  void set_assumptions(const bvt &_assumptions) override;
-
   // features
-  bool has_set_assumptions() const override
+  bool has_assumptions() const override
   {
     return true;
   }
@@ -47,12 +44,11 @@ public:
   bool is_in_conflict(literalt l) const override;
 
 protected:
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &assumptions) override;
 
   // NOLINTNEXTLINE(readability/identifiers)
   class Solver *solver;
   void add_variables();
-  bvt assumptions;
   bool empty_clause_added;
 };
 
@@ -100,6 +96,6 @@ public:
 protected:
   std::vector<bool> in_core;
 
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &assumptions) override;
 };
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_MINISAT_H

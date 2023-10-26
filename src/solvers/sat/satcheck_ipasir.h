@@ -34,10 +34,8 @@ public:
   /* This method is not supported, and currently not called anywhere in CBMC */
   void set_assignment(literalt a, bool value) override;
 
-  void set_assumptions(const bvt &_assumptions) override;
-
   bool is_in_conflict(literalt a) const override;
-  bool has_set_assumptions() const override final
+  bool has_assumptions() const override final
   {
     return true;
   }
@@ -47,11 +45,9 @@ public:
   }
 
 protected:
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &assumptions) override;
 
   void *solver;
-
-  bvt assumptions;
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_IPASIR_H

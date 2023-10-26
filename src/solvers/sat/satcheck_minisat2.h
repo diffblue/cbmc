@@ -43,9 +43,6 @@ public:
   void lcnf(const bvt &bv) override final;
   void set_assignment(literalt a, bool value) override;
 
-  // extra MiniSat feature: solve with assumptions
-  void set_assumptions(const bvt &_assumptions) override;
-
   // extra MiniSat feature: default branching decision
   void set_polarity(literalt a, bool value);
 
@@ -56,7 +53,7 @@ public:
   void clear_interrupt();
 
   bool is_in_conflict(literalt a) const override;
-  bool has_set_assumptions() const override final
+  bool has_assumptions() const override final
   {
     return true;
   }
@@ -71,13 +68,12 @@ public:
   }
 
 protected:
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &) override;
 
   std::unique_ptr<T> solver;
   uint32_t time_limit_seconds;
 
   void add_variables();
-  bvt assumptions;
 };
 
 class satcheck_minisat_no_simplifiert:

@@ -27,8 +27,7 @@ public:
   void lcnf(const bvt &bv) override;
   void set_assignment(literalt a, bool value) override;
 
-  void set_assumptions(const bvt &_assumptions) override;
-  bool has_set_assumptions() const override
+  bool has_assumptions() const override
   {
     return true;
   }
@@ -40,11 +39,10 @@ public:
   void set_frozen(literalt a) override;
 
 protected:
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &assumptions) override;
 
   // NOLINTNEXTLINE(readability/identifiers)
-  struct LGL * solver;
-  bvt assumptions;
+  struct LGL *solver;
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_LINGELING_H

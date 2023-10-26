@@ -205,8 +205,10 @@ bool pbs_dimacs_cnft::pbs_solve()
   return satisfied;
 }
 
-propt::resultt pbs_dimacs_cnft::do_prop_solve()
+propt::resultt pbs_dimacs_cnft::do_prop_solve(const bvt &assumptions)
 {
+  PRECONDITION(assumptions.empty());
+
   std::ofstream file("temp.cnf");
 
   write_dimacs_cnf(file);

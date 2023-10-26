@@ -41,14 +41,11 @@ public:
   void lcnf(const bvt &bv) override;
   void set_assignment(literalt a, bool value) override;
 
-  // extra MiniSat feature: solve with assumptions
-  void set_assumptions(const bvt &_assumptions) override;
-
   // extra MiniSat feature: default branching decision
   void set_polarity(literalt a, bool value);
 
   bool is_in_conflict(literalt a) const override;
-  bool has_set_assumptions() const override
+  bool has_assumptions() const override
   {
     return true;
   }
@@ -58,12 +55,11 @@ public:
   }
 
 protected:
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &assumptions) override;
 
   std::unique_ptr<T> solver;
 
   void add_variables();
-  bvt assumptions;
 };
 
 class satcheck_glucose_no_simplifiert:

@@ -36,7 +36,7 @@ void external_satt::set_assignment(literalt, bool)
   UNIMPLEMENTED;
 }
 
-void external_satt::write_cnf_file(std::string cnf_file)
+void external_satt::write_cnf_file(std::string cnf_file, const bvt &assumptions)
 {
   log.status() << "Writing temporary CNF" << messaget::eom;
   std::ofstream out(cnf_file);
@@ -167,7 +167,7 @@ external_satt::resultt external_satt::parse_result(std::string solver_output)
   return resultt::P_ERROR;
 }
 
-external_satt::resultt external_satt::do_prop_solve()
+external_satt::resultt external_satt::do_prop_solve(const bvt &assumptions)
 {
   // are we assuming 'false'?
   if(
@@ -179,7 +179,7 @@ external_satt::resultt external_satt::do_prop_solve()
 
   // create a temporary file
   temporary_filet cnf_file("external-sat", ".cnf");
-  write_cnf_file(cnf_file());
+  write_cnf_file(cnf_file(), assumptions);
   auto output = execute_solver(cnf_file());
   return parse_result(output);
 }

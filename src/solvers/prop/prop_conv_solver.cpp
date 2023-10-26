@@ -459,7 +459,7 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   log.statistics() << "Solving with " << prop.solver_text() << messaget::eom;
 
-  switch(prop.prop_solve())
+  switch(prop.prop_solve(assumption_stack))
   {
   case propt::resultt::P_SATISFIABLE:
     return resultt::D_SATISFIABLE;
@@ -531,8 +531,6 @@ void prop_conv_solvert::push(const std::vector<exprt> &assumptions)
   for(const auto &assumption : assumptions)
     assumption_stack.push_back(to_literal_expr(assumption).get_literal());
   context_size_stack.push_back(assumptions.size());
-
-  prop.set_assumptions(assumption_stack);
 }
 
 void prop_conv_solvert::push()
@@ -543,8 +541,6 @@ void prop_conv_solvert::push()
 
   assumption_stack.push_back(context_literal);
   context_size_stack.push_back(1);
-
-  prop.set_assumptions(assumption_stack);
 }
 
 void prop_conv_solvert::pop()
@@ -552,8 +548,6 @@ void prop_conv_solvert::pop()
   // We remove the context from the stack.
   assumption_stack.resize(assumption_stack.size() - context_size_stack.back());
   context_size_stack.pop_back();
-
-  prop.set_assumptions(assumption_stack);
 }
 
 // This method out-of-line because gcc-5.5.0-12ubuntu1 20171010 miscompiles it

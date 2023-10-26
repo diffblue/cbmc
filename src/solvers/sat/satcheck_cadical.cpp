@@ -85,7 +85,7 @@ void satcheck_cadicalt::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_cadicalt::do_prop_solve()
+propt::resultt satcheck_cadicalt::do_prop_solve(const bvt &assumptions)
 {
   INVARIANT(status != statust::ERROR, "there cannot be an error");
 
@@ -105,7 +105,8 @@ propt::resultt satcheck_cadicalt::do_prop_solve()
   }
 
   for(const auto &a : assumptions)
-    solver->assume(a.dimacs());
+    if(!a.is_true())
+      solver->assume(a.dimacs());
 
   switch(solver->solve())
   {
@@ -142,19 +143,6 @@ satcheck_cadicalt::satcheck_cadicalt(message_handlert &message_handler)
 satcheck_cadicalt::~satcheck_cadicalt()
 {
   delete solver;
-}
-
-void satcheck_cadicalt::set_assumptions(const bvt &bv)
-{
-  // We filter out 'true' assumptions which cause spurious results with CaDiCaL.
-  assumptions.clear();
-  for(const auto &assumption : bv)
-  {
-    if(!assumption.is_true())
-    {
-      assumptions.push_back(assumption);
-    }
-  }
 }
 
 bool satcheck_cadicalt::is_in_conflict(literalt a) const

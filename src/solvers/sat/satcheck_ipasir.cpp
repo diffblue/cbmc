@@ -110,7 +110,7 @@ void satcheck_ipasirt::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_ipasirt::do_prop_solve()
+propt::resultt satcheck_ipasirt::do_prop_solve(const bvt &assumptions)
 {
   INVARIANT(status!=statust::ERROR, "there cannot be an error");
 
@@ -131,7 +131,7 @@ propt::resultt satcheck_ipasirt::do_prop_solve()
   {
     for(const auto &literal : assumptions)
     {
-      if(!literal.is_false())
+      if(!literal.is_true())
         ipasir_assume(solver, literal.dimacs());
     }
 
@@ -183,20 +183,6 @@ satcheck_ipasirt::~satcheck_ipasirt()
 bool satcheck_ipasirt::is_in_conflict(literalt a) const
 {
   return ipasir_failed(solver, a.var_no());
-}
-
-void satcheck_ipasirt::set_assumptions(const bvt &bv)
-{
-  bvt::const_iterator it = std::find_if(bv.begin(), bv.end(), is_true);
-  const bool has_true = it != bv.end();
-
-  if(has_true)
-  {
-    assumptions.clear();
-    return;
-  }
-  // only copy assertions, if there is no false in bt parameter
-  assumptions=bv;
 }
 
 #endif

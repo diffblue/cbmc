@@ -12,7 +12,7 @@ class external_satt : public cnf_clause_list_assignmentt
 public:
   explicit external_satt(message_handlert &message_handler, std::string cmd);
 
-  bool has_set_assumptions() const override final
+  bool has_assumptions() const override final
   {
     return true;
   }
@@ -27,17 +27,11 @@ public:
   bool is_in_conflict(literalt) const override;
   void set_assignment(literalt, bool) override;
 
-  void set_assumptions(const bvt &_assumptions) override
-  {
-    assumptions = _assumptions;
-  }
-
 protected:
   std::string solver_cmd;
-  bvt assumptions;
 
-  resultt do_prop_solve() override;
-  void write_cnf_file(std::string);
+  resultt do_prop_solve(const bvt &assumptions) override;
+  void write_cnf_file(std::string, const bvt &);
   std::string execute_solver(std::string);
   resultt parse_result(std::string);
 };
