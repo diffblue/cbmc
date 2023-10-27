@@ -317,9 +317,17 @@ void smt2_convt::define_object_size(
   }
 }
 
-decision_proceduret::resultt smt2_convt::dec_solve()
+decision_proceduret::resultt smt2_convt::dec_solve(const exprt &assumption)
 {
-  write_footer();
+  if(assumption.is_nil())
+    write_footer();
+  else
+  {
+    assumptions.push_back(literal_exprt(convert(assumption)));
+    write_footer();
+    assumptions.pop_back();
+  }
+
   out.flush();
   return decision_proceduret::resultt::D_ERROR;
 }

@@ -84,7 +84,9 @@ public:
 
   exprt get(const exprt &expr) const override;
   void set_to(const exprt &expr, bool value) override;
-  decision_proceduret::resultt dec_solve() override;
+
+protected:
+  decision_proceduret::resultt dec_solve(const exprt &) override;
 
 private:
   // Base class

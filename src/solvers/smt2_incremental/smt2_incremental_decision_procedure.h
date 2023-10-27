@@ -67,7 +67,7 @@ public:
 
 protected:
   // Implementation of protected decision_proceduret member function.
-  resultt dec_solve() override;
+  resultt dec_solve(const exprt &) override;
   /// \brief Defines a function of array sort and asserts the element values
   /// from `array_exprt` or `array_of_exprt`.
   /// \details

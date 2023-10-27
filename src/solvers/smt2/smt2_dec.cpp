@@ -33,7 +33,7 @@ std::string smt2_dect::decision_procedure_text() const
   // clang-format on
 }
 
-decision_proceduret::resultt smt2_dect::dec_solve()
+decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
 {
   ++number_of_solver_calls;
 

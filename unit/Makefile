@@ -96,6 +96,7 @@ SRC += analyses/ai/ai.cpp \
        path_strategies.cpp \
        pointer-analysis/value_set.cpp \
        solvers/bdd/miniBDD/miniBDD.cpp \
+       solvers/flattening/boolbv.cpp \
        solvers/floatbv/float_utils.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/external_sat.cpp \
