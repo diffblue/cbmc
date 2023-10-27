@@ -122,13 +122,13 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;{</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="comment">// adjust return type of function to match pointer subtype</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">if</span>(arguments.size() &lt; 2)</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects at least two arguments&quot;</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects at least two arguments&quot;</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  }</div>
@@ -137,8 +137,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">if</span>(ptr_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  }</div>
@@ -161,13 +161,13 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;{</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// adjust return type of function to match pointer subtype</span></div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keywordflow">if</span>(arguments.size() &lt; 3)</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects at least three arguments&quot;</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects at least three arguments&quot;</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  }</div>
@@ -176,8 +176,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keywordflow">if</span>(ptr_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  }</div>
@@ -204,13 +204,13 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="comment">// adjust return type of function to match pointer subtype</span></div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordflow">if</span>(arguments.empty())</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  {</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects at least one argument&quot;</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects at least one argument&quot;</span></div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  }</div>
@@ -219,8 +219,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keywordflow">if</span>(ptr_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  }</div>
@@ -240,12 +240,12 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;{</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="comment">// type __atomic_load_n(type *ptr, int memorder)</span></div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <span class="keywordflow">if</span>(arguments.size() != 2)</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  {</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects two arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects two arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  }</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
@@ -253,8 +253,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordflow">if</span>(ptr_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  {</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  }</div>
@@ -275,12 +275,12 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;{</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  <span class="comment">// void __atomic_store_n(type *ptr, type val, int memorder)</span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keywordflow">if</span>(arguments.size() != 3)</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  {</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects three arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects three arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  }</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
@@ -288,8 +288,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="keywordflow">if</span>(ptr_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  {</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  }</div>
@@ -313,12 +313,12 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;{</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="comment">// type __atomic_exchange_n(type *ptr, type val, int memorder)</span></div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keywordflow">if</span>(arguments.size() != 3)</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  {</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects three arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects three arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  }</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
@@ -326,8 +326,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="keywordflow">if</span>(ptr_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  {</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  }</div>
@@ -352,27 +352,27 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;{</div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="comment">// void __atomic_load(type *ptr, type *ret, int memorder)</span></div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  <span class="comment">// void __atomic_store(type *ptr, type *val, int memorder)</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="keywordflow">if</span>(arguments.size() != 3)</div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  {</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects three arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects three arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  }</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="keywordflow">if</span>(arguments[0].type().<span class="keywordtype">id</span>() != ID_pointer)</div>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  {</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  }</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  <span class="keywordflow">if</span>(arguments[1].type().<span class="keywordtype">id</span>() != ID_pointer)</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  {</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as second argument&quot;</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as second argument&quot;</span></div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  }</div>
@@ -396,35 +396,35 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;{</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  <span class="comment">// void __atomic_exchange(type *ptr, type *val, type *ret, int memorder)</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="keywordflow">if</span>(arguments.size() != 4)</div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  {</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects four arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects four arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;  }</div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <span class="keywordflow">if</span>(arguments[0].type().<span class="keywordtype">id</span>() != ID_pointer)</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  {</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  }</div>
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160; </div>
 <div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  <span class="keywordflow">if</span>(arguments[1].type().<span class="keywordtype">id</span>() != ID_pointer)</div>
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  {</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as second argument&quot;</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as second argument&quot;</span></div>
 <div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  }</div>
 <div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160; </div>
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  <span class="keywordflow">if</span>(arguments[2].type().<span class="keywordtype">id</span>() != ID_pointer)</div>
 <div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;  {</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as third argument&quot;</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as third argument&quot;</span></div>
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  }</div>
@@ -452,27 +452,27 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="comment">// desired, bool weak, int success_memorder, int failure_memorder)</span></div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;  <span class="comment">// bool __atomic_compare_exchange(type *ptr, type *expected, type</span></div>
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;  <span class="comment">// *desired, bool weak, int success_memorder, int failure_memorder)</span></div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="keywordflow">if</span>(arguments.size() != 6)</div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  {</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects six arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; expects six arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  }</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160; </div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  <span class="keywordflow">if</span>(arguments[0].type().<span class="keywordtype">id</span>() != ID_pointer)</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  {</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  }</div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160; </div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="keywordflow">if</span>(arguments[1].type().<span class="keywordtype">id</span>() != ID_pointer)</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  {</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as second argument&quot;</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as second argument&quot;</span></div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  }</div>
@@ -481,8 +481,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    identifier == ID___atomic_compare_exchange &amp;&amp;</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    arguments[2].type().<span class="keywordtype">id</span>() != ID_pointer)</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  {</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as third argument&quot;</span></div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot; takes a pointer as third argument&quot;</span></div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  }</div>
@@ -514,12 +514,12 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;{</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160; </div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  <span class="keywordflow">if</span>(arguments.size() != 3)</div>
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  {</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;__atomic_*_fetch primitives take three arguments&quot;</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;__atomic_*_fetch primitives take three arguments&quot;</span></div>
 <div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  }</div>
@@ -528,8 +528,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160; </div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;  <span class="keywordflow">if</span>(ptr_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  {</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>()</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error()</div>
 <div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;      &lt;&lt; <span class="stringliteral">&quot;__atomic_*_fetch primitives take a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;      &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
@@ -551,12 +551,12 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
 <div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;{</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; </div>
 <div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;  <span class="keywordflow">if</span>(arguments.size() != 3)</div>
 <div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  {</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;__atomic_fetch_* primitives take three arguments&quot;</span></div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;__atomic_fetch_* primitives take three arguments&quot;</span></div>
 <div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;  }</div>
@@ -565,8 +565,8 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160; </div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  <span class="keywordflow">if</span>(ptr_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  {</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a> = source_location;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>()</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error().source_location = source_location;</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error()</div>
 <div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;      &lt;&lt; <span class="stringliteral">&quot;__atomic_fetch_* primitives take a pointer as first argument&quot;</span></div>
 <div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;      &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    <span class="keywordflow">throw</span> 0;</div>
@@ -1705,6 +1705,7 @@ $(document).ready(function(){initNavTree('c__typecheck__gcc__polymorphic__builti
 <div class="ttc" id="acprover__prefix_8h_html_a5f537726f4fcb4d977cbd151c99a39df"><div class="ttname"><a href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a></div><div class="ttdeci">#define CPROVER_PREFIX</div><div class="ttdef"><b>Definition:</b> <a href="cprover__prefix_8h_source.html#l00014">cprover_prefix.h:14</a></div></div>
 <div class="ttc" id="agoto__instruction__code_8h_html"><div class="ttname"><a href="goto__instruction__code_8h.html">goto_instruction_code.h</a></div></div>
 <div class="ttc" id="airep_8h_html_aec473a7cdee5da3223f587aa2c1c4132"><div class="ttname"><a href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00047">irep.h:47</a></div></div>
+<div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02689">math.c:2689</a></div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html"><div class="ttname"><a href="pointer__expr_8h.html">pointer_expr.h</a></div><div class="ttdoc">API to expression classes for Pointers.</div></div>
 <div class="ttc" id="apointer__expr_8h_html_a803796648f3f21fa7835f4509b7ea0a2"><div class="ttname"><a href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a></div><div class="ttdeci">const pointer_typet &amp; to_pointer_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a pointer_typet.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00093">pointer_expr.h:93</a></div></div>

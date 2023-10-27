@@ -240,11 +240,11 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="comment">// overwrite argv[0]</span></div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  new_argv[0] = <a class="code" href="classld__modet.html#a746dd94323425951570740cfb05f3c6c">native_tool_name</a>;</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classld__modet.html#a76765a7708772c9fb11466e8d70ab808">gcc_message_handler</a>};</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  log.debug() &lt;&lt; <span class="stringliteral">&quot;RUN:&quot;</span>;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{<a class="code" href="classld__modet.html#a76765a7708772c9fb11466e8d70ab808">gcc_message_handler</a>};</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;RUN:&quot;</span>;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; new_argv.size(); i++)</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    log.debug() &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; new_argv[i];</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  log.debug() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; new_argv[i];</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a>(new_argv[0], new_argv, <a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a5d44a30bebc5fb0f94d726cceb8de7f1">stdin_file</a>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;}</div>
@@ -265,8 +265,8 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    output_file = <span class="stringliteral">&quot;a.out&quot;</span>;</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log{<a class="code" href="classld__modet.html#a76765a7708772c9fb11466e8d70ab808">gcc_message_handler</a>};</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  log.debug() &lt;&lt; <span class="stringliteral">&quot;Running &quot;</span> &lt;&lt; <a class="code" href="classld__modet.html#a746dd94323425951570740cfb05f3c6c">native_tool_name</a> &lt;&lt; <span class="stringliteral">&quot; to generate hybrid binary&quot;</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{<a class="code" href="classld__modet.html#a76765a7708772c9fb11466e8d70ab808">gcc_message_handler</a>};</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;Running &quot;</span> &lt;&lt; <a class="code" href="classld__modet.html#a746dd94323425951570740cfb05f3c6c">native_tool_name</a> &lt;&lt; <span class="stringliteral">&quot; to generate hybrid binary&quot;</span></div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  <span class="comment">// save the goto-cc output file</span></div>
@@ -278,7 +278,7 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  }</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classcprover__exception__baset.html">cprover_exception_baset</a> &amp;e)</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  {</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    log.error() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; e.<a class="code" href="classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca">what</a>() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; e.<a class="code" href="classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca">what</a>() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  }</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
@@ -291,7 +291,7 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;object_file : object_files)</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    {</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      log.debug() &lt;&lt; <span class="stringliteral">&quot;stripping goto-cc sections before building EFI binary&quot;</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;stripping goto-cc sections before building EFI binary&quot;</span></div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                  &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      <span class="comment">// create a backup copy</span></div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;      <span class="keyword">const</span> std::string bin_name = object_file + <a class="code" href="classld__modet.html#a37e2f5cd4069570c6f81ac0382402507">goto_binary_tmp_suffix</a>;</div>
@@ -309,7 +309,7 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a>(objcopy_argv[0], objcopy_argv) != 0)</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        log.debug() &lt;&lt; <span class="stringliteral">&quot;EFI binary preparation: removing goto-cc section failed&quot;</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;EFI binary preparation: removing goto-cc section failed&quot;</span></div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;                    &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      }</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    }</div>
@@ -330,16 +330,16 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="preprocessor">#ifdef __linux__</span></div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="keywordflow">if</span>(linking_efi)</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  {</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    log.debug() &lt;&lt; <span class="stringliteral">&quot;arch set with &quot;</span> &lt;&lt; object_files.size() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;arch set with &quot;</span> &lt;&lt; object_files.size() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;object_file : object_files)</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    {</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      log.debug() &lt;&lt; <span class="stringliteral">&quot;EFI binary preparation: restoring object files&quot;</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;EFI binary preparation: restoring object files&quot;</span></div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;                  &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="keyword">const</span> std::string bin_name = object_file + <a class="code" href="classld__modet.html#a37e2f5cd4069570c6f81ac0382402507">goto_binary_tmp_suffix</a>;</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> mv_result = rename(bin_name.c_str(), object_file.c_str());</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      <span class="keywordflow">if</span>(mv_result != 0)</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      {</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        log.debug() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; <a class="code" href="string_8c.html#add46ab98f32b76457852dbb872842bf2">std::strerror</a>(errno)</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; <a class="code" href="string_8c.html#add46ab98f32b76457852dbb872842bf2">std::strerror</a>(errno)</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;                    &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      }</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    }</div>
@@ -425,6 +425,7 @@ $(document).ready(function(){initNavTree('ld__mode_8cpp_source.html',''); initRe
 <div class="ttc" id="ald__mode_8h_html"><div class="ttname"><a href="ld__mode_8h.html">ld_mode.h</a></div><div class="ttdoc">Base class for command line interpretation.</div></div>
 <div class="ttc" id="alinker__script__merge_8h_html"><div class="ttname"><a href="linker__script__merge_8h.html">linker_script_merge.h</a></div><div class="ttdoc">Merge linker script-defined symbols into a goto-program.</div></div>
 <div class="ttc" id="aliteral_8h_html_afe9a214e6401c7ef6920677a5a066fdf"><div class="ttname"><a href="literal_8h.html#afe9a214e6401c7ef6920677a5a066fdf">pos</a></div><div class="ttdeci">literalt pos(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00194">literal.h:194</a></div></div>
+<div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02689">math.c:2689</a></div></div>
 <div class="ttc" id="arun_8cpp_html_a32e6ac327187b7ac705f730a35ab0628"><div class="ttname"><a href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a></div><div class="ttdeci">int run(const std::string &amp;what, const std::vector&lt; std::string &gt; &amp;argv)</div><div class="ttdef"><b>Definition:</b> <a href="run_8cpp_source.html#l00048">run.cpp:48</a></div></div>
 <div class="ttc" id="arun_8h_html"><div class="ttname"><a href="run_8h.html">run.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>

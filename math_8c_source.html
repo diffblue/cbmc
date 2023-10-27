@@ -2512,6 +2512,824 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l02418"></a><span class="lineno"> 2418</span>&#160;  <span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="stdlib_8c.html#af15d7205d8d10c4820f997ce5c526279">abs</a> = <a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(x);</div>
 <div class="line"><a name="l02419"></a><span class="lineno"> 2419</span>&#160;  <span class="keywordflow">return</span> (<a class="code" href="math_8c.html#a4a7d6391bc220941e599eca8ee4235fa">signbit</a>(y)) ? -<a class="code" href="stdlib_8c.html#af15d7205d8d10c4820f997ce5c526279">abs</a> : <a class="code" href="stdlib_8c.html#af15d7205d8d10c4820f997ce5c526279">abs</a>;</div>
 <div class="line"><a name="l02420"></a><span class="lineno"> 2420</span>&#160;}</div>
+<div class="line"><a name="l02421"></a><span class="lineno"> 2421</span>&#160; </div>
+<div class="line"><a name="l02422"></a><span class="lineno"> 2422</span>&#160;<span class="comment">/* FUNCTION: exp2 */</span></div>
+<div class="line"><a name="l02423"></a><span class="lineno"> 2423</span>&#160; </div>
+<div class="line"><a name="l02424"></a><span class="lineno"> 2424</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02425"></a><span class="lineno"> 2425</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02426"></a><span class="lineno"> 2426</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02427"></a><span class="lineno"> 2427</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02428"></a><span class="lineno"> 2428</span>&#160; </div>
+<div class="line"><a name="l02429"></a><span class="lineno"><a class="line" href="math_8c.html#a86e37219434c0b7978453b6ca88fc5fb"> 2429</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#a86e37219434c0b7978453b6ca88fc5fb">exp2</a>(<span class="keywordtype">double</span> x)</div>
+<div class="line"><a name="l02430"></a><span class="lineno"> 2430</span>&#160;{</div>
+<div class="line"><a name="l02431"></a><span class="lineno"> 2431</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#aa56c9494c95edf68386375e97d64159b">pow</a>(2.0, x);</div>
+<div class="line"><a name="l02432"></a><span class="lineno"> 2432</span>&#160;}</div>
+<div class="line"><a name="l02433"></a><span class="lineno"> 2433</span>&#160; </div>
+<div class="line"><a name="l02434"></a><span class="lineno"> 2434</span>&#160;<span class="comment">/* FUNCTION: exp2f */</span></div>
+<div class="line"><a name="l02435"></a><span class="lineno"> 2435</span>&#160; </div>
+<div class="line"><a name="l02436"></a><span class="lineno"> 2436</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02437"></a><span class="lineno"> 2437</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02438"></a><span class="lineno"> 2438</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02439"></a><span class="lineno"> 2439</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02440"></a><span class="lineno"> 2440</span>&#160; </div>
+<div class="line"><a name="l02441"></a><span class="lineno"><a class="line" href="math_8c.html#aed26c6708ff2027f9a8214d206eef0e7"> 2441</a></span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#aed26c6708ff2027f9a8214d206eef0e7">exp2f</a>(<span class="keywordtype">float</span> x)</div>
+<div class="line"><a name="l02442"></a><span class="lineno"> 2442</span>&#160;{</div>
+<div class="line"><a name="l02443"></a><span class="lineno"> 2443</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#ac6b287549be087f6f0bf03b6fe30499e">powf</a>(2.0f, x);</div>
+<div class="line"><a name="l02444"></a><span class="lineno"> 2444</span>&#160;}</div>
+<div class="line"><a name="l02445"></a><span class="lineno"> 2445</span>&#160; </div>
+<div class="line"><a name="l02446"></a><span class="lineno"> 2446</span>&#160;<span class="comment">/* FUNCTION: exp2l */</span></div>
+<div class="line"><a name="l02447"></a><span class="lineno"> 2447</span>&#160; </div>
+<div class="line"><a name="l02448"></a><span class="lineno"> 2448</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02449"></a><span class="lineno"> 2449</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02450"></a><span class="lineno"> 2450</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02451"></a><span class="lineno"> 2451</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02452"></a><span class="lineno"> 2452</span>&#160; </div>
+<div class="line"><a name="l02453"></a><span class="lineno"><a class="line" href="math_8c.html#a4618e032de8318b72df5cc71f15b5e45"> 2453</a></span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#a4618e032de8318b72df5cc71f15b5e45">exp2l</a>(<span class="keywordtype">long</span> <span class="keywordtype">double</span> x)</div>
+<div class="line"><a name="l02454"></a><span class="lineno"> 2454</span>&#160;{</div>
+<div class="line"><a name="l02455"></a><span class="lineno"> 2455</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a2f4830e468138e1513b55ca6a92a0f9a">powl</a>(2.0l, x);</div>
+<div class="line"><a name="l02456"></a><span class="lineno"> 2456</span>&#160;}</div>
+<div class="line"><a name="l02457"></a><span class="lineno"> 2457</span>&#160; </div>
+<div class="line"><a name="l02458"></a><span class="lineno"> 2458</span>&#160;<span class="comment">/* FUNCTION: exp */</span></div>
+<div class="line"><a name="l02459"></a><span class="lineno"> 2459</span>&#160; </div>
+<div class="line"><a name="l02460"></a><span class="lineno"> 2460</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02461"></a><span class="lineno"> 2461</span>&#160;<span class="preprocessor">#  ifdef _WIN32</span></div>
+<div class="line"><a name="l02462"></a><span class="lineno"> 2462</span>&#160;<span class="preprocessor">#    define _USE_MATH_DEFINES</span></div>
+<div class="line"><a name="l02463"></a><span class="lineno"> 2463</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l02464"></a><span class="lineno"> 2464</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02465"></a><span class="lineno"> 2465</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02466"></a><span class="lineno"> 2466</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02467"></a><span class="lineno"> 2467</span>&#160; </div>
+<div class="line"><a name="l02468"></a><span class="lineno"> 2468</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02469"></a><span class="lineno"> 2469</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l02470"></a><span class="lineno"><a class="line" href="math_8c.html#a1e5f7b41a88e217972a585bf869395d4"> 2470</a></span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02471"></a><span class="lineno"> 2471</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02472"></a><span class="lineno"> 2472</span>&#160; </div>
+<div class="line"><a name="l02473"></a><span class="lineno"> 2473</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02474"></a><span class="lineno"> 2474</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l02475"></a><span class="lineno"><a class="line" href="math_8c.html#a40c164fa2b2bf09a2ec154c97be511cc"> 2475</a></span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02476"></a><span class="lineno"> 2476</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02477"></a><span class="lineno"> 2477</span>&#160; </div>
+<div class="line"><a name="l02478"></a><span class="lineno"><a class="line" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f"> 2478</a></span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02479"></a><span class="lineno"> 2479</span>&#160; </div>
+<div class="line"><a name="l02480"></a><span class="lineno"><a class="line" href="math_8c.html#ae09128febbbe6372cde4fa0c65608a42"> 2480</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#ae09128febbbe6372cde4fa0c65608a42">exp</a>(<span class="keywordtype">double</span> x)</div>
+<div class="line"><a name="l02481"></a><span class="lineno"> 2481</span>&#160;{</div>
+<div class="line"><a name="l02482"></a><span class="lineno"> 2482</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#aee912cd47a11dde6f608ea7cff6b9720">__CPROVER_isnand</a>(x) || (<a class="code" href="cprover__builtin__headers_8h.html#aaf68da028fdbb175dc47d568fc62851a">__CPROVER_isinfd</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x)))</div>
+<div class="line"><a name="l02483"></a><span class="lineno"> 2483</span>&#160;    <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l02484"></a><span class="lineno"> 2484</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#aaf68da028fdbb175dc47d568fc62851a">__CPROVER_isinfd</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x))</div>
+<div class="line"><a name="l02485"></a><span class="lineno"> 2485</span>&#160;    <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l02486"></a><span class="lineno"> 2486</span>&#160;  <span class="comment">// underflow/overflow when the result is not representable in 11 exponent bits</span></div>
+<div class="line"><a name="l02487"></a><span class="lineno"> 2487</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x &lt; -1024.0 * M_LN2)</div>
+<div class="line"><a name="l02488"></a><span class="lineno"> 2488</span>&#160;  {</div>
+<div class="line"><a name="l02489"></a><span class="lineno"> 2489</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02490"></a><span class="lineno"> 2490</span>&#160;    <span class="keywordflow">return</span> 0.0;</div>
+<div class="line"><a name="l02491"></a><span class="lineno"> 2491</span>&#160;  }</div>
+<div class="line"><a name="l02492"></a><span class="lineno"> 2492</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x &gt; 1024.0 * M_LN2)</div>
+<div class="line"><a name="l02493"></a><span class="lineno"> 2493</span>&#160;  {</div>
+<div class="line"><a name="l02494"></a><span class="lineno"> 2494</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02495"></a><span class="lineno"> 2495</span>&#160;    <span class="keywordflow">return</span> HUGE_VAL;</div>
+<div class="line"><a name="l02496"></a><span class="lineno"> 2496</span>&#160;  }</div>
+<div class="line"><a name="l02497"></a><span class="lineno"> 2497</span>&#160; </div>
+<div class="line"><a name="l02498"></a><span class="lineno"> 2498</span>&#160;  <span class="comment">// Nicol N. Schraudolph: A Fast, Compact Approximation of the Exponential</span></div>
+<div class="line"><a name="l02499"></a><span class="lineno"> 2499</span>&#160;  <span class="comment">// Function. Neural Computation 11(4), 1999</span></div>
+<div class="line"><a name="l02500"></a><span class="lineno"> 2500</span>&#160;  <span class="comment">// https://schraudolph.org/pubs/Schraudolph99.pdf</span></div>
+<div class="line"><a name="l02501"></a><span class="lineno"> 2501</span>&#160;  <span class="comment">// 20 is 32 - 1 sign bit - 11 exponent bits</span></div>
+<div class="line"><a name="l02502"></a><span class="lineno"> 2502</span>&#160;  int32_t bias = (1 &lt;&lt; 20) * ((1 &lt;&lt; 10) - 1);</div>
+<div class="line"><a name="l02503"></a><span class="lineno"> 2503</span>&#160;  int32_t exp_a_x = (int32_t)(x / M_LN2 * (<span class="keywordtype">double</span>)(1 &lt;&lt; 20)) + bias;</div>
+<div class="line"><a name="l02504"></a><span class="lineno"> 2504</span>&#160;  <span class="comment">// EXP&#39;C controls the approximation; the paper suggests 60801, but -1 yields</span></div>
+<div class="line"><a name="l02505"></a><span class="lineno"> 2505</span>&#160;  <span class="comment">// an upper bound and 90253 a lower bound, and we pick a value in between.</span></div>
+<div class="line"><a name="l02506"></a><span class="lineno"> 2506</span>&#160;  int32_t lower = exp_a_x - 90253;</div>
+<div class="line"><a name="l02507"></a><span class="lineno"> 2507</span>&#160;  int32_t upper = exp_a_x + 1;</div>
+<div class="line"><a name="l02508"></a><span class="lineno"> 2508</span>&#160;  int32_t result = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l02509"></a><span class="lineno"> 2509</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &gt;= lower);</div>
+<div class="line"><a name="l02510"></a><span class="lineno"> 2510</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &lt;= upper);</div>
+<div class="line"><a name="l02511"></a><span class="lineno"> 2511</span>&#160; </div>
+<div class="line"><a name="l02512"></a><span class="lineno"> 2512</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l02513"></a><span class="lineno"> 2513</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">double</span>) == 2 * <span class="keyword">sizeof</span>(int32_t),</div>
+<div class="line"><a name="l02514"></a><span class="lineno"> 2514</span>&#160;    <span class="stringliteral">&quot;bit width of double is 2x bit width of int32_t&quot;</span>);</div>
+<div class="line"><a name="l02515"></a><span class="lineno"> 2515</span>&#160;  <span class="keyword">union </span>U</div>
+<div class="line"><a name="l02516"></a><span class="lineno"> 2516</span>&#160;  {</div>
+<div class="line"><a name="l02517"></a><span class="lineno"> 2517</span>&#160;    <span class="keywordtype">double</span> d;</div>
+<div class="line"><a name="l02518"></a><span class="lineno"> 2518</span>&#160;    int32_t i[2];</div>
+<div class="line"><a name="l02519"></a><span class="lineno"> 2519</span>&#160;  };</div>
+<div class="line"><a name="l02520"></a><span class="lineno"> 2520</span>&#160;<span class="preprocessor">#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l02521"></a><span class="lineno"> 2521</span>&#160;  <span class="keyword">union </span>U u = {.i = {0, result}};</div>
+<div class="line"><a name="l02522"></a><span class="lineno"> 2522</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l02523"></a><span class="lineno"> 2523</span>&#160;  <span class="keyword">union </span>U u = {.i = {result, 0}};</div>
+<div class="line"><a name="l02524"></a><span class="lineno"> 2524</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02525"></a><span class="lineno"> 2525</span>&#160;  <span class="keywordflow">return</span> u.d;</div>
+<div class="line"><a name="l02526"></a><span class="lineno"> 2526</span>&#160;}</div>
+<div class="line"><a name="l02527"></a><span class="lineno"> 2527</span>&#160; </div>
+<div class="line"><a name="l02528"></a><span class="lineno"> 2528</span>&#160;<span class="comment">/* FUNCTION: expf */</span></div>
+<div class="line"><a name="l02529"></a><span class="lineno"> 2529</span>&#160; </div>
+<div class="line"><a name="l02530"></a><span class="lineno"> 2530</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02531"></a><span class="lineno"> 2531</span>&#160;<span class="preprocessor">#  ifdef _WIN32</span></div>
+<div class="line"><a name="l02532"></a><span class="lineno"> 2532</span>&#160;<span class="preprocessor">#    define _USE_MATH_DEFINES</span></div>
+<div class="line"><a name="l02533"></a><span class="lineno"> 2533</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l02534"></a><span class="lineno"> 2534</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02535"></a><span class="lineno"> 2535</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02536"></a><span class="lineno"> 2536</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02537"></a><span class="lineno"> 2537</span>&#160; </div>
+<div class="line"><a name="l02538"></a><span class="lineno"> 2538</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02539"></a><span class="lineno"> 2539</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l02540"></a><span class="lineno"> 2540</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02541"></a><span class="lineno"> 2541</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02542"></a><span class="lineno"> 2542</span>&#160; </div>
+<div class="line"><a name="l02543"></a><span class="lineno"> 2543</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02544"></a><span class="lineno"> 2544</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l02545"></a><span class="lineno"> 2545</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02546"></a><span class="lineno"> 2546</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02547"></a><span class="lineno"> 2547</span>&#160; </div>
+<div class="line"><a name="l02548"></a><span class="lineno"> 2548</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02549"></a><span class="lineno"> 2549</span>&#160; </div>
+<div class="line"><a name="l02550"></a><span class="lineno"><a class="line" href="math_8c.html#a0c2bc89b8355a89542ac98d9e2120363"> 2550</a></span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#a0c2bc89b8355a89542ac98d9e2120363">expf</a>(<span class="keywordtype">float</span> x)</div>
+<div class="line"><a name="l02551"></a><span class="lineno"> 2551</span>&#160;{</div>
+<div class="line"><a name="l02552"></a><span class="lineno"> 2552</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a295eae882b9fed7ffcde88218023563d">__CPROVER_isnanf</a>(x) || (<a class="code" href="cprover__builtin__headers_8h.html#a6752cc1f8eb7e1c9bfed7fd6ab847e5a">__CPROVER_isinff</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x)))</div>
+<div class="line"><a name="l02553"></a><span class="lineno"> 2553</span>&#160;    <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l02554"></a><span class="lineno"> 2554</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a6752cc1f8eb7e1c9bfed7fd6ab847e5a">__CPROVER_isinff</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x))</div>
+<div class="line"><a name="l02555"></a><span class="lineno"> 2555</span>&#160;    <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l02556"></a><span class="lineno"> 2556</span>&#160;  <span class="comment">// underflow/overflow when the result is not representable in 8 exponent bits</span></div>
+<div class="line"><a name="l02557"></a><span class="lineno"> 2557</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x &lt; -128.0f * (<span class="keywordtype">float</span>)M_LN2)</div>
+<div class="line"><a name="l02558"></a><span class="lineno"> 2558</span>&#160;  {</div>
+<div class="line"><a name="l02559"></a><span class="lineno"> 2559</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02560"></a><span class="lineno"> 2560</span>&#160;    <span class="keywordflow">return</span> 0.0f;</div>
+<div class="line"><a name="l02561"></a><span class="lineno"> 2561</span>&#160;  }</div>
+<div class="line"><a name="l02562"></a><span class="lineno"> 2562</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x &gt; 128.0f * (<span class="keywordtype">float</span>)M_LN2)</div>
+<div class="line"><a name="l02563"></a><span class="lineno"> 2563</span>&#160;  {</div>
+<div class="line"><a name="l02564"></a><span class="lineno"> 2564</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02565"></a><span class="lineno"> 2565</span>&#160;    <span class="keywordflow">return</span> HUGE_VALF;</div>
+<div class="line"><a name="l02566"></a><span class="lineno"> 2566</span>&#160;  }</div>
+<div class="line"><a name="l02567"></a><span class="lineno"> 2567</span>&#160; </div>
+<div class="line"><a name="l02568"></a><span class="lineno"> 2568</span>&#160;  <span class="comment">// 23 is 32 - 1 sign bit - 8 exponent bits</span></div>
+<div class="line"><a name="l02569"></a><span class="lineno"> 2569</span>&#160;  int32_t bias = (1 &lt;&lt; 23) * ((1 &lt;&lt; 7) - 1);</div>
+<div class="line"><a name="l02570"></a><span class="lineno"> 2570</span>&#160;  int32_t exp_a_x = (int32_t)(x / (<span class="keywordtype">float</span>)M_LN2 * (float)(1 &lt;&lt; 23)) + bias;</div>
+<div class="line"><a name="l02571"></a><span class="lineno"> 2571</span>&#160;  <span class="comment">// 722019 is 2^23 * [1 - [ln(ln(2)) + 1] / ln(2)] rounded up -- see Appendix</span></div>
+<div class="line"><a name="l02572"></a><span class="lineno"> 2572</span>&#160;  <span class="comment">// of Schraudolph&#39;s paper</span></div>
+<div class="line"><a name="l02573"></a><span class="lineno"> 2573</span>&#160;  int32_t lower = exp_a_x - 722019;</div>
+<div class="line"><a name="l02574"></a><span class="lineno"> 2574</span>&#160;  int32_t upper = exp_a_x + 1;</div>
+<div class="line"><a name="l02575"></a><span class="lineno"> 2575</span>&#160;  int32_t result = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l02576"></a><span class="lineno"> 2576</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &gt;= lower);</div>
+<div class="line"><a name="l02577"></a><span class="lineno"> 2577</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &lt;= upper);</div>
+<div class="line"><a name="l02578"></a><span class="lineno"> 2578</span>&#160; </div>
+<div class="line"><a name="l02579"></a><span class="lineno"> 2579</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l02580"></a><span class="lineno"> 2580</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>) == <span class="keyword">sizeof</span>(int32_t),</div>
+<div class="line"><a name="l02581"></a><span class="lineno"> 2581</span>&#160;    <span class="stringliteral">&quot;bit width of float and int32_t should match&quot;</span>);</div>
+<div class="line"><a name="l02582"></a><span class="lineno"> 2582</span>&#160;  <span class="keyword">union </span>U</div>
+<div class="line"><a name="l02583"></a><span class="lineno"> 2583</span>&#160;  {</div>
+<div class="line"><a name="l02584"></a><span class="lineno"> 2584</span>&#160;    <span class="keywordtype">float</span> f;</div>
+<div class="line"><a name="l02585"></a><span class="lineno"> 2585</span>&#160;    int32_t i;</div>
+<div class="line"><a name="l02586"></a><span class="lineno"> 2586</span>&#160;  };</div>
+<div class="line"><a name="l02587"></a><span class="lineno"> 2587</span>&#160;  <span class="keyword">union </span>U u = {.i = result};</div>
+<div class="line"><a name="l02588"></a><span class="lineno"> 2588</span>&#160;  <span class="keywordflow">return</span> u.f;</div>
+<div class="line"><a name="l02589"></a><span class="lineno"> 2589</span>&#160;}</div>
+<div class="line"><a name="l02590"></a><span class="lineno"> 2590</span>&#160; </div>
+<div class="line"><a name="l02591"></a><span class="lineno"> 2591</span>&#160;<span class="comment">/* FUNCTION: expl */</span></div>
+<div class="line"><a name="l02592"></a><span class="lineno"> 2592</span>&#160; </div>
+<div class="line"><a name="l02593"></a><span class="lineno"> 2593</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02594"></a><span class="lineno"> 2594</span>&#160;<span class="preprocessor">#  ifdef _WIN32</span></div>
+<div class="line"><a name="l02595"></a><span class="lineno"> 2595</span>&#160;<span class="preprocessor">#    define _USE_MATH_DEFINES</span></div>
+<div class="line"><a name="l02596"></a><span class="lineno"> 2596</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l02597"></a><span class="lineno"> 2597</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02598"></a><span class="lineno"> 2598</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02599"></a><span class="lineno"> 2599</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02600"></a><span class="lineno"> 2600</span>&#160; </div>
+<div class="line"><a name="l02601"></a><span class="lineno"> 2601</span>&#160;<span class="preprocessor">#ifndef __CPROVER_FLOAT_H_INCLUDED</span></div>
+<div class="line"><a name="l02602"></a><span class="lineno"> 2602</span>&#160;<span class="preprocessor">#  include &lt;float.h&gt;</span></div>
+<div class="line"><a name="l02603"></a><span class="lineno"><a class="line" href="math_8c.html#ac6d497121e858a88f835207ccf35c33c"> 2603</a></span>&#160;<span class="preprocessor">#  define __CPROVER_FLOAT_H_INCLUDED</span></div>
+<div class="line"><a name="l02604"></a><span class="lineno"> 2604</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02605"></a><span class="lineno"> 2605</span>&#160; </div>
+<div class="line"><a name="l02606"></a><span class="lineno"> 2606</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02607"></a><span class="lineno"> 2607</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l02608"></a><span class="lineno"> 2608</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02609"></a><span class="lineno"> 2609</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02610"></a><span class="lineno"> 2610</span>&#160; </div>
+<div class="line"><a name="l02611"></a><span class="lineno"> 2611</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02612"></a><span class="lineno"> 2612</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l02613"></a><span class="lineno"> 2613</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02614"></a><span class="lineno"> 2614</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02615"></a><span class="lineno"> 2615</span>&#160; </div>
+<div class="line"><a name="l02616"></a><span class="lineno"> 2616</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02617"></a><span class="lineno"> 2617</span>&#160; </div>
+<div class="line"><a name="l02618"></a><span class="lineno"><a class="line" href="math_8c.html#aed4eb11ef1397c751334311ce5b43920"> 2618</a></span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#aed4eb11ef1397c751334311ce5b43920">expl</a>(<span class="keywordtype">long</span> <span class="keywordtype">double</span> x)</div>
+<div class="line"><a name="l02619"></a><span class="lineno"> 2619</span>&#160;{</div>
+<div class="line"><a name="l02620"></a><span class="lineno"> 2620</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#abf7a77c5a397eda1e77d31598b793036">__CPROVER_isnanld</a>(x) || (<a class="code" href="cprover__builtin__headers_8h.html#a35e917dcd1896efbaceb063dd940bf95">__CPROVER_isinfld</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x)))</div>
+<div class="line"><a name="l02621"></a><span class="lineno"> 2621</span>&#160;    <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l02622"></a><span class="lineno"> 2622</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a35e917dcd1896efbaceb063dd940bf95">__CPROVER_isinfld</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x))</div>
+<div class="line"><a name="l02623"></a><span class="lineno"> 2623</span>&#160;    <span class="keywordflow">return</span> +0.0l;</div>
+<div class="line"><a name="l02624"></a><span class="lineno"> 2624</span>&#160; </div>
+<div class="line"><a name="l02625"></a><span class="lineno"> 2625</span>&#160;<span class="preprocessor">#if LDBL_MAX_EXP == DBL_MAX_EXP</span></div>
+<div class="line"><a name="l02626"></a><span class="lineno"> 2626</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#ae09128febbbe6372cde4fa0c65608a42">exp</a>(x, y);</div>
+<div class="line"><a name="l02627"></a><span class="lineno"> 2627</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l02628"></a><span class="lineno"> 2628</span>&#160;  <span class="comment">// underflow/overflow when the result is not representable in 15 exponent bits</span></div>
+<div class="line"><a name="l02629"></a><span class="lineno"> 2629</span>&#160;  <span class="keywordflow">if</span>(x &lt; -16384.0l * M_LN2)</div>
+<div class="line"><a name="l02630"></a><span class="lineno"> 2630</span>&#160;  {</div>
+<div class="line"><a name="l02631"></a><span class="lineno"> 2631</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02632"></a><span class="lineno"> 2632</span>&#160;    <span class="keywordflow">return</span> 0.0l;</div>
+<div class="line"><a name="l02633"></a><span class="lineno"> 2633</span>&#160;  }</div>
+<div class="line"><a name="l02634"></a><span class="lineno"> 2634</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x &gt; 16384.0l * M_LN2)</div>
+<div class="line"><a name="l02635"></a><span class="lineno"> 2635</span>&#160;  {</div>
+<div class="line"><a name="l02636"></a><span class="lineno"> 2636</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02637"></a><span class="lineno"> 2637</span>&#160;    <span class="keywordflow">return</span> HUGE_VALL;</div>
+<div class="line"><a name="l02638"></a><span class="lineno"> 2638</span>&#160;  }</div>
+<div class="line"><a name="l02639"></a><span class="lineno"> 2639</span>&#160;  <span class="comment">// 16 is 32 - 1 sign bit - 15 exponent bits</span></div>
+<div class="line"><a name="l02640"></a><span class="lineno"> 2640</span>&#160;  int32_t bias = (1 &lt;&lt; 16) * ((1 &lt;&lt; 14) - 1);</div>
+<div class="line"><a name="l02641"></a><span class="lineno"> 2641</span>&#160;  int32_t exp_a_x = (int32_t)(x / M_LN2 * (<span class="keywordtype">long</span> <span class="keywordtype">double</span>)(1 &lt;&lt; 16)) + bias;</div>
+<div class="line"><a name="l02642"></a><span class="lineno"> 2642</span>&#160;  <span class="comment">// 5641 is 2^16 * [1 - [ln(ln(2)) + 1] / ln(2)] rounded up -- see Appendix</span></div>
+<div class="line"><a name="l02643"></a><span class="lineno"> 2643</span>&#160;  <span class="comment">// of Schraudolph&#39;s paper</span></div>
+<div class="line"><a name="l02644"></a><span class="lineno"> 2644</span>&#160;  int32_t lower = exp_a_x - 5641;</div>
+<div class="line"><a name="l02645"></a><span class="lineno"> 2645</span>&#160;  int32_t upper = exp_a_x + 1;</div>
+<div class="line"><a name="l02646"></a><span class="lineno"> 2646</span>&#160;  int32_t result = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l02647"></a><span class="lineno"> 2647</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &gt;= lower);</div>
+<div class="line"><a name="l02648"></a><span class="lineno"> 2648</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(result &lt;= upper);</div>
+<div class="line"><a name="l02649"></a><span class="lineno"> 2649</span>&#160; </div>
+<div class="line"><a name="l02650"></a><span class="lineno"> 2650</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l02651"></a><span class="lineno"> 2651</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">long</span> <span class="keywordtype">double</span>) % <span class="keyword">sizeof</span>(int32_t) == 0,</div>
+<div class="line"><a name="l02652"></a><span class="lineno"> 2652</span>&#160;    <span class="stringliteral">&quot;bit width of long double is a multiple of bit width of int32_t&quot;</span>);</div>
+<div class="line"><a name="l02653"></a><span class="lineno"> 2653</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l02654"></a><span class="lineno"> 2654</span>&#160;  {</div>
+<div class="line"><a name="l02655"></a><span class="lineno"> 2655</span>&#160;    <span class="keywordtype">long</span> <span class="keywordtype">double</span> l;</div>
+<div class="line"><a name="l02656"></a><span class="lineno"> 2656</span>&#160;    int32_t i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t)];</div>
+<div class="line"><a name="l02657"></a><span class="lineno"> 2657</span>&#160;  } u = {.i = {0}};</div>
+<div class="line"><a name="l02658"></a><span class="lineno"> 2658</span>&#160;<span class="preprocessor">#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l02659"></a><span class="lineno"> 2659</span>&#160;  u.i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t) - 1] = result;</div>
+<div class="line"><a name="l02660"></a><span class="lineno"> 2660</span>&#160;<span class="preprocessor">#  else</span></div>
+<div class="line"><a name="l02661"></a><span class="lineno"> 2661</span>&#160;  u.i[0] = result;</div>
+<div class="line"><a name="l02662"></a><span class="lineno"> 2662</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l02663"></a><span class="lineno"> 2663</span>&#160;  <span class="keywordflow">return</span> u.l;</div>
+<div class="line"><a name="l02664"></a><span class="lineno"> 2664</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02665"></a><span class="lineno"> 2665</span>&#160;}</div>
+<div class="line"><a name="l02666"></a><span class="lineno"> 2666</span>&#160; </div>
+<div class="line"><a name="l02667"></a><span class="lineno"> 2667</span>&#160;<span class="comment">/* FUNCTION: log */</span></div>
+<div class="line"><a name="l02668"></a><span class="lineno"> 2668</span>&#160; </div>
+<div class="line"><a name="l02669"></a><span class="lineno"> 2669</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02670"></a><span class="lineno"> 2670</span>&#160;<span class="preprocessor">#  ifdef _WIN32</span></div>
+<div class="line"><a name="l02671"></a><span class="lineno"> 2671</span>&#160;<span class="preprocessor">#    define _USE_MATH_DEFINES</span></div>
+<div class="line"><a name="l02672"></a><span class="lineno"> 2672</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l02673"></a><span class="lineno"> 2673</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02674"></a><span class="lineno"> 2674</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02675"></a><span class="lineno"> 2675</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02676"></a><span class="lineno"> 2676</span>&#160; </div>
+<div class="line"><a name="l02677"></a><span class="lineno"> 2677</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02678"></a><span class="lineno"> 2678</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l02679"></a><span class="lineno"> 2679</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02680"></a><span class="lineno"> 2680</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02681"></a><span class="lineno"> 2681</span>&#160; </div>
+<div class="line"><a name="l02682"></a><span class="lineno"> 2682</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02683"></a><span class="lineno"> 2683</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l02684"></a><span class="lineno"> 2684</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02685"></a><span class="lineno"> 2685</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02686"></a><span class="lineno"> 2686</span>&#160; </div>
+<div class="line"><a name="l02687"></a><span class="lineno"> 2687</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02688"></a><span class="lineno"> 2688</span>&#160; </div>
+<div class="line"><a name="l02689"></a><span class="lineno"><a class="line" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82"> 2689</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(<span class="keywordtype">double</span> x)</div>
+<div class="line"><a name="l02690"></a><span class="lineno"> 2690</span>&#160;{</div>
+<div class="line"><a name="l02691"></a><span class="lineno"> 2691</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#aee912cd47a11dde6f608ea7cff6b9720">__CPROVER_isnand</a>(x) || (<a class="code" href="cprover__builtin__headers_8h.html#aaf68da028fdbb175dc47d568fc62851a">__CPROVER_isinfd</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x)))</div>
+<div class="line"><a name="l02692"></a><span class="lineno"> 2692</span>&#160;    <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l02693"></a><span class="lineno"> 2693</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x == 1.0)</div>
+<div class="line"><a name="l02694"></a><span class="lineno"> 2694</span>&#160;    <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l02695"></a><span class="lineno"> 2695</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO)</div>
+<div class="line"><a name="l02696"></a><span class="lineno"> 2696</span>&#160;  {</div>
+<div class="line"><a name="l02697"></a><span class="lineno"> 2697</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02698"></a><span class="lineno"> 2698</span>&#160;    <span class="keywordflow">return</span> -HUGE_VAL;</div>
+<div class="line"><a name="l02699"></a><span class="lineno"> 2699</span>&#160;  }</div>
+<div class="line"><a name="l02700"></a><span class="lineno"> 2700</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x))</div>
+<div class="line"><a name="l02701"></a><span class="lineno"> 2701</span>&#160;  {</div>
+<div class="line"><a name="l02702"></a><span class="lineno"> 2702</span>&#160;    errno = EDOM;</div>
+<div class="line"><a name="l02703"></a><span class="lineno"> 2703</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
+<div class="line"><a name="l02704"></a><span class="lineno"> 2704</span>&#160;  }</div>
+<div class="line"><a name="l02705"></a><span class="lineno"> 2705</span>&#160; </div>
+<div class="line"><a name="l02706"></a><span class="lineno"> 2706</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l02707"></a><span class="lineno"> 2707</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">double</span>) == 2 * <span class="keyword">sizeof</span>(int32_t),</div>
+<div class="line"><a name="l02708"></a><span class="lineno"> 2708</span>&#160;    <span class="stringliteral">&quot;bit width of double is 2x bit width of int32_t&quot;</span>);</div>
+<div class="line"><a name="l02709"></a><span class="lineno"> 2709</span>&#160;  <span class="comment">// https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/</span></div>
+<div class="line"><a name="l02710"></a><span class="lineno"> 2710</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l02711"></a><span class="lineno"> 2711</span>&#160;  {</div>
+<div class="line"><a name="l02712"></a><span class="lineno"> 2712</span>&#160;    <span class="keywordtype">double</span> d;</div>
+<div class="line"><a name="l02713"></a><span class="lineno"> 2713</span>&#160;    int32_t i[2];</div>
+<div class="line"><a name="l02714"></a><span class="lineno"> 2714</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l02715"></a><span class="lineno"> 2715</span>&#160;  int32_t bias = (1 &lt;&lt; 20) * ((1 &lt;&lt; 10) - 1);</div>
+<div class="line"><a name="l02716"></a><span class="lineno"> 2716</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l02717"></a><span class="lineno"> 2717</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -90253 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l02718"></a><span class="lineno"> 2718</span>&#160;<span class="preprocessor">#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l02719"></a><span class="lineno"> 2719</span>&#160;  <span class="keywordflow">return</span> ((<span class="keywordtype">double</span>)u.i[1] - (<span class="keywordtype">double</span>)(bias + exp_c)) * M_LN2 / (double)(1 &lt;&lt; 20);</div>
+<div class="line"><a name="l02720"></a><span class="lineno"> 2720</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l02721"></a><span class="lineno"> 2721</span>&#160;  <span class="keywordflow">return</span> ((<span class="keywordtype">double</span>)u.i[0] - (double)(bias + exp_c)) * M_LN2 / (<span class="keywordtype">double</span>)(1 &lt;&lt; 20);</div>
+<div class="line"><a name="l02722"></a><span class="lineno"> 2722</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02723"></a><span class="lineno"> 2723</span>&#160;}</div>
+<div class="line"><a name="l02724"></a><span class="lineno"> 2724</span>&#160; </div>
+<div class="line"><a name="l02725"></a><span class="lineno"> 2725</span>&#160;<span class="comment">/* FUNCTION: logf */</span></div>
+<div class="line"><a name="l02726"></a><span class="lineno"> 2726</span>&#160; </div>
+<div class="line"><a name="l02727"></a><span class="lineno"> 2727</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02728"></a><span class="lineno"> 2728</span>&#160;<span class="preprocessor">#  ifdef _WIN32</span></div>
+<div class="line"><a name="l02729"></a><span class="lineno"> 2729</span>&#160;<span class="preprocessor">#    define _USE_MATH_DEFINES</span></div>
+<div class="line"><a name="l02730"></a><span class="lineno"> 2730</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l02731"></a><span class="lineno"> 2731</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02732"></a><span class="lineno"> 2732</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02733"></a><span class="lineno"> 2733</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02734"></a><span class="lineno"> 2734</span>&#160; </div>
+<div class="line"><a name="l02735"></a><span class="lineno"> 2735</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02736"></a><span class="lineno"> 2736</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l02737"></a><span class="lineno"> 2737</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02738"></a><span class="lineno"> 2738</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02739"></a><span class="lineno"> 2739</span>&#160; </div>
+<div class="line"><a name="l02740"></a><span class="lineno"> 2740</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02741"></a><span class="lineno"> 2741</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l02742"></a><span class="lineno"> 2742</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02743"></a><span class="lineno"> 2743</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02744"></a><span class="lineno"> 2744</span>&#160; </div>
+<div class="line"><a name="l02745"></a><span class="lineno"> 2745</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02746"></a><span class="lineno"> 2746</span>&#160; </div>
+<div class="line"><a name="l02747"></a><span class="lineno"><a class="line" href="math_8c.html#a8246b3e17a39b137d0c62670d0c6e336"> 2747</a></span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#a8246b3e17a39b137d0c62670d0c6e336">logf</a>(<span class="keywordtype">float</span> x)</div>
+<div class="line"><a name="l02748"></a><span class="lineno"> 2748</span>&#160;{</div>
+<div class="line"><a name="l02749"></a><span class="lineno"> 2749</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a295eae882b9fed7ffcde88218023563d">__CPROVER_isnanf</a>(x) || (<a class="code" href="cprover__builtin__headers_8h.html#a6752cc1f8eb7e1c9bfed7fd6ab847e5a">__CPROVER_isinff</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x)))</div>
+<div class="line"><a name="l02750"></a><span class="lineno"> 2750</span>&#160;    <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l02751"></a><span class="lineno"> 2751</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x == 1.0f)</div>
+<div class="line"><a name="l02752"></a><span class="lineno"> 2752</span>&#160;    <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l02753"></a><span class="lineno"> 2753</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO)</div>
+<div class="line"><a name="l02754"></a><span class="lineno"> 2754</span>&#160;  {</div>
+<div class="line"><a name="l02755"></a><span class="lineno"> 2755</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02756"></a><span class="lineno"> 2756</span>&#160;    <span class="keywordflow">return</span> -HUGE_VALF;</div>
+<div class="line"><a name="l02757"></a><span class="lineno"> 2757</span>&#160;  }</div>
+<div class="line"><a name="l02758"></a><span class="lineno"> 2758</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x))</div>
+<div class="line"><a name="l02759"></a><span class="lineno"> 2759</span>&#160;  {</div>
+<div class="line"><a name="l02760"></a><span class="lineno"> 2760</span>&#160;    errno = EDOM;</div>
+<div class="line"><a name="l02761"></a><span class="lineno"> 2761</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
+<div class="line"><a name="l02762"></a><span class="lineno"> 2762</span>&#160;  }</div>
+<div class="line"><a name="l02763"></a><span class="lineno"> 2763</span>&#160; </div>
+<div class="line"><a name="l02764"></a><span class="lineno"> 2764</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l02765"></a><span class="lineno"> 2765</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>) == <span class="keyword">sizeof</span>(int32_t),</div>
+<div class="line"><a name="l02766"></a><span class="lineno"> 2766</span>&#160;    <span class="stringliteral">&quot;bit width of float and int32_t should match&quot;</span>);</div>
+<div class="line"><a name="l02767"></a><span class="lineno"> 2767</span>&#160;  <span class="comment">// https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/</span></div>
+<div class="line"><a name="l02768"></a><span class="lineno"> 2768</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l02769"></a><span class="lineno"> 2769</span>&#160;  {</div>
+<div class="line"><a name="l02770"></a><span class="lineno"> 2770</span>&#160;    <span class="keywordtype">float</span> f;</div>
+<div class="line"><a name="l02771"></a><span class="lineno"> 2771</span>&#160;    int32_t i;</div>
+<div class="line"><a name="l02772"></a><span class="lineno"> 2772</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l02773"></a><span class="lineno"> 2773</span>&#160;  int32_t bias = (1 &lt;&lt; 23) * ((1 &lt;&lt; 7) - 1);</div>
+<div class="line"><a name="l02774"></a><span class="lineno"> 2774</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l02775"></a><span class="lineno"> 2775</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -722019 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l02776"></a><span class="lineno"> 2776</span>&#160;  <span class="keywordflow">return</span> ((<span class="keywordtype">float</span>)u.i - (<span class="keywordtype">float</span>)(bias + exp_c)) * (float)M_LN2 / (<span class="keywordtype">float</span>)(1 &lt;&lt; 23);</div>
+<div class="line"><a name="l02777"></a><span class="lineno"> 2777</span>&#160;}</div>
+<div class="line"><a name="l02778"></a><span class="lineno"> 2778</span>&#160; </div>
+<div class="line"><a name="l02779"></a><span class="lineno"> 2779</span>&#160;<span class="comment">/* FUNCTION: logl */</span></div>
+<div class="line"><a name="l02780"></a><span class="lineno"> 2780</span>&#160; </div>
+<div class="line"><a name="l02781"></a><span class="lineno"> 2781</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02782"></a><span class="lineno"> 2782</span>&#160;<span class="preprocessor">#  ifdef _WIN32</span></div>
+<div class="line"><a name="l02783"></a><span class="lineno"> 2783</span>&#160;<span class="preprocessor">#    define _USE_MATH_DEFINES</span></div>
+<div class="line"><a name="l02784"></a><span class="lineno"> 2784</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l02785"></a><span class="lineno"> 2785</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02786"></a><span class="lineno"> 2786</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02787"></a><span class="lineno"> 2787</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02788"></a><span class="lineno"> 2788</span>&#160; </div>
+<div class="line"><a name="l02789"></a><span class="lineno"> 2789</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02790"></a><span class="lineno"> 2790</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l02791"></a><span class="lineno"> 2791</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02792"></a><span class="lineno"> 2792</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02793"></a><span class="lineno"> 2793</span>&#160; </div>
+<div class="line"><a name="l02794"></a><span class="lineno"> 2794</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02795"></a><span class="lineno"> 2795</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l02796"></a><span class="lineno"> 2796</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02797"></a><span class="lineno"> 2797</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02798"></a><span class="lineno"> 2798</span>&#160; </div>
+<div class="line"><a name="l02799"></a><span class="lineno"> 2799</span>&#160;<span class="preprocessor">#ifndef __CPROVER_FLOAT_H_INCLUDED</span></div>
+<div class="line"><a name="l02800"></a><span class="lineno"> 2800</span>&#160;<span class="preprocessor">#  include &lt;float.h&gt;</span></div>
+<div class="line"><a name="l02801"></a><span class="lineno"> 2801</span>&#160;<span class="preprocessor">#  define __CPROVER_FLOAT_H_INCLUDED</span></div>
+<div class="line"><a name="l02802"></a><span class="lineno"> 2802</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02803"></a><span class="lineno"> 2803</span>&#160; </div>
+<div class="line"><a name="l02804"></a><span class="lineno"> 2804</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02805"></a><span class="lineno"> 2805</span>&#160; </div>
+<div class="line"><a name="l02806"></a><span class="lineno"><a class="line" href="math_8c.html#af67da1c28ce33b403f955103f201dfb8"> 2806</a></span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#af67da1c28ce33b403f955103f201dfb8">logl</a>(<span class="keywordtype">long</span> <span class="keywordtype">double</span> x)</div>
+<div class="line"><a name="l02807"></a><span class="lineno"> 2807</span>&#160;{</div>
+<div class="line"><a name="l02808"></a><span class="lineno"> 2808</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#abf7a77c5a397eda1e77d31598b793036">__CPROVER_isnanld</a>(x) || (<a class="code" href="cprover__builtin__headers_8h.html#a35e917dcd1896efbaceb063dd940bf95">__CPROVER_isinfld</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x)))</div>
+<div class="line"><a name="l02809"></a><span class="lineno"> 2809</span>&#160;    <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l02810"></a><span class="lineno"> 2810</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x == 1.0l)</div>
+<div class="line"><a name="l02811"></a><span class="lineno"> 2811</span>&#160;    <span class="keywordflow">return</span> +0.0l;</div>
+<div class="line"><a name="l02812"></a><span class="lineno"> 2812</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO)</div>
+<div class="line"><a name="l02813"></a><span class="lineno"> 2813</span>&#160;  {</div>
+<div class="line"><a name="l02814"></a><span class="lineno"> 2814</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02815"></a><span class="lineno"> 2815</span>&#160;    <span class="keywordflow">return</span> -HUGE_VALL;</div>
+<div class="line"><a name="l02816"></a><span class="lineno"> 2816</span>&#160;  }</div>
+<div class="line"><a name="l02817"></a><span class="lineno"> 2817</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x))</div>
+<div class="line"><a name="l02818"></a><span class="lineno"> 2818</span>&#160;  {</div>
+<div class="line"><a name="l02819"></a><span class="lineno"> 2819</span>&#160;    errno = EDOM;</div>
+<div class="line"><a name="l02820"></a><span class="lineno"> 2820</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
+<div class="line"><a name="l02821"></a><span class="lineno"> 2821</span>&#160;  }</div>
+<div class="line"><a name="l02822"></a><span class="lineno"> 2822</span>&#160; </div>
+<div class="line"><a name="l02823"></a><span class="lineno"> 2823</span>&#160;<span class="preprocessor">#if LDBL_MAX_EXP == DBL_MAX_EXP</span></div>
+<div class="line"><a name="l02824"></a><span class="lineno"> 2824</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af67da1c28ce33b403f955103f201dfb8">logl</a>(x, y);</div>
+<div class="line"><a name="l02825"></a><span class="lineno"> 2825</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l02826"></a><span class="lineno"> 2826</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l02827"></a><span class="lineno"> 2827</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">long</span> <span class="keywordtype">double</span>) % <span class="keyword">sizeof</span>(int32_t) == 0,</div>
+<div class="line"><a name="l02828"></a><span class="lineno"> 2828</span>&#160;    <span class="stringliteral">&quot;bit width of long double is a multiple of bit width of int32_t&quot;</span>);</div>
+<div class="line"><a name="l02829"></a><span class="lineno"> 2829</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l02830"></a><span class="lineno"> 2830</span>&#160;  {</div>
+<div class="line"><a name="l02831"></a><span class="lineno"> 2831</span>&#160;    <span class="keywordtype">long</span> <span class="keywordtype">double</span> l;</div>
+<div class="line"><a name="l02832"></a><span class="lineno"> 2832</span>&#160;    int32_t i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t)];</div>
+<div class="line"><a name="l02833"></a><span class="lineno"> 2833</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l02834"></a><span class="lineno"> 2834</span>&#160;  int32_t bias = (1 &lt;&lt; 16) * ((1 &lt;&lt; 14) - 1);</div>
+<div class="line"><a name="l02835"></a><span class="lineno"> 2835</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l02836"></a><span class="lineno"> 2836</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -5641 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l02837"></a><span class="lineno"> 2837</span>&#160;<span class="preprocessor">#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l02838"></a><span class="lineno"> 2838</span>&#160;  <span class="keywordflow">return</span> ((<span class="keywordtype">long</span> <span class="keywordtype">double</span>)u.i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> <span class="keywordtype">double</span>) / <span class="keyword">sizeof</span>(int32_t) - 1] -</div>
+<div class="line"><a name="l02839"></a><span class="lineno"> 2839</span>&#160;          (<span class="keywordtype">long</span> <span class="keywordtype">double</span>)(bias + exp_c)) *</div>
+<div class="line"><a name="l02840"></a><span class="lineno"> 2840</span>&#160;         M_LN2 / (<span class="keywordtype">long</span> double)(1 &lt;&lt; 16);</div>
+<div class="line"><a name="l02841"></a><span class="lineno"> 2841</span>&#160;<span class="preprocessor">#  else</span></div>
+<div class="line"><a name="l02842"></a><span class="lineno"> 2842</span>&#160;  <span class="keywordflow">return</span> ((<span class="keywordtype">long</span> <span class="keywordtype">double</span>)u.i[0] - (<span class="keywordtype">long</span> double)(bias + exp_c)) * M_LN2 /</div>
+<div class="line"><a name="l02843"></a><span class="lineno"> 2843</span>&#160;         (<span class="keywordtype">long</span> <span class="keywordtype">double</span>)(1 &lt;&lt; 16);</div>
+<div class="line"><a name="l02844"></a><span class="lineno"> 2844</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l02845"></a><span class="lineno"> 2845</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02846"></a><span class="lineno"> 2846</span>&#160;}</div>
+<div class="line"><a name="l02847"></a><span class="lineno"> 2847</span>&#160; </div>
+<div class="line"><a name="l02848"></a><span class="lineno"> 2848</span>&#160;<span class="comment">/* FUNCTION: pow */</span></div>
+<div class="line"><a name="l02849"></a><span class="lineno"> 2849</span>&#160; </div>
+<div class="line"><a name="l02850"></a><span class="lineno"> 2850</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02851"></a><span class="lineno"> 2851</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02852"></a><span class="lineno"> 2852</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02853"></a><span class="lineno"> 2853</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02854"></a><span class="lineno"> 2854</span>&#160; </div>
+<div class="line"><a name="l02855"></a><span class="lineno"> 2855</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02856"></a><span class="lineno"> 2856</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l02857"></a><span class="lineno"> 2857</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02858"></a><span class="lineno"> 2858</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02859"></a><span class="lineno"> 2859</span>&#160; </div>
+<div class="line"><a name="l02860"></a><span class="lineno"> 2860</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02861"></a><span class="lineno"> 2861</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l02862"></a><span class="lineno"> 2862</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02863"></a><span class="lineno"> 2863</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02864"></a><span class="lineno"> 2864</span>&#160; </div>
+<div class="line"><a name="l02865"></a><span class="lineno"> 2865</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02866"></a><span class="lineno"> 2866</span>&#160; </div>
+<div class="line"><a name="l02867"></a><span class="lineno"> 2867</span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02868"></a><span class="lineno"> 2868</span>&#160; </div>
+<div class="line"><a name="l02869"></a><span class="lineno"><a class="line" href="math_8c.html#aa56c9494c95edf68386375e97d64159b"> 2869</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#aa56c9494c95edf68386375e97d64159b">pow</a>(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y)</div>
+<div class="line"><a name="l02870"></a><span class="lineno"> 2870</span>&#160;{</div>
+<div class="line"><a name="l02871"></a><span class="lineno"> 2871</span>&#160;  <span class="comment">// see man pow (https://linux.die.net/man/3/pow)</span></div>
+<div class="line"><a name="l02872"></a><span class="lineno"> 2872</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l02873"></a><span class="lineno"> 2873</span>&#160;    <a class="code" href="cprover__builtin__headers_8h.html#a61349296693e25289989f4e8baa815bf">__CPROVER_isfinited</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#a61349296693e25289989f4e8baa815bf">__CPROVER_isfinited</a>(y) &amp;&amp;</div>
+<div class="line"><a name="l02874"></a><span class="lineno"> 2874</span>&#160;    <a class="code" href="math_8c.html#a61ba6b3078ccbd5aac518e6ca2a757bd">nearbyint</a>(y) != y)</div>
+<div class="line"><a name="l02875"></a><span class="lineno"> 2875</span>&#160;  {</div>
+<div class="line"><a name="l02876"></a><span class="lineno"> 2876</span>&#160;    errno = EDOM;</div>
+<div class="line"><a name="l02877"></a><span class="lineno"> 2877</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
+<div class="line"><a name="l02878"></a><span class="lineno"> 2878</span>&#160;  }</div>
+<div class="line"><a name="l02879"></a><span class="lineno"> 2879</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x == 1.0)</div>
+<div class="line"><a name="l02880"></a><span class="lineno"> 2880</span>&#160;    <span class="keywordflow">return</span> 1.0;</div>
+<div class="line"><a name="l02881"></a><span class="lineno"> 2881</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(y) == FP_ZERO)</div>
+<div class="line"><a name="l02882"></a><span class="lineno"> 2882</span>&#160;    <span class="keywordflow">return</span> 1.0;</div>
+<div class="line"><a name="l02883"></a><span class="lineno"> 2883</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(y))</div>
+<div class="line"><a name="l02884"></a><span class="lineno"> 2884</span>&#160;  {</div>
+<div class="line"><a name="l02885"></a><span class="lineno"> 2885</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a61ba6b3078ccbd5aac518e6ca2a757bd">nearbyint</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a>(<a class="code" href="math_8c.html#a537296d1a8f9fb621676038b99ba7edf">fmod</a>(y, 2.0)) == 1.0)</div>
+<div class="line"><a name="l02886"></a><span class="lineno"> 2886</span>&#160;      <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l02887"></a><span class="lineno"> 2887</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02888"></a><span class="lineno"> 2888</span>&#160;      <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l02889"></a><span class="lineno"> 2889</span>&#160;  }</div>
+<div class="line"><a name="l02890"></a><span class="lineno"> 2890</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abdd3ff867a71e23d7eddfad6b5e2fdd3">isinf</a>(y))</div>
+<div class="line"><a name="l02891"></a><span class="lineno"> 2891</span>&#160;  {</div>
+<div class="line"><a name="l02892"></a><span class="lineno"> 2892</span>&#160;    <span class="comment">// x == 1.0 and y-is-zero caught above</span></div>
+<div class="line"><a name="l02893"></a><span class="lineno"> 2893</span>&#160;    <span class="keywordflow">if</span>(x == -1.0)</div>
+<div class="line"><a name="l02894"></a><span class="lineno"> 2894</span>&#160;      <span class="keywordflow">return</span> 1.0;</div>
+<div class="line"><a name="l02895"></a><span class="lineno"> 2895</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(y))</div>
+<div class="line"><a name="l02896"></a><span class="lineno"> 2896</span>&#160;    {</div>
+<div class="line"><a name="l02897"></a><span class="lineno"> 2897</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a>(x) &lt; 1.0)</div>
+<div class="line"><a name="l02898"></a><span class="lineno"> 2898</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>();</div>
+<div class="line"><a name="l02899"></a><span class="lineno"> 2899</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02900"></a><span class="lineno"> 2900</span>&#160;        <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l02901"></a><span class="lineno"> 2901</span>&#160;    }</div>
+<div class="line"><a name="l02902"></a><span class="lineno"> 2902</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02903"></a><span class="lineno"> 2903</span>&#160;    {</div>
+<div class="line"><a name="l02904"></a><span class="lineno"> 2904</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a>(x) &lt; 1.0)</div>
+<div class="line"><a name="l02905"></a><span class="lineno"> 2905</span>&#160;        <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l02906"></a><span class="lineno"> 2906</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02907"></a><span class="lineno"> 2907</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>();</div>
+<div class="line"><a name="l02908"></a><span class="lineno"> 2908</span>&#160;    }</div>
+<div class="line"><a name="l02909"></a><span class="lineno"> 2909</span>&#160;  }</div>
+<div class="line"><a name="l02910"></a><span class="lineno"> 2910</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abdd3ff867a71e23d7eddfad6b5e2fdd3">isinf</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x))</div>
+<div class="line"><a name="l02911"></a><span class="lineno"> 2911</span>&#160;  {</div>
+<div class="line"><a name="l02912"></a><span class="lineno"> 2912</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(y))</div>
+<div class="line"><a name="l02913"></a><span class="lineno"> 2913</span>&#160;    {</div>
+<div class="line"><a name="l02914"></a><span class="lineno"> 2914</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a61ba6b3078ccbd5aac518e6ca2a757bd">nearbyint</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a>(<a class="code" href="math_8c.html#a537296d1a8f9fb621676038b99ba7edf">fmod</a>(y, 2.0)) == 1.0)</div>
+<div class="line"><a name="l02915"></a><span class="lineno"> 2915</span>&#160;        <span class="keywordflow">return</span> -0.0;</div>
+<div class="line"><a name="l02916"></a><span class="lineno"> 2916</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02917"></a><span class="lineno"> 2917</span>&#160;        <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l02918"></a><span class="lineno"> 2918</span>&#160;    }</div>
+<div class="line"><a name="l02919"></a><span class="lineno"> 2919</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02920"></a><span class="lineno"> 2920</span>&#160;    {</div>
+<div class="line"><a name="l02921"></a><span class="lineno"> 2921</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a61ba6b3078ccbd5aac518e6ca2a757bd">nearbyint</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a>(<a class="code" href="math_8c.html#a537296d1a8f9fb621676038b99ba7edf">fmod</a>(y, 2.0)) == 1.0)</div>
+<div class="line"><a name="l02922"></a><span class="lineno"> 2922</span>&#160;        <span class="keywordflow">return</span> -<a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>();</div>
+<div class="line"><a name="l02923"></a><span class="lineno"> 2923</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02924"></a><span class="lineno"> 2924</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>();</div>
+<div class="line"><a name="l02925"></a><span class="lineno"> 2925</span>&#160;    }</div>
+<div class="line"><a name="l02926"></a><span class="lineno"> 2926</span>&#160;  }</div>
+<div class="line"><a name="l02927"></a><span class="lineno"> 2927</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abdd3ff867a71e23d7eddfad6b5e2fdd3">isinf</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x))</div>
+<div class="line"><a name="l02928"></a><span class="lineno"> 2928</span>&#160;  {</div>
+<div class="line"><a name="l02929"></a><span class="lineno"> 2929</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(y))</div>
+<div class="line"><a name="l02930"></a><span class="lineno"> 2930</span>&#160;      <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l02931"></a><span class="lineno"> 2931</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02932"></a><span class="lineno"> 2932</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>();</div>
+<div class="line"><a name="l02933"></a><span class="lineno"> 2933</span>&#160;  }</div>
+<div class="line"><a name="l02934"></a><span class="lineno"> 2934</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(y))</div>
+<div class="line"><a name="l02935"></a><span class="lineno"> 2935</span>&#160;  {</div>
+<div class="line"><a name="l02936"></a><span class="lineno"> 2936</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02937"></a><span class="lineno"> 2937</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x) &amp;&amp; <a class="code" href="math_8c.html#a61ba6b3078ccbd5aac518e6ca2a757bd">nearbyint</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a>(<a class="code" href="math_8c.html#a537296d1a8f9fb621676038b99ba7edf">fmod</a>(y, 2.0)) == 1.0)</div>
+<div class="line"><a name="l02938"></a><span class="lineno"> 2938</span>&#160;      <span class="keywordflow">return</span> -HUGE_VAL;</div>
+<div class="line"><a name="l02939"></a><span class="lineno"> 2939</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02940"></a><span class="lineno"> 2940</span>&#160;      <span class="keywordflow">return</span> HUGE_VAL;</div>
+<div class="line"><a name="l02941"></a><span class="lineno"> 2941</span>&#160;  }</div>
+<div class="line"><a name="l02942"></a><span class="lineno"> 2942</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(x) || <a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(y))</div>
+<div class="line"><a name="l02943"></a><span class="lineno"> 2943</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
+<div class="line"><a name="l02944"></a><span class="lineno"> 2944</span>&#160; </div>
+<div class="line"><a name="l02945"></a><span class="lineno"> 2945</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l02946"></a><span class="lineno"> 2946</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">double</span>) == 2 * <span class="keyword">sizeof</span>(int32_t),</div>
+<div class="line"><a name="l02947"></a><span class="lineno"> 2947</span>&#160;    <span class="stringliteral">&quot;bit width of double is 2x bit width of int32_t&quot;</span>);</div>
+<div class="line"><a name="l02948"></a><span class="lineno"> 2948</span>&#160;  <span class="comment">// https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/</span></div>
+<div class="line"><a name="l02949"></a><span class="lineno"> 2949</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l02950"></a><span class="lineno"> 2950</span>&#160;  {</div>
+<div class="line"><a name="l02951"></a><span class="lineno"> 2951</span>&#160;    <span class="keywordtype">double</span> d;</div>
+<div class="line"><a name="l02952"></a><span class="lineno"> 2952</span>&#160;    int32_t i[2];</div>
+<div class="line"><a name="l02953"></a><span class="lineno"> 2953</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l02954"></a><span class="lineno"> 2954</span>&#160;  int32_t bias = (1 &lt;&lt; 20) * ((1 &lt;&lt; 10) - 1);</div>
+<div class="line"><a name="l02955"></a><span class="lineno"> 2955</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l02956"></a><span class="lineno"> 2956</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -90253 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l02957"></a><span class="lineno"> 2957</span>&#160;<span class="preprocessor">#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l02958"></a><span class="lineno"> 2958</span>&#160;  <span class="keywordtype">double</span> mult_result = y * (double)(u.i[1] - (bias + exp_c));</div>
+<div class="line"><a name="l02959"></a><span class="lineno"> 2959</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l02960"></a><span class="lineno"> 2960</span>&#160;  <span class="keywordtype">double</span> mult_result = y * (double)(u.i[0] - (bias + exp_c));</div>
+<div class="line"><a name="l02961"></a><span class="lineno"> 2961</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02962"></a><span class="lineno"> 2962</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a>(mult_result) &gt; (double)(1 &lt;&lt; 30))</div>
+<div class="line"><a name="l02963"></a><span class="lineno"> 2963</span>&#160;  {</div>
+<div class="line"><a name="l02964"></a><span class="lineno"> 2964</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l02965"></a><span class="lineno"> 2965</span>&#160;    <span class="keywordflow">return</span> y &gt; 0.0 ? HUGE_VAL : 0.0;</div>
+<div class="line"><a name="l02966"></a><span class="lineno"> 2966</span>&#160;  }</div>
+<div class="line"><a name="l02967"></a><span class="lineno"> 2967</span>&#160;<span class="preprocessor">#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l02968"></a><span class="lineno"> 2968</span>&#160;  u.i[1] = (int32_t)mult_result + (bias + exp_c);</div>
+<div class="line"><a name="l02969"></a><span class="lineno"> 2969</span>&#160;  u.i[0] = 0;</div>
+<div class="line"><a name="l02970"></a><span class="lineno"> 2970</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l02971"></a><span class="lineno"> 2971</span>&#160;  u.i[0] = (int32_t)mult_result + (bias + exp_c);</div>
+<div class="line"><a name="l02972"></a><span class="lineno"> 2972</span>&#160;  u.i[1] = 0;</div>
+<div class="line"><a name="l02973"></a><span class="lineno"> 2973</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02974"></a><span class="lineno"> 2974</span>&#160;  <span class="keywordflow">return</span> u.d;</div>
+<div class="line"><a name="l02975"></a><span class="lineno"> 2975</span>&#160;}</div>
+<div class="line"><a name="l02976"></a><span class="lineno"> 2976</span>&#160; </div>
+<div class="line"><a name="l02977"></a><span class="lineno"> 2977</span>&#160;<span class="comment">/* FUNCTION: powf */</span></div>
+<div class="line"><a name="l02978"></a><span class="lineno"> 2978</span>&#160; </div>
+<div class="line"><a name="l02979"></a><span class="lineno"> 2979</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02980"></a><span class="lineno"> 2980</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l02981"></a><span class="lineno"> 2981</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l02982"></a><span class="lineno"> 2982</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02983"></a><span class="lineno"> 2983</span>&#160; </div>
+<div class="line"><a name="l02984"></a><span class="lineno"> 2984</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02985"></a><span class="lineno"> 2985</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l02986"></a><span class="lineno"> 2986</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l02987"></a><span class="lineno"> 2987</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02988"></a><span class="lineno"> 2988</span>&#160; </div>
+<div class="line"><a name="l02989"></a><span class="lineno"> 2989</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02990"></a><span class="lineno"> 2990</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l02991"></a><span class="lineno"> 2991</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l02992"></a><span class="lineno"> 2992</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02993"></a><span class="lineno"> 2993</span>&#160; </div>
+<div class="line"><a name="l02994"></a><span class="lineno"> 2994</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02995"></a><span class="lineno"> 2995</span>&#160; </div>
+<div class="line"><a name="l02996"></a><span class="lineno"> 2996</span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l02997"></a><span class="lineno"> 2997</span>&#160; </div>
+<div class="line"><a name="l02998"></a><span class="lineno"><a class="line" href="math_8c.html#ac6b287549be087f6f0bf03b6fe30499e"> 2998</a></span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#ac6b287549be087f6f0bf03b6fe30499e">powf</a>(<span class="keywordtype">float</span> x, <span class="keywordtype">float</span> y)</div>
+<div class="line"><a name="l02999"></a><span class="lineno"> 2999</span>&#160;{</div>
+<div class="line"><a name="l03000"></a><span class="lineno"> 3000</span>&#160;  <span class="comment">// see man pow (https://linux.die.net/man/3/pow)</span></div>
+<div class="line"><a name="l03001"></a><span class="lineno"> 3001</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l03002"></a><span class="lineno"> 3002</span>&#160;    <a class="code" href="cprover__builtin__headers_8h.html#a2201432296132ded1f0395b96b027d44">__CPROVER_isfinitef</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#a2201432296132ded1f0395b96b027d44">__CPROVER_isfinitef</a>(y) &amp;&amp;</div>
+<div class="line"><a name="l03003"></a><span class="lineno"> 3003</span>&#160;    <a class="code" href="math_8c.html#ab3be3fdcb83a6d7cbd10aa5d891f88bf">nearbyintf</a>(y) != y)</div>
+<div class="line"><a name="l03004"></a><span class="lineno"> 3004</span>&#160;  {</div>
+<div class="line"><a name="l03005"></a><span class="lineno"> 3005</span>&#160;    errno = EDOM;</div>
+<div class="line"><a name="l03006"></a><span class="lineno"> 3006</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
+<div class="line"><a name="l03007"></a><span class="lineno"> 3007</span>&#160;  }</div>
+<div class="line"><a name="l03008"></a><span class="lineno"> 3008</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x == 1.0f)</div>
+<div class="line"><a name="l03009"></a><span class="lineno"> 3009</span>&#160;    <span class="keywordflow">return</span> 1.0f;</div>
+<div class="line"><a name="l03010"></a><span class="lineno"> 3010</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(y) == FP_ZERO)</div>
+<div class="line"><a name="l03011"></a><span class="lineno"> 3011</span>&#160;    <span class="keywordflow">return</span> 1.0f;</div>
+<div class="line"><a name="l03012"></a><span class="lineno"> 3012</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(y))</div>
+<div class="line"><a name="l03013"></a><span class="lineno"> 3013</span>&#160;  {</div>
+<div class="line"><a name="l03014"></a><span class="lineno"> 3014</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3be3fdcb83a6d7cbd10aa5d891f88bf">nearbyintf</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#acd3521e6a0dbd207dc331c548414b366">fabsf</a>(<a class="code" href="math_8c.html#af17ec425baca2b5f3882a05b5e19dfb5">fmodf</a>(y, 2.0f)) == 1.0f)</div>
+<div class="line"><a name="l03015"></a><span class="lineno"> 3015</span>&#160;      <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l03016"></a><span class="lineno"> 3016</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03017"></a><span class="lineno"> 3017</span>&#160;      <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l03018"></a><span class="lineno"> 3018</span>&#160;  }</div>
+<div class="line"><a name="l03019"></a><span class="lineno"> 3019</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a8b8a30104d4cb0dd4b0a988ee56c5411">isinff</a>(y))</div>
+<div class="line"><a name="l03020"></a><span class="lineno"> 3020</span>&#160;  {</div>
+<div class="line"><a name="l03021"></a><span class="lineno"> 3021</span>&#160;    <span class="comment">// x == 1.0f and y-is-zero caught above</span></div>
+<div class="line"><a name="l03022"></a><span class="lineno"> 3022</span>&#160;    <span class="keywordflow">if</span>(x == -1.0f)</div>
+<div class="line"><a name="l03023"></a><span class="lineno"> 3023</span>&#160;      <span class="keywordflow">return</span> 1.0f;</div>
+<div class="line"><a name="l03024"></a><span class="lineno"> 3024</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(y))</div>
+<div class="line"><a name="l03025"></a><span class="lineno"> 3025</span>&#160;    {</div>
+<div class="line"><a name="l03026"></a><span class="lineno"> 3026</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#acd3521e6a0dbd207dc331c548414b366">fabsf</a>(x) &lt; 1.0f)</div>
+<div class="line"><a name="l03027"></a><span class="lineno"> 3027</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>();</div>
+<div class="line"><a name="l03028"></a><span class="lineno"> 3028</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03029"></a><span class="lineno"> 3029</span>&#160;        <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l03030"></a><span class="lineno"> 3030</span>&#160;    }</div>
+<div class="line"><a name="l03031"></a><span class="lineno"> 3031</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03032"></a><span class="lineno"> 3032</span>&#160;    {</div>
+<div class="line"><a name="l03033"></a><span class="lineno"> 3033</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#acd3521e6a0dbd207dc331c548414b366">fabsf</a>(x) &lt; 1.0f)</div>
+<div class="line"><a name="l03034"></a><span class="lineno"> 3034</span>&#160;        <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l03035"></a><span class="lineno"> 3035</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03036"></a><span class="lineno"> 3036</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>();</div>
+<div class="line"><a name="l03037"></a><span class="lineno"> 3037</span>&#160;    }</div>
+<div class="line"><a name="l03038"></a><span class="lineno"> 3038</span>&#160;  }</div>
+<div class="line"><a name="l03039"></a><span class="lineno"> 3039</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a8b8a30104d4cb0dd4b0a988ee56c5411">isinff</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x))</div>
+<div class="line"><a name="l03040"></a><span class="lineno"> 3040</span>&#160;  {</div>
+<div class="line"><a name="l03041"></a><span class="lineno"> 3041</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(y))</div>
+<div class="line"><a name="l03042"></a><span class="lineno"> 3042</span>&#160;    {</div>
+<div class="line"><a name="l03043"></a><span class="lineno"> 3043</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3be3fdcb83a6d7cbd10aa5d891f88bf">nearbyintf</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#acd3521e6a0dbd207dc331c548414b366">fabsf</a>(<a class="code" href="math_8c.html#af17ec425baca2b5f3882a05b5e19dfb5">fmodf</a>(y, 2.0f)) == 1.0f)</div>
+<div class="line"><a name="l03044"></a><span class="lineno"> 3044</span>&#160;        <span class="keywordflow">return</span> -0.0f;</div>
+<div class="line"><a name="l03045"></a><span class="lineno"> 3045</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03046"></a><span class="lineno"> 3046</span>&#160;        <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l03047"></a><span class="lineno"> 3047</span>&#160;    }</div>
+<div class="line"><a name="l03048"></a><span class="lineno"> 3048</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03049"></a><span class="lineno"> 3049</span>&#160;    {</div>
+<div class="line"><a name="l03050"></a><span class="lineno"> 3050</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3be3fdcb83a6d7cbd10aa5d891f88bf">nearbyintf</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#acd3521e6a0dbd207dc331c548414b366">fabsf</a>(<a class="code" href="math_8c.html#af17ec425baca2b5f3882a05b5e19dfb5">fmodf</a>(y, 2.0f)) == 1.0f)</div>
+<div class="line"><a name="l03051"></a><span class="lineno"> 3051</span>&#160;        <span class="keywordflow">return</span> -<a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>();</div>
+<div class="line"><a name="l03052"></a><span class="lineno"> 3052</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03053"></a><span class="lineno"> 3053</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>();</div>
+<div class="line"><a name="l03054"></a><span class="lineno"> 3054</span>&#160;    }</div>
+<div class="line"><a name="l03055"></a><span class="lineno"> 3055</span>&#160;  }</div>
+<div class="line"><a name="l03056"></a><span class="lineno"> 3056</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a8b8a30104d4cb0dd4b0a988ee56c5411">isinff</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x))</div>
+<div class="line"><a name="l03057"></a><span class="lineno"> 3057</span>&#160;  {</div>
+<div class="line"><a name="l03058"></a><span class="lineno"> 3058</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(y))</div>
+<div class="line"><a name="l03059"></a><span class="lineno"> 3059</span>&#160;      <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l03060"></a><span class="lineno"> 3060</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03061"></a><span class="lineno"> 3061</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>();</div>
+<div class="line"><a name="l03062"></a><span class="lineno"> 3062</span>&#160;  }</div>
+<div class="line"><a name="l03063"></a><span class="lineno"> 3063</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(y))</div>
+<div class="line"><a name="l03064"></a><span class="lineno"> 3064</span>&#160;  {</div>
+<div class="line"><a name="l03065"></a><span class="lineno"> 3065</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l03066"></a><span class="lineno"> 3066</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l03067"></a><span class="lineno"> 3067</span>&#160;      <a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x) &amp;&amp; <a class="code" href="math_8c.html#ab3be3fdcb83a6d7cbd10aa5d891f88bf">nearbyintf</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#acd3521e6a0dbd207dc331c548414b366">fabsf</a>(<a class="code" href="math_8c.html#af17ec425baca2b5f3882a05b5e19dfb5">fmodf</a>(y, 2.0f)) == 1.0f)</div>
+<div class="line"><a name="l03068"></a><span class="lineno"> 3068</span>&#160;    {</div>
+<div class="line"><a name="l03069"></a><span class="lineno"> 3069</span>&#160;      <span class="keywordflow">return</span> -HUGE_VALF;</div>
+<div class="line"><a name="l03070"></a><span class="lineno"> 3070</span>&#160;    }</div>
+<div class="line"><a name="l03071"></a><span class="lineno"> 3071</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03072"></a><span class="lineno"> 3072</span>&#160;      <span class="keywordflow">return</span> HUGE_VALF;</div>
+<div class="line"><a name="l03073"></a><span class="lineno"> 3073</span>&#160;  }</div>
+<div class="line"><a name="l03074"></a><span class="lineno"> 3074</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a>(x) || <a class="code" href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a>(y))</div>
+<div class="line"><a name="l03075"></a><span class="lineno"> 3075</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
+<div class="line"><a name="l03076"></a><span class="lineno"> 3076</span>&#160; </div>
+<div class="line"><a name="l03077"></a><span class="lineno"> 3077</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l03078"></a><span class="lineno"> 3078</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">float</span>) == <span class="keyword">sizeof</span>(int32_t),</div>
+<div class="line"><a name="l03079"></a><span class="lineno"> 3079</span>&#160;    <span class="stringliteral">&quot;bit width of float and int32_t should match&quot;</span>);</div>
+<div class="line"><a name="l03080"></a><span class="lineno"> 3080</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l03081"></a><span class="lineno"> 3081</span>&#160;  {</div>
+<div class="line"><a name="l03082"></a><span class="lineno"> 3082</span>&#160;    <span class="keywordtype">float</span> f;</div>
+<div class="line"><a name="l03083"></a><span class="lineno"> 3083</span>&#160;    int32_t i;</div>
+<div class="line"><a name="l03084"></a><span class="lineno"> 3084</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l03085"></a><span class="lineno"> 3085</span>&#160;  int32_t bias = (1 &lt;&lt; 23) * ((1 &lt;&lt; 7) - 1);</div>
+<div class="line"><a name="l03086"></a><span class="lineno"> 3086</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l03087"></a><span class="lineno"> 3087</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -722019 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l03088"></a><span class="lineno"> 3088</span>&#160;  <span class="keywordtype">float</span> mult_result = y * (float)(u.i - (bias + exp_c));</div>
+<div class="line"><a name="l03089"></a><span class="lineno"> 3089</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#acd3521e6a0dbd207dc331c548414b366">fabsf</a>(mult_result) &gt; (float)(1 &lt;&lt; 30))</div>
+<div class="line"><a name="l03090"></a><span class="lineno"> 3090</span>&#160;  {</div>
+<div class="line"><a name="l03091"></a><span class="lineno"> 3091</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l03092"></a><span class="lineno"> 3092</span>&#160;    <span class="keywordflow">return</span> y &gt; 0.0f ? HUGE_VALF : 0.0f;</div>
+<div class="line"><a name="l03093"></a><span class="lineno"> 3093</span>&#160;  }</div>
+<div class="line"><a name="l03094"></a><span class="lineno"> 3094</span>&#160;  u.i = (int32_t)mult_result + (bias + exp_c);</div>
+<div class="line"><a name="l03095"></a><span class="lineno"> 3095</span>&#160;  <span class="keywordflow">return</span> u.f;</div>
+<div class="line"><a name="l03096"></a><span class="lineno"> 3096</span>&#160;}</div>
+<div class="line"><a name="l03097"></a><span class="lineno"> 3097</span>&#160; </div>
+<div class="line"><a name="l03098"></a><span class="lineno"> 3098</span>&#160;<span class="comment">/* FUNCTION: powl */</span></div>
+<div class="line"><a name="l03099"></a><span class="lineno"> 3099</span>&#160; </div>
+<div class="line"><a name="l03100"></a><span class="lineno"> 3100</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l03101"></a><span class="lineno"> 3101</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l03102"></a><span class="lineno"> 3102</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l03103"></a><span class="lineno"> 3103</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l03104"></a><span class="lineno"> 3104</span>&#160; </div>
+<div class="line"><a name="l03105"></a><span class="lineno"> 3105</span>&#160;<span class="preprocessor">#ifndef __CPROVER_FLOAT_H_INCLUDED</span></div>
+<div class="line"><a name="l03106"></a><span class="lineno"> 3106</span>&#160;<span class="preprocessor">#  include &lt;float.h&gt;</span></div>
+<div class="line"><a name="l03107"></a><span class="lineno"> 3107</span>&#160;<span class="preprocessor">#  define __CPROVER_FLOAT_H_INCLUDED</span></div>
+<div class="line"><a name="l03108"></a><span class="lineno"> 3108</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l03109"></a><span class="lineno"> 3109</span>&#160; </div>
+<div class="line"><a name="l03110"></a><span class="lineno"> 3110</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l03111"></a><span class="lineno"> 3111</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l03112"></a><span class="lineno"> 3112</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l03113"></a><span class="lineno"> 3113</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l03114"></a><span class="lineno"> 3114</span>&#160; </div>
+<div class="line"><a name="l03115"></a><span class="lineno"> 3115</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l03116"></a><span class="lineno"> 3116</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l03117"></a><span class="lineno"> 3117</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l03118"></a><span class="lineno"> 3118</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l03119"></a><span class="lineno"> 3119</span>&#160; </div>
+<div class="line"><a name="l03120"></a><span class="lineno"> 3120</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l03121"></a><span class="lineno"> 3121</span>&#160; </div>
+<div class="line"><a name="l03122"></a><span class="lineno"> 3122</span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l03123"></a><span class="lineno"> 3123</span>&#160; </div>
+<div class="line"><a name="l03124"></a><span class="lineno"><a class="line" href="math_8c.html#a2f4830e468138e1513b55ca6a92a0f9a"> 3124</a></span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#a2f4830e468138e1513b55ca6a92a0f9a">powl</a>(<span class="keywordtype">long</span> <span class="keywordtype">double</span> x, <span class="keywordtype">long</span> <span class="keywordtype">double</span> y)</div>
+<div class="line"><a name="l03125"></a><span class="lineno"> 3125</span>&#160;{</div>
+<div class="line"><a name="l03126"></a><span class="lineno"> 3126</span>&#160;  <span class="comment">// see man pow (https://linux.die.net/man/3/pow)</span></div>
+<div class="line"><a name="l03127"></a><span class="lineno"> 3127</span>&#160;  <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l03128"></a><span class="lineno"> 3128</span>&#160;    <a class="code" href="cprover__builtin__headers_8h.html#ac083d01e2e68b3840acb5abe6b15e92f">__CPROVER_isfiniteld</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#ac083d01e2e68b3840acb5abe6b15e92f">__CPROVER_isfiniteld</a>(y) &amp;&amp;</div>
+<div class="line"><a name="l03129"></a><span class="lineno"> 3129</span>&#160;    <a class="code" href="math_8c.html#a4b51faf338f7d4f31224d0c096a8859b">nearbyintl</a>(y) != y)</div>
+<div class="line"><a name="l03130"></a><span class="lineno"> 3130</span>&#160;  {</div>
+<div class="line"><a name="l03131"></a><span class="lineno"> 3131</span>&#160;    errno = EDOM;</div>
+<div class="line"><a name="l03132"></a><span class="lineno"> 3132</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
+<div class="line"><a name="l03133"></a><span class="lineno"> 3133</span>&#160;  }</div>
+<div class="line"><a name="l03134"></a><span class="lineno"> 3134</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(x == 1.0l)</div>
+<div class="line"><a name="l03135"></a><span class="lineno"> 3135</span>&#160;    <span class="keywordflow">return</span> 1.0l;</div>
+<div class="line"><a name="l03136"></a><span class="lineno"> 3136</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(y) == FP_ZERO)</div>
+<div class="line"><a name="l03137"></a><span class="lineno"> 3137</span>&#160;    <span class="keywordflow">return</span> 1.0l;</div>
+<div class="line"><a name="l03138"></a><span class="lineno"> 3138</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(y))</div>
+<div class="line"><a name="l03139"></a><span class="lineno"> 3139</span>&#160;  {</div>
+<div class="line"><a name="l03140"></a><span class="lineno"> 3140</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a4b51faf338f7d4f31224d0c096a8859b">nearbyintl</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(<a class="code" href="math_8c.html#aa927d9996fb40db42bd3a6cbe57da9a7">fmodl</a>(y, 2.0l)) == 1.0l)</div>
+<div class="line"><a name="l03141"></a><span class="lineno"> 3141</span>&#160;      <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l03142"></a><span class="lineno"> 3142</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03143"></a><span class="lineno"> 3143</span>&#160;      <span class="keywordflow">return</span> +0.0l;</div>
+<div class="line"><a name="l03144"></a><span class="lineno"> 3144</span>&#160;  }</div>
+<div class="line"><a name="l03145"></a><span class="lineno"> 3145</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a3d540c1d8c8a8fb8d6e5d447220bfea7">isinfl</a>(y))</div>
+<div class="line"><a name="l03146"></a><span class="lineno"> 3146</span>&#160;  {</div>
+<div class="line"><a name="l03147"></a><span class="lineno"> 3147</span>&#160;    <span class="comment">// x == 1.0l and y-is-zero caught above</span></div>
+<div class="line"><a name="l03148"></a><span class="lineno"> 3148</span>&#160;    <span class="keywordflow">if</span>(x == -1.0l)</div>
+<div class="line"><a name="l03149"></a><span class="lineno"> 3149</span>&#160;      <span class="keywordflow">return</span> 1.0l;</div>
+<div class="line"><a name="l03150"></a><span class="lineno"> 3150</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(y))</div>
+<div class="line"><a name="l03151"></a><span class="lineno"> 3151</span>&#160;    {</div>
+<div class="line"><a name="l03152"></a><span class="lineno"> 3152</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(x) &lt; 1.0l)</div>
+<div class="line"><a name="l03153"></a><span class="lineno"> 3153</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>();</div>
+<div class="line"><a name="l03154"></a><span class="lineno"> 3154</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03155"></a><span class="lineno"> 3155</span>&#160;        <span class="keywordflow">return</span> +0.0l;</div>
+<div class="line"><a name="l03156"></a><span class="lineno"> 3156</span>&#160;    }</div>
+<div class="line"><a name="l03157"></a><span class="lineno"> 3157</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03158"></a><span class="lineno"> 3158</span>&#160;    {</div>
+<div class="line"><a name="l03159"></a><span class="lineno"> 3159</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(x) &lt; 1.0l)</div>
+<div class="line"><a name="l03160"></a><span class="lineno"> 3160</span>&#160;        <span class="keywordflow">return</span> +0.0l;</div>
+<div class="line"><a name="l03161"></a><span class="lineno"> 3161</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03162"></a><span class="lineno"> 3162</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>();</div>
+<div class="line"><a name="l03163"></a><span class="lineno"> 3163</span>&#160;    }</div>
+<div class="line"><a name="l03164"></a><span class="lineno"> 3164</span>&#160;  }</div>
+<div class="line"><a name="l03165"></a><span class="lineno"> 3165</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a3d540c1d8c8a8fb8d6e5d447220bfea7">isinfl</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x))</div>
+<div class="line"><a name="l03166"></a><span class="lineno"> 3166</span>&#160;  {</div>
+<div class="line"><a name="l03167"></a><span class="lineno"> 3167</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(y))</div>
+<div class="line"><a name="l03168"></a><span class="lineno"> 3168</span>&#160;    {</div>
+<div class="line"><a name="l03169"></a><span class="lineno"> 3169</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a4b51faf338f7d4f31224d0c096a8859b">nearbyintl</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(<a class="code" href="math_8c.html#aa927d9996fb40db42bd3a6cbe57da9a7">fmodl</a>(y, 2.0l)) == 1.0l)</div>
+<div class="line"><a name="l03170"></a><span class="lineno"> 3170</span>&#160;        <span class="keywordflow">return</span> -0.0l;</div>
+<div class="line"><a name="l03171"></a><span class="lineno"> 3171</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03172"></a><span class="lineno"> 3172</span>&#160;        <span class="keywordflow">return</span> +0.0l;</div>
+<div class="line"><a name="l03173"></a><span class="lineno"> 3173</span>&#160;    }</div>
+<div class="line"><a name="l03174"></a><span class="lineno"> 3174</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03175"></a><span class="lineno"> 3175</span>&#160;    {</div>
+<div class="line"><a name="l03176"></a><span class="lineno"> 3176</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a4b51faf338f7d4f31224d0c096a8859b">nearbyintl</a>(y) == y &amp;&amp; <a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(<a class="code" href="math_8c.html#aa927d9996fb40db42bd3a6cbe57da9a7">fmodl</a>(y, 2.0l)) == 1.0l)</div>
+<div class="line"><a name="l03177"></a><span class="lineno"> 3177</span>&#160;        <span class="keywordflow">return</span> -<a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>();</div>
+<div class="line"><a name="l03178"></a><span class="lineno"> 3178</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03179"></a><span class="lineno"> 3179</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>();</div>
+<div class="line"><a name="l03180"></a><span class="lineno"> 3180</span>&#160;    }</div>
+<div class="line"><a name="l03181"></a><span class="lineno"> 3181</span>&#160;  }</div>
+<div class="line"><a name="l03182"></a><span class="lineno"> 3182</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a3d540c1d8c8a8fb8d6e5d447220bfea7">isinfl</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x))</div>
+<div class="line"><a name="l03183"></a><span class="lineno"> 3183</span>&#160;  {</div>
+<div class="line"><a name="l03184"></a><span class="lineno"> 3184</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(y))</div>
+<div class="line"><a name="l03185"></a><span class="lineno"> 3185</span>&#160;      <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l03186"></a><span class="lineno"> 3186</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03187"></a><span class="lineno"> 3187</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>();</div>
+<div class="line"><a name="l03188"></a><span class="lineno"> 3188</span>&#160;  }</div>
+<div class="line"><a name="l03189"></a><span class="lineno"> 3189</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(y))</div>
+<div class="line"><a name="l03190"></a><span class="lineno"> 3190</span>&#160;  {</div>
+<div class="line"><a name="l03191"></a><span class="lineno"> 3191</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l03192"></a><span class="lineno"> 3192</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l03193"></a><span class="lineno"> 3193</span>&#160;      <a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x) &amp;&amp; <a class="code" href="math_8c.html#a4b51faf338f7d4f31224d0c096a8859b">nearbyintl</a>(y) == y &amp;&amp;</div>
+<div class="line"><a name="l03194"></a><span class="lineno"> 3194</span>&#160;      <a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(<a class="code" href="math_8c.html#aa927d9996fb40db42bd3a6cbe57da9a7">fmodl</a>(y, 2.0l)) == 1.0l)</div>
+<div class="line"><a name="l03195"></a><span class="lineno"> 3195</span>&#160;    {</div>
+<div class="line"><a name="l03196"></a><span class="lineno"> 3196</span>&#160;      <span class="keywordflow">return</span> -HUGE_VALL;</div>
+<div class="line"><a name="l03197"></a><span class="lineno"> 3197</span>&#160;    }</div>
+<div class="line"><a name="l03198"></a><span class="lineno"> 3198</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l03199"></a><span class="lineno"> 3199</span>&#160;      <span class="keywordflow">return</span> HUGE_VALL;</div>
+<div class="line"><a name="l03200"></a><span class="lineno"> 3200</span>&#160;  }</div>
+<div class="line"><a name="l03201"></a><span class="lineno"> 3201</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#aa9a1e7cefb5331a6c8090fcd85124a45">isnanl</a>(x) || <a class="code" href="math_8c.html#aa9a1e7cefb5331a6c8090fcd85124a45">isnanl</a>(y))</div>
+<div class="line"><a name="l03202"></a><span class="lineno"> 3202</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
+<div class="line"><a name="l03203"></a><span class="lineno"> 3203</span>&#160; </div>
+<div class="line"><a name="l03204"></a><span class="lineno"> 3204</span>&#160;<span class="preprocessor">#if LDBL_MAX_EXP == DBL_MAX_EXP</span></div>
+<div class="line"><a name="l03205"></a><span class="lineno"> 3205</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#aa56c9494c95edf68386375e97d64159b">pow</a>(x, y);</div>
+<div class="line"><a name="l03206"></a><span class="lineno"> 3206</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l03207"></a><span class="lineno"> 3207</span>&#160;  _Static_assert(</div>
+<div class="line"><a name="l03208"></a><span class="lineno"> 3208</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">long</span> <span class="keywordtype">double</span>) % <span class="keyword">sizeof</span>(int32_t) == 0,</div>
+<div class="line"><a name="l03209"></a><span class="lineno"> 3209</span>&#160;    <span class="stringliteral">&quot;bit width of long double is a multiple of bit width of int32_t&quot;</span>);</div>
+<div class="line"><a name="l03210"></a><span class="lineno"> 3210</span>&#160;  <span class="keyword">union </span>U</div>
+<div class="line"><a name="l03211"></a><span class="lineno"> 3211</span>&#160;  {</div>
+<div class="line"><a name="l03212"></a><span class="lineno"> 3212</span>&#160;    <span class="keywordtype">long</span> <span class="keywordtype">double</span> l;</div>
+<div class="line"><a name="l03213"></a><span class="lineno"> 3213</span>&#160;    int32_t i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t)];</div>
+<div class="line"><a name="l03214"></a><span class="lineno"> 3214</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l03215"></a><span class="lineno"> 3215</span>&#160;<span class="preprocessor">#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l03216"></a><span class="lineno"> 3216</span>&#160;  int32_t exponent = u.i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t) - 1];</div>
+<div class="line"><a name="l03217"></a><span class="lineno"> 3217</span>&#160;<span class="preprocessor">#  else</span></div>
+<div class="line"><a name="l03218"></a><span class="lineno"> 3218</span>&#160;  int32_t exponent = u.i[0];</div>
+<div class="line"><a name="l03219"></a><span class="lineno"> 3219</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l03220"></a><span class="lineno"> 3220</span>&#160;  int32_t bias = (1 &lt;&lt; 16) * ((1 &lt;&lt; 14) - 1);</div>
+<div class="line"><a name="l03221"></a><span class="lineno"> 3221</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l03222"></a><span class="lineno"> 3222</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -5641 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l03223"></a><span class="lineno"> 3223</span>&#160;  <span class="keywordtype">long</span> <span class="keywordtype">double</span> mult_result = y * (<span class="keywordtype">long</span> double)(exponent - (bias + exp_c));</div>
+<div class="line"><a name="l03224"></a><span class="lineno"> 3224</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(mult_result) &gt; (<span class="keywordtype">long</span> double)(1 &lt;&lt; 30))</div>
+<div class="line"><a name="l03225"></a><span class="lineno"> 3225</span>&#160;  {</div>
+<div class="line"><a name="l03226"></a><span class="lineno"> 3226</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l03227"></a><span class="lineno"> 3227</span>&#160;    <span class="keywordflow">return</span> y &gt; 0.0l ? HUGE_VALL : 0.0l;</div>
+<div class="line"><a name="l03228"></a><span class="lineno"> 3228</span>&#160;  }</div>
+<div class="line"><a name="l03229"></a><span class="lineno"> 3229</span>&#160;  int32_t result = (int32_t)mult_result + (bias + exp_c);</div>
+<div class="line"><a name="l03230"></a><span class="lineno"> 3230</span>&#160;  <span class="keyword">union </span>U result_u = {.i = {0}};</div>
+<div class="line"><a name="l03231"></a><span class="lineno"> 3231</span>&#160;<span class="preprocessor">#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l03232"></a><span class="lineno"> 3232</span>&#160;  result_u.i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t) - 1] = result;</div>
+<div class="line"><a name="l03233"></a><span class="lineno"> 3233</span>&#160;<span class="preprocessor">#  else</span></div>
+<div class="line"><a name="l03234"></a><span class="lineno"> 3234</span>&#160;  result_u.i[0] = result;</div>
+<div class="line"><a name="l03235"></a><span class="lineno"> 3235</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l03236"></a><span class="lineno"> 3236</span>&#160;  <span class="keywordflow">return</span> result_u.l;</div>
+<div class="line"><a name="l03237"></a><span class="lineno"> 3237</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l03238"></a><span class="lineno"> 3238</span>&#160;}</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a0ae550b5df791740ca16a05ab1717ede"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a0ae550b5df791740ca16a05ab1717ede">__CPROVER_fabs</a></div><div class="ttdeci">double __CPROVER_fabs(double x)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a0b383637915343bca9bd7f2836360c59"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a0b383637915343bca9bd7f2836360c59">__CPROVER_isnormalld</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_isnormalld(long double f)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a11dd2c1c6eaaa857811c901c3557d0bf"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a11dd2c1c6eaaa857811c901c3557d0bf">__CPROVER_fmodf</a></div><div class="ttdeci">float __CPROVER_fmodf(float, float)</div></div>
@@ -2541,6 +3359,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a02adad59335d6d7fdc9d180226ceb56e"><div class="ttname"><a href="math_8c.html#a02adad59335d6d7fdc9d180226ceb56e">__fpclassifyl</a></div><div class="ttdeci">int __fpclassifyl(long double f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00433">math.c:433</a></div></div>
 <div class="ttc" id="amath_8c_html_a07819e65fa6852a914c1651d8eda7566"><div class="ttname"><a href="math_8c.html#a07819e65fa6852a914c1651d8eda7566">__builtin_fabsf</a></div><div class="ttdeci">float __builtin_fabsf(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00038">math.c:38</a></div></div>
 <div class="ttc" id="amath_8c_html_a0bcc6aa4b3c37bfa73f06ebdecc0d247"><div class="ttname"><a href="math_8c.html#a0bcc6aa4b3c37bfa73f06ebdecc0d247">floorf</a></div><div class="ttdeci">float floorf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01404">math.c:1404</a></div></div>
+<div class="ttc" id="amath_8c_html_a0c2bc89b8355a89542ac98d9e2120363"><div class="ttname"><a href="math_8c.html#a0c2bc89b8355a89542ac98d9e2120363">expf</a></div><div class="ttdeci">float expf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02550">math.c:2550</a></div></div>
 <div class="ttc" id="amath_8c_html_a16173bca19eef93d0230bfb7c86b5740"><div class="ttname"><a href="math_8c.html#a16173bca19eef93d0230bfb7c86b5740">lrintf</a></div><div class="ttdeci">long int lrintf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01790">math.c:1790</a></div></div>
 <div class="ttc" id="amath_8c_html_a16711aca70175e29b0bcf6d41db3e691"><div class="ttname"><a href="math_8c.html#a16711aca70175e29b0bcf6d41db3e691">fminf</a></div><div class="ttdeci">float fminf(float f, float g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01131">math.c:1131</a></div></div>
 <div class="ttc" id="amath_8c_html_a1ab6421a4a974f25e86bc533a81588d2"><div class="ttname"><a href="math_8c.html#a1ab6421a4a974f25e86bc533a81588d2">__VERIFIER_nondet_float</a></div><div class="ttdeci">float __VERIFIER_nondet_float(void)</div></div>
@@ -2551,6 +3370,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a271aa2e12b14713a382cdf79e544ddae"><div class="ttname"><a href="math_8c.html#a271aa2e12b14713a382cdf79e544ddae">__VERIFIER_nondet_long_double</a></div><div class="ttdeci">long double __VERIFIER_nondet_long_double(void)</div></div>
 <div class="ttc" id="amath_8c_html_a2a1102aa390e0865fcd052f58f8b4123"><div class="ttname"><a href="math_8c.html#a2a1102aa390e0865fcd052f58f8b4123">sqrtl</a></div><div class="ttdeci">long double sqrtl(long double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00996">math.c:996</a></div></div>
 <div class="ttc" id="amath_8c_html_a2c82f7589e96cb842b2876e35df8b94c"><div class="ttname"><a href="math_8c.html#a2c82f7589e96cb842b2876e35df8b94c">nan</a></div><div class="ttdeci">double nan(const char *str)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00629">math.c:629</a></div></div>
+<div class="ttc" id="amath_8c_html_a2f4830e468138e1513b55ca6a92a0f9a"><div class="ttname"><a href="math_8c.html#a2f4830e468138e1513b55ca6a92a0f9a">powl</a></div><div class="ttdeci">long double powl(long double x, long double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l03124">math.c:3124</a></div></div>
 <div class="ttc" id="amath_8c_html_a3009d7aa7b4e8a7e71f393ff3a4cdf35"><div class="ttname"><a href="math_8c.html#a3009d7aa7b4e8a7e71f393ff3a4cdf35">fminl</a></div><div class="ttdeci">long double fminl(long double f, long double g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01141">math.c:1141</a></div></div>
 <div class="ttc" id="amath_8c_html_a3337db086394bad101bd8d42d891640a"><div class="ttname"><a href="math_8c.html#a3337db086394bad101bd8d42d891640a">lrint</a></div><div class="ttdeci">long int lrint(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01768">math.c:1768</a></div></div>
 <div class="ttc" id="amath_8c_html_a33d95711621def731d3f88c4e606323e"><div class="ttname"><a href="math_8c.html#a33d95711621def731d3f88c4e606323e">llrintf</a></div><div class="ttdeci">long long int llrintf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01858">math.c:1858</a></div></div>
@@ -2562,6 +3382,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a42c2329ef247d4bc7a19ea7a72a7bc30"><div class="ttname"><a href="math_8c.html#a42c2329ef247d4bc7a19ea7a72a7bc30">__CPROVER_isgreaterd</a></div><div class="ttdeci">int __CPROVER_isgreaterd(double f, double g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00049">math.c:49</a></div></div>
 <div class="ttc" id="amath_8c_html_a43418ed4932726a6070da8a9b55090cc"><div class="ttname"><a href="math_8c.html#a43418ed4932726a6070da8a9b55090cc">fmaxf</a></div><div class="ttdeci">float fmaxf(float f, float g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01088">math.c:1088</a></div></div>
 <div class="ttc" id="amath_8c_html_a44f1309085cc0f577103681994bcda36"><div class="ttname"><a href="math_8c.html#a44f1309085cc0f577103681994bcda36">__sort_of_CPROVER_remainderf</a></div><div class="ttdeci">float __sort_of_CPROVER_remainderf(int rounding_mode, float x, float y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02212">math.c:2212</a></div></div>
+<div class="ttc" id="amath_8c_html_a4618e032de8318b72df5cc71f15b5e45"><div class="ttname"><a href="math_8c.html#a4618e032de8318b72df5cc71f15b5e45">exp2l</a></div><div class="ttdeci">long double exp2l(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02453">math.c:2453</a></div></div>
 <div class="ttc" id="amath_8c_html_a465b763ca84f8fd2099493b3c4e5352c"><div class="ttname"><a href="math_8c.html#a465b763ca84f8fd2099493b3c4e5352c">sqrtf</a></div><div class="ttdeci">float sqrtf(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00838">math.c:838</a></div></div>
 <div class="ttc" id="amath_8c_html_a48b07ac3e4fbcda2507c312d60e6eb72"><div class="ttname"><a href="math_8c.html#a48b07ac3e4fbcda2507c312d60e6eb72">__fpclassifyf</a></div><div class="ttdeci">int __fpclassifyf(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00419">math.c:419</a></div></div>
 <div class="ttc" id="amath_8c_html_a48f9341b9310fefa5dd1b0c8c84c99df"><div class="ttname"><a href="math_8c.html#a48f9341b9310fefa5dd1b0c8c84c99df">rintf</a></div><div class="ttdeci">float rintf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01719">math.c:1719</a></div></div>
@@ -2584,6 +3405,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a64a4201c82f6ee7043a270bbbc6a5e19"><div class="ttname"><a href="math_8c.html#a64a4201c82f6ee7043a270bbbc6a5e19">llrint</a></div><div class="ttdeci">long long int llrint(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01836">math.c:1836</a></div></div>
 <div class="ttc" id="amath_8c_html_a6565127c023ae8f392ce69e3b3f30aa1"><div class="ttname"><a href="math_8c.html#a6565127c023ae8f392ce69e3b3f30aa1">roundl</a></div><div class="ttdeci">long double roundl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01588">math.c:1588</a></div></div>
 <div class="ttc" id="amath_8c_html_a659287f7399efa8d6bc66dc37c8e35f4"><div class="ttname"><a href="math_8c.html#a659287f7399efa8d6bc66dc37c8e35f4">cosl</a></div><div class="ttdeci">long double cosl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00554">math.c:554</a></div></div>
+<div class="ttc" id="amath_8c_html_a67115817a750a87eb899252b5deb2f9f"><div class="ttname"><a href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a></div><div class="ttdeci">int32_t __VERIFIER_nondet_int32_t(void)</div></div>
 <div class="ttc" id="amath_8c_html_a6759c1cb2015170dd45f3398f6e04396"><div class="ttname"><a href="math_8c.html#a6759c1cb2015170dd45f3398f6e04396">__isnormalf</a></div><div class="ttdeci">int __isnormalf(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00214">math.c:214</a></div></div>
 <div class="ttc" id="amath_8c_html_a6de60a3e907dcf0bfe3ea8d64f1e8873"><div class="ttname"><a href="math_8c.html#a6de60a3e907dcf0bfe3ea8d64f1e8873">floor</a></div><div class="ttdeci">double floor(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01385">math.c:1385</a></div></div>
 <div class="ttc" id="amath_8c_html_a724ef91997ed2b6b1982c4dda28f6b28"><div class="ttname"><a href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a></div><div class="ttdeci">double __builtin_inf(void)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00228">math.c:228</a></div></div>
@@ -2596,6 +3418,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a7d179dac0d888a4610b1d638a3805e6b"><div class="ttname"><a href="math_8c.html#a7d179dac0d888a4610b1d638a3805e6b">__isnanf</a></div><div class="ttdeci">int __isnanf(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00177">math.c:177</a></div></div>
 <div class="ttc" id="amath_8c_html_a7df19cf730447c00150569250a4b5e1d"><div class="ttname"><a href="math_8c.html#a7df19cf730447c00150569250a4b5e1d">round</a></div><div class="ttdeci">double round(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01515">math.c:1515</a></div></div>
 <div class="ttc" id="amath_8c_html_a81303ae9d978d20ca79b74025b9a9738"><div class="ttname"><a href="math_8c.html#a81303ae9d978d20ca79b74025b9a9738">__isinfl</a></div><div class="ttdeci">int __isinfl(long double ld)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00154">math.c:154</a></div></div>
+<div class="ttc" id="amath_8c_html_a8246b3e17a39b137d0c62670d0c6e336"><div class="ttname"><a href="math_8c.html#a8246b3e17a39b137d0c62670d0c6e336">logf</a></div><div class="ttdeci">float logf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02747">math.c:2747</a></div></div>
 <div class="ttc" id="amath_8c_html_a8259999687e8bd4b5509ca0d69b0ad9d"><div class="ttname"><a href="math_8c.html#a8259999687e8bd4b5509ca0d69b0ad9d">llroundf</a></div><div class="ttdeci">long long int llroundf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02060">math.c:2060</a></div></div>
 <div class="ttc" id="amath_8c_html_a82a151adfde56b28fa8a50355c4f2ff6"><div class="ttname"><a href="math_8c.html#a82a151adfde56b28fa8a50355c4f2ff6">trunc</a></div><div class="ttdeci">double trunc(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01450">math.c:1450</a></div></div>
 <div class="ttc" id="amath_8c_html_a82a6d70a29e839514b93bb0699f07bbe"><div class="ttname"><a href="math_8c.html#a82a6d70a29e839514b93bb0699f07bbe">llroundl</a></div><div class="ttdeci">long long int llroundl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02097">math.c:2097</a></div></div>
@@ -2604,6 +3427,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a85a82e0deaac3d3c1cd53e42209234cd"><div class="ttname"><a href="math_8c.html#a85a82e0deaac3d3c1cd53e42209234cd">__isinff</a></div><div class="ttdeci">int __isinff(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00140">math.c:140</a></div></div>
 <div class="ttc" id="amath_8c_html_a85ef70b7a5a0ded5593a4eec8a84e88f"><div class="ttname"><a href="math_8c.html#a85ef70b7a5a0ded5593a4eec8a84e88f">__CPROVER_isgreaterequald</a></div><div class="ttdeci">int __CPROVER_isgreaterequald(double f, double g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00057">math.c:57</a></div></div>
 <div class="ttc" id="amath_8c_html_a86598adf0006047a3e25066935215021"><div class="ttname"><a href="math_8c.html#a86598adf0006047a3e25066935215021">__CPROVER_islessd</a></div><div class="ttdeci">int __CPROVER_islessd(double f, double g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00065">math.c:65</a></div></div>
+<div class="ttc" id="amath_8c_html_a86e37219434c0b7978453b6ca88fc5fb"><div class="ttname"><a href="math_8c.html#a86e37219434c0b7978453b6ca88fc5fb">exp2</a></div><div class="ttdeci">double exp2(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02429">math.c:2429</a></div></div>
 <div class="ttc" id="amath_8c_html_a882b8d435a699914a60dd849374da387"><div class="ttname"><a href="math_8c.html#a882b8d435a699914a60dd849374da387">__CPROVER_isgreaterf</a></div><div class="ttdeci">int __CPROVER_isgreaterf(float f, float g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00045">math.c:45</a></div></div>
 <div class="ttc" id="amath_8c_html_a8a7dc2a88e109f4e15b661247665709a"><div class="ttname"><a href="math_8c.html#a8a7dc2a88e109f4e15b661247665709a">sinf</a></div><div class="ttdeci">float sinf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00512">math.c:512</a></div></div>
 <div class="ttc" id="amath_8c_html_a8b8a30104d4cb0dd4b0a988ee56c5411"><div class="ttname"><a href="math_8c.html#a8b8a30104d4cb0dd4b0a988ee56c5411">isinff</a></div><div class="ttdeci">int isinff(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00133">math.c:133</a></div></div>
@@ -2616,6 +3440,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a9739fbefd2657c3df997471a09ffb6d1"><div class="ttname"><a href="math_8c.html#a9739fbefd2657c3df997471a09ffb6d1">__builtin_fabsl</a></div><div class="ttdeci">long double __builtin_fabsl(long double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00031">math.c:31</a></div></div>
 <div class="ttc" id="amath_8c_html_a9e2bcaa7903406e650466164fb5d90f7"><div class="ttname"><a href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a></div><div class="ttdeci">float __builtin_inff(void)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00221">math.c:221</a></div></div>
 <div class="ttc" id="amath_8c_html_a9eed579ebc385cc12e10a052c46a1be7"><div class="ttname"><a href="math_8c.html#a9eed579ebc385cc12e10a052c46a1be7">nextUpf</a></div><div class="ttdeci">float nextUpf(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00675">math.c:675</a></div></div>
+<div class="ttc" id="amath_8c_html_aa56c9494c95edf68386375e97d64159b"><div class="ttname"><a href="math_8c.html#aa56c9494c95edf68386375e97d64159b">pow</a></div><div class="ttdeci">double pow(double x, double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02869">math.c:2869</a></div></div>
 <div class="ttc" id="amath_8c_html_aa800d7b5a3b579a99f8c75e24a5ca910"><div class="ttname"><a href="math_8c.html#aa800d7b5a3b579a99f8c75e24a5ca910">__CPROVER_islessequalf</a></div><div class="ttdeci">int __CPROVER_islessequalf(float f, float g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00069">math.c:69</a></div></div>
 <div class="ttc" id="amath_8c_html_aa8bb2049c170c9ac5b131fdba029991a"><div class="ttname"><a href="math_8c.html#aa8bb2049c170c9ac5b131fdba029991a">truncf</a></div><div class="ttdeci">float truncf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01469">math.c:1469</a></div></div>
 <div class="ttc" id="amath_8c_html_aa927d9996fb40db42bd3a6cbe57da9a7"><div class="ttname"><a href="math_8c.html#aa927d9996fb40db42bd3a6cbe57da9a7">fmodl</a></div><div class="ttdeci">long double fmodl(long double x, long double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02298">math.c:2298</a></div></div>
@@ -2637,6 +3462,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_ac4a145fe57847a90fa0d8c9a50fc35e2"><div class="ttname"><a href="math_8c.html#ac4a145fe57847a90fa0d8c9a50fc35e2">__finitel</a></div><div class="ttdeci">int __finitel(long double ld)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00113">math.c:113</a></div></div>
 <div class="ttc" id="amath_8c_html_ac4dc4baab13cea6b133597c6545e299d"><div class="ttname"><a href="math_8c.html#ac4dc4baab13cea6b133597c6545e299d">__signbitd</a></div><div class="ttdeci">int __signbitd(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00328">math.c:328</a></div></div>
 <div class="ttc" id="amath_8c_html_ac671b114526bad0f2222076d28128c77"><div class="ttname"><a href="math_8c.html#ac671b114526bad0f2222076d28128c77">__fpclassifyd</a></div><div class="ttdeci">int __fpclassifyd(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00405">math.c:405</a></div></div>
+<div class="ttc" id="amath_8c_html_ac6b287549be087f6f0bf03b6fe30499e"><div class="ttname"><a href="math_8c.html#ac6b287549be087f6f0bf03b6fe30499e">powf</a></div><div class="ttdeci">float powf(float x, float y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02998">math.c:2998</a></div></div>
 <div class="ttc" id="amath_8c_html_ac6d217e9b96a145f5eeb2a490e6496e6"><div class="ttname"><a href="math_8c.html#ac6d217e9b96a145f5eeb2a490e6496e6">lrintl</a></div><div class="ttdeci">long int lrintl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01813">math.c:1813</a></div></div>
 <div class="ttc" id="amath_8c_html_ac78478d6c78290f248a8173f8de5e640"><div class="ttname"><a href="math_8c.html#ac78478d6c78290f248a8173f8de5e640">__VERIFIER_nondet_double</a></div><div class="ttdeci">double __VERIFIER_nondet_double(void)</div></div>
 <div class="ttc" id="amath_8c_html_acba297b1ca98eb04546d39941363ba71"><div class="ttname"><a href="math_8c.html#acba297b1ca98eb04546d39941363ba71">isnormal</a></div><div class="ttdeci">int isnormal(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00207">math.c:207</a></div></div>
@@ -2644,12 +3470,14 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_ad096296eb51629c12af666a90e5cb464"><div class="ttname"><a href="math_8c.html#ad096296eb51629c12af666a90e5cb464">nanf</a></div><div class="ttdeci">float nanf(const char *str)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00638">math.c:638</a></div></div>
 <div class="ttc" id="amath_8c_html_ad8314f66dfe8603f3a166eb466261ce1"><div class="ttname"><a href="math_8c.html#ad8314f66dfe8603f3a166eb466261ce1">modff</a></div><div class="ttdeci">float modff(float x, float *iptr)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02162">math.c:2162</a></div></div>
 <div class="ttc" id="amath_8c_html_ad8d1296592a3e783acdd0de21ff58e2e"><div class="ttname"><a href="math_8c.html#ad8d1296592a3e783acdd0de21ff58e2e">copysign</a></div><div class="ttdeci">double copysign(double x, double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02386">math.c:2386</a></div></div>
+<div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02689">math.c:2689</a></div></div>
 <div class="ttc" id="amath_8c_html_adb7cad9a4cf947abaa4b03fe3d0c26ab"><div class="ttname"><a href="math_8c.html#adb7cad9a4cf947abaa4b03fe3d0c26ab">__builtin_fabs</a></div><div class="ttdeci">double __builtin_fabs(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00024">math.c:24</a></div></div>
 <div class="ttc" id="amath_8c_html_adbac59a4abc110ec3dbef4251d956fbf"><div class="ttname"><a href="math_8c.html#adbac59a4abc110ec3dbef4251d956fbf">_fdsign</a></div><div class="ttdeci">int _fdsign(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00312">math.c:312</a></div></div>
 <div class="ttc" id="amath_8c_html_add276dbad1c96eff532b9beb46612143"><div class="ttname"><a href="math_8c.html#add276dbad1c96eff532b9beb46612143">__isnanl</a></div><div class="ttdeci">int __isnanl(long double ld)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00198">math.c:198</a></div></div>
 <div class="ttc" id="amath_8c_html_addf52fad48012d23dd6c87111a5c1b89"><div class="ttname"><a href="math_8c.html#addf52fad48012d23dd6c87111a5c1b89">nextUpl</a></div><div class="ttdeci">long double nextUpl(long double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00772">math.c:772</a></div></div>
 <div class="ttc" id="amath_8c_html_ade09185c0cf8101fa9e2f25c15041b81"><div class="ttname"><a href="math_8c.html#ade09185c0cf8101fa9e2f25c15041b81">roundf</a></div><div class="ttdeci">float roundf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01551">math.c:1551</a></div></div>
 <div class="ttc" id="amath_8c_html_ade8117d49ed4d18874edacda5ff06ba1"><div class="ttname"><a href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a></div><div class="ttdeci">int isnanf(float f)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00184">math.c:184</a></div></div>
+<div class="ttc" id="amath_8c_html_ae09128febbbe6372cde4fa0c65608a42"><div class="ttname"><a href="math_8c.html#ae09128febbbe6372cde4fa0c65608a42">exp</a></div><div class="ttdeci">double exp(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02480">math.c:2480</a></div></div>
 <div class="ttc" id="amath_8c_html_ae11b7781f057eb7ba5d7ed95be7fdbee"><div class="ttname"><a href="math_8c.html#ae11b7781f057eb7ba5d7ed95be7fdbee">ceill</a></div><div class="ttdeci">long double ceill(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01360">math.c:1360</a></div></div>
 <div class="ttc" id="amath_8c_html_ae1f9edd5049d3ff63b0373a3c15c38c1"><div class="ttname"><a href="math_8c.html#ae1f9edd5049d3ff63b0373a3c15c38c1">rint</a></div><div class="ttdeci">double rint(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01700">math.c:1700</a></div></div>
 <div class="ttc" id="amath_8c_html_ae2a665bf8a42a9113a90260a4a8bd1f0"><div class="ttname"><a href="math_8c.html#ae2a665bf8a42a9113a90260a4a8bd1f0">__fpclassify</a></div><div class="ttdeci">int __fpclassify(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00458">math.c:458</a></div></div>
@@ -2658,6 +3486,8 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_ae87aa7b7444b2ae0ccfdfcfe00f91355"><div class="ttname"><a href="math_8c.html#ae87aa7b7444b2ae0ccfdfcfe00f91355">__builtin_isinf</a></div><div class="ttdeci">int __builtin_isinf(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00242">math.c:242</a></div></div>
 <div class="ttc" id="amath_8c_html_aeb537bfea71fa91192234a666f3a6a25"><div class="ttname"><a href="math_8c.html#aeb537bfea71fa91192234a666f3a6a25">sinl</a></div><div class="ttdeci">long double sinl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00491">math.c:491</a></div></div>
 <div class="ttc" id="amath_8c_html_aeb7e728350e442c10065da58f5adff56"><div class="ttname"><a href="math_8c.html#aeb7e728350e442c10065da58f5adff56">__builtin_huge_valf</a></div><div class="ttdeci">float __builtin_huge_valf(void)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00277">math.c:277</a></div></div>
+<div class="ttc" id="amath_8c_html_aed26c6708ff2027f9a8214d206eef0e7"><div class="ttname"><a href="math_8c.html#aed26c6708ff2027f9a8214d206eef0e7">exp2f</a></div><div class="ttdeci">float exp2f(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02441">math.c:2441</a></div></div>
+<div class="ttc" id="amath_8c_html_aed4eb11ef1397c751334311ce5b43920"><div class="ttname"><a href="math_8c.html#aed4eb11ef1397c751334311ce5b43920">expl</a></div><div class="ttdeci">long double expl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02618">math.c:2618</a></div></div>
 <div class="ttc" id="amath_8c_html_aedc37bf10d69d2efa2a478f5f5d4b26b"><div class="ttname"><a href="math_8c.html#aedc37bf10d69d2efa2a478f5f5d4b26b">rintl</a></div><div class="ttdeci">long double rintl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01738">math.c:1738</a></div></div>
 <div class="ttc" id="amath_8c_html_af17ec425baca2b5f3882a05b5e19dfb5"><div class="ttname"><a href="math_8c.html#af17ec425baca2b5f3882a05b5e19dfb5">fmodf</a></div><div class="ttdeci">float fmodf(float x, float y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02281">math.c:2281</a></div></div>
 <div class="ttc" id="amath_8c_html_af1b4fae85c66012e8e7e09ae3737933f"><div class="ttname"><a href="math_8c.html#af1b4fae85c66012e8e7e09ae3737933f">__finite</a></div><div class="ttdeci">int __finite(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00105">math.c:105</a></div></div>
@@ -2666,6 +3496,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_af4dbce976984f75dc170aef9b4e68001"><div class="ttname"><a href="math_8c.html#af4dbce976984f75dc170aef9b4e68001">isfinite</a></div><div class="ttdeci">int isfinite(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00101">math.c:101</a></div></div>
 <div class="ttc" id="amath_8c_html_af4f6badf29e0064603766a6f0875f6fc"><div class="ttname"><a href="math_8c.html#af4f6badf29e0064603766a6f0875f6fc">__builtin_huge_vall</a></div><div class="ttdeci">long double __builtin_huge_vall(void)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00291">math.c:291</a></div></div>
 <div class="ttc" id="amath_8c_html_af5d42a1cfb3689630653039dc38c1554"><div class="ttname"><a href="math_8c.html#af5d42a1cfb3689630653039dc38c1554">nanl</a></div><div class="ttdeci">long double nanl(const char *str)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00647">math.c:647</a></div></div>
+<div class="ttc" id="amath_8c_html_af67da1c28ce33b403f955103f201dfb8"><div class="ttname"><a href="math_8c.html#af67da1c28ce33b403f955103f201dfb8">logl</a></div><div class="ttdeci">long double logl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02806">math.c:2806</a></div></div>
 <div class="ttc" id="amath_8c_html_af7df01c4a9038dbf3562b41bc8c3be03"><div class="ttname"><a href="math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03">remainder</a></div><div class="ttdeci">double remainder(double x, double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02330">math.c:2330</a></div></div>
 <div class="ttc" id="amath_8c_html_af7eb976cc28d0a9a6f0827d01611f979"><div class="ttname"><a href="math_8c.html#af7eb976cc28d0a9a6f0827d01611f979">copysignf</a></div><div class="ttdeci">float copysignf(float x, float y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02401">math.c:2401</a></div></div>
 <div class="ttc" id="amath_8c_html_af8375111d664d7b4b7ceeec9108868fc"><div class="ttname"><a href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a></div><div class="ttdeci">long double __builtin_infl(void)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00235">math.c:235</a></div></div>

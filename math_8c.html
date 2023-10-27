@@ -99,12 +99,15 @@ $(document).ready(function(){initNavTree('math_8c.html',''); initResizable(); })
 <div class="textblock"><code>#include &lt;math.h&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;fenv.h&gt;</code><br />
+<code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;errno.h&gt;</code><br />
+<code>#include &lt;float.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for math.c:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="math_8c__incl.svg" width="260" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="math_8c__incl.svg" width="534" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -127,6 +130,12 @@ Macros</h2></td></tr>
 <tr class="separator:a508e18289cf35f19c7562637b9a63a8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d28061bf15a2362a2d6229012c5ad12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a4d28061bf15a2362a2d6229012c5ad12">__CPROVER_FENV_H_INCLUDED</a></td></tr>
 <tr class="separator:a4d28061bf15a2362a2d6229012c5ad12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e5f7b41a88e217972a585bf869395d4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a1e5f7b41a88e217972a585bf869395d4">__CPROVER_STDINT_H_INCLUDED</a></td></tr>
+<tr class="separator:a1e5f7b41a88e217972a585bf869395d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40c164fa2b2bf09a2ec154c97be511cc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a40c164fa2b2bf09a2ec154c97be511cc">__CPROVER_ERRNO_H_INCLUDED</a></td></tr>
+<tr class="separator:a40c164fa2b2bf09a2ec154c97be511cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6d497121e858a88f835207ccf35c33c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#ac6d497121e858a88f835207ccf35c33c">__CPROVER_FLOAT_H_INCLUDED</a></td></tr>
+<tr class="separator:ac6d497121e858a88f835207ccf35c33c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -406,8 +415,50 @@ Functions</h2></td></tr>
 <tr class="separator:af7eb976cc28d0a9a6f0827d01611f979"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae60d4866e88abf023d92d33c6351ae6f"><td class="memItemLeft" align="right" valign="top">long double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#ae60d4866e88abf023d92d33c6351ae6f">copysignl</a> (long double x, long double y)</td></tr>
 <tr class="separator:ae60d4866e88abf023d92d33c6351ae6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86e37219434c0b7978453b6ca88fc5fb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a86e37219434c0b7978453b6ca88fc5fb">exp2</a> (double x)</td></tr>
+<tr class="separator:a86e37219434c0b7978453b6ca88fc5fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed26c6708ff2027f9a8214d206eef0e7"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#aed26c6708ff2027f9a8214d206eef0e7">exp2f</a> (float x)</td></tr>
+<tr class="separator:aed26c6708ff2027f9a8214d206eef0e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4618e032de8318b72df5cc71f15b5e45"><td class="memItemLeft" align="right" valign="top">long double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a4618e032de8318b72df5cc71f15b5e45">exp2l</a> (long double x)</td></tr>
+<tr class="separator:a4618e032de8318b72df5cc71f15b5e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67115817a750a87eb899252b5deb2f9f"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a> (void)</td></tr>
+<tr class="separator:a67115817a750a87eb899252b5deb2f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae09128febbbe6372cde4fa0c65608a42"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#ae09128febbbe6372cde4fa0c65608a42">exp</a> (double x)</td></tr>
+<tr class="separator:ae09128febbbe6372cde4fa0c65608a42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c2bc89b8355a89542ac98d9e2120363"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a0c2bc89b8355a89542ac98d9e2120363">expf</a> (float x)</td></tr>
+<tr class="separator:a0c2bc89b8355a89542ac98d9e2120363"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed4eb11ef1397c751334311ce5b43920"><td class="memItemLeft" align="right" valign="top">long double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#aed4eb11ef1397c751334311ce5b43920">expl</a> (long double x)</td></tr>
+<tr class="separator:aed4eb11ef1397c751334311ce5b43920"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb302c9aafbaa5e180d9f60ee954bb82"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a> (double x)</td></tr>
+<tr class="separator:adb302c9aafbaa5e180d9f60ee954bb82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8246b3e17a39b137d0c62670d0c6e336"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a8246b3e17a39b137d0c62670d0c6e336">logf</a> (float x)</td></tr>
+<tr class="separator:a8246b3e17a39b137d0c62670d0c6e336"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af67da1c28ce33b403f955103f201dfb8"><td class="memItemLeft" align="right" valign="top">long double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#af67da1c28ce33b403f955103f201dfb8">logl</a> (long double x)</td></tr>
+<tr class="separator:af67da1c28ce33b403f955103f201dfb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa56c9494c95edf68386375e97d64159b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#aa56c9494c95edf68386375e97d64159b">pow</a> (double x, double y)</td></tr>
+<tr class="separator:aa56c9494c95edf68386375e97d64159b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6b287549be087f6f0bf03b6fe30499e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#ac6b287549be087f6f0bf03b6fe30499e">powf</a> (float x, float y)</td></tr>
+<tr class="separator:ac6b287549be087f6f0bf03b6fe30499e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f4830e468138e1513b55ca6a92a0f9a"><td class="memItemLeft" align="right" valign="top">long double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="math_8c.html#a2f4830e468138e1513b55ca6a92a0f9a">powl</a> (long double x, long double y)</td></tr>
+<tr class="separator:a2f4830e468138e1513b55ca6a92a0f9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a40c164fa2b2bf09a2ec154c97be511cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40c164fa2b2bf09a2ec154c97be511cc">&#9670;&nbsp;</a></span>__CPROVER_ERRNO_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_ERRNO_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02475">2475</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
 <a id="a4d28061bf15a2362a2d6229012c5ad12"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4d28061bf15a2362a2d6229012c5ad12">&#9670;&nbsp;</a></span>__CPROVER_FENV_H_INCLUDED</h2>
 
@@ -421,6 +472,22 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="math_8c_source.html#l00831">831</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="ac6d497121e858a88f835207ccf35c33c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6d497121e858a88f835207ccf35c33c">&#9670;&nbsp;</a></span>__CPROVER_FLOAT_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_FLOAT_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02603">2603</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
 
 </div>
 </div>
@@ -453,6 +520,22 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="math_8c_source.html#l00351">351</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="a1e5f7b41a88e217972a585bf869395d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e5f7b41a88e217972a585bf869395d4">&#9670;&nbsp;</a></span>__CPROVER_STDINT_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_STDINT_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02470">2470</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
 
 </div>
 </div>
@@ -1711,6 +1794,24 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a67115817a750a87eb899252b5deb2f9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67115817a750a87eb899252b5deb2f9f">&#9670;&nbsp;</a></span>__VERIFIER_nondet_int32_t()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int32_t __VERIFIER_nondet_int32_t </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a271aa2e12b14713a382cdf79e544ddae"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a271aa2e12b14713a382cdf79e544ddae">&#9670;&nbsp;</a></span>__VERIFIER_nondet_long_double()</h2>
 
@@ -2056,6 +2157,126 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="math_8c_source.html#l00554">554</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="ae09128febbbe6372cde4fa0c65608a42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae09128febbbe6372cde4fa0c65608a42">&#9670;&nbsp;</a></span>exp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double exp </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02480">2480</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="a86e37219434c0b7978453b6ca88fc5fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86e37219434c0b7978453b6ca88fc5fb">&#9670;&nbsp;</a></span>exp2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double exp2 </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02429">2429</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="aed26c6708ff2027f9a8214d206eef0e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed26c6708ff2027f9a8214d206eef0e7">&#9670;&nbsp;</a></span>exp2f()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float exp2f </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02441">2441</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="a4618e032de8318b72df5cc71f15b5e45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4618e032de8318b72df5cc71f15b5e45">&#9670;&nbsp;</a></span>exp2l()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long double exp2l </td>
+          <td>(</td>
+          <td class="paramtype">long double&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02453">2453</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="a0c2bc89b8355a89542ac98d9e2120363"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c2bc89b8355a89542ac98d9e2120363">&#9670;&nbsp;</a></span>expf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float expf </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02550">2550</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="aed4eb11ef1397c751334311ce5b43920"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed4eb11ef1397c751334311ce5b43920">&#9670;&nbsp;</a></span>expl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long double expl </td>
+          <td>(</td>
+          <td class="paramtype">long double&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02618">2618</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
 
 </div>
 </div>
@@ -2819,6 +3040,66 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="adb302c9aafbaa5e180d9f60ee954bb82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb302c9aafbaa5e180d9f60ee954bb82">&#9670;&nbsp;</a></span>log()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double log </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02689">2689</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="a8246b3e17a39b137d0c62670d0c6e336"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8246b3e17a39b137d0c62670d0c6e336">&#9670;&nbsp;</a></span>logf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float logf </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02747">2747</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="af67da1c28ce33b403f955103f201dfb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af67da1c28ce33b403f955103f201dfb8">&#9670;&nbsp;</a></span>logl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long double logl </td>
+          <td>(</td>
+          <td class="paramtype">long double&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02806">2806</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
 <a id="a3337db086394bad101bd8d42d891640a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3337db086394bad101bd8d42d891640a">&#9670;&nbsp;</a></span>lrint()</h2>
 
@@ -3206,6 +3487,96 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="math_8c_source.html#l00772">772</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="aa56c9494c95edf68386375e97d64159b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa56c9494c95edf68386375e97d64159b">&#9670;&nbsp;</a></span>pow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double pow </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02869">2869</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="ac6b287549be087f6f0bf03b6fe30499e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6b287549be087f6f0bf03b6fe30499e">&#9670;&nbsp;</a></span>powf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float powf </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l02998">2998</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
+
+</div>
+</div>
+<a id="a2f4830e468138e1513b55ca6a92a0f9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f4830e468138e1513b55ca6a92a0f9a">&#9670;&nbsp;</a></span>powl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long double powl </td>
+          <td>(</td>
+          <td class="paramtype">long double&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long double&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="math_8c_source.html#l03124">3124</a> of file <a class="el" href="math_8c_source.html">math.c</a>.</p>
 
 </div>
 </div>

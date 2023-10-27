@@ -140,7 +140,7 @@ $(document).ready(function(){initNavTree('language__file_8cpp_source.html',''); 
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
 <div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classlanguage__filest.html#a356642db7d74c5ce5a38cb887190c841">   51</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classlanguage__filest.html#a356642db7d74c5ce5a38cb887190c841">language_filest::parse</a>(<a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;{</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;file : <a class="code" href="classlanguage__filest.html#a597011178313773fe195fa16e150c38d">file_map</a>)</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  {</div>
@@ -150,7 +150,7 @@ $(document).ready(function(){initNavTree('language__file_8cpp_source.html',''); 
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">if</span>(!infile)</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Failed to open &quot;</span> &lt;&lt; file.first &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Failed to open &quot;</span> &lt;&lt; file.first &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    }</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
@@ -160,7 +160,7 @@ $(document).ready(function(){initNavTree('language__file_8cpp_source.html',''); 
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">if</span>(language.<a class="code" href="classlanguaget.html#a6e834f6839a657842c57cad0398d7109">parse</a>(infile, file.first))</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;Parsing of &quot;</span> &lt;&lt; file.first &lt;&lt; <span class="stringliteral">&quot; failed&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Parsing of &quot;</span> &lt;&lt; file.first &lt;&lt; <span class="stringliteral">&quot; failed&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    }</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
@@ -306,8 +306,8 @@ $(document).ready(function(){initNavTree('language__file_8cpp_source.html',''); 
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  <span class="keywordflow">if</span>(it==<a class="code" href="classlanguage__filest.html#ab0b69c01675080fb2ca171f02b76d374">module_map</a>.end())</div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  {</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;found no file that provides module &quot;</span> &lt;&lt; module</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;found no file that provides module &quot;</span> &lt;&lt; module</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;                &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  }</div>
@@ -327,13 +327,13 @@ $(document).ready(function(){initNavTree('language__file_8cpp_source.html',''); 
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keywordflow">if</span>(module.<a class="code" href="classlanguage__modulet.html#add7c86ea174f5eb8c86ebe5a70c37f7b">type_checked</a>)</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log(message_handler);</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler);</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  <span class="comment">// already in progress?</span></div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <span class="keywordflow">if</span>(module.<a class="code" href="classlanguage__modulet.html#a5131b603b5b21f39e352a8962d7d9d03">in_progress</a>)</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  {</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    log.<a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;circular dependency in &quot;</span> &lt;&lt; module.<a class="code" href="classlanguage__modulet.html#a191ed40111ff17410dea621f7b087ebe">name</a> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;circular dependency in &quot;</span> &lt;&lt; module.<a class="code" href="classlanguage__modulet.html#a191ed40111ff17410dea621f7b087ebe">name</a> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  }</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
@@ -358,7 +358,7 @@ $(document).ready(function(){initNavTree('language__file_8cpp_source.html',''); 
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  <span class="comment">// type check it</span></div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  log.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;Type-checking &quot;</span> &lt;&lt; module.<a class="code" href="classlanguage__modulet.html#a191ed40111ff17410dea621f7b087ebe">name</a> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.status() &lt;&lt; <span class="stringliteral">&quot;Type-checking &quot;</span> &lt;&lt; module.<a class="code" href="classlanguage__modulet.html#a191ed40111ff17410dea621f7b087ebe">name</a> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="keywordflow">if</span>(module.<a class="code" href="classlanguage__modulet.html#a843b888345bd98d79f5c4613e6647a90">file</a>-&gt;<a class="code" href="classlanguage__filet.html#afa538bd4b5f7f3be2e2780d648ea0cd8">language</a>-&gt;can_keep_file_local())</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  {</div>
@@ -407,12 +407,11 @@ $(document).ready(function(){initNavTree('language__file_8cpp_source.html',''); 
 <div class="ttc" id="aclasslanguaget_html_a6e834f6839a657842c57cad0398d7109"><div class="ttname"><a href="classlanguaget.html#a6e834f6839a657842c57cad0398d7109">languaget::parse</a></div><div class="ttdeci">virtual bool parse(std::istream &amp;instream, const std::string &amp;path)=0</div></div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:28</a></div></div>
 <div class="ttc" id="aclassmessaget_html"><div class="ttname"><a href="classmessaget.html">messaget</a></div><div class="ttdoc">Class that provides messages with a built-in verbosity 'level'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00154">message.h:155</a></div></div>
-<div class="ttc" id="aclassmessaget_html_a108043e0a9925dcebbb8a793611428b6"><div class="ttname"><a href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">messaget::error</a></div><div class="ttdeci">mstreamt &amp; error() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00399">message.h:399</a></div></div>
-<div class="ttc" id="aclassmessaget_html_a4ff7dd53c201e241ca4e86221a0e7259"><div class="ttname"><a href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">messaget::status</a></div><div class="ttdeci">mstreamt &amp; status() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00414">message.h:414</a></div></div>
 <div class="ttc" id="aclassmessaget_html_af53bf1a50370a1e7ad55df9dd0e6fdd0"><div class="ttname"><a href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a></div><div class="ttdeci">static eomt eom</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00297">message.h:297</a></div></div>
 <div class="ttc" id="aclasssymbol__table__baset_html"><div class="ttname"><a href="classsymbol__table__baset.html">symbol_table_baset</a></div><div class="ttdoc">The symbol table base class interface.</div><div class="ttdef"><b>Definition:</b> <a href="symbol__table__base_8h_source.html#l00021">symbol_table_base.h:22</a></div></div>
 <div class="ttc" id="alanguage_8h_html"><div class="ttname"><a href="language_8h.html">language.h</a></div><div class="ttdoc">Abstract interface to support a programming language.</div></div>
 <div class="ttc" id="alanguage__file_8h_html"><div class="ttname"><a href="language__file_8h.html">language_file.h</a></div></div>
+<div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02689">math.c:2689</a></div></div>
 <div class="ttc" id="amode_8cpp_html_a6d09cb0ef47fac009e70e87456a7ce7f"><div class="ttname"><a href="mode_8cpp.html#a6d09cb0ef47fac009e70e87456a7ce7f">languages</a></div><div class="ttdeci">languagest languages</div><div class="ttdef"><b>Definition:</b> <a href="mode_8cpp_source.html#l00033">mode.cpp:33</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

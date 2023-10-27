@@ -192,7 +192,7 @@ $(document).ready(function(){initNavTree('ci__lazy__methods_8cpp_source.html',''
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    called_virtual_functions;</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keywordtype">bool</span> class_initializer_seen = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log{message_handler};</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  <span class="keywordtype">bool</span> any_new_classes = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  <span class="keywordflow">while</span>(any_new_classes)</div>
@@ -225,7 +225,7 @@ $(document).ready(function(){initNavTree('ci__lazy__methods_8cpp_source.html',''
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <span class="comment">// Given the object types we now know may be created, populate more</span></div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      <span class="comment">// possible virtual function call targets:</span></div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      log.debug() &lt;&lt; <span class="stringliteral">&quot;CI lazy methods: add virtual method targets (&quot;</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;CI lazy methods: add virtual method targets (&quot;</span></div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                  &lt;&lt; called_virtual_functions.size() &lt;&lt; <span class="stringliteral">&quot; callsites)&quot;</span></div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                  &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
@@ -276,7 +276,7 @@ $(document).ready(function(){initNavTree('ci__lazy__methods_8cpp_source.html',''
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    keep_symbols.<a class="code" href="classsymbol__table__baset.html#ace726bfe2960bd1ad332c5ac52768e10">add</a>(sym.second);</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  }</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  log.debug() &lt;&lt; <span class="stringliteral">&quot;CI lazy methods: removed &quot;</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;CI lazy methods: removed &quot;</span></div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;              &lt;&lt; symbol_table.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.size() - keep_symbols.<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>.size()</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;              &lt;&lt; <span class="stringliteral">&quot; unreachable methods and globals&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
@@ -384,8 +384,8 @@ $(document).ready(function(){initNavTree('ci__lazy__methods_8cpp_source.html',''
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="keywordflow">if</span>(!methods_already_populated.insert(method_name).second)</div>
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    <span class="keywordflow">return</span> result;</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160; </div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> log{message_handler};</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  log.debug() &lt;&lt; <span class="stringliteral">&quot;CI lazy methods: elaborate &quot;</span> &lt;&lt; method_name &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;CI lazy methods: elaborate &quot;</span> &lt;&lt; method_name &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160; </div>
 <div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <span class="comment">// Note this wraps *references* to methods_to_convert_later &amp;</span></div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <span class="comment">// instantiated_classes</span></div>
@@ -646,6 +646,7 @@ $(document).ready(function(){initNavTree('ci__lazy__methods_8cpp_source.html',''
 <div class="ttc" id="ajava__entry__point_8cpp_html_adf20ddd9a3c3a13e61f9ad953636cd90"><div class="ttname"><a href="java__entry__point_8cpp.html#adf20ddd9a3c3a13e61f9ad953636cd90">get_java_class_literal_initializer_signature</a></div><div class="ttdeci">irep_idt get_java_class_literal_initializer_signature()</div><div class="ttdoc">Get the symbol name of java.lang.Class' initializer method.</div><div class="ttdef"><b>Definition:</b> <a href="java__entry__point_8cpp_source.html#l00076">java_entry_point.cpp:76</a></div></div>
 <div class="ttc" id="ajava__entry__point_8h_html"><div class="ttname"><a href="java__entry__point_8h.html">java_entry_point.h</a></div></div>
 <div class="ttc" id="ajava__types_8h_html_a4c61f87b6ac4b9dad95a81d9e0130be2"><div class="ttname"><a href="java__types_8h.html#a4c61f87b6ac4b9dad95a81d9e0130be2">to_java_method_type</a></div><div class="ttdeci">const java_method_typet &amp; to_java_method_type(const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="java__types_8h_source.html#l00184">java_types.h:184</a></div></div>
+<div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02689">math.c:2689</a></div></div>
 <div class="ttc" id="anamespace_8h_html"><div class="ttname"><a href="namespace_8h.html">namespace.h</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html_a803796648f3f21fa7835f4509b7ea0a2"><div class="ttname"><a href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a></div><div class="ttdeci">const pointer_typet &amp; to_pointer_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a pointer_typet.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00093">pointer_expr.h:93</a></div></div>
 <div class="ttc" id="aremove__exceptions_8h_html"><div class="ttname"><a href="remove__exceptions_8h.html">remove_exceptions.h</a></div><div class="ttdoc">Remove function exceptional returns.</div></div>
