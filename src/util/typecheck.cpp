@@ -44,5 +44,16 @@ bool typecheckt::typecheck_main()
     error() << e.get_reason() << messaget::eom;
   }
 
+  catch(const errort &e)
+  {
+    if(e.what().empty())
+      error();
+    else
+    {
+      error().source_location = e.source_location();
+      error() << e.what() << messaget::eom;
+    }
+  }
+
   return message_handler->get_message_count(messaget::M_ERROR)!=errors_before;
 }
