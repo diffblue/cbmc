@@ -63,7 +63,7 @@ void satcheck_lingelingt::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_lingelingt::do_prop_solve()
+propt::resultt satcheck_lingelingt::do_prop_solve(const bvt &assumptions)
 {
   PRECONDITION(status != ERROR);
 
@@ -78,7 +78,8 @@ propt::resultt satcheck_lingelingt::do_prop_solve()
   std::string msg;
 
   for(const auto &literal : assumptions)
-    lglassume(solver, literal.dimacs());
+    if(!literal.is_true())
+      lglassume(solver, literal.dimacs());
 
   const int res=lglsat(solver);
   CHECK_RETURN(res == 10 || res == 20);
@@ -115,18 +116,6 @@ satcheck_lingelingt::~satcheck_lingelingt()
 {
   lglrelease(solver);
   solver=0;
-}
-
-void satcheck_lingelingt::set_assumptions(const bvt &bv)
-{
-  assumptions=bv;
-
-  INVARIANT(
-    std::all_of(
-      assumptions.begin(),
-      assumptions.end(),
-      [](const literalt &l) { return !l.is_constant(); }),
-    "assumptions should be non-constant");
 }
 
 void satcheck_lingelingt::set_frozen(literalt a)

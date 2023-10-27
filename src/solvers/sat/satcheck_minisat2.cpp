@@ -39,6 +39,20 @@ void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
   }
 }
 
+void convert_assumptions(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
+{
+  PRECONDITION(
+    bv.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));
+  dest.capacity(static_cast<int>(bv.size()));
+
+  for(const auto &literal : bv)
+  {
+    // when converting assumptions, ignore 'true'
+    if(!literal.is_true())
+      dest.push(Minisat::mkLit(literal.var_no(), literal.sign()));
+  }
+}
+
 template<typename T>
 tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 {
@@ -186,7 +200,7 @@ static void interrupt_solver(int signum)
 #endif
 
 template <typename T>
-propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
+propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 {
   PRECONDITION(status != statust::ERROR);
 
@@ -218,7 +232,7 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
     }
 
     Minisat::vec<Minisat::Lit> solver_assumptions;
-    convert(assumptions, solver_assumptions);
+    convert_assumptions(assumptions, solver_assumptions);
 
     using Minisat::lbool;
 
@@ -329,21 +343,6 @@ bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
       return true;
 
   return false;
-}
-
-template<typename T>
-void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
-{
-  // We filter out 'true' assumptions which cause an assertion violation
-  // in Minisat2.
-  assumptions.clear();
-  for(const auto &assumption : bv)
-  {
-    if(!assumption.is_true())
-    {
-      assumptions.push_back(assumption);
-    }
-  }
 }
 
 template class satcheck_minisat2_baset<Minisat::Solver>;

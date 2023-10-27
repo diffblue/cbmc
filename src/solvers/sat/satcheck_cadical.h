@@ -31,8 +31,7 @@ public:
   void lcnf(const bvt &bv) override;
   void set_assignment(literalt a, bool value) override;
 
-  void set_assumptions(const bvt &_assumptions) override;
-  bool has_set_assumptions() const override
+  bool has_assumptions() const override
   {
     return true;
   }
@@ -43,12 +42,10 @@ public:
   bool is_in_conflict(literalt a) const override;
 
 protected:
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &assumptions) override;
 
   // NOLINTNEXTLINE(readability/identifiers)
-  CaDiCaL::Solver * solver;
-
-  bvt assumptions;
+  CaDiCaL::Solver *solver;
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_CADICAL_H

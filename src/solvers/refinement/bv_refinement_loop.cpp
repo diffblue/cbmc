@@ -16,7 +16,7 @@ bv_refinementt::bv_refinementt(const infot &info)
     config_(info)
 {
   // check features we need
-  PRECONDITION(prop.has_set_assumptions());
+  PRECONDITION(prop.has_assumptions());
   PRECONDITION(prop.has_set_to());
   PRECONDITION(prop.has_is_in_conflict());
 }
@@ -102,7 +102,7 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   }
 
   push(assumptions);
-  propt::resultt result=prop.prop_solve();
+  propt::resultt result = prop.prop_solve(assumption_stack);
   pop();
 
   // clang-format off

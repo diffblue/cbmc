@@ -34,8 +34,10 @@ std::string satcheck_zcoret::solver_text() const
   return "ZCore";
 }
 
-propt::resultt satcheck_zcoret::do_prop_solve()
+propt::resultt satcheck_zcoret::do_prop_solve(const bvt &assumptions)
 {
+  PRECONDITION(assumptions.empty());
+
   // We start counting at 1, thus there is one variable fewer.
   {
     std::string msg=

@@ -32,6 +32,17 @@ void convert(const bvt &bv, Glucose::vec<Glucose::Lit> &dest)
   }
 }
 
+void convert_assumptions(const bvt &bv, Glucose::vec<Glucose::Lit> &dest)
+{
+  dest.capacity(bv.size());
+
+  for(const auto &literal : bv)
+  {
+    if(!literal.is_true())
+      dest.push(Glucose::mkLit(literal.var_no(), literal.sign()));
+  }
+}
+
 template<typename T>
 tvt satcheck_glucose_baset<T>::l_get(literalt a) const
 {
@@ -153,7 +164,7 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
 }
 
 template <typename T>
-propt::resultt satcheck_glucose_baset<T>::do_prop_solve()
+propt::resultt satcheck_glucose_baset<T>::do_prop_solve(const bvt &assumptions)
 {
   PRECONDITION(status != statust::ERROR);
 
@@ -189,7 +200,7 @@ propt::resultt satcheck_glucose_baset<T>::do_prop_solve()
       else
       {
         Glucose::vec<Glucose::Lit> solver_assumptions;
-        convert(assumptions, solver_assumptions);
+        convert_assumptions(assumptions, solver_assumptions);
 
         if(solver->solve(solver_assumptions))
         {
@@ -260,18 +271,6 @@ bool satcheck_glucose_baset<T>::is_in_conflict(literalt a) const
       return true;
 
   return false;
-}
-
-template<typename T>
-void satcheck_glucose_baset<T>::set_assumptions(const bvt &bv)
-{
-  assumptions=bv;
-
-  for(const auto &literal : assumptions)
-  {
-    INVARIANT(
-      !literal.is_constant(), "assumption literals must not be constant");
-  }
 }
 
 template class satcheck_glucose_baset<Glucose::Solver>;

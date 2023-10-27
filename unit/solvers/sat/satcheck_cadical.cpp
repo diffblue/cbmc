@@ -35,8 +35,8 @@ SCENARIO("satcheck_cadical", "[core][solvers][sat][satcheck_cadical]")
     {
       bvt assumptions;
       assumptions.push_back(const_literal(false));
-      satcheck.set_assumptions(assumptions);
-      REQUIRE(satcheck.prop_solve() == propt::resultt::P_UNSATISFIABLE);
+      REQUIRE(
+        satcheck.prop_solve(assumptions) == propt::resultt::P_UNSATISFIABLE);
     }
   }
 
@@ -63,22 +63,22 @@ SCENARIO("satcheck_cadical", "[core][solvers][sat][satcheck_cadical]")
     {
       bvt assumptions;
       assumptions.push_back(a);
-      satcheck.set_assumptions(assumptions);
-      REQUIRE(satcheck.prop_solve() == propt::resultt::P_UNSATISFIABLE);
+      REQUIRE(
+        satcheck.prop_solve(assumptions) == propt::resultt::P_UNSATISFIABLE);
     }
     THEN("is still unsatisfiable under assumption a and true")
     {
       bvt assumptions;
       assumptions.push_back(const_literal(true));
       assumptions.push_back(a);
-      satcheck.set_assumptions(assumptions);
-      REQUIRE(satcheck.prop_solve() == propt::resultt::P_UNSATISFIABLE);
+      REQUIRE(
+        satcheck.prop_solve(assumptions) == propt::resultt::P_UNSATISFIABLE);
     }
     THEN("becomes satisfiable when assumption a is lifted")
     {
       bvt assumptions;
-      satcheck.set_assumptions(assumptions);
-      REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+      REQUIRE(
+        satcheck.prop_solve(assumptions) == propt::resultt::P_SATISFIABLE);
     }
   }
 }

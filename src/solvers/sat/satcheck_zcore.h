@@ -29,7 +29,7 @@ public:
   }
 
 protected:
-  resultt do_prop_solve() override;
+  resultt do_prop_solve(const bvt &assumptions) override;
 
   std::set<unsigned> in_core;
 };

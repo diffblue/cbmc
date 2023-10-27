@@ -152,7 +152,7 @@ public:
     return "BDDs";
   }
 
-  resultt do_prop_solve() override
+  resultt do_prop_solve(const bvt &) override
   {
     UNREACHABLE;
     return {};
