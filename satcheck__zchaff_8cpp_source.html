@@ -164,111 +164,112 @@ $(document).ready(function(){initNavTree('satcheck__zchaff_8cpp_source.html','')
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">int</span>*<span class="keyword">&gt;</span>(&amp;((*it)[0])), it-&gt;size());</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classsatcheck__zchaff__baset.html#a36d713c9cb72a0a5e776398328e64e04">   73</a></span>&#160;<a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a> <a class="code" href="classsatcheck__zchaff__baset.html#a36d713c9cb72a0a5e776398328e64e04">satcheck_zchaff_baset::do_prop_solve</a>()</div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classsatcheck__zchaff__baset.html#a37c7caaac5daa5aa0f221bf4cf4f0b71">   73</a></span>&#160;<a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a> <a class="code" href="classsatcheck__zchaff__baset.html#a37c7caaac5daa5aa0f221bf4cf4f0b71">satcheck_zchaff_baset::do_prop_solve</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;assumptions)</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;{</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="comment">// this is *not* incremental</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<a class="code" href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">status</a> == <a class="code" href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848baedb39ded165a2d23beeaa76df810c887">INIT</a>);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <a class="code" href="classsatcheck__zchaff__baset.html#a1e91885840337265a212259bc7458e12">copy_cnf</a>();</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    std::string msg=</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;num_variables())+<span class="stringliteral">&quot; variables, &quot;</span>+</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;clauses().size())+<span class="stringliteral">&quot; clauses&quot;</span>;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a207055d212f4e938086700a51b6c8190">statistics</a>() &lt;&lt; msg &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  SAT_StatusT result=(SAT_StatusT)<a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;solve();</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    std::string msg;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">switch</span>(result)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    {</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;     <span class="keywordflow">case</span> UNSATISFIABLE:</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker: instance is UNSATISFIABLE&quot;</span>;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;     <span class="keywordflow">case</span> SATISFIABLE:</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker: instance is SATISFIABLE&quot;</span>;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;     <span class="keywordflow">case</span> UNDETERMINED:</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: UNDETERMINED&quot;</span>;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;     <span class="keywordflow">case</span> TIME_OUT:</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: Time out&quot;</span>;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;     <span class="keywordflow">case</span> MEM_OUT:</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: Out of memory&quot;</span>;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;     <span class="keywordflow">case</span> ABORTED:</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: ABORTED&quot;</span>;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;     <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: unknown result&quot;</span>;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    }</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; msg &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  }</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keywordflow">if</span>(result==SATISFIABLE)</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">// see if it is complete</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> i=1; i&lt;<a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;variables().size(); i++)</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;variables()[i].value() == 0 ||</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;          <a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;variables()[i].value() == 1,</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="stringliteral">&quot;all variables shall have been assigned&quot;</span>);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  }</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">  #ifdef DEBUG</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <span class="keywordflow">if</span>(result==SATISFIABLE)</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  {</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> i=2; i&lt;(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>*2); i+=2)</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;DEBUG L&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; get(i) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  }</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keywordflow">if</span>(result==UNSATISFIABLE)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  {</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <a class="code" href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">status</a>=<a class="code" href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848babee4ddbf8d061a4434619efc2acf9e2f">UNSAT</a>;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">return</span> P_UNSATISFIABLE;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  }</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keywordflow">if</span>(result==SATISFIABLE)</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  {</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <a class="code" href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">status</a>=<a class="code" href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848ba850158691392cf2b6890489904588571">SAT</a>;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">return</span> P_SATISFIABLE;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  }</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  <a class="code" href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">status</a>=<a class="code" href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848bac60e7f6d5d2739460ff836aa136203f9">ERROR</a>;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <span class="keywordflow">return</span> P_ERROR;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;}</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno"><a class="line" href="classsatcheck__zchaff__baset.html#a91adf23ac223f70ecf838c1aecfbf0a2">  161</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsatcheck__zchaff__baset.html#a91adf23ac223f70ecf838c1aecfbf0a2">satcheck_zchaff_baset::set_assignment</a>(<a class="code" href="classliteralt.html">literalt</a> a, <span class="keywordtype">bool</span> value)</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;{</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keywordtype">unsigned</span> v=a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>();</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keywordtype">bool</span> sign=a.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>();</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  value^=sign;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;variables()[v].set_value(value);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
-<div class="line"><a name="l00169"></a><span class="lineno"><a class="line" href="classsatcheck__zchafft.html#ae0fb0db8dc944e19b4b8a8b5742cafca">  169</a></span>&#160;<a class="code" href="classsatcheck__zchafft.html#ae0fb0db8dc944e19b4b8a8b5742cafca">satcheck_zchafft::satcheck_zchafft</a>():</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <a class="code" href="classsatcheck__zchaff__baset.html">satcheck_zchaff_baset</a>(new CSolver)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;{</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;}</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
-<div class="line"><a name="l00174"></a><span class="lineno"><a class="line" href="classsatcheck__zchafft.html#a5c7a23b35357e9dac38e5aa38bbc95be">  174</a></span>&#160;<a class="code" href="classsatcheck__zchafft.html#a5c7a23b35357e9dac38e5aa38bbc95be">satcheck_zchafft::~satcheck_zchafft</a>()</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;{</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <span class="keyword">delete</span> <a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;}</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(assumptions.empty());</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<a class="code" href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">status</a> == <a class="code" href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848baedb39ded165a2d23beeaa76df810c887">INIT</a>);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <a class="code" href="classsatcheck__zchaff__baset.html#a1e91885840337265a212259bc7458e12">copy_cnf</a>();</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    std::string msg=</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;num_variables())+<span class="stringliteral">&quot; variables, &quot;</span>+</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;clauses().size())+<span class="stringliteral">&quot; clauses&quot;</span>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a207055d212f4e938086700a51b6c8190">statistics</a>() &lt;&lt; msg &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  }</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  SAT_StatusT result=(SAT_StatusT)<a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;solve();</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    std::string msg;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordflow">switch</span>(result)</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    {</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;     <span class="keywordflow">case</span> UNSATISFIABLE:</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker: instance is UNSATISFIABLE&quot;</span>;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;     <span class="keywordflow">case</span> SATISFIABLE:</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker: instance is SATISFIABLE&quot;</span>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;     <span class="keywordflow">case</span> UNDETERMINED:</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: UNDETERMINED&quot;</span>;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;     <span class="keywordflow">case</span> TIME_OUT:</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: Time out&quot;</span>;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;     <span class="keywordflow">case</span> MEM_OUT:</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: Out of memory&quot;</span>;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;     <span class="keywordflow">case</span> ABORTED:</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: ABORTED&quot;</span>;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;     <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      msg=<span class="stringliteral">&quot;SAT checker failed: unknown result&quot;</span>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    }</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; msg &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  }</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="keywordflow">if</span>(result==SATISFIABLE)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">// see if it is complete</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> i=1; i&lt;<a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;variables().size(); i++)</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      <a class="code" href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">INVARIANT</a>(</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;variables()[i].value() == 0 ||</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;          <a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;variables()[i].value() == 1,</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="stringliteral">&quot;all variables shall have been assigned&quot;</span>);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  }</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">  #ifdef DEBUG</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <span class="keywordflow">if</span>(result==SATISFIABLE)</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  {</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> i=2; i&lt;(<a class="code" href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">_no_variables</a>*2); i+=2)</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;DEBUG L&quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; get(i) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  }</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="keywordflow">if</span>(result==UNSATISFIABLE)</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  {</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <a class="code" href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">status</a>=<a class="code" href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848babee4ddbf8d061a4434619efc2acf9e2f">UNSAT</a>;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">return</span> P_UNSATISFIABLE;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  }</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="keywordflow">if</span>(result==SATISFIABLE)</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  {</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <a class="code" href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">status</a>=<a class="code" href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848ba850158691392cf2b6890489904588571">SAT</a>;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">return</span> P_SATISFIABLE;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  }</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  <a class="code" href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">status</a>=<a class="code" href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848bac60e7f6d5d2739460ff836aa136203f9">ERROR</a>;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keywordflow">return</span> P_ERROR;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;}</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno"><a class="line" href="classsatcheck__zchaff__baset.html#a91adf23ac223f70ecf838c1aecfbf0a2">  162</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classsatcheck__zchaff__baset.html#a91adf23ac223f70ecf838c1aecfbf0a2">satcheck_zchaff_baset::set_assignment</a>(<a class="code" href="classliteralt.html">literalt</a> a, <span class="keywordtype">bool</span> value)</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;{</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keywordtype">unsigned</span> v=a.<a class="code" href="classliteralt.html#a5d14de13ca0a861587b0d187eee1b03a">var_no</a>();</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <span class="keywordtype">bool</span> sign=a.<a class="code" href="classliteralt.html#a155aee401f2145171e9fe78a2578584a">sign</a>();</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  value^=sign;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>-&gt;variables()[v].set_value(value);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;}</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno"><a class="line" href="classsatcheck__zchafft.html#ae0fb0db8dc944e19b4b8a8b5742cafca">  170</a></span>&#160;<a class="code" href="classsatcheck__zchafft.html#ae0fb0db8dc944e19b4b8a8b5742cafca">satcheck_zchafft::satcheck_zchafft</a>():</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <a class="code" href="classsatcheck__zchaff__baset.html">satcheck_zchaff_baset</a>(new CSolver)</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;{</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;}</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
+<div class="line"><a name="l00175"></a><span class="lineno"><a class="line" href="classsatcheck__zchafft.html#a5c7a23b35357e9dac38e5aa38bbc95be">  175</a></span>&#160;<a class="code" href="classsatcheck__zchafft.html#a5c7a23b35357e9dac38e5aa38bbc95be">satcheck_zchafft::~satcheck_zchafft</a>()</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;{</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="keyword">delete</span> <a class="code" href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">solver</a>;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;}</div>
 <div class="ttc" id="aclasscnf__clause__listt_html_a8cdceda047383c0049f01ce64594035e"><div class="ttname"><a href="classcnf__clause__listt.html#a8cdceda047383c0049f01ce64594035e">cnf_clause_listt::clauses</a></div><div class="ttdeci">clausest clauses</div><div class="ttdef"><b>Definition:</b> <a href="cnf__clause__list_8h_source.html#l00085">cnf_clause_list.h:85</a></div></div>
 <div class="ttc" id="aclasscnft_html_a9524544b46ee5dd67d66365e1ceb1dd0"><div class="ttname"><a href="classcnft.html#a9524544b46ee5dd67d66365e1ceb1dd0">cnft::no_variables</a></div><div class="ttdeci">virtual size_t no_variables() const override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8h_source.html#l00042">cnf.h:42</a></div></div>
 <div class="ttc" id="aclasscnft_html_a98476dd4043457fd71ebe7f5313c0b00"><div class="ttname"><a href="classcnft.html#a98476dd4043457fd71ebe7f5313c0b00">cnft::_no_variables</a></div><div class="ttdeci">size_t _no_variables</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8h_source.html#l00057">cnf.h:57</a></div></div>
@@ -280,26 +281,27 @@ $(document).ready(function(){initNavTree('satcheck__zchaff_8cpp_source.html','')
 <div class="ttc" id="aclassmessaget_html_a207055d212f4e938086700a51b6c8190"><div class="ttname"><a href="classmessaget.html#a207055d212f4e938086700a51b6c8190">messaget::statistics</a></div><div class="ttdeci">mstreamt &amp; statistics() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00419">message.h:419</a></div></div>
 <div class="ttc" id="aclassmessaget_html_a4ff7dd53c201e241ca4e86221a0e7259"><div class="ttname"><a href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">messaget::status</a></div><div class="ttdeci">mstreamt &amp; status() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00414">message.h:414</a></div></div>
 <div class="ttc" id="aclassmessaget_html_af53bf1a50370a1e7ad55df9dd0e6fdd0"><div class="ttname"><a href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a></div><div class="ttdeci">static eomt eom</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00297">message.h:297</a></div></div>
-<div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06c"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a></div><div class="ttdeci">resultt</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00099">prop.h:99</a></div></div>
-<div class="ttc" id="aclasspropt_html_afdb08f757ee6d3a90a7732de7372dade"><div class="ttname"><a href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">propt::log</a></div><div class="ttdeci">messaget log</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00130">prop.h:130</a></div></div>
+<div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06c"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a></div><div class="ttdeci">resultt</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00101">prop.h:101</a></div></div>
+<div class="ttc" id="aclasspropt_html_afdb08f757ee6d3a90a7732de7372dade"><div class="ttname"><a href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">propt::log</a></div><div class="ttdeci">messaget log</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00134">prop.h:134</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html"><div class="ttname"><a href="classsatcheck__zchaff__baset.html">satcheck_zchaff_baset</a></div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8h_source.html#l00021">satcheck_zchaff.h:22</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_a1e91885840337265a212259bc7458e12"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a1e91885840337265a212259bc7458e12">satcheck_zchaff_baset::copy_cnf</a></div><div class="ttdeci">virtual void copy_cnf()</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00059">satcheck_zchaff.cpp:59</a></div></div>
-<div class="ttc" id="aclasssatcheck__zchaff__baset_html_a36d713c9cb72a0a5e776398328e64e04"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a36d713c9cb72a0a5e776398328e64e04">satcheck_zchaff_baset::do_prop_solve</a></div><div class="ttdeci">resultt do_prop_solve() override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00073">satcheck_zchaff.cpp:73</a></div></div>
+<div class="ttc" id="aclasssatcheck__zchaff__baset_html_a37c7caaac5daa5aa0f221bf4cf4f0b71"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a37c7caaac5daa5aa0f221bf4cf4f0b71">satcheck_zchaff_baset::do_prop_solve</a></div><div class="ttdeci">resultt do_prop_solve(const bvt &amp;assumptions) override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00073">satcheck_zchaff.cpp:73</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_a6ccb3e4ca08f1758b95b71a2f16c848ba850158691392cf2b6890489904588571"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848ba850158691392cf2b6890489904588571">satcheck_zchaff_baset::SAT</a></div><div class="ttdeci">@ SAT</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8h_source.html#l00042">satcheck_zchaff.h:42</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_a6ccb3e4ca08f1758b95b71a2f16c848babee4ddbf8d061a4434619efc2acf9e2f"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848babee4ddbf8d061a4434619efc2acf9e2f">satcheck_zchaff_baset::UNSAT</a></div><div class="ttdeci">@ UNSAT</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8h_source.html#l00042">satcheck_zchaff.h:42</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_a6ccb3e4ca08f1758b95b71a2f16c848bac60e7f6d5d2739460ff836aa136203f9"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848bac60e7f6d5d2739460ff836aa136203f9">satcheck_zchaff_baset::ERROR</a></div><div class="ttdeci">@ ERROR</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8h_source.html#l00042">satcheck_zchaff.h:42</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_a6ccb3e4ca08f1758b95b71a2f16c848baedb39ded165a2d23beeaa76df810c887"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a6ccb3e4ca08f1758b95b71a2f16c848baedb39ded165a2d23beeaa76df810c887">satcheck_zchaff_baset::INIT</a></div><div class="ttdeci">@ INIT</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8h_source.html#l00042">satcheck_zchaff.h:42</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_a6ff7e2a1286835fa346b358a7cc25227"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a6ff7e2a1286835fa346b358a7cc25227">satcheck_zchaff_baset::~satcheck_zchaff_baset</a></div><div class="ttdeci">virtual ~satcheck_zchaff_baset()</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00022">satcheck_zchaff.cpp:22</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_a8035ab481ed48724fb31c402761c952e"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a8035ab481ed48724fb31c402761c952e">satcheck_zchaff_baset::solver_text</a></div><div class="ttdeci">std::string solver_text() const override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00054">satcheck_zchaff.cpp:54</a></div></div>
-<div class="ttc" id="aclasssatcheck__zchaff__baset_html_a91adf23ac223f70ecf838c1aecfbf0a2"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a91adf23ac223f70ecf838c1aecfbf0a2">satcheck_zchaff_baset::set_assignment</a></div><div class="ttdeci">void set_assignment(literalt a, bool value) override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00161">satcheck_zchaff.cpp:161</a></div></div>
+<div class="ttc" id="aclasssatcheck__zchaff__baset_html_a91adf23ac223f70ecf838c1aecfbf0a2"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#a91adf23ac223f70ecf838c1aecfbf0a2">satcheck_zchaff_baset::set_assignment</a></div><div class="ttdeci">void set_assignment(literalt a, bool value) override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00162">satcheck_zchaff.cpp:162</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_ab0551b80c70f5631cfc2a8f87809f486"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#ab0551b80c70f5631cfc2a8f87809f486">satcheck_zchaff_baset::satcheck_zchaff_baset</a></div><div class="ttdeci">satcheck_zchaff_baset(CSolver *_solver)</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00015">satcheck_zchaff.cpp:15</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_adc82b2e16c905942938d9ee1a047ba9b"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#adc82b2e16c905942938d9ee1a047ba9b">satcheck_zchaff_baset::solver</a></div><div class="ttdeci">CSolver * solver</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8h_source.html#l00040">satcheck_zchaff.h:40</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_aea44c60190a5a5735f09593ef5163f40"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#aea44c60190a5a5735f09593ef5163f40">satcheck_zchaff_baset::status</a></div><div class="ttdeci">statust status</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8h_source.html#l00043">satcheck_zchaff.h:43</a></div></div>
 <div class="ttc" id="aclasssatcheck__zchaff__baset_html_af3737b0e25559b34cc210eaeafab91f6"><div class="ttname"><a href="classsatcheck__zchaff__baset.html#af3737b0e25559b34cc210eaeafab91f6">satcheck_zchaff_baset::l_get</a></div><div class="ttdeci">tvt l_get(literalt a) const override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00026">satcheck_zchaff.cpp:26</a></div></div>
-<div class="ttc" id="aclasssatcheck__zchafft_html_a5c7a23b35357e9dac38e5aa38bbc95be"><div class="ttname"><a href="classsatcheck__zchafft.html#a5c7a23b35357e9dac38e5aa38bbc95be">satcheck_zchafft::~satcheck_zchafft</a></div><div class="ttdeci">virtual ~satcheck_zchafft()</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00174">satcheck_zchaff.cpp:174</a></div></div>
-<div class="ttc" id="aclasssatcheck__zchafft_html_ae0fb0db8dc944e19b4b8a8b5742cafca"><div class="ttname"><a href="classsatcheck__zchafft.html#ae0fb0db8dc944e19b4b8a8b5742cafca">satcheck_zchafft::satcheck_zchafft</a></div><div class="ttdeci">satcheck_zchafft()</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00169">satcheck_zchaff.cpp:169</a></div></div>
+<div class="ttc" id="aclasssatcheck__zchafft_html_a5c7a23b35357e9dac38e5aa38bbc95be"><div class="ttname"><a href="classsatcheck__zchafft.html#a5c7a23b35357e9dac38e5aa38bbc95be">satcheck_zchafft::~satcheck_zchafft</a></div><div class="ttdeci">virtual ~satcheck_zchafft()</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00175">satcheck_zchaff.cpp:175</a></div></div>
+<div class="ttc" id="aclasssatcheck__zchafft_html_ae0fb0db8dc944e19b4b8a8b5742cafca"><div class="ttname"><a href="classsatcheck__zchafft.html#ae0fb0db8dc944e19b4b8a8b5742cafca">satcheck_zchafft::satcheck_zchafft</a></div><div class="ttdeci">satcheck_zchafft()</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zchaff_8cpp_source.html#l00170">satcheck_zchaff.cpp:170</a></div></div>
 <div class="ttc" id="aclasstvt_html"><div class="ttname"><a href="classtvt.html">tvt</a></div><div class="ttdef"><b>Definition:</b> <a href="threeval_8h_source.html#l00019">threeval.h:20</a></div></div>
 <div class="ttc" id="aclasstvt_html_affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43"><div class="ttname"><a href="classtvt.html#affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43">tvt::tv_enumt::TV_UNKNOWN</a></div><div class="ttdeci">@ TV_UNKNOWN</div></div>
+<div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
 <div class="ttc" id="asatcheck__zchaff_8h_html"><div class="ttname"><a href="satcheck__zchaff_8h.html">satcheck_zchaff.h</a></div></div>
 <div class="ttc" id="asolver_8cpp_html_a9065b6af619d5b871e86e0faed9b494c"><div class="ttname"><a href="solver_8cpp.html#a9065b6af619d5b871e86e0faed9b494c">solver</a></div><div class="ttdeci">void solver(std::vector&lt; framet &gt; &amp;frames, const std::unordered_set&lt; symbol_exprt, irep_hash &gt; &amp;address_taken, const solver_optionst &amp;solver_options, const namespacet &amp;ns, std::vector&lt; propertyt &gt; &amp;properties, std::size_t property_index)</div><div class="ttdef"><b>Definition:</b> <a href="solver_8cpp_source.html#l00044">solver.cpp:44</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>

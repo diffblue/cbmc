@@ -177,10 +177,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae353a5b55cad71394ce2c7c43b585547"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c9141f5f830de823eb0bacb642112e4"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#a5c9141f5f830de823eb0bacb642112e4">cnf_handled_well</a> () const</td></tr>
 <tr class="separator:a5c9141f5f830de823eb0bacb642112e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ee3bd6707710e8e6244c58bafb0077d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#a8ee3bd6707710e8e6244c58bafb0077d">set_assumptions</a> (const <a class="el" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;)</td></tr>
-<tr class="separator:a8ee3bd6707710e8e6244c58bafb0077d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3af4d5491d5e8ecbd56073d36414f60e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#a3af4d5491d5e8ecbd56073d36414f60e">has_set_assumptions</a> () const</td></tr>
-<tr class="separator:a3af4d5491d5e8ecbd56073d36414f60e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9be83cdb2131c9e9601e2ec7d06be06"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#ab9be83cdb2131c9e9601e2ec7d06be06">has_assumptions</a> () const</td></tr>
+<tr class="separator:ab9be83cdb2131c9e9601e2ec7d06be06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd417a4b281966755360a57a77a78b48"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classliteralt.html">literalt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#acd417a4b281966755360a57a77a78b48">new_variable</a> ()=0</td></tr>
 <tr class="separator:acd417a4b281966755360a57a77a78b48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3532718b9e468242b154e4578e3e3e54"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#a3532718b9e468242b154e4578e3e3e54">set_variable_name</a> (<a class="el" href="classliteralt.html">literalt</a>, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)</td></tr>
@@ -194,6 +192,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a80688ba4d267ceff0010292cac4ad874"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf9970412671c2f7ea8c097fee9c4e82"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#aaf9970412671c2f7ea8c097fee9c4e82">prop_solve</a> ()</td></tr>
 <tr class="separator:aaf9970412671c2f7ea8c097fee9c4e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accdc65578977abd9765c2e59a7e2aec0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#accdc65578977abd9765c2e59a7e2aec0">prop_solve</a> (const <a class="el" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;assumptions)</td></tr>
+<tr class="separator:accdc65578977abd9765c2e59a7e2aec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf97d3193105345ee1332f2bf08ebaed"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classtvt.html">tvt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#adf97d3193105345ee1332f2bf08ebaed">l_get</a> (<a class="el" href="classliteralt.html">literalt</a> a) const =0</td></tr>
 <tr class="separator:adf97d3193105345ee1332f2bf08ebaed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e619afc32340bb9389a07ab7bca3031"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#a7e619afc32340bb9389a07ab7bca3031">set_assignment</a> (<a class="el" href="classliteralt.html">literalt</a> a, bool value)=0</td></tr>
@@ -212,8 +212,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:ac3eb5f62b22bc4607170860a6fb5a6fc"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#ac3eb5f62b22bc4607170860a6fb5a6fc">do_prop_solve</a> ()=0</td></tr>
-<tr class="separator:ac3eb5f62b22bc4607170860a6fb5a6fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7538310bc6f69111c85ce68baffa1439"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpropt.html#a7538310bc6f69111c85ce68baffa1439">do_prop_solve</a> (const <a class="el" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;assumptions)=0</td></tr>
+<tr class="separator:a7538310bc6f69111c85ce68baffa1439"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -254,7 +254,7 @@ Protected Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="abc5dd44f95571105f68cc1724b5fa06ca841d0c19495a16ef6b381a7e1d793f9e"></a>P_ERROR&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00099">99</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00101">101</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -342,8 +342,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac3eb5f62b22bc4607170860a6fb5a6fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3eb5f62b22bc4607170860a6fb5a6fc">&#9670;&nbsp;</a></span>do_prop_solve()</h2>
+<a id="a7538310bc6f69111c85ce68baffa1439"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7538310bc6f69111c85ce68baffa1439">&#9670;&nbsp;</a></span>do_prop_solve()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -354,7 +354,8 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">virtual <a class="el" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">resultt</a> propt::do_prop_solve </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assumptions</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -365,7 +366,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classsatcheck__zcoret.html#a5ed8b7e1bad28930f20910fd874bbd50">satcheck_zcoret</a>, <a class="el" href="classsatcheck__zchaff__baset.html#a36d713c9cb72a0a5e776398328e64e04">satcheck_zchaff_baset</a>, <a class="el" href="classsatcheck__picosatt.html#a161eea73b3aef250c40fcb5acbb58d96">satcheck_picosatt</a>, <a class="el" href="classsatcheck__minisat2__baset.html#af0961797d409c74df52de96599e560d4">satcheck_minisat2_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#af0961797d409c74df52de96599e560d4">satcheck_minisat2_baset&lt; Minisat::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#af0961797d409c74df52de96599e560d4">satcheck_minisat2_baset&lt; Minisat::Solver &gt;</a>, <a class="el" href="classsatcheck__minisat1__coret.html#a0b42109eb91dfde09f1c3c9f88740658">satcheck_minisat1_coret</a>, <a class="el" href="classsatcheck__minisat1__baset.html#a62794a14bf14d33d7b3b6a0a0ceadd80">satcheck_minisat1_baset</a>, <a class="el" href="classsatcheck__lingelingt.html#aa1c8bdf7c2a8f0551b9bf63a42243c99">satcheck_lingelingt</a>, <a class="el" href="classsatcheck__ipasirt.html#a24fa68613788832d50d638dbf919c06d">satcheck_ipasirt</a>, <a class="el" href="classsatcheck__glucose__baset.html#aa09e5cdd379bf7a9b89c51fdca53e246">satcheck_glucose_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#aa09e5cdd379bf7a9b89c51fdca53e246">satcheck_glucose_baset&lt; Glucose::Solver &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#aa09e5cdd379bf7a9b89c51fdca53e246">satcheck_glucose_baset&lt; Glucose::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__cadicalt.html#a6fa336df152b233caae1f205bbd6dc06">satcheck_cadicalt</a>, <a class="el" href="classsatcheck__booleforce__baset.html#ae0218e75d32fa9ca857f552e105b63ce">satcheck_booleforce_baset</a>, <a class="el" href="classpbs__dimacs__cnft.html#a96629036ddbc6fe84ece50faf926bd84">pbs_dimacs_cnft</a>, <a class="el" href="classexternal__satt.html#a22cd0466f341f45e95261356eba183e1">external_satt</a>, <a class="el" href="classdimacs__cnf__dumpt.html#ad071daec1009443009a9ca21f95ee619">dimacs_cnf_dumpt</a>, and <a class="el" href="classcnf__clause__listt.html#a696a4233f60fcbaf401761be326f8a2d">cnf_clause_listt</a>.</p>
+<p>Implemented in <a class="el" href="classsatcheck__zcoret.html#a205685b7f6e882a82ea67c1c2c2445de">satcheck_zcoret</a>, <a class="el" href="classsatcheck__zchaff__baset.html#a37c7caaac5daa5aa0f221bf4cf4f0b71">satcheck_zchaff_baset</a>, <a class="el" href="classsatcheck__picosatt.html#a892c21d65a166207b717f54b75ab2204">satcheck_picosatt</a>, <a class="el" href="classsatcheck__minisat1__coret.html#a0772f04ceab82f1551adf368cd6ea7d7">satcheck_minisat1_coret</a>, <a class="el" href="classsatcheck__minisat1__baset.html#a17d27b92edf04dc76cf27ff2bd980207">satcheck_minisat1_baset</a>, <a class="el" href="classsatcheck__lingelingt.html#a88874b780773106a2f92a6d0b171c3cf">satcheck_lingelingt</a>, <a class="el" href="classsatcheck__ipasirt.html#aec6336fb026ed956dce9e43519cee3d8">satcheck_ipasirt</a>, <a class="el" href="classsatcheck__glucose__baset.html#ad734da641c6f6333f9fcbcdc20cbde3e">satcheck_glucose_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#ad734da641c6f6333f9fcbcdc20cbde3e">satcheck_glucose_baset&lt; Glucose::Solver &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#ad734da641c6f6333f9fcbcdc20cbde3e">satcheck_glucose_baset&lt; Glucose::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__cadicalt.html#adb0408ff6f5a7353f7431de77c0ce923">satcheck_cadicalt</a>, <a class="el" href="classsatcheck__booleforce__baset.html#a5f6630037e1615dab4550f47e181ec4f">satcheck_booleforce_baset</a>, <a class="el" href="classpbs__dimacs__cnft.html#a8e552de24091e9704694316c5fcdaae6">pbs_dimacs_cnft</a>, <a class="el" href="classexternal__satt.html#a14fd99cda6763512b69fe5a8e101b362">external_satt</a>, <a class="el" href="classsatcheck__minisat2__baset.html#a612ba19076f554970d672f7f55aad75d">satcheck_minisat2_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#a612ba19076f554970d672f7f55aad75d">satcheck_minisat2_baset&lt; Minisat::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#a612ba19076f554970d672f7f55aad75d">satcheck_minisat2_baset&lt; Minisat::Solver &gt;</a>, <a class="el" href="classdimacs__cnf__dumpt.html#a9adfc6a0ef69564ebd19b7a164b51449">dimacs_cnf_dumpt</a>, and <a class="el" href="classcnf__clause__listt.html#a6e80a63b7265b1c5beddd7bd2b520904">cnf_clause_listt</a>.</p>
 
 </div>
 </div>
@@ -384,7 +385,36 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="prop_8cpp_source.html#l00045">45</a> of file <a class="el" href="prop_8cpp_source.html">prop.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8cpp_source.html#l00052">52</a> of file <a class="el" href="prop_8cpp_source.html">prop.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ab9be83cdb2131c9e9601e2ec7d06be06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9be83cdb2131c9e9601e2ec7d06be06">&#9670;&nbsp;</a></span>has_assumptions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool propt::has_assumptions </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classsatcheck__minisat2__baset.html#ae1084be1d7842fffc3955ceec3b22506">satcheck_minisat2_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#ae1084be1d7842fffc3955ceec3b22506">satcheck_minisat2_baset&lt; Minisat::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#ae1084be1d7842fffc3955ceec3b22506">satcheck_minisat2_baset&lt; Minisat::Solver &gt;</a>, <a class="el" href="classsatcheck__ipasirt.html#a7a42639c0fc0a1742922110ccc484209">satcheck_ipasirt</a>, <a class="el" href="classexternal__satt.html#ad16d23fff750a1437dc04db8ed0c9e54">external_satt</a>, <a class="el" href="classsatcheck__picosatt.html#ac9406861d93a3887515a60394d19a942">satcheck_picosatt</a>, <a class="el" href="classsatcheck__minisat1__baset.html#a071669fcd18e122316b5adce03e78926">satcheck_minisat1_baset</a>, <a class="el" href="classsatcheck__lingelingt.html#a90ec8a8196b7e32450d80a9589b3eb8f">satcheck_lingelingt</a>, <a class="el" href="classsatcheck__glucose__baset.html#afb8f18aaf328f9b000b1dc5689eda251">satcheck_glucose_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#afb8f18aaf328f9b000b1dc5689eda251">satcheck_glucose_baset&lt; Glucose::Solver &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#afb8f18aaf328f9b000b1dc5689eda251">satcheck_glucose_baset&lt; Glucose::SimpSolver &gt;</a>, and <a class="el" href="classsatcheck__cadicalt.html#a89820d44e764c369e232b6d52ff0755f">satcheck_cadicalt</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00088">88</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -413,36 +443,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classsatcheck__minisat2__baset.html#a25092c203145f1005078ef1b4a6c098c">satcheck_minisat2_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#a25092c203145f1005078ef1b4a6c098c">satcheck_minisat2_baset&lt; Minisat::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#a25092c203145f1005078ef1b4a6c098c">satcheck_minisat2_baset&lt; Minisat::Solver &gt;</a>, <a class="el" href="classsatcheck__ipasirt.html#a2d699c9d18f2c9702e697e0dd7cb59e5">satcheck_ipasirt</a>, <a class="el" href="classexternal__satt.html#a59d6b4c427632ce6bf7632f9ec2e1286">external_satt</a>, <a class="el" href="classsatcheck__picosatt.html#af028692a9c3b42ec024caecb38d8f7e2">satcheck_picosatt</a>, <a class="el" href="classsatcheck__minisat1__baset.html#aa0052774a1a91d8d26ce2de5205de23c">satcheck_minisat1_baset</a>, <a class="el" href="classsatcheck__lingelingt.html#a11e94b69e65175d38e274f35126d86ba">satcheck_lingelingt</a>, <a class="el" href="classsatcheck__glucose__baset.html#ad4fc2eb01498411a3cd93acb34fa833b">satcheck_glucose_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#ad4fc2eb01498411a3cd93acb34fa833b">satcheck_glucose_baset&lt; Glucose::Solver &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#ad4fc2eb01498411a3cd93acb34fa833b">satcheck_glucose_baset&lt; Glucose::SimpSolver &gt;</a>, and <a class="el" href="classsatcheck__cadicalt.html#aeb1bf06a19099d9b5ee48d4da1282037">satcheck_cadicalt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00111">111</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
-
-</div>
-</div>
-<a id="a3af4d5491d5e8ecbd56073d36414f60e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3af4d5491d5e8ecbd56073d36414f60e">&#9670;&nbsp;</a></span>has_set_assumptions()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool propt::has_set_assumptions </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented in <a class="el" href="classsatcheck__minisat2__baset.html#a2a32aa1520635d4d9ba2fe3a06273b1c">satcheck_minisat2_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#a2a32aa1520635d4d9ba2fe3a06273b1c">satcheck_minisat2_baset&lt; Minisat::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#a2a32aa1520635d4d9ba2fe3a06273b1c">satcheck_minisat2_baset&lt; Minisat::Solver &gt;</a>, <a class="el" href="classsatcheck__ipasirt.html#a114ca565cfb954f4156603c24b8b4b7e">satcheck_ipasirt</a>, <a class="el" href="classexternal__satt.html#a97b94e761761829111c635d425e0de52">external_satt</a>, <a class="el" href="classsatcheck__picosatt.html#af7101bbc50d937800a54f11a9f3116ba">satcheck_picosatt</a>, <a class="el" href="classsatcheck__minisat1__baset.html#a5aa47bdf0d393c473dc30a9a8163af91">satcheck_minisat1_baset</a>, <a class="el" href="classsatcheck__lingelingt.html#aa2d60a5db669a7f0fc843a52e5c2c2b7">satcheck_lingelingt</a>, <a class="el" href="classsatcheck__glucose__baset.html#a5a86ee417758289b3c3998d2dfd06915">satcheck_glucose_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#a5a86ee417758289b3c3998d2dfd06915">satcheck_glucose_baset&lt; Glucose::Solver &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#a5a86ee417758289b3c3998d2dfd06915">satcheck_glucose_baset&lt; Glucose::SimpSolver &gt;</a>, and <a class="el" href="classsatcheck__cadicalt.html#a0cb0af9124c95c587610ac745a2122ac">satcheck_cadicalt</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00089">89</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00114">114</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -1268,7 +1269,7 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <a id="aaf9970412671c2f7ea8c097fee9c4e82"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf9970412671c2f7ea8c097fee9c4e82">&#9670;&nbsp;</a></span>prop_solve()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf9970412671c2f7ea8c097fee9c4e82">&#9670;&nbsp;</a></span>prop_solve() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1283,6 +1284,26 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="prop_8cpp_source.html#l00039">39</a> of file <a class="el" href="prop_8cpp_source.html">prop.cpp</a>.</p>
+
+</div>
+</div>
+<a id="accdc65578977abd9765c2e59a7e2aec0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accdc65578977abd9765c2e59a7e2aec0">&#9670;&nbsp;</a></span>prop_solve() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a> propt::prop_solve </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assumptions</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="prop_8cpp_source.html#l00046">46</a> of file <a class="el" href="prop_8cpp_source.html">prop.cpp</a>.</p>
 
 </div>
 </div>
@@ -1321,36 +1342,6 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Implemented in <a class="el" href="classexternal__satt.html#a6610ac52645709a875378776dc533fda">external_satt</a>, <a class="el" href="classsatcheck__zchaff__baset.html#a91adf23ac223f70ecf838c1aecfbf0a2">satcheck_zchaff_baset</a>, <a class="el" href="classsatcheck__picosatt.html#a3900d146e3f96515f3ef74978260e078">satcheck_picosatt</a>, <a class="el" href="classsatcheck__minisat2__baset.html#af6e46011239fe8b065c8fed2aeebce82">satcheck_minisat2_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#af6e46011239fe8b065c8fed2aeebce82">satcheck_minisat2_baset&lt; Minisat::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#af6e46011239fe8b065c8fed2aeebce82">satcheck_minisat2_baset&lt; Minisat::Solver &gt;</a>, <a class="el" href="classsatcheck__minisat1__baset.html#a2fad6e734a4481f225b519f64d08853c">satcheck_minisat1_baset</a>, <a class="el" href="classsatcheck__lingelingt.html#aa20d8b6d5f869f60dc08e03b00fc497b">satcheck_lingelingt</a>, <a class="el" href="classsatcheck__ipasirt.html#ad50076f45d812ca80d2516db0599f869">satcheck_ipasirt</a>, <a class="el" href="classsatcheck__glucose__baset.html#ae66fd39f562b9ecc7c63386a147796fb">satcheck_glucose_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#ae66fd39f562b9ecc7c63386a147796fb">satcheck_glucose_baset&lt; Glucose::Solver &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#ae66fd39f562b9ecc7c63386a147796fb">satcheck_glucose_baset&lt; Glucose::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__cadicalt.html#a71ba8f87c0cbe77a2f3a28d3df0b9841">satcheck_cadicalt</a>, and <a class="el" href="classdimacs__cnft.html#a92b30778f87669e16f3393587d02e31e">dimacs_cnft</a>.</p>
-
-</div>
-</div>
-<a id="a8ee3bd6707710e8e6244c58bafb0077d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ee3bd6707710e8e6244c58bafb0077d">&#9670;&nbsp;</a></span>set_assumptions()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void propt::set_assumptions </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented in <a class="el" href="classsatcheck__picosatt.html#a51d2f013e9cfab2c9f0c3ba94ee2273a">satcheck_picosatt</a>, <a class="el" href="classsatcheck__minisat2__baset.html#aff10c7c593fea9a9da9c156fb7b3dfa0">satcheck_minisat2_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#aff10c7c593fea9a9da9c156fb7b3dfa0">satcheck_minisat2_baset&lt; Minisat::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#aff10c7c593fea9a9da9c156fb7b3dfa0">satcheck_minisat2_baset&lt; Minisat::Solver &gt;</a>, <a class="el" href="classsatcheck__minisat1__baset.html#aceb586ce2d4526b2f4295f422a465205">satcheck_minisat1_baset</a>, <a class="el" href="classsatcheck__lingelingt.html#a396353c2ae02b9c558f1ff8b8ced5e27">satcheck_lingelingt</a>, <a class="el" href="classsatcheck__ipasirt.html#a1d005b143adc36fd5f6db6aaf7618edf">satcheck_ipasirt</a>, <a class="el" href="classsatcheck__glucose__baset.html#a597ca1c4deb315086e38c2078d2771f2">satcheck_glucose_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#a597ca1c4deb315086e38c2078d2771f2">satcheck_glucose_baset&lt; Glucose::Solver &gt;</a>, <a class="el" href="classsatcheck__glucose__baset.html#a597ca1c4deb315086e38c2078d2771f2">satcheck_glucose_baset&lt; Glucose::SimpSolver &gt;</a>, <a class="el" href="classsatcheck__cadicalt.html#a41a4686ffca6785ca88bfc5fc64e2478">satcheck_cadicalt</a>, and <a class="el" href="classexternal__satt.html#a1ede49d0fd7548d7a608075ca7a1e272">external_satt</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00088">88</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -1420,7 +1411,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classsatcheck__minisat__simplifiert.html#a5d9c38fdec545e6fc8ffd6c7139b5d72">satcheck_minisat_simplifiert</a>, <a class="el" href="classsatcheck__lingelingt.html#ac35d3530e2238b6c54f2d25316d8cc7d">satcheck_lingelingt</a>, and <a class="el" href="classsatcheck__glucose__simplifiert.html#a5611f94a563b425434386fc11bf9337e">satcheck_glucose_simplifiert</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00114">114</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00117">117</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -1450,7 +1441,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classsatcheck__minisat2__baset.html#aebe721a42509942cc2bff7e03b3d4b18">satcheck_minisat2_baset&lt; T &gt;</a>, <a class="el" href="classsatcheck__minisat2__baset.html#aebe721a42509942cc2bff7e03b3d4b18">satcheck_minisat2_baset&lt; Minisat::SimpSolver &gt;</a>, and <a class="el" href="classsatcheck__minisat2__baset.html#aebe721a42509942cc2bff7e03b3d4b18">satcheck_minisat2_baset&lt; Minisat::Solver &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00117">117</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00120">120</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -1488,7 +1479,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00093">93</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00095">95</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -1540,7 +1531,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00128">128</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00132">132</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -1564,7 +1555,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00130">130</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00134">134</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>
@@ -1588,7 +1579,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00131">131</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prop_8h_source.html#l00135">135</a> of file <a class="el" href="prop_8h_source.html">prop.h</a>.</p>
 
 </div>
 </div>

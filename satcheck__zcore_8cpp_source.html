@@ -128,101 +128,105 @@ $(document).ready(function(){initNavTree('satcheck__zcore_8cpp_source.html','');
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">return</span> <span class="stringliteral">&quot;ZCore&quot;</span>;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;}</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classsatcheck__zcoret.html#a5ed8b7e1bad28930f20910fd874bbd50">   37</a></span>&#160;<a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a> <a class="code" href="classsatcheck__zcoret.html#a5ed8b7e1bad28930f20910fd874bbd50">satcheck_zcoret::do_prop_solve</a>()</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classsatcheck__zcoret.html#a205685b7f6e882a82ea67c1c2c2445de">   37</a></span>&#160;<a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a> <a class="code" href="classsatcheck__zcoret.html#a205685b7f6e882a82ea67c1c2c2445de">satcheck_zcoret::do_prop_solve</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;assumptions)</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="comment">// We start counting at 1, thus there is one variable fewer.</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::string msg=</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classcnft.html#a9524544b46ee5dd67d66365e1ceb1dd0">no_variables</a>()-1)+<span class="stringliteral">&quot; variables, &quot;</span>+</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classcnf__clause__listt.html#a6230d4799244bdf4161ca9933aa8cee2">no_clauses</a>())+<span class="stringliteral">&quot; clauses&quot;</span>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a207055d212f4e938086700a51b6c8190">statistics</a>() &lt;&lt; msg &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="comment">// get the core</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  std::string cnf_file=<span class="stringliteral">&quot;cnf.dimacs&quot;</span>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  std::string core_file=<span class="stringliteral">&quot;unsat_core.cnf&quot;</span>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  std::string trace_file=<span class="stringliteral">&quot;resolve_trace&quot;</span>;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  std::string output_file=<span class="stringliteral">&quot;cnf.out&quot;</span>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    std::ofstream out(cnf_file.c_str(), std::ios::out);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classdimacs__cnft.html#aeece13e342d24281f7f67575d4f49c48">write_dimacs_cnf</a>(out);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="comment">// generate resolve_trace</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  system(std::string(<span class="stringliteral">&quot;zchaff_verify &quot;</span>+cnf_file+<span class="stringliteral">&quot; &gt; &quot;</span>+output_file).c_str());</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// get core</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  system(</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    std::string(<span class="stringliteral">&quot;zcore &quot;</span>+cnf_file+<span class="stringliteral">&quot; &quot;</span>+trace_file+<span class="stringliteral">&quot; &gt;&gt; &quot;</span>+output_file).c_str());</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <a class="code" href="classsatcheck__zcoret.html#ab81156654c1754b429d942dca91e0391">in_core</a>.clear();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(assumptions.empty());</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">// We start counting at 1, thus there is one variable fewer.</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  {</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    std::string msg=</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classcnft.html#a9524544b46ee5dd67d66365e1ceb1dd0">no_variables</a>()-1)+<span class="stringliteral">&quot; variables, &quot;</span>+</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(<a class="code" href="classcnf__clause__listt.html#a6230d4799244bdf4161ca9933aa8cee2">no_clauses</a>())+<span class="stringliteral">&quot; clauses&quot;</span>;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a207055d212f4e938086700a51b6c8190">statistics</a>() &lt;&lt; msg &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="comment">// get the core</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  std::string cnf_file=<span class="stringliteral">&quot;cnf.dimacs&quot;</span>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  std::string core_file=<span class="stringliteral">&quot;unsat_core.cnf&quot;</span>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  std::string trace_file=<span class="stringliteral">&quot;resolve_trace&quot;</span>;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  std::string output_file=<span class="stringliteral">&quot;cnf.out&quot;</span>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  {</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    std::ofstream out(cnf_file.c_str(), std::ios::out);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="classdimacs__cnft.html#aeece13e342d24281f7f67575d4f49c48">write_dimacs_cnf</a>(out);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">// generate resolve_trace</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  system(std::string(<span class="stringliteral">&quot;zchaff_verify &quot;</span>+cnf_file+<span class="stringliteral">&quot; &gt; &quot;</span>+output_file).c_str());</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="comment">// get core</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  system(</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    std::string(<span class="stringliteral">&quot;zcore &quot;</span>+cnf_file+<span class="stringliteral">&quot; &quot;</span>+trace_file+<span class="stringliteral">&quot; &gt;&gt; &quot;</span>+output_file).c_str());</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="comment">// read result</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  {</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    std::ifstream in(core_file.c_str());</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">while</span>(<span class="keyword">true</span>)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      std::string line;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      <span class="keywordflow">if</span>(!std::getline(in, line))</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <span class="keywordflow">if</span>(!(line.substr(0, 1)==<span class="stringliteral">&quot;c&quot;</span> || line.substr(0, 1)==<span class="stringliteral">&quot;p&quot;</span>))</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">char</span> *p=line.c_str();</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="keywordflow">while</span>(<span class="keyword">true</span>)</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;          <span class="keywordtype">int</span> l=unsafe_str2int(p);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;          <span class="keywordflow">if</span>(l==0)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;          <span class="keywordflow">if</span>(l&lt;0)</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;            l=-l;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;          <a class="code" href="classsatcheck__zcoret.html#ab81156654c1754b429d942dca91e0391">in_core</a>.insert(l);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <a class="code" href="classsatcheck__zcoret.html#ab81156654c1754b429d942dca91e0391">in_core</a>.clear();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="comment">// read result</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    std::ifstream in(core_file.c_str());</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordflow">while</span>(<span class="keyword">true</span>)</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    {</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      std::string line;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      <span class="keywordflow">if</span>(!std::getline(in, line))</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      <span class="keywordflow">if</span>(!(line.substr(0, 1)==<span class="stringliteral">&quot;c&quot;</span> || line.substr(0, 1)==<span class="stringliteral">&quot;p&quot;</span>))</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">char</span> *p=line.c_str();</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keywordflow">while</span>(<span class="keyword">true</span>)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        {</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;          <span class="keywordtype">int</span> l=unsafe_str2int(p);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;          <span class="keywordflow">if</span>(l==0)</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;          <span class="keywordflow">if</span>(l&lt;0)</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            l=-l;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;          <span class="comment">// next one</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;          <span class="keyword">const</span> <span class="keywordtype">char</span> *q=<a class="code" href="string_8c.html#a33a6bb7fa8613b0783ec4bab1a79cc6c">strchr</a>(p, <span class="charliteral">&#39; &#39;</span>);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;          <span class="keywordflow">while</span>(*q==<span class="charliteral">&#39; &#39;</span>) q++;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;          <span class="keywordflow">if</span>(q==NULL)</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;          p=q;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      }</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    }</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classsatcheck__zcoret.html#ab81156654c1754b429d942dca91e0391">in_core</a>.empty())</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keywordflow">return</span> P_ERROR;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  remove(cnf_file.c_str());</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="comment">// remove(core_file.c_str());</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  remove(trace_file.c_str());</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="comment">// remove(output_file.c_str());</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keywordflow">return</span> P_UNSATISFIABLE;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;          <a class="code" href="classsatcheck__zcoret.html#ab81156654c1754b429d942dca91e0391">in_core</a>.insert(l);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;          <span class="comment">// next one</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;          <span class="keyword">const</span> <span class="keywordtype">char</span> *q=<a class="code" href="string_8c.html#a33a6bb7fa8613b0783ec4bab1a79cc6c">strchr</a>(p, <span class="charliteral">&#39; &#39;</span>);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;          <span class="keywordflow">while</span>(*q==<span class="charliteral">&#39; &#39;</span>) q++;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;          <span class="keywordflow">if</span>(q==NULL)</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;          p=q;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        }</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      }</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classsatcheck__zcoret.html#ab81156654c1754b429d942dca91e0391">in_core</a>.empty())</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">return</span> P_ERROR;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  remove(cnf_file.c_str());</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="comment">// remove(core_file.c_str());</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  remove(trace_file.c_str());</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="comment">// remove(output_file.c_str());</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">return</span> P_UNSATISFIABLE;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;}</div>
 <div class="ttc" id="aclasscnf__clause__listt_html_a6230d4799244bdf4161ca9933aa8cee2"><div class="ttname"><a href="classcnf__clause__listt.html#a6230d4799244bdf4161ca9933aa8cee2">cnf_clause_listt::no_clauses</a></div><div class="ttdeci">size_t no_clauses() const override</div><div class="ttdef"><b>Definition:</b> <a href="cnf__clause__list_8h_source.html#l00042">cnf_clause_list.h:42</a></div></div>
 <div class="ttc" id="aclasscnft_html_a9524544b46ee5dd67d66365e1ceb1dd0"><div class="ttname"><a href="classcnft.html#a9524544b46ee5dd67d66365e1ceb1dd0">cnft::no_variables</a></div><div class="ttdeci">virtual size_t no_variables() const override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8h_source.html#l00042">cnf.h:42</a></div></div>
 <div class="ttc" id="aclassdimacs__cnft_html_aeece13e342d24281f7f67575d4f49c48"><div class="ttname"><a href="classdimacs__cnft.html#aeece13e342d24281f7f67575d4f49c48">dimacs_cnft::write_dimacs_cnf</a></div><div class="ttdeci">virtual void write_dimacs_cnf(std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="dimacs__cnf_8cpp_source.html#l00040">dimacs_cnf.cpp:40</a></div></div>
 <div class="ttc" id="aclassliteralt_html"><div class="ttname"><a href="classliteralt.html">literalt</a></div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00025">literal.h:26</a></div></div>
 <div class="ttc" id="aclassmessaget_html_a207055d212f4e938086700a51b6c8190"><div class="ttname"><a href="classmessaget.html#a207055d212f4e938086700a51b6c8190">messaget::statistics</a></div><div class="ttdeci">mstreamt &amp; statistics() const</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00419">message.h:419</a></div></div>
 <div class="ttc" id="aclassmessaget_html_af53bf1a50370a1e7ad55df9dd0e6fdd0"><div class="ttname"><a href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a></div><div class="ttdeci">static eomt eom</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00297">message.h:297</a></div></div>
-<div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06c"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a></div><div class="ttdeci">resultt</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00099">prop.h:99</a></div></div>
-<div class="ttc" id="aclasspropt_html_afdb08f757ee6d3a90a7732de7372dade"><div class="ttname"><a href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">propt::log</a></div><div class="ttdeci">messaget log</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00130">prop.h:130</a></div></div>
+<div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06c"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a></div><div class="ttdeci">resultt</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00101">prop.h:101</a></div></div>
+<div class="ttc" id="aclasspropt_html_afdb08f757ee6d3a90a7732de7372dade"><div class="ttname"><a href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">propt::log</a></div><div class="ttdeci">messaget log</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00134">prop.h:134</a></div></div>
+<div class="ttc" id="aclasssatcheck__zcoret_html_a205685b7f6e882a82ea67c1c2c2445de"><div class="ttname"><a href="classsatcheck__zcoret.html#a205685b7f6e882a82ea67c1c2c2445de">satcheck_zcoret::do_prop_solve</a></div><div class="ttdeci">resultt do_prop_solve(const bvt &amp;assumptions) override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zcore_8cpp_source.html#l00037">satcheck_zcore.cpp:37</a></div></div>
 <div class="ttc" id="aclasssatcheck__zcoret_html_a2f9d537de904198f90d38c948e9eb44f"><div class="ttname"><a href="classsatcheck__zcoret.html#a2f9d537de904198f90d38c948e9eb44f">satcheck_zcoret::l_get</a></div><div class="ttdeci">tvt l_get(literalt a) const override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zcore_8cpp_source.html#l00026">satcheck_zcore.cpp:26</a></div></div>
 <div class="ttc" id="aclasssatcheck__zcoret_html_a4b75168eab743e5a874b244a58b0a887"><div class="ttname"><a href="classsatcheck__zcoret.html#a4b75168eab743e5a874b244a58b0a887">satcheck_zcoret::~satcheck_zcoret</a></div><div class="ttdeci">virtual ~satcheck_zcoret()</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zcore_8cpp_source.html#l00022">satcheck_zcore.cpp:22</a></div></div>
-<div class="ttc" id="aclasssatcheck__zcoret_html_a5ed8b7e1bad28930f20910fd874bbd50"><div class="ttname"><a href="classsatcheck__zcoret.html#a5ed8b7e1bad28930f20910fd874bbd50">satcheck_zcoret::do_prop_solve</a></div><div class="ttdeci">resultt do_prop_solve() override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zcore_8cpp_source.html#l00037">satcheck_zcore.cpp:37</a></div></div>
 <div class="ttc" id="aclasssatcheck__zcoret_html_a669737853d96dafd90f7314ed0d68083"><div class="ttname"><a href="classsatcheck__zcoret.html#a669737853d96dafd90f7314ed0d68083">satcheck_zcoret::satcheck_zcoret</a></div><div class="ttdeci">satcheck_zcoret()</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zcore_8cpp_source.html#l00018">satcheck_zcore.cpp:18</a></div></div>
 <div class="ttc" id="aclasssatcheck__zcoret_html_ab81156654c1754b429d942dca91e0391"><div class="ttname"><a href="classsatcheck__zcoret.html#ab81156654c1754b429d942dca91e0391">satcheck_zcoret::in_core</a></div><div class="ttdeci">std::set&lt; unsigned &gt; in_core</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zcore_8h_source.html#l00034">satcheck_zcore.h:34</a></div></div>
 <div class="ttc" id="aclasssatcheck__zcoret_html_acfe6bccc05295002a9e5f15db2f26692"><div class="ttname"><a href="classsatcheck__zcoret.html#acfe6bccc05295002a9e5f15db2f26692">satcheck_zcoret::solver_text</a></div><div class="ttdeci">std::string solver_text() const override</div><div class="ttdef"><b>Definition:</b> <a href="satcheck__zcore_8cpp_source.html#l00032">satcheck_zcore.cpp:32</a></div></div>
 <div class="ttc" id="aclasstvt_html"><div class="ttname"><a href="classtvt.html">tvt</a></div><div class="ttdef"><b>Definition:</b> <a href="threeval_8h_source.html#l00019">threeval.h:20</a></div></div>
 <div class="ttc" id="aclasstvt_html_affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43"><div class="ttname"><a href="classtvt.html#affa728d816b52a738f27189e00d1c20fa50f00d8a97831dc699f6900ac581db43">tvt::tv_enumt::TV_UNKNOWN</a></div><div class="ttdeci">@ TV_UNKNOWN</div></div>
+<div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
 <div class="ttc" id="asatcheck__zcore_8h_html"><div class="ttname"><a href="satcheck__zcore_8h.html">satcheck_zcore.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00525">invariant.h:525</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="astring2int_8h_html"><div class="ttname"><a href="string2int_8h.html">string2int.h</a></div></div>
 <div class="ttc" id="astring_8c_html_a33a6bb7fa8613b0783ec4bab1a79cc6c"><div class="ttname"><a href="string_8c.html#a33a6bb7fa8613b0783ec4bab1a79cc6c">strchr</a></div><div class="ttdeci">char * strchr(const char *src, int c)</div><div class="ttdef"><b>Definition:</b> <a href="string_8c_source.html#l00958">string.c:958</a></div></div>
 <div class="ttc" id="astring__constraint_8cpp_html_a72759a5f821d21176866b7bf77d1142b"><div class="ttname"><a href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">to_string</a></div><div class="ttdeci">std::string to_string(const string_not_contains_constraintt &amp;expr)</div><div class="ttdoc">Used for debug printing.</div><div class="ttdef"><b>Definition:</b> <a href="string__constraint_8cpp_source.html#l00058">string_constraint.cpp:58</a></div></div>

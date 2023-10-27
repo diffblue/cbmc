@@ -9,7 +9,7 @@ var classsatcheck__zchaff__baset =
     [ "satcheck_zchaff_baset", "classsatcheck__zchaff__baset.html#ab0551b80c70f5631cfc2a8f87809f486", null ],
     [ "~satcheck_zchaff_baset", "classsatcheck__zchaff__baset.html#a6ff7e2a1286835fa346b358a7cc25227", null ],
     [ "copy_cnf", "classsatcheck__zchaff__baset.html#a1e91885840337265a212259bc7458e12", null ],
-    [ "do_prop_solve", "classsatcheck__zchaff__baset.html#a36d713c9cb72a0a5e776398328e64e04", null ],
+    [ "do_prop_solve", "classsatcheck__zchaff__baset.html#a37c7caaac5daa5aa0f221bf4cf4f0b71", null ],
     [ "l_get", "classsatcheck__zchaff__baset.html#af3737b0e25559b34cc210eaeafab91f6", null ],
     [ "set_assignment", "classsatcheck__zchaff__baset.html#a91adf23ac223f70ecf838c1aecfbf0a2", null ],
     [ "solver_text", "classsatcheck__zchaff__baset.html#a8035ab481ed48724fb31c402761c952e", null ],

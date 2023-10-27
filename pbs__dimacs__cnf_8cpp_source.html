@@ -299,92 +299,94 @@ $(document).ready(function(){initNavTree('pbs__dimacs__cnf_8cpp_source.html','')
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keywordflow">return</span> satisfied;</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;}</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
-<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="classpbs__dimacs__cnft.html#a96629036ddbc6fe84ece50faf926bd84">  208</a></span>&#160;<a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a> <a class="code" href="classpbs__dimacs__cnft.html#a96629036ddbc6fe84ece50faf926bd84">pbs_dimacs_cnft::do_prop_solve</a>()</div>
+<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="classpbs__dimacs__cnft.html#a8e552de24091e9704694316c5fcdaae6">  208</a></span>&#160;<a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a> <a class="code" href="classpbs__dimacs__cnft.html#a8e552de24091e9704694316c5fcdaae6">pbs_dimacs_cnft::do_prop_solve</a>(<span class="keyword">const</span> <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> &amp;assumptions)</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;{</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  std::ofstream file(<span class="stringliteral">&quot;temp.cnf&quot;</span>);</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(assumptions.empty());</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <a class="code" href="classdimacs__cnft.html#aeece13e342d24281f7f67575d4f49c48">write_dimacs_cnf</a>(file);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  std::ofstream file(<span class="stringliteral">&quot;temp.cnf&quot;</span>);</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  std::ofstream pbfile(<span class="stringliteral">&quot;temp.cnf.pb&quot;</span>);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  <a class="code" href="classdimacs__cnft.html#aeece13e342d24281f7f67575d4f49c48">write_dimacs_cnf</a>(file);</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <a class="code" href="classpbs__dimacs__cnft.html#ab001af208004d6262a92fd72bfdd9300">write_dimacs_pb</a>(pbfile);</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  std::ofstream pbfile(<span class="stringliteral">&quot;temp.cnf.pb&quot;</span>);</div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  file.close();</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  pbfile.close();</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="comment">// We start counting at 1, thus there is one variable fewer.</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a207055d212f4e938086700a51b6c8190">statistics</a>() &lt;&lt; (<a class="code" href="classcnft.html#a9524544b46ee5dd67d66365e1ceb1dd0">no_variables</a>() - 1) &lt;&lt; <span class="stringliteral">&quot; variables, &quot;</span> &lt;&lt; <a class="code" href="classcnf__clause__listt.html#a8cdceda047383c0049f01ce64594035e">clauses</a>.size()</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                   &lt;&lt; <span class="stringliteral">&quot; clauses&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> result = <a class="code" href="classpbs__dimacs__cnft.html#aab1a46db3221f484a17928d45ae1e741">pbs_solve</a>();</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <a class="code" href="classpbs__dimacs__cnft.html#ab001af208004d6262a92fd72bfdd9300">write_dimacs_pb</a>(pbfile);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  file.close();</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  pbfile.close();</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="comment">// We start counting at 1, thus there is one variable fewer.</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a207055d212f4e938086700a51b6c8190">statistics</a>() &lt;&lt; (<a class="code" href="classcnft.html#a9524544b46ee5dd67d66365e1ceb1dd0">no_variables</a>() - 1) &lt;&lt; <span class="stringliteral">&quot; variables, &quot;</span> &lt;&lt; <a class="code" href="classcnf__clause__listt.html#a8cdceda047383c0049f01ce64594035e">clauses</a>.size()</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;                   &lt;&lt; <span class="stringliteral">&quot; clauses&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="keywordflow">if</span>(!result)</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  {</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;PBS checker: system is UNSATISFIABLE&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  {</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;PBS checker: system is SATISFIABLE&quot;</span>;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classpbs__dimacs__cnft.html#a715dd5db5397fec25483baf08aedf797">optimize</a>)</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot; (distance &quot;</span> &lt;&lt; <a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  }</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keywordflow">if</span>(result)</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca27ccb7b2b3e57bbdd3c5c5a621a7da88">resultt::P_SATISFIABLE</a>;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca202ae688865d6a63a00ec10972ff4bc4">resultt::P_UNSATISFIABLE</a>;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;}</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
-<div class="line"><a name="l00245"></a><span class="lineno"><a class="line" href="classpbs__dimacs__cnft.html#a40dc88b66d9e118e8e1857565f3fc49e">  245</a></span>&#160;<a class="code" href="classtvt.html">tvt</a> <a class="code" href="classpbs__dimacs__cnft.html#a40dc88b66d9e118e8e1857565f3fc49e">pbs_dimacs_cnft::l_get</a>(<a class="code" href="classliteralt.html">literalt</a> a)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <span class="keywordtype">int</span> dimacs_lit = a.<a class="code" href="classliteralt.html#a166dd1aad4e915ef8fc874402dccfe6c">dimacs</a>();</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  std::cout &lt;&lt; a &lt;&lt; <span class="stringliteral">&quot; / &quot;</span> &lt;&lt; dimacs_lit &lt;&lt; <span class="stringliteral">&quot;=&quot;</span>;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a> = (dimacs_lit &lt; 0);</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>)</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    dimacs_lit = -dimacs_lit;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160; </div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  std::set&lt;int&gt;::const_iterator f = <a class="code" href="classpbs__dimacs__cnft.html#a690b05971eb0327e4645b4ca85e1cefa">assigned</a>.find(dimacs_lit);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> result = <a class="code" href="classpbs__dimacs__cnft.html#aab1a46db3221f484a17928d45ae1e741">pbs_solve</a>();</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <span class="keywordflow">if</span>(!result)</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  {</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;PBS checker: system is UNSATISFIABLE&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  }</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  {</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;PBS checker: system is SATISFIABLE&quot;</span>;</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classpbs__dimacs__cnft.html#a715dd5db5397fec25483baf08aedf797">optimize</a>)</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot; (distance &quot;</span> &lt;&lt; <a class="code" href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">opt_sum</a> &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <a class="code" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  }</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  <span class="keywordflow">if</span>(result)</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca27ccb7b2b3e57bbdd3c5c5a621a7da88">resultt::P_SATISFIABLE</a>;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca202ae688865d6a63a00ec10972ff4bc4">resultt::P_UNSATISFIABLE</a>;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;}</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
+<div class="line"><a name="l00247"></a><span class="lineno"><a class="line" href="classpbs__dimacs__cnft.html#a40dc88b66d9e118e8e1857565f3fc49e">  247</a></span>&#160;<a class="code" href="classtvt.html">tvt</a> <a class="code" href="classpbs__dimacs__cnft.html#a40dc88b66d9e118e8e1857565f3fc49e">pbs_dimacs_cnft::l_get</a>(<a class="code" href="classliteralt.html">literalt</a> a)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="keywordtype">int</span> dimacs_lit = a.<a class="code" href="classliteralt.html#a166dd1aad4e915ef8fc874402dccfe6c">dimacs</a>();</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  std::cout &lt;&lt; a &lt;&lt; <span class="stringliteral">&quot; / &quot;</span> &lt;&lt; dimacs_lit &lt;&lt; <span class="stringliteral">&quot;=&quot;</span>;</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a> = (dimacs_lit &lt; 0);</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>)</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    dimacs_lit = -dimacs_lit;</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>)</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  {</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keywordflow">if</span>(f == <a class="code" href="classpbs__dimacs__cnft.html#a690b05971eb0327e4645b4ca85e1cefa">assigned</a>.end())</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    {</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;FALSE\n&quot;</span>;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    }</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    {</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;TRUE\n&quot;</span>;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    }</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  }</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  {</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keywordflow">if</span>(f != <a class="code" href="classpbs__dimacs__cnft.html#a690b05971eb0327e4645b4ca85e1cefa">assigned</a>.end())</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    {</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;FALSE\n&quot;</span>;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    }</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    {</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;TRUE\n&quot;</span>;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    }</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  }</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;}</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  std::set&lt;int&gt;::const_iterator f = <a class="code" href="classpbs__dimacs__cnft.html#a690b05971eb0327e4645b4ca85e1cefa">assigned</a>.find(dimacs_lit);</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a>)</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  {</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="keywordflow">if</span>(f == <a class="code" href="classpbs__dimacs__cnft.html#a690b05971eb0327e4645b4ca85e1cefa">assigned</a>.end())</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    {</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;FALSE\n&quot;</span>;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    }</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    {</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;TRUE\n&quot;</span>;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    }</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  }</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  {</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keywordflow">if</span>(f != <a class="code" href="classpbs__dimacs__cnft.html#a690b05971eb0327e4645b4ca85e1cefa">assigned</a>.end())</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    {</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;FALSE\n&quot;</span>;</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    }</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    {</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;TRUE\n&quot;</span>;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classtvt.html">tvt</a>(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    }</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  }</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;}</div>
 <div class="ttc" id="aclasscnf__clause__listt_html_a8cdceda047383c0049f01ce64594035e"><div class="ttname"><a href="classcnf__clause__listt.html#a8cdceda047383c0049f01ce64594035e">cnf_clause_listt::clauses</a></div><div class="ttdeci">clausest clauses</div><div class="ttdef"><b>Definition:</b> <a href="cnf__clause__list_8h_source.html#l00085">cnf_clause_list.h:85</a></div></div>
 <div class="ttc" id="aclasscnft_html_a9524544b46ee5dd67d66365e1ceb1dd0"><div class="ttname"><a href="classcnft.html#a9524544b46ee5dd67d66365e1ceb1dd0">cnft::no_variables</a></div><div class="ttdeci">virtual size_t no_variables() const override</div><div class="ttdef"><b>Definition:</b> <a href="cnf_8h_source.html#l00042">cnf.h:42</a></div></div>
 <div class="ttc" id="aclassdimacs__cnft_html_aeece13e342d24281f7f67575d4f49c48"><div class="ttname"><a href="classdimacs__cnft.html#aeece13e342d24281f7f67575d4f49c48">dimacs_cnft::write_dimacs_cnf</a></div><div class="ttdeci">virtual void write_dimacs_cnf(std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="dimacs__cnf_8cpp_source.html#l00040">dimacs_cnf.cpp:40</a></div></div>
@@ -396,24 +398,26 @@ $(document).ready(function(){initNavTree('pbs__dimacs__cnf_8cpp_source.html','')
 <div class="ttc" id="aclassmessaget_html_af53bf1a50370a1e7ad55df9dd0e6fdd0"><div class="ttname"><a href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a></div><div class="ttdeci">static eomt eom</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00297">message.h:297</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_a18941f0eb7c438ec101fecb56ac18e70"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a18941f0eb7c438ec101fecb56ac18e70">pbs_dimacs_cnft::maximize</a></div><div class="ttdeci">bool maximize</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8h_source.html#l00039">pbs_dimacs_cnf.h:39</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_a2da856cfe06247a43d188fdad4b9862b"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a2da856cfe06247a43d188fdad4b9862b">pbs_dimacs_cnft::binary_search</a></div><div class="ttdeci">bool binary_search</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8h_source.html#l00040">pbs_dimacs_cnf.h:40</a></div></div>
-<div class="ttc" id="aclasspbs__dimacs__cnft_html_a40dc88b66d9e118e8e1857565f3fc49e"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a40dc88b66d9e118e8e1857565f3fc49e">pbs_dimacs_cnft::l_get</a></div><div class="ttdeci">tvt l_get(literalt a) const override</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8cpp_source.html#l00245">pbs_dimacs_cnf.cpp:245</a></div></div>
+<div class="ttc" id="aclasspbs__dimacs__cnft_html_a40dc88b66d9e118e8e1857565f3fc49e"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a40dc88b66d9e118e8e1857565f3fc49e">pbs_dimacs_cnft::l_get</a></div><div class="ttdeci">tvt l_get(literalt a) const override</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8cpp_source.html#l00247">pbs_dimacs_cnf.cpp:247</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_a5d8a9c8c8082906fc7b86bf9c7d47bd4"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a5d8a9c8c8082906fc7b86bf9c7d47bd4">pbs_dimacs_cnft::opt_sum</a></div><div class="ttdeci">int opt_sum</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8h_source.html#l00045">pbs_dimacs_cnf.h:45</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_a690b05971eb0327e4645b4ca85e1cefa"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a690b05971eb0327e4645b4ca85e1cefa">pbs_dimacs_cnft::assigned</a></div><div class="ttdeci">std::set&lt; int &gt; assigned</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8h_source.html#l00063">pbs_dimacs_cnf.h:63</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_a715dd5db5397fec25483baf08aedf797"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a715dd5db5397fec25483baf08aedf797">pbs_dimacs_cnft::optimize</a></div><div class="ttdeci">bool optimize</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8h_source.html#l00038">pbs_dimacs_cnf.h:38</a></div></div>
+<div class="ttc" id="aclasspbs__dimacs__cnft_html_a8e552de24091e9704694316c5fcdaae6"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a8e552de24091e9704694316c5fcdaae6">pbs_dimacs_cnft::do_prop_solve</a></div><div class="ttdeci">resultt do_prop_solve(const bvt &amp;assumptions) override</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8cpp_source.html#l00208">pbs_dimacs_cnf.cpp:208</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_a918f0265511924e2e4887946c21d75ea"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a918f0265511924e2e4887946c21d75ea">pbs_dimacs_cnft::goal</a></div><div class="ttdeci">int goal</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8h_source.html#l00044">pbs_dimacs_cnf.h:44</a></div></div>
-<div class="ttc" id="aclasspbs__dimacs__cnft_html_a96629036ddbc6fe84ece50faf926bd84"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a96629036ddbc6fe84ece50faf926bd84">pbs_dimacs_cnft::do_prop_solve</a></div><div class="ttdeci">resultt do_prop_solve() override</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8cpp_source.html#l00208">pbs_dimacs_cnf.cpp:208</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_a9b70f8ece427866382528ff53f2ecb54"><div class="ttname"><a href="classpbs__dimacs__cnft.html#a9b70f8ece427866382528ff53f2ecb54">pbs_dimacs_cnft::pbs_path</a></div><div class="ttdeci">std::string pbs_path</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8h_source.html#l00042">pbs_dimacs_cnf.h:42</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_aab1a46db3221f484a17928d45ae1e741"><div class="ttname"><a href="classpbs__dimacs__cnft.html#aab1a46db3221f484a17928d45ae1e741">pbs_dimacs_cnft::pbs_solve</a></div><div class="ttdeci">bool pbs_solve()</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8cpp_source.html#l00061">pbs_dimacs_cnf.cpp:61</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_ab001af208004d6262a92fd72bfdd9300"><div class="ttname"><a href="classpbs__dimacs__cnft.html#ab001af208004d6262a92fd72bfdd9300">pbs_dimacs_cnft::write_dimacs_pb</a></div><div class="ttdeci">virtual void write_dimacs_pb(std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8cpp_source.html#l00019">pbs_dimacs_cnf.cpp:19</a></div></div>
 <div class="ttc" id="aclasspbs__dimacs__cnft_html_ab458ccdf09d44082bc300a8bdcc1efe8"><div class="ttname"><a href="classpbs__dimacs__cnft.html#ab458ccdf09d44082bc300a8bdcc1efe8">pbs_dimacs_cnft::pb_constraintmap</a></div><div class="ttdeci">std::map&lt; literalt, unsigned &gt; pb_constraintmap</div><div class="ttdef"><b>Definition:</b> <a href="pbs__dimacs__cnf_8h_source.html#l00047">pbs_dimacs_cnf.h:47</a></div></div>
-<div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06c"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a></div><div class="ttdeci">resultt</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00099">prop.h:99</a></div></div>
+<div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06c"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06c">propt::resultt</a></div><div class="ttdeci">resultt</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00101">prop.h:101</a></div></div>
 <div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06ca202ae688865d6a63a00ec10972ff4bc4"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca202ae688865d6a63a00ec10972ff4bc4">propt::resultt::P_UNSATISFIABLE</a></div><div class="ttdeci">@ P_UNSATISFIABLE</div></div>
 <div class="ttc" id="aclasspropt_html_abc5dd44f95571105f68cc1724b5fa06ca27ccb7b2b3e57bbdd3c5c5a621a7da88"><div class="ttname"><a href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca27ccb7b2b3e57bbdd3c5c5a621a7da88">propt::resultt::P_SATISFIABLE</a></div><div class="ttdeci">@ P_SATISFIABLE</div></div>
-<div class="ttc" id="aclasspropt_html_afdb08f757ee6d3a90a7732de7372dade"><div class="ttname"><a href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">propt::log</a></div><div class="ttdeci">messaget log</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00130">prop.h:130</a></div></div>
+<div class="ttc" id="aclasspropt_html_afdb08f757ee6d3a90a7732de7372dade"><div class="ttname"><a href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">propt::log</a></div><div class="ttdeci">messaget log</div><div class="ttdef"><b>Definition:</b> <a href="prop_8h_source.html#l00134">prop.h:134</a></div></div>
 <div class="ttc" id="aclasstvt_html"><div class="ttname"><a href="classtvt.html">tvt</a></div><div class="ttdef"><b>Definition:</b> <a href="threeval_8h_source.html#l00019">threeval.h:20</a></div></div>
 <div class="ttc" id="aliteral_8h_html_a5f1735d8dc11129d5a7270b90ac04495"><div class="ttname"><a href="literal_8h.html#a5f1735d8dc11129d5a7270b90ac04495">neg</a></div><div class="ttdeci">literalt neg(literalt a)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00193">literal.h:193</a></div></div>
+<div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
 <div class="ttc" id="apbs__dimacs__cnf_8h_html"><div class="ttname"><a href="pbs__dimacs__cnf_8h.html">pbs_dimacs_cnf.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
+<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
 <div class="ttc" id="astdio_8c_html_a43e2eb12f1a4a1186ac1cee67b2435ad"><div class="ttname"><a href="stdio_8c.html#a43e2eb12f1a4a1186ac1cee67b2435ad">sscanf</a></div><div class="ttdeci">int sscanf(const char *restrict s, const char *restrict format,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01032">stdio.c:1032</a></div></div>
 <div class="ttc" id="astdlib_8c_html_abc6595dbf6880c71628fecf0dbb23d66"><div class="ttname"><a href="stdlib_8c.html#abc6595dbf6880c71628fecf0dbb23d66">getenv</a></div><div class="ttdeci">char * getenv(const char *name)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00496">stdlib.c:496</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
