@@ -1,6 +1,5 @@
 var NAVTREEINDEX134 =
 {
-"structjava__bytecode__parsert_1_1pool__entryt.html#a24bd82b9b457b5000f578d7737b1a640":[8,0,689,0,4],
 "structjava__bytecode__parsert_1_1pool__entryt.html#a37d4d284543b18e7495e3e353a8b2842":[8,0,689,0,1],
 "structjava__bytecode__parsert_1_1pool__entryt.html#a6bd09559d29fa8237cf6c4b61fd7a4eb":[8,0,689,0,0],
 "structjava__bytecode__parsert_1_1pool__entryt.html#adf62230f63d303f83cfc6f7caa5333e7":[8,0,689,0,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX134 =
 "structmz__zip__writer__add__state.html#a4736843d8fbef3a1d323451bb29ae3cd":[8,0,852,0],
 "structmz__zip__writer__add__state.html#a8beb0e578862314a35cc724aeb95e709":[8,0,852,2],
 "structnfat.html":[8,0,861],
-"structnfat.html#a0d76b643f40535c90fbb41e0c3553b88":[8,0,861,9]
+"structnfat.html#a0d76b643f40535c90fbb41e0c3553b88":[8,0,861,9],
+"structnfat.html#a45c85de2a84eaebe8d453917eec7b7ae":[8,0,861,10]
 };
