@@ -1,12 +1,29 @@
-# CBMC 5.94.0
+# CBMC 5.95.0
 
 ## What's Changed
+
+* Add C front-end support for vector expressions as compile-time constants by @tautschnig in https://github.com/diffblue/cbmc/pull/7947
+* C library: add exp, log, pow models by @tautschnig in https://github.com/diffblue/cbmc/pull/7906
+
+## Bug Fixes
+
+* Fix bug with std::sort requires strict weak ordering by @tautschnig in https://github.com/diffblue/cbmc/pull/7956
+* SYNTHESIZER: Use only symbols from the original goto as terminals by @qinheping in https://github.com/diffblue/cbmc/pull/7970
+* Add missing lowering of symbol values in new SMT backend by @thomasspriggs in https://github.com/diffblue/cbmc/pull/7952
+* Restrict memory-analyzer build to Linux x86_64/i386 by @tautschnig in https://github.com/diffblue/cbmc/pull/7958
+* Add support for empty unions in incremental SMT decision procedure by @thomasspriggs in https://github.com/diffblue/cbmc/pull/7966
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.94.0...cbmc-5.95.0
+
+## CBMC 5.94.0
+
+### What's Changed
 * Add models for C library: getpwnam, getpwuid, and getopt by @tautschnig in https://github.com/diffblue/cbmc/pull/7919 and https://github.com/diffblue/cbmc/pull/7916
 * Shadow memory addresses now also support --pointer-check argument by @esteffin in https://github.com/diffblue/cbmc/pull/7936
 * [DOCS] Add documentation on CBMC Shadow Memory intrinsics and shadow memory functions (via doxygen) by @NlightNFotis in https://github.com/diffblue/cbmc/pull/7913 and https://github.com/diffblue/cbmc/pull/7930
 * [SYNTHESIZER] goto-synthesizer now accepts all CBMC options by @qinheping in https://github.com/diffblue/cbmc/pull/7900
 
-## Bug Fixes
+### Bug Fixes
 * Fix problem on array size L2 renaming by @esteffin in https://github.com/diffblue/cbmc/pull/7877
 * Fix shadow memory missing aggregation on non-compound bitvector types by @esteffin in https://github.com/diffblue/cbmc/pull/7935
 * Fix SMT encoding of structs which contain a single struct field by @thomasspriggs in https://github.com/diffblue/cbmc/pull/7951
