@@ -2623,7 +2623,7 @@ long double expl(long double x)
     return +0.0l;
 
 #if LDBL_MAX_EXP == DBL_MAX_EXP
-  return exp(x, y);
+  return exp(x);
 #else
   // underflow/overflow when the result is not representable in 15 exponent bits
   if(x < -16384.0l * M_LN2)
@@ -2821,7 +2821,7 @@ long double logl(long double x)
   }
 
 #if LDBL_MAX_EXP == DBL_MAX_EXP
-  return logl(x, y);
+  return logl(x);
 #else
   _Static_assert(
     sizeof(long double) % sizeof(int32_t) == 0,
