@@ -27,6 +27,7 @@ var classbv__utilst =
     [ "cond_implies_equal", "classbv__utilst.html#a8ca59a4e51039fe73545276fca05bf5b", null ],
     [ "cond_negate", "classbv__utilst.html#ac08af477d24c0baf4e29438cc74992f1", null ],
     [ "cond_negate_no_overflow", "classbv__utilst.html#a80cb53e8cfb49711c70c2a5610c470ea", null ],
+    [ "dadda_tree", "classbv__utilst.html#ac60c95b7d190a5c5404f2ead1103c4a9", null ],
     [ "divider", "classbv__utilst.html#a290267647d61701670e9de939f285929", null ],
     [ "divider", "classbv__utilst.html#ab1217db24554b0926b290fec4ed690c4", null ],
     [ "equal", "classbv__utilst.html#a770b550f3704656e076961f976723f49", null ],
