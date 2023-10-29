@@ -244,6 +244,7 @@ protected:
   bvt cond_negate_no_overflow(const bvt &bv, const literalt cond);
 
   bvt wallace_tree(const std::vector<bvt> &pps);
+  bvt dadda_tree(const std::vector<bvt> &pps);
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_UTILS_H

@@ -664,14 +664,15 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
       INVARIANT(a.size() == b.size(), "groups should be of equal size");
       INVARIANT(a.size() == c.size(), "groups should be of equal size");
 
-      bvt s(a.size()), t(a.size());
+      bvt s, t(a.size(), const_literal(false));
+      s.reserve(a.size());
 
       for(std::size_t bit=0; bit<a.size(); bit++)
       {
-        // \todo reformulate using full_adder
-        s[bit]=prop.lxor(a[bit], prop.lxor(b[bit], c[bit]));
-        t[bit]=(bit==0)?const_literal(false):
-               carry(a[bit-1], b[bit-1], c[bit-1]);
+        literalt carry_out;
+        s.push_back(full_adder(a[bit], b[bit], c[bit], carry_out));
+        if(bit + 1 < a.size())
+          t[bit + 1] = carry_out;
       }
 
       new_pps.push_back(std::move(s));
@@ -687,66 +688,276 @@ bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
   }
 }
 
+bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
+{
+  PRECONDITION(!pps.empty());
+
+  using columnt = std::list<literalt>;
+  std::vector<columnt> columns(pps.front().size());
+  for(const auto &pp : pps)
+  {
+    PRECONDITION(pp.size() == pps.front().size());
+    for(std::size_t i = 0; i < pp.size(); ++i)
+    {
+      if(!pp[i].is_false())
+        columns[i].push_back(pp[i]);
+    }
+  }
+
+  std::list<std::size_t> dadda_sequence;
+  for(std::size_t d = 2; d < pps.front().size(); d = (d * 3) / 2)
+    dadda_sequence.push_front(d);
+
+  for(auto d : dadda_sequence)
+  {
+    for(auto col_it = columns.begin(); col_it != columns.end();) // no ++col_it
+    {
+      if(col_it->size() <= d)
+        ++col_it;
+      else if(col_it->size() == d + 1)
+      {
+        // Dadda prescribes a half adder here, but OPTIMAL_FULL_ADDER makes
+        // full_adder actually build a half adder when carry-in is false.
+        literalt carry_out;
+        col_it->push_back(full_adder(
+          col_it->front(),
+          *std::next(col_it->begin()),
+          const_literal(false),
+          carry_out));
+        col_it->pop_front();
+        col_it->pop_front();
+        if(std::next(col_it) != columns.end())
+          std::next(col_it)->push_back(carry_out);
+      }
+      else
+      {
+        // We could also experiment with n:2 compressors (for n > 3, n=3 is the
+        // full adder as used below) that use circuits with lower gate count
+        // than just combining multiple full adders.
+        literalt carry_out;
+        col_it->push_back(full_adder(
+          col_it->front(),
+          *std::next(col_it->begin()),
+          *std::next(std::next(col_it->begin())),
+          carry_out));
+        col_it->pop_front();
+        col_it->pop_front();
+        col_it->pop_front();
+        if(std::next(col_it) != columns.end())
+          std::next(col_it)->push_back(carry_out);
+      }
+    }
+  }
+
+  bvt a, b;
+  a.reserve(pps.front().size());
+  b.reserve(pps.front().size());
+
+  for(const auto &col : columns)
+  {
+    PRECONDITION(col.size() <= 2);
+    switch(col.size())
+    {
+    case 0:
+      a.push_back(const_literal(false));
+      b.push_back(const_literal(false));
+      break;
+    case 1:
+      a.push_back(col.front());
+      b.push_back(const_literal(false));
+      break;
+    case 2:
+      a.push_back(col.front());
+      b.push_back(col.back());
+    }
+  }
+
+  return add(a, b);
+}
+
+// Wallace tree multiplier. This is disabled, as runtimes have
+// been observed to go up by 5%-10%, and on some models even by 20%.
+// #define WALLACE_TREE
+// Dadda' reduction scheme. This yields a smaller formula size than Wallace
+// trees (and also the default addition scheme), but remains disabled as it
+// isn't consistently more performant either.
+// #define DADDA_TREE
+
+// The following examples demonstrate the performance differences (with a
+// time-out of 7200 seconds):
+//
+// #ifndef BITWIDTH
+// #define BITWIDTH 8
+// #endif
+//
+// int main()
+// {
+//   __CPROVER_bitvector[BITWIDTH] a, b;
+//   __CPROVER_assert(a * 3 == a + a + a, "multiplication by 3");
+//   __CPROVER_assert(3 * a == a + a + a, "multiplication by 3");
+//   __CPROVER_bitvector[BITWIDTH] ab = a * b;
+//   __CPROVER_bitvector[BITWIDTH * 2] ab_check =
+//     (__CPROVER_bitvector[BITWIDTH * 2])a *
+//     (__CPROVER_bitvector[BITWIDTH * 2])b;
+//   __CPROVER_assert(
+//     ab == (__CPROVER_bitvector[BITWIDTH])ab_check, "should pass");
+// }
+//
+// |----|-----------------------------|-----------------------------|
+// |    |           CaDiCaL           |           MiniSat2          |
+// |----|-----------------------------|-----------------------------|
+// | n  | No tree | Wallace |  Dadda  | No tree | Wallace |  Dadda  |
+// |----|---------|---------|---------|---------|---------|---------|
+// |  1 |    0.00 |    0.00 |    0.00 |    0.00 |    0.00 |    0.00 |
+// |  2 |    0.00 |    0.00 |    0.00 |    0.00 |    0.00 |    0.00 |
+// |  3 |    0.01 |    0.01 |    0.00 |    0.00 |    0.00 |    0.00 |
+// |  4 |    0.01 |    0.01 |    0.01 |    0.01 |    0.01 |    0.01 |
+// |  5 |    0.04 |    0.04 |    0.04 |    0.01 |    0.01 |    0.01 |
+// |  6 |    0.11 |    0.13 |    0.12 |    0.04 |    0.05 |    0.06 |
+// |  7 |    0.28 |    0.46 |    0.44 |    0.15 |    0.27 |    0.31 |
+// |  8 |    0.50 |    1.55 |    1.09 |    0.90 |    1.06 |    1.36 |
+// |  9 |    2.22 |    3.63 |    2.67 |    3.40 |    5.85 |    3.44 |
+// | 10 |    2.79 |    4.81 |    4.69 |    4.32 |   28.41 |   28.01 |
+// | 11 |    8.48 |    4.45 |   11.99 |   38.24 |   98.55 |   86.46 |
+// | 12 |   14.52 |    4.86 |    5.80 |  115.00 |  140.11 |  461.70 |
+// | 13 |   33.62 |    5.56 |    6.14 |  210.24 |  805.59 |  609.01 |
+// | 14 |   37.23 |    6.11 |    8.01 |  776.75 |  689.96 | 6153.82 |
+// | 15 |  108.65 |    7.86 |   14.72 | 1048.92 | 1421.74 | 6881.78 |
+// | 16 |  102.61 |   14.08 |   18.54 | 1628.01 | timeout | 1943.85 |
+// | 17 |  117.89 |   18.53 |    9.19 | 4148.73 | timeout | timeout |
+// | 18 |  209.40 |    7.97 |    7.74 | 2760.51 | timeout | timeout |
+// | 19 |  168.21 |   18.04 |   15.00 | 2514.21 | timeout | timeout |
+// | 20 |  566.76 |   12.68 |   22.47 | 2609.09 | timeout | timeout |
+// | 21 |  786.31 |   23.80 |   23.80 | 2232.77 | timeout | timeout |
+// | 22 |  817.74 |   17.64 |   22.53 | 3866.70 | timeout | timeout |
+// | 23 | 1102.76 |   24.19 |   26.37 | timeout | timeout | timeout |
+// | 24 | 1319.59 |   27.37 |   29.95 | timeout | timeout | timeout |
+// | 25 | 1786.11 |   27.10 |   29.94 | timeout | timeout | timeout |
+// | 26 | 1952.18 |   31.08 |   33.95 | timeout | timeout | timeout |
+// | 27 | 6908.48 |   27.92 |   34.94 | timeout | timeout | timeout |
+// | 28 | 6919.34 |   36.63 |   33.78 | timeout | timeout | timeout |
+// | 29 | timeout |   27.95 |   40.69 | timeout | timeout | timeout |
+// | 30 | timeout |   36.94 |   31.59 | timeout | timeout | timeout |
+// | 31 | timeout |   38.41 |   40.04 | timeout | timeout | timeout |
+// | 32 | timeout |   33.06 |   91.38 | timeout | timeout | timeout |
+// |----|---------|---------|---------|---------|---------|---------|
+//
+// In summary, both Wallace tree and Dadda reduction are substantially more
+// efficient with CaDiCaL on the above code for all bit width > 11, but somewhat
+// slower with MiniSat.
+//
+// #ifndef BITWIDTH
+// #define BITWIDTH 8
+// #endif
+//
+// int main()
+// {
+//   __CPROVER_bitvector[BITWIDTH] a, b, c, ab, bc, abc;
+//   ab = a * b;
+//   __CPROVER_bitvector[BITWIDTH * 2] ab_check =
+//     (__CPROVER_bitvector[BITWIDTH * 2])a *
+//     (__CPROVER_bitvector[BITWIDTH * 2])b;
+//   __CPROVER_assume(ab == ab_check);
+//   bc = b * c;
+//   __CPROVER_bitvector[BITWIDTH * 2] bc_check =
+//     (__CPROVER_bitvector[BITWIDTH * 2])b *
+//     (__CPROVER_bitvector[BITWIDTH * 2])c;
+//   __CPROVER_assume(bc == bc_check);
+//   abc = ab * c;
+//   __CPROVER_bitvector[BITWIDTH * 2] abc_check =
+//     (__CPROVER_bitvector[BITWIDTH * 2])ab *
+//     (__CPROVER_bitvector[BITWIDTH * 2])c;
+//   __CPROVER_assume(abc == abc_check);
+//   __CPROVER_assert(abc == a * bc, "associativity");
+// }
+//
+// |----|-----------------------------|-----------------------------|
+// |    |           CaDiCaL           |           MiniSat2          |
+// |----|-----------------------------|-----------------------------|
+// | n  | No tree | Wallace |  Dadda  | No tree | Wallace |  Dadda  |
+// |----|---------|---------|---------|---------|---------|---------|
+// |  1 |    0.00 |    0.00 |    0.00 |    0.01 |    0.01 |    0.01 |
+// |  2 |    0.01 |    0.01 |    0.01 |    0.01 |    0.01 |    0.01 |
+// |  3 |    0.02 |    0.03 |    0.03 |    0.01 |    0.01 |    0.01 |
+// |  4 |    0.05 |    0.07 |    0.06 |    0.02 |    0.02 |    0.02 |
+// |  5 |    0.17 |    0.18 |    0.14 |    0.04 |    0.04 |    0.04 |
+// |  6 |    0.50 |    0.63 |    0.63 |    0.13 |    0.14 |    0.13 |
+// |  7 |    1.01 |    1.15 |    0.90 |    0.43 |    0.47 |    0.47 |
+// |  8 |    1.56 |    1.76 |    1.75 |    3.35 |    2.39 |    1.75 |
+// |  9 |    2.07 |    2.48 |    1.75 |   11.20 |   12.64 |    7.94 |
+// | 10 |    3.58 |    3.88 |    3.54 |   20.23 |   23.49 |   15.66 |
+// | 11 |    5.84 |    7.46 |    5.31 |   49.32 |   39.86 |   44.15 |
+// | 12 |   11.71 |   16.85 |   13.40 |   69.32 |  156.57 |   46.50 |
+// | 13 |   33.22 |   41.95 |   34.43 |  250.91 |  294.73 |   79.47 |
+// | 14 |   76.27 |  109.59 |   84.49 |  226.98 |  259.84 |  258.08 |
+// | 15 |  220.01 |  330.10 |  267.11 |  783.73 | 1160.47 | 1262.91 |
+// | 16 |  591.91 |  981.16 |  808.33 | 2712.20 | 4286.60 | timeout |
+// | 17 | 1634.97 | 2574.81 | 2006.27 | timeout | timeout | timeout |
+// | 18 | 4680.16 | timeout | 6704.35 | timeout | timeout | timeout |
+// | 19 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 20 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 21 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 22 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 23 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 24 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 25 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 26 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 27 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 28 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 29 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 30 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 31 | timeout | timeout | timeout | timeout | timeout | timeout |
+// | 32 | timeout | timeout | timeout | timeout | timeout | timeout |
+// |----|---------|---------|---------|---------|---------|---------|
+//
+// In summary, Wallace tree reduction is slower for both solvers and all bit
+// widths (except BITWIDTH==8 with MiniSat2). Dadda multipliers get closer to
+// our multiplier that's not using a tree reduction scheme, but aren't uniformly
+// better either.
+
 bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 {
-  #if 1
   bvt op0=_op0, op1=_op1;
 
   if(is_constant(op1))
     std::swap(op0, op1);
-
-  bvt product;
-  product.resize(op0.size());
-
-  for(std::size_t i=0; i<product.size(); i++)
-    product[i]=const_literal(false);
-
-  for(std::size_t sum=0; sum<op0.size(); sum++)
-    if(op0[sum]!=const_literal(false))
-    {
-      bvt tmpop = zeros(sum);
-      tmpop.reserve(op0.size());
-
-      for(std::size_t idx=sum; idx<op0.size(); idx++)
-        tmpop.push_back(prop.land(op1[idx-sum], op0[sum]));
-
-      product=add(product, tmpop);
-    }
-
-  return product;
-  #else
-  // Wallace tree multiplier. This is disabled, as runtimes have
-  // been observed to go up by 5%-10%, and on some models even by 20%.
 
   // build the usual quadratic number of partial products
-
-  bvt op0=_op0, op1=_op1;
-
-  if(is_constant(op1))
-    std::swap(op0, op1);
-
   std::vector<bvt> pps;
   pps.reserve(op0.size());
 
   for(std::size_t bit=0; bit<op0.size(); bit++)
-    if(op0[bit]!=const_literal(false))
-    {
-      // zeros according to weight
-      bvt pp = zeros(bit);
-      pp.reserve(op0.size());
+  {
+    if(op0[bit] == const_literal(false))
+      continue;
 
-      for(std::size_t idx=bit; idx<op0.size(); idx++)
-        pp.push_back(prop.land(op1[idx-bit], op0[bit]));
+    // zeros according to weight
+    bvt pp = zeros(bit);
+    pp.reserve(op0.size());
 
-      pps.push_back(pp);
-    }
+    for(std::size_t idx = bit; idx < op0.size(); idx++)
+      pp.push_back(prop.land(op1[idx - bit], op0[bit]));
+
+    pps.push_back(pp);
+  }
 
   if(pps.empty())
     return zeros(op0.size());
   else
+  {
+#ifdef WALLACE_TREE
     return wallace_tree(pps);
+#elif defined(DADDA_TREE)
+    return dadda_tree(pps);
+#else
+    bvt product = pps.front();
 
-  #endif
+    for(auto it = std::next(pps.begin()); it != pps.end(); ++it)
+      product = add(product, *it);
+
+    return product;
+#endif
+  }
 }
 
 bvt bv_utilst::unsigned_multiplier_no_overflow(
