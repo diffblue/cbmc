@@ -1,6 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"as__cmdline_8h_source.html":[9,0,2,10,7],
 "as__const_8h.html":[9,0,2,32,6],
 "as__const_8h.html#a37898bc9977a702de0778a9bb660ec3e":[9,0,2,32,6,0],
 "as__const_8h.html#a3f867a238882d97da88bccd5aeb93c19":[9,0,2,32,6,1],
@@ -42,8 +41,6 @@ var NAVTREEINDEX2 =
 "assignments__from__json_8h.html":[9,0,1,0,1,1],
 "assignments__from__json_8h.html#a535a26c0ef50ff38b34e3333b8c296c6":[9,0,1,0,1,1,0],
 "assignments__from__json_8h_source.html":[9,0,1,0,1,1],
-"auto__objects_8cpp.html":[9,0,2,17,0],
-"auto__objects_8cpp_source.html":[9,0,2,17,0],
 "axioms_8cpp.html":[9,0,2,6,2],
 "axioms_8cpp_source.html":[9,0,2,6,2],
 "axioms_8h.html":[9,0,2,6,3],
@@ -64,7 +61,6 @@ var NAVTREEINDEX2 =
 "background-concepts.html#flattening_lowering_subsection":[0,4,8,2,1],
 "background-concepts.html#instrument_subsection":[0,4,8,2,0],
 "background-concepts.html#propositional_logic_subsubsection":[0,4,8,1,0,0],
-"background-concepts.html#representations_section":[0,4,8,0],
 "background-concepts.html#smt_etc_subsubsection":[0,4,8,1,0,3],
 "background-concepts.html#static_analysis_section":[0,4,8,1,1],
 "background-concepts.html#symbol_table_section":[0,4,8,0,0,0],
@@ -249,5 +245,9 @@ var NAVTREEINDEX2 =
 "boolbv_8cpp_source.html":[9,0,2,29,1,2],
 "boolbv_8h.html":[9,0,2,29,1,3],
 "boolbv_8h_source.html":[9,0,2,29,1,3],
-"boolbv__abs_8cpp.html":[9,0,2,29,1,4]
+"boolbv__abs_8cpp.html":[9,0,2,29,1,4],
+"boolbv__abs_8cpp_source.html":[9,0,2,29,1,4],
+"boolbv__add__sub_8cpp.html":[9,0,2,29,1,5],
+"boolbv__add__sub_8cpp_source.html":[9,0,2,29,1,5],
+"boolbv__array_8cpp.html":[9,0,2,29,1,6]
 };

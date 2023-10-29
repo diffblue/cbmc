@@ -2717,7 +2717,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l02623"></a><span class="lineno"> 2623</span>&#160;    <span class="keywordflow">return</span> +0.0l;</div>
 <div class="line"><a name="l02624"></a><span class="lineno"> 2624</span>&#160; </div>
 <div class="line"><a name="l02625"></a><span class="lineno"> 2625</span>&#160;<span class="preprocessor">#if LDBL_MAX_EXP == DBL_MAX_EXP</span></div>
-<div class="line"><a name="l02626"></a><span class="lineno"> 2626</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#ae09128febbbe6372cde4fa0c65608a42">exp</a>(x, y);</div>
+<div class="line"><a name="l02626"></a><span class="lineno"> 2626</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#ae09128febbbe6372cde4fa0c65608a42">exp</a>(x);</div>
 <div class="line"><a name="l02627"></a><span class="lineno"> 2627</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l02628"></a><span class="lineno"> 2628</span>&#160;  <span class="comment">// underflow/overflow when the result is not representable in 15 exponent bits</span></div>
 <div class="line"><a name="l02629"></a><span class="lineno"> 2629</span>&#160;  <span class="keywordflow">if</span>(x &lt; -16384.0l * M_LN2)</div>
@@ -2915,7 +2915,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l02821"></a><span class="lineno"> 2821</span>&#160;  }</div>
 <div class="line"><a name="l02822"></a><span class="lineno"> 2822</span>&#160; </div>
 <div class="line"><a name="l02823"></a><span class="lineno"> 2823</span>&#160;<span class="preprocessor">#if LDBL_MAX_EXP == DBL_MAX_EXP</span></div>
-<div class="line"><a name="l02824"></a><span class="lineno"> 2824</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af67da1c28ce33b403f955103f201dfb8">logl</a>(x, y);</div>
+<div class="line"><a name="l02824"></a><span class="lineno"> 2824</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af67da1c28ce33b403f955103f201dfb8">logl</a>(x);</div>
 <div class="line"><a name="l02825"></a><span class="lineno"> 2825</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l02826"></a><span class="lineno"> 2826</span>&#160;  _Static_assert(</div>
 <div class="line"><a name="l02827"></a><span class="lineno"> 2827</span>&#160;    <span class="keyword">sizeof</span>(<span class="keywordtype">long</span> <span class="keywordtype">double</span>) % <span class="keyword">sizeof</span>(int32_t) == 0,</div>
