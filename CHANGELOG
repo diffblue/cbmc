@@ -1,11 +1,23 @@
-# CBMC 5.95.0
+# CBMC 5.95.1
 
 ## What's Changed
+
+* Multiplication encoding: cleanup, Dadda, data by @tautschnig in https://github.com/diffblue/cbmc/pull/7984
+
+## Bug Fixes
+
+* Remove extraneous y parameter from calls to exp and logl by @NlightNFotis in https://github.com/diffblue/cbmc/pull/7985
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.95.0...cbmc-5.95.1
+
+## CBMC 5.95.0
+
+### What's Changed
 
 * Add C front-end support for vector expressions as compile-time constants by @tautschnig in https://github.com/diffblue/cbmc/pull/7947
 * C library: add exp, log, pow models by @tautschnig in https://github.com/diffblue/cbmc/pull/7906
 
-## Bug Fixes
+### Bug Fixes
 
 * Fix bug with std::sort requires strict weak ordering by @tautschnig in https://github.com/diffblue/cbmc/pull/7956
 * SYNTHESIZER: Use only symbols from the original goto as terminals by @qinheping in https://github.com/diffblue/cbmc/pull/7970
