@@ -1,0 +1,12 @@
+CORE
+padded.c
+--trace
+Passing problem to incremental SMT2 solving
+\[main\.assertion\.1\] line 13 assertion my_union\.a \=\= 5\: FAILURE
+my_union\=\{ \.a\=\d+ \} \(\d{8} 00000101\)
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Test that we support union values and traces for a example where the trace
+should include non deterministic padding.
