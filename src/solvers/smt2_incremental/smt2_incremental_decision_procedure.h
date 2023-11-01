@@ -23,6 +23,7 @@
 class namespacet;
 class smt_base_solver_processt; // IWYU pragma: keep
 class string_constantt;
+class union_tag_typet;
 
 class smt2_incremental_decision_proceduret final
   : public stack_decision_proceduret
@@ -59,6 +60,8 @@ public:
   get_expr(const smt_termt &descriptor, const typet &type) const;
   optionalt<exprt>
   get_expr(const smt_termt &struct_term, const struct_tag_typet &type) const;
+  optionalt<exprt>
+  get_expr(const smt_termt &union_term, const union_tag_typet &type) const;
   optionalt<exprt>
   get_expr(const smt_termt &array, const array_typet &type) const;
 

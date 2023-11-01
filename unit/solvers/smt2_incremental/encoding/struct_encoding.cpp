@@ -418,6 +418,50 @@ TEST_CASE("decoding into struct expressions.", "[core][smt2_incremental]")
   REQUIRE(test.struct_encoding.decode(encoded, struct_tag) == expected);
 }
 
+TEST_CASE("decoding into union expressions.", "[core][smt2_incremental]")
+{
+  auto test = struct_encoding_test_environmentt::make();
+  SECTION("Single union component")
+  {
+    const struct_union_typet::componentst type_components{
+      {"eggs", unsignedbv_typet{16}}};
+    const union_typet union_type{type_components};
+    const type_symbolt type_symbol{"my_uniont", union_type, ID_C};
+    test.symbol_table.insert(type_symbol);
+    const union_tag_typet union_tag{type_symbol.name};
+    const union_exprt expected{
+      "eggs", from_integer(12, unsignedbv_typet{16}), union_tag};
+    const exprt encoded = from_integer(12, bv_typet{16});
+    REQUIRE(test.struct_encoding.decode(encoded, union_tag) == expected);
+  }
+  SECTION("Multiple union components")
+  {
+    const struct_union_typet::componentst type_components{
+      {"green", signedbv_typet{32}},
+      {"eggs", unsignedbv_typet{16}},
+      {"ham", signedbv_typet{24}}};
+    const union_typet union_type{type_components};
+    const type_symbolt type_symbol{"my_uniont", union_type, ID_C};
+    test.symbol_table.insert(type_symbol);
+    const union_tag_typet union_tag{type_symbol.name};
+    const union_exprt expected{
+      "green", from_integer(-42, signedbv_typet{32}), union_tag};
+    const exprt encoded = from_integer((~uint32_t{42} + 1), bv_typet{32});
+    REQUIRE(test.struct_encoding.decode(encoded, union_tag) == expected);
+  }
+  SECTION("Empty union")
+  {
+    const struct_union_typet::componentst type_components{};
+    const union_typet union_type{type_components};
+    const type_symbolt type_symbol{"my_empty_uniont", union_type, ID_C};
+    test.symbol_table.insert(type_symbol);
+    const union_tag_typet union_tag{type_symbol.name};
+    const empty_union_exprt expected{union_tag};
+    const exprt encoded = from_integer(0, bv_typet{8});
+    REQUIRE(test.struct_encoding.decode(encoded, union_tag) == expected);
+  }
+}
+
 TEST_CASE("encoding of struct with no members", "[core][smt2_incremental]")
 {
   auto test = struct_encoding_test_environmentt::make();

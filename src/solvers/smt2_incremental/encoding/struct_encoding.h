@@ -12,6 +12,7 @@ class namespacet;
 class boolbv_widtht;
 class member_exprt;
 class struct_tag_typet;
+class union_tag_typet;
 
 /// Encodes struct types/values into non-struct expressions/types.
 class struct_encodingt final
@@ -27,6 +28,8 @@ public:
   /// from the bit vector \p encoded expression.
   exprt
   decode(const exprt &encoded, const struct_tag_typet &original_type) const;
+  exprt
+  decode(const exprt &encoded, const union_tag_typet &original_type) const;
 
 private:
   std::unique_ptr<boolbv_widtht> boolbv_width;
