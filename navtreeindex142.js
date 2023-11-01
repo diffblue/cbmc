@@ -1,5 +1,7 @@
 var NAVTREEINDEX142 =
 {
+"wcwidth_8c.html#ac7c15649959bee9854a33fb2aaac0ec4":[9,0,2,6,61,2],
+"wcwidth_8c_source.html":[9,0,2,6,61],
 "weak__memory_8cpp.html":[9,0,2,15,2,16],
 "weak__memory_8cpp.html#a39ad78a272a557d5006db6d0ed6cf01b":[9,0,2,15,2,16,1],
 "weak__memory_8cpp.html#a8e92963d5109ac04e441bbb2008e654b":[9,0,2,15,2,16,0],

@@ -14,6 +14,7 @@ var classsmt2__incremental__decision__proceduret =
     [ "get_expr", "classsmt2__incremental__decision__proceduret.html#aec7bb9183a20720e1ca4d0d51e3d53f4", null ],
     [ "get_expr", "classsmt2__incremental__decision__proceduret.html#a912cfa91ef1bdcf7dd1b430a43b2c79e", null ],
     [ "get_expr", "classsmt2__incremental__decision__proceduret.html#aa9cbb8da02817b247aeb31b9bbf40d2a", null ],
+    [ "get_expr", "classsmt2__incremental__decision__proceduret.html#aba6608195a0d6da337227ff7f13cb549", null ],
     [ "get_identifier", "classsmt2__incremental__decision__proceduret.html#a415df63ca30e893e0127688d4b3d63a9", null ],
     [ "get_number_of_solver_calls", "classsmt2__incremental__decision__proceduret.html#a4a9c51d367b9c96a09f0612416662121", null ],
     [ "handle", "classsmt2__incremental__decision__proceduret.html#a1d1569125e1afdee07d0b312d3b7d650", null ],

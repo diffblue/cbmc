@@ -1,5 +1,7 @@
 var NAVTREEINDEX132 =
 {
+"structfloat__bvt_1_1rounding__mode__bitst.html#ab0d48798545682331bbf352337169067":[8,0,482,1,4],
+"structfloat__bvt_1_1rounding__mode__bitst.html#af0ca73fb2e04389bee7a42fe7b4f48dc":[8,0,482,1,1],
 "structfloat__bvt_1_1rounding__mode__bitst.html#af4f7917c01b90ddd28f650c64a666705":[8,0,482,1,3],
 "structfloat__bvt_1_1unbiased__floatt.html":[8,0,482,2],
 "structfloat__bvt_1_1unpacked__floatt.html":[8,0,482,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX132 =
 "structincremental__goto__checkert_1_1resultt.html#af81e34bd1f2de798ea22382a67d7d806":[8,0,610,0,3],
 "structindex__set__pairt.html":[8,0,617],
 "structindex__set__pairt.html#a61a20f5657b97fba5e3b7dc0e78ec072":[8,0,617,1],
-"structindex__set__pairt.html#aa8dc71b64a2f7f54109a2d17e9a38b68":[8,0,617,0],
-"structinfix__opt.html":[8,0,620],
-"structinfix__opt.html#a5e8dee9dfdea6364767e7e89d2b90a67":[8,0,620,0]
+"structindex__set__pairt.html#aa8dc71b64a2f7f54109a2d17e9a38b68":[8,0,617,0]
 };

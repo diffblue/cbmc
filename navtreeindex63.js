@@ -1,5 +1,6 @@
 var NAVTREEINDEX63 =
 {
+"classstate__is__sentinel__dll__exprt.html":[8,0,1176],
 "classstate__is__sentinel__dll__exprt.html#a1692bf0b028f20ea2c2f7d8cbe003d98":[8,0,1176,3],
 "classstate__is__sentinel__dll__exprt.html#a2c89c07c5b7bda6b526578e56997b715":[8,0,1176,1],
 "classstate__is__sentinel__dll__exprt.html#a6077b95dadecdf4af58a5ee8c799c476":[8,0,1176,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX63 =
 "classstring__abstractiont.html#a655a8bbf2d5f9622a449f23ac8b7d7aa":[8,0,1191,27],
 "classstring__abstractiont.html#a6ae5a6f08a7cc33274d1eb859bac74b0":[8,0,1191,3],
 "classstring__abstractiont.html#a6b94730ef3457302b87cd67e8f10beb8":[8,0,1191,21],
-"classstring__abstractiont.html#a6c45bfc4d5f7501e47964d5c7b78e565":[8,0,1191,33],
-"classstring__abstractiont.html#a6f0bae1af8118b09d7753c3e69ef44d1":[8,0,1191,47]
+"classstring__abstractiont.html#a6c45bfc4d5f7501e47964d5c7b78e565":[8,0,1191,33]
 };
