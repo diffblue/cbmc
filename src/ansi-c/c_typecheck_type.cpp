@@ -309,11 +309,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
     }
     else
     {
-      error().source_location=type.source_location();
-      error() << "attribute mode '" << gcc_attr_mode
-              << "' applied to inappropriate type '" << to_string(type) << "'"
-              << eom;
-      throw 0;
+      throw errort().with_location(type.source_location())
+        << "attribute mode '" << gcc_attr_mode
+        << "' applied to inappropriate type '" << to_string(type) << "'";
     }
   }
 
@@ -323,9 +321,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
      type.id()!=ID_pointer &&
      type.id()!=ID_array)
   {
-    error().source_location=type.source_location();
-    error() << "only a pointer can be 'restrict'" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "only a pointer can be 'restrict'";
   }
 }
 
@@ -342,16 +339,13 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
   mp_integer size_int;
   if(to_integer(to_constant_expr(size_expr), size_int))
   {
-    error().source_location=source_location;
-    error() << "failed to convert bit vector width to constant" << eom;
-    throw 0;
+    throw errort().with_location(source_location)
+      << "failed to convert bit vector width to constant";
   }
 
   if(size_int<1)
   {
-    error().source_location=source_location;
-    error() << "bit vector width invalid" << eom;
-    throw 0;
+    throw errort().with_location(source_location) << "bit vector width invalid";
   }
 
   type.remove(ID_size);
@@ -380,16 +374,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(to_constant_expr(f_expr), f_int))
     {
-      error().source_location = fraction_source_location;
-      error() << "failed to convert number of fraction bits to constant" << eom;
-      throw 0;
+      throw errort().with_location(fraction_source_location)
+        << "failed to convert number of fraction bits to constant";
     }
 
     if(f_int<0 || f_int>size_int)
     {
-      error().source_location = fraction_source_location;
-      error() << "fixedbv fraction width invalid" << eom;
-      throw 0;
+      throw errort().with_location(fraction_source_location)
+        << "fixedbv fraction width invalid";
     }
 
     type.remove(ID_f);
@@ -412,16 +404,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(to_constant_expr(f_expr), f_int))
     {
-      error().source_location = fraction_source_location;
-      error() << "failed to convert number of fraction bits to constant" << eom;
-      throw 0;
+      throw errort().with_location(fraction_source_location)
+        << "failed to convert number of fraction bits to constant";
     }
 
     if(f_int<1 || f_int+1>=size_int)
     {
-      error().source_location = fraction_source_location;
-      error() << "floatbv fraction width invalid" << eom;
-      throw 0;
+      throw errort().with_location(fraction_source_location)
+        << "floatbv fraction width invalid";
     }
 
     type.remove(ID_f);
@@ -516,16 +506,14 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
 
   if(decl_return_type.id() == ID_array)
   {
-    error().source_location=type.source_location();
-    error() << "function must not return array" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "function must not return array";
   }
 
   if(decl_return_type.id() == ID_code)
   {
-    error().source_location=type.source_location();
-    error() << "function must not return function type" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "function must not return function type";
   }
 }
 
@@ -537,9 +525,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   // We don't allow void as the element type.
   if(type.element_type().id() == ID_empty)
   {
-    error().source_location=type.source_location();
-    error() << "array of voids" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location()) << "array of voids";
   }
 
   // We don't allow incomplete structs or unions as element type.
@@ -550,18 +536,16 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     to_struct_union_type(followed_subtype).is_incomplete())
   {
     // ISO/IEC 9899 6.7.5.2
-    error().source_location = type.source_location();
-    error() << "array has incomplete element type" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "array has incomplete element type";
   }
 
   // We don't allow functions as element type.
   if(type.element_type().id() == ID_code)
   {
     // ISO/IEC 9899 6.7.5.2
-    error().source_location = type.source_location();
-    error() << "array of function element type" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "array of function element type";
   }
 
   // We add the index type.
@@ -587,18 +571,16 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       mp_integer s;
       if(to_integer(to_constant_expr(tmp_size), s))
       {
-        error().source_location = size_source_location;
-        error() << "failed to convert constant: "
-                << tmp_size.pretty() << eom;
-        throw 0;
+        throw errort().with_location(size_source_location)
+          << "failed to convert constant: " << tmp_size.pretty();
       }
 
       if(s<0)
       {
-        error().source_location = size_source_location;
-        error() << "array size must not be negative, "
-                   "but got " << s << eom;
-        throw 0;
+        throw errort().with_location(size_source_location)
+          << "array size must not be negative, "
+             "but got "
+          << s;
       }
 
       size=tmp_size;
@@ -626,10 +608,9 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
 
       if(current_symbol.is_static_lifetime)
       {
-        error().source_location=current_symbol.location;
-        error() << "array size of static symbol '" << current_symbol.base_name
-                << "' is not constant" << eom;
-        throw 0;
+        throw errort().with_location(current_symbol.location)
+          << "array size of static symbol '" << current_symbol.base_name
+          << "' is not constant";
       }
 
       symbolt &new_symbol = get_fresh_aux_symbol(
@@ -684,10 +665,8 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
      subtype.id()!=ID_floatbv &&
      subtype.id()!=ID_fixedbv)
   {
-    error().source_location=source_location;
-    error() << "cannot make a vector of subtype "
-            << to_string(subtype) << eom;
-    throw 0;
+    throw errort().with_location(source_location)
+      << "cannot make a vector of subtype " << to_string(subtype);
   }
 
   make_constant_index(size);
@@ -695,18 +674,16 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   mp_integer s;
   if(to_integer(to_constant_expr(size), s))
   {
-    error().source_location=source_location;
-    error() << "failed to convert constant: "
-            << size.pretty() << eom;
-    throw 0;
+    throw errort().with_location(source_location)
+      << "failed to convert constant: " << size.pretty();
   }
 
   if(s<=0)
   {
-    error().source_location=source_location;
-    error() << "vector size must be positive, "
-               "but got " << s << eom;
-    throw 0;
+    throw errort().with_location(source_location)
+      << "vector size must be positive, "
+         "but got "
+      << s;
   }
 
   // the subtype must have constant size
@@ -714,10 +691,9 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
 
   if(!sub_size_expr_opt.has_value())
   {
-    error().source_location = source_location;
-    error() << "failed to determine size of vector base type '"
-            << to_string(subtype) << "'" << eom;
-    throw 0;
+    throw errort().with_location(source_location)
+      << "failed to determine size of vector base type '" << to_string(subtype)
+      << "'";
   }
 
   simplify(sub_size_expr_opt.value(), *this);
@@ -726,27 +702,23 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
 
   if(!sub_size.has_value())
   {
-    error().source_location=source_location;
-    error() << "failed to determine size of vector base type '"
-            << to_string(subtype) << "'" << eom;
-    throw 0;
+    throw errort().with_location(source_location)
+      << "failed to determine size of vector base type '" << to_string(subtype)
+      << "'";
   }
 
   if(*sub_size == 0)
   {
-    error().source_location=source_location;
-    error() << "type had size 0: '" << to_string(subtype) << "'" << eom;
-    throw 0;
+    throw errort().with_location(source_location)
+      << "type had size 0: '" << to_string(subtype) << "'";
   }
 
   // adjust by width of base type
   if(s % *sub_size != 0)
   {
-    error().source_location=source_location;
-    error() << "vector size (" << s
-            << ") expected to be multiple of base type size (" << *sub_size
-            << ")" << eom;
-    throw 0;
+    throw errort().with_location(source_location)
+      << "vector size (" << s << ") expected to be multiple of base type size ("
+      << *sub_size << ")";
   }
 
   s /= *sub_size;
@@ -859,17 +831,14 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       }
       else if(s_it->second.type.id() != type.id())
       {
-        error().source_location = type.source_location();
-        error() << "redefinition of '" << s_it->second.pretty_name << "'"
-                << " as different kind of tag" << eom;
-        throw 0;
+        throw errort().with_location(type.source_location())
+          << "redefinition of '" << s_it->second.pretty_name << "'"
+          << " as different kind of tag";
       }
       else if(have_body)
       {
-        error().source_location=type.source_location();
-        error() << "redefinition of body of '" << s_it->second.pretty_name
-                << "'" << eom;
-        throw 0;
+        throw errort().with_location(type.source_location())
+          << "redefinition of body of '" << s_it->second.pretty_name << "'";
       }
     }
   }
@@ -956,8 +925,8 @@ void c_typecheck_baset::typecheck_compound_body(
               new_component.type().id() != ID_struct_tag &&
               new_component.type().id() != ID_union_tag)
             {
-              throw invalid_source_file_exceptiont{
-                "no members defined", source_location};
+              throw errort().with_location(source_location)
+                << "no members defined";
             }
           }
           else
@@ -995,16 +964,14 @@ void c_typecheck_baset::typecheck_compound_body(
            (new_component.type().id()!=ID_array ||
             !to_array_type(new_component.type()).is_incomplete()))
         {
-          error().source_location = source_location;
-          error() << "incomplete type not permitted here" << eom;
-          throw 0;
+          throw errort().with_location(source_location)
+            << "incomplete type not permitted here";
         }
 
         if(new_component.type().id() == ID_empty)
         {
-          error().source_location = source_location;
-          error() << "void-typed member not permitted" << eom;
-          throw 0;
+          throw errort().with_location(source_location)
+            << "void-typed member not permitted";
         }
 
         if(
@@ -1012,9 +979,8 @@ void c_typecheck_baset::typecheck_compound_body(
           to_c_bit_field_type(new_component.type()).get_width() == 0 &&
           !new_component.get_name().empty())
         {
-          throw invalid_source_file_exceptiont{
-            "zero-width bit-field with declarator not permitted",
-            source_location};
+          throw errort().with_location(source_location)
+            << "zero-width bit-field with declarator not permitted";
         }
 
         components.push_back(new_component);
@@ -1043,9 +1009,8 @@ void c_typecheck_baset::typecheck_compound_body(
     {
       if(!members.insert(c.get_name()).second)
       {
-        error().source_location = c.source_location();
-        error() << "duplicate member '" << c.get_name() << '\'' << eom;
-        throw 0;
+        throw errort().with_location(c.source_location())
+          << "duplicate member '" << c.get_name() << '\'';
       }
     }
   }
@@ -1069,9 +1034,8 @@ void c_typecheck_baset::typecheck_compound_body(
         // needs to be last member
         if(type.id()==ID_struct && it!=--components.end())
         {
-          error().source_location=it->source_location();
-          error() << "flexible struct member must be last member" << eom;
-          throw 0;
+          throw errort().with_location(it->source_location())
+            << "flexible struct member must be last member";
         }
 
         // make it zero-length
@@ -1100,9 +1064,8 @@ void c_typecheck_baset::typecheck_compound_body(
     {
       if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
       {
-        error().source_location = it->source_location();
-        error() << "static_assert not supported in compound body" << eom;
-        throw 0;
+        throw errort().with_location(it->source_location())
+          << "static_assert not supported in compound body";
       }
 
       exprt &assertion = to_binary_expr(*it).op0();
@@ -1113,9 +1076,8 @@ void c_typecheck_baset::typecheck_compound_body(
 
       if(assertion.is_false())
       {
-        error().source_location=it->source_location();
-        error() << "failed _Static_assert" << eom;
-        throw 0;
+        throw errort().with_location(it->source_location())
+          << "failed _Static_assert";
       }
       else if(!assertion.is_true())
       {
@@ -1134,9 +1096,8 @@ void c_typecheck_baset::typecheck_compound_body(
     components.empty() &&
     config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
-    throw invalid_source_file_exceptiont{
-      "C requires that a struct or union has at least one member",
-      type.source_location()};
+    throw errort().with_location(type.source_location())
+      << "C requires that a struct or union has at least one member";
   }
 }
 
@@ -1242,9 +1203,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // error messages.
   if(as_expr.operands().empty())
   {
-    error().source_location=source_location;
-    error() << "empty enum" << eom;
-    throw 0;
+    throw errort().with_location(source_location) << "empty enum";
   }
 
   const bool have_underlying_type =
@@ -1259,10 +1218,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
     if(!is_signed_or_unsigned_bitvector(underlying_type))
     {
-      std::ostringstream msg;
-      msg << "non-integral type '" << underlying_type.get(ID_C_c_type)
-          << "' is an invalid underlying type";
-      throw invalid_source_file_exceptiont{msg.str(), source_location};
+      throw errort().with_location(source_location)
+        << "non-integral type '" << underlying_type.get(ID_C_c_type)
+        << "' is an invalid underlying type";
     }
   }
 
@@ -1300,9 +1258,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       }
       else
       {
-        error().source_location=v.source_location();
-        error() << "enum is not a constant" << eom;
-        throw 0;
+        throw errort().with_location(v.source_location())
+          << "enum is not a constant";
       }
     }
 
@@ -1320,10 +1277,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
       if(value < tmp.smallest() || value > tmp.largest())
       {
-        std::ostringstream msg;
-        msg << "enumerator value is not representable in the underlying type '"
-            << constant_type.get(ID_C_c_type) << "'";
-        throw invalid_source_file_exceptiont{msg.str(), v.source_location()};
+        throw errort().with_location(v.source_location())
+          << "enumerator value is not representable in the underlying type '"
+          << constant_type.get(ID_C_c_type) << "'";
       }
     }
     else
@@ -1429,9 +1385,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
     if(symbol.type.id() != ID_c_enum)
     {
-      error().source_location = source_location;
-      error() << "use of tag that does not match previous declaration" << eom;
-      throw 0;
+      throw errort().with_location(source_location)
+        << "use of tag that does not match previous declaration";
     }
 
     if(to_c_enum_type(symbol.type).is_incomplete())
@@ -1447,9 +1402,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       // different types.
       if(!base_name.empty())
       {
-        error().source_location=type.source_location();
-        error() << "redeclaration of enum tag" << eom;
-        throw 0;
+        throw errort().with_location(type.source_location())
+          << "redeclaration of enum tag";
       }
     }
   }
@@ -1471,9 +1425,8 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
 
   if(type.find(ID_tag).is_nil())
   {
-    error().source_location=type.source_location();
-    error() << "anonymous enum tag without members" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "anonymous enum tag without members";
   }
 
   if(type.find(ID_enum_underlying_type).is_not_nil())
@@ -1499,9 +1452,8 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
 
     if(symbol.type.id() != ID_c_enum)
     {
-      error().source_location=source_location;
-      error() << "use of tag that does not match previous declaration" << eom;
-      throw 0;
+      throw errort().with_location(source_location)
+        << "use of tag that does not match previous declaration";
     }
   }
   else
@@ -1539,16 +1491,14 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 
     if(to_integer(to_constant_expr(width_expr), i))
     {
-      error().source_location=type.source_location();
-      error() << "failed to convert bit field width" << eom;
-      throw 0;
+      throw errort().with_location(type.source_location())
+        << "failed to convert bit field width";
     }
 
     if(i<0)
     {
-      error().source_location=type.source_location();
-      error() << "bit field width is negative" << eom;
-      throw 0;
+      throw errort().with_location(type.source_location())
+        << "bit field width is negative";
     }
 
     type.set_width(numeric_cast_v<std::size_t>(i));
@@ -1580,28 +1530,23 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 
     if(c_enum_type.is_incomplete())
     {
-      error().source_location=type.source_location();
-      error() << "bit field has incomplete enum type" << eom;
-      throw 0;
+      throw errort().with_location(type.source_location())
+        << "bit field has incomplete enum type";
     }
 
     sub_width = to_bitvector_type(c_enum_type.underlying_type()).get_width();
   }
   else
   {
-    error().source_location=type.source_location();
-    error() << "bit field with non-integer type: " << to_string(underlying_type)
-            << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "bit field with non-integer type: " << to_string(underlying_type);
   }
 
   if(i>sub_width)
   {
-    error().source_location=type.source_location();
-    error() << "bit field (" << i
-            << " bits) larger than type (" << sub_width << " bits)"
-            << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "bit field (" << i << " bits) larger than type (" << sub_width
+      << " bits)";
   }
 }
 
@@ -1650,18 +1595,16 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 
   if(s_it == symbol_table.symbols.end())
   {
-    error().source_location = type.source_location();
-    error() << "typedef symbol '" << identifier << "' not found" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "typedef symbol '" << identifier << "' not found";
   }
 
   const symbolt &symbol = s_it->second;
 
   if(!symbol.is_type)
   {
-    error().source_location = type.source_location();
-    error() << "expected type symbol for typedef" << eom;
-    throw 0;
+    throw errort().with_location(type.source_location())
+      << "expected type symbol for typedef";
   }
 
   // overwrite, but preserve (add) any qualifiers and other flags
