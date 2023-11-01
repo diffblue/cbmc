@@ -535,6 +535,7 @@ var hierarchy =
     [ "messaget::eomt", "classmessaget_1_1eomt.html", null ],
     [ "smt_core_theoryt::equalt", "structsmt__core__theoryt_1_1equalt.html", null ],
     [ "equation_symbol_mappingt", "classequation__symbol__mappingt.html", null ],
+    [ "typecheckt::errort", "classtypecheckt_1_1errort.html", null ],
     [ "eval_index_resultt", "structeval__index__resultt.html", null ],
     [ "event_grapht", "classevent__grapht.html", null ],
     [ "std::exception", null, [

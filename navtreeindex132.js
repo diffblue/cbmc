@@ -1,5 +1,13 @@
 var NAVTREEINDEX132 =
 {
+"structfloat__bvt_1_1rounding__mode__bitst.html#af4f7917c01b90ddd28f650c64a666705":[8,0,482,1,3],
+"structfloat__bvt_1_1unbiased__floatt.html":[8,0,482,2],
+"structfloat__bvt_1_1unpacked__floatt.html":[8,0,482,3],
+"structfloat__bvt_1_1unpacked__floatt.html#a550ace5b4061e152e312ce966bb40133":[8,0,482,3,0],
+"structfloat__bvt_1_1unpacked__floatt.html#a7fdeff8ee2c27e4a351f5ab6e0c561a8":[8,0,482,3,2],
+"structfloat__bvt_1_1unpacked__floatt.html#a91e3aa77626e7d94f9746b8459caad25":[8,0,482,3,1],
+"structfloat__bvt_1_1unpacked__floatt.html#a997a92f919b7c1c4014d46344439ae2d":[8,0,482,3,4],
+"structfloat__bvt_1_1unpacked__floatt.html#acee2c4ad90d62ac2f68b3c6b579e9bb2":[8,0,482,3,3],
 "structfloat__bvt_1_1unpacked__floatt.html#ae4aa7791af9269220fc2c09e111dcac8":[8,0,482,3,6],
 "structfloat__bvt_1_1unpacked__floatt.html#af600642e1a3b0b6a2d20bf881bfbcb6a":[8,0,482,3,5],
 "structfloat__utilst_1_1biased__floatt.html":[8,0,483,0],
@@ -241,13 +249,5 @@ var NAVTREEINDEX132 =
 "structindex__set__pairt.html#a61a20f5657b97fba5e3b7dc0e78ec072":[8,0,617,1],
 "structindex__set__pairt.html#aa8dc71b64a2f7f54109a2d17e9a38b68":[8,0,617,0],
 "structinfix__opt.html":[8,0,620],
-"structinfix__opt.html#a5e8dee9dfdea6364767e7e89d2b90a67":[8,0,620,0],
-"structinflate__state.html":[8,0,621],
-"structinflate__state.html#a05183fc4ee620dfaac7cdde5c17697a9":[8,0,621,7],
-"structinflate__state.html#a26b59390ae38c5a0ee081a729479b89f":[8,0,621,3],
-"structinflate__state.html#a26ee41a3a0d93350c737252334fe783f":[8,0,621,5],
-"structinflate__state.html#a2d81f0dc8d60bcd1851cc21cd0ea1a35":[8,0,621,1],
-"structinflate__state.html#a45eb73702d5588b380842d55633adfa1":[8,0,621,2],
-"structinflate__state.html#a8ed1d9e9a13f5e5f5c4229c67509a5a1":[8,0,621,4],
-"structinflate__state.html#a9d2e5eba1b8c7a5bf78289b7a412f154":[8,0,621,6]
+"structinfix__opt.html#a5e8dee9dfdea6364767e7e89d2b90a67":[8,0,620,0]
 };

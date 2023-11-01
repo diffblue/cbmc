@@ -374,9 +374,7 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
     [ "type.cpp", "type_8cpp.html", "type_8cpp" ],
     [ "type.h", "type_8h.html", "type_8h" ],
     [ "typecheck.cpp", "typecheck_8cpp.html", null ],
-    [ "typecheck.h", "typecheck_8h.html", [
-      [ "typecheckt", "classtypecheckt.html", "classtypecheckt" ]
-    ] ],
+    [ "typecheck.h", "typecheck_8h.html", "typecheck_8h" ],
     [ "ui_message.cpp", "ui__message_8cpp.html", null ],
     [ "ui_message.h", "ui__message_8h.html", "ui__message_8h" ],
     [ "unicode.cpp", "unicode_8cpp.html", "unicode_8cpp" ],
