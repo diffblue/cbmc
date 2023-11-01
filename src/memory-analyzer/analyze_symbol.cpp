@@ -313,7 +313,7 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
       struct_symbol_expr,
       from_integer(
         member_offset / get_type_size(to_pointer_type(expr.type()).base_type()),
-        index_type())};
+        c_index_type())};
   }
   if(struct_symbol->type.id() == ID_pointer)
   {
@@ -406,7 +406,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
       for(size_t i = 0; i < number_of_elements; i++)
       {
         const auto sub_expr_value = get_expr_value(
-          dereference_exprt{plus_exprt{expr, from_integer(i, index_type())}},
+          dereference_exprt{plus_exprt{expr, from_integer(i, c_index_type())}},
           *zero_expr,
           location);
         elements.push_back(sub_expr_value);
@@ -415,7 +415,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
 
       // knowing the number of elements we can build the type
       const typet target_array_type =
-        array_typet{target_type, from_integer(elements.size(), index_type())};
+        array_typet{target_type, from_integer(elements.size(), c_index_type())};
 
       array_exprt new_array{elements, to_array_type(target_array_type)};
 
@@ -591,7 +591,7 @@ exprt gdb_value_extractort::get_array_value(
 
   for(size_t i = 0; i < new_array.operands().size(); ++i)
   {
-    const index_exprt index_expr(expr, from_integer(i, index_type()));
+    const index_exprt index_expr(expr, from_integer(i, c_index_type()));
 
     exprt &operand = new_array.operands()[i];
 

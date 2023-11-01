@@ -19,11 +19,6 @@ bitvector_typet c_index_type()
   return signed_size_type();
 }
 
-bitvector_typet index_type()
-{
-  return c_index_type();
-}
-
 signedbv_typet signed_int_type()
 {
   signedbv_typet result(config.ansi_c.int_width);
