@@ -225,6 +225,11 @@ document_propertiest::get_code(const source_locationt &source_location)
 
   // build dest
 
+  std::size_t max_line_number_width = 0;
+  if(!lines.empty())
+  {
+    max_line_number_width = std::to_string(lines.back().line_number).size();
+  }
   for(std::list<linet>::iterator it=lines.begin();
       it!=lines.end(); it++)
   {
@@ -235,10 +240,10 @@ document_propertiest::get_code(const source_locationt &source_location)
     switch(format)
     {
     case LATEX:
-      while(line_no.size()<4)
+      while(line_no.size() < max_line_number_width)
         line_no=" "+line_no;
 
-      line_no+"  ";
+      line_no += "  ";
 
       tmp+=escape_latex(it->text, true);
 
@@ -248,10 +253,10 @@ document_propertiest::get_code(const source_locationt &source_location)
       break;
 
     case HTML:
-      while(line_no.size()<4)
+      while(line_no.size() < max_line_number_width)
         line_no="&nbsp;"+line_no;
 
-      line_no+"&nbsp;&nbsp;";
+      line_no += "&nbsp;&nbsp;";
 
       tmp+=escape_html(it->text);
 
@@ -261,7 +266,7 @@ document_propertiest::get_code(const source_locationt &source_location)
       break;
     }
 
-    dest+=tmp+"\n";
+    dest += line_no + tmp + "\n";
   }
 
   return dest;
