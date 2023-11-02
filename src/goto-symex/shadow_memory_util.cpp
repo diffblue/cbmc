@@ -475,7 +475,7 @@ exprt compute_or_over_bytes(
       for(mp_integer index = 0; index < size; ++index)
       {
         extract_bytes_of_expr(
-          index_exprt(expr, from_integer(index, index_type())),
+          index_exprt(expr, from_integer(index, array_type.index_type())),
           field_type,
           ns,
           log,
