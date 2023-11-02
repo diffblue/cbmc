@@ -534,3 +534,30 @@ void remove_function_pointers(
 
   rfp(goto_model.goto_functions);
 }
+
+bool has_function_pointers(const goto_programt &goto_program)
+{
+  for(auto &instruction : goto_program.instructions)
+    if(
+      instruction.is_function_call() &&
+      instruction.call_function().id() == ID_dereference)
+    {
+      return true;
+    }
+
+  return false;
+}
+
+bool has_function_pointers(const goto_functionst &goto_functions)
+{
+  for(auto &function_it : goto_functions.function_map)
+    if(has_function_pointers(function_it.second.body))
+      return true;
+
+  return false;
+}
+
+bool has_function_pointers(const goto_modelt &goto_model)
+{
+  return has_function_pointers(goto_model.goto_functions);
+}

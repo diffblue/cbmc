@@ -565,3 +565,22 @@ void remove_asm(goto_modelt &goto_model)
 {
   remove_asm(goto_model.goto_functions, goto_model.symbol_table);
 }
+
+bool has_asm(const goto_functionst &goto_functions)
+{
+  for(auto &function_it : goto_functions.function_map)
+    for(auto &instruction : function_it.second.body.instructions)
+      if(
+        instruction.is_other() &&
+        instruction.get_other().get_statement() == ID_asm)
+      {
+        return true;
+      }
+
+  return false;
+}
+
+bool has_asm(const goto_modelt &goto_model)
+{
+  return has_asm(goto_model.goto_functions);
+}

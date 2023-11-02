@@ -386,3 +386,25 @@ void remove_vector(goto_modelt &goto_model)
 {
   remove_vector(goto_model.symbol_table, goto_model.goto_functions);
 }
+
+bool has_vector(const goto_functionst &goto_functions)
+{
+  for(auto &function_it : goto_functions.function_map)
+    for(auto &instruction : function_it.second.body.instructions)
+    {
+      bool has_vector = false;
+      instruction.apply([&has_vector](const exprt &expr) {
+        if(have_to_remove_vector(expr))
+          has_vector = true;
+      });
+      if(has_vector)
+        return true;
+    }
+
+  return false;
+}
+
+bool has_vector(const goto_modelt &goto_model)
+{
+  return has_vector(goto_model.goto_functions);
+}

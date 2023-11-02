@@ -18,6 +18,7 @@ Date: June 2003
 
 #include <unordered_set>
 
+class goto_functionst;
 class goto_modelt;
 class message_handlert;
 class symbol_tablet;
@@ -53,5 +54,13 @@ bool function_is_type_compatible(
   const code_typet &call_type,
   const code_typet &function_type,
   const namespacet &ns);
+
+/// returns true iff any of the given goto functions has function calls via
+/// a function pointer
+bool has_function_pointers(const goto_functionst &);
+
+/// returns true iff the given goto model has function calls via
+/// a function pointer
+bool has_function_pointers(const goto_modelt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
