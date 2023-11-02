@@ -132,12 +132,62 @@ Functions</h2></td></tr>
 <tr class="memitem:a9511a5388ea6dab71b6300864bb3dc37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__asm_8cpp.html#a9511a5388ea6dab71b6300864bb3dc37">remove_asm</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
 <tr class="memdesc:a9511a5388ea6dab71b6300864bb3dc37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces inline assembly instructions in the goto program (i.e., instructions of kind <code>OTHER</code> with a <code>code</code> member of type <code><a class="el" href="classcode__asmt.html" title="codet representation of an inline assembler statement.">code_asmt</a></code>) with an appropriate (sequence of) non-assembly goto program instruction(s).  <a href="remove__asm_8cpp.html#a9511a5388ea6dab71b6300864bb3dc37">More...</a><br /></td></tr>
 <tr class="separator:a9511a5388ea6dab71b6300864bb3dc37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad703fa7ac01658a610f73b00b8579a89"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__asm_8cpp.html#ad703fa7ac01658a610f73b00b8579a89">has_asm</a> (const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</td></tr>
+<tr class="memdesc:ad703fa7ac01658a610f73b00b8579a89"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff the given goto functions use asm instructions  <a href="remove__asm_8cpp.html#ad703fa7ac01658a610f73b00b8579a89">More...</a><br /></td></tr>
+<tr class="separator:ad703fa7ac01658a610f73b00b8579a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14896be88ccc1a63e459f83027977d9e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__asm_8cpp.html#a14896be88ccc1a63e459f83027977d9e">has_asm</a> (const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
+<tr class="memdesc:a14896be88ccc1a63e459f83027977d9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff the given goto model uses asm instructions  <a href="remove__asm_8cpp.html#a14896be88ccc1a63e459f83027977d9e">More...</a><br /></td></tr>
+<tr class="separator:a14896be88ccc1a63e459f83027977d9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Remove 'asm' statements by compiling them into suitable standard goto program instructions. </p>
 
 <p class="definition">Definition in file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="ad703fa7ac01658a610f73b00b8579a89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad703fa7ac01658a610f73b00b8579a89">&#9670;&nbsp;</a></span>has_asm() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_asm </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_functions</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true iff the given goto functions use asm instructions </p>
+
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00569">569</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a14896be88ccc1a63e459f83027977d9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14896be88ccc1a63e459f83027977d9e">&#9670;&nbsp;</a></span>has_asm() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_asm </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true iff the given goto model uses asm instructions </p>
+
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00583">583</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a617ff9672439887326661658912896dc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a617ff9672439887326661658912896dc">&#9670;&nbsp;</a></span>remove_asm() <span class="overload">[1/2]</span></h2>
 

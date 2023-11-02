@@ -102,7 +102,7 @@ $(document).ready(function(){initNavTree('remove__vector_8h.html',''); initResiz
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="remove__vector_8h__dep__incl.svg" width="422" height="171"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="remove__vector_8h__dep__incl.svg" width="676" height="171"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -116,12 +116,62 @@ Functions</h2></td></tr>
 <tr class="memitem:ac0932edd1232236734a80df2d92552c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__vector_8h.html#ac0932edd1232236734a80df2d92552c0">remove_vector</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;)</td></tr>
 <tr class="memdesc:ac0932edd1232236734a80df2d92552c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">removes vector data type  <a href="remove__vector_8h.html#ac0932edd1232236734a80df2d92552c0">More...</a><br /></td></tr>
 <tr class="separator:ac0932edd1232236734a80df2d92552c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa247c279549398085a360a62dd2a133b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__vector_8h.html#aa247c279549398085a360a62dd2a133b">has_vector</a> (const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;)</td></tr>
+<tr class="memdesc:aa247c279549398085a360a62dd2a133b"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff any of the given goto functions has instructions that use the vector type  <a href="remove__vector_8h.html#aa247c279549398085a360a62dd2a133b">More...</a><br /></td></tr>
+<tr class="separator:aa247c279549398085a360a62dd2a133b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8419a15dfeac7e0540c067e89e609dd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__vector_8h.html#ab8419a15dfeac7e0540c067e89e609dd">has_vector</a> (const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;)</td></tr>
+<tr class="memdesc:ab8419a15dfeac7e0540c067e89e609dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff the given goto model has instructions that use the vector type  <a href="remove__vector_8h.html#ab8419a15dfeac7e0540c067e89e609dd">More...</a><br /></td></tr>
+<tr class="separator:ab8419a15dfeac7e0540c067e89e609dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Remove the 'vector' data type by compilation into arrays. </p>
 
 <p class="definition">Definition in file <a class="el" href="remove__vector_8h_source.html">remove_vector.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="aa247c279549398085a360a62dd2a133b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa247c279549398085a360a62dd2a133b">&#9670;&nbsp;</a></span>has_vector() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_vector </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_functions</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true iff any of the given goto functions has instructions that use the vector type </p>
+
+<p class="definition">Definition at line <a class="el" href="remove__vector_8cpp_source.html#l00390">390</a> of file <a class="el" href="remove__vector_8cpp_source.html">remove_vector.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ab8419a15dfeac7e0540c067e89e609dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8419a15dfeac7e0540c067e89e609dd">&#9670;&nbsp;</a></span>has_vector() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_vector </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true iff the given goto model has instructions that use the vector type </p>
+
+<p class="definition">Definition at line <a class="el" href="remove__vector_8cpp_source.html#l00407">407</a> of file <a class="el" href="remove__vector_8cpp_source.html">remove_vector.cpp</a>.</p>
+
+</div>
+</div>
 <a id="ac0932edd1232236734a80df2d92552c0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac0932edd1232236734a80df2d92552c0">&#9670;&nbsp;</a></span>remove_vector() <span class="overload">[1/2]</span></h2>
 

@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/multi_path_symex_checker.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/multi_path_symex_checker.cpp">
-<area shape="rect" id="node1" title="Goto Checker using Bounded Model Checking." alt="" coords="1762,5,1993,61"/>
-<area shape="rect" id="node2" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="1872,109,2083,136"/>
-<area shape="rect" id="node44" href="$ui__message_8h.html" title=" " alt="" coords="123,459,261,486"/>
-<area shape="rect" id="node46" href="$solver__hardness_8h.html" title=" " alt="" coords="694,370,917,397"/>
-<area shape="rect" id="node54" href="$bmc__util_8h.html" title="Bounded Model Checking Utilities." alt="" coords="1536,191,1627,218"/>
-<area shape="rect" id="node56" href="$counterexample__beautification_8h.html" title="Counterexample Beautification." alt="" coords="2682,109,2918,136"/>
-<area shape="rect" id="node60" href="$goto__symex__fault__localizer_8h.html" title="Fault Localization for Goto Symex." alt="" coords="2257,370,2469,397"/>
-<area shape="rect" id="node3" href="$fault__localization__provider_8h.html" title="Interface for Goto Checkers to provide Fault Localization." alt="" coords="1845,452,1979,493"/>
-<area shape="rect" id="node18" href="$goto__symex__property__decider_8h.html" title="Property Decider for Goto&#45;Symex." alt="" coords="1970,273,2134,315"/>
-<area shape="rect" id="node36" href="$goto__trace__provider_8h.html" title="Interface for returning Goto Traces from Goto Checkers." alt="" coords="3228,370,3391,397"/>
-<area shape="rect" id="node37" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="1703,184,1881,225"/>
-<area shape="rect" id="node42" href="$witness__provider_8h.html" title="Interface for outputting GraphML Witnesses for Goto Checkers." alt="" coords="1905,191,2049,218"/>
-<area shape="rect" id="node43" title=" " alt="" coords="1548,281,1615,307"/>
-<area shape="rect" id="node4" title=" " alt="" coords="2003,541,2053,568"/>
-<area shape="rect" id="node5" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="2179,616,2330,657"/>
-<area shape="rect" id="node6" href="$goto__instruction__code_8h.html" title=" " alt="" coords="2214,705,2391,732"/>
-<area shape="rect" id="node7" title=" " alt="" coords="1781,705,1845,732"/>
-<area shape="rect" id="node8" title=" " alt="" coords="2416,705,2459,732"/>
-<area shape="rect" id="node9" title=" " alt="" coords="2131,705,2189,732"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1853,929,1912,956"/>
-<area shape="rect" id="node11" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="2687,855,2779,881"/>
-<area shape="rect" id="node13" href="$source__location_8h.html" title=" " alt="" coords="1971,705,2107,732"/>
-<area shape="rect" id="node12" title=" " alt="" coords="2915,929,2989,956"/>
-<area shape="rect" id="node14" href="$deprecate_8h.html" title=" " alt="" coords="1663,780,1761,807"/>
-<area shape="rect" id="node15" href="$irep_8h.html" title=" " alt="" coords="2517,780,2576,807"/>
-<area shape="rect" id="node17" href="$optional_8h.html" title=" " alt="" coords="2242,780,2329,807"/>
-<area shape="rect" id="node16" title=" " alt="" coords="1431,855,1494,881"/>
-<area shape="rect" id="node19" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="2543,363,2737,404"/>
-<area shape="rect" id="node29" href="$properties_8h.html" title="Properties." alt="" coords="1794,370,1894,397"/>
-<area shape="rect" id="node30" href="$solver__factory_8h.html" title="Solver Factory." alt="" coords="1461,459,1587,486"/>
-<area shape="rect" id="node20" title=" " alt="" coords="2593,459,2679,486"/>
-<area shape="rect" id="node21" title=" " alt="" coords="2331,541,2373,568"/>
-<area shape="rect" id="node22" href="$merge__irep_8h.html" title=" " alt="" coords="2703,459,2836,486"/>
-<area shape="rect" id="node24" href="$src_2util_2message_8h.html" title=" " alt="" coords="1649,623,1767,650"/>
-<area shape="rect" id="node26" href="$narrow_8h.html" title=" " alt="" coords="2739,705,2818,732"/>
-<area shape="rect" id="node27" href="$ssa__step_8h.html" title=" " alt="" coords="2911,459,3001,486"/>
-<area shape="rect" id="node28" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="2811,541,2935,568"/>
-<area shape="rect" id="node23" title=" " alt="" coords="2448,541,2563,568"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1501,705,1587,732"/>
-<area shape="rect" id="node31" href="$prop_8h.html" title=" " alt="" coords="1419,541,1565,568"/>
-<area shape="rect" id="node34" href="$smt2__dec_8h.html" title=" " alt="" coords="1590,541,1775,568"/>
-<area shape="rect" id="node35" title=" " alt="" coords="285,623,363,650"/>
-<area shape="rect" id="node32" href="$threeval_8h.html" title=" " alt="" coords="1799,623,1913,650"/>
-<area shape="rect" id="node33" href="$literal_8h.html" title=" " alt="" coords="1456,623,1528,650"/>
-<area shape="rect" id="node38" href="$incremental__goto__checker_8h.html" title="Incremental Goto Checker Interface." alt="" coords="1690,281,1894,307"/>
-<area shape="rect" id="node39" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="2406,281,2607,307"/>
-<area shape="rect" id="node40" href="$unwindset_8h.html" title="Loop unwinding." alt="" coords="2055,459,2265,486"/>
-<area shape="rect" id="node41" href="$symex__bmc_8h.html" title="Bounded Model Checking for ANSI&#45;C." alt="" coords="1554,370,1667,397"/>
-<area shape="rect" id="node45" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="43,541,160,568"/>
-<area shape="rect" id="node47" href="$hardness__collector_8h.html" title="Capability to collect the statistics of the complexity of individual solver queries." alt="" coords="438,541,645,568"/>
-<area shape="rect" id="node48" href="$prop__conv__solver_8h.html" title=" " alt="" coords="780,452,953,493"/>
-<area shape="rect" id="node53" title=" " alt="" coords="978,459,1102,486"/>
-<area shape="rect" id="node49" href="$expr_8h.html" title=" " alt="" coords="1070,623,1133,650"/>
-<area shape="rect" id="node50" href="$conflict__provider_8h.html" title="Capability to check whether an expression is a reason for the solver returning UNSAT." alt="" coords="771,541,963,568"/>
-<area shape="rect" id="node51" href="$prop__conv_8h.html" title=" " alt="" coords="987,541,1087,568"/>
-<area shape="rect" id="node52" href="$solver__resource__limits_8h.html" title="Solver capability to set resource limits." alt="" coords="1112,541,1293,568"/>
-<area shape="rect" id="node55" href="$build__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="2158,273,2330,315"/>
-<area shape="rect" id="node57" href="$bv__minimize_8h.html" title="SAT&#45;optimizer for minimizing expressions." alt="" coords="2785,184,2919,225"/>
-<area shape="rect" id="node58" href="$bv__pointers_8h.html" title=" " alt="" coords="2785,273,2919,315"/>
-<area shape="rect" id="node59" href="$satcheck_8h.html" title=" " alt="" coords="2943,281,3110,307"/>
+<area shape="rect" id="node1" title="Goto Checker using Bounded Model Checking." alt="" coords="1448,5,1678,61"/>
+<area shape="rect" id="node2" href="$multi__path__symex__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution." alt="" coords="1235,117,1446,143"/>
+<area shape="rect" id="node43" href="$ui__message_8h.html" title=" " alt="" coords="2981,474,3118,501"/>
+<area shape="rect" id="node45" href="$remove__function__pointers_8h.html" title="Remove Indirect Function Calls." alt="" coords="782,467,954,508"/>
+<area shape="rect" id="node46" href="$remove__vector_8h.html" title="Remove the &#39;vector&#39; data type by compilation into arrays." alt="" coords="3009,109,3181,151"/>
+<area shape="rect" id="node47" href="$remove__asm_8h.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="3205,117,3396,143"/>
+<area shape="rect" id="node48" href="$solver__hardness_8h.html" title=" " alt="" coords="2045,385,2268,411"/>
+<area shape="rect" id="node56" href="$bmc__util_8h.html" title="Bounded Model Checking Utilities." alt="" coords="1518,206,1608,233"/>
+<area shape="rect" id="node58" href="$counterexample__beautification_8h.html" title="Counterexample Beautification." alt="" coords="473,117,709,143"/>
+<area shape="rect" id="node60" href="$goto__symex__fault__localizer_8h.html" title="Fault Localization for Goto Symex." alt="" coords="56,385,268,411"/>
+<area shape="rect" id="node3" href="$fault__localization__provider_8h.html" title="Interface for Goto Checkers to provide Fault Localization." alt="" coords="94,467,229,508"/>
+<area shape="rect" id="node18" href="$goto__symex__property__decider_8h.html" title="Property Decider for Goto&#45;Symex." alt="" coords="1248,288,1412,329"/>
+<area shape="rect" id="node35" href="$goto__trace__provider_8h.html" title="Interface for returning Goto Traces from Goto Checkers." alt="" coords="1858,385,2020,411"/>
+<area shape="rect" id="node36" href="$multi__path__symex__only__checker_8h.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="1124,199,1303,240"/>
+<area shape="rect" id="node41" href="$witness__provider_8h.html" title="Interface for outputting GraphML Witnesses for Goto Checkers." alt="" coords="956,206,1100,233"/>
+<area shape="rect" id="node42" title=" " alt="" coords="1436,295,1503,322"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1270,556,1320,583"/>
+<area shape="rect" id="node5" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="590,631,741,672"/>
+<area shape="rect" id="node6" href="$goto__instruction__code_8h.html" title=" " alt="" coords="577,720,754,747"/>
+<area shape="rect" id="node7" title=" " alt="" coords="979,720,1043,747"/>
+<area shape="rect" id="node8" title=" " alt="" coords="779,720,822,747"/>
+<area shape="rect" id="node9" title=" " alt="" coords="846,720,904,747"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1812,944,1871,971"/>
+<area shape="rect" id="node11" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="726,869,818,896"/>
+<area shape="rect" id="node13" href="$source__location_8h.html" title=" " alt="" coords="1446,720,1582,747"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1268,944,1343,971"/>
+<area shape="rect" id="node14" href="$deprecate_8h.html" title=" " alt="" coords="1503,795,1602,821"/>
+<area shape="rect" id="node15" href="$irep_8h.html" title=" " alt="" coords="1258,795,1316,821"/>
+<area shape="rect" id="node17" href="$optional_8h.html" title=" " alt="" coords="1341,795,1428,821"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1658,869,1721,896"/>
+<area shape="rect" id="node19" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="596,377,791,419"/>
+<area shape="rect" id="node29" href="$properties_8h.html" title="Properties." alt="" coords="1266,385,1366,411"/>
+<area shape="rect" id="node30" href="$solver__factory_8h.html" title="Solver Factory." alt="" coords="1675,474,1800,501"/>
+<area shape="rect" id="node20" title=" " alt="" coords="520,474,606,501"/>
+<area shape="rect" id="node21" title=" " alt="" coords="754,556,796,583"/>
+<area shape="rect" id="node22" href="$merge__irep_8h.html" title=" " alt="" coords="1080,474,1214,501"/>
+<area shape="rect" id="node24" href="$src_2util_2message_8h.html" title=" " alt="" coords="1712,638,1830,665"/>
+<area shape="rect" id="node26" href="$narrow_8h.html" title=" " alt="" coords="474,720,553,747"/>
+<area shape="rect" id="node27" href="$ssa__step_8h.html" title=" " alt="" coords="355,474,446,501"/>
+<area shape="rect" id="node28" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="421,556,545,583"/>
+<area shape="rect" id="node23" title=" " alt="" coords="1131,556,1246,583"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1860,720,1946,747"/>
+<area shape="rect" id="node31" href="$prop_8h.html" title=" " alt="" coords="1552,556,1699,583"/>
+<area shape="rect" id="node34" title=" " alt="" coords="2522,638,2599,665"/>
+<area shape="rect" id="node32" href="$threeval_8h.html" title=" " alt="" coords="938,638,1052,665"/>
+<area shape="rect" id="node33" href="$literal_8h.html" title=" " alt="" coords="1564,638,1636,665"/>
+<area shape="rect" id="node37" href="$incremental__goto__checker_8h.html" title="Incremental Goto Checker Interface." alt="" coords="1578,295,1782,322"/>
+<area shape="rect" id="node38" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="629,295,830,322"/>
+<area shape="rect" id="node39" href="$unwindset_8h.html" title="Loop unwinding." alt="" coords="1390,474,1600,501"/>
+<area shape="rect" id="node40" href="$symex__bmc_8h.html" title="Bounded Model Checking for ANSI&#45;C." alt="" coords="957,385,1070,411"/>
+<area shape="rect" id="node44" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="3110,556,3227,583"/>
+<area shape="rect" id="node49" href="$hardness__collector_8h.html" title="Capability to collect the statistics of the complexity of individual solver queries." alt="" coords="2028,556,2234,583"/>
+<area shape="rect" id="node50" href="$prop__conv__solver_8h.html" title=" " alt="" coords="2186,467,2359,508"/>
+<area shape="rect" id="node55" title=" " alt="" coords="2384,474,2508,501"/>
+<area shape="rect" id="node51" href="$expr_8h.html" title=" " alt="" coords="2254,638,2317,665"/>
+<area shape="rect" id="node52" href="$conflict__provider_8h.html" title="Capability to check whether an expression is a reason for the solver returning UNSAT." alt="" coords="2310,556,2502,583"/>
+<area shape="rect" id="node53" href="$prop__conv_8h.html" title=" " alt="" coords="2526,556,2626,583"/>
+<area shape="rect" id="node54" href="$solver__resource__limits_8h.html" title="Solver capability to set resource limits." alt="" coords="2651,556,2832,583"/>
+<area shape="rect" id="node57" href="$build__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="1052,288,1224,329"/>
+<area shape="rect" id="node59" href="$bv__minimize_8h.html" title="SAT&#45;optimizer for minimizing expressions." alt="" coords="418,199,553,240"/>
 </map>

@@ -150,6 +150,14 @@ Functions</h2></td></tr>
 <tr class="separator:a4b64614447da79ee7425440890d3cf5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcbbb61dec4ade79261bdbd77f4ebb52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function__pointers_8cpp.html#adcbbb61dec4ade79261bdbd77f4ebb52">remove_function_pointers</a> (<a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;_message_handler, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, bool only_remove_const_fps)</td></tr>
 <tr class="separator:adcbbb61dec4ade79261bdbd77f4ebb52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7a781b46531cfb144f787c1777ad230"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function__pointers_8cpp.html#ae7a781b46531cfb144f787c1777ad230">has_function_pointers</a> (const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
+<tr class="separator:ae7a781b46531cfb144f787c1777ad230"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1620bf1eaa1bf6e495bef180b1006c27"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function__pointers_8cpp.html#a1620bf1eaa1bf6e495bef180b1006c27">has_function_pointers</a> (const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</td></tr>
+<tr class="memdesc:a1620bf1eaa1bf6e495bef180b1006c27"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff any of the given goto functions has function calls via a function pointer  <a href="remove__function__pointers_8cpp.html#a1620bf1eaa1bf6e495bef180b1006c27">More...</a><br /></td></tr>
+<tr class="separator:a1620bf1eaa1bf6e495bef180b1006c27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a4bac0e520c89f3ac8b388ac3c3521d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function__pointers_8cpp.html#a7a4bac0e520c89f3ac8b388ac3c3521d">has_function_pointers</a> (const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
+<tr class="memdesc:a7a4bac0e520c89f3ac8b388ac3c3521d"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff the given goto model has function calls via a function pointer  <a href="remove__function__pointers_8cpp.html#a7a4bac0e520c89f3ac8b388ac3c3521d">More...</a><br /></td></tr>
+<tr class="separator:a7a4bac0e520c89f3ac8b388ac3c3521d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Program Transformation. </p>
@@ -347,6 +355,70 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="remove__function__pointers_8cpp_source.html#l00346">346</a> of file <a class="el" href="remove__function__pointers_8cpp_source.html">remove_function_pointers.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a1620bf1eaa1bf6e495bef180b1006c27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1620bf1eaa1bf6e495bef180b1006c27">&#9670;&nbsp;</a></span>has_function_pointers() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_function_pointers </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_functions</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true iff any of the given goto functions has function calls via a function pointer </p>
+
+<p class="definition">Definition at line <a class="el" href="remove__function__pointers_8cpp_source.html#l00551">551</a> of file <a class="el" href="remove__function__pointers_8cpp_source.html">remove_function_pointers.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a7a4bac0e520c89f3ac8b388ac3c3521d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a4bac0e520c89f3ac8b388ac3c3521d">&#9670;&nbsp;</a></span>has_function_pointers() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_function_pointers </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true iff the given goto model has function calls via a function pointer </p>
+
+<p class="definition">Definition at line <a class="el" href="remove__function__pointers_8cpp_source.html#l00560">560</a> of file <a class="el" href="remove__function__pointers_8cpp_source.html">remove_function_pointers.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ae7a781b46531cfb144f787c1777ad230"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7a781b46531cfb144f787c1777ad230">&#9670;&nbsp;</a></span>has_function_pointers() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_function_pointers </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_program</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="remove__function__pointers_8cpp_source.html#l00538">538</a> of file <a class="el" href="remove__function__pointers_8cpp_source.html">remove_function_pointers.cpp</a>.</p>
 
 </div>
 </div>

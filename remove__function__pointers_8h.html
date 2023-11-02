@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('remove__function__pointers_8h.html',''
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="remove__function__pointers_8h__dep__incl.svg" width="1866" height="186"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="remove__function__pointers_8h__dep__incl.svg" width="2120" height="186"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -128,6 +128,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a7e87fa040b93acfd34ee382a89b4e4b6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function__pointers_8h.html#a7e87fa040b93acfd34ee382a89b4e4b6">function_is_type_compatible</a> (bool return_value_used, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;call_type, const <a class="el" href="classcode__typet.html">code_typet</a> &amp;function_type, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a7e87fa040b93acfd34ee382a89b4e4b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff <code>call_type</code> can be converted to produce a function call of the same type as <code>function_type</code>.  <a href="remove__function__pointers_8h.html#a7e87fa040b93acfd34ee382a89b4e4b6">More...</a><br /></td></tr>
 <tr class="separator:a7e87fa040b93acfd34ee382a89b4e4b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a271472cba61f723c57d5016ebd3d9d92"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function__pointers_8h.html#a271472cba61f723c57d5016ebd3d9d92">has_function_pointers</a> (const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;)</td></tr>
+<tr class="memdesc:a271472cba61f723c57d5016ebd3d9d92"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff any of the given goto functions has function calls via a function pointer  <a href="remove__function__pointers_8h.html#a271472cba61f723c57d5016ebd3d9d92">More...</a><br /></td></tr>
+<tr class="separator:a271472cba61f723c57d5016ebd3d9d92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68f13a4739e830c215df5003dcd48b5f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function__pointers_8h.html#a68f13a4739e830c215df5003dcd48b5f">has_function_pointers</a> (const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;)</td></tr>
+<tr class="memdesc:a68f13a4739e830c215df5003dcd48b5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns true iff the given goto model has function calls via a function pointer  <a href="remove__function__pointers_8h.html#a68f13a4739e830c215df5003dcd48b5f">More...</a><br /></td></tr>
+<tr class="separator:a68f13a4739e830c215df5003dcd48b5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Remove Indirect Function Calls. </p>
@@ -175,6 +181,50 @@ Functions</h2></td></tr>
 <p>Returns true iff <code>call_type</code> can be converted to produce a function call of the same type as <code>function_type</code>. </p>
 
 <p class="definition">Definition at line <a class="el" href="remove__function__pointers_8cpp_source.html#l00129">129</a> of file <a class="el" href="remove__function__pointers_8cpp_source.html">remove_function_pointers.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a271472cba61f723c57d5016ebd3d9d92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a271472cba61f723c57d5016ebd3d9d92">&#9670;&nbsp;</a></span>has_function_pointers() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_function_pointers </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_functions</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true iff any of the given goto functions has function calls via a function pointer </p>
+
+<p class="definition">Definition at line <a class="el" href="remove__function__pointers_8cpp_source.html#l00551">551</a> of file <a class="el" href="remove__function__pointers_8cpp_source.html">remove_function_pointers.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a68f13a4739e830c215df5003dcd48b5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68f13a4739e830c215df5003dcd48b5f">&#9670;&nbsp;</a></span>has_function_pointers() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_function_pointers </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns true iff the given goto model has function calls via a function pointer </p>
+
+<p class="definition">Definition at line <a class="el" href="remove__function__pointers_8cpp_source.html#l00560">560</a> of file <a class="el" href="remove__function__pointers_8cpp_source.html">remove_function_pointers.cpp</a>.</p>
 
 </div>
 </div>
