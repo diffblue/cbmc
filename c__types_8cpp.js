@@ -8,7 +8,6 @@ var c__types_8cpp =
     [ "char_type", "c__types_8cpp.html#a944f20ad4bf1dddfaf9d9085dd124164", null ],
     [ "double_type", "c__types_8cpp.html#ac819b7bc6104e71d66797d4eed870fb9", null ],
     [ "float_type", "c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46", null ],
-    [ "index_type", "c__types_8cpp.html#a0adb1561af206c923aaa0fc6c6579edf", null ],
     [ "long_double_type", "c__types_8cpp.html#aa4b7e1b0ff1261815e7109613ccda5f4", null ],
     [ "pointer_diff_type", "c__types_8cpp.html#a8c181bb981a94aa3dbae1fd975a3e418", null ],
     [ "pointer_type", "c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0", null ],

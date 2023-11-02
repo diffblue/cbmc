@@ -23,7 +23,6 @@ var c__types_8h =
     [ "char_type", "c__types_8h.html#a944f20ad4bf1dddfaf9d9085dd124164", null ],
     [ "double_type", "c__types_8h.html#ac819b7bc6104e71d66797d4eed870fb9", null ],
     [ "float_type", "c__types_8h.html#a089edcb2f3bb86d72d53a3bf5d79ef46", null ],
-    [ "index_type", "c__types_8h.html#a0adb1561af206c923aaa0fc6c6579edf", null ],
     [ "long_double_type", "c__types_8h.html#aa4b7e1b0ff1261815e7109613ccda5f4", null ],
     [ "pointer_diff_type", "c__types_8h.html#a8c181bb981a94aa3dbae1fd975a3e418", null ],
     [ "pointer_type", "c__types_8h.html#a95d86c4b6ea870e453f609e340317176", null ],
