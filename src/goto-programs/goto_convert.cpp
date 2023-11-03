@@ -1639,13 +1639,28 @@ void goto_convertt::generate_ifthenelse(
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
 
+  // When the `then` branch of a balanced `if` condition ends with a `return` or
+  // a `goto` statement, it is not necessary to add the `goto z` and `z:` goto
+  // elements as they are never used.
+  // This helps for example when using `--cover location` as such command are
+  // marked unreachable, but are not part of the user-provided code to analyze.
+  bool then_branch_returns = dest.instructions.rbegin()->is_goto();
+
   if(has_else)
   {
-    dest.destructive_append(tmp_x);
+    // Don't add the `goto` at the end of the `then` branch if not needed
+    if(!then_branch_returns)
+    {
+      dest.destructive_append(tmp_x);
+    }
     dest.destructive_append(tmp_y);
   }
 
-  dest.destructive_append(tmp_z);
+  // Don't add the `z` label at the end of the `if` when not needed.
+  if(!has_else || !then_branch_returns)
+  {
+    dest.destructive_append(tmp_z);
+  }
 }
 
 /// if(guard) goto target;
