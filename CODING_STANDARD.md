@@ -12,8 +12,9 @@ Here a few minimalistic coding rules for the CPROVER source tree.
 
 # Whitespaces
 
-Formatting is enforced using clang-format. For more information about this, see
-`COMPILING.md`. A brief summary of the formatting rules is given below:
+Formatting is enforced using clang-format.  For more information about this,
+see the section "using clang-format" below.  A brief summary of the
+formatting rules is given below:
 
 - Use 2 spaces indent, no tabs.
 - No lines wider than 80 chars.
@@ -340,13 +341,13 @@ To avoid waiting until you've made a PR to find formatting issues, you can
 install clang-format locally and run it against your code as you are working.
 
 Different versions of clang-format have slightly different behaviors. CBMC uses
-clang-format-10 as it is available the repositories for Ubuntu 18.04 and
+clang-format-11 as it is available the repositories for Ubuntu 20.04 and
 Homebrew.
 To install on a Unix-like system, try installing using the system package
 manager:
 ```
-apt-get install clang-format-10  # Run this on Ubuntu, Debian etc.
-brew install clang-format@10     # Run this on a Mac with Homebrew installed
+apt-get install clang-format-11  # Run this on Ubuntu, Debian etc.
+brew install clang-format@11     # Run this on a Mac with Homebrew installed
 ```
 
 If your platform doesn't have a package for clang-format, you can download a
@@ -373,7 +374,7 @@ rebase your work onto the tip of the branch it's based on before running
 Note: By default, git-clang-format uses the git config variable
 `clangformat.binary`. If you have multiple versions of clang-format installed,
 you might need to update this, or explicitly specify the binary to use via
-`--binary clang-format-10`.
+`--binary clang-format-11`.
 
 ### RETROACTIVELY FORMATTING INDIVIDUAL COMMITS
 
