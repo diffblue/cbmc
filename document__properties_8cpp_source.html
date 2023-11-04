@@ -317,153 +317,158 @@ $(document).ready(function(){initNavTree('document__properties_8cpp_source.html'
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="comment">// build dest</span></div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160; </div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;linet&gt;::iterator it=lines.begin();</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      it!=lines.end(); it++)</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  std::size_t max_line_number_width = 0;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <span class="keywordflow">if</span>(!lines.empty())</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  {</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    std::string line_no=<a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(it-&gt;line_number);</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    std::string tmp;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classdocument__propertiest.html#ac6a5da392fa40c435e1f5250eb40d4e9">format</a>)</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    {</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea0fbc00fbbaee093a4771786d8c457b3d">LATEX</a>:</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      <span class="keywordflow">while</span>(line_no.size()&lt;4)</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        line_no=<span class="stringliteral">&quot; &quot;</span>+line_no;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      line_no+<span class="stringliteral">&quot;  &quot;</span>;</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      tmp+=<a class="code" href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a>(it-&gt;text, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <span class="keywordflow">if</span>(it-&gt;line_number==line_int)</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        tmp=<span class="stringliteral">&quot;{\\ttb{}&quot;</span>+tmp+<span class="stringliteral">&quot;}&quot;</span>;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    max_line_number_width = <a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(lines.back().line_number).size();</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  }</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;linet&gt;::iterator it=lines.begin();</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      it!=lines.end(); it++)</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    std::string line_no=<a class="code" href="string__constraint_8cpp.html#a72759a5f821d21176866b7bf77d1142b">std::to_string</a>(it-&gt;line_number);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    std::string tmp;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classdocument__propertiest.html#ac6a5da392fa40c435e1f5250eb40d4e9">format</a>)</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    {</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea0fbc00fbbaee093a4771786d8c457b3d">LATEX</a>:</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      <span class="keywordflow">while</span>(line_no.size() &lt; max_line_number_width)</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        line_no=<span class="stringliteral">&quot; &quot;</span>+line_no;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      line_no += <span class="stringliteral">&quot;  &quot;</span>;</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      tmp+=<a class="code" href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a>(it-&gt;text, <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea3db5c2020fa6b8f32420adc20883623c">HTML</a>:</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      <span class="keywordflow">while</span>(line_no.size()&lt;4)</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        line_no=<span class="stringliteral">&quot;&amp;nbsp;&quot;</span>+line_no;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      line_no+<span class="stringliteral">&quot;&amp;nbsp;&amp;nbsp;&quot;</span>;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      tmp+=<a class="code" href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a>(it-&gt;text);</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <span class="keywordflow">if</span>(it-&gt;line_number==line_int)</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        tmp=<span class="stringliteral">&quot;&lt;em&gt;&quot;</span>+tmp+<span class="stringliteral">&quot;&lt;/em&gt;&quot;</span>;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      <span class="keywordflow">if</span>(it-&gt;line_number==line_int)</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        tmp=<span class="stringliteral">&quot;{\\ttb{}&quot;</span>+tmp+<span class="stringliteral">&quot;}&quot;</span>;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea3db5c2020fa6b8f32420adc20883623c">HTML</a>:</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <span class="keywordflow">while</span>(line_no.size() &lt; max_line_number_width)</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        line_no=<span class="stringliteral">&quot;&amp;nbsp;&quot;</span>+line_no;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      line_no += <span class="stringliteral">&quot;&amp;nbsp;&amp;nbsp;&quot;</span>;</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    }</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    dest+=tmp+<span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  <span class="keywordflow">return</span> dest;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;}</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
-<div class="line"><a name="l00270"></a><span class="lineno"><a class="line" href="classdocument__propertiest.html#ac6206fd8184378d347dc232846eddaa5">  270</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdocument__propertiest.html#ac6206fd8184378d347dc232846eddaa5">document_propertiest::doit</a>()</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;{</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="keyword">typedef</span> std::map&lt;source_locationt, doc_claimt&gt; claim_sett;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  claim_sett claim_set;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;      tmp+=<a class="code" href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a>(it-&gt;text);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160; </div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      <span class="keywordflow">if</span>(it-&gt;line_number==line_int)</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        tmp=<span class="stringliteral">&quot;&lt;em&gt;&quot;</span>+tmp+<span class="stringliteral">&quot;&lt;/em&gt;&quot;</span>;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160; </div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    }</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    dest += line_no + tmp + <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  }</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;  <span class="keywordflow">return</span> dest;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;}</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : <a class="code" href="classdocument__propertiest.html#ae17e08bd629b4018d4d20e521b7ab3a9">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  {</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program = gf_entry.second.body;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    {</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      <span class="keywordflow">if</span>(instruction.is_assert())</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      {</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> &amp;source_location = instruction.source_location();</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <a class="code" href="classsource__locationt.html">source_locationt</a> new_source_location;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160; </div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        new_source_location.<a class="code" href="classsource__locationt.html#aeac5d6e9903cb150b7688a2ea5a84421">set_file</a>(source_location.get_file());</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        new_source_location.<a class="code" href="classsource__locationt.html#aeb4caa8fd6855cfc473b4e9d01c0ea09">set_line</a>(source_location.get_line());</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        new_source_location.<a class="code" href="classsource__locationt.html#affd0be5e28a571c5cbbd9d91ae4ba0eb">set_function</a>(source_location.get_function());</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160; </div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        claim_set[new_source_location].comment_set.insert(</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;          source_location.get_comment());</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;      }</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    }</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  }</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160; </div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  <span class="keywordflow">for</span>(claim_sett::const_iterator it=claim_set.begin();</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      it!=claim_set.end(); it++)</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location=it-&gt;first;</div>
+<div class="line"><a name="l00275"></a><span class="lineno"><a class="line" href="classdocument__propertiest.html#ac6206fd8184378d347dc232846eddaa5">  275</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classdocument__propertiest.html#ac6206fd8184378d347dc232846eddaa5">document_propertiest::doit</a>()</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;{</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <span class="keyword">typedef</span> std::map&lt;source_locationt, doc_claimt&gt; claim_sett;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  claim_sett claim_set;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : <a class="code" href="classdocument__propertiest.html#ae17e08bd629b4018d4d20e521b7ab3a9">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  {</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program = gf_entry.second.body;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160; </div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    {</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;      <span class="keywordflow">if</span>(instruction.is_assert())</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;      {</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> &amp;source_location = instruction.source_location();</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <a class="code" href="classsource__locationt.html">source_locationt</a> new_source_location;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160; </div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        new_source_location.<a class="code" href="classsource__locationt.html#aeac5d6e9903cb150b7688a2ea5a84421">set_file</a>(source_location.get_file());</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        new_source_location.<a class="code" href="classsource__locationt.html#aeb4caa8fd6855cfc473b4e9d01c0ea09">set_line</a>(source_location.get_line());</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        new_source_location.<a class="code" href="classsource__locationt.html#affd0be5e28a571c5cbbd9d91ae4ba0eb">set_function</a>(source_location.get_function());</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160; </div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        claim_set[new_source_location].comment_set.insert(</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;          source_location.get_comment());</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      }</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    }</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  }</div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160; </div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    std::string code = <a class="code" href="classdocument__propertiest.html#a5a34c19a62dffb34779813d27c6e5359">get_code</a>(source_location);</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160; </div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classdocument__propertiest.html#ac6a5da392fa40c435e1f5250eb40d4e9">format</a>)</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    {</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea0fbc00fbbaee093a4771786d8c457b3d">LATEX</a>:</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;\\claimlocation{File &quot;</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;          &lt;&lt; <a class="code" href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a>(source_location.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(<span class="stringliteral">&quot;file&quot;</span>), <span class="keyword">false</span>)</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; function &quot;</span></div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;          &lt;&lt; <a class="code" href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a>(source_location.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(<span class="stringliteral">&quot;function&quot;</span>), <span class="keyword">false</span>)</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      <span class="keywordflow">for</span>(std::set&lt;irep_idt&gt;::const_iterator</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;          s_it=it-&gt;second.comment_set.begin();</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;          s_it!=it-&gt;second.comment_set.end();</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;          s_it++)</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;\\claim{&quot;</span> &lt;&lt; <a class="code" href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(*s_it), <span class="keyword">false</span>)</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160; </div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;\\begin{alltt}\\claimcode\n&quot;</span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;          &lt;&lt; code</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;\\end{alltt}\n&quot;</span>;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea3db5c2020fa6b8f32420adc20883623c">HTML</a>:</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;&lt;div class=\&quot;claim\&quot;&gt;\n&quot;</span></div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;&lt;div class=\&quot;location\&quot;&gt;File &quot;</span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;          &lt;&lt; <a class="code" href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a>(source_location.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(<span class="stringliteral">&quot;file&quot;</span>))</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; function &quot;</span></div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;          &lt;&lt; <a class="code" href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a>(source_location.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(<span class="stringliteral">&quot;function&quot;</span>))</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;&lt;/div&gt;\n&quot;</span>;</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160; </div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160; </div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      <span class="keywordflow">for</span>(std::set&lt;irep_idt&gt;::const_iterator</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;          s_it=it-&gt;second.comment_set.begin();</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;          s_it!=it-&gt;second.comment_set.end();</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;          s_it++)</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;&lt;div class=\&quot;description\&quot;&gt;\n&quot;</span></div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;            &lt;&lt; <a class="code" href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(*s_it)) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;&lt;/div&gt;\n&quot;</span>;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160; </div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160; </div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;&lt;div class=\&quot;code\&quot;&gt;\n&quot;</span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;          &lt;&lt; code</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;&lt;/div&gt; &lt;!-- code --&gt;\n&quot;</span>;</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160; </div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;&lt;/div&gt; &lt;!-- claim --&gt;\n&quot;</span>;</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    }</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  }</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;}</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160; </div>
-<div class="line"><a name="l00362"></a><span class="lineno"><a class="line" href="document__properties_8cpp.html#ae53f643ce65e210b4992c554e6eaf3f7">  362</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="document__properties_8cpp.html#ae53f643ce65e210b4992c554e6eaf3f7">document_properties_html</a>(</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  std::ostream &amp;out)</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;{</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <a class="code" href="classdocument__propertiest.html">document_propertiest</a>(goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>, out).<a class="code" href="classdocument__propertiest.html#a141f94ddad459bf5c13caa4ea874c83d">html</a>();</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;}</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160; </div>
-<div class="line"><a name="l00369"></a><span class="lineno"><a class="line" href="document__properties_8cpp.html#a3b216937e18c5f01ed38354ec37f8882">  369</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="document__properties_8cpp.html#a3b216937e18c5f01ed38354ec37f8882">document_properties_latex</a>(</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  std::ostream &amp;out)</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;{</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <a class="code" href="classdocument__propertiest.html">document_propertiest</a>(goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>, out).<a class="code" href="classdocument__propertiest.html#a4e0084da1c47d7f46fcc0cec7b536833">latex</a>();</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;}</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  <span class="keywordflow">for</span>(claim_sett::const_iterator it=claim_set.begin();</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      it!=claim_set.end(); it++)</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  {</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location=it-&gt;first;</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160; </div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    std::string code = <a class="code" href="classdocument__propertiest.html#a5a34c19a62dffb34779813d27c6e5359">get_code</a>(source_location);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160; </div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordflow">switch</span>(<a class="code" href="classdocument__propertiest.html#ac6a5da392fa40c435e1f5250eb40d4e9">format</a>)</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    {</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea0fbc00fbbaee093a4771786d8c457b3d">LATEX</a>:</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;\\claimlocation{File &quot;</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;          &lt;&lt; <a class="code" href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a>(source_location.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(<span class="stringliteral">&quot;file&quot;</span>), <span class="keyword">false</span>)</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; function &quot;</span></div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;          &lt;&lt; <a class="code" href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a>(source_location.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(<span class="stringliteral">&quot;function&quot;</span>), <span class="keyword">false</span>)</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160; </div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      <span class="keywordflow">for</span>(std::set&lt;irep_idt&gt;::const_iterator</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;          s_it=it-&gt;second.comment_set.begin();</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;          s_it!=it-&gt;second.comment_set.end();</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;          s_it++)</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;\\claim{&quot;</span> &lt;&lt; <a class="code" href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(*s_it), <span class="keyword">false</span>)</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160; </div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160; </div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;\\begin{alltt}\\claimcode\n&quot;</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;          &lt;&lt; code</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;\\end{alltt}\n&quot;</span>;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160; </div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160; </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea3db5c2020fa6b8f32420adc20883623c">HTML</a>:</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;&lt;div class=\&quot;claim\&quot;&gt;\n&quot;</span></div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;&lt;div class=\&quot;location\&quot;&gt;File &quot;</span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;          &lt;&lt; <a class="code" href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a>(source_location.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(<span class="stringliteral">&quot;file&quot;</span>))</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;          &lt;&lt; <span class="stringliteral">&quot; function &quot;</span></div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;          &lt;&lt; <a class="code" href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a>(source_location.<a class="code" href="classirept.html#ae8e3838afb6cbf4dbe3c11aaf4cc4d1a">get_string</a>(<span class="stringliteral">&quot;function&quot;</span>))</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;&lt;/div&gt;\n&quot;</span>;</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160; </div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160; </div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;      <span class="keywordflow">for</span>(std::set&lt;irep_idt&gt;::const_iterator</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;          s_it=it-&gt;second.comment_set.begin();</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;          s_it!=it-&gt;second.comment_set.end();</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;          s_it++)</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;        <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;&lt;div class=\&quot;description\&quot;&gt;\n&quot;</span></div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;            &lt;&lt; <a class="code" href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(*s_it)) &lt;&lt; <span class="charliteral">&#39;\n&#39;</span></div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;&lt;/div&gt;\n&quot;</span>;</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160; </div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;&lt;div class=\&quot;code\&quot;&gt;\n&quot;</span></div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;          &lt;&lt; code</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;          &lt;&lt; <span class="stringliteral">&quot;&lt;/div&gt; &lt;!-- code --&gt;\n&quot;</span>;</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160; </div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="stringliteral">&quot;&lt;/div&gt; &lt;!-- claim --&gt;\n&quot;</span>;</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;      <a class="code" href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">out</a> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    }</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  }</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;}</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160; </div>
+<div class="line"><a name="l00367"></a><span class="lineno"><a class="line" href="document__properties_8cpp.html#ae53f643ce65e210b4992c554e6eaf3f7">  367</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="document__properties_8cpp.html#ae53f643ce65e210b4992c554e6eaf3f7">document_properties_html</a>(</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  std::ostream &amp;out)</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;{</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  <a class="code" href="classdocument__propertiest.html">document_propertiest</a>(goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>, out).<a class="code" href="classdocument__propertiest.html#a141f94ddad459bf5c13caa4ea874c83d">html</a>();</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;}</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160; </div>
+<div class="line"><a name="l00374"></a><span class="lineno"><a class="line" href="document__properties_8cpp.html#a3b216937e18c5f01ed38354ec37f8882">  374</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="document__properties_8cpp.html#a3b216937e18c5f01ed38354ec37f8882">document_properties_latex</a>(</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  std::ostream &amp;out)</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;{</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  <a class="code" href="classdocument__propertiest.html">document_propertiest</a>(goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>, out).<a class="code" href="classdocument__propertiest.html#a4e0084da1c47d7f46fcc0cec7b536833">latex</a>();</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;}</div>
 <div class="ttc" id="aclassdocument__propertiest_html"><div class="ttname"><a href="classdocument__propertiest.html">document_propertiest</a></div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00022">document_properties.cpp:23</a></div></div>
 <div class="ttc" id="aclassdocument__propertiest_html_a141f94ddad459bf5c13caa4ea874c83d"><div class="ttname"><a href="classdocument__propertiest.html#a141f94ddad459bf5c13caa4ea874c83d">document_propertiest::html</a></div><div class="ttdeci">void html()</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00034">document_properties.cpp:34</a></div></div>
 <div class="ttc" id="aclassdocument__propertiest_html_a4e0084da1c47d7f46fcc0cec7b536833"><div class="ttname"><a href="classdocument__propertiest.html#a4e0084da1c47d7f46fcc0cec7b536833">document_propertiest::latex</a></div><div class="ttdeci">void latex()</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00040">document_properties.cpp:40</a></div></div>
@@ -472,7 +477,7 @@ $(document).ready(function(){initNavTree('document__properties_8cpp_source.html'
 <div class="ttc" id="aclassdocument__propertiest_html_a8c8a76c28989cf53c9e968b3989af87c"><div class="ttname"><a href="classdocument__propertiest.html#a8c8a76c28989cf53c9e968b3989af87c">document_propertiest::strip_space</a></div><div class="ttdeci">static void strip_space(std::list&lt; linet &gt; &amp;lines)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00070">document_properties.cpp:70</a></div></div>
 <div class="ttc" id="aclassdocument__propertiest_html_a94c496dfd1d9e4195df0dd6b8d41878ea0fbc00fbbaee093a4771786d8c457b3d"><div class="ttname"><a href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea0fbc00fbbaee093a4771786d8c457b3d">document_propertiest::LATEX</a></div><div class="ttdeci">@ LATEX</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00065">document_properties.cpp:65</a></div></div>
 <div class="ttc" id="aclassdocument__propertiest_html_a94c496dfd1d9e4195df0dd6b8d41878ea3db5c2020fa6b8f32420adc20883623c"><div class="ttname"><a href="classdocument__propertiest.html#a94c496dfd1d9e4195df0dd6b8d41878ea3db5c2020fa6b8f32420adc20883623c">document_propertiest::HTML</a></div><div class="ttdeci">@ HTML</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00065">document_properties.cpp:65</a></div></div>
-<div class="ttc" id="aclassdocument__propertiest_html_ac6206fd8184378d347dc232846eddaa5"><div class="ttname"><a href="classdocument__propertiest.html#ac6206fd8184378d347dc232846eddaa5">document_propertiest::doit</a></div><div class="ttdeci">void doit()</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00270">document_properties.cpp:270</a></div></div>
+<div class="ttc" id="aclassdocument__propertiest_html_ac6206fd8184378d347dc232846eddaa5"><div class="ttname"><a href="classdocument__propertiest.html#ac6206fd8184378d347dc232846eddaa5">document_propertiest::doit</a></div><div class="ttdeci">void doit()</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00275">document_properties.cpp:275</a></div></div>
 <div class="ttc" id="aclassdocument__propertiest_html_ac6a5da392fa40c435e1f5250eb40d4e9"><div class="ttname"><a href="classdocument__propertiest.html#ac6a5da392fa40c435e1f5250eb40d4e9">document_propertiest::format</a></div><div class="ttdeci">enum document_propertiest::@4 format</div></div>
 <div class="ttc" id="aclassdocument__propertiest_html_ae17e08bd629b4018d4d20e521b7ab3a9"><div class="ttname"><a href="classdocument__propertiest.html#ae17e08bd629b4018d4d20e521b7ab3a9">document_propertiest::goto_functions</a></div><div class="ttdeci">const goto_functionst &amp; goto_functions</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00047">document_properties.cpp:47</a></div></div>
 <div class="ttc" id="aclassdocument__propertiest_html_ae49a7bb5b254af4c6442b37cd6db05bc"><div class="ttname"><a href="classdocument__propertiest.html#ae49a7bb5b254af4c6442b37cd6db05bc">document_propertiest::out</a></div><div class="ttdeci">std::ostream &amp; out</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00048">document_properties.cpp:48</a></div></div>
@@ -494,10 +499,10 @@ $(document).ready(function(){initNavTree('document__properties_8cpp_source.html'
 <div class="ttc" id="actype_8c_html_a49f40fd869fd0c90e4497fda08c89561"><div class="ttname"><a href="ctype_8c.html#a49f40fd869fd0c90e4497fda08c89561">isgraph</a></div><div class="ttdeci">int isgraph(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00029">ctype.c:29</a></div></div>
 <div class="ttc" id="adocument__properties_8cpp_html_a0aff1735dc2e315e2f1c4b229ea7a00d"><div class="ttname"><a href="document__properties_8cpp.html#a0aff1735dc2e315e2f1c4b229ea7a00d">is_empty</a></div><div class="ttdeci">bool is_empty(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00138">document_properties.cpp:138</a></div></div>
 <div class="ttc" id="adocument__properties_8cpp_html_a1ab6468603137cf29f127328b14694ca"><div class="ttname"><a href="document__properties_8cpp.html#a1ab6468603137cf29f127328b14694ca">escape_latex</a></div><div class="ttdeci">std::string escape_latex(const std::string &amp;s, bool alltt)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00099">document_properties.cpp:99</a></div></div>
-<div class="ttc" id="adocument__properties_8cpp_html_a3b216937e18c5f01ed38354ec37f8882"><div class="ttname"><a href="document__properties_8cpp.html#a3b216937e18c5f01ed38354ec37f8882">document_properties_latex</a></div><div class="ttdeci">void document_properties_latex(const goto_modelt &amp;goto_model, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00369">document_properties.cpp:369</a></div></div>
+<div class="ttc" id="adocument__properties_8cpp_html_a3b216937e18c5f01ed38354ec37f8882"><div class="ttname"><a href="document__properties_8cpp.html#a3b216937e18c5f01ed38354ec37f8882">document_properties_latex</a></div><div class="ttdeci">void document_properties_latex(const goto_modelt &amp;goto_model, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00374">document_properties.cpp:374</a></div></div>
 <div class="ttc" id="adocument__properties_8cpp_html_a3c700f5859350d21a4df5ccf5f4ee391"><div class="ttname"><a href="document__properties_8cpp.html#a3c700f5859350d21a4df5ccf5f4ee391">escape_html</a></div><div class="ttdeci">std::string escape_html(const std::string &amp;s)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00120">document_properties.cpp:120</a></div></div>
 <div class="ttc" id="adocument__properties_8cpp_html_ac101c663138f79260b6d5ea00140fa22"><div class="ttname"><a href="document__properties_8cpp.html#ac101c663138f79260b6d5ea00140fa22">MAXWIDTH</a></div><div class="ttdeci">#define MAXWIDTH</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00020">document_properties.cpp:20</a></div></div>
-<div class="ttc" id="adocument__properties_8cpp_html_ae53f643ce65e210b4992c554e6eaf3f7"><div class="ttname"><a href="document__properties_8cpp.html#ae53f643ce65e210b4992c554e6eaf3f7">document_properties_html</a></div><div class="ttdeci">void document_properties_html(const goto_modelt &amp;goto_model, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00362">document_properties.cpp:362</a></div></div>
+<div class="ttc" id="adocument__properties_8cpp_html_ae53f643ce65e210b4992c554e6eaf3f7"><div class="ttname"><a href="document__properties_8cpp.html#ae53f643ce65e210b4992c554e6eaf3f7">document_properties_html</a></div><div class="ttdeci">void document_properties_html(const goto_modelt &amp;goto_model, std::ostream &amp;out)</div><div class="ttdef"><b>Definition:</b> <a href="document__properties_8cpp_source.html#l00367">document_properties.cpp:367</a></div></div>
 <div class="ttc" id="adocument__properties_8h_html"><div class="ttname"><a href="document__properties_8h.html">document_properties.h</a></div><div class="ttdoc">Documentation of Properties.</div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div><div class="ttdoc">Symbol Table + CFG.</div></div>
 <div class="ttc" id="airep_8h_html_aec473a7cdee5da3223f587aa2c1c4132"><div class="ttname"><a href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00047">irep.h:47</a></div></div>
