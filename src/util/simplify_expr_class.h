@@ -20,10 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "mp_arith.h"
 #include "type.h"
-// #define USE_LOCAL_REPLACE_MAP
-#ifdef USE_LOCAL_REPLACE_MAP
 #include "replace_expr.h"
-#endif
 
 class abs_exprt;
 class address_of_exprt;
@@ -80,17 +77,22 @@ class with_exprt;
 class simplify_exprt
 {
 public:
-  explicit simplify_exprt(const namespacet &_ns):
-    do_simplify_if(true),
-    ns(_ns)
+  simplify_exprt(const namespacet &_ns, bool propagate_if_cond)
+    : do_simplify_if(propagate_if_cond),
+      ns(_ns)
 #ifdef DEBUG_ON_DEMAND
-    , debug_on(false)
+      ,
+      debug_on(false)
 #endif
   {
 #ifdef DEBUG_ON_DEMAND
     struct stat f;
     debug_on=stat("SIMP_DEBUG", &f)==0;
 #endif
+  }
+
+  explicit simplify_exprt(const namespacet &_ns) : simplify_exprt(_ns, false)
+  {
   }
 
   virtual ~simplify_exprt()
@@ -287,10 +289,7 @@ protected:
 #ifdef DEBUG_ON_DEMAND
   bool debug_on;
 #endif
-#ifdef USE_LOCAL_REPLACE_MAP
   replace_mapt local_replace_map;
-#endif
-
 };
 
 #endif // CPROVER_UTIL_SIMPLIFY_EXPR_CLASS_H
