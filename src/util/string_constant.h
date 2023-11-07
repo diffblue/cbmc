@@ -16,19 +16,7 @@ class string_constantt : public nullary_exprt
 public:
   explicit string_constantt(const irep_idt &);
 
-  DEPRECATED(SINCE(2023, 10, 31, "use value(...)"))
-  void set_value(const irep_idt &_value)
-  {
-    value(_value);
-  }
-
   void value(const irep_idt &);
-
-  DEPRECATED(SINCE(2023, 10, 31, "use value()"))
-  const irep_idt &get_value() const
-  {
-    return value();
-  }
 
   const irep_idt &value() const
   {
