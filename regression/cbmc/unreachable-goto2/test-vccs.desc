@@ -2,7 +2,7 @@ CORE paths-lifo-expected-failure
 test.c
 --show-vcc
 ^Generated 1 VCC\(s\), 1 remaining after simplification$
-^\{1\} goto_symex::\\guard#1$
+^\{1\} ¬goto_symex::\\guard#1$
 ^EXIT=0$
 ^SIGNAL=0$
 --
