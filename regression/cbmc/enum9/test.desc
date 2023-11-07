@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE gcc-only no-new-smt
 main.c
 
 ^VERIFICATION SUCCESSFUL$

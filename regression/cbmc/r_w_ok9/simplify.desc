@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --show-goto-functions
 ^EXIT=0$

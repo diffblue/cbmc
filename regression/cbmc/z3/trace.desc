@@ -1,4 +1,4 @@
-CORE smt-backend
+CORE smt-backend no-new-smt
 trace.c
 --trace --z3
 ^EXIT=10$

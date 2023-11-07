@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --reachability-slice --show-goto-functions
 ^EXIT=0$

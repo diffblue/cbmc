@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 test.c
 --pointer-check
 ^EXIT=0$

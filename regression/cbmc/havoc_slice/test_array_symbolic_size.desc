@@ -1,4 +1,4 @@
-CORE thorough-paths thorough-smt-backend
+CORE thorough-paths thorough-smt-backend no-new-smt
 test_array_symbolic_size.c
 
 ^EXIT=10$

@@ -1,4 +1,4 @@
-CORE paths-lifo-expected-failure broken-smt-backend
+CORE paths-lifo-expected-failure broken-smt-backend no-new-smt
 main.c
 --localize-faults --stop-on-fail
 ^EXIT=10$

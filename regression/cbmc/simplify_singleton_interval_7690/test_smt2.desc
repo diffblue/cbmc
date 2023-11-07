@@ -1,4 +1,4 @@
-CORE smt-backend new-smt-backend
+CORE smt-backend
 singleton_interval_in_assume_7690.c
 --pointer-check
 ^\[stk_push\.pointer_dereference\.17] line \d+ dereference failure: pointer outside object bounds in stk-\>elems\[\(signed( long( long)?)? int\)stk-\>top\]: SUCCESS$

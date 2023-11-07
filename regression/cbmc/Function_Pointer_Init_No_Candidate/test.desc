@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --function foo --pointer-check
 ^\[foo.assertion.\d+\] line \d+ assertion other_function\(4\) > 5: SUCCESS$

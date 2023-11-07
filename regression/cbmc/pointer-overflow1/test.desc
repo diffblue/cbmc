@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --pointer-overflow-check --unsigned-overflow-check
 ^EXIT=10$

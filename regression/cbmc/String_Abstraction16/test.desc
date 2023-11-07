@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 ptr-arith.c
 --string-abstraction
 ^EXIT=0$

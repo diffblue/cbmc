@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --arrays-uf-always --no-propagation --refine-arrays --unwind 11
 ^EXIT=0$

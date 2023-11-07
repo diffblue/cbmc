@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --floatbv
 ^EXIT=0$

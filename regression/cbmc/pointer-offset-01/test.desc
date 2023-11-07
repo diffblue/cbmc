@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --trace
 ^\s*ub.*=(\(char \*\)&)?dynamic_object \+ \d+

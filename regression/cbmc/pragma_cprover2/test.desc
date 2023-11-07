@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --signed-overflow-check
 ^\[main.overflow\.1\] line 21 arithmetic overflow on signed \+ in n \+ n: FAILURE$

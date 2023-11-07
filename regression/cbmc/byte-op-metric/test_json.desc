@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --show-byte-ops --json-ui
 activate-multi-line-match

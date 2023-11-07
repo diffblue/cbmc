@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 trace-values.c
 --trace
 ^EXIT=10$

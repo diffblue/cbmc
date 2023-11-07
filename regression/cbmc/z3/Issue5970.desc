@@ -1,4 +1,4 @@
-CORE smt-backend broken-cprover-smt-backend
+CORE smt-backend broken-cprover-smt-backend no-new-smt
 Issue5970.c
 --z3
 ^EXIT=10$

@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --unwind 1 --unwinding-assertions
 ^EXIT=10$

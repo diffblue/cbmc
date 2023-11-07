@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 strcpy-no-decl.c
 --string-abstraction --validate-goto-model
 ^EXIT=10$

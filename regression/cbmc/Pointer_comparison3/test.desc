@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 
 ^\[main.assertion.3\] line 21 always false for different objects: FAILURE$

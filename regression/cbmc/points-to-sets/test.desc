@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --show-points-to-sets
 ^EXIT=1$

@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 --div-by-zero-check
 test.c
 ^EXIT=0$

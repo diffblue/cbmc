@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 
 ^\[main\.array_bounds\.1\] line \d+ array 'y' upper bound.*FAILURE$
