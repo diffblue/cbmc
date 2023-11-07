@@ -62,7 +62,7 @@ static std::string find_version(const exprt &root)
     if(op.get(ID_statement_list_type) == ID_statement_list_version)
     {
       const string_constantt &constant{to_string_constant(op)};
-      return id2string(constant.get_value());
+      return id2string(constant.value());
     }
   }
   UNREACHABLE; // Root expression should always have a version
@@ -274,10 +274,10 @@ static void find_instructions(
         code_token.add_to_operands(*op_it);
     }
 
-    if(label.get_value() == ID_nil)
+    if(label.value() == ID_nil)
       instruction.add_token(code_token);
     else
-      instruction.add_token(code_labelt{label.get_value(), code_token});
+      instruction.add_token(code_labelt{label.value(), code_token});
 
     network.add_instruction(instruction);
   }

@@ -178,7 +178,7 @@ proc_ident_expr: proc_ident
                | TOK_STRING
                {
                  symbol_exprt s = symbol_exprt::typeless(
-                   to_string_constant(parser_stack($$)).get_value());
+                   to_string_constant(parser_stack($$)).value());
                  parser_stack($$).swap(s);
                }
                ;
@@ -429,7 +429,7 @@ literal: TOK_IDENTIFIER
        | TOK_STRING
        {
          constant_exprt c(to_string_constant(parser_stack($$))
-           .get_value(), string_typet());
+           .value(), string_typet());
          parser_stack($$).swap(c);
        }
        | TOK_BUILTIN_LOC

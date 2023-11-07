@@ -44,14 +44,14 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       !type_with_subtypes.subtypes().empty() &&
       type_with_subtypes.subtypes()[0].id() == ID_string_constant)
       c_storage_spec.asm_label =
-        to_string_constant(type_with_subtypes.subtypes()[0]).get_value();
+        to_string_constant(type_with_subtypes.subtypes()[0]).value();
   }
   else if(
     type.id() == ID_section && type.has_subtype() &&
     to_type_with_subtype(type).subtype().id() == ID_string_constant)
   {
     c_storage_spec.section =
-      to_string_constant(to_type_with_subtype(type).subtype()).get_value();
+      to_string_constant(to_type_with_subtype(type).subtype()).value();
   }
   else if(type.id()==ID_const)
     c_qualifiers.is_constant=true;
@@ -227,7 +227,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     to_type_with_subtype(type).subtype().id() == ID_string_constant)
   {
     c_storage_spec.alias =
-      to_string_constant(to_type_with_subtype(type).subtype()).get_value();
+      to_string_constant(to_type_with_subtype(type).subtype()).value();
   }
   else if(type.id()==ID_frontend_pointer)
   {

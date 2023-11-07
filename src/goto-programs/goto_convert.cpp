@@ -1788,7 +1788,7 @@ bool goto_convertt::get_string_constant(
 
     if(index_op.id()==ID_string_constant)
     {
-      value = to_string_constant(index_op).get_value();
+      value = to_string_constant(index_op).value();
       return false;
     }
     else if(index_op.id()==ID_array)
@@ -1813,7 +1813,7 @@ bool goto_convertt::get_string_constant(
 
   if(expr.id()==ID_string_constant)
   {
-    value = to_string_constant(expr).get_value();
+    value = to_string_constant(expr).value();
     return false;
   }
 

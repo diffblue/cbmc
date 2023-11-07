@@ -40,7 +40,7 @@ std::string format_constantt::operator()(const exprt &expr)
     }
   }
   else if(expr.id()==ID_string_constant)
-    return id2string(to_string_constant(expr).get_value());
+    return id2string(to_string_constant(expr).value());
 
   return "(format-constant failed: "+expr.id_string()+")";
 }

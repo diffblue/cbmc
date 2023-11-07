@@ -3957,8 +3957,7 @@ std::string expr2ct::convert_with_precedence(
   }
 
   else if(src.id()==ID_string_constant)
-    return '"' + MetaString(id2string(to_string_constant(src).get_value())) +
-           '"';
+    return '"' + MetaString(id2string(to_string_constant(src).value())) + '"';
 
   else if(src.id()==ID_struct)
     return convert_struct(src, precedence);

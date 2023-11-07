@@ -394,7 +394,7 @@ void shadow_memoryt::symex_field_static_init_string_constant(
 
   const typet &type = index_expr.array().type();
   log.debug() << "Shadow memory: global memory "
-              << id2string(to_string_constant(index_expr.array()).get_value())
+              << id2string(to_string_constant(index_expr.array()).value())
               << " of type " << from_type(ns, "", type) << messaget::eom;
 
   initialize_shadow_memory(
