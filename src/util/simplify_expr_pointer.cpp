@@ -54,6 +54,32 @@ static bool is_dereference_integer_object(
 }
 
 simplify_exprt::resultt<>
+simplify_exprt::simplify_unary_pointer_predicate_preorder(
+  const unary_exprt &expr)
+{
+  const exprt &pointer = expr.op();
+  PRECONDITION(pointer.type().id() == ID_pointer);
+
+  if(pointer.id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    return changed(simplify_if_preorder(if_expr));
+  }
+  else
+  {
+    auto r_it = simplify_rec(pointer); // recursive call
+    if(r_it.has_changed())
+    {
+      auto tmp = expr;
+      tmp.op() = r_it.expr;
+      return tmp;
+    }
+  }
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
 simplify_exprt::simplify_address_of_arg(const exprt &expr)
 {
   if(expr.id()==ID_index)
@@ -248,16 +274,6 @@ simplify_exprt::resultt<>
 simplify_exprt::simplify_pointer_offset(const pointer_offset_exprt &expr)
 {
   const exprt &ptr = expr.pointer();
-
-  if(ptr.id()==ID_if && ptr.operands().size()==3)
-  {
-    if_exprt if_expr=lift_if(expr, 0);
-    if_expr.true_case() =
-      simplify_pointer_offset(to_pointer_offset_expr(if_expr.true_case()));
-    if_expr.false_case() =
-      simplify_pointer_offset(to_pointer_offset_expr(if_expr.false_case()));
-    return changed(simplify_if(if_expr));
-  }
 
   if(ptr.type().id()!=ID_pointer)
     return unchanged(expr);
@@ -558,16 +574,6 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
 {
   auto new_expr = expr;
   exprt &op = new_expr.op();
-
-  if(op.id()==ID_if && op.operands().size()==3)
-  {
-    if_exprt if_expr=lift_if(expr, 0);
-    if_expr.true_case() =
-      simplify_is_dynamic_object(to_unary_expr(if_expr.true_case()));
-    if_expr.false_case() =
-      simplify_is_dynamic_object(to_unary_expr(if_expr.false_case()));
-    return changed(simplify_if(if_expr));
-  }
 
   bool no_change = true;
 

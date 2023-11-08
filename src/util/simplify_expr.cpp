@@ -820,9 +820,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     // rewrite (T)(bool) to bool?1:0
     auto one = from_integer(1, expr_type);
     auto zero = from_integer(0, expr_type);
-    exprt new_expr = if_exprt(expr.op(), std::move(one), std::move(zero));
-    simplify_if_preorder(to_if_expr(new_expr));
-    return new_expr;
+    return changed(simplify_if_preorder(
+      if_exprt{expr.op(), std::move(one), std::move(zero)}));
   }
 
   // circular casts through types shorter than `int`
@@ -1340,33 +1339,33 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   return unchanged(expr);
 }
 
-bool simplify_exprt::simplify_typecast_preorder(typecast_exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_typecast_preorder(const typecast_exprt &expr)
 {
-  const typet &expr_type = as_const(expr).type();
-  const typet &op_type = as_const(expr).op().type();
+  const typet &expr_type = expr.type();
+  const typet &op_type = expr.op().type();
 
   // (T)(a?b:c) --> a?(T)b:(T)c; don't do this for floating-point type casts as
   // the type cast itself may be costly
   if(
-    as_const(expr).op().id() == ID_if && expr_type.id() != ID_floatbv &&
+    expr.op().id() == ID_if && expr_type.id() != ID_floatbv &&
     op_type.id() != ID_floatbv)
   {
     if_exprt if_expr = lift_if(expr, 0);
-    simplify_if_preorder(if_expr);
-    expr.swap(if_expr);
-    return false;
+    return changed(simplify_if_preorder(if_expr));
   }
   else
   {
     auto r_it = simplify_rec(expr.op()); // recursive call
     if(r_it.has_changed())
     {
-      expr.op() = r_it.expr;
-      return false;
+      auto tmp = expr;
+      tmp.op() = r_it.expr;
+      return tmp;
     }
-    else
-      return true;
   }
+
+  return unchanged(expr);
 }
 
 simplify_exprt::resultt<>
@@ -1376,23 +1375,6 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
 
   if(pointer.type().id()!=ID_pointer)
     return unchanged(expr);
-
-  if(pointer.id()==ID_if && pointer.operands().size()==3)
-  {
-    const if_exprt &if_expr=to_if_expr(pointer);
-
-    auto tmp_op1 = expr;
-    tmp_op1.op() = if_expr.true_case();
-    exprt tmp_op1_result = simplify_dereference(tmp_op1);
-
-    auto tmp_op2 = expr;
-    tmp_op2.op() = if_expr.false_case();
-    exprt tmp_op2_result = simplify_dereference(tmp_op2);
-
-    if_exprt tmp{if_expr.cond(), tmp_op1_result, tmp_op2_result};
-
-    return changed(simplify_if(tmp));
-  }
 
   if(pointer.id()==ID_address_of)
   {
@@ -1421,6 +1403,30 @@ simplify_exprt::simplify_dereference(const dereference_exprt &expr)
           to_array_type(old.array().type()).element_type());
         return changed(simplify_rec(idx));
       }
+    }
+  }
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_dereference_preorder(const dereference_exprt &expr)
+{
+  const exprt &pointer = expr.pointer();
+
+  if(pointer.id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    return changed(simplify_if_preorder(if_expr));
+  }
+  else
+  {
+    auto r_it = simplify_rec(pointer); // recursive call
+    if(r_it.has_changed())
+    {
+      auto tmp = expr;
+      tmp.pointer() = r_it.expr;
+      return tmp;
     }
   }
 
@@ -1643,17 +1649,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 {
-  // lift up any ID_if on the object
-  if(expr.op().id()==ID_if)
-  {
-    if_exprt if_expr=lift_if(expr, 0);
-    if_expr.true_case() =
-      simplify_byte_extract(to_byte_extract_expr(if_expr.true_case()));
-    if_expr.false_case() =
-      simplify_byte_extract(to_byte_extract_expr(if_expr.false_case()));
-    return changed(simplify_if(if_expr));
-  }
-
   const auto el_size = pointer_offset_bits(expr.type(), ns);
   if(el_size.has_value() && *el_size < 0)
     return unchanged(expr);
@@ -2007,6 +2002,41 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 
   if(can_forward_propagatet(ns)(expr))
     return changed(simplify_rec(lower_byte_extract(expr, ns)));
+
+  return unchanged(expr);
+}
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_byte_extract_preorder(const byte_extract_exprt &expr)
+{
+  // lift up any ID_if on the object
+  if(expr.op().id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    return changed(simplify_if_preorder(if_expr));
+  }
+  else
+  {
+    optionalt<exprt::operandst> new_operands;
+
+    for(std::size_t i = 0; i < expr.operands().size(); ++i)
+    {
+      auto r_it = simplify_rec(expr.operands()[i]); // recursive call
+      if(r_it.has_changed())
+      {
+        if(!new_operands.has_value())
+          new_operands = expr.operands();
+        (*new_operands)[i] = std::move(r_it.expr);
+      }
+    }
+
+    if(new_operands.has_value())
+    {
+      exprt result = expr;
+      std::swap(result.operands(), *new_operands);
+      return result;
+    }
+  }
 
   return unchanged(expr);
 }
@@ -2721,9 +2751,10 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
   }
 }
 
-bool simplify_exprt::simplify_node_preorder(exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_node_preorder(const exprt &expr)
 {
-  bool result=true;
+  auto result = unchanged(expr);
 
   // The ifs below could one day be replaced by a switch()
 
@@ -2732,40 +2763,75 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
     // the argument of this expression needs special treatment
   }
   else if(expr.id()==ID_if)
-    result=simplify_if_preorder(to_if_expr(expr));
-  else if(expr.id() == ID_typecast)
-    result = simplify_typecast_preorder(to_typecast_expr(expr));
-  else
   {
-    if(expr.has_operands())
+    result = simplify_if_preorder(to_if_expr(expr));
+  }
+  else if(expr.id() == ID_typecast)
+  {
+    result = simplify_typecast_preorder(to_typecast_expr(expr));
+  }
+  else if(
+    expr.id() == ID_byte_extract_little_endian ||
+    expr.id() == ID_byte_extract_big_endian)
+  {
+    result = simplify_byte_extract_preorder(to_byte_extract_expr(expr));
+  }
+  else if(expr.id() == ID_dereference)
+  {
+    result = simplify_dereference_preorder(to_dereference_expr(expr));
+  }
+  else if(expr.id() == ID_index)
+  {
+    result = simplify_index_preorder(to_index_expr(expr));
+  }
+  else if(expr.id() == ID_member)
+  {
+    result = simplify_member_preorder(to_member_expr(expr));
+  }
+  else if(
+    expr.id() == ID_is_dynamic_object || expr.id() == ID_is_invalid_pointer ||
+    expr.id() == ID_object_size || expr.id() == ID_pointer_object ||
+    expr.id() == ID_pointer_offset)
+  {
+    result = simplify_unary_pointer_predicate_preorder(to_unary_expr(expr));
+  }
+  else if(expr.has_operands())
+  {
+    optionalt<exprt::operandst> new_operands;
+
+    for(std::size_t i = 0; i < expr.operands().size(); ++i)
     {
-      Forall_operands(it, expr)
+      auto r_it = simplify_rec(expr.operands()[i]); // recursive call
+      if(r_it.has_changed())
       {
-        auto r_it = simplify_rec(*it); // recursive call
-        if(r_it.has_changed())
-        {
-          *it = r_it.expr;
-          result=false;
-        }
+        if(!new_operands.has_value())
+          new_operands = expr.operands();
+        (*new_operands)[i] = std::move(r_it.expr);
       }
+    }
+
+    if(new_operands.has_value())
+    {
+      std::swap(result.expr.operands(), *new_operands);
+      result.expr_changed = resultt<>::CHANGED;
     }
   }
 
-  if(as_const(expr).type().id() == ID_array)
+  if(as_const(result.expr).type().id() == ID_array)
   {
-    const array_typet &array_type = to_array_type(as_const(expr).type());
+    const array_typet &array_type = to_array_type(as_const(result.expr).type());
     resultt<> simp_size = simplify_rec(array_type.size());
     if(simp_size.has_changed())
     {
-      to_array_type(expr.type()).size() = simp_size.expr;
-      result = false;
+      to_array_type(result.expr.type()).size() = simp_size.expr;
+      result.expr_changed = resultt<>::CHANGED;
     }
   }
 
   return result;
 }
 
-simplify_exprt::resultt<> simplify_exprt::simplify_node(exprt node)
+simplify_exprt::resultt<> simplify_exprt::simplify_node(const exprt &node)
 {
   if(!node.has_operands())
     return unchanged(node); // no change
@@ -3062,53 +3128,54 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
   #endif
 
   // We work on a copy to prevent unnecessary destruction of sharing.
-  exprt tmp=expr;
-  bool no_change = simplify_node_preorder(tmp);
+  auto simplify_node_preorder_result = simplify_node_preorder(expr);
 
-  auto simplify_node_result = simplify_node(tmp);
+  auto simplify_node_result = simplify_node(simplify_node_preorder_result.expr);
 
-  if(simplify_node_result.has_changed())
+  if(
+    !simplify_node_result.has_changed() &&
+    simplify_node_preorder_result.has_changed())
   {
-    no_change = false;
-    tmp = simplify_node_result.expr;
+    simplify_node_result.expr_changed =
+      simplify_node_preorder_result.expr_changed;
   }
 
 #ifdef USE_LOCAL_REPLACE_MAP
-  #if 1
-  replace_mapt::const_iterator it=local_replace_map.find(tmp);
+  exprt tmp = simplify_node_result.expr;
+#  if 1
+  replace_mapt::const_iterator it =
+    local_replace_map.find(simplify_node_result.expr);
   if(it!=local_replace_map.end())
+    simplify_node_result = changed(it->second);
+#  else
+  if(
+    !local_replace_map.empty() &&
+    !replace_expr(local_replace_map, simplify_node_result.expr))
   {
-    tmp=it->second;
-    no_change = false;
+    simplify_node_result = changed(simplify_rec(simplify_node_result.expr));
   }
-  #else
-  if(!local_replace_map.empty() &&
-     !replace_expr(local_replace_map, tmp))
-  {
-    simplify_rec(tmp);
-    no_change = false;
-  }
-  #endif
+#  endif
 #endif
 
-  if(no_change) // no change
+  if(!simplify_node_result.has_changed())
   {
     return unchanged(expr);
   }
-  else // change, new expression is 'tmp'
+  else
   {
     POSTCONDITION_WITH_DIAGNOSTICS(
-      (as_const(tmp).type().id() == ID_array && expr.type().id() == ID_array) ||
-        as_const(tmp).type() == expr.type(),
-      tmp.pretty(),
+      (as_const(simplify_node_result.expr).type().id() == ID_array &&
+       expr.type().id() == ID_array) ||
+        as_const(simplify_node_result.expr).type() == expr.type(),
+      simplify_node_result.expr.pretty(),
       expr.pretty());
 
 #ifdef USE_CACHE
     // save in cache
-    cache_result.first->second = tmp;
+    cache_result.first->second = simplify_node_result.expr;
 #endif
 
-    return std::move(tmp);
+    return simplify_node_result;
   }
 }
 

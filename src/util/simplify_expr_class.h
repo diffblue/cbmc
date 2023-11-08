@@ -149,7 +149,7 @@ public:
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
   NODISCARD resultt<> simplify_typecast(const typecast_exprt &);
-  bool simplify_typecast_preorder(typecast_exprt &);
+  NODISCARD resultt<> simplify_typecast_preorder(const typecast_exprt &);
   NODISCARD resultt<> simplify_extractbit(const extractbit_exprt &);
   NODISCARD resultt<> simplify_extractbits(const extractbits_exprt &);
   NODISCARD resultt<> simplify_concatenation(const concatenation_exprt &);
@@ -163,7 +163,7 @@ public:
   NODISCARD resultt<> simplify_shifts(const shift_exprt &);
   NODISCARD resultt<> simplify_power(const binary_exprt &);
   NODISCARD resultt<> simplify_bitwise(const multi_ary_exprt &);
-  bool simplify_if_preorder(if_exprt &expr);
+  NODISCARD resultt<> simplify_if_preorder(const if_exprt &expr);
   NODISCARD resultt<> simplify_if(const if_exprt &);
   NODISCARD resultt<> simplify_bitnot(const bitnot_exprt &);
   NODISCARD resultt<> simplify_not(const not_exprt &);
@@ -175,10 +175,16 @@ public:
   NODISCARD resultt<> simplify_with(const with_exprt &);
   NODISCARD resultt<> simplify_update(const update_exprt &);
   NODISCARD resultt<> simplify_index(const index_exprt &);
+  NODISCARD resultt<> simplify_index_preorder(const index_exprt &);
   NODISCARD resultt<> simplify_member(const member_exprt &);
+  NODISCARD resultt<> simplify_member_preorder(const member_exprt &);
   NODISCARD resultt<> simplify_byte_update(const byte_update_exprt &);
   NODISCARD resultt<> simplify_byte_extract(const byte_extract_exprt &);
+  NODISCARD resultt<>
+  simplify_byte_extract_preorder(const byte_extract_exprt &);
   NODISCARD resultt<> simplify_pointer_object(const pointer_object_exprt &);
+  NODISCARD resultt<>
+  simplify_unary_pointer_predicate_preorder(const unary_exprt &);
   NODISCARD resultt<> simplify_object_size(const object_size_exprt &);
   NODISCARD resultt<> simplify_is_dynamic_object(const unary_exprt &);
   NODISCARD resultt<> simplify_is_invalid_pointer(const unary_exprt &);
@@ -186,6 +192,7 @@ public:
   NODISCARD resultt<> simplify_unary_minus(const unary_minus_exprt &);
   NODISCARD resultt<> simplify_unary_plus(const unary_plus_exprt &);
   NODISCARD resultt<> simplify_dereference(const dereference_exprt &);
+  NODISCARD resultt<> simplify_dereference_preorder(const dereference_exprt &);
   NODISCARD resultt<> simplify_address_of(const address_of_exprt &);
   NODISCARD resultt<> simplify_pointer_offset(const pointer_offset_exprt &);
   NODISCARD resultt<> simplify_bswap(const bswap_exprt &);
@@ -259,8 +266,8 @@ public:
   simplify_inequality_pointer_object(const binary_relation_exprt &);
 
   // main recursion
-  NODISCARD resultt<> simplify_node(exprt);
-  bool simplify_node_preorder(exprt &expr);
+  NODISCARD resultt<> simplify_node(const exprt &);
+  NODISCARD resultt<> simplify_node_preorder(const exprt &);
   NODISCARD resultt<> simplify_rec(const exprt &);
 
   virtual bool simplify(exprt &expr);
