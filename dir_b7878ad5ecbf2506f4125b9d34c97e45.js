@@ -309,7 +309,7 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
       [ "resultt", "structsimplify__exprt_1_1resultt.html", "structsimplify__exprt_1_1resultt" ]
     ] ],
     [ "simplify_expr_floatbv.cpp", "simplify__expr__floatbv_8cpp.html", null ],
-    [ "simplify_expr_if.cpp", "simplify__expr__if_8cpp.html", null ],
+    [ "simplify_expr_if.cpp", "simplify__expr__if_8cpp.html", "simplify__expr__if_8cpp" ],
     [ "simplify_expr_int.cpp", "simplify__expr__int_8cpp.html", "simplify__expr__int_8cpp" ],
     [ "simplify_expr_pointer.cpp", "simplify__expr__pointer_8cpp.html", "simplify__expr__pointer_8cpp" ],
     [ "simplify_expr_struct.cpp", "simplify__expr__struct_8cpp.html", null ],

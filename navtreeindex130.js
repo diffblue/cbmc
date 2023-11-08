@@ -1,5 +1,11 @@
 var NAVTREEINDEX130 =
 {
+"structbv__refinementt_1_1approximationt.html#a1e2a42fe560e232b1f0bd592fedaca8f":[8,0,138,0,13],
+"structbv__refinementt_1_1approximationt.html#a2229778deda9165e9a93220a3ac287e7":[8,0,138,0,12],
+"structbv__refinementt_1_1approximationt.html#a26bd105bdabd738b0c6eed1554ed82dc":[8,0,138,0,2],
+"structbv__refinementt_1_1approximationt.html#a28b011a2c03e5a8d2a8dd74345f174f3":[8,0,138,0,4],
+"structbv__refinementt_1_1approximationt.html#a3090a86cf633e6283467de1ded603679":[8,0,138,0,16],
+"structbv__refinementt_1_1approximationt.html#a6c605263f23624de1cef87a5e0bf4e14":[8,0,138,0,11],
 "structbv__refinementt_1_1approximationt.html#a90bc21ce7ddb883723918259a47bb092":[8,0,138,0,7],
 "structbv__refinementt_1_1approximationt.html#a939b461fc37699eb83277246872c0123":[8,0,138,0,3],
 "structbv__refinementt_1_1approximationt.html#a9e8527f5533d33f3625fda4fad7ec2b4":[8,0,138,0,5],
@@ -243,11 +249,5 @@ var NAVTREEINDEX130 =
 "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a8a9f5c7cf9bfd7a6531d354d7cfc1f01":[8,0,255,0,0,0],
 "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987aa42f23ef20764de07767b3a1558abf36":[8,0,255,0,0,2],
 "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987ad79a339fadaa631d027ba959da7f1892":[8,0,255,0,0,1],
-"structconfigt_1_1ansi__ct.html#ad08ae339567011176d52a581ba4bfd88":[8,0,255,0,33],
-"structconfigt_1_1ansi__ct.html#ad3b96c01f34e9377b113c20cc6e86b6a":[8,0,255,0,58],
-"structconfigt_1_1ansi__ct.html#ad5f38da55f83dd34bb403dff3cba4bf6":[8,0,255,0,54],
-"structconfigt_1_1ansi__ct.html#ada723b2cb1666be3ff494b27df4758bd":[8,0,255,0,21],
-"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591e":[8,0,255,0,6],
-"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea32d8b233e3c58a262a0b75872297d8d5":[8,0,255,0,6,1],
-"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea47f45e65244c17ec9fa8771a5c6d60e1":[8,0,255,0,6,5]
+"structconfigt_1_1ansi__ct.html#ad08ae339567011176d52a581ba4bfd88":[8,0,255,0,33]
 };

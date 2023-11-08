@@ -104,211 +104,234 @@ $(document).ready(function(){initNavTree('simplify__expr__array_8cpp_source.html
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="arith__tools_8h.html">arith_tools.h</a>&quot;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="byte__operators_8h.html">byte_operators.h</a>&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="pointer__offset__size_8h.html">pointer_offset_size.h</a>&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="replace__expr_8h.html">replace_expr.h</a>&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="std__expr_8h.html">std_expr.h</a>&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="string__constant_8h.html">string_constant.h</a>&quot;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<a class="code" href="structsimplify__exprt_1_1resultt.html">simplify_exprt::resultt&lt;&gt;</a></div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classsimplify__exprt.html#ab037539e4bc9e3b3f8584f4b6e886392">   19</a></span>&#160;<a class="code" href="classsimplify__exprt.html#ab037539e4bc9e3b3f8584f4b6e886392">simplify_exprt::simplify_index</a>(<span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> &amp;expr)</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordtype">bool</span> no_change = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="comment">// copy</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keyword">auto</span> new_expr = expr;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="comment">// references</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">auto</span> &amp;index = new_expr.<a class="code" href="classindex__exprt.html#afe2bc466e7b5865c7c2dd84761922b7f">index</a>();</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">auto</span> &amp;array = new_expr.array();</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="comment">// extra arithmetic optimizations</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">if</span>(index.id() == ID_div)</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;index_div_expr = <a class="code" href="std__expr_8h.html#a6f83d8d7d325f712814e2ed74c38bbb4">to_div_expr</a>(index);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      index_div_expr.dividend().id() == ID_mult &amp;&amp;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      index_div_expr.dividend().operands().size() == 2 &amp;&amp;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      <a class="code" href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a>(index_div_expr.dividend()).<a class="code" href="classmulti__ary__exprt.html#accc8222cf91343b96a779c8b80bb4ae9">op1</a>() == index_div_expr.divisor())</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="comment">// this rewrites (a*b)/b to a</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      index = <a class="code" href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a>(index_div_expr.dividend()).<a class="code" href="classmulti__ary__exprt.html#acdc1d9b41c7bf806e2e279cf7c7f90e6">op0</a>();</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      no_change = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      index_div_expr.dividend().id() == ID_mult &amp;&amp;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      index_div_expr.dividend().operands().size() == 2 &amp;&amp;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <a class="code" href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a>(index_div_expr.dividend()).<a class="code" href="classmulti__ary__exprt.html#acdc1d9b41c7bf806e2e279cf7c7f90e6">op0</a>() == index_div_expr.divisor())</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="comment">// this rewrites (a*b)/a to b</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      index = <a class="code" href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a>(index_div_expr.dividend()).<a class="code" href="classmulti__ary__exprt.html#accc8222cf91343b96a779c8b80bb4ae9">op1</a>();</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      no_change = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  }</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordflow">if</span>(array.id() == ID_array_comprehension)</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">// simplify (lambda i: e)(x) to e[i/x]</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;comprehension = <a class="code" href="std__expr_8h.html#a48b9be36eec5691ee3f2e6212d77155e">to_array_comprehension_expr</a>(array);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">if</span>(index.type() == comprehension.arg().type())</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      <a class="code" href="classexprt.html">exprt</a> tmp = comprehension.body();</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(comprehension.arg(), index, tmp);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">changed</a>(<a class="code" href="classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423">simplify_rec</a>(tmp));</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    }</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_with)</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  {</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="comment">// we have (a WITH [i:=e])[j]</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordflow">if</span>(array.operands().size() != 3)</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">unchanged</a>(expr);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;with_expr = <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(array);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">if</span>(with_expr.where() == index)</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="comment">// simplify (e with [i:=v])[i] to v</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="keywordflow">return</span> with_expr.new_value();</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      <span class="comment">// Turn (a with i:=x)[j] into (i==j)?x:a[j].</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="comment">// watch out that the type of i and j might be different.</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> rhs_casted =</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(with_expr.where(), index.type());</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <a class="code" href="classexprt.html">exprt</a> equality_expr = <a class="code" href="classsimplify__exprt.html#aa51f41c30d921ede79aa8836965ae76e">simplify_inequality</a>(<a class="code" href="classequal__exprt.html">equal_exprt</a>(index, rhs_casted));</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <a class="code" href="classexprt.html">exprt</a> new_index_expr = <a class="code" href="classsimplify__exprt.html#ab037539e4bc9e3b3f8584f4b6e886392">simplify_index</a>(</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="code" href="classindex__exprt.html">index_exprt</a>(with_expr.old(), index, new_expr.type())); <span class="comment">// recursive call</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <span class="keywordflow">if</span>(equality_expr.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">return</span> with_expr.new_value();</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(equality_expr.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      {</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordflow">return</span> new_index_expr;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      }</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <a class="code" href="classif__exprt.html">if_exprt</a> if_expr(equality_expr, with_expr.new_value(), new_index_expr);</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">changed</a>(<a class="code" href="classsimplify__exprt.html#a4d16933a9b35d843f314cc51a76656ae">simplify_if</a>(if_expr));</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    }</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    array.is_constant() || array.id() == ID_array || array.id() == ID_vector)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> i = numeric_cast&lt;mp_integer&gt;(index);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordflow">if</span>(!i.has_value())</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    {</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(*i &lt; 0 || *i &gt;= array.operands().size())</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="comment">// out of bounds</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    }</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    {</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      <span class="comment">// ok</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <span class="keywordflow">return</span> array.operands()[numeric_cast_v&lt;std::size_t&gt;(*i)];</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    }</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  }</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_string_constant)</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> i = numeric_cast&lt;mp_integer&gt;(index);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keyword">const</span> std::string &amp;value = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(array).get_value());</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">if</span>(!i.has_value())</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    }</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(*i &lt; 0 || *i &gt; value.size())</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    {</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      <span class="comment">// out of bounds</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    }</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    {</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="comment">// terminating zero?</span></div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">char</span> v =</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        (*i == value.size()) ? 0 : value[numeric_cast_v&lt;std::size_t&gt;(*i)];</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(v, new_expr.type());</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  }</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_array_of)</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  {</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="std__expr_8h.html#a9ea196d6fad92905394e71928a64b6e2">to_array_of_expr</a>(array).<a class="code" href="classarray__of__exprt.html#a6c3d19d6eb229886cc98397b21a2470b">what</a>();</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id() == ID_array_list)</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  {</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="comment">// These are index/value pairs, alternating.</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i=0; i&lt;array.operands().size()/2; i++)</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    {</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <a class="code" href="classexprt.html">exprt</a> tmp_index = <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>(array.operands()[i * 2], index.type());</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      <a class="code" href="classsimplify__exprt.html#acc99ab3b39ccee8109412b8b7c198bbc">simplify</a>(tmp_index);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      <span class="keywordflow">if</span>(tmp_index==index)</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keywordflow">return</span> array.operands()[i * 2 + 1];</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      }</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    }</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  }</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_byte_extract_little_endian ||</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;          array.id()==ID_byte_extract_big_endian)</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  {</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;byte_extract_expr = <a class="code" href="byte__operators_8h.html#af1763b1e9181575ca253edca181f1a1f">to_byte_extract_expr</a>(array);</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">if</span>(array.type().id() == ID_array || array.type().id() == ID_vector)</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    {</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;typet&gt;</a> subtype;</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      <span class="keywordflow">if</span>(array.type().id() == ID_array)</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        subtype = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(array.type()).<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>();</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        subtype = <a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(array.type()).<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>();</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="comment">// This rewrites byte_extract(s, o, array_type)[i]</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      <span class="comment">// to byte_extract(s, o+offset, sub_type)</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="keyword">auto</span> sub_size = <a class="code" href="pointer__offset__size_8cpp.html#a7ee4b81e0982aa273d7341124350bd18">pointer_offset_size</a>(*subtype, <a class="code" href="classsimplify__exprt.html#a0dc7f96e955895764c4a6525a659000d">ns</a>);</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <span class="keywordflow">if</span>(!sub_size.has_value())</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">unchanged</a>(expr);</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;      <span class="comment">// add offset to index</span></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      <a class="code" href="classexprt.html">exprt</a> offset = <a class="code" href="classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423">simplify_rec</a>(<a class="code" href="classmult__exprt.html">mult_exprt</a>{</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(*sub_size, byte_extract_expr.offset().type()),</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;          index, byte_extract_expr.offset().type())});</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <a class="code" href="classexprt.html">exprt</a> final_offset =</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        <a class="code" href="classsimplify__exprt.html#acc2eea43d52a48c2053b9edc6f645438">simplify_plus</a>(<a class="code" href="classplus__exprt.html">plus_exprt</a>(byte_extract_expr.offset(), offset));</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keyword">auto</span> result_expr = byte_extract_expr;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      result_expr.type() = expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      result_expr.offset() = final_offset;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">changed</a>(<a class="code" href="classsimplify__exprt.html#a12e510622ae83734308aef3fc5aa5474">simplify_byte_extract</a>(result_expr));</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    }</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  }</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_if)</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  {</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keyword">const</span> <a class="code" href="classif__exprt.html">if_exprt</a> &amp;if_expr=<a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(array);</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <a class="code" href="classexprt.html">exprt</a> cond=if_expr.<a class="code" href="classif__exprt.html#ae69bc7600573edb06050729ed8763666">cond</a>();</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <a class="code" href="classindex__exprt.html">index_exprt</a> idx_false=<a class="code" href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a>(expr);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    idx_false.<a class="code" href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">array</a>()=if_expr.<a class="code" href="classif__exprt.html#adf44709fd0ed42bdc62fa97e5af2a8ba">false_case</a>();</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="expr__util_8h.html">expr_util.h</a>&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="pointer__offset__size_8h.html">pointer_offset_size.h</a>&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="replace__expr_8h.html">replace_expr.h</a>&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="std__expr_8h.html">std_expr.h</a>&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="string__constant_8h.html">string_constant.h</a>&quot;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<a class="code" href="structsimplify__exprt_1_1resultt.html">simplify_exprt::resultt&lt;&gt;</a></div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classsimplify__exprt.html#ab037539e4bc9e3b3f8584f4b6e886392">   20</a></span>&#160;<a class="code" href="classsimplify__exprt.html#ab037539e4bc9e3b3f8584f4b6e886392">simplify_exprt::simplify_index</a>(<span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> &amp;expr)</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordtype">bool</span> no_change = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="comment">// copy</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">auto</span> new_expr = expr;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="comment">// references</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">auto</span> &amp;index = new_expr.<a class="code" href="classindex__exprt.html#afe2bc466e7b5865c7c2dd84761922b7f">index</a>();</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">auto</span> &amp;array = new_expr.array();</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="comment">// extra arithmetic optimizations</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">if</span>(index.id() == ID_div)</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;index_div_expr = <a class="code" href="std__expr_8h.html#a6f83d8d7d325f712814e2ed74c38bbb4">to_div_expr</a>(index);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      index_div_expr.dividend().id() == ID_mult &amp;&amp;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      index_div_expr.dividend().operands().size() == 2 &amp;&amp;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <a class="code" href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a>(index_div_expr.dividend()).<a class="code" href="classmulti__ary__exprt.html#accc8222cf91343b96a779c8b80bb4ae9">op1</a>() == index_div_expr.divisor())</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      <span class="comment">// this rewrites (a*b)/b to a</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      index = <a class="code" href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a>(index_div_expr.dividend()).<a class="code" href="classmulti__ary__exprt.html#acdc1d9b41c7bf806e2e279cf7c7f90e6">op0</a>();</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      no_change = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    }</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      index_div_expr.dividend().id() == ID_mult &amp;&amp;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      index_div_expr.dividend().operands().size() == 2 &amp;&amp;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <a class="code" href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a>(index_div_expr.dividend()).<a class="code" href="classmulti__ary__exprt.html#acdc1d9b41c7bf806e2e279cf7c7f90e6">op0</a>() == index_div_expr.divisor())</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      <span class="comment">// this rewrites (a*b)/a to b</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      index = <a class="code" href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a>(index_div_expr.dividend()).<a class="code" href="classmulti__ary__exprt.html#accc8222cf91343b96a779c8b80bb4ae9">op1</a>();</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      no_change = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  }</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordflow">if</span>(array.id() == ID_array_comprehension)</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">// simplify (lambda i: e)(x) to e[i/x]</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;comprehension = <a class="code" href="std__expr_8h.html#a48b9be36eec5691ee3f2e6212d77155e">to_array_comprehension_expr</a>(array);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">if</span>(index.type() == comprehension.arg().type())</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <a class="code" href="classexprt.html">exprt</a> tmp = comprehension.body();</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      <a class="code" href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a>(comprehension.arg(), index, tmp);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">changed</a>(<a class="code" href="classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423">simplify_rec</a>(tmp));</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_with)</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  {</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="comment">// we have (a WITH [i:=e])[j]</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">if</span>(array.operands().size() != 3)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">unchanged</a>(expr);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;with_expr = <a class="code" href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a>(array);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordflow">if</span>(with_expr.where() == index)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="comment">// simplify (e with [i:=v])[i] to v</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      <span class="keywordflow">return</span> with_expr.new_value();</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="comment">// Turn (a with i:=x)[j] into (i==j)?x:a[j].</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="comment">// watch out that the type of i and j might be different.</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> rhs_casted =</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(with_expr.where(), index.type());</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      <a class="code" href="classexprt.html">exprt</a> equality_expr = <a class="code" href="classsimplify__exprt.html#aa51f41c30d921ede79aa8836965ae76e">simplify_inequality</a>(<a class="code" href="classequal__exprt.html">equal_exprt</a>(index, rhs_casted));</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <a class="code" href="classexprt.html">exprt</a> new_index_expr = <a class="code" href="classsimplify__exprt.html#ab037539e4bc9e3b3f8584f4b6e886392">simplify_index</a>(</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <a class="code" href="classindex__exprt.html">index_exprt</a>(with_expr.old(), index, new_expr.type())); <span class="comment">// recursive call</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <span class="keywordflow">if</span>(equality_expr.<a class="code" href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">is_true</a>())</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">return</span> with_expr.new_value();</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      }</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(equality_expr.<a class="code" href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">is_false</a>())</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordflow">return</span> new_index_expr;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <a class="code" href="classif__exprt.html">if_exprt</a> if_expr(equality_expr, with_expr.new_value(), new_index_expr);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">changed</a>(<a class="code" href="classsimplify__exprt.html#a4d16933a9b35d843f314cc51a76656ae">simplify_if</a>(if_expr));</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  }</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    array.is_constant() || array.id() == ID_array || array.id() == ID_vector)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> i = numeric_cast&lt;mp_integer&gt;(index);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">if</span>(!i.has_value())</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    }</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(*i &lt; 0 || *i &gt;= array.operands().size())</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      <span class="comment">// out of bounds</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <span class="comment">// ok</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      <span class="keywordflow">return</span> array.operands()[numeric_cast_v&lt;std::size_t&gt;(*i)];</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    }</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  }</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_string_constant)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> i = numeric_cast&lt;mp_integer&gt;(index);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keyword">const</span> std::string &amp;value = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(array).get_value());</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">if</span>(!i.has_value())</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    {</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    }</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(*i &lt; 0 || *i &gt; value.size())</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <span class="comment">// out of bounds</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    {</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      <span class="comment">// terminating zero?</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">char</span> v =</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        (*i == value.size()) ? 0 : value[numeric_cast_v&lt;std::size_t&gt;(*i)];</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(v, new_expr.type());</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  }</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_array_of)</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  {</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="std__expr_8h.html#a9ea196d6fad92905394e71928a64b6e2">to_array_of_expr</a>(array).<a class="code" href="classarray__of__exprt.html#a6c3d19d6eb229886cc98397b21a2470b">what</a>();</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  }</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id() == ID_array_list)</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  {</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="comment">// These are index/value pairs, alternating.</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i=0; i&lt;array.operands().size()/2; i++)</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      <a class="code" href="classexprt.html">exprt</a> tmp_index = <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>(array.operands()[i * 2], index.type());</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      <a class="code" href="classsimplify__exprt.html#acc99ab3b39ccee8109412b8b7c198bbc">simplify</a>(tmp_index);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      <span class="keywordflow">if</span>(tmp_index==index)</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      {</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keywordflow">return</span> array.operands()[i * 2 + 1];</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      }</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    }</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(array.id()==ID_byte_extract_little_endian ||</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;          array.id()==ID_byte_extract_big_endian)</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;byte_extract_expr = <a class="code" href="byte__operators_8h.html#af1763b1e9181575ca253edca181f1a1f">to_byte_extract_expr</a>(array);</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordflow">if</span>(array.type().id() == ID_array || array.type().id() == ID_vector)</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;typet&gt;</a> subtype;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      <span class="keywordflow">if</span>(array.type().id() == ID_array)</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        subtype = <a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(array.type()).<a class="code" href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">element_type</a>();</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        subtype = <a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(array.type()).<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>();</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      <span class="comment">// This rewrites byte_extract(s, o, array_type)[i]</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      <span class="comment">// to byte_extract(s, o+offset, sub_type)</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <span class="keyword">auto</span> sub_size = <a class="code" href="pointer__offset__size_8cpp.html#a7ee4b81e0982aa273d7341124350bd18">pointer_offset_size</a>(*subtype, <a class="code" href="classsimplify__exprt.html#a0dc7f96e955895764c4a6525a659000d">ns</a>);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      <span class="keywordflow">if</span>(!sub_size.has_value())</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">unchanged</a>(expr);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      <span class="comment">// add offset to index</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      <a class="code" href="classexprt.html">exprt</a> offset = <a class="code" href="classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423">simplify_rec</a>(<a class="code" href="classmult__exprt.html">mult_exprt</a>{</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(*sub_size, byte_extract_expr.offset().type()),</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        <a class="code" href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a>(</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;          index, byte_extract_expr.offset().type())});</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <a class="code" href="classexprt.html">exprt</a> final_offset =</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        <a class="code" href="classsimplify__exprt.html#acc2eea43d52a48c2053b9edc6f645438">simplify_plus</a>(<a class="code" href="classplus__exprt.html">plus_exprt</a>(byte_extract_expr.offset(), offset));</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      <span class="keyword">auto</span> result_expr = byte_extract_expr;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      result_expr.type() = expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>();</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      result_expr.offset() = final_offset;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">changed</a>(<a class="code" href="classsimplify__exprt.html#a12e510622ae83734308aef3fc5aa5474">simplify_byte_extract</a>(result_expr));</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  }</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keywordflow">if</span>(no_change)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">unchanged</a>(expr);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordflow">return</span> std::move(new_expr);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;}</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    new_expr.array() = if_expr.<a class="code" href="classif__exprt.html#a843bfef7748ce3a9ead554a30fbc628d">true_case</a>();</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <a class="code" href="classexprt.html">exprt</a> result = <a class="code" href="classif__exprt.html">if_exprt</a>(cond, new_expr, idx_false, expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">changed</a>(<a class="code" href="classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423">simplify_rec</a>(result));</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  }</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keywordflow">if</span>(no_change)</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">unchanged</a>(expr);</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordflow">return</span> std::move(new_expr);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;}</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<a class="code" href="structsimplify__exprt_1_1resultt.html">simplify_exprt::resultt&lt;&gt;</a></div>
+<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="classsimplify__exprt.html#a7f4ff10a8d25a21d8b7df9eeff76fd0b">  208</a></span>&#160;<a class="code" href="classsimplify__exprt.html#a7f4ff10a8d25a21d8b7df9eeff76fd0b">simplify_exprt::simplify_index_preorder</a>(<span class="keyword">const</span> <a class="code" href="classindex__exprt.html">index_exprt</a> &amp;expr)</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;{</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="comment">// lift up any ID_if on the array</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="keywordflow">if</span>(expr.<a class="code" href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">array</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_if)</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <a class="code" href="classif__exprt.html">if_exprt</a> if_expr = <a class="code" href="expr__util_8cpp.html#acc0e1c63deb5df653204af547e32afe8">lift_if</a>(expr, 0);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">changed</a>(<a class="code" href="classsimplify__exprt.html#ad681c1417befbe3e30e6b7c3839d90e3">simplify_if_preorder</a>(if_expr));</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  }</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  {</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt::operandst&gt;</a> new_operands;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keywordflow">for</span>(std::size_t i = 0; i &lt; expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>().size(); ++i)</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    {</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      <span class="keyword">auto</span> r_it = <a class="code" href="classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423">simplify_rec</a>(expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>()[i]); <span class="comment">// recursive call</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      <span class="keywordflow">if</span>(r_it.has_changed())</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      {</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <span class="keywordflow">if</span>(!new_operands.has_value())</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;          new_operands = expr.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>();</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        (*new_operands)[i] = std::move(r_it.expr);</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      }</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    }</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">if</span>(new_operands.has_value())</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    {</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      <a class="code" href="classexprt.html">exprt</a> result = expr;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      std::swap(result.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>(), *new_operands);</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    }</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">unchanged</a>(expr);</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
 <div class="ttc" id="abyte__operators_8h_html"><div class="ttname"><a href="byte__operators_8h.html">byte_operators.h</a></div><div class="ttdoc">Expression classes for byte-level operators.</div></div>
@@ -320,30 +343,33 @@ $(document).ready(function(){initNavTree('simplify__expr__array_8cpp_source.html
 <div class="ttc" id="aclassexprt_html_a3e9b65ae74930500d1674057a35b18d3"><div class="ttname"><a href="classexprt.html#a3e9b65ae74930500d1674057a35b18d3">exprt::is_true</a></div><div class="ttdeci">bool is_true() const</div><div class="ttdoc">Return whether the expression is a constant representing true.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00027">expr.cpp:27</a></div></div>
 <div class="ttc" id="aclassexprt_html_a727eaab489ece52bb6abbee2af9bc019"><div class="ttname"><a href="classexprt.html#a727eaab489ece52bb6abbee2af9bc019">exprt::is_false</a></div><div class="ttdeci">bool is_false() const</div><div class="ttdoc">Return whether the expression is a constant representing false.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00034">expr.cpp:34</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
+<div class="ttc" id="aclassexprt_html_ab33453726d7cb050fc23fb9b9d2375ac"><div class="ttname"><a href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">exprt::operands</a></div><div class="ttdeci">operandst &amp; operands()</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00094">expr.h:94</a></div></div>
 <div class="ttc" id="aclassif__exprt_html"><div class="ttname"><a href="classif__exprt.html">if_exprt</a></div><div class="ttdoc">The trinary if-then-else operator.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02322">std_expr.h:2323</a></div></div>
-<div class="ttc" id="aclassif__exprt_html_a843bfef7748ce3a9ead554a30fbc628d"><div class="ttname"><a href="classif__exprt.html#a843bfef7748ce3a9ead554a30fbc628d">if_exprt::true_case</a></div><div class="ttdeci">exprt &amp; true_case()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02350">std_expr.h:2350</a></div></div>
-<div class="ttc" id="aclassif__exprt_html_adf44709fd0ed42bdc62fa97e5af2a8ba"><div class="ttname"><a href="classif__exprt.html#adf44709fd0ed42bdc62fa97e5af2a8ba">if_exprt::false_case</a></div><div class="ttdeci">exprt &amp; false_case()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02360">std_expr.h:2360</a></div></div>
-<div class="ttc" id="aclassif__exprt_html_ae69bc7600573edb06050729ed8763666"><div class="ttname"><a href="classif__exprt.html#ae69bc7600573edb06050729ed8763666">if_exprt::cond</a></div><div class="ttdeci">exprt &amp; cond()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02340">std_expr.h:2340</a></div></div>
 <div class="ttc" id="aclassindex__exprt_html"><div class="ttname"><a href="classindex__exprt.html">index_exprt</a></div><div class="ttdoc">Array index operator.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01409">std_expr.h:1410</a></div></div>
 <div class="ttc" id="aclassindex__exprt_html_a677da95c5fed7e6548bcc311c3685a49"><div class="ttname"><a href="classindex__exprt.html#a677da95c5fed7e6548bcc311c3685a49">index_exprt::array</a></div><div class="ttdeci">exprt &amp; array()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01440">std_expr.h:1440</a></div></div>
 <div class="ttc" id="aclassindex__exprt_html_afe2bc466e7b5865c7c2dd84761922b7f"><div class="ttname"><a href="classindex__exprt.html#afe2bc466e7b5865c7c2dd84761922b7f">index_exprt::index</a></div><div class="ttdeci">exprt &amp; index()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01450">std_expr.h:1450</a></div></div>
+<div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00396">irep.h:396</a></div></div>
 <div class="ttc" id="aclassmult__exprt_html"><div class="ttname"><a href="classmult__exprt.html">mult_exprt</a></div><div class="ttdoc">Binary multiplication Associativity is not specified.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01051">std_expr.h:1052</a></div></div>
 <div class="ttc" id="aclassmulti__ary__exprt_html_accc8222cf91343b96a779c8b80bb4ae9"><div class="ttname"><a href="classmulti__ary__exprt.html#accc8222cf91343b96a779c8b80bb4ae9">multi_ary_exprt::op1</a></div><div class="ttdeci">exprt &amp; op1()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00883">std_expr.h:883</a></div></div>
 <div class="ttc" id="aclassmulti__ary__exprt_html_acdc1d9b41c7bf806e2e279cf7c7f90e6"><div class="ttname"><a href="classmulti__ary__exprt.html#acdc1d9b41c7bf806e2e279cf7c7f90e6">multi_ary_exprt::op0</a></div><div class="ttdeci">exprt &amp; op0()</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00877">std_expr.h:877</a></div></div>
 <div class="ttc" id="aclassplus__exprt_html"><div class="ttname"><a href="classplus__exprt.html">plus_exprt</a></div><div class="ttdoc">The plus expression Associativity is not specified.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00946">std_expr.h:947</a></div></div>
-<div class="ttc" id="aclasssimplify__exprt_html_a0dc7f96e955895764c4a6525a659000d"><div class="ttname"><a href="classsimplify__exprt.html#a0dc7f96e955895764c4a6525a659000d">simplify_exprt::ns</a></div><div class="ttdeci">const namespacet &amp; ns</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__class_8h_source.html#l00276">simplify_expr_class.h:276</a></div></div>
-<div class="ttc" id="aclasssimplify__exprt_html_a12e510622ae83734308aef3fc5aa5474"><div class="ttname"><a href="classsimplify__exprt.html#a12e510622ae83734308aef3fc5aa5474">simplify_exprt::simplify_byte_extract</a></div><div class="ttdeci">resultt simplify_byte_extract(const byte_extract_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l01644">simplify_expr.cpp:1644</a></div></div>
+<div class="ttc" id="aclasssimplify__exprt_html_a0dc7f96e955895764c4a6525a659000d"><div class="ttname"><a href="classsimplify__exprt.html#a0dc7f96e955895764c4a6525a659000d">simplify_exprt::ns</a></div><div class="ttdeci">const namespacet &amp; ns</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__class_8h_source.html#l00283">simplify_expr_class.h:283</a></div></div>
+<div class="ttc" id="aclasssimplify__exprt_html_a12e510622ae83734308aef3fc5aa5474"><div class="ttname"><a href="classsimplify__exprt.html#a12e510622ae83734308aef3fc5aa5474">simplify_exprt::simplify_byte_extract</a></div><div class="ttdeci">resultt simplify_byte_extract(const byte_extract_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l01650">simplify_expr.cpp:1650</a></div></div>
 <div class="ttc" id="aclasssimplify__exprt_html_a4891492541975b0557b78cbbd73bbed1"><div class="ttname"><a href="classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1">simplify_exprt::changed</a></div><div class="ttdeci">static resultt changed(resultt&lt;&gt; result)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__class_8h_source.html#l00143">simplify_expr_class.h:143</a></div></div>
-<div class="ttc" id="aclasssimplify__exprt_html_a4d16933a9b35d843f314cc51a76656ae"><div class="ttname"><a href="classsimplify__exprt.html#a4d16933a9b35d843f314cc51a76656ae">simplify_exprt::simplify_if</a></div><div class="ttdeci">resultt simplify_if(const if_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__if_8cpp_source.html#l00330">simplify_expr_if.cpp:330</a></div></div>
-<div class="ttc" id="aclasssimplify__exprt_html_a6bc0edfa759d71ad602d938230f74423"><div class="ttname"><a href="classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423">simplify_exprt::simplify_rec</a></div><div class="ttdeci">resultt simplify_rec(const exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03043">simplify_expr.cpp:3043</a></div></div>
+<div class="ttc" id="aclasssimplify__exprt_html_a4d16933a9b35d843f314cc51a76656ae"><div class="ttname"><a href="classsimplify__exprt.html#a4d16933a9b35d843f314cc51a76656ae">simplify_exprt::simplify_if</a></div><div class="ttdeci">resultt simplify_if(const if_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__if_8cpp_source.html#l00336">simplify_expr_if.cpp:336</a></div></div>
+<div class="ttc" id="aclasssimplify__exprt_html_a6bc0edfa759d71ad602d938230f74423"><div class="ttname"><a href="classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423">simplify_exprt::simplify_rec</a></div><div class="ttdeci">resultt simplify_rec(const exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03109">simplify_expr.cpp:3109</a></div></div>
+<div class="ttc" id="aclasssimplify__exprt_html_a7f4ff10a8d25a21d8b7df9eeff76fd0b"><div class="ttname"><a href="classsimplify__exprt.html#a7f4ff10a8d25a21d8b7df9eeff76fd0b">simplify_exprt::simplify_index_preorder</a></div><div class="ttdeci">resultt simplify_index_preorder(const index_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__array_8cpp_source.html#l00208">simplify_expr_array.cpp:208</a></div></div>
 <div class="ttc" id="aclasssimplify__exprt_html_aa51f41c30d921ede79aa8836965ae76e"><div class="ttname"><a href="classsimplify__exprt.html#aa51f41c30d921ede79aa8836965ae76e">simplify_exprt::simplify_inequality</a></div><div class="ttdeci">resultt simplify_inequality(const binary_relation_exprt &amp;)</div><div class="ttdoc">simplifies inequalities !=, &lt;=, &lt;, &gt;=, &gt;, and also ==</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__int_8cpp_source.html#l01332">simplify_expr_int.cpp:1332</a></div></div>
-<div class="ttc" id="aclasssimplify__exprt_html_ab037539e4bc9e3b3f8584f4b6e886392"><div class="ttname"><a href="classsimplify__exprt.html#ab037539e4bc9e3b3f8584f4b6e886392">simplify_exprt::simplify_index</a></div><div class="ttdeci">resultt simplify_index(const index_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__array_8cpp_source.html#l00019">simplify_expr_array.cpp:19</a></div></div>
+<div class="ttc" id="aclasssimplify__exprt_html_ab037539e4bc9e3b3f8584f4b6e886392"><div class="ttname"><a href="classsimplify__exprt.html#ab037539e4bc9e3b3f8584f4b6e886392">simplify_exprt::simplify_index</a></div><div class="ttdeci">resultt simplify_index(const index_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__array_8cpp_source.html#l00020">simplify_expr_array.cpp:20</a></div></div>
 <div class="ttc" id="aclasssimplify__exprt_html_abe0382ab13fb829ab12b2058b1255577"><div class="ttname"><a href="classsimplify__exprt.html#abe0382ab13fb829ab12b2058b1255577">simplify_exprt::unchanged</a></div><div class="ttdeci">static resultt unchanged(exprt expr)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__class_8h_source.html#l00138">simplify_expr_class.h:138</a></div></div>
 <div class="ttc" id="aclasssimplify__exprt_html_acc2eea43d52a48c2053b9edc6f645438"><div class="ttname"><a href="classsimplify__exprt.html#acc2eea43d52a48c2053b9edc6f645438">simplify_exprt::simplify_plus</a></div><div class="ttdeci">resultt simplify_plus(const plus_exprt &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__int_8cpp_source.html#l00412">simplify_expr_int.cpp:412</a></div></div>
-<div class="ttc" id="aclasssimplify__exprt_html_acc99ab3b39ccee8109412b8b7c198bbc"><div class="ttname"><a href="classsimplify__exprt.html#acc99ab3b39ccee8109412b8b7c198bbc">simplify_exprt::simplify</a></div><div class="ttdeci">virtual bool simplify(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03116">simplify_expr.cpp:3116</a></div></div>
+<div class="ttc" id="aclasssimplify__exprt_html_acc99ab3b39ccee8109412b8b7c198bbc"><div class="ttname"><a href="classsimplify__exprt.html#acc99ab3b39ccee8109412b8b7c198bbc">simplify_exprt::simplify</a></div><div class="ttdeci">virtual bool simplify(exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr_8cpp_source.html#l03183">simplify_expr.cpp:3183</a></div></div>
+<div class="ttc" id="aclasssimplify__exprt_html_ad681c1417befbe3e30e6b7c3839d90e3"><div class="ttname"><a href="classsimplify__exprt.html#ad681c1417befbe3e30e6b7c3839d90e3">simplify_exprt::simplify_if_preorder</a></div><div class="ttdeci">resultt simplify_if_preorder(const if_exprt &amp;expr)</div><div class="ttdef"><b>Definition:</b> <a href="simplify__expr__if_8cpp_source.html#l00241">simplify_expr_if.cpp:241</a></div></div>
 <div class="ttc" id="aclasstypecast__exprt_html"><div class="ttname"><a href="classtypecast__exprt.html">typecast_exprt</a></div><div class="ttdoc">Semantic type conversion.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02016">std_expr.h:2017</a></div></div>
 <div class="ttc" id="aclasstypecast__exprt_html_a2bfd5894f5cb1287403a7b3ae74b7fd7"><div class="ttname"><a href="classtypecast__exprt.html#a2bfd5894f5cb1287403a7b3ae74b7fd7">typecast_exprt::conditional_cast</a></div><div class="ttdeci">static exprt conditional_cast(const exprt &amp;expr, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02025">std_expr.h:2025</a></div></div>
 <div class="ttc" id="aclassvector__typet_html_ad382a3b88f4f2a79391ec112868db54a"><div class="ttname"><a href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">vector_typet::element_type</a></div><div class="ttdeci">const typet &amp; element_type() const</div><div class="ttdoc">The type of the elements of the vector.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l01024">std_types.h:1024</a></div></div>
+<div class="ttc" id="aexpr__util_8cpp_html_acc0e1c63deb5df653204af547e32afe8"><div class="ttname"><a href="expr__util_8cpp.html#acc0e1c63deb5df653204af547e32afe8">lift_if</a></div><div class="ttdeci">if_exprt lift_if(const exprt &amp;src, std::size_t operand_number)</div><div class="ttdoc">lift up an if_exprt one level</div><div class="ttdef"><b>Definition:</b> <a href="expr__util_8cpp_source.html#l00203">expr_util.cpp:203</a></div></div>
+<div class="ttc" id="aexpr__util_8h_html"><div class="ttname"><a href="expr__util_8h.html">expr_util.h</a></div><div class="ttdoc">Deprecated expression utility functions.</div></div>
 <div class="ttc" id="airep_8h_html_aec473a7cdee5da3223f587aa2c1c4132"><div class="ttname"><a href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00047">irep.h:47</a></div></div>
 <div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="apointer__offset__size_8cpp_html_a7ee4b81e0982aa273d7341124350bd18"><div class="ttname"><a href="pointer__offset__size_8cpp.html#a7ee4b81e0982aa273d7341124350bd18">pointer_offset_size</a></div><div class="ttdeci">optionalt&lt; mp_integer &gt; pointer_offset_size(const typet &amp;type, const namespacet &amp;ns)</div><div class="ttdoc">Compute the size of a type in bytes, rounding up to full bytes.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__offset__size_8cpp_source.html#l00091">pointer_offset_size.cpp:91</a></div></div>
@@ -352,12 +378,10 @@ $(document).ready(function(){initNavTree('simplify__expr__array_8cpp_source.html
 <div class="ttc" id="areplace__expr_8h_html"><div class="ttname"><a href="replace__expr_8h.html">replace_expr.h</a></div></div>
 <div class="ttc" id="asimplify__expr__class_8h_html"><div class="ttname"><a href="simplify__expr__class_8h.html">simplify_expr_class.h</a></div></div>
 <div class="ttc" id="astd__expr_8h_html"><div class="ttname"><a href="std__expr_8h.html">std_expr.h</a></div><div class="ttdoc">API to expression classes.</div></div>
-<div class="ttc" id="astd__expr_8h_html_a12b435d4696cdc708b3c69e958544ae4"><div class="ttname"><a href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a></div><div class="ttdeci">const if_exprt &amp; to_if_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an if_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02403">std_expr.h:2403</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a48b9be36eec5691ee3f2e6212d77155e"><div class="ttname"><a href="std__expr_8h.html#a48b9be36eec5691ee3f2e6212d77155e">to_array_comprehension_expr</a></div><div class="ttdeci">const array_comprehension_exprt &amp; to_array_comprehension_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a array_comprehension_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03425">std_expr.h:3425</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a6f83d8d7d325f712814e2ed74c38bbb4"><div class="ttname"><a href="std__expr_8h.html#a6f83d8d7d325f712814e2ed74c38bbb4">to_div_expr</a></div><div class="ttdeci">const div_exprt &amp; to_div_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a div_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01146">std_expr.h:1146</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a8abff3fe454650ac95f47c614020a558"><div class="ttname"><a href="std__expr_8h.html#a8abff3fe454650ac95f47c614020a558">to_with_expr</a></div><div class="ttdeci">const with_exprt &amp; to_with_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a with_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02486">std_expr.h:2486</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a9ea196d6fad92905394e71928a64b6e2"><div class="ttname"><a href="std__expr_8h.html#a9ea196d6fad92905394e71928a64b6e2">to_array_of_expr</a></div><div class="ttdeci">const array_of_exprt &amp; to_array_of_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an array_of_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01543">std_expr.h:1543</a></div></div>
-<div class="ttc" id="astd__expr_8h_html_af3504ad7009663c1eef67bafedf71206"><div class="ttname"><a href="std__expr_8h.html#af3504ad7009663c1eef67bafedf71206">to_index_expr</a></div><div class="ttdeci">const index_exprt &amp; to_index_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an index_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01478">std_expr.h:1478</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_af450acc343bbe9c1866fc084cbf7078b"><div class="ttname"><a href="std__expr_8h.html#af450acc343bbe9c1866fc084cbf7078b">to_mult_expr</a></div><div class="ttdeci">const mult_exprt &amp; to_mult_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a mult_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01077">std_expr.h:1077</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a0940051f8c5c8b653861ef24c996a4d2"><div class="ttname"><a href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a></div><div class="ttdeci">const vector_typet &amp; to_vector_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a vector_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l01060">std_types.h:1060</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a6ceae55cfc16506fda77e87c30d4bd68"><div class="ttname"><a href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a></div><div class="ttdeci">const array_typet &amp; to_array_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to an array_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00844">std_types.h:844</a></div></div>
