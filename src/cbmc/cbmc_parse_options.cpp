@@ -92,6 +92,9 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
 
 void cbmc_parse_optionst::set_default_options(optionst &options)
 {
+  // Enable the standard checks by default, unless a user overrides.
+  options.set_option("standard-checks", true);
+
   // Default true
   options.set_option("built-in-assertions", true);
   options.set_option("propagation", true);
@@ -106,6 +109,20 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("depth", UINT32_MAX);
 }
 
+void cbmc_parse_optionst::set_soundness_on_by_default(optionst &options)
+{
+  // Analysis flags on by default
+  options.set_option("bounds-check", true);
+  options.set_option("pointer-check", true);
+  options.set_option("pointer-primitive-check", true);
+  options.set_option("malloc-may-fail", true);
+  // TODO: Default malloc-fail-profile
+  options.set_option("div-by-zero-check", true);
+  options.set_option("signed-overflow-check", true);
+  options.set_option("undefined-shift-check", true);
+  options.set_option("unwinding-assertions", true);
+}
+
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
@@ -116,6 +133,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   cbmc_parse_optionst::set_default_options(options);
   parse_c_object_factory_options(cmdline, options);
+
+  // Enable flags that in combination provide analysis with no surprises
+  // (expected checks and no unsoundness by missing checks).
+  if (options.get_bool_option("standard-checks"))
+    set_soundness_on_by_default(options);
 
   if(cmdline.isset("function"))
     options.set_option("function", cmdline.get_value("function"));
@@ -309,8 +331,14 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // generate unwinding assertions
-  if(cmdline.isset("unwinding-assertions"))
+  // TODO: Fotis: revisit
+  if(cmdline.isset("no-unwinding-assertions"))
   {
+    options.set_option("unwinding-assertions", false);
+    options.set_option("paths-symex-explore-all", false);
+  } else {
+    // Not really needed, as it's now on by default, but keeping it here
+    // for completeness' sake.
     options.set_option("unwinding-assertions", true);
     options.set_option("paths-symex-explore-all", true);
   }

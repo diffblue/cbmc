@@ -79,21 +79,21 @@ void goto_check_c(
 
 // clang-format off
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
-  options.set_option("bounds-check", cmdline.isset("bounds-check")); \
-  options.set_option("pointer-check", cmdline.isset("pointer-check")); \
+  options.set_option("bounds-check", !cmdline.isset("no-bounds-check")); \
+  options.set_option("pointer-check", !cmdline.isset("no-pointer-check")); \
   options.set_option("memory-leak-check", cmdline.isset("memory-leak-check")); \
   options.set_option("memory-cleanup-check", cmdline.isset("memory-cleanup-check")); /* NOLINT(whitespace/line_length) */ \
-  options.set_option("div-by-zero-check", cmdline.isset("div-by-zero-check")); \
+  options.set_option("div-by-zero-check", !cmdline.isset("no-div-by-zero-check")); \
   options.set_option("enum-range-check", cmdline.isset("enum-range-check")); \
-  options.set_option("signed-overflow-check", cmdline.isset("signed-overflow-check")); /* NOLINT(whitespace/line_length) */  \
+  options.set_option("signed-overflow-check", !cmdline.isset("no-signed-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("unsigned-overflow-check", cmdline.isset("unsigned-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("pointer-overflow-check", cmdline.isset("pointer-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("conversion-check", cmdline.isset("conversion-check")); \
-  options.set_option("undefined-shift-check", cmdline.isset("undefined-shift-check")); /* NOLINT(whitespace/line_length) */  \
+  options.set_option("undefined-shift-check", !cmdline.isset("no-undefined-shift-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("float-overflow-check", cmdline.isset("float-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("nan-check", cmdline.isset("nan-check")); \
   options.set_option("built-in-assertions", !cmdline.isset("no-built-in-assertions")); /* NOLINT(whitespace/line_length) */ \
-  options.set_option("pointer-primitive-check", cmdline.isset("pointer-primitive-check")); /* NOLINT(whitespace/line_length) */ \
+  options.set_option("pointer-primitive-check", !cmdline.isset("no-pointer-primitive-check")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("retain-trivial-checks", \
                      cmdline.isset("retain-trivial-checks")); \
   options.set_option("assertions", !cmdline.isset("no-assertions")); /* NOLINT(whitespace/line_length) */ \
