@@ -1,0 +1,9 @@
+This directory contains an example of a problem encountered when
+applying function contracts in the context of AWS s2n-tls.  Run the
+example by using the command:
+
+make veryclean && make result
+
+This creates a large problem during symbolic execution and solving.
+
+This test is currently not included in the any regression.
