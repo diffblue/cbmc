@@ -115,6 +115,8 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
     os << u8" \u2192 "; // → -- we don't use ⟶  since that doesn't render well
     return os << format(mathematical_function.codomain());
   }
+  else if(id == ID_c_bit_field)
+    return os << "c_bit_field[" << to_c_bit_field_type(type).get_width() << ']';
   else
     return os << id;
 }

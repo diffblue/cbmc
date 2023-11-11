@@ -12,8 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rewrite_union.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_code.h>
@@ -85,8 +87,20 @@ void rewrite_union(exprt &expr)
 
     if(op.type().id() == ID_union_tag || op.type().id() == ID_union)
     {
-      exprt offset = from_integer(0, c_index_type());
-      expr = make_byte_extract(op, offset, expr.type());
+      if(
+        expr.type().id() != ID_c_bit_field ||
+        to_c_bit_field_type(expr.type()).get_width() %
+            config.ansi_c.char_width ==
+          0)
+      {
+        exprt offset = from_integer(0, c_index_type());
+        expr = make_byte_extract(op, offset, expr.type());
+      }
+      else
+      {
+        const auto upper = to_c_bit_field_type(expr.type()).get_width() - 1;
+        expr = extractbits_exprt(op, upper, 0, expr.type());
+      }
     }
   }
   else if(expr.id()==ID_union)
