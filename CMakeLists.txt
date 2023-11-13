@@ -40,8 +40,8 @@ endif()
 # filenames)
 file(
   STRINGS src/config.inc CBMC_VERSION
-  REGEX "CBMC_VERSION = (.*)")
-string(REGEX REPLACE "CBMC_VERSION = (.*)" "\\1" CBMC_VERSION ${CBMC_VERSION})
+  REGEX "CBMC_VERSION = ([0-9.]+).*")
+string(REGEX REPLACE "CBMC_VERSION = ([0-9.]+).*" "\\1" CBMC_VERSION ${CBMC_VERSION})
 message(STATUS "Building CBMC version ${CBMC_VERSION}")
 
 project(CBMC VERSION ${CBMC_VERSION})

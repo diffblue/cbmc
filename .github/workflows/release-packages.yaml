@@ -149,35 +149,35 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 20.04 package built and uploaded successfully' || 'Ubuntu 20.04 package build failed' }}"
 
-  homebrew-pr:
-    runs-on: macos-11
-    steps:
-      - name: Get release tag name
-        # The GITHUB_REF we get has refs/tags/ in front of the tag name so we
-        # strip that here
-        run: echo "RELEASE_TAG=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
-      - name: Configure git user name and email
-        uses: Homebrew/actions/git-user-config@07da0794847043a11761f14c97cc682577c74d5d
-        with:
-          username: db-ci-cprover
-      - name: Create homebrew PR
-        run: |
-          brew update-reset
-          brew bump-formula-pr --tag "$RELEASE_TAG" --revision "$GITHUB_SHA" cbmc
-        env:
-          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
-      - name: Checkout CBMC project source code to obtain access to scripts
-        if: always()
-        uses: actions/checkout@v3
-      - name: Slack notification of CI status
-        if: success() || failure()
-        env:
-          SLACK_CHANNEL: team_open_source
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Homebrew PR submitted successfully' || 'Homebrew PR failed' }}"
-        run: go run scripts/slack_notification_action.go
+  # homebrew-pr:
+  #   runs-on: macos-11
+  #   steps:
+  #     - name: Get release tag name
+  #       # The GITHUB_REF we get has refs/tags/ in front of the tag name so we
+  #       # strip that here
+  #       run: echo "RELEASE_TAG=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
+  #     - name: Configure git user name and email
+  #       uses: Homebrew/actions/git-user-config@07da0794847043a11761f14c97cc682577c74d5d
+  #       with:
+  #         username: db-ci-cprover
+  #     - name: Create homebrew PR
+  #       run: |
+  #         brew update-reset
+  #         brew bump-formula-pr --tag "$RELEASE_TAG" --revision "$GITHUB_SHA" cbmc
+  #       env:
+  #         HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
+  #     - name: Checkout CBMC project source code to obtain access to scripts
+  #       if: always()
+  #       uses: actions/checkout@v3
+  #     - name: Slack notification of CI status
+  #       if: success() || failure()
+  #       env:
+  #         SLACK_CHANNEL: team_open_source
+  #         SLACK_COLOR: ${{ job.status }}
+  #         SLACK_USERNAME: Github Actions CI bot
+  #         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  #         SLACK_MESSAGE: "${{ job.status == 'success' && 'Homebrew PR submitted successfully' || 'Homebrew PR failed' }}"
+  #       run: go run scripts/slack_notification_action.go
 
   windows-msi-package:
     runs-on: windows-2019
@@ -273,34 +273,34 @@ jobs:
           SLACK_MESSAGE: "${{ job.status == 'success' && 'Windows package built and uploaded successfully' || 'Windows package build failed' }}"
         run: go run scripts/slack_notification_action.go
 
-  push-docker-image-dockerhub:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout CBMC source
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Set Image Tag
-        run: |
-          # Isolate the version number from a reference to a tag, for example,
-          # '5.20.3' from a string like 'refs/tags/cbmc-5.20.3-exp'
-          VERSION=$(echo ${{ github.ref }} | cut -d "/" -f 3 | cut -d "-" -f 2)
-          echo "IMAGE_TAG=diffblue/cbmc:$VERSION" >> $GITHUB_ENV
-      - name: Build docker image
-        run: docker build -t "$IMAGE_TAG" .
-      - name: Push docker image to DockerHub
-        run: |
-          echo ${{ secrets.DOCKERHUB_ACCESS_DB_CI_CPROVER }} | docker login --username=dbcicprover --password-stdin
-          docker image push "$IMAGE_TAG"
-          # For security reasons remove stored login credentials from
-          # configuration file they are stored at by docker login.
-          docker logout
-      - name: Slack notification of CI status
-        uses: rtCamp/action-slack-notify@v2
-        if: success() || failure()
-        env:
-          SLACK_CHANNEL: team_open_source
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Docker Image built and submitted to DockerHub successfully' || 'Docker Image build failed' }}"
+  # push-docker-image-dockerhub:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Checkout CBMC source
+  #       uses: actions/checkout@v3
+  #       with:
+  #         submodules: recursive
+  #     - name: Set Image Tag
+  #       run: |
+  #         # Isolate the version number from a reference to a tag, for example,
+  #         # '5.20.3' from a string like 'refs/tags/cbmc-5.20.3-exp'
+  #         VERSION=$(echo ${{ github.ref }} | cut -d "/" -f 3 | cut -d "-" -f 2)
+  #         echo "IMAGE_TAG=diffblue/cbmc:$VERSION" >> $GITHUB_ENV
+  #     - name: Build docker image
+  #       run: docker build -t "$IMAGE_TAG" .
+  #     - name: Push docker image to DockerHub
+  #       run: |
+  #         echo ${{ secrets.DOCKERHUB_ACCESS_DB_CI_CPROVER }} | docker login --username=dbcicprover --password-stdin
+  #         docker image push "$IMAGE_TAG"
+  #         # For security reasons remove stored login credentials from
+  #         # configuration file they are stored at by docker login.
+  #         docker logout
+  #     - name: Slack notification of CI status
+  #       uses: rtCamp/action-slack-notify@v2
+  #       if: success() || failure()
+  #       env:
+  #         SLACK_CHANNEL: team_open_source
+  #         SLACK_COLOR: ${{ job.status }}
+  #         SLACK_USERNAME: Github Actions CI bot
+  #         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  #         SLACK_MESSAGE: "${{ job.status == 'success' && 'Docker Image built and submitted to DockerHub successfully' || 'Docker Image build failed' }}"

@@ -37,6 +37,7 @@ jobs:
         with:
           tag_name: cbmc-${{ env.CBMC_VERSION }}
           release_name: cbmc-${{ env.CBMC_VERSION }}
+          prerelease: true
           body: |
             This is CBMC version ${{ env.CBMC_VERSION }}.
 
