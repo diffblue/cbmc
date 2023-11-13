@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED true)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 # Compile with /usr/bin/clang on MacOS
 # See https://github.com/diffblue/cbmc/issues/4956
 #
@@ -190,9 +186,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 endif()
 
 function(cprover_default_properties)
-    set(CBMC_CXX_STANDARD ${CMAKE_CXX_STANDARD})
-    set(CBMC_CXX_STANDARD_REQUIRED ${CMAKE_CXX_STANDARD_REQUIRED})
-    set(CBMC_CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS})
+    set(CBMC_CXX_STANDARD 11)
+    set(CBMC_CXX_STANDARD_REQUIRED true)
     set(CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY
             "Developer ID Application: Daniel Kroening")
 
