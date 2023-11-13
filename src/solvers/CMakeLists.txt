@@ -1,6 +1,3 @@
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED true)
-
 #   We may use one of several different solver libraries.
 #   The following files wrap the chosen solver library.
 #   We remove them all from the solver-library sources list, and then add the

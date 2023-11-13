@@ -33,7 +33,7 @@ for t in  \
   tool_name=$(basename $t)
   opt_name=$(echo $tool_name | tr 'a-z-' 'A-Z_')
 	echo "Extracting the raw list of parameters from $tool_name"
-  g++ -E -dM -std=c++11 -I../src -I../jbmc/src $t/*_parse_options.cpp -o macros.c
+  g++ -E -dM -std=c++17 -I../src -I../jbmc/src $t/*_parse_options.cpp -o macros.c
   # goto-analyzer partly uses the spelling "analyser" within the code base
   echo ${opt_name}_OPTIONS | sed 's/GOTO_ANALYZER/GOTO_ANALYSER/' >> macros.c
   rawstring="`gcc -E -P -w macros.c` \"?h(help)\""
