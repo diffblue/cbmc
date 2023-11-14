@@ -7,7 +7,7 @@ var smt__terms_8h =
     [ "smt_bit_vector_constant_termt", "classsmt__bit__vector__constant__termt.html", "classsmt__bit__vector__constant__termt" ],
     [ "smt_function_application_termt", "classsmt__function__application__termt.html", "classsmt__function__application__termt" ],
     [ "has_indicest", "structsmt__function__application__termt_1_1has__indicest.html", null ],
-    [ "has_indicest< functiont, void_t< decltype(std::declval< functiont >().indices())> >", "structsmt__function__application__termt_1_1has__indicest_3_01functiont_00_01void__t_3_01decltypee12aeb38d6b102d3d76884f449b76745.html", null ],
+    [ "has_indicest< functiont, std::void_t< decltype(std::declval< functiont >().indices())> >", "structsmt__function__application__termt_1_1has__indicest_3_01functiont_00_01std_1_1void__t_3_01d3decc81de71c84a3e9ed33eb6a5b5091.html", null ],
     [ "factoryt", "classsmt__function__application__termt_1_1factoryt.html", "classsmt__function__application__termt_1_1factoryt" ],
     [ "smt_forall_termt", "classsmt__forall__termt.html", "classsmt__forall__termt" ],
     [ "smt_exists_termt", "classsmt__exists__termt.html", "classsmt__exists__termt" ],

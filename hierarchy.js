@@ -1054,7 +1054,6 @@ var hierarchy =
     ] ],
     [ "loop_templatet< goto_programt::targett, goto_programt::instructiont::target_less_than >", "classloop__templatet.html", null ],
     [ "main_function_resultt", "structmain__function__resultt.html", null ],
-    [ "detail::make_voidt< typest >", "structdetail_1_1make__voidt.html", null ],
     [ "boolbv_mapt::map_entryt", "classboolbv__mapt_1_1map__entryt.html", null ],
     [ "map_iteratort< iteratort, outputt >", "classmap__iteratort.html", null ],
     [ "Catch::MatcherBase", null, [
@@ -2099,7 +2098,7 @@ var hierarchy =
     [ "propertyt::trace_updatet", "structpropertyt_1_1trace__updatet.html", null ],
     [ "nfat< T >::transitiont", "structnfat_1_1transitiont.html", null ],
     [ "std::true_type", null, [
-      [ "smt_function_application_termt::has_indicest< functiont, void_t< decltype(std::declval< functiont >().indices())> >", "structsmt__function__application__termt_1_1has__indicest_3_01functiont_00_01void__t_3_01decltypee12aeb38d6b102d3d76884f449b76745.html", null ]
+      [ "smt_function_application_termt::has_indicest< functiont, std::void_t< decltype(std::declval< functiont >().indices())> >", "structsmt__function__application__termt_1_1has__indicest_3_01functiont_00_01std_1_1void__t_3_01d3decc81de71c84a3e9ed33eb6a5b5091.html", null ]
     ] ],
     [ "tvt", "classtvt.html", null ],
     [ "local_safe_pointerst::type_comparet", "structlocal__safe__pointerst_1_1type__comparet.html", null ],
