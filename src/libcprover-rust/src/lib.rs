@@ -517,7 +517,7 @@ mod tests {
         if let Ok(el) = results {
             let_cxx_string!(non_existing_property = "main.the.jabberwocky");
             let prop_status = cprover_api::get_property_status(&el, &non_existing_property);
-            if let Err(status) = prop_status {
+            if let Err(_status) = prop_status {
                 Ok(())
             } else {
                 let error_msg = format!(

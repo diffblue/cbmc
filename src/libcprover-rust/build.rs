@@ -72,7 +72,7 @@ fn main() {
         .include(cpp_api_include_path)
         .include(get_current_working_dir().unwrap())
         .file("src/c_api.cc")
-        .flag_if_supported("-std=c++11")
+        .flag_if_supported("-std=c++17")
         .compile("cprover-rust-api");
 
     println!("cargo:rerun-if-changed=src/c_api.cc");

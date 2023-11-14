@@ -62,14 +62,14 @@ jobs:
       # by the other jobs already present in `pull-request-checks.yaml`.
       - name: Run Rust API tests
         run: |
-          VERSION=$(cat src/config.inc | python3 -c "import sys,re;line = [line for line in sys.stdin if re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line)];sys.stdout.write(re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line[0]).group(1))")
+          VERSION=$(cat src/config.inc | python3 -c "import sys,re;line = [line for line in sys.stdin if re.search(r'CBMC_VERSION = (\d+\.\d+\.\d+)', line)];sys.stdout.write(re.search(r'CBMC_VERSION = (\d+\.\d+\.\d+)', line[0]).group(1))")
           cd src/libcprover-rust;\
           cargo clean;\
           CBMC_INCLUDE_DIR=../../${{env.default_include_dir}} CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
 
 
-  check-macos-12-cmake-clang-rust:
-    runs-on: macos-12
+  check-macos-13-cmake-clang-rust:
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
         with:
@@ -82,10 +82,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .ccache
-          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR-Rust-API
+          key: ${{ runner.os }}-Release-Minisat-${{ github.ref }}-${{ github.sha }}-PR-Rust-API
           restore-keys: |
-            ${{ runner.os }}-Release-${{ github.ref }}
-            ${{ runner.os }}-Release
+            ${{ runner.os }}-Release-Minisat-${{ github.ref }}
+            ${{ runner.os }}-Release-Minisat
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -102,7 +102,8 @@ jobs:
       # by the other jobs already present in `pull-request-checks.yaml`.
       - name: Run Rust API tests
         run: |
-          VERSION=$(cat src/config.inc | python3 -c "import sys,re;line = [line for line in sys.stdin if re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line)];sys.stdout.write(re.search('CBMC_VERSION = (\d+\.\d+\.\d+)', line[0]).group(1))")
+          export MACOSX_DEPLOYMENT_TARGET=10.15
+          VERSION=$(cat src/config.inc | python3 -c "import sys,re;line = [line for line in sys.stdin if re.search(r'CBMC_VERSION = (\d+\.\d+\.\d+)', line)];sys.stdout.write(re.search(r'CBMC_VERSION = (\d+\.\d+\.\d+)', line[0]).group(1))")
           cd src/libcprover-rust;\
           cargo clean;\
           CBMC_INCLUDE_DIR=../../${{env.default_include_dir}} CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
