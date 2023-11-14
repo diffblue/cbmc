@@ -6,7 +6,6 @@
 #include <util/irep.h>
 
 #include <solvers/smt2_incremental/response_or_error.h>
-#include <solvers/smt2_incremental/type_traits.h>
 
 #include "smt_index.h"
 #include "smt_sorts.h"
@@ -150,7 +149,7 @@ private:
   template <class functiont>
   struct has_indicest<
     functiont,
-    void_t<decltype(std::declval<functiont>().indices())>> : std::true_type
+    std::void_t<decltype(std::declval<functiont>().indices())>> : std::true_type
   {
   };
 
