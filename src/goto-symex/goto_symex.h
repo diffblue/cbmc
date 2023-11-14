@@ -112,8 +112,7 @@ public:
   /// \param fields The shadow memory field declarations
   /// \return A symbol table holding the symbols added during symbolic
   ///   execution.
-  NODISCARD
-  virtual symbol_tablet symex_from_entry_point_of(
+  [[nodiscard]] virtual symbol_tablet symex_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
     const shadow_memory_field_definitionst &fields);
 
@@ -138,8 +137,7 @@ public:
   /// \param saved_equation: The equation as previously built up
   /// \return A symbol table holding the symbols added during symbolic
   ///   execution.
-  NODISCARD
-  virtual symbol_tablet resume_symex_from_saved_state(
+  [[nodiscard]] virtual symbol_tablet resume_symex_from_saved_state(
     const get_goto_functiont &get_goto_function,
     const statet &saved_state,
     symex_target_equationt *saved_equation);
@@ -156,8 +154,7 @@ public:
   ///   execute
   /// \return A symbol table holding the symbols added during symbolic
   ///   execution.
-  NODISCARD
-  virtual symbol_tablet
+  [[nodiscard]] virtual symbol_tablet
   symex_with_state(statet &state, const get_goto_functiont &get_goto_functions);
 
   /// \brief Set when states are pushed onto the workqueue

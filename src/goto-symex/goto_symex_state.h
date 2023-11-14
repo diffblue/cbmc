@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 
 #include <util/invariant.h>
-#include <util/nodiscard.h>
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -98,21 +97,21 @@ public:
   /// A full explanation of SSA (which is why we do this renaming) is in
   /// the SSA section of background-concepts.md.
   template <levelt level = L2>
-  NODISCARD renamedt<exprt, level> rename(exprt expr, const namespacet &ns);
+  [[nodiscard]] renamedt<exprt, level> rename(exprt expr, const namespacet &ns);
 
   /// Version of rename which is specialized for SSA exprt.
   /// Implementation only exists for level L0 and L1.
   template <levelt level>
-  NODISCARD renamedt<ssa_exprt, level>
+  [[nodiscard]] renamedt<ssa_exprt, level>
   rename_ssa(ssa_exprt ssa, const namespacet &ns);
 
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
 
-  NODISCARD exprt l2_rename_rvalues(exprt lvalue, const namespacet &ns);
+  [[nodiscard]] exprt l2_rename_rvalues(exprt lvalue, const namespacet &ns);
 
   /// \return lhs renamed to level 2
-  NODISCARD renamedt<ssa_exprt, L2> assignment(
+  [[nodiscard]] renamedt<ssa_exprt, L2> assignment(
     ssa_exprt lhs,    // L0/L1
     const exprt &rhs, // L2
     const namespacet &ns,
@@ -130,7 +129,7 @@ protected:
 
   /// Update values up to \c level.
   template <levelt level>
-  NODISCARD renamedt<ssa_exprt, level>
+  [[nodiscard]] renamedt<ssa_exprt, level>
   set_indices(ssa_exprt expr, const namespacet &ns);
 
   // this maps L1 names to (L2) types

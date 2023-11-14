@@ -6,7 +6,6 @@
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
-#include <util/nodiscard.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -663,8 +662,8 @@ void smt2_incremental_decision_proceduret::pop()
   UNIMPLEMENTED_FEATURE("`pop`.");
 }
 
-NODISCARD
-static decision_proceduret::resultt lookup_decision_procedure_result(
+[[nodiscard]] static decision_proceduret::resultt
+lookup_decision_procedure_result(
   const smt_check_sat_response_kindt &response_kind)
 {
   if(response_kind.cast<smt_sat_responset>())

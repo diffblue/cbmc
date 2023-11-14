@@ -14,7 +14,6 @@ typedef void *HANDLE;                                    // NOLINT
 #endif
 
 #include "message.h"
-#include "nodiscard.h"
 #include "optional.h"
 
 #include <vector>
@@ -45,7 +44,7 @@ public:
   /// Send a string message (command) to the child process.
   /// \param message The string message to be sent.
   /// \return
-  NODISCARD send_responset send(const std::string &message);
+  [[nodiscard]] send_responset send(const std::string &message);
   /// Read a string from the child process' output.
   /// \return a string containing data from the process, empty string if no data
   std::string receive();

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
-#include <util/nodiscard.h>
 #include <util/pointer_expr.h>
 
 #include <goto-programs/resolve_inherited_component.h>
@@ -185,7 +184,7 @@ void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class);
 /// Get JVM type name of the class in which \p method_name is defined.
 /// Returns an empty optional if the class name cannot be retrieved,
 /// e.g. method_name is an internal function.
-NODISCARD optionalt<std::string>
+[[nodiscard]] optionalt<std::string>
 class_name_from_method_name(const std::string &method_name);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

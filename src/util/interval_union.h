@@ -14,7 +14,6 @@ Author: Diffblue Limited
 
 #include <util/interval_template.h>
 #include <util/mp_arith.h>
-#include <util/nodiscard.h>
 #include <util/optional.h>
 #include <vector>
 
@@ -44,12 +43,12 @@ public:
 
   /// Return a new interval_uniontt object representing the set of intergers in
   /// the intersection of this object and \p other.
-  NODISCARD interval_uniont
+  [[nodiscard]] interval_uniont
   make_intersection(const interval_uniont &other) const;
 
   /// Return a new interval_uniontt object representing the set of intergers in
   /// the union of this object and \p other.
-  NODISCARD interval_uniont make_union(const interval_uniont &other) const;
+  [[nodiscard]] interval_uniont make_union(const interval_uniont &other) const;
 
   bool is_empty() const;
 
