@@ -1,4 +1,4 @@
-CORE smt-backend new-smt-backend
+CORE smt-backend
 original_repro.c
 --smt2
 ^EXIT=0$

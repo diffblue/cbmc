@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 
 \[check_int.assertion.1\] line \d+ assertion !__builtin_sadd_overflow\(one, one, &result\): SUCCESS

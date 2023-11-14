@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --show-points-to-sets --json-ui
 activate-multi-line-match

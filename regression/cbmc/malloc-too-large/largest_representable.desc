@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 largest_representable.c
 --malloc-fail-assert
 ^EXIT=0$

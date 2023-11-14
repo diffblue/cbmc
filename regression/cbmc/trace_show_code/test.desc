@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --trace --trace-show-code
 ^EXIT=10$

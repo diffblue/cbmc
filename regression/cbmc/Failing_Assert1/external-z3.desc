@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE gcc-only no-new-smt
 main.c
 --external-sat-solver ./z3-wrapper.sh --trace
 ^VERIFICATION FAILED$

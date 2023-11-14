@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --program-only
 ASSERT\(exists \{ signed int i!0#0; !\(i!0#0 >= 0\) \}\)$

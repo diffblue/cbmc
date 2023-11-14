@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --malloc-may-fail --malloc-fail-null
 ^VERIFICATION SUCCESSFUL$

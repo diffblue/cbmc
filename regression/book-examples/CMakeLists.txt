@@ -30,11 +30,11 @@ add_test_pl_profile(
     "CORE"
 )
 
-# If `-I` (include flag) is passed, test.pl will run only the tests matching the label following it.
+# If `-X` (exclude flag) is passed, test.pl will exclude the tests matching the label following it.
 add_test_pl_profile(
   "book-examples-new-smt-backend"
   "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'z3 --smt2 -in'"
-  "${gcc_only_string}-I;new-smt-backend;-s;new-smt-backend"
+  "${gcc_only_string}-X;no-new-smt;-s;new-smt-backend"
   "CORE"
 )
 

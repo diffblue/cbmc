@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 test.c
 --object-bits foobar
 Value of "foobar" given for object-bits is not a valid unsigned integer.

@@ -31,7 +31,7 @@ test-paths-lifo:
 
 test-new-smt-backend:
 	@../test.pl -e -p -c "../../../src/cbmc/cbmc --incremental-smt2-solver 'z3 --smt2 -in'" \
-					  -I new-smt-backend \
+					  -X no-new-smt \
 					  -s new-smt-backend $(GCC_ONLY)
 
 tests.log: ../test.pl test

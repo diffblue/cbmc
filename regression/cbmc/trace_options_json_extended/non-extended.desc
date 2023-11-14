@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 test.c
 --trace --json-ui
 ^EXIT=10$

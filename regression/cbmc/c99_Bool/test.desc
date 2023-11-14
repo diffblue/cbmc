@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --function foo
 ^EXIT=0$

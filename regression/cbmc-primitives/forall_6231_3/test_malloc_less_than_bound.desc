@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 test_malloc_less_than_bound.c
 --pointer-check
 ^EXIT=10$

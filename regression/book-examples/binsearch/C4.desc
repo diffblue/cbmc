@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 binsearch.c
 --function binsearch --unwind 6 --bounds-check --unwinding-assertions
 ^EXIT=0$

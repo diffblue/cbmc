@@ -1,4 +1,4 @@
-CORE thorough-smt-backend
+CORE thorough-smt-backend no-new-smt
 union_large_array.c
 
 ^EXIT=10$

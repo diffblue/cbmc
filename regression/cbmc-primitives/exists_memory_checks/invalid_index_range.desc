@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 invalid_index_range.c
 --pointer-check
 ^EXIT=10$

@@ -1,4 +1,4 @@
-CORE smt-backend
+CORE smt-backend no-new-smt
 main.c
 --smt2
 ^EXIT=10$

@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 --xml-interface
 < test_wrong_option.xml
 ^EXIT=6$

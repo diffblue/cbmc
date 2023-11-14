@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 abs.c
 --function abs --signed-overflow-check --trace
 ^EXIT=10$

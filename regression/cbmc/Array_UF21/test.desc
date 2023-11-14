@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --arrays-uf-always --bounds-check
 ^VERIFICATION FAILED$

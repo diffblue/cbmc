@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-smt-backend no-new-smt
 unbounded_array.c
 --trace
 \{ \[0u?l?l?\]=1, \[1u?l?l?\]=2, \[\d+u?l?l?\]=42 \}

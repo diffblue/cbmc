@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 main.c
 --symex-coverage-report - --paths lifo
 <line branch="false" hits="1" number="12"/>

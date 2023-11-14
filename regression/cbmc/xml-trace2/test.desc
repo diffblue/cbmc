@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --xml-ui
 <full_lhs_value( binary="[01]+")?>\{ 14, 0 \}</full_lhs_value>

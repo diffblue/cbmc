@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-smt-backend no-new-smt
 main.c
 --pointer-check
 ^\[main.assertion.1\] line 6 correct: SUCCESS

@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 double_deref_with_cast_single_alias.c
 --show-vcc
 \{1\} main::argc!0@1#1 = 1

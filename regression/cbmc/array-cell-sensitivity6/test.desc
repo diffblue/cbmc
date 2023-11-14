@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 test.c
 --show-vcc
 symex_dynamic::dynamic_object#2\[\[1\]\] =

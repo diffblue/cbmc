@@ -1,4 +1,4 @@
-CORE new-smt-backend
+CORE
 max_size.c
 --malloc-fail-assert
 ^EXIT=10$

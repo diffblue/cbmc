@@ -1,4 +1,4 @@
-CORE broken-cprover-smt-backend
+CORE broken-cprover-smt-backend no-new-smt
 test_struct_raw_bytes.c
 
 ^EXIT=10$

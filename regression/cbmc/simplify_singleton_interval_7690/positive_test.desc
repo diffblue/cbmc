@@ -1,4 +1,4 @@
-CORE 
+CORE no-new-smt
 --trace
 singleton_interval_simp.c
 ^VERIFICATION FAILED$

@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --trace-hex --trace
 ^EXIT=10$

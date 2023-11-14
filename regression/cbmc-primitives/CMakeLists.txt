@@ -5,11 +5,11 @@ if(Z3_EXISTS)
         "$<TARGET_FILE:cbmc>"
     )
 
-    # If `-I` (include flag) is passed, test.pl will run only the tests matching the label following it.
+    # If `-X` (exclude flag) is passed, test.pl will exclude the tests matching the label following it.
     add_test_pl_profile(
             "cbmc-primitives-new-smt-backend"
             "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'z3 --smt2 -in'"
-            "-I;new-smt-backend;-s;new-smt-backend"
+            "-X;no-new-smt;-s;new-smt-backend"
             "CORE"
     )
 else()
