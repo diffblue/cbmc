@@ -418,9 +418,7 @@ public:
   /// a value through `f`. `f` may take a move-only typed parameter by const
   /// reference. 'f' may also construct and return a move-only typed value.
   template <typename functiont>
-  auto map(functiont &&f) -> ranget<map_iteratort<
-    iteratort,
-    typename std::result_of<functiont(value_type)>::type>>
+  auto map(functiont &&f)
   {
     using outputt = typename std::result_of<functiont(value_type)>::type;
     auto shared_f = std::make_shared<
