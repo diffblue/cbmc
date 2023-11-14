@@ -12,7 +12,7 @@ readme = "readme.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cxx = "1.0"
+cxx = { version = "1.0", default-features = false, features = ["std", "c++17"] }
 
 [build-dependencies]
 cxx-build = "1.0"
