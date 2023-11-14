@@ -153,28 +153,15 @@ private:
   {
   };
 
-  /// Overload for when \p functiont does not have indices.
-  template <class functiont>
-  static std::vector<smt_indext>
-  indices(const functiont &function, const std::false_type &has_indices)
-  {
-    return {};
-  }
-
-  /// Overload for when \p functiont has indices member function.
-  template <class functiont>
-  static std::vector<smt_indext>
-  indices(const functiont &function, const std::true_type &has_indices)
-  {
-    return function.indices();
-  }
-
-  /// Returns `function.indices` if `functiont` has an `indices` member function
-  /// or returns an empty collection otherwise.
+  /// Returns `function.indices()` if `functiont` has an `indices` member
+  /// function or returns an empty collection otherwise.
   template <class functiont>
   static std::vector<smt_indext> indices(const functiont &function)
   {
-    return indices(function, has_indicest<functiont>{});
+    if constexpr(has_indicest<functiont>::value)
+      return function.indices();
+    else
+      return {};
   }
 
 public:
