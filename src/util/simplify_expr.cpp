@@ -1649,6 +1649,17 @@ simplify_exprt::resultt<> simplify_exprt::simplify_object(const exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 {
+  // lift up any ID_if on the object
+  if(expr.op().id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 0);
+    if_expr.true_case() =
+      simplify_byte_extract(to_byte_extract_expr(if_expr.true_case()));
+    if_expr.false_case() =
+      simplify_byte_extract(to_byte_extract_expr(if_expr.false_case()));
+    return changed(simplify_if(if_expr));
+  }
+
   const auto el_size = pointer_offset_bits(expr.type(), ns);
   if(el_size.has_value() && *el_size < 0)
     return unchanged(expr);
