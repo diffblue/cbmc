@@ -420,7 +420,7 @@ public:
   template <typename functiont>
   auto map(functiont &&f)
   {
-    using outputt = typename std::result_of<functiont(value_type)>::type;
+    using outputt = typename std::invoke_result<functiont, value_type>::type;
     auto shared_f = std::make_shared<
       std::function<outputt(const typename iteratort::value_type &)>>(
       std::forward<functiont>(f));
