@@ -82,10 +82,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .ccache
-          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR-Rust-API
+          key: ${{ runner.os }}-Release-Minisat-${{ github.ref }}-${{ github.sha }}-PR-Rust-API
           restore-keys: |
-            ${{ runner.os }}-Release-${{ github.ref }}
-            ${{ runner.os }}-Release
+            ${{ runner.os }}-Release-Minisat-${{ github.ref }}
+            ${{ runner.os }}-Release-Minisat
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
