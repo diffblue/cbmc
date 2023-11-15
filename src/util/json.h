@@ -274,7 +274,7 @@ public:
   {
   }
 
-#ifndef USE_STD_STRING
+#ifdef USE_DSTRING
   explicit json_stringt(const irep_idt &_value)
     : jsont(kindt::J_STRING, id2string(_value))
   {
