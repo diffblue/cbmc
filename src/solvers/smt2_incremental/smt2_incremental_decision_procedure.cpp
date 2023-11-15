@@ -715,6 +715,7 @@ decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
   {
     if(check_sat_response->kind().cast<smt_unknown_responset>())
       log.error() << "SMT2 solver returned \"unknown\"" << messaget::eom;
+    lookup_decision_procedure_result(check_sat_response->kind());
     return lookup_decision_procedure_result(check_sat_response->kind());
   }
   if(const auto problem = get_problem_messages(result))
