@@ -45,7 +45,7 @@ enum class idt:unsigned
 #else
 
 #define IREP_ID_ONE(the_id) const std::string ID_##the_id(#the_id);
-#define IREP_ID_TWO(the_id, str) const std::string ID_##the_id(#the_id);
+#  define IREP_ID_TWO(the_id, str) const std::string ID_##the_id(#  str);
 
 #endif
 
