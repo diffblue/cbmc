@@ -5,10 +5,11 @@
 #ifndef CPROVER_GOTO_CC_LINKER_SCRIPT_MERGE_H
 #define CPROVER_GOTO_CC_LINKER_SCRIPT_MERGE_H
 
-#include <functional>
-#include <map>
-
 #include <util/message.h>
+
+#include <functional>
+#include <list>
+#include <map>
 
 class cmdlinet;
 class exprt; // IWYU pragma: keep

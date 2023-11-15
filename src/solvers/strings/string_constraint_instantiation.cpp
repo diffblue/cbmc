@@ -10,14 +10,16 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 /// Defines related function for string constraints.
 
 #include "string_constraint_instantiation.h"
-#include <algorithm>
-#include <unordered_set>
 
 #include <util/arith_tools.h>
 #include <util/expr_iterator.h>
 #include <util/format_expr.h>
 
 #include "string_constraint.h"
+
+#include <algorithm>
+#include <list>
+#include <unordered_set>
 
 /// Look for symbol \p qvar in the expression \p index and return true if found
 /// \return True, iff \p qvar appears in \p index.

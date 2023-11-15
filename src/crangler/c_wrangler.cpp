@@ -23,6 +23,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
+#include <list>
 #include <map>
 #include <regex>
 #include <sstream>

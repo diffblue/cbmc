@@ -23,6 +23,7 @@ Date:   March 2017
 #include <util/mp_arith.h>
 #include <util/std_code_base.h>
 
+#include <list>
 #include <unordered_map>
 
 class code_function_callt;

@@ -12,15 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 
+#include <util/invariant.h>
+#include <util/source_location.h>
+
 #include "goto_instruction_code.h"
 
 #include <iosfwd>
-#include <set>
 #include <limits>
+#include <list>
+#include <set>
 #include <string>
-
-#include <util/invariant.h>
-#include <util/source_location.h>
 
 class code_gotot;
 class namespacet;

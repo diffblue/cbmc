@@ -8,6 +8,7 @@
 
 #include "symbol.h" // IWYU pragma: keep
 
+#include <list>
 #include <map>
 #include <unordered_map>
 

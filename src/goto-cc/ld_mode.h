@@ -17,6 +17,8 @@ Date: June 2006
 #include "gcc_message_handler.h"
 #include "goto_cc_mode.h"
 
+#include <list>
+
 class ld_modet : public goto_cc_modet
 {
 public:

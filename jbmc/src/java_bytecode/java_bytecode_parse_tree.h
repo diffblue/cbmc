@@ -10,13 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSE_TREE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSE_TREE_H
 
-#include <set>
-#include <map>
-
 #include <util/std_types.h>
 
 #include "bytecode_info.h"
 #include "java_types.h"
+
+#include <list>
+#include <map>
+#include <set>
 
 struct java_bytecode_parse_treet
 {

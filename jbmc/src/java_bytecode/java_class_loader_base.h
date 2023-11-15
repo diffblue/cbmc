@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "jar_pool.h"
 
+#include <list>
+
 class message_handlert;
 struct java_bytecode_parse_treet;
 
