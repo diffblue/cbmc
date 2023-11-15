@@ -24,9 +24,9 @@ SCENARIO(
 {
   const auto int_type = signedbv_typet(32);
   const auto ptr_type = pointer_typet(int_type, 32);
-  const auto val2_symbol = symbol_exprt(dstringt("val2"), int_type);
+  const auto val2_symbol = symbol_exprt("val2", int_type);
 
-  const auto x_name = symbol_exprt(dstringt("x"), int_type);
+  const auto x_name = symbol_exprt("x", int_type);
 
   auto config = vsd_configt::constant_domain();
   config.context_tracking.data_dependency_context = false;

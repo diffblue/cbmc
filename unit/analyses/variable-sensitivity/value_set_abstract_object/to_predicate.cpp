@@ -37,7 +37,7 @@ SCENARIO(
   const exprt interval_0_2 = constant_interval_exprt(val1, val2);
   const exprt interval_2_3 = constant_interval_exprt(val2, val3);
 
-  const exprt x_name = symbol_exprt(dstringt("x"), type);
+  const exprt x_name = symbol_exprt("x", type);
 
   auto config = vsd_configt::constant_domain();
   config.context_tracking.data_dependency_context = false;

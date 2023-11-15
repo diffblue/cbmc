@@ -114,7 +114,7 @@ std::vector<std::string> verification_resultt::get_property_ids() const
   std::vector<std::string> result;
   for(const auto &props : _impl->get_properties())
   {
-    result.push_back(as_string(props.first));
+    result.push_back(id2string(props.first));
   }
   return result;
 }

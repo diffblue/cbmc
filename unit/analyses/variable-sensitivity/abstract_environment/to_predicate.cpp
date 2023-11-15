@@ -52,7 +52,7 @@ SCENARIO(
 
       auto type = signedbv_typet(32);
       auto val2 = make_constant(from_integer(2, type), env, ns);
-      auto x_name = symbol_exprt(dstringt("x"), type);
+      auto x_name = symbol_exprt("x", type);
 
       env.assign(x_name, val2, ns);
 
@@ -65,10 +65,10 @@ SCENARIO(
 
       auto type = signedbv_typet(32);
       auto val2 = make_constant(from_integer(2, type), env, ns);
-      auto x_name = symbol_exprt(dstringt("x"), type);
+      auto x_name = symbol_exprt("x", type);
 
       auto val3 = make_constant(from_integer(3, type), env, ns);
-      auto y_name = symbol_exprt(dstringt("y"), type);
+      auto y_name = symbol_exprt("y", type);
 
       env.assign(x_name, val2, ns);
       env.assign(y_name, val3, ns);
