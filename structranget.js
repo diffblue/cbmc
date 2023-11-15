@@ -10,7 +10,7 @@ var structranget =
     [ "empty", "structranget.html#ab32e920bbce64a5539975292cdf735a2", null ],
     [ "end", "structranget.html#a3084132429983014c85c399535466e69", null ],
     [ "filter", "structranget.html#ab2ac5e8c9e6a029492f674dca728d6b3", null ],
-    [ "map", "structranget.html#aab3183fbf72c7eab02bd7866abe31a5a", null ],
+    [ "map", "structranget.html#ab04665dc2e2719932a841ecfd19fce47", null ],
     [ "operator containert", "structranget.html#a712bf17968a705ec7a92621fdf168981", null ],
     [ "zip", "structranget.html#afff0b6175bc3f3d68cbd2d7f3d353c46", null ],
     [ "zip", "structranget.html#a8a629a0b5ab4c2c89938532aad6c955c", null ],
