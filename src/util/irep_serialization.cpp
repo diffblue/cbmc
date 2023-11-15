@@ -13,10 +13,11 @@ Date: May 2007
 
 #include "irep_serialization.h"
 
+#include "exception_utils.h"
+#include "string_container.h"
+
 #include <climits>
 #include <iostream>
-
-#include "exception_utils.h"
 
 void irep_serializationt::write_irep(
   std::ostream &out,
@@ -211,7 +212,11 @@ void irep_serializationt::write_string_ref(
   std::ostream &out,
   const irep_idt &s)
 {
-  size_t id=irep_id_hash()(s);
+#ifdef USE_DSTRING
+  size_t id = s.get_no();
+#else
+  size_t id = get_string_container()[s];
+#endif
   if(id>=ireps_container.string_map.size())
     ireps_container.string_map.resize(id+1, false);
 
