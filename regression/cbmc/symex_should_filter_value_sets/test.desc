@@ -1,4 +1,4 @@
-CORE paths-lifo-expected-failure no-new-smt
+CORE paths-lifo-expected-failure
 main.c
 --show-vcc
 ^EXIT=0$

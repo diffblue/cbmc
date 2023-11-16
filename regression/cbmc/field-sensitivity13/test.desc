@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 test.c
 --show-vcc
 main::1::b1!0@1#2\.\.a\.\.x = main::argc!0@1#1

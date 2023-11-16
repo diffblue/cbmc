@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --unwind 10 --unwinding-assertions
 ^VERIFICATION SUCCESSFUL$

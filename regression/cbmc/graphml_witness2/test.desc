@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --graphml-witness - --unwindset main.0:1 --unwinding-assertions --stack-trace
 ^EXIT=10$

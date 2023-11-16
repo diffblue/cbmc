@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --pointer-check --bounds-check
 ^EXIT=0$
