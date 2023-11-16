@@ -44,6 +44,94 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
+/// Architecturally similar to \ref can_forward_propagatet, but specialized for
+/// what is a constexpr, i.e., an expression that can be fully evaluated at
+/// compile time.
+class is_compile_time_constantt
+{
+public:
+  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
+  {
+  }
+
+  /// returns true iff the expression can be considered constant
+  bool operator()(const exprt &e) const
+  {
+    return is_constant(e);
+  }
+
+protected:
+  const namespacet &ns;
+
+  /// This function determines what expressions are to be propagated as
+  /// "constants"
+  bool is_constant(const exprt &e) const
+  {
+    if(e.id() == ID_infinity)
+      return true;
+
+    if(e.is_constant())
+      return true;
+
+    if(e.id() == ID_address_of)
+    {
+      return is_constant_address_of(to_address_of_expr(e).object());
+    }
+    else if(
+      e.id() == ID_typecast || e.id() == ID_array_of || e.id() == ID_plus ||
+      e.id() == ID_mult || e.id() == ID_array || e.id() == ID_with ||
+      e.id() == ID_struct || e.id() == ID_union || e.id() == ID_empty_union ||
+      e.id() == ID_equal || e.id() == ID_notequal || e.id() == ID_lt ||
+      e.id() == ID_le || e.id() == ID_gt || e.id() == ID_ge ||
+      e.id() == ID_if || e.id() == ID_not || e.id() == ID_and ||
+      e.id() == ID_or || e.id() == ID_bitnot || e.id() == ID_bitand ||
+      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector)
+    {
+      return std::all_of(
+        e.operands().begin(), e.operands().end(), [this](const exprt &op) {
+          return is_constant(op);
+        });
+    }
+
+    return false;
+  }
+
+  /// this function determines which reference-typed expressions are constant
+  bool is_constant_address_of(const exprt &e) const
+  {
+    if(e.id() == ID_symbol)
+    {
+      return e.type().id() == ID_code ||
+             ns.lookup(to_symbol_expr(e).get_identifier()).is_static_lifetime;
+    }
+    else if(e.id() == ID_array && e.get_bool(ID_C_string_constant))
+      return true;
+    else if(e.id() == ID_label)
+      return true;
+    else if(e.id() == ID_index)
+    {
+      const index_exprt &index_expr = to_index_expr(e);
+
+      return is_constant_address_of(index_expr.array()) &&
+             is_constant(index_expr.index());
+    }
+    else if(e.id() == ID_member)
+    {
+      return is_constant_address_of(to_member_expr(e).compound());
+    }
+    else if(e.id() == ID_dereference)
+    {
+      const dereference_exprt &deref = to_dereference_expr(e);
+
+      return is_constant(deref.pointer());
+    }
+    else if(e.id() == ID_string_constant)
+      return true;
+
+    return false;
+  }
+};
+
 void c_typecheck_baset::typecheck_expr(exprt &expr)
 {
   if(expr.id()==ID_already_typechecked)
@@ -4560,94 +4648,6 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
   throw 0;
 }
-
-/// Architecturally similar to \ref can_forward_propagatet, but specialized for
-/// what is a constexpr, i.e., an expression that can be fully evaluated at
-/// compile time.
-class is_compile_time_constantt
-{
-public:
-  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
-  {
-  }
-
-  /// returns true iff the expression can be considered constant
-  bool operator()(const exprt &e) const
-  {
-    return is_constant(e);
-  }
-
-protected:
-  const namespacet &ns;
-
-  /// This function determines what expressions are to be propagated as
-  /// "constants"
-  bool is_constant(const exprt &e) const
-  {
-    if(e.id() == ID_infinity)
-      return true;
-
-    if(e.is_constant())
-      return true;
-
-    if(e.id() == ID_address_of)
-    {
-      return is_constant_address_of(to_address_of_expr(e).object());
-    }
-    else if(
-      e.id() == ID_typecast || e.id() == ID_array_of || e.id() == ID_plus ||
-      e.id() == ID_mult || e.id() == ID_array || e.id() == ID_with ||
-      e.id() == ID_struct || e.id() == ID_union || e.id() == ID_empty_union ||
-      e.id() == ID_equal || e.id() == ID_notequal || e.id() == ID_lt ||
-      e.id() == ID_le || e.id() == ID_gt || e.id() == ID_ge ||
-      e.id() == ID_if || e.id() == ID_not || e.id() == ID_and ||
-      e.id() == ID_or || e.id() == ID_bitnot || e.id() == ID_bitand ||
-      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector)
-    {
-      return std::all_of(
-        e.operands().begin(), e.operands().end(), [this](const exprt &op) {
-          return is_constant(op);
-        });
-    }
-
-    return false;
-  }
-
-  /// this function determines which reference-typed expressions are constant
-  bool is_constant_address_of(const exprt &e) const
-  {
-    if(e.id() == ID_symbol)
-    {
-      return e.type().id() == ID_code ||
-             ns.lookup(to_symbol_expr(e).get_identifier()).is_static_lifetime;
-    }
-    else if(e.id() == ID_array && e.get_bool(ID_C_string_constant))
-      return true;
-    else if(e.id() == ID_label)
-      return true;
-    else if(e.id() == ID_index)
-    {
-      const index_exprt &index_expr = to_index_expr(e);
-
-      return is_constant_address_of(index_expr.array()) &&
-             is_constant(index_expr.index());
-    }
-    else if(e.id() == ID_member)
-    {
-      return is_constant_address_of(to_member_expr(e).compound());
-    }
-    else if(e.id() == ID_dereference)
-    {
-      const dereference_exprt &deref = to_dereference_expr(e);
-
-      return is_constant(deref.pointer());
-    }
-    else if(e.id() == ID_string_constant)
-      return true;
-
-    return false;
-  }
-};
 
 void c_typecheck_baset::make_constant(exprt &expr)
 {
