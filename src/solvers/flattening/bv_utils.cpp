@@ -8,6 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_utils.h"
 
+#include <util/arith_tools.h>
+
+#include <map>
 #include <utility>
 
 bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
@@ -292,8 +295,10 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
   }
 }
 
-std::pair<bvt, literalt>
-bv_utilst::adder(const bvt &op0, const bvt &op1, literalt carry_in)
+std::pair<bvt, literalt> bv_utilst::optimized_ripple_carry_adder(
+  const bvt &op0,
+  const bvt &op1,
+  literalt carry_in)
 {
   PRECONDITION(op0.size() == op1.size());
 
@@ -307,6 +312,500 @@ bv_utilst::adder(const bvt &op0, const bvt &op1, literalt carry_in)
   }
 
   return result;
+}
+
+std::pair<bvt, literalt> bv_utilst::carry_lookahead_adder(
+  const bvt &op0,
+  const bvt &op1,
+  literalt carry_in)
+{
+  PRECONDITION(prop.cnf_handled_well());
+  PRECONDITION(op0.size() == op1.size());
+
+  std::pair<bvt, literalt> result{op0, literalt{}};
+  bvt &sum = result.first;
+
+  bvt constants;
+  constants.reserve(2);
+  if(op0[0].is_constant())
+    constants.push_back(op0[0]);
+  if(op1[0].is_constant())
+    constants.push_back(op1[0]);
+  else
+    sum[0] = op1[0];
+  if(constants.size() == 2)
+    sum[0] = constants[0] == constants[1] ? carry_in : !carry_in;
+  else if(constants.size() == 1 && carry_in.is_constant())
+  {
+    if(constants[0] != carry_in)
+      sum[0].invert();
+  }
+  else
+  {
+    sum[0] = prop.new_variable();
+    prop.lcnf({sum[0], op0[0], op1[0], !carry_in});
+    prop.lcnf({sum[0], op0[0], !op1[0], carry_in});
+    prop.lcnf({sum[0], !op0[0], op1[0], carry_in});
+    prop.lcnf({sum[0], !op0[0], !op1[0], !carry_in});
+    prop.lcnf({!sum[0], op0[0], op1[0], carry_in});
+    prop.lcnf({!sum[0], op0[0], !op1[0], !carry_in});
+    prop.lcnf({!sum[0], !op0[0], op1[0], !carry_in});
+    prop.lcnf({!sum[0], !op0[0], !op1[0], carry_in});
+  }
+
+  for(std::size_t i = 1; i < sum.size(); i++)
+  {
+    sum[i] = prop.new_variable();
+
+    prop.lcnf({sum[i], op0[i], op1[i], !op0[i - 1], !op1[i - 1]});
+    prop.lcnf({sum[i], op0[i], op1[i], sum[i - 1], !op0[i - 1]});
+    prop.lcnf({sum[i], op0[i], op1[i], sum[i - 1], !op1[i - 1]});
+
+    prop.lcnf({sum[i], op0[i], !op1[i], op0[i - 1], op1[i - 1]});
+    prop.lcnf({sum[i], op0[i], !op1[i], !sum[i - 1], op0[i - 1]});
+    prop.lcnf({sum[i], op0[i], !op1[i], !sum[i - 1], op1[i - 1]});
+
+    prop.lcnf({sum[i], !op0[i], op1[i], op0[i - 1], op1[i - 1]});
+    prop.lcnf({sum[i], !op0[i], op1[i], !sum[i - 1], op0[i - 1]});
+    prop.lcnf({sum[i], !op0[i], op1[i], !sum[i - 1], op1[i - 1]});
+
+    prop.lcnf({sum[i], !op0[i], !op1[i], !op0[i - 1], !op1[i - 1]});
+    prop.lcnf({sum[i], !op0[i], !op1[i], sum[i - 1], !op0[i - 1]});
+    prop.lcnf({sum[i], !op0[i], !op1[i], sum[i - 1], !op1[i - 1]});
+
+    prop.lcnf({!sum[i], op0[i], op1[i], op0[i - 1], op1[i - 1]});
+    prop.lcnf({!sum[i], op0[i], op1[i], !sum[i - 1], op0[i - 1]});
+    prop.lcnf({!sum[i], op0[i], op1[i], !sum[i - 1], op1[i - 1]});
+
+    prop.lcnf({!sum[i], op0[i], !op1[i], !op0[i - 1], !op1[i - 1]});
+    prop.lcnf({!sum[i], op0[i], !op1[i], sum[i - 1], !op0[i - 1]});
+    prop.lcnf({!sum[i], op0[i], !op1[i], sum[i - 1], !op1[i - 1]});
+
+    prop.lcnf({!sum[i], !op0[i], op1[i], !op0[i - 1], !op1[i - 1]});
+    prop.lcnf({!sum[i], !op0[i], op1[i], sum[i - 1], !op0[i - 1]});
+    prop.lcnf({!sum[i], !op0[i], op1[i], sum[i - 1], !op1[i - 1]});
+
+    prop.lcnf({!sum[i], !op0[i], !op1[i], op0[i - 1], op1[i - 1]});
+    prop.lcnf({!sum[i], !op0[i], !op1[i], !sum[i - 1], op0[i - 1]});
+    prop.lcnf({!sum[i], !op0[i], !op1[i], !sum[i - 1], op1[i - 1]});
+  }
+
+  result.second = prop.lor(
+    prop.land(op0.back(), op1.back()),
+    prop.land(!sum.back(), prop.lor(op0.back(), op1.back())));
+
+  return result;
+}
+
+std::pair<bvt, literalt> bv_utilst::simple_ripple_carry_adder(
+  const bvt &op0,
+  const bvt &op1,
+  literalt carry_in)
+{
+  PRECONDITION(op0.size() == op1.size());
+
+  std::pair<bvt, literalt> result;
+  result.first.reserve(op0.size());
+  bvt carries;
+  carries.reserve(op0.size() + 1);
+
+  carries.push_back(carry_in);
+
+  for(std::size_t i = 0; i < op0.size(); i++)
+  {
+    literalt c_i_minus_1 = carries.back();
+#if 1
+    carries.push_back(prop.lor(
+      {prop.land(op0[i], op1[i]),
+       prop.land(op0[i], c_i_minus_1),
+       prop.land(op1[i], c_i_minus_1)}));
+    result.first.push_back(prop.lxor({op0[i], op1[i], c_i_minus_1}));
+#else
+    // Area optimized low power arithmetic and logic unit. Rani et al. 2011
+    literalt x = !prop.lxor(op0[i], op1[i]);
+    result.first.push_back(!prop.lxor(x, c_i_minus_1));
+    carries.push_back(prop.lselect(x, op0[i], c_i_minus_1));
+#endif
+  }
+
+  result.second = carries.back();
+  return result;
+}
+
+std::pair<bvt, literalt> bv_utilst::carry_lookahead_4_bit_adder(
+  const bvt &op0,
+  const bvt &op1,
+  literalt carry_in)
+{
+  PRECONDITION(op0.size() == op1.size());
+
+  std::pair<bvt, literalt> result;
+  result.first.reserve(op0.size());
+  bvt carries;
+  carries.reserve(op0.size());
+  bvt generate;
+  generate.reserve(op0.size());
+  bvt propagate;
+  propagate.reserve(op0.size());
+
+  bvt group_var1, group_var2;
+  group_var1.reserve(3);
+  group_var2.reserve(2);
+  literalt group_var3;
+
+  carries.push_back(carry_in);
+
+  for(std::size_t i = 0; i < op0.size(); i++)
+  {
+    literalt c_i_minus_1 = carries.back();
+    generate.push_back(prop.land(op0[i], op1[i]));
+    propagate.push_back(prop.lor(op0[i], op1[i])); // could also use lxor
+
+    result.first.push_back(prop.lxor({op0[i], op1[i], c_i_minus_1}));
+
+    switch(i % 4)
+    {
+    case 0:
+      group_var1.clear();
+      group_var1.push_back(prop.land(propagate.back(), c_i_minus_1));
+      carries.push_back(prop.lor(generate.back(), group_var1[0]));
+      break;
+    case 1:
+      group_var1.push_back(prop.land(group_var1[0], propagate.back()));
+      group_var2.clear();
+      group_var2.push_back(prop.land(generate.rbegin()[1], propagate.back()));
+      carries.push_back(
+        prop.lor({generate.back(), group_var2[0], group_var1[1]}));
+      break;
+    case 2:
+      group_var1.push_back(prop.land(group_var1[1], propagate.back()));
+      group_var2.push_back(prop.land(group_var2[0], propagate.back()));
+      group_var3 = prop.land(generate.rbegin()[1], propagate.back());
+      carries.push_back(
+        prop.lor({generate.back(), group_var3, group_var2[1], group_var1[2]}));
+      break;
+    case 3:
+      carries.push_back(prop.lor(
+        generate.back(),
+        prop.land(
+          prop.lor(
+            {generate.rbegin()[1], group_var3, group_var2[1], group_var1[2]}),
+          propagate.back())));
+      break;
+    }
+  }
+
+  result.second = carries.back();
+  return result;
+}
+
+std::pair<bvt, literalt>
+bv_utilst::kogge_stone_adder(const bvt &op0, const bvt &op1, literalt carry_in)
+{
+  PRECONDITION(op0.size() == op1.size());
+  PRECONDITION(!op0.empty());
+
+  std::map<std::pair<std::size_t, std::size_t>, literalt> generate, propagate;
+
+  for(std::size_t i = 0; i < op0.size(); i++)
+  {
+    generate.emplace(std::make_pair(i, i), prop.land(op0[i], op1[i]));
+    propagate.emplace(std::make_pair(i, i), prop.lxor(op0[i], op1[i]));
+  }
+
+  std::size_t L = address_bits(op0.size());
+
+  for(std::size_t llevel = 1; llevel <= L + 1; ++llevel)
+  {
+    std::size_t u = 1ll << llevel;
+    std::size_t v = u >> 1;
+
+    {
+      // with i = v - 1:
+      // GP_{i : i - u  + 1} = GP_{i : i - v + 1} \circ GP_{i - v : i - u + 1}
+      // where all indices are set to -1 if less than that
+
+      auto g__i__i_v_1 = generate.find({v - 1, 0});
+      CHECK_RETURN(g__i__i_v_1 != generate.end());
+      auto p__i__i_v_1 = propagate.find({v - 1, 0});
+      CHECK_RETURN(p__i__i_v_1 != propagate.end());
+
+      generate.emplace(
+        std::make_pair(v - 1, SIZE_MAX),
+        prop.lor(
+          g__i__i_v_1->second, prop.land(p__i__i_v_1->second, carry_in)));
+      propagate.emplace(std::make_pair(v - 1, SIZE_MAX), const_literal(false));
+    }
+    for(std::size_t i = v; i < op0.size() - 1; ++i)
+    {
+      // GP_{i : i - u  + 1} = GP_{i : i - v + 1} \circ GP_{i - v : i - u + 1}
+      // where all indices are set to -1 if less than that
+      auto lb = i + 1 < u ? SIZE_MAX : i + 1 - u;
+
+      auto g__i__i_v_1 = generate.find({i, i - v + 1});
+      CHECK_RETURN(g__i__i_v_1 != generate.end());
+      auto g__i_v__i_u_1 = generate.find({i - v, lb});
+      CHECK_RETURN(g__i_v__i_u_1 != generate.end());
+      auto p__i__i_v_1 = propagate.find({i, i - v + 1});
+      CHECK_RETURN(p__i__i_v_1 != propagate.end());
+      auto p__i_v__i_u_1 = propagate.find({i - v, lb});
+      CHECK_RETURN(p__i_v__i_u_1 != propagate.end());
+
+      generate.emplace(
+        std::make_pair(i, lb),
+        prop.lor(
+          g__i__i_v_1->second,
+          prop.land(p__i__i_v_1->second, g__i_v__i_u_1->second)));
+      propagate.emplace(
+        std::make_pair(i, lb),
+        prop.land(p__i__i_v_1->second, p__i_v__i_u_1->second));
+    }
+    if(llevel <= L)
+    {
+      auto i = op0.size() - 1;
+      // GP_{i : i - u  + 1} = GP_{i : i - v + 1} \circ GP_{i - v : i - u + 1}
+      // where all indices are set to -1 if less than that
+      auto lb = i + 1 < u ? SIZE_MAX : i + 1 - u;
+
+      auto g__i__i_v_1 = generate.find({i, i - v + 1});
+      CHECK_RETURN(g__i__i_v_1 != generate.end());
+      auto g__i_v__i_u_1 = generate.find({i - v, lb});
+      CHECK_RETURN(g__i_v__i_u_1 != generate.end());
+      auto p__i__i_v_1 = propagate.find({i, i - v + 1});
+      CHECK_RETURN(p__i__i_v_1 != propagate.end());
+      auto p__i_v__i_u_1 = propagate.find({i - v, lb});
+      CHECK_RETURN(p__i_v__i_u_1 != propagate.end());
+
+      generate.emplace(
+        std::make_pair(i, lb),
+        prop.lor(
+          g__i__i_v_1->second,
+          prop.land(p__i__i_v_1->second, g__i_v__i_u_1->second)));
+      propagate.emplace(
+        std::make_pair(i, lb),
+        prop.land(p__i__i_v_1->second, p__i_v__i_u_1->second));
+    }
+  }
+
+  std::pair<bvt, literalt> result;
+  result.first.reserve(op0.size());
+
+  result.first.push_back(prop.lxor(propagate.at({0, 0}), carry_in));
+  for(std::size_t i = 1; i < op0.size(); i++)
+  {
+    result.first.push_back(
+      prop.lxor(propagate.at({i, i}), generate.at({i - 1, SIZE_MAX})));
+  }
+
+  // carry-out
+  result.second = generate.at({op0.size() - 1, SIZE_MAX});
+  return result;
+}
+
+std::pair<bvt, literalt>
+bv_utilst::brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in)
+{
+  PRECONDITION(op0.size() == op1.size());
+  PRECONDITION(!op0.empty());
+
+  std::map<std::pair<std::size_t, std::size_t>, literalt> generate, propagate;
+
+  for(std::size_t i = 0; i < op0.size(); i++)
+  {
+    generate.emplace(std::make_pair(i, i), prop.land(op0[i], op1[i]));
+    propagate.emplace(std::make_pair(i, i), prop.lxor(op0[i], op1[i]));
+  }
+
+  std::size_t L = address_bits(op0.size());
+
+  for(std::size_t llevel = 1; llevel <= L; ++llevel)
+  {
+    std::size_t u = 1ll << llevel;
+    std::size_t v = u >> 1;
+
+    if(llevel == 1)
+    {
+      // with i = u - 2:
+      // GP_{i : i - u  + 1} = GP_{i : i - v + 1} \circ GP_{i - v : i - u + 1}
+      // where all indices are set to -1 if less than that
+      // auto i = u - 2;
+
+      auto g__i__i_v_1 = generate.find({u - 2, v - 1});
+      CHECK_RETURN(g__i__i_v_1 != generate.end());
+      auto p__i__i_v_1 = propagate.find({u - 2, v - 1});
+      CHECK_RETURN(p__i__i_v_1 != propagate.end());
+
+      generate.emplace(
+        std::make_pair(u - 2, SIZE_MAX),
+        prop.lor(
+          g__i__i_v_1->second, prop.land(p__i__i_v_1->second, carry_in)));
+    }
+    for(std::size_t i = (llevel == 1 ? 2 * u - 2 : u - 2); i < op0.size() - 1;
+        i += u)
+    {
+      // GP_{i : i - u  + 1} = GP_{i : i - v + 1} \circ GP_{i - v : i - u + 1}
+      // where all indices are set to -1 if less than that
+      auto lb = i + 1 < u ? SIZE_MAX : i + 1 - u;
+
+      auto g__i__i_v_1 = generate.find({i, i - v + 1});
+      CHECK_RETURN(g__i__i_v_1 != generate.end());
+      auto g__i_v__i_u_1 = generate.find({i - v, lb});
+      CHECK_RETURN(g__i_v__i_u_1 != generate.end());
+      auto p__i__i_v_1 = propagate.find({i, i - v + 1});
+      CHECK_RETURN(p__i__i_v_1 != propagate.end());
+
+      generate.emplace(
+        std::make_pair(i, lb),
+        prop.lor(
+          g__i__i_v_1->second,
+          prop.land(p__i__i_v_1->second, g__i_v__i_u_1->second)));
+      if(lb != SIZE_MAX)
+      {
+        auto p__i_v__i_u_1 = propagate.find({i - v, lb});
+        CHECK_RETURN(p__i_v__i_u_1 != propagate.end());
+        propagate.emplace(
+          std::make_pair(i, lb),
+          prop.land(p__i__i_v_1->second, p__i_v__i_u_1->second));
+      }
+    }
+  }
+
+  for(std::size_t llevel = L - 1; llevel >= 1; --llevel)
+  {
+    std::size_t u = 1ll << llevel;
+    std::size_t v = u >> 1;
+
+    for(std::size_t i = u + v - 2; i < op0.size(); i += u)
+    {
+      // GP_{i : -1} = GP_{i : i - v + 1} \circ GP_{i - v : -1}
+      // where all indices are set to -1 if less than that
+
+      auto g__i__i_v_1 = generate.find({i, i - v + 1});
+      CHECK_RETURN(g__i__i_v_1 != generate.end());
+      auto g__i_v___1 = generate.find({i - v, SIZE_MAX});
+      CHECK_RETURN(g__i_v___1 != generate.end());
+      auto p__i__i_v_1 = propagate.find({i, i - v + 1});
+      CHECK_RETURN(p__i__i_v_1 != propagate.end());
+
+      generate.emplace(
+        std::make_pair(i, SIZE_MAX),
+        prop.lor(
+          g__i__i_v_1->second,
+          prop.land(p__i__i_v_1->second, g__i_v___1->second)));
+    }
+  }
+
+  std::pair<bvt, literalt> result;
+  result.first.reserve(op0.size());
+
+  result.first.push_back(prop.lxor(propagate.at({0, 0}), carry_in));
+  for(std::size_t i = 1; i < op0.size(); i++)
+  {
+    result.first.push_back(
+      prop.lxor(propagate.at({i, i}), generate.at({i - 1, SIZE_MAX})));
+  }
+
+  // carry-out
+  result.second = generate.at({op0.size() - 1, SIZE_MAX});
+  return result;
+}
+
+std::pair<bvt, literalt>
+bv_utilst::sklansky_adder(const bvt &op0, const bvt &op1, literalt carry_in)
+{
+  PRECONDITION(op0.size() == op1.size());
+  PRECONDITION(!op0.empty());
+
+  std::map<std::pair<std::size_t, std::size_t>, literalt> generate, propagate;
+
+  for(std::size_t i = 0; i < op0.size(); i++)
+  {
+    generate.emplace(std::make_pair(i, i), prop.land(op0[i], op1[i]));
+    propagate.emplace(std::make_pair(i, i), prop.lxor(op0[i], op1[i]));
+  }
+
+  std::size_t L = address_bits(op0.size());
+
+  for(std::size_t llevel = 1; llevel <= L; ++llevel)
+  {
+    std::size_t u = 1ll << llevel;
+    std::size_t v = u >> 1;
+
+    if(llevel == 1)
+    {
+      // with i = u - 2:
+      // GP_{i : i - u  + 1} = GP_{i : i - v + 1} \circ GP_{i - v : i - u + 1}
+      // where all indices are set to -1 if less than that
+
+      auto g__i__i_v_1 = generate.find({u - 2, v - 1});
+      CHECK_RETURN(g__i__i_v_1 != generate.end());
+      auto p__i__i_v_1 = propagate.find({u - 2, v - 1});
+      CHECK_RETURN(p__i__i_v_1 != propagate.end());
+
+      generate.emplace(
+        std::make_pair(u - 2, SIZE_MAX),
+        prop.lor(
+          g__i__i_v_1->second, prop.land(p__i__i_v_1->second, carry_in)));
+    }
+    for(std::size_t i = (llevel == 1 ? 2 * u - 2 : u - 2); i < op0.size() - 1;
+        i += u)
+    {
+      for(std::size_t j = i; j > i - v; --j)
+      {
+        // GP_{i : i - u  + 1} = GP_{i : i - v + 1} \circ GP_{i - v : i - u + 1}
+        // where all indices are set to -1 if less than that
+        auto lb = i + 1 < u ? SIZE_MAX : i + 1 - u;
+
+        auto g__j__i_v_1 = generate.find({j, i - v + 1});
+        CHECK_RETURN(g__j__i_v_1 != generate.end());
+        auto g__i_v__i_u_1 = generate.find({i - v, lb});
+        CHECK_RETURN(g__i_v__i_u_1 != generate.end());
+        auto p__j__i_v_1 = propagate.find({j, i - v + 1});
+        CHECK_RETURN(p__j__i_v_1 != propagate.end());
+
+        generate.emplace(
+          std::make_pair(j, lb),
+          prop.lor(
+            g__j__i_v_1->second,
+            prop.land(p__j__i_v_1->second, g__i_v__i_u_1->second)));
+        if(lb != SIZE_MAX)
+        {
+          auto p__i_v__i_u_1 = propagate.find({i - v, lb});
+          CHECK_RETURN(p__i_v__i_u_1 != propagate.end());
+          propagate.emplace(
+            std::make_pair(j, lb),
+            prop.land(p__j__i_v_1->second, p__i_v__i_u_1->second));
+        }
+      }
+    }
+  }
+
+  std::pair<bvt, literalt> result;
+  result.first.reserve(op0.size());
+
+  result.first.push_back(prop.lxor(propagate.at({0, 0}), carry_in));
+  for(std::size_t i = 1; i < op0.size(); i++)
+  {
+    result.first.push_back(
+      prop.lxor(propagate.at({i, i}), generate.at({i - 1, SIZE_MAX})));
+  }
+
+  // carry-out
+  generate.emplace(
+    std::make_pair(op0.size() - 1, SIZE_MAX),
+    prop.lor(
+      generate.at({op0.size() - 1, op0.size() - 1}),
+      prop.land(
+        propagate.at({op0.size() - 1, op0.size() - 1}),
+        generate.at({op0.size() - 2, SIZE_MAX}))));
+  result.second = generate.at({op0.size() - 1, SIZE_MAX});
+  return result;
+}
+
+std::pair<bvt, literalt>
+bv_utilst::adder(const bvt &op0, const bvt &op1, literalt carry_in)
+{
+  return optimized_ripple_carry_adder(op0, op1, std::move(carry_in));
 }
 
 literalt bv_utilst::carry_out(
