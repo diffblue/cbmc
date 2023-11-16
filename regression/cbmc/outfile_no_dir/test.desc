@@ -1,0 +1,7 @@
+CORE paths-lifo-expected-failure
+main.c
+--dimacs --outfile /xyz/out.dimacs
+^EXIT=1$
+^SIGNAL=0$
+--
+^warning: ignoring
