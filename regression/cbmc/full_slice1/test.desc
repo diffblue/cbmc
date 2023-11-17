@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --full-slice --property main.assertion.1 --unwind 1
 ^EXIT=10$
