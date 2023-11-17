@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --function foo
 ^\[foo.assertion.\d+\] line \d+ assertion other_function\(4\) == 5: FAILURE$
