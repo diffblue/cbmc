@@ -1462,7 +1462,7 @@ static smt_termt convert_expr_to_smt(
   const sub_expression_mapt &converted)
 {
   UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for byte swap expression: " +
+    "Generation of SMT formula for count trailing zeros expression: " +
     count_trailing_zeros.pretty());
 }
 
