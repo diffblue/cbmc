@@ -296,13 +296,7 @@ bool cmdlinet::parse_arguments(int argc, const char **argv)
         return true;
       }
 
-      // Work around spurious GCC 12 warning about optnr being uninitialised.
-#pragma GCC diagnostic push
-#ifndef __clang__
-#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
       options[*optnr].isset = true;
-#pragma GCC diagnostic pop
 
       if(options[*optnr].hasval)
       {

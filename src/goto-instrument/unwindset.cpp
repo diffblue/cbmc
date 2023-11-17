@@ -33,13 +33,7 @@ void unwindsett::parse_unwindset_one_loop(
   if(val.empty())
     return;
 
-// Work around spurious GCC 12 warning about thread_nr being uninitialised.
-#pragma GCC diagnostic push
-#ifndef __clang__
-#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
   optionalt<unsigned> thread_nr;
-#pragma GCC diagnostic pop
   if(isdigit(val[0]))
   {
     auto c_pos = val.find(':');
@@ -160,13 +154,7 @@ void unwindsett::parse_unwindset_one_loop(
           return;
         }
         else
-// Work around spurious GCC 12 warning about thread_nr being uninitialised.
-#pragma GCC diagnostic push
-#ifndef __clang__
-#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
           id = function_id + "." + std::to_string(*nr);
-#pragma GCC diagnostic pop
       }
     }
 
@@ -182,13 +170,7 @@ void unwindsett::parse_unwindset_one_loop(
 
     if(thread_nr.has_value())
     {
-// Work around spurious GCC 12 warning about thread_nr being uninitialised.
-#pragma GCC diagnostic push
-#ifndef __clang__
-#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
       thread_loop_map[std::pair<irep_idt, unsigned>(id, *thread_nr)] = uw;
-#pragma GCC diagnostic pop
     }
     else
     {
