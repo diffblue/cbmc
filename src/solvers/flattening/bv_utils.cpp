@@ -1070,6 +1070,11 @@ bvt bv_utilst::multiplier(
   const bvt &op1,
   representationt rep)
 {
+  // We determine the result size from the operand size, and the implementation
+  // liberally swaps the operands, so we need to arrive at the same size
+  // whatever the order of the operands.
+  PRECONDITION(op0.size() == op1.size());
+
   switch(rep)
   {
   case representationt::SIGNED: return signed_multiplier(op0, op1);
