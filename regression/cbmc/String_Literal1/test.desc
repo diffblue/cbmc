@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --trace
 ^State \d+ file main.c function main line 20 thread 0$
