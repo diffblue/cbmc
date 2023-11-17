@@ -1,6 +1,5 @@
 var NAVTREEINDEX117 =
 {
-"parse__float_8cpp_source.html":[9,0,2,1,2,8],
 "parse__float_8h.html":[9,0,2,1,2,9],
 "parse__float_8h_source.html":[9,0,2,1,2,9],
 "parse__options_8cpp.html":[9,0,2,32,152],
@@ -249,5 +248,6 @@ var NAVTREEINDEX117 =
 "polynomial_8h_source.html":[9,0,2,15,0,19],
 "polynomial__accelerator_8cpp.html":[9,0,2,15,0,20],
 "polynomial__accelerator_8cpp_source.html":[9,0,2,15,0,20],
-"polynomial__accelerator_8h.html":[9,0,2,15,0,21]
+"polynomial__accelerator_8h.html":[9,0,2,15,0,21],
+"polynomial__accelerator_8h.html#a33830775fb2571c9deebab44509394d6":[9,0,2,15,0,21,2]
 };

@@ -1,6 +1,5 @@
 var NAVTREEINDEX25 =
 {
-"classdereference__callbackt.html#a643be6282dd364b19aade7e76885b480":[8,0,364,1],
 "classdereference__callbackt.html#a6525bf6a9bb012d3151b20ca8367b28f":[8,0,364,2],
 "classdereference__exprt.html":[8,0,365],
 "classdereference__exprt.html#a02f682cad8f409bb6dd1f9cba9675308":[8,0,365,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX25 =
 "classdfcc__libraryt.html#afdd1a9fe8bc51d3eb63055a72471a527":[8,0,380,18],
 "classdfcc__libraryt.html#afe679d91ee7da0b0e3f39d499a9a9e5a":[8,0,380,54],
 "classdfcc__lift__memory__predicatest.html":[8,0,381],
-"classdfcc__lift__memory__predicatest.html#a02dc12836542082b17cd512e5531c17e":[8,0,381,11]
+"classdfcc__lift__memory__predicatest.html#a02dc12836542082b17cd512e5531c17e":[8,0,381,11],
+"classdfcc__lift__memory__predicatest.html#a06eb615d4cce712c0d0cba7457d96e94":[8,0,381,4]
 };
