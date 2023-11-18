@@ -578,11 +578,15 @@ void dfcc_wrapper_programt::encode_requires_clauses()
   memory_predicates.fix_calls(requires_program);
 
   // instrument for side effects
+  // make the program well-formed
+  requires_program.add(goto_programt::make_end_function());
   instrument.instrument_goto_program(
     wrapper_id,
     requires_program,
     addr_of_requires_write_set,
     function_pointer_contracts);
+  // turn it back into a sequence of statements
+  requires_program.instructions.back().turn_into_skip();
 
   // append resulting program to preconditions section
   preconditions.destructive_append(requires_program);
@@ -637,11 +641,15 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
   memory_predicates.fix_calls(ensures_program);
 
   // instrument for side effects
+  // make the program well-formed
+  ensures_program.add(goto_programt::make_end_function());
   instrument.instrument_goto_program(
     wrapper_id,
     ensures_program,
     addr_of_ensures_write_set,
     function_pointer_contracts);
+  // turn it back into a sequence of statements
+  ensures_program.instructions.back().turn_into_skip();
 
   // add the ensures program to the postconditions section
   postconditions.destructive_append(ensures_program);

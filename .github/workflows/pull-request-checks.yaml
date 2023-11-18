@@ -432,7 +432,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-Wp,-D_GLIBCXX_ASSERTIONS
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
