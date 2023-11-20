@@ -5,7 +5,10 @@ BUILD_ENV = AUTO
 ifeq ($(BUILD_ENV),MSVC)
   #CXXFLAGS += /Wall /WX
 else
-  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum
+  CXXFLAGS += -Wall -pedantic -Werror -Wswitch-enum
+  CXXFLAGS += -Wno-deprecated-declarations
+  # GCC only, silence clang warning
+  CXXFLAGS += -Wno-maybe-uninitialized -Wno-unknown-warning-option
 endif
 
 ifeq ($(CPROVER_WITH_PROFILING),1)
