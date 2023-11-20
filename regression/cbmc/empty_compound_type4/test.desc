@@ -1,4 +1,4 @@
-CORE gcc-only no-new-smt
+CORE gcc-only
 main.c
 --trace
 ^VERIFICATION FAILED$

@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 test.c
 --export-symex-ready-goto exported.symex.ready.goto
 ^Parsing test.c$

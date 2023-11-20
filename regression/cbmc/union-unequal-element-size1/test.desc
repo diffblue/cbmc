@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --verbosity 10
 ^EXIT=0$

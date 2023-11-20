@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --memory-leak-check
 ^EXIT=10$

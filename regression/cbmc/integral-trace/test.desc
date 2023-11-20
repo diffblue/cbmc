@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 test.c
 --trace --xml-ui
 activate-multi-line-match
