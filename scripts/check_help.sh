@@ -2,6 +2,9 @@
 
 set -e
 
+CXX=$1
+shift
+
 # if a command-line argument is provided, use it as a path to built binaries
 # (CMake-style build); otherwise assume we use Makefile-based in-tree build
 if [ $# -eq 1 ] ; then
@@ -33,10 +36,10 @@ for t in  \
   tool_name=$(basename $t)
   opt_name=$(echo $tool_name | tr 'a-z-' 'A-Z_')
 	echo "Extracting the raw list of parameters from $tool_name"
-  g++ -E -dM -std=c++17 -I../src -I../jbmc/src $t/*_parse_options.cpp -o macros.c
+  $CXX -E -dM -std=c++17 -I../src -I../jbmc/src $t/*_parse_options.cpp -o macros.c
   # goto-analyzer partly uses the spelling "analyser" within the code base
   echo ${opt_name}_OPTIONS | sed 's/GOTO_ANALYZER/GOTO_ANALYSER/' >> macros.c
-  rawstring="`gcc -E -P -w macros.c` \"?h(help)\""
+  rawstring="`$CXX -E -P -w macros.c` \"?h(help)\""
   rm macros.c
 
   # now the main bit, convert from raw format to a proper list of switches
@@ -58,8 +61,8 @@ for t in  \
   fi
 
   if [ ! -x $tool_bin ] ; then
-    echo "$tool_bin is not an executable"
-    exit 1
+    echo "$tool_bin is not an executable, cannot check help completeness"
+    continue
   fi
   $tool_bin --help > help_string
   grep '^\\fB\\-' ../doc/man/$tool_name.1 > man_page_opts

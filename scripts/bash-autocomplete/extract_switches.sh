@@ -2,15 +2,18 @@
 
 set -e
 
+CXX=$1
+shift
+
 # make sure we execute the remainder in the directory containing this script
 cd `dirname $0`
 
 echo "Compiling the helper file to extract the raw list of parameters from cbmc"
-g++ -E -dM -std=c++17 -I../../src ../../src/cbmc/cbmc_parse_options.cpp -o macros.c
+$CXX -E -dM -std=c++17 -I../../src ../../src/cbmc/cbmc_parse_options.cpp -o macros.c
 echo CBMC_OPTIONS >> macros.c
 
 echo "Converting the raw parameter list to the format required by autocomplete scripts"
-rawstring="`gcc -E -P -w macros.c` \"?h(help)\""
+rawstring="`$CXX -E -P -w macros.c` \"?h(help)\""
 rm macros.c
 
 #now the main bit, convert from raw format to a proper list of switches
