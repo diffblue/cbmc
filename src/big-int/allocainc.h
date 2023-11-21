@@ -49,9 +49,10 @@ extern "C" void *alloca (unsigned);
 
 # define alloca(X) __builtin_alloca(X)
 
-#elif defined __FreeBSD__ || defined __FreeBSD_kernel__ || defined __OpenBSD__
+#elif defined __FreeBSD__ || defined __FreeBSD_kernel__ ||                     \
+  defined __OpenBSD__ || defined __NetBSD__
 
-# include <stdlib.h>
+#  include <stdlib.h>
 
 #endif
 
