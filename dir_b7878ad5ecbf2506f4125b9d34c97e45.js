@@ -234,7 +234,6 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
       [ "statet", "structnfat_1_1statet.html", "structnfat_1_1statet" ],
       [ "transitiont", "structnfat_1_1transitiont.html", "structnfat_1_1transitiont" ]
     ] ],
-    [ "nodiscard.h", "nodiscard_8h.html", "nodiscard_8h" ],
     [ "nondet_bool.h", "nondet__bool_8h.html", "nondet__bool_8h" ],
     [ "numbering.h", "numbering_8h.html", [
       [ "numberingt", "classnumberingt.html", "classnumberingt" ]
