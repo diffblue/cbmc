@@ -14,8 +14,6 @@ Author: Diffblue Ltd.
 
 #include <memory>
 
-#include <util/nodiscard.h>
-
 #include "string_builtin_function.h"
 
 /// Keep track of dependencies between strings.
@@ -115,7 +113,7 @@ public:
   /// For all builtin call on which a test (or an unsupported buitin)
   /// result depends, add the corresponding constraints. For the other builtin
   /// only add constraints on the length.
-  NODISCARD string_constraintst add_constraints(
+  [[nodiscard]] string_constraintst add_constraints(
     string_constraint_generatort &generatort,
     message_handlert &message_handler);
 

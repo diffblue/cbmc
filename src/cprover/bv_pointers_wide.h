@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CPROVER_BV_POINTERS_WIDE_H
 #define CPROVER_CPROVER_BV_POINTERS_WIDE_H
 
-#include <util/nodiscard.h>
 #include <util/pointer_expr.h>
 
 #include <solvers/flattening/boolbv.h>
@@ -51,13 +50,12 @@ protected:
   // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
 
-  NODISCARD
-  bvt encode(const mp_integer &object, const pointer_typet &) const;
+  [[nodiscard]] bvt
+  encode(const mp_integer &object, const pointer_typet &) const;
 
   virtual bvt convert_pointer_type(const exprt &);
 
-  NODISCARD
-  virtual bvt add_addr(const exprt &);
+  [[nodiscard]] virtual bvt add_addr(const exprt &);
 
   // overloading
   literalt convert_rest(const exprt &) override;
@@ -66,19 +64,16 @@ protected:
   exprt
   bv_get_rec(const exprt &, const bvt &, std::size_t offset) const override;
 
-  NODISCARD
-  optionalt<bvt> convert_address_of_rec(const exprt &);
+  [[nodiscard]] optionalt<bvt> convert_address_of_rec(const exprt &);
 
-  NODISCARD
-  bvt offset_arithmetic(const pointer_typet &, const bvt &, const mp_integer &);
-  NODISCARD
-  bvt offset_arithmetic(
+  [[nodiscard]] bvt
+  offset_arithmetic(const pointer_typet &, const bvt &, const mp_integer &);
+  [[nodiscard]] bvt offset_arithmetic(
     const pointer_typet &,
     const bvt &,
     const mp_integer &factor,
     const exprt &index);
-  NODISCARD
-  bvt offset_arithmetic(
+  [[nodiscard]] bvt offset_arithmetic(
     const pointer_typet &,
     const bvt &,
     const mp_integer &factor,

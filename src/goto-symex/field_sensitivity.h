@@ -9,7 +9,6 @@ Author: Michael Tautschnig
 #ifndef CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 #define CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 
-#include <util/nodiscard.h>
 #include <util/ssa_expr.h>
 
 class namespacet;
@@ -158,13 +157,11 @@ public:
   /// \param expr: an expression to be (recursively) transformed.
   /// \param write: set to true if the expression is to be used as an lvalue.
   /// \return the transformed expression
-  NODISCARD
-  exprt
+  [[nodiscard]] exprt
   apply(const namespacet &ns, goto_symex_statet &state, exprt expr, bool write)
     const;
   /// \copydoc apply(const namespacet&,goto_symex_statet&,exprt,bool) const
-  NODISCARD
-  exprt apply(
+  [[nodiscard]] exprt apply(
     const namespacet &ns,
     goto_symex_statet &state,
     ssa_exprt expr,
@@ -182,8 +179,7 @@ public:
   /// \return Expanded expression; for example, for a \p ssa_expr of some struct
   ///   type, a `struct_exprt` with each component now being an SSA expression
   ///   is built.
-  NODISCARD
-  exprt get_fields(
+  [[nodiscard]] exprt get_fields(
     const namespacet &ns,
     goto_symex_statet &state,
     const ssa_exprt &ssa_expr,
@@ -198,8 +194,8 @@ public:
   ///   (`true`)
   /// \return False, if and only if, \p expr would be a single field-sensitive
   /// SSA expression.
-  NODISCARD
-  bool is_divisible(const ssa_exprt &expr, bool disjoined_fields_only) const;
+  [[nodiscard]] bool
+  is_divisible(const ssa_exprt &expr, bool disjoined_fields_only) const;
 
 private:
   const std::size_t max_field_sensitivity_array_size;
@@ -214,8 +210,7 @@ private:
     symex_targett &target,
     bool allow_pointer_unsoundness) const;
 
-  NODISCARD
-  exprt simplify_opt(exprt e, const namespacet &ns) const;
+  [[nodiscard]] exprt simplify_opt(exprt e, const namespacet &ns) const;
 };
 
 #endif // CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H

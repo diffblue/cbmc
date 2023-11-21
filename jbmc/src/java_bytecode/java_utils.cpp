@@ -577,7 +577,7 @@ void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class)
   symbol.type.set(ID_C_class, declaring_class);
 }
 
-NODISCARD optionalt<std::string>
+[[nodiscard]] optionalt<std::string>
 class_name_from_method_name(const std::string &method_name)
 {
   const auto signature_index = method_name.rfind(":");
