@@ -2,8 +2,7 @@
 
 void main()
 {
-  unsigned long len;
-  __CPROVER_assume(len <= SIZE);
+  unsigned long long len;
   __CPROVER_assume(len >= 8);
   char *array = malloc(len);
   const char *end = array + len;
