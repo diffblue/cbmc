@@ -464,7 +464,8 @@ cext cegis_verifiert::build_cex(
           {
             if(
               underlying_array.id() == ID_address_of ||
-              underlying_array.id() == ID_index)
+              underlying_array.id() == ID_index ||
+              underlying_array.id() == ID_typecast)
             {
               underlying_array = underlying_array.operands()[0];
               continue;

@@ -1,4 +1,5 @@
-SRC = cegis_verifier.cpp \
+SRC = cegis_evaluator.cpp \
+      cegis_verifier.cpp \
       dump_loop_contracts.cpp \
       enumerative_loop_contracts_synthesizer.cpp \
       expr_enumerator.cpp \
