@@ -44,8 +44,8 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
   for(auto it = expr.depth_begin(), itend = expr.depth_end(); it != itend; ++it)
   {
     if(
-      expr.id() == ID_symbol &&
-      has_prefix(id2string(to_symbol_expr(expr).get_identifier()), prefix))
+      it->id() == ID_symbol &&
+      has_prefix(id2string(to_symbol_expr(*it).get_identifier()), prefix))
     {
       return true;
     }
