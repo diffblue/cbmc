@@ -8,34 +8,37 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "memory_info.h"
 
-#ifdef __APPLE__
-#include <mach/task.h>
-#include <mach/mach_init.h>
-#include <malloc/malloc.h>
-#endif
+#include "invariant.h"
 
-#ifdef __linux__
-#include <malloc.h>
-#endif
-
-#ifdef _WIN32
-#include <util/pragma_push.def>
-#ifdef _MSC_VER
-#pragma warning(disable:4668)
-  // using #if/#elif on undefined macro
-#pragma warning(disable : 5039)
+#ifdef __GLIBC__
+#  include <malloc.h>
+#elif defined(_WIN32)
+#  include <util/pragma_push.def>
+#  ifdef _MSC_VER
+#    pragma warning(disable : 4668)
+// using #if/#elif on undefined macro
+#    pragma warning(disable : 5039)
 // pointer or reference to potentially throwing function passed to extern C
-#endif
-#include <windows.h>
-#include <psapi.h>
-#include <util/pragma_pop.def>
+#  endif
+#  include <util/pragma_pop.def>
+// windows.h must be included before psapi.h
+// clang-format off
+#  include <windows.h>
+#  include <psapi.h>
+// clang-format on
+#elif defined(__APPLE__)
+#  include <mach/mach_init.h>
+#  include <mach/task.h>
+#  include <malloc/malloc.h>
+#else
+#  include <sys/resource.h>
 #endif
 
 #include <ostream>
 
 void memory_info(std::ostream &out)
 {
-#if defined(__linux__) && defined(__GLIBC__)
+#ifdef __GLIBC__
   // NOLINTNEXTLINE(readability/identifiers)
   struct mallinfo m = mallinfo();
   out << "  non-mmapped space allocated from system: " << m.arena << "\n";
@@ -70,5 +73,11 @@ void memory_info(std::ostream &out)
       << static_cast<double>(t.max_size_in_use)/1000000 << "m\n";
   out << "  size_allocated: "
       << static_cast<double>(t.size_allocated)/1000000 << "m\n";
+#else
+  // NOLINTNEXTLINE(readability/identifiers)
+  struct rusage r_usage;
+  int result = getrusage(RUSAGE_SELF, &r_usage);
+  CHECK_RETURN(result == 0);
+  out << "  maximum resident set size [bytes]: " << r_usage.ru_maxrss << '\n';
 #endif
 }
