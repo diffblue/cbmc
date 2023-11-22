@@ -186,6 +186,7 @@ var annotated_dup =
     [ "casting_replace_symbolt", "classcasting__replace__symbolt.html", "classcasting__replace__symbolt" ],
     [ "cbmc_invariants_should_throwt", "structcbmc__invariants__should__throwt.html", "structcbmc__invariants__should__throwt" ],
     [ "cbmc_parse_optionst", "classcbmc__parse__optionst.html", "classcbmc__parse__optionst" ],
+    [ "cegis_evaluatort", "classcegis__evaluatort.html", "classcegis__evaluatort" ],
     [ "cegis_verifiert", "classcegis__verifiert.html", "classcegis__verifiert" ],
     [ "cerr_message_handlert", "classcerr__message__handlert.html", "classcerr__message__handlert" ],
     [ "cext", "classcext.html", "classcext" ],
