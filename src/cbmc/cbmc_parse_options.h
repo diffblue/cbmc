@@ -34,7 +34,7 @@ class optionst;
 // clang-format off
 #define CBMC_OPTIONS \
   OPT_BMC            \
-  "(standard-checks)" \
+  "(no-standard-checks)" \
   "(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
   "(no-simplify)(full-slice)" \
@@ -91,7 +91,7 @@ public:
   /// This function can be called from clients that wish to emulate CBMC's
   /// default behaviour, for example unit tests.
   static void set_default_options(optionst &);
-  static void set_soundness_on_by_default(optionst &options);
+  static void set_default_analysis_flags(optionst &options);
 
   static bool process_goto_program(goto_modelt &, const optionst &, messaget &);
 

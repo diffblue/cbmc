@@ -109,7 +109,7 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("depth", UINT32_MAX);
 }
 
-void cbmc_parse_optionst::set_soundness_on_by_default(optionst &options)
+void cbmc_parse_optionst::set_default_analysis_flags(optionst &options)
 {
   // Analysis flags on by default
   options.set_option("bounds-check", true);
@@ -133,11 +133,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   cbmc_parse_optionst::set_default_options(options);
   parse_c_object_factory_options(cmdline, options);
-
-  // Enable flags that in combination provide analysis with no surprises
-  // (expected checks and no unsoundness by missing checks).
-  if (options.get_bool_option("standard-checks"))
-    set_soundness_on_by_default(options);
 
   if(cmdline.isset("function"))
     options.set_option("function", cmdline.get_value("function"));
@@ -327,7 +322,14 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     "self-loops-to-assumptions",
     !cmdline.isset("no-self-loops-to-assumptions"));
 
-  // all checks supported by goto_check
+  // Enable flags that in combination provide analysis with no surprises
+  // (expected checks and no unsoundness by missing checks).
+  if (!cmdline.isset("no-standard-checks") && options.get_bool_option("standard-checks"))
+    set_default_analysis_flags(options);
+  else
+    PARSE_OPTIONS_GOTO_CHECK_DEFAULTS_OVERRIDE(cmdline, options);
+
+  // all (non-default) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // generate unwinding assertions
