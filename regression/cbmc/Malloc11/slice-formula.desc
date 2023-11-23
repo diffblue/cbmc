@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --slice-formula
+--slice-formula
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

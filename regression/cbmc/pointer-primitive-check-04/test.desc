@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-primitive-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 \[main.pointer_primitives.1\] line \d+ pointer invalid in R_OK\(p, .*1\): FAILURE

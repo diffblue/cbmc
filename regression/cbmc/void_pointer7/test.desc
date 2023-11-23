@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
---pointer-check
+
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

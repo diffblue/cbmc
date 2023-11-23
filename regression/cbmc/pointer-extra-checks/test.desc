@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.pointer_dereference.1\] .* dereference failure: pointer NULL in \*p: FAILURE$

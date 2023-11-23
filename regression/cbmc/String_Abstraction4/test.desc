@@ -1,6 +1,6 @@
 CORE
 main.c
---string-abstraction --pointer-check --bounds-check
+--string-abstraction
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

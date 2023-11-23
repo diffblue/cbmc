@@ -1,6 +1,6 @@
 CORE broken-smt-backend no-new-smt
 main.c
---pointer-check
+
 ^\[main.assertion.1\] line 6 correct: SUCCESS
 ^\[main.pointer.1\] line 8 same object violation in array - other_array: FAILURE$
 ^\[main.assertion.2\] line 11 undefined behavior: FAILURE$

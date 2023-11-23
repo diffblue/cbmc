@@ -1,6 +1,6 @@
 CORE
 main.c
---undefined-shift-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*\] line 4 shift operand is negative in .*: SUCCESS$

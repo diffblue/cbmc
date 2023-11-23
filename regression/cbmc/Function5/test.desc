@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check
+
 ^SIGNAL=0$
 ^EXIT=10$
 ^\[.*\] .* dereference failure: pointer outside object bounds in \*p: FAILURE$

@@ -1,6 +1,6 @@
 CORE
---trace
 singleton_interval_simp_neg.c
+--trace
 ^VERIFICATION FAILED$
 ^\[main\.assertion\.1\] line \d expected failure: paths where x is unbounded explored: FAILURE$
 ^\[main\.assertion\.2\] line \d+ expected failure: paths where 0 \<= x \<= 15 explored: FAILURE$

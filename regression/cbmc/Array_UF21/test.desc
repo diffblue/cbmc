@@ -1,6 +1,6 @@
 CORE
 main.c
---arrays-uf-always --bounds-check
+--arrays-uf-always
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

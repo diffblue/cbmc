@@ -1,6 +1,6 @@
 CORE
 main.c
---unsigned-overflow-check --signed-overflow-check --function reduce
+--unsigned-overflow-check --function reduce
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
