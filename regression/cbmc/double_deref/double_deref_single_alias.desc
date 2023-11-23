@@ -1,6 +1,6 @@
 CORE
 double_deref_single_alias.c
---show-vcc
+--no-malloc-may-fail --show-vcc
 \{1\} main::argc!0@1#1 = 1
 ^EXIT=0$
 ^SIGNAL=0$

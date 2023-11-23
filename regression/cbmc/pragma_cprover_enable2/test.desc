@@ -6,7 +6,9 @@ main.c
 ^\[main\.overflow\.3\] line 15 arithmetic overflow on signed \+ in n \+ 1: FAILURE$
 ^\[main\.overflow\.4\] line 16 arithmetic overflow on signed \+ in n \+ 1: FAILURE$
 ^\[main\.overflow\.5\] line 17 arithmetic overflow on signed \+ in x \+ n: FAILURE$
-^\*\* 5 of 5 failed
+^\[main\.overflow\.6\] line 20 arithmetic overflow on signed \+ in n \+ n: FAILURE$
+^\[main\.overflow\.7\] line 21 arithmetic overflow on signed \+ in x \+ n: FAILURE$
+^\*\* 7 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

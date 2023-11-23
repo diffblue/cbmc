@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --program-only
+--program-only
 ^EXIT=0$
 ^SIGNAL=0$
 a!0@1#2 == 0$

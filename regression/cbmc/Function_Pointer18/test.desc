@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 \[f2.assertion.1\] line [0-9]+ assertion 0: SUCCESS
-\[main.pointer_dereference.1\] line 28 dereferenced function pointer must be f2: FAILURE$
+\[main.pointer_dereference.\d*\] line 28 dereferenced function pointer must be f2: FAILURE$
 \[main.assertion.1\] line [0-9]+ assertion x == 1: SUCCESS
 \[main.assertion.2\] line [0-9]+ assertion x == 2: SUCCESS
 ^VERIFICATION FAILED$

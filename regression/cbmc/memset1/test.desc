@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
-
+--no-malloc-may-fail
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

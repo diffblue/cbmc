@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---pointer-check --bounds-check --big-endian
+--big-endian
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

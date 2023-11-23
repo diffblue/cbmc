@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.i
---little-endian
+--little-endian --no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^\*\* 8 of 8 failed

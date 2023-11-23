@@ -1,6 +1,6 @@
 CORE
 test.c
---pointer-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 --

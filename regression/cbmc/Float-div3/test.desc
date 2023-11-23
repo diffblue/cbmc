@@ -1,6 +1,6 @@
 CORE broken-z3-smt-backend no-new-smt
 main.c
---floatbv
+--floatbv --no-built-in-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

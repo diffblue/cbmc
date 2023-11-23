@@ -3,7 +3,7 @@ main.c
 
 ^\[main\.array_bounds\.1\] line \d+ array 'y' upper bound.*FAILURE$
 ^\[main\.overflow\.1\] line \d+ arithmetic overflow on signed.*FAILURE$
-^\*\* 2 of 2 failed
+^\*\* 2 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE broken-smt-backend no-new-smt
 main.c
---no-simplify
+--no-simplify --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

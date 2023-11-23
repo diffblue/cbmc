@@ -1,6 +1,6 @@
 CORE
 at_bounds1.c
---pointer-primitive-check --malloc-fail-null
+--malloc-fail-null
 ^\[main.pointer_primitives.\d+\] line 13 pointer outside object bounds in R_OK\(q \+ (\(signed (long (long )?)?int\))?1, (\(unsigned (long (long )?)?int\))?0\): FAILURE$
 ^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$

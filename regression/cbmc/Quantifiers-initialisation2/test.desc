@@ -7,7 +7,7 @@ main.c
 ^\[main.assertion.3\] .* assertion a\[.*\] > a\[.*\]: FAILURE$
 ^\[main.assertion.4\] .* forall c\[\]: SUCCESS$
 ^\[main.assertion.5\] .* assertion c\[.*\] >= c\[.*\]: SUCCESS$
-^\*\* 1 of 5 failed
+^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

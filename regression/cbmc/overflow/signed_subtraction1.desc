@@ -1,6 +1,6 @@
 CORE
 signed_subtraction1.c
---signed-overflow-check
+--no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

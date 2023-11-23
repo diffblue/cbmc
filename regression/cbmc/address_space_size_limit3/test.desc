@@ -1,6 +1,6 @@
 CORE thorough-smt-backend no-new-smt
 main.i
---32 --little-endian --object-bits 26 --pointer-check
+--32 --little-endian --object-bits 26
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

@@ -1,6 +1,6 @@
 CORE
 one.json_symtab
-two.json_symtab
+two.json_symtab --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 \[1\] file two.adb line [0-9]+ assertion: SUCCESS

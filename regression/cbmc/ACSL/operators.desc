@@ -1,6 +1,6 @@
 CORE no-new-smt
 operators.c
-
+--no-signed-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

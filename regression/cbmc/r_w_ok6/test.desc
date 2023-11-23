@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-malloc-may-fail
 \[main.assertion.1\] .*: SUCCESS
 \[main.assertion.2\] .*: FAILURE
 \[main.assertion.3\] .*: FAILURE

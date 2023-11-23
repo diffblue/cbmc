@@ -1,6 +1,6 @@
 CORE
 main.c
---property inc.overflow.1 --property inc.overflow.2 --slice-formula --signed-overflow-check --conversion-check
+--property inc.overflow.1 --property inc.overflow.2 --slice-formula --conversion-check
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED

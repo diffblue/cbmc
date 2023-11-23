@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-primitive-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 \[main.pointer_primitives.\d+\] line \d+ pointer invalid in __CPROVER_OBJECT_SIZE\(\(const void \*\)p4\): FAILURE

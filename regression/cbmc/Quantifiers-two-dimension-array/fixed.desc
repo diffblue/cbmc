@@ -7,7 +7,7 @@ fixed.c
 ^\[main.assertion.3\] line 16 assertion a\[.*\]\[.*\] == 1: SUCCESS$
 ^\[main.assertion.4\] line 17 assertion a\[.*\]\[.*\] == 2: SUCCESS$
 ^\[main.assertion.5\] line 18 assertion .*: SUCCESS$
-^\*\* 0 of 5 failed
+^\*\* 0 of \d+ failed
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
