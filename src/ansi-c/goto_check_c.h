@@ -38,12 +38,12 @@ void goto_check_c(
   message_handlert &message_handler);
 
 #define OPT_GOTO_CHECK                                                         \
-  "(no-bounds-check)(pointer-check)(memory-leak-check)(memory-cleanup-check)"     \
-  "(div-by-zero-check)(enum-range-check)"                                      \
-  "(signed-overflow-check)(unsigned-overflow-check)"                           \
-  "(pointer-overflow-check)(conversion-check)(undefined-shift-check)"          \
+  "(no-bounds-check)(no-pointer-check)(memory-leak-check)(memory-cleanup-check)"     \
+  "(no-div-by-zero-check)(enum-range-check)"                                      \
+  "(no-signed-overflow-check)(unsigned-overflow-check)"                           \
+  "(pointer-overflow-check)(conversion-check)(no-undefined-shift-check)"          \
   "(float-overflow-check)(nan-check)(no-built-in-assertions)"                  \
-  "(pointer-primitive-check)"                                                  \
+  "(no-pointer-primitive-check)"                                                  \
   "(retain-trivial-checks)"                                                    \
   "(error-label):"                                                             \
   "(no-assertions)(no-assumptions)"                                            \

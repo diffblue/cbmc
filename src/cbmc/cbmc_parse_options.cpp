@@ -326,8 +326,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // (expected checks and no unsoundness by missing checks).
   if (!cmdline.isset("no-standard-checks") && options.get_bool_option("standard-checks"))
     set_default_analysis_flags(options);
-  else
-    PARSE_OPTIONS_GOTO_CHECK_DEFAULTS_OVERRIDE(cmdline, options);
+
+  PARSE_OPTIONS_GOTO_CHECK_DEFAULTS_OVERRIDE(cmdline, options);
 
   // all (non-default) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
