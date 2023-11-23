@@ -17,6 +17,7 @@ static std::unique_ptr<optionst> make_internal_default_options()
 {
   std::unique_ptr<optionst> options = std::make_unique<optionst>();
   cmdlinet command_line;
+  // TODO: May need to add the default one here.
   PARSE_OPTIONS_GOTO_CHECK(command_line, (*options));
   parse_solver_options(command_line, *options);
   options->set_option("built-in-assertions", true);

@@ -1025,6 +1025,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   else
     options.set_option("simplify", true);
 
+  // TODO: May need to add the default one here
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 

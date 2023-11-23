@@ -59,6 +59,7 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);
 
+  // TODO: May need to add default one here.
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
