@@ -320,7 +320,7 @@ test: $(CATCH_TEST)
 	# Include hidden tests by specifying "*,[.]" for tests to count
 	if ! ./$(CATCH_TEST) "*,[.]" -l | grep -q "^$(N_CATCH_TESTS) matching test cases" ; then \
 		./$(CATCH_TEST) "*,[.]" -l ; fi
-	./$(CATCH_TEST) ${TAGS}
+	./$(CATCH_TEST) '${TAGS}'
 
 
 ###############################################################################
