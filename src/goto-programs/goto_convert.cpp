@@ -1613,17 +1613,34 @@ void goto_convertt::convert_ifthenelse(
   // convert 'then'-branch
   goto_programt tmp_then;
   convert(code.then_case(), tmp_then, mode);
+  source_locationt then_end_location =
+    code.then_case().get_statement() == ID_block
+      ? to_code_block(code.then_case()).end_location()
+      : code.then_case().source_location();
 
   goto_programt tmp_else;
+  source_locationt else_end_location;
 
   if(has_else)
+  {
     convert(code.else_case(), tmp_else, mode);
+    else_end_location = code.else_case().get_statement() == ID_block
+                          ? to_code_block(code.else_case()).end_location()
+                          : code.else_case().source_location();
+  }
 
   exprt tmp_guard=code.cond();
   clean_expr(tmp_guard, dest, mode);
 
   generate_ifthenelse(
-    tmp_guard, tmp_then, tmp_else, source_location, dest, mode);
+    tmp_guard,
+    source_location,
+    tmp_then,
+    then_end_location,
+    tmp_else,
+    else_end_location,
+    dest,
+    mode);
 }
 
 void goto_convertt::collect_operands(
@@ -1655,9 +1672,11 @@ static inline bool is_size_one(const goto_programt &g)
 /// if(guard) true_case; else false_case;
 void goto_convertt::generate_ifthenelse(
   const exprt &guard,
-  goto_programt &true_case,
-  goto_programt &false_case,
   const source_locationt &source_location,
+  goto_programt &true_case,
+  const source_locationt &then_end_location,
+  goto_programt &false_case,
+  const source_locationt &else_end_location,
   goto_programt &dest,
   const irep_idt &mode)
 {
@@ -1727,13 +1746,17 @@ void goto_convertt::generate_ifthenelse(
 
   // Flip around if no 'true' case code.
   if(is_empty(true_case))
+  {
     return generate_ifthenelse(
       boolean_negate(guard),
-      false_case,
-      true_case,
       source_location,
+      false_case,
+      else_end_location,
+      true_case,
+      then_end_location,
       dest,
       mode);
+  }
 
   bool has_else=!is_empty(false_case);
 
@@ -1753,14 +1776,13 @@ void goto_convertt::generate_ifthenelse(
 
   // do the x label
   goto_programt tmp_x;
-  goto_programt::targett x = tmp_x.add(goto_programt::make_incomplete_goto(
-    true_exprt(), true_case.instructions.back().source_location()));
+  goto_programt::targett x = tmp_x.add(
+    goto_programt::make_incomplete_goto(true_exprt(), then_end_location));
 
   // do the z label
   goto_programt tmp_z;
-  goto_programt::targett z = tmp_z.add(goto_programt::make_skip());
-  // We deliberately don't set a location for 'z', it's a dummy
-  // target.
+  goto_programt::targett z = tmp_z.add(
+    goto_programt::make_skip(has_else ? else_end_location : then_end_location));
 
   // y: Q;
   goto_programt tmp_y;

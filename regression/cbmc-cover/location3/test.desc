@@ -1,0 +1,12 @@
+CORE
+main.c
+--cover location
+^EXIT=0$
+^SIGNAL=0$
+^\[main.coverage.\d+\] file main.c line 9 function main block \d+ \(lines main.c:main:9,10\): SATISFIED$
+^\[main.coverage.\d+\] file main.c line 15 function main block \d+ \(lines main.c:main:15\): SATISFIED$
+^\*\* 7 of 7 covered \(100.0%\)
+--
+^warning: ignoring
+--
+All gotos must have a source location annotated.
