@@ -970,9 +970,39 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
 
   if(type.id()==ID_c_bit_field)
   {
-    error().source_location = expr.source_location();
-    error() << "sizeof cannot be applied to bit fields" << eom;
-    throw 0;
+    // only comma or side-effect expressions are permitted
+    const exprt &op = skip_typecast(to_unary_expr(as_const(expr)).op());
+    if(op.id() == ID_comma || op.id() == ID_side_effect)
+    {
+      const c_bit_field_typet &bf_type = to_c_bit_field_type(type);
+      if(config.ansi_c.mode == configt::ansi_ct::flavourt::GCC)
+      {
+        new_expr = from_integer(
+          (bf_type.get_width() + config.ansi_c.char_width - 1) /
+            config.ansi_c.char_width,
+          size_type());
+      }
+      else
+      {
+        auto size_of_opt = size_of_expr(bf_type.underlying_type(), *this);
+
+        if(!size_of_opt.has_value())
+        {
+          error().source_location = expr.source_location();
+          error() << "type has no size: "
+                  << to_string(bf_type.underlying_type()) << eom;
+          throw 0;
+        }
+
+        new_expr = size_of_opt.value();
+      }
+    }
+    else
+    {
+      error().source_location = expr.source_location();
+      error() << "sizeof cannot be applied to bit fields" << eom;
+      throw 0;
+    }
   }
   else if(type.id() == ID_bool)
   {
@@ -1876,8 +1906,11 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
     {
       // promote to underlying type
       typet underlying_type = to_c_bit_field_type(type0).underlying_type();
+      typet type_before{type0};
       to_unary_expr(expr).op() = typecast_exprt(op0, underlying_type);
       expr.type()=underlying_type;
+      typecast_exprt result{expr, type_before};
+      expr.swap(result);
     }
     else if(type0.id() == ID_bool || type0.id() == ID_c_bool)
     {
@@ -4345,10 +4378,11 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   }
 
   // Add a cast to the underlying type for bit fields.
-  // In particular, sizeof(s.f=1) works for bit fields.
-  if(op0.type().id()==ID_c_bit_field)
-    op0 =
-      typecast_exprt(op0, to_c_bit_field_type(op0.type()).underlying_type());
+  if(op0.type() != op1.type() && op0.type().id() == ID_c_bit_field)
+  {
+    op1 =
+      typecast_exprt{op1, to_c_bit_field_type(op0.type()).underlying_type()};
+  }
 
   const typet o_type0=op0.type();
   const typet o_type1=op1.type();
