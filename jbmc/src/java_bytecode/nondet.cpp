@@ -123,7 +123,9 @@ code_blockt generate_nondet_switch(
     this_block.add(switch_case);
     this_block.add(code_breakt());
     code_switch_caset this_case(
-      from_integer(case_number, switch_value.type()), this_block);
+      from_integer(case_number, switch_value.type())
+        .with_source_location(source_location),
+      this_block);
     switch_block.add(std::move(this_case));
     ++case_number;
   }

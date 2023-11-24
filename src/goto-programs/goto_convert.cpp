@@ -526,6 +526,13 @@ void goto_convertt::convert_switch_case(
 
     exprt::operandst &case_op_dest=cases_entry->second->second;
     case_op_dest.push_back(code.case_op());
+    // make sure we have a source location in the case operand as otherwise we
+    // end up with a GOTO instruction without a source location
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      case_op_dest.back().source_location().is_not_nil(),
+      "case operand should have a source location",
+      case_op_dest.back().pretty(),
+      code.pretty());
   }
 }
 
