@@ -225,7 +225,7 @@ void remove_asmt::process_instruction_gcc(
   const code_asm_gcct &code,
   goto_programt &dest)
 {
-  const irep_idt &i_str = to_string_constant(code.asm_text()).get_value();
+  const irep_idt &i_str = to_string_constant(code.asm_text()).value();
 
   std::istringstream str(id2string(i_str));
   assembler_parser.clear();
@@ -396,7 +396,7 @@ void remove_asmt::process_instruction_msc(
   const code_asmt &code,
   goto_programt &dest)
 {
-  const irep_idt &i_str = to_string_constant(code.op0()).get_value();
+  const irep_idt &i_str = to_string_constant(code.op0()).value();
 
   std::istringstream str(id2string(i_str));
   assembler_parser.clear();

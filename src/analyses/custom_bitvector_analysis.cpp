@@ -184,7 +184,7 @@ unsigned custom_bitvector_analysist::get_bit_nr(
   else if(string_expr.id()==ID_index)
     return get_bit_nr(to_index_expr(string_expr).array());
   else if(string_expr.id()==ID_string_constant)
-    return bits.number(to_string_constant(string_expr).get_value());
+    return bits.number(to_string_constant(string_expr).value());
   else
     return bits.number("(unknown)");
 }

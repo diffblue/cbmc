@@ -266,7 +266,7 @@ void axiomst::object_size()
         auto pointers_equal = same_object(a_it->address(), *b_it);
         auto size_equal = equal_exprt(
           *a_it,
-          from_integer(string_constant.get_value().size() + 1, a_it->type()));
+          from_integer(string_constant.value().size() + 1, a_it->type()));
         auto implication = implies_exprt(pointers_equal, size_equal);
         if(verbose)
           std::cout << "OBJECT_SIZE2: " << format(implication) << '\n';

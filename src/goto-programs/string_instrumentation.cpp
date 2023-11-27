@@ -378,7 +378,7 @@ void string_instrumentationt::do_format_string_read(
     format_token_listt token_list = parse_format_string(id2string(
       to_string_constant(
         to_index_expr(to_address_of_expr(format_arg).object()).array())
-        .get_value()));
+        .value()));
 
     std::size_t args=0;
 
@@ -472,7 +472,7 @@ void string_instrumentationt::do_format_string_write(
     format_token_listt token_list = parse_format_string(id2string(
       to_string_constant(
         to_index_expr(to_address_of_expr(format_arg).object()).array())
-        .get_value()));
+        .value()));
 
     std::size_t args=0;
 
