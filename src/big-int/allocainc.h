@@ -1,4 +1,10 @@
-// $Id: allocainc.h,v 1.7 2005-12-25 14:44:24 kroening Exp $
+/*******************************************************************\
+
+Module: Big Integers
+
+Author: Daniel Kroening, dkr@amazon.com
+
+\*******************************************************************/
 
 // Whatever is necessary to use alloca().
 
