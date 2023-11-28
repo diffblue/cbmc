@@ -4,9 +4,9 @@
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_RESPONSE_OR_ERROR_H
 
 #include <util/invariant.h>
-#include <util/optional.h>
 
 #include <string>
+#include <variant>
 #include <vector>
 
 /// Holds either a valid parsed response or response sub-tree of type \tparam
@@ -16,17 +16,17 @@ template <class smtt>
 class response_or_errort final
 {
 public:
-  explicit response_or_errort(smtt smt) : smt{std::move(smt)}
+  explicit response_or_errort(smtt smt) : smt_or_messages{std::move(smt)}
   {
   }
 
   explicit response_or_errort(std::string message)
-    : messages{std::move(message)}
+    : smt_or_messages{std::vector<std::string>{std::move(message)}}
   {
   }
 
   explicit response_or_errort(std::vector<std::string> messages)
-    : messages{std::move(messages)}
+    : smt_or_messages{std::move(messages)}
   {
   }
 
@@ -34,31 +34,18 @@ public:
   ///   otherwise.
   const smtt *get_if_valid() const
   {
-    INVARIANT(
-      smt.has_value() == messages.empty(),
-      "The response_or_errort class must be in the valid state or error state, "
-      "exclusively.");
-    return smt.has_value() ? &smt.value() : nullptr;
+    return std::get_if<smtt>(&smt_or_messages);
   }
 
   /// \brief Gets the error messages if the response is invalid, or returns
   ///   nullptr otherwise.
   const std::vector<std::string> *get_if_error() const
   {
-    INVARIANT(
-      smt.has_value() == messages.empty(),
-      "The response_or_errort class must be in the valid state or error state, "
-      "exclusively.");
-    return smt.has_value() ? nullptr : &messages;
+    return std::get_if<std::vector<std::string>>(&smt_or_messages);
   }
 
 private:
-  // The below two fields could be a single `std::variant` field, if there was
-  // an implementation of it available in the cbmc repository. However at the
-  // time of writing we are targeting C++11, `std::variant` was introduced in
-  // C++17 and we have no backported version.
-  optionalt<smtt> smt;
-  std::vector<std::string> messages;
+  std::variant<smtt, std::vector<std::string>> smt_or_messages;
 };
 
 #endif // CPROVER_SOLVERS_SMT2_INCREMENTAL_RESPONSE_OR_ERROR_H
