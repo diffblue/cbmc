@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 stack_object.c
 --pointer-check
 ^EXIT=0$
