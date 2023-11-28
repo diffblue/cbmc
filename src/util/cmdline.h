@@ -111,8 +111,8 @@ public:
       using iterator_category = std::forward_iterator_tag;
       using value_type = std::string;
       using difference_type = std::ptrdiff_t;
-      using pointer = std::string *;
-      using reference = std::string &;
+      using pointer = const std::string *;
+      using reference = const std::string &;
 
       option_names_iteratort() = default;
       explicit option_names_iteratort(
