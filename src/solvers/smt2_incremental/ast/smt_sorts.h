@@ -18,7 +18,7 @@ class smt_sortt : protected irept
 {
 public:
   // smt_sortt does not support the notion of an empty / null state. Use
-  // optionalt<smt_sortt> instead if an empty sort is required.
+  // std::optional<smt_sortt> instead if an empty sort is required.
   smt_sortt() = delete;
 
   using irept::pretty;

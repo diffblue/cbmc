@@ -15,7 +15,7 @@ class smt_commandt : protected irept
 {
 public:
   // smt_commandt does not support the notion of an empty / null state. Use
-  // optionalt<smt_commandt> instead if an empty command is required.
+  // std::optional<smt_commandt> instead if an empty command is required.
   smt_commandt() = delete;
 
   using irept::pretty;

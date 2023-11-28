@@ -11,7 +11,7 @@ class smt_optiont : protected irept
 {
 public:
   // smt_optiont does not support the notion of an empty / null state. Use
-  // optionalt<smt_optiont> instead if an empty option is required.
+  // std::optional<smt_optiont> instead if an empty option is required.
   smt_optiont() = delete;
 
   using irept::pretty;

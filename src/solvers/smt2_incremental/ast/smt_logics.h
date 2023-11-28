@@ -11,7 +11,7 @@ class smt_logict : protected irept
 {
 public:
   // smt_logict does not support the notion of an empty / null state. Use
-  // optionalt<smt_logict> instead if an empty logic is required.
+  // std::optional<smt_logict> instead if an empty logic is required.
   smt_logict() = delete;
 
   using irept::pretty;

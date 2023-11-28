@@ -21,7 +21,7 @@ class smt_termt : protected irept, private smt_sortt::storert<smt_termt>
 {
 public:
   // smt_termt does not support the notion of an empty / null state. Use
-  // optionalt<smt_termt> instead if an empty term is required.
+  // std::optional<smt_termt> instead if an empty term is required.
   smt_termt() = delete;
 
   using irept::pretty;
