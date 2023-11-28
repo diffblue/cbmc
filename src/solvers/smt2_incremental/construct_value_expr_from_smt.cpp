@@ -16,7 +16,7 @@ class value_expr_from_smt_factoryt : public smt_term_const_downcast_visitort
 private:
   const typet &type_to_construct;
   const namespacet &ns;
-  optionalt<exprt> result;
+  std::optional<exprt> result;
 
   explicit value_expr_from_smt_factoryt(
     const typet &type_to_construct,
