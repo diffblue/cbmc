@@ -20,7 +20,7 @@
 /src/goto-checker/ @kroening @tautschnig @peterschrammel
 /src/goto-symex/ @kroening @tautschnig @peterschrammel
 /src/json/ @kroening @tautschnig @peterschrammel
-/src/json-symtab-language/ @martin-cs
+/src/json-symtab-language/ @martin-cs @kroening @tautschnig @peterschrammel
 /src/langapi/ @kroening @tautschnig @peterschrammel
 /src/xmllang/ @kroening @tautschnig @peterschrammel
 /src/nonstd/ @peterschrammel
@@ -29,7 +29,7 @@
 /src/solvers/miniBDD @tautschnig @kroening
 /src/solvers/prop @martin-cs @kroening @tautschnig @peterschrammel
 /src/solvers/sat @martin-cs @kroening @tautschnig @peterschrammel
-/src/symtab2gb/ @martin-cs
+/src/symtab2gb/ @martin-cs @kroening @tautschnig @peterschrammel
 /jbmc/src/miniz/ @peterschrammel
 /src/crangler/ @kroening @tautschnig @qinheping
 
