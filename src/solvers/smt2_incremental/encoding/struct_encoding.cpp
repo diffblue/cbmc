@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <optional>
 #include <queue>
 
 struct_encodingt::struct_encodingt(const namespacet &ns)
@@ -33,7 +34,7 @@ struct_encodingt::~struct_encodingt() = default;
 /// If the given \p type needs re-encoding as a bit-vector then this function
 /// \returns the width of the new bitvector type. The width calculation is
 /// delegated to \p boolbv_width.
-static optionalt<std::size_t>
+static std::optional<std::size_t>
 needs_width(const typet &type, const boolbv_widtht &boolbv_width)
 {
   if(const auto struct_tag = type_try_dynamic_cast<struct_tag_typet>(type))
@@ -222,7 +223,7 @@ exprt struct_encodingt::encode(exprt expr) const
       if(can_cast_type<struct_tag_typet>(current.type()))
         current = ::encode(*with_expr, ns);
     current.type() = encode(current.type());
-    optionalt<exprt> update;
+    std::optional<exprt> update;
     if(const auto struct_expr = expr_try_dynamic_cast<struct_exprt>(current))
       update = ::encode(*struct_expr);
     if(const auto union_expr = expr_try_dynamic_cast<union_exprt>(current))
