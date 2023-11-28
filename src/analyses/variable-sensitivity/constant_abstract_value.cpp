@@ -34,7 +34,7 @@ public:
 static index_range_implementation_ptrt
 make_constant_index_range(const exprt &val)
 {
-  return util_make_unique<constant_index_ranget>(val);
+  return std::make_unique<constant_index_ranget>(val);
 }
 
 constant_abstract_valuet::constant_abstract_valuet(const exprt &e)

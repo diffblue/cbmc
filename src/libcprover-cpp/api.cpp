@@ -36,7 +36,7 @@ extern configt config;
 
 std::unique_ptr<std::string> api_sessiont::get_api_version() const
 {
-  return util_make_unique<std::string>(std::string{CBMC_VERSION});
+  return std::make_unique<std::string>(std::string{CBMC_VERSION});
 }
 
 struct api_session_implementationt
@@ -51,10 +51,10 @@ api_sessiont::api_sessiont() : api_sessiont{api_optionst::create()}
 }
 
 api_sessiont::api_sessiont(const api_optionst &options)
-  : implementation{util_make_unique<api_session_implementationt>()}
+  : implementation{std::make_unique<api_session_implementationt>()}
 {
   implementation->message_handler =
-    util_make_unique<null_message_handlert>(null_message_handlert{});
+    std::make_unique<null_message_handlert>(null_message_handlert{});
   implementation->options = options.to_engine_options();
   // Needed to initialise the language options correctly
   cmdlinet cmdline;
@@ -130,13 +130,13 @@ void api_sessiont::set_message_callback(
   api_call_back_contextt context)
 {
   implementation->message_handler =
-    util_make_unique<api_message_handlert>(callback, context);
+    std::make_unique<api_message_handlert>(callback, context);
 }
 
 void api_sessiont::load_model_from_files(
   const std::vector<std::string> &files) const
 {
-  implementation->model = util_make_unique<goto_modelt>(initialize_goto_model(
+  implementation->model = std::make_unique<goto_modelt>(initialize_goto_model(
     files, *implementation->message_handler, *implementation->options));
 }
 
@@ -161,7 +161,7 @@ void api_sessiont::read_goto_binary(std::string &file) const
   if(read_opt_val.has_value())
   {
     implementation->model =
-      util_make_unique<goto_modelt>(std::move(read_opt_val.value()));
+      std::make_unique<goto_modelt>(std::move(read_opt_val.value()));
   }
   else
   {
@@ -228,7 +228,7 @@ std::unique_ptr<verification_resultt> api_sessiont::run_verifier() const
 
   auto properties = verifier.get_properties();
   result.set_properties(properties);
-  return util_make_unique<verification_resultt>(result);
+  return std::make_unique<verification_resultt>(result);
 }
 
 void api_sessiont::drop_unused_functions() const

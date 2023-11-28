@@ -101,7 +101,7 @@ void jsil_languaget::show_parse(std::ostream &out)
 
 std::unique_ptr<languaget> new_jsil_language()
 {
-  return util_make_unique<jsil_languaget>();
+  return std::make_unique<jsil_languaget>();
 }
 
 bool jsil_languaget::from_expr(

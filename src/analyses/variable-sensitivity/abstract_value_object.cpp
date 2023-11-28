@@ -9,7 +9,6 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/ieee_float.h>
-#include <util/make_unique.h>
 #include <util/simplify_expr.h>
 
 #include <goto-programs/adjust_float_expressions.h>
@@ -76,12 +75,12 @@ bool single_value_index_ranget::advance_to_next()
 
 index_range_implementation_ptrt make_empty_index_range()
 {
-  return util_make_unique<empty_index_ranget>();
+  return std::make_unique<empty_index_ranget>();
 }
 
 index_range_implementation_ptrt make_indeterminate_index_range()
 {
-  return util_make_unique<indeterminate_index_ranget>();
+  return std::make_unique<indeterminate_index_ranget>();
 }
 
 class single_value_value_ranget : public value_range_implementationt
@@ -115,7 +114,7 @@ private:
 value_range_implementation_ptrt
 make_single_value_range(const abstract_object_pointert &value)
 {
-  return util_make_unique<single_value_value_ranget>(value);
+  return std::make_unique<single_value_value_ranget>(value);
 }
 
 static abstract_object_pointert constants_expression_transform(

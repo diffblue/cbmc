@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/threeval.h>
 
 #include <core/Solver.h>
@@ -254,7 +253,7 @@ void satcheck_glucose_baset<T>::set_assignment(literalt a, bool value)
 template <typename T>
 satcheck_glucose_baset<T>::satcheck_glucose_baset(
   message_handlert &message_handler)
-  : cnf_solvert(message_handler), solver(util_make_unique<T>())
+  : cnf_solvert(message_handler), solver(std::make_unique<T>())
 {
 }
 

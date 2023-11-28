@@ -617,7 +617,7 @@ public:
   {
     auto node_id = dg.add_node();
     dg.nodes[node_id].PC = l;
-    auto p = util_make_unique<variable_sensitivity_dependence_domaint>(
+    auto p = std::make_unique<variable_sensitivity_dependence_domaint>(
       node_id, object_factory, configuration);
     CHECK_RETURN(p->is_bottom());
 
@@ -637,12 +637,12 @@ variable_sensitivity_dependence_grapht::variable_sensitivity_dependence_grapht(
   const vsd_configt &configuration,
   message_handlert &message_handler)
   : ai_three_way_merget(
-      util_make_unique<ai_history_factory_default_constructort<ahistoricalt>>(),
-      util_make_unique<variable_sensitivity_dependence_domain_factoryt>(
+      std::make_unique<ai_history_factory_default_constructort<ahistoricalt>>(),
+      std::make_unique<variable_sensitivity_dependence_domain_factoryt>(
         *this,
         object_factory,
         configuration),
-      util_make_unique<location_sensitive_storaget>(),
+      std::make_unique<location_sensitive_storaget>(),
       message_handler),
     goto_functions(goto_functions),
     ns(_ns)

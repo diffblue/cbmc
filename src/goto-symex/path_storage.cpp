@@ -12,7 +12,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>
 
 #include <util/cmdline.h>
 #include <util/exit_codes.h>
-#include <util/make_unique.h>
 
 nondet_symbol_exprt symex_nondet_generatort::
 operator()(typet type, source_locationt location)
@@ -97,7 +96,7 @@ static const std::map<
        "                              last-in, first-out order. Explores\n"
        "                              the program tree depth-first.\n",
        []() { // NOLINT(whitespace/braces)
-         return util_make_unique<path_lifot>();
+         return std::make_unique<path_lifot>();
        }}},
      {"fifo",
       {" fifo                         next instruction is pushed before\n"
@@ -105,7 +104,7 @@ static const std::map<
        "                              first-in, first-out order. Explores\n"
        "                              the program tree breadth-first.\n",
        []() { // NOLINT(whitespace/braces)
-         return util_make_unique<path_fifot>();
+         return std::make_unique<path_fifot>();
        }}}});
 
 std::string show_path_strategies()

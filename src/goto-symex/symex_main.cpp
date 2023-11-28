@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format.h>
 #include <util/format_expr.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/mathematical_expr.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
@@ -417,7 +416,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   auto *storage = &path_storage;
 
   // create and prepare the state
-  auto state = util_make_unique<statet>(
+  auto state = std::make_unique<statet>(
     symex_targett::sourcet(entry_point_id, start_function->body),
     symex_config.max_field_sensitivity_array_size,
     symex_config.simplify_opt,

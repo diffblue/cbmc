@@ -592,7 +592,7 @@ optionalt<cext> cegis_verifiert::verify()
   preprocess_goto_model();
   std::unique_ptr<
     all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>>
-    checker = util_make_unique<
+    checker = std::make_unique<
       all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>>(
       options, ui_message_handler, goto_model);
 

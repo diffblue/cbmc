@@ -13,7 +13,6 @@ Author: Diffblue Ltd.
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/suffix.h>
 #include <util/version.h>
 
@@ -258,12 +257,12 @@ goto_harness_generator_factoryt goto_harness_parse_optionst::make_factory()
 {
   auto factory = goto_harness_generator_factoryt{};
   factory.register_generator("call-function", [this]() {
-    return util_make_unique<function_call_harness_generatort>(
+    return std::make_unique<function_call_harness_generatort>(
       ui_message_handler);
   });
 
   factory.register_generator("initialize-with-memory-snapshot", [this]() {
-    return util_make_unique<memory_snapshot_harness_generatort>(
+    return std::make_unique<memory_snapshot_harness_generatort>(
       ui_message_handler);
   });
 

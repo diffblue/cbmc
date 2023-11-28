@@ -16,7 +16,6 @@ Date: May 2016
 
 #include "cover_filter.h"
 #include "cover_instrument.h"
-#include "util/make_unique.h"
 
 class cmdlinet;
 class goto_modelt;
@@ -64,7 +63,7 @@ struct cover_configt
   function_filterst function_filters;
   // cover instruments point to goal_filters, so they must be stored on the heap
   std::unique_ptr<goal_filterst> goal_filters =
-    util_make_unique<goal_filterst>();
+    std::make_unique<goal_filterst>();
   cover_instrumenterst cover_instrumenters;
   cover_instrumenter_baset::assertion_factoryt make_assertion =
     goto_programt::make_assertion;

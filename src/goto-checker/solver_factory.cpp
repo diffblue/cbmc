@@ -14,7 +14,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/cmdline.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
-#include <util/make_unique.h>
 #include <util/message.h>
 #include <util/options.h>
 #include <util/unicode.h>
@@ -192,14 +191,14 @@ template <typename SatcheckT>
 static std::unique_ptr<SatcheckT>
 make_satcheck_prop(message_handlert &message_handler, const optionst &options)
 {
-  auto satcheck = util_make_unique<SatcheckT>(message_handler);
+  auto satcheck = std::make_unique<SatcheckT>(message_handler);
   if(options.is_set("write-solver-stats-to"))
   {
     if(
       auto hardness_collector = dynamic_cast<hardness_collectort *>(&*satcheck))
     {
       std::unique_ptr<solver_hardnesst> solver_hardness =
-        util_make_unique<solver_hardnesst>();
+        std::make_unique<solver_hardnesst>();
       solver_hardness->set_outfile(options.get_option("write-solver-stats-to"));
       hardness_collector->solver_hardness = std::move(solver_hardness);
     }
@@ -345,7 +344,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 
   bool get_array_constraints =
     options.get_bool_option("show-array-constraints");
-  auto bv_pointers = util_make_unique<bv_pointerst>(
+  auto bv_pointers = std::make_unique<bv_pointerst>(
     ns, *sat_solver, message_handler, get_array_constraints);
 
   if(options.get_option("arrays-uf") == "never")
@@ -355,7 +354,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 
   set_decision_procedure_time_limit(*bv_pointers);
 
-  return util_make_unique<solvert>(
+  return std::make_unique<solvert>(
     std::move(bv_pointers), std::move(sat_solver));
 }
 
@@ -364,14 +363,14 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
   no_beautification();
   no_incremental_check();
 
-  auto prop = util_make_unique<dimacs_cnft>(message_handler);
+  auto prop = std::make_unique<dimacs_cnft>(message_handler);
 
   std::string filename = options.get_option("outfile");
 
   auto bv_dimacs =
-    util_make_unique<bv_dimacst>(ns, *prop, message_handler, filename);
+    std::make_unique<bv_dimacst>(ns, *prop, message_handler, filename);
 
-  return util_make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
+  return std::make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
@@ -381,11 +380,11 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
 
   std::string external_sat_solver = options.get_option("external-sat-solver");
   auto prop =
-    util_make_unique<external_satt>(message_handler, external_sat_solver);
+    std::make_unique<external_satt>(message_handler, external_sat_solver);
 
-  auto bv_pointers = util_make_unique<bv_pointerst>(ns, *prop, message_handler);
+  auto bv_pointers = std::make_unique<bv_pointerst>(ns, *prop, message_handler);
 
-  return util_make_unique<solvert>(std::move(bv_pointers), std::move(prop));
+  return std::make_unique<solvert>(std::move(bv_pointers), std::move(prop));
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
@@ -406,9 +405,9 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
-  auto decision_procedure = util_make_unique<bv_refinementt>(info);
+  auto decision_procedure = std::make_unique<bv_refinementt>(info);
   set_decision_procedure_time_limit(*decision_procedure);
-  return util_make_unique<solvert>(
+  return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
 }
 
@@ -431,9 +430,9 @@ solver_factoryt::get_string_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
-  auto decision_procedure = util_make_unique<string_refinementt>(info);
+  auto decision_procedure = std::make_unique<string_refinementt>(info);
   set_decision_procedure_time_limit(*decision_procedure);
-  return util_make_unique<solvert>(
+  return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
 }
 
@@ -445,7 +444,7 @@ std::unique_ptr<std::ofstream> open_outfile_and_check(
   if(filename.empty())
     return nullptr;
 
-  auto out = util_make_unique<std::ofstream>(widen_if_needed(filename));
+  auto out = std::make_unique<std::ofstream>(widen_if_needed(filename));
 
   if(!*out)
   {
@@ -483,7 +482,7 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
       on_std_out
         ? nullptr
         : open_outfile_and_check(outfile_arg, message_handler, "--outfile");
-    solver_process = util_make_unique<smt_incremental_dry_run_solvert>(
+    solver_process = std::make_unique<smt_incremental_dry_run_solvert>(
       message_handler, on_std_out ? std::cout : *outfile, std::move(outfile));
   }
   else
@@ -492,15 +491,15 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
 
     // If no out_filename is provided `open_outfile_and_check` will return
     // `nullptr`, and the solver will work normally without any logging.
-    solver_process = util_make_unique<smt_piped_solver_processt>(
+    solver_process = std::make_unique<smt_piped_solver_processt>(
       std::move(solver_command),
       message_handler,
       open_outfile_and_check(
         out_filename, message_handler, "--dump-smt-formula"));
   }
 
-  return util_make_unique<solvert>(
-    util_make_unique<smt2_incremental_decision_proceduret>(
+  return std::make_unique<solvert>(
+    std::make_unique<smt2_incremental_decision_proceduret>(
       ns, std::move(solver_process), message_handler));
 }
 
@@ -521,7 +520,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
         "provide a filename with --outfile");
     }
 
-    auto smt2_dec = util_make_unique<smt2_dect>(
+    auto smt2_dec = std::make_unique<smt2_dect>(
       ns,
       "cbmc",
       std::string("Generated by CBMC ") + CBMC_VERSION,
@@ -533,11 +532,11 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
       smt2_dec->use_FPA_theory = true;
 
     set_decision_procedure_time_limit(*smt2_dec);
-    return util_make_unique<solvert>(std::move(smt2_dec));
+    return std::make_unique<solvert>(std::move(smt2_dec));
   }
   else if(filename == "-")
   {
-    auto smt2_conv = util_make_unique<smt2_convt>(
+    auto smt2_conv = std::make_unique<smt2_convt>(
       ns,
       "cbmc",
       std::string("Generated by CBMC ") + CBMC_VERSION,
@@ -549,13 +548,13 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
       smt2_conv->use_FPA_theory = true;
 
     set_decision_procedure_time_limit(*smt2_conv);
-    return util_make_unique<solvert>(std::move(smt2_conv));
+    return std::make_unique<solvert>(std::move(smt2_conv));
   }
   else
   {
     auto out = open_outfile_and_check(filename, message_handler, "--outfile");
 
-    auto smt2_conv = util_make_unique<smt2_convt>(
+    auto smt2_conv = std::make_unique<smt2_convt>(
       ns,
       "cbmc",
       std::string("Generated by CBMC ") + CBMC_VERSION,
@@ -567,7 +566,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
       smt2_conv->use_FPA_theory = true;
 
     set_decision_procedure_time_limit(*smt2_conv);
-    return util_make_unique<solvert>(std::move(smt2_conv), std::move(out));
+    return std::make_unique<solvert>(std::move(smt2_conv), std::move(out));
   }
 }
 

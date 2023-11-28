@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/version.h>
 #include <util/xml.h>
 
@@ -535,7 +534,7 @@ int jbmc_parse_optionst::doit()
     options.get_bool_option("stop-on-fail") && options.get_bool_option("paths"))
   {
     verifier =
-      util_make_unique<stop_on_fail_verifiert<java_single_path_symex_checkert>>(
+      std::make_unique<stop_on_fail_verifiert<java_single_path_symex_checkert>>(
         options, ui_message_handler, *goto_model_ptr);
   }
   else if(
@@ -545,13 +544,13 @@ int jbmc_parse_optionst::doit()
     if(options.get_bool_option("localize-faults"))
     {
       verifier =
-        util_make_unique<stop_on_fail_verifier_with_fault_localizationt<
+        std::make_unique<stop_on_fail_verifier_with_fault_localizationt<
           java_multi_path_symex_checkert>>(
           options, ui_message_handler, *goto_model_ptr);
     }
     else
     {
-      verifier = util_make_unique<
+      verifier = std::make_unique<
         stop_on_fail_verifiert<java_multi_path_symex_checkert>>(
         options, ui_message_handler, *goto_model_ptr);
     }
@@ -560,7 +559,7 @@ int jbmc_parse_optionst::doit()
     !options.get_bool_option("stop-on-fail") &&
     options.get_bool_option("paths"))
   {
-    verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
+    verifier = std::make_unique<all_properties_verifier_with_trace_storaget<
       java_single_path_symex_checkert>>(
       options, ui_message_handler, *goto_model_ptr);
   }
@@ -571,13 +570,13 @@ int jbmc_parse_optionst::doit()
     if(options.get_bool_option("localize-faults"))
     {
       verifier =
-        util_make_unique<all_properties_verifier_with_fault_localizationt<
+        std::make_unique<all_properties_verifier_with_fault_localizationt<
           java_multi_path_symex_checkert>>(
           options, ui_message_handler, *goto_model_ptr);
     }
     else
     {
-      verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
+      verifier = std::make_unique<all_properties_verifier_with_trace_storaget<
         java_multi_path_symex_checkert>>(
         options, ui_message_handler, *goto_model_ptr);
     }
@@ -603,7 +602,7 @@ int jbmc_parse_optionst::get_goto_program(
   lazy_goto_model.initialize(cmdline.args, options);
 
   class_hierarchy =
-    util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
+    std::make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
 
   // Show the class hierarchy
   if(cmdline.isset("show-class-hierarchy"))
@@ -662,7 +661,7 @@ int jbmc_parse_optionst::get_goto_program(
     }
 
     goto_model_ptr =
-      util_make_unique<lazy_goto_modelt>(std::move(lazy_goto_model));
+      std::make_unique<lazy_goto_modelt>(std::move(lazy_goto_model));
   }
 
   log.status() << config.object_bits_info() << messaget::eom;

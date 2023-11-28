@@ -19,7 +19,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 #include <util/get_base_name.h>
-#include <util/make_unique.h>
 #include <util/symbol_table.h>
 
 void statement_list_languaget::set_language_options(const optionst &options)
@@ -144,12 +143,12 @@ std::set<std::string> statement_list_languaget::extensions() const
 
 std::unique_ptr<languaget> new_statement_list_language()
 {
-  return util_make_unique<statement_list_languaget>();
+  return std::make_unique<statement_list_languaget>();
 }
 
 std::unique_ptr<languaget> statement_list_languaget::new_language()
 {
-  return util_make_unique<statement_list_languaget>();
+  return std::make_unique<statement_list_languaget>();
 }
 
 std::string statement_list_languaget::id() const

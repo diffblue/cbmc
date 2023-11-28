@@ -197,7 +197,7 @@ void cpp_languaget::show_parse(
 
 std::unique_ptr<languaget> new_cpp_language()
 {
-  return util_make_unique<cpp_languaget>();
+  return std::make_unique<cpp_languaget>();
 }
 
 bool cpp_languaget::from_expr(

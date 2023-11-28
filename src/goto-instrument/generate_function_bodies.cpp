@@ -16,7 +16,6 @@ Author: Diffblue Ltd.
 #include <goto-programs/remove_skip.h>
 
 #include <util/fresh_symbol.h>
-#include <util/make_unique.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/string2int.h>
@@ -381,7 +380,7 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
 {
   if(options.empty() || options == "nondet-return")
   {
-    return util_make_unique<havoc_generate_function_bodiest>(
+    return std::make_unique<havoc_generate_function_bodiest>(
       std::vector<irep_idt>{},
       std::regex{},
       object_factory_parameters,
@@ -390,17 +389,17 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
 
   if(options == "assume-false")
   {
-    return util_make_unique<assume_false_generate_function_bodiest>();
+    return std::make_unique<assume_false_generate_function_bodiest>();
   }
 
   if(options == "assert-false")
   {
-    return util_make_unique<assert_false_generate_function_bodiest>();
+    return std::make_unique<assert_false_generate_function_bodiest>();
   }
 
   if(options == "assert-false-assume-false")
   {
-    return util_make_unique<
+    return std::make_unique<
       assert_false_then_assume_false_generate_function_bodiest>();
   }
 
@@ -477,13 +476,13 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
       }
     }
     if(param_numbers.empty())
-      return util_make_unique<havoc_generate_function_bodiest>(
+      return std::make_unique<havoc_generate_function_bodiest>(
         std::move(globals_to_havoc),
         std::move(params_regex),
         object_factory_parameters,
         message_handler);
     else
-      return util_make_unique<havoc_generate_function_bodiest>(
+      return std::make_unique<havoc_generate_function_bodiest>(
         std::move(globals_to_havoc),
         std::move(param_numbers),
         object_factory_parameters,

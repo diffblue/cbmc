@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/floatbv_expr.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
-#include <util/make_unique.h>
 #include <util/mathematical_expr.h>
 #include <util/message.h>
 #include <util/options.h>
@@ -2022,7 +2021,7 @@ void goto_check_ct::goto_check(
   bool did_something = false;
 
   local_bitvector_analysis =
-    util_make_unique<local_bitvector_analysist>(goto_function, ns);
+    std::make_unique<local_bitvector_analysist>(goto_function, ns);
 
   goto_programt &goto_program = goto_function.body;
 

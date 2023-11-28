@@ -27,7 +27,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/decision_procedure.h>
 
 #include <util/json_stream.h>
-#include <util/make_unique.h>
 #include <util/ui_message.h>
 
 #include "goto_symex_property_decider.h"
@@ -165,11 +164,11 @@ get_memory_model(const optionst &options, const namespacet &ns)
   const std::string mm = options.get_option("mm");
 
   if(mm.empty() || mm == "sc")
-    return util_make_unique<memory_model_sct>(ns);
+    return std::make_unique<memory_model_sct>(ns);
   else if(mm == "tso")
-    return util_make_unique<memory_model_tsot>(ns);
+    return std::make_unique<memory_model_tsot>(ns);
   else if(mm == "pso")
-    return util_make_unique<memory_model_psot>(ns);
+    return std::make_unique<memory_model_psot>(ns);
   else
   {
     throw "invalid memory model '" + mm + "': use one of sc, tso, pso";

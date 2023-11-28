@@ -10,7 +10,6 @@
 /// Value Set Abstract Object
 
 #include <util/arith_tools.h>
-#include <util/make_unique.h>
 #include <util/simplify_expr.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
@@ -62,7 +61,7 @@ private:
 static index_range_implementation_ptrt
 make_value_set_index_range(const std::set<exprt> &vals)
 {
-  return util_make_unique<value_set_index_ranget>(vals);
+  return std::make_unique<value_set_index_ranget>(vals);
 }
 
 static value_range_implementation_ptrt
@@ -104,7 +103,7 @@ private:
 static value_range_implementation_ptrt
 make_value_set_value_range(const abstract_object_sett &vals)
 {
-  return util_make_unique<value_set_value_ranget>(vals);
+  return std::make_unique<value_set_value_ranget>(vals);
 }
 
 static abstract_object_sett

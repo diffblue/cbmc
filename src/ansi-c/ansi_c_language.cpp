@@ -150,7 +150,7 @@ void ansi_c_languaget::show_parse(std::ostream &out)
 
 std::unique_ptr<languaget> new_ansi_c_language()
 {
-  return util_make_unique<ansi_c_languaget>();
+  return std::make_unique<ansi_c_languaget>();
 }
 
 bool ansi_c_languaget::from_expr(

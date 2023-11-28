@@ -33,7 +33,7 @@ public:
   typedef typename baset::locationt locationt;
 
   explicit value_set_analysis_templatet(const namespacet &_ns)
-    : baset(util_make_unique<ai_domain_factory_location_constructort<VSDT>>()),
+    : baset(std::make_unique<ai_domain_factory_location_constructort<VSDT>>()),
       ns(_ns)
   {
   }

@@ -3,7 +3,6 @@
 #include "api_options.h"
 
 #include <util/cmdline.h>
-#include <util/make_unique.h>
 #include <util/options.h>
 
 #include <ansi-c/goto_check_c.h>
@@ -16,7 +15,7 @@ api_optionst api_optionst::create()
 
 static std::unique_ptr<optionst> make_internal_default_options()
 {
-  std::unique_ptr<optionst> options = util_make_unique<optionst>();
+  std::unique_ptr<optionst> options = std::make_unique<optionst>();
   cmdlinet command_line;
   PARSE_OPTIONS_GOTO_CHECK(command_line, (*options));
   parse_solver_options(command_line, *options);

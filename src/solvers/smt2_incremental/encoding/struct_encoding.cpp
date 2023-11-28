@@ -6,7 +6,6 @@
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
-#include <util/make_unique.h>
 #include <util/namespace.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
@@ -19,12 +18,12 @@
 #include <queue>
 
 struct_encodingt::struct_encodingt(const namespacet &ns)
-  : boolbv_width{util_make_unique<boolbv_widtht>(ns)}, ns{ns}
+  : boolbv_width{std::make_unique<boolbv_widtht>(ns)}, ns{ns}
 {
 }
 
 struct_encodingt::struct_encodingt(const struct_encodingt &other)
-  : boolbv_width{util_make_unique<boolbv_widtht>(*other.boolbv_width)},
+  : boolbv_width{std::make_unique<boolbv_widtht>(*other.boolbv_width)},
     ns{other.ns}
 {
 }
