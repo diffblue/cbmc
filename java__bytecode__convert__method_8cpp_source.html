@@ -289,7 +289,7 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp_s
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
 <div class="line"><a name="l00229"></a><span class="lineno"><a class="line" href="java__bytecode__convert__method_8cpp.html#aa924d187cecf1c837270eec8009548f0">  229</a></span>&#160;<a class="code" href="classjava__method__typet.html">java_method_typet</a> <a class="code" href="java__bytecode__convert__method_8cpp.html#aa924d187cecf1c837270eec8009548f0">member_type_lazy</a>(</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  <span class="keyword">const</span> std::string &amp;descriptor,</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::string&gt;</a> &amp;signature,</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="keyword">const</span> optionalt&lt;std::string&gt; &amp;signature,</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keyword">const</span> std::string &amp;class_name,</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="keyword">const</span> std::string &amp;method_name,</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
@@ -585,7 +585,7 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp_s
 <div class="line"><a name="l00534"></a><span class="lineno"><a class="line" href="classjava__bytecode__convert__methodt.html#a8050ef4c96ad5335890cdfb24fc1216f">  534</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classjava__bytecode__convert__methodt.html#a8050ef4c96ad5335890cdfb24fc1216f">java_bytecode_convert_methodt::convert</a>(</div>
 <div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;class_symbol,</div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;  <span class="keyword">const</span> <a class="code" href="structjava__bytecode__parse__treet_1_1methodt.html">methodt</a> &amp;m,</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;prefix_filtert&gt;</a> &amp;method_context)</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;  <span class="keyword">const</span> optionalt&lt;prefix_filtert&gt; &amp;method_context)</div>
 <div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;{</div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;  <span class="comment">// Construct the fully qualified method name</span></div>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;  <span class="comment">// (e.g. &quot;my.package.ClassName.myMethodName:(II)I&quot;) and query the symbol table</span></div>
@@ -1263,7 +1263,7 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp_s
 <div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;      }</div>
 <div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;    }</div>
 <div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160; </div>
-<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> catch_instruction;</div>
+<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;    optionalt&lt;codet&gt; catch_instruction;</div>
 <div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160; </div>
 <div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;    <span class="keywordflow">if</span>(catch_type!=<a class="code" href="classtypet.html">typet</a>())</div>
 <div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;    {</div>
@@ -3078,7 +3078,7 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp_s
 <div class="line"><a name="l03083"></a><span class="lineno"> 3083</span>&#160;  <span class="keywordflow">return</span> block;</div>
 <div class="line"><a name="l03084"></a><span class="lineno"> 3084</span>&#160;}</div>
 <div class="line"><a name="l03085"></a><span class="lineno"> 3085</span>&#160; </div>
-<div class="line"><a name="l03086"></a><span class="lineno"><a class="line" href="classjava__bytecode__convert__methodt.html#abb006c0c832c6436bd6cf6c0182f6e0c"> 3086</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="classjava__bytecode__convert__methodt.html#abb006c0c832c6436bd6cf6c0182f6e0c">java_bytecode_convert_methodt::convert_invoke_dynamic</a>(</div>
+<div class="line"><a name="l03086"></a><span class="lineno"><a class="line" href="classjava__bytecode__convert__methodt.html#abb006c0c832c6436bd6cf6c0182f6e0c"> 3086</a></span>&#160;optionalt&lt;exprt&gt; <a class="code" href="classjava__bytecode__convert__methodt.html#abb006c0c832c6436bd6cf6c0182f6e0c">java_bytecode_convert_methodt::convert_invoke_dynamic</a>(</div>
 <div class="line"><a name="l03087"></a><span class="lineno"> 3087</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;location,</div>
 <div class="line"><a name="l03088"></a><span class="lineno"> 3088</span>&#160;  std::size_t instruction_address,</div>
 <div class="line"><a name="l03089"></a><span class="lineno"> 3089</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;arg0,</div>
@@ -3265,11 +3265,11 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp_s
 <div class="line"><a name="l03282"></a><span class="lineno"> 3282</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
 <div class="line"><a name="l03283"></a><span class="lineno"> 3283</span>&#160;  <span class="keywordtype">size_t</span> max_array_length,</div>
 <div class="line"><a name="l03284"></a><span class="lineno"> 3284</span>&#160;  <span class="keywordtype">bool</span> throw_assertion_error,</div>
-<div class="line"><a name="l03285"></a><span class="lineno"> 3285</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;ci_lazy_methods_neededt&gt;</a> needed_lazy_methods,</div>
+<div class="line"><a name="l03285"></a><span class="lineno"> 3285</span>&#160;  optionalt&lt;ci_lazy_methods_neededt&gt; needed_lazy_methods,</div>
 <div class="line"><a name="l03286"></a><span class="lineno"> 3286</span>&#160;  <a class="code" href="classjava__string__library__preprocesst.html">java_string_library_preprocesst</a> &amp;string_preprocess,</div>
 <div class="line"><a name="l03287"></a><span class="lineno"> 3287</span>&#160;  <span class="keyword">const</span> <a class="code" href="classclass__hierarchyt.html">class_hierarchyt</a> &amp;class_hierarchy,</div>
 <div class="line"><a name="l03288"></a><span class="lineno"> 3288</span>&#160;  <span class="keywordtype">bool</span> threading_support,</div>
-<div class="line"><a name="l03289"></a><span class="lineno"> 3289</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;prefix_filtert&gt;</a> &amp;method_context,</div>
+<div class="line"><a name="l03289"></a><span class="lineno"> 3289</span>&#160;  <span class="keyword">const</span> optionalt&lt;prefix_filtert&gt; &amp;method_context,</div>
 <div class="line"><a name="l03290"></a><span class="lineno"> 3290</span>&#160;  <span class="keywordtype">bool</span> assert_no_exceptions_thrown)</div>
 <div class="line"><a name="l03291"></a><span class="lineno"> 3291</span>&#160; </div>
 <div class="line"><a name="l03292"></a><span class="lineno"> 3292</span>&#160;{</div>
@@ -3800,7 +3800,6 @@ $(document).ready(function(){initNavTree('java__bytecode__convert__method_8cpp_s
 <div class="ttc" id="amp__arith_8cpp_html_a146a9868afe5cddd8384186982d39345"><div class="ttname"><a href="mp__arith_8cpp.html#a146a9868afe5cddd8384186982d39345">string2integer</a></div><div class="ttdeci">const mp_integer string2integer(const std::string &amp;n, unsigned base)</div><div class="ttdef"><b>Definition:</b> <a href="mp__arith_8cpp_source.html#l00054">mp_arith.cpp:54</a></div></div>
 <div class="ttc" id="amp__arith_8cpp_html_a8ba48a3c9deb8ae1f6834b75d8e8157e"><div class="ttname"><a href="mp__arith_8cpp.html#a8ba48a3c9deb8ae1f6834b75d8e8157e">integer2string</a></div><div class="ttdeci">const std::string integer2string(const mp_integer &amp;n, unsigned base)</div><div class="ttdef"><b>Definition:</b> <a href="mp__arith_8cpp_source.html#l00103">mp_arith.cpp:103</a></div></div>
 <div class="ttc" id="anamespace_8h_html"><div class="ttname"><a href="namespace_8h.html">namespace.h</a></div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="apattern_8h_html"><div class="ttname"><a href="pattern_8h.html">pattern.h</a></div><div class="ttdoc">Pattern matching for bytecode instructions.</div></div>
 <div class="ttc" id="apointer__expr_8h_html_a0e49f887d3e1afa57ada1bb6314ed704"><div class="ttname"><a href="pointer__expr_8h.html#a0e49f887d3e1afa57ada1bb6314ed704">can_cast_type&lt; reference_typet &gt;</a></div><div class="ttdeci">bool can_cast_type&lt; reference_typet &gt;(const typet &amp;type)</div><div class="ttdoc">Check whether a reference to a typet is a reference_typet.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00149">pointer_expr.h:149</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html_a803796648f3f21fa7835f4509b7ea0a2"><div class="ttname"><a href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a></div><div class="ttdeci">const pointer_typet &amp; to_pointer_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a pointer_typet.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00093">pointer_expr.h:93</a></div></div>

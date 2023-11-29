@@ -807,7 +807,7 @@ $(document).ready(function(){initNavTree('arrays_8cpp_source.html',''); initResi
 <div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;      <span class="comment">// We have a constant index - just pick the element at that index from the</span></div>
 <div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;      <span class="comment">// array constant.</span></div>
 <div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160; </div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;      <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::size_t&gt;</a> i =</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;      <span class="keyword">const</span> optionalt&lt;std::size_t&gt; i =</div>
 <div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;        numeric_cast&lt;std::size_t&gt;(<a class="code" href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a>(index));</div>
 <div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;      <span class="comment">// if the access is out of bounds, we leave it unconstrained</span></div>
 <div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;      <span class="keywordflow">if</span>(!i.has_value() || *i &gt;= operands.size())</div>
@@ -1113,7 +1113,6 @@ $(document).ready(function(){initNavTree('arrays_8cpp_source.html',''); initResi
 <div class="ttc" id="aliteral_8h_html_ad2dfd63c2c74c4a666f97dd385f57230"><div class="ttname"><a href="literal_8h.html#ad2dfd63c2c74c4a666f97dd385f57230">const_literal</a></div><div class="ttdeci">literalt const_literal(bool value)</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00188">literal.h:188</a></div></div>
 <div class="ttc" id="aliteral__expr_8h_html"><div class="ttname"><a href="literal__expr_8h.html">literal_expr.h</a></div></div>
 <div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02689">math.c:2689</a></div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="aprop_8h_html"><div class="ttname"><a href="prop_8h.html">prop.h</a></div></div>
 <div class="ttc" id="areplace__expr_8cpp_html_aab92a05844d0a7899fc516fe37f4e786"><div class="ttname"><a href="replace__expr_8cpp.html#aab92a05844d0a7899fc516fe37f4e786">replace_expr</a></div><div class="ttdeci">bool replace_expr(const exprt &amp;what, const exprt &amp;by, exprt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="replace__expr_8cpp_source.html#l00012">replace_expr.cpp:12</a></div></div>
 <div class="ttc" id="areplace__expr_8h_html"><div class="ttname"><a href="replace__expr_8h.html">replace_expr.h</a></div></div>

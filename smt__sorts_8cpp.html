@@ -103,7 +103,7 @@ $(document).ready(function(){initNavTree('smt__sorts_8cpp.html',''); initResizab
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="smt__sorts_8cpp__incl.svg" width="1292" height="590"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="smt__sorts_8cpp__incl.svg" width="1443" height="590"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -191,7 +191,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">  <span class="keyword">template</span> &lt;&gt;                                                                  \</div>
-<div class="line">  optionalt&lt;smt_##the_id##_sortt&gt; smt_sortt::cast&lt;smt_##the_id##_sortt&gt;() &amp;&amp;   \</div>
+<div class="line">  std::optional&lt;smt_##the_id##_sortt&gt; smt_sortt::cast&lt;smt_##the_id##_sortt&gt;()  \</div>
+<div class="line">    &amp;&amp;                                                                         \</div>
 <div class="line">  {                                                                            \</div>
 <div class="line">    if(<span class="keywordtype">id</span>() == ID_smt_##the_id##_sort)                                         \</div>
 <div class="line">      return {std::move(*<span class="keyword">static_cast&lt;</span><span class="keyword">const </span>smt_##the_id##_sortt *<span class="keyword">&gt;</span>(<span class="keyword">this</span>))};    \</div>
@@ -260,7 +261,7 @@ template&lt;typename visitort &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt__sorts_8cpp_source.html#l00086">86</a> of file <a class="el" href="smt__sorts_8cpp_source.html">smt_sorts.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt__sorts_8cpp_source.html#l00087">87</a> of file <a class="el" href="smt__sorts_8cpp_source.html">smt_sorts.cpp</a>.</p>
 
 </div>
 </div>

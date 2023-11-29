@@ -555,7 +555,7 @@ $(document).ready(function(){initNavTree('gdb__api_8cpp_source.html',''); initRe
 <div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  <span class="keywordflow">if</span>(!b)</div>
 <div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    <span class="keywordflow">return</span> pointer_valuet{};</div>
 <div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160; </div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::string&gt;</a> opt_string;</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  optionalt&lt;std::string&gt; opt_string;</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  <span class="keyword">const</span> std::string <span class="keywordtype">string</span> = result[4];</div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160; </div>
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;  <span class="keywordflow">if</span>(!<span class="keywordtype">string</span>.empty())</div>
@@ -584,7 +584,7 @@ $(document).ready(function(){initNavTree('gdb__api_8cpp_source.html',''); initRe
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  <span class="keywordflow">return</span> pointer_valuet(result[1], result[2], result[3], opt_string, <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;}</div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160; </div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::string&gt;</a> <a class="code" href="classgdb__apit.html#ad928c87caea2de74546e75920d7dec7b">gdb_apit::get_value</a>(<span class="keyword">const</span> std::string &amp;expr)</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;optionalt&lt;std::string&gt; <a class="code" href="classgdb__apit.html#ad928c87caea2de74546e75920d7dec7b">gdb_apit::get_value</a>(<span class="keyword">const</span> std::string &amp;expr)</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;{</div>
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<a class="code" href="classgdb__apit.html#a444e6d79682bff0c59a0648705ff6c05">gdb_state</a> == <a class="code" href="classgdb__apit.html#a82089847f123abf36720af560a56f947a09d4d696b4e935115b9313e3c412509a">gdb_statet::STOPPED</a>);</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160; </div>
@@ -790,7 +790,6 @@ $(document).ready(function(){initNavTree('gdb__api_8cpp_source.html',''); initRe
 <div class="ttc" id="agdb__api_8h_html"><div class="ttname"><a href="gdb__api_8h.html">gdb_api.h</a></div><div class="ttdoc">Low-level interface to gdb.</div></div>
 <div class="ttc" id="airep__hash_8h_html_a6f2aef269e9e7c90182bcb65e01977d3"><div class="ttname"><a href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a></div><div class="ttdeci">static int8_t r</div><div class="ttdef"><b>Definition:</b> <a href="irep__hash_8h_source.html#l00059">irep_hash.h:60</a></div></div>
 <div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02689">math.c:2689</a></div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="aprefix_8h_html"><div class="ttname"><a href="prefix_8h.html">prefix.h</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3846e19582b97ae45a1650a541cac0a2"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a></div><div class="ttdeci">#define CHECK_RETURN(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00495">invariant.h:495</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3af99897b60119951af8961dbd52dd3f"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a></div><div class="ttdeci">#define UNREACHABLE</div><div class="ttdoc">This should be used to mark dead code.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00525">invariant.h:525</a></div></div>

@@ -147,14 +147,14 @@ $(document).ready(function(){initNavTree('boolbv__map_8h_source.html',''); initR
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier,</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type);</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::reference_wrapper&lt;const map_entryt&gt;</a>&gt;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  optionalt&lt;std::reference_wrapper&lt;const map_entryt&gt;&gt;</div>
 <div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classboolbv__mapt.html#a5eebe4f3b24117d49921202b5cbca844">   57</a></span>&#160;  <a class="code" href="classboolbv__mapt.html#a5eebe4f3b24117d49921202b5cbca844">get_map_entry</a>(<span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;identifier)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">  </span>{</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> entry = <a class="code" href="classboolbv__mapt.html#a4c6ef2a8ace1383fdcdb211bd8ba34b9">mapping</a>.find(identifier);</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">if</span>(entry == <a class="code" href="classboolbv__mapt.html#a4c6ef2a8ace1383fdcdb211bd8ba34b9">mapping</a>.end())</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      <span class="keywordflow">return</span> {};</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::reference_wrapper&lt;const map_entryt&gt;</a>&gt;(entry-&gt;second);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">return</span> optionalt&lt;std::reference_wrapper&lt;const map_entryt&gt;&gt;(entry-&gt;second);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  }</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
 <div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classboolbv__mapt.html#a8787341e8ed18b99b1cf44fe0c97eeca">   66</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="classboolbv__mapt.html#afc6097b333f1b3bb5f6901f6364085d0">mappingt</a> &amp;<a class="code" href="classboolbv__mapt.html#a8787341e8ed18b99b1cf44fe0c97eeca">get_mapping</a>()<span class="keyword"> const</span></div>
@@ -188,7 +188,6 @@ $(document).ready(function(){initNavTree('boolbv__map_8h_source.html',''); initR
 <div class="ttc" id="aclasstypet_html"><div class="ttname"><a href="classtypet.html">typet</a></div><div class="ttdoc">The type of an expression, extends irept.</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00028">type.h:29</a></div></div>
 <div class="ttc" id="aliteral_8h_html"><div class="ttname"><a href="literal_8h.html">literal.h</a></div></div>
 <div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div><div class="ttdoc">Defines typet, type_with_subtypet and type_with_subtypest.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

@@ -961,10 +961,7 @@ var hierarchy =
     ] ],
     [ "is_predecessor_oft", "structis__predecessor__oft.html", null ],
     [ "is_threadedt", "classis__threadedt.html", null ],
-    [ "std::iterator", null, [
-      [ "cmdlinet::option_namest::option_names_iteratort", "structcmdlinet_1_1option__namest_1_1option__names__iteratort.html", null ],
-      [ "dense_integer_mapt< K, V, KeyToDenseInteger >::iterator_templatet< UnderlyingIterator, UnderlyingValue >", "classdense__integer__mapt_1_1iterator__templatet.html", null ]
-    ] ],
+    [ "dense_integer_mapt< K, V, KeyToDenseInteger >::iterator_templatet< UnderlyingIterator, UnderlyingValue >", "classdense__integer__mapt_1_1iterator__templatet.html", null ],
     [ "symbol_table_baset::iteratort", "classsymbol__table__baset_1_1iteratort.html", null ],
     [ "jar_filet", "classjar__filet.html", null ],
     [ "jar_poolt", "classjar__poolt.html", null ],
@@ -1193,6 +1190,7 @@ var hierarchy =
     [ "c_wranglert::objectt", "structc__wranglert_1_1objectt.html", null ],
     [ "cover_goalst::observert", "classcover__goalst_1_1observert.html", null ],
     [ "operator_entryt", "structoperator__entryt.html", null ],
+    [ "cmdlinet::option_namest::option_names_iteratort", "structcmdlinet_1_1option__namest_1_1option__names__iteratort.html", null ],
     [ "cmdlinet::option_namest", "structcmdlinet_1_1option__namest.html", null ],
     [ "optionst", "classoptionst.html", null ],
     [ "cmdlinet::optiont", "structcmdlinet_1_1optiont.html", null ],
@@ -2060,10 +2058,6 @@ var hierarchy =
       [ "symex_target_equationt", "classsymex__target__equationt.html", null ]
     ] ],
     [ "system_library_symbolst", "classsystem__library__symbolst.html", null ],
-    [ "T", null, [
-      [ "cfg_base_nodet< T, I >", "structcfg__base__nodet.html", null ],
-      [ "reference_counting< T, empty >::dt", "classreference__counting_1_1dt.html", null ]
-    ] ],
     [ "taint_analysist", "classtaint__analysist.html", null ],
     [ "taint_parse_treet", "classtaint__parse__treet.html", null ],
     [ "take_time_resourcet", "classtake__time__resourcet.html", null ],
@@ -2192,5 +2186,9 @@ var hierarchy =
     [ "smt_bit_vector_theoryt::xort", "structsmt__bit__vector__theoryt_1_1xort.html", null ],
     [ "smt_core_theoryt::xort", "structsmt__core__theoryt_1_1xort.html", null ],
     [ "smt_bit_vector_theoryt::zero_extendt", "structsmt__bit__vector__theoryt_1_1zero__extendt.html", null ],
-    [ "zip_iteratort< first_iteratort, second_iteratort, same_size >", "structzip__iteratort.html", null ]
+    [ "zip_iteratort< first_iteratort, second_iteratort, same_size >", "structzip__iteratort.html", null ],
+    [ "T", null, [
+      [ "cfg_base_nodet< T, I >", "structcfg__base__nodet.html", null ],
+      [ "reference_counting< T, empty >::dt", "classreference__counting_1_1dt.html", null ]
+    ] ]
 ];

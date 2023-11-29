@@ -36,17 +36,32 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="26.5,-0.5 26.5,-19.5 139.5,-19.5 139.5,-0.5 26.5,-0.5"/>
-<text text-anchor="middle" x="83" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">nonstd/optional.hpp</text>
+<g id="a_node3"><a xlink:href="deprecate_8h.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="5,-0.5 5,-19.5 79,-19.5 79,-0.5 5,-0.5"/>
+<text text-anchor="middle" x="42" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">deprecate.h</text>
 </a>
 </g>
 </g>
 <!-- Node2&#45;&gt;Node3 -->
 <g id="edge2" class="edge">
 <title>Node2&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M83,-56.08C83,-49.01 83,-38.86 83,-29.99"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="86.5,-29.75 83,-19.75 79.5,-29.75 86.5,-29.75"/>
+<path fill="none" stroke="midnightblue" d="M76.23,-56.08C70.44,-48.46 61.94,-37.26 54.86,-27.94"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="57.48,-25.6 48.64,-19.75 51.9,-29.83 57.48,-25.6"/>
+</g>
+<!-- Node4 -->
+<g id="node4" class="node">
+<title>Node4</title>
+<g id="a_node4"><a xlink:title=" ">
+<polygon fill="none" stroke="#bfbfbf" points="97,-0.5 97,-19.5 153,-19.5 153,-0.5 97,-0.5"/>
+<text text-anchor="middle" x="125" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">optional</text>
+</a>
+</g>
+</g>
+<!-- Node2&#45;&gt;Node4 -->
+<g id="edge3" class="edge">
+<title>Node2&#45;&gt;Node4</title>
+<path fill="none" stroke="midnightblue" d="M89.94,-56.08C95.93,-48.38 104.75,-37.03 112.05,-27.65"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="114.82,-29.79 118.19,-19.75 109.29,-25.5 114.82,-29.79"/>
 </g>
 </g>
 </svg>

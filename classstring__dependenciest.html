@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('classstring__dependenciest.html',''); 
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classstring__dependenciest__coll__graph.svg" width="2070" height="392"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classstring__dependenciest__coll__graph.svg" width="2014" height="512"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -144,7 +144,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa15250d0ca1916edefc58f30891d755b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c11ff33797367acc7ffce28016584d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#a4c11ff33797367acc7ffce28016584d3">for_each_dependency</a> (const <a class="el" href="classstring__dependenciest_1_1builtin__function__nodet.html">builtin_function_nodet</a> &amp;node, const std::function&lt; void(const <a class="el" href="classstring__dependenciest_1_1string__nodet.html">string_nodet</a> &amp;)&gt; &amp;f) const</td></tr>
 <tr class="separator:a4c11ff33797367acc7ffce28016584d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afedc2575cb326daa2bb32ee27b1a0734"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#afedc2575cb326daa2bb32ee27b1a0734">eval</a> (const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;s, const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;get_value) const</td></tr>
+<tr class="memitem:afedc2575cb326daa2bb32ee27b1a0734"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#afedc2575cb326daa2bb32ee27b1a0734">eval</a> (const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;s, const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;get_value) const</td></tr>
 <tr class="memdesc:afedc2575cb326daa2bb32ee27b1a0734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to evaluate the given string from the dependencies and valuation of strings on which it depends Warning: eval uses a cache which must be cleaned everytime the valuations given by get_value can change.  <a href="classstring__dependenciest.html#afedc2575cb326daa2bb32ee27b1a0734">More...</a><br /></td></tr>
 <tr class="separator:afedc2575cb326daa2bb32ee27b1a0734"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a263895fc2995bd34d8cabc0f691a0c90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#a263895fc2995bd34d8cabc0f691a0c90">clean_cache</a> ()</td></tr>
@@ -179,7 +179,7 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a85eadafceae7d84e6977a2bb01fd2b65"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="classarray__string__exprt.html">array_string_exprt</a>, std::size_t, <a class="el" href="structirep__hash.html">irep_hash</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#a85eadafceae7d84e6977a2bb01fd2b65">node_index_pool</a></td></tr>
 <tr class="memdesc:a85eadafceae7d84e6977a2bb01fd2b65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nodes describing dependencies of a string: values of the map correspond to indexes in the vector <code>string_nodes</code>.  <a href="classstring__dependenciest.html#a85eadafceae7d84e6977a2bb01fd2b65">More...</a><br /></td></tr>
 <tr class="separator:a85eadafceae7d84e6977a2bb01fd2b65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab92dac4be71622cfe71bb98ec2613084"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#ab92dac4be71622cfe71bb98ec2613084">eval_string_cache</a></td></tr>
+<tr class="memitem:ab92dac4be71622cfe71bb98ec2613084"><td class="memItemLeft" align="right" valign="top">std::vector&lt; optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#ab92dac4be71622cfe71bb98ec2613084">eval_string_cache</a></td></tr>
 <tr class="separator:ab92dac4be71622cfe71bb98ec2613084"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -217,7 +217,7 @@ Private Attributes</h2></td></tr>
 <p>For all builtin call on which a test (or an unsupported buitin) result depends, add the corresponding constraints. </p>
 <p>For the other builtin only add constraints on the length. </p>
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00348">348</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00347">347</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -250,7 +250,7 @@ Private Attributes</h2></td></tr>
 <p>Add edge from node for <code>e</code>&#160;to node for <code>builtin_function</code> if <code>e</code> is a simple array expression. </p>
 <p>If it is an <code><a class="el" href="classif__exprt.html" title="The trinary if-then-else operator.">if_exprt</a></code> we add the sub-expressions that are not <code><a class="el" href="classif__exprt.html" title="The trinary if-then-else operator.">if_exprt</a></code>s instead. </p>
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00118">118</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00117">117</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -271,7 +271,7 @@ Private Attributes</h2></td></tr>
 
 <p>Clean the cache used by <code>eval</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00191">191</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00190">190</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -293,7 +293,7 @@ Private Attributes</h2></td></tr>
 
 <p>Clear the content of the dependency graph. </p>
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00128">128</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00127">127</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -304,7 +304,7 @@ Private Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classexprt.html">exprt</a> &gt; string_dependenciest::eval </td>
+          <td class="memname">optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt; string_dependenciest::eval </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -325,7 +325,7 @@ Private Attributes</h2></td></tr>
 
 <p>Attempt to evaluate the given string from the dependencies and valuation of strings on which it depends Warning: eval uses a cache which must be cleaned everytime the valuations given by get_value can change. </p>
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00169">169</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00168">168</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -355,7 +355,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00256">256</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00255">255</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -387,7 +387,7 @@ Private Attributes</h2></td></tr>
 
 <p>Applies <code>f</code> to each node on which <code>node</code> depends. </p>
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00286">286</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00285">285</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +417,7 @@ Private Attributes</h2></td></tr>
 
 <p>Applies <code>f</code> on all nodes. </p>
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00314">314</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00313">313</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -457,7 +457,7 @@ Private Attributes</h2></td></tr>
 
 <p>Applies <code>f</code> on all successors of the node n. </p>
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00294">294</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00293">293</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -477,7 +477,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00100">100</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00099">99</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -497,7 +497,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00073">73</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00072">72</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -517,7 +517,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00092">92</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00091">91</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -537,7 +537,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00084">84</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00083">83</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -557,7 +557,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00323">323</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8cpp_source.html#l00322">322</a> of file <a class="el" href="string__dependencies_8cpp_source.html">string_dependencies.cpp</a>.</p>
 
 </div>
 </div>
@@ -598,7 +598,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="classexprt.html">exprt</a>&gt; &gt; string_dependenciest::eval_string_cache</td>
+          <td class="memname">std::vector&lt;optionalt&lt;<a class="el" href="classexprt.html">exprt</a>&gt; &gt; string_dependenciest::eval_string_cache</td>
         </tr>
       </table>
   </td>
@@ -608,7 +608,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__dependencies_8h_source.html#l00173">173</a> of file <a class="el" href="string__dependencies_8h_source.html">string_dependencies.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__dependencies_8h_source.html#l00172">172</a> of file <a class="el" href="string__dependencies_8h_source.html">string_dependencies.h</a>.</p>
 
 </div>
 </div>

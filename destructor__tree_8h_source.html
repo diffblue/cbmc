@@ -154,17 +154,17 @@ $(document).ready(function(){initNavTree('destructor__tree_8h_source.html',''); 
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classdestructor__treet.html#a16d09c9599f5d9885d52e8b64d5420db">add</a>(<span class="keyword">const</span> <a class="code" href="classcodet.html">codet</a> &amp;destructor);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> &amp;<a class="code" href="classdestructor__treet.html#ae2886e09b54a77d2153d5943d12d92e0">get_destructor</a>(<a class="code" href="destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a">node_indext</a> index);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  optionalt&lt;codet&gt; &amp;<a class="code" href="classdestructor__treet.html#ae2886e09b54a77d2153d5943d12d92e0">get_destructor</a>(<a class="code" href="destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a">node_indext</a> index);</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keyword">const</span> std::vector&lt;destructor_and_idt&gt; <a class="code" href="classdestructor__treet.html#a35ec6145336f7369992bbf2804818850">get_destructors</a>(</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;node_indext&gt;</a> end_index = {},</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;node_indext&gt;</a> starting_index = {});</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    optionalt&lt;node_indext&gt; end_index = {},</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    optionalt&lt;node_indext&gt; starting_index = {});</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keyword">const</span> <a class="code" href="classancestry__resultt.html">ancestry_resultt</a> <a class="code" href="classdestructor__treet.html#ad842fa46be4cd4f2b7c095732fb7796a">get_nearest_common_ancestor_info</a>(</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <a class="code" href="destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a">node_indext</a> left_index,</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <a class="code" href="destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a">node_indext</a> right_index);</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classdestructor__treet.html#a15595822effb642100055ace8cda7b33">set_current_node</a>(<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;node_indext&gt;</a> val);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classdestructor__treet.html#a15595822effb642100055ace8cda7b33">set_current_node</a>(optionalt&lt;node_indext&gt; val);</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classdestructor__treet.html#a15595822effb642100055ace8cda7b33">set_current_node</a>(<a class="code" href="destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a">node_indext</a> val);</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
@@ -182,7 +182,7 @@ $(document).ready(function(){initNavTree('destructor__tree_8h_source.html',''); 
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      : <a class="code" href="classdestructor__treet_1_1destructor__nodet.html#a1bf49f4d3cba9569dc8ce0d6070aaad2">destructor_value</a>(std::move(destructor))</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    {</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    }</div>
-<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="classdestructor__treet_1_1destructor__nodet.html#a1bf49f4d3cba9569dc8ce0d6070aaad2">  148</a></span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="classdestructor__treet_1_1destructor__nodet.html#a1bf49f4d3cba9569dc8ce0d6070aaad2">destructor_value</a>;</div>
+<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="classdestructor__treet_1_1destructor__nodet.html#a1bf49f4d3cba9569dc8ce0d6070aaad2">  148</a></span>&#160;    optionalt&lt;codet&gt; <a class="code" href="classdestructor__treet_1_1destructor__nodet.html#a1bf49f4d3cba9569dc8ce0d6070aaad2">destructor_value</a>;</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  };</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
 <div class="line"><a name="l00151"></a><span class="lineno"><a class="line" href="classdestructor__treet.html#a3d146fa7ea71283e644fb2ec1b79fa39">  151</a></span>&#160;  <a class="code" href="classgrapht.html">grapht&lt;destructor_nodet&gt;</a> <a class="code" href="classdestructor__treet.html#a3d146fa7ea71283e644fb2ec1b79fa39">destruction_graph</a>;</div>
@@ -220,7 +220,6 @@ $(document).ready(function(){initNavTree('destructor__tree_8h_source.html',''); 
 <div class="ttc" id="aclassgrapht_html"><div class="ttname"><a href="classgrapht.html">grapht</a></div><div class="ttdoc">A generic directed graph with a parametric node type.</div><div class="ttdef"><b>Definition:</b> <a href="graph_8h_source.html#l00166">graph.h:167</a></div></div>
 <div class="ttc" id="adestructor__tree_8h_html_a133f0a5da8cf79fbc1420080e6d6bd5a"><div class="ttname"><a href="destructor__tree_8h.html#a133f0a5da8cf79fbc1420080e6d6bd5a">node_indext</a></div><div class="ttdeci">std::size_t node_indext</div><div class="ttdef"><b>Definition:</b> <a href="destructor__tree_8h_source.html#l00015">destructor_tree.h:15</a></div></div>
 <div class="ttc" id="agraph_8h_html"><div class="ttname"><a href="graph_8h.html">graph.h</a></div><div class="ttdoc">A Template Class for Graphs.</div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="astd__code__base_8h_html"><div class="ttname"><a href="std__code__base_8h.html">std_code_base.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

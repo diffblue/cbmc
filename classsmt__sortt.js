@@ -4,7 +4,7 @@ var classsmt__sortt =
     [ "smt_sortt", "classsmt__sortt.html#ae244a59d5ff4dcfd5ffa1f926e0a5a28", null ],
     [ "accept", "classsmt__sortt.html#a02a80a8e05daf1f9f847fd5fe3d5dd84", null ],
     [ "accept", "classsmt__sortt.html#ae6db844ae16b7dc822e2514162d39122", null ],
-    [ "cast", "classsmt__sortt.html#a55171f8c22535f19a5824cb55e9ed646", null ],
+    [ "cast", "classsmt__sortt.html#a60ba8e7186c87ac3fcf420bf8ab701e0", null ],
     [ "cast", "classsmt__sortt.html#a20955e9a52fb0f4f3b381c895d161b79", null ],
     [ "irept", "classsmt__sortt.html#a03b253c617775718b1ea6354fa32329d", null ],
     [ "irept", "classsmt__sortt.html#a4924f2845a5023d67e22ef133ce7bcd2", null ],

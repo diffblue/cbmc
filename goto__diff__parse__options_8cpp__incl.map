@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;diff/goto_diff_parse_options.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;diff/goto_diff_parse_options.cpp">
-<area shape="rect" id="node1" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2079,5,2263,61"/>
-<area shape="rect" id="node2" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="629,117,819,143"/>
-<area shape="rect" id="node14" title=" " alt="" coords="687,616,753,643"/>
-<area shape="rect" id="node19" href="$show__properties_8h.html" title="Show the properties." alt="" coords="1171,199,1327,240"/>
-<area shape="rect" id="node26" href="$cover_8h.html" title="Coverage Instrumentation." alt="" coords="219,206,397,233"/>
-<area shape="rect" id="node33" href="$config_8h.html" title=" " alt="" coords="2395,206,2493,233"/>
-<area shape="rect" id="node37" href="$exit__codes_8h.html" title="Document and give macros for the exit codes of CPROVER binaries." alt="" coords="1310,117,1439,143"/>
-<area shape="rect" id="node38" href="$help__formatter_8h.html" title="Help Formatter." alt="" coords="3339,385,3493,411"/>
-<area shape="rect" id="node39" href="$options_8h.html" title="Options." alt="" coords="1557,295,1664,322"/>
-<area shape="rect" id="node40" href="$version_8h.html" title=" " alt="" coords="1717,117,1824,143"/>
-<area shape="rect" id="node41" href="$initialize__goto__model_8h.html" title="Initialize a Goto Program." alt="" coords="1464,109,1643,151"/>
-<area shape="rect" id="node46" href="$link__to__library_8h.html" title="Library Linking." alt="" coords="2157,377,2304,419"/>
-<area shape="rect" id="node47" href="$loop__ids_8h.html" title="Loop IDs." alt="" coords="43,199,194,240"/>
-<area shape="rect" id="node48" href="$process__goto__program_8h.html" title=" " alt="" coords="2147,109,2319,151"/>
-<area shape="rect" id="node49" href="$remove__skip_8h.html" title="Program Transformation." alt="" coords="1899,199,2071,240"/>
-<area shape="rect" id="node50" href="$set__properties_8h.html" title="Set the properties to check." alt="" coords="2165,295,2392,322"/>
-<area shape="rect" id="node51" href="$ansi-c_2cprover__library_8h.html" title=" " alt="" coords="2792,385,2965,411"/>
-<area shape="rect" id="node52" href="$gcc__version_8h.html" title=" " alt="" coords="2445,117,2600,143"/>
-<area shape="rect" id="node53" href="$remove__asm_8h.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="2770,117,2961,143"/>
-<area shape="rect" id="node54" href="$cpp_2cprover__library_8h.html" title=" " alt="" coords="2989,385,3147,411"/>
-<area shape="rect" id="node55" href="$change__impact_8h.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="3036,117,3169,143"/>
-<area shape="rect" id="node56" href="$syntactic__diff_8h.html" title="Syntactic GOTO&#45;DIFF." alt="" coords="2625,117,2746,143"/>
-<area shape="rect" id="node58" href="$unified__diff_8h.html" title="Unified diff (using LCSS) of goto functions." alt="" coords="1688,295,1795,322"/>
-<area shape="rect" id="node59" title=" " alt="" coords="3295,117,3369,143"/>
-<area shape="rect" id="node60" title=" " alt="" coords="3393,117,3473,143"/>
-<area shape="rect" id="node3" href="$parse__options_8h.html" title=" " alt="" coords="705,206,855,233"/>
-<area shape="rect" id="node15" href="$ui__message_8h.html" title=" " alt="" coords="416,295,528,322"/>
-<area shape="rect" id="node17" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="325,385,443,411"/>
-<area shape="rect" id="node18" href="$show__goto__functions_8h.html" title="Show the goto functions." alt="" coords="473,199,629,240"/>
-<area shape="rect" id="node23" href="$goto__check__c_8h.html" title="Program Transformation." alt="" coords="880,206,1045,233"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1479,616,1537,643"/>
-<area shape="rect" id="node5" href="$cmdline_8h.html" title=" " alt="" coords="827,295,914,322"/>
-<area shape="rect" id="node10" href="$src_2util_2message_8h.html" title=" " alt="" coords="881,385,975,411"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1847,385,1889,411"/>
-<area shape="rect" id="node7" title=" " alt="" coords="1629,541,1691,568"/>
-<area shape="rect" id="node8" href="$optional_8h.html" title=" " alt="" coords="1225,385,1311,411"/>
-<area shape="rect" id="node9" title=" " alt="" coords="1193,467,1343,493"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1833,467,1919,493"/>
-<area shape="rect" id="node12" title=" " alt="" coords="2508,467,2572,493"/>
-<area shape="rect" id="node13" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1373,541,1465,568"/>
-<area shape="rect" id="node16" title=" " alt="" coords="345,467,423,493"/>
-<area shape="rect" id="node20" href="$irep_8h.html" title=" " alt="" coords="1976,467,2035,493"/>
-<area shape="rect" id="node21" href="$irep__ids_8h.html" title="util" alt="" coords="2080,541,2165,568"/>
-<area shape="rect" id="node22" href="$forward__list__as__map_8h.html" title=" " alt="" coords="1886,541,2055,568"/>
-<area shape="rect" id="node24" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1050,377,1201,419"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1545,467,1596,493"/>
-<area shape="rect" id="node27" href="$cover__filter_8h.html" title="Filters for the Coverage Instrumentation." alt="" coords="235,295,341,322"/>
-<area shape="rect" id="node28" href="$cover__instrument_8h.html" title="Coverage Instrumentation." alt="" coords="603,295,751,322"/>
-<area shape="rect" id="node32" href="$make__unique_8h.html" title=" " alt="" coords="64,295,211,322"/>
-<area shape="rect" id="node29" href="$namespace_8h.html" title=" " alt="" coords="1335,385,1470,411"/>
-<area shape="rect" id="node30" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1697,385,1823,411"/>
-<area shape="rect" id="node31" title=" " alt="" coords="2857,467,2900,493"/>
-<area shape="rect" id="node34" href="$ieee__float_8h.html" title=" " alt="" coords="2619,295,2717,322"/>
-<area shape="rect" id="node35" href="$mp__arith_8h.html" title=" " alt="" coords="3171,385,3263,411"/>
-<area shape="rect" id="node36" href="$format__spec_8h.html" title=" " alt="" coords="2603,385,2717,411"/>
-<area shape="rect" id="node42" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="1353,206,1463,233"/>
-<area shape="rect" id="node43" href="$journalling__symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="1920,288,2091,329"/>
-<area shape="rect" id="node44" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="1336,295,1483,322"/>
-<area shape="rect" id="node45" href="$abstract__goto__model_8h.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="1040,295,1211,322"/>
-<area shape="rect" id="node57" href="$goto__diff_8h.html" title="GOTO&#45;DIFF Base Class." alt="" coords="2675,206,2765,233"/>
+<area shape="rect" id="node1" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1603,5,1787,61"/>
+<area shape="rect" id="node2" href="$goto__diff__parse__options_8h.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1667,117,1856,143"/>
+<area shape="rect" id="node15" title=" " alt="" coords="2613,616,2678,643"/>
+<area shape="rect" id="node20" href="$show__properties_8h.html" title="Show the properties." alt="" coords="811,199,967,240"/>
+<area shape="rect" id="node27" href="$cover_8h.html" title="Coverage Instrumentation." alt="" coords="2383,206,2561,233"/>
+<area shape="rect" id="node33" href="$config_8h.html" title=" " alt="" coords="667,206,765,233"/>
+<area shape="rect" id="node37" href="$exit__codes_8h.html" title="Document and give macros for the exit codes of CPROVER binaries." alt="" coords="2235,117,2365,143"/>
+<area shape="rect" id="node38" href="$help__formatter_8h.html" title="Help Formatter." alt="" coords="43,385,197,411"/>
+<area shape="rect" id="node39" href="$options_8h.html" title="Options." alt="" coords="1900,295,2007,322"/>
+<area shape="rect" id="node40" href="$version_8h.html" title=" " alt="" coords="2389,117,2496,143"/>
+<area shape="rect" id="node41" href="$initialize__goto__model_8h.html" title="Initialize a Goto Program." alt="" coords="1981,109,2160,151"/>
+<area shape="rect" id="node46" href="$link__to__library_8h.html" title="Library Linking." alt="" coords="1373,377,1520,419"/>
+<area shape="rect" id="node47" href="$loop__ids_8h.html" title="Loop IDs." alt="" coords="2157,199,2307,240"/>
+<area shape="rect" id="node48" href="$process__goto__program_8h.html" title=" " alt="" coords="2521,109,2693,151"/>
+<area shape="rect" id="node49" href="$remove__skip_8h.html" title="Program Transformation." alt="" coords="1909,199,2081,240"/>
+<area shape="rect" id="node50" href="$set__properties_8h.html" title="Set the properties to check." alt="" coords="893,295,1120,322"/>
+<area shape="rect" id="node51" href="$ansi-c_2cprover__library_8h.html" title=" " alt="" coords="944,385,1117,411"/>
+<area shape="rect" id="node52" href="$gcc__version_8h.html" title=" " alt="" coords="571,117,725,143"/>
+<area shape="rect" id="node53" href="$remove__asm_8h.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="2717,117,2907,143"/>
+<area shape="rect" id="node54" href="$cpp_2cprover__library_8h.html" title=" " alt="" coords="1192,385,1349,411"/>
+<area shape="rect" id="node55" href="$change__impact_8h.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="2932,117,3065,143"/>
+<area shape="rect" id="node56" href="$syntactic__diff_8h.html" title="Syntactic GOTO&#45;DIFF." alt="" coords="1322,117,1443,143"/>
+<area shape="rect" id="node58" href="$unified__diff_8h.html" title="Unified diff (using LCSS) of goto functions." alt="" coords="1769,295,1876,322"/>
+<area shape="rect" id="node59" title=" " alt="" coords="3090,117,3163,143"/>
+<area shape="rect" id="node60" title=" " alt="" coords="3188,117,3268,143"/>
+<area shape="rect" id="node3" href="$parse__options_8h.html" title=" " alt="" coords="1734,206,1885,233"/>
+<area shape="rect" id="node16" href="$ui__message_8h.html" title=" " alt="" coords="2132,295,2244,322"/>
+<area shape="rect" id="node18" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="2443,385,2560,411"/>
+<area shape="rect" id="node19" href="$show__goto__functions_8h.html" title="Show the goto functions." alt="" coords="1554,199,1710,240"/>
+<area shape="rect" id="node24" href="$goto__check__c_8h.html" title="Program Transformation." alt="" coords="2585,206,2751,233"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1843,616,1901,643"/>
+<area shape="rect" id="node5" href="$cmdline_8h.html" title=" " alt="" coords="1557,295,1643,322"/>
+<area shape="rect" id="node11" href="$src_2util_2message_8h.html" title=" " alt="" coords="1763,385,1856,411"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1696,385,1739,411"/>
+<area shape="rect" id="node7" title=" " alt="" coords="1577,541,1639,568"/>
+<area shape="rect" id="node8" href="$optional_8h.html" title=" " alt="" coords="630,385,717,411"/>
+<area shape="rect" id="node9" href="$deprecate_8h.html" title=" " alt="" coords="927,467,1025,493"/>
+<area shape="rect" id="node10" title=" " alt="" coords="636,467,711,493"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1646,467,1733,493"/>
+<area shape="rect" id="node13" title=" " alt="" coords="529,467,593,493"/>
+<area shape="rect" id="node14" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="2091,541,2183,568"/>
+<area shape="rect" id="node17" title=" " alt="" coords="2584,467,2661,493"/>
+<area shape="rect" id="node21" href="$irep_8h.html" title=" " alt="" coords="1241,467,1300,493"/>
+<area shape="rect" id="node22" href="$irep__ids_8h.html" title="util" alt="" coords="1424,541,1509,568"/>
+<area shape="rect" id="node23" href="$forward__list__as__map_8h.html" title=" " alt="" coords="1230,541,1399,568"/>
+<area shape="rect" id="node25" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="2737,377,2887,419"/>
+<area shape="rect" id="node26" title=" " alt="" coords="2380,467,2431,493"/>
+<area shape="rect" id="node28" href="$cover__filter_8h.html" title="Filters for the Coverage Instrumentation." alt="" coords="2544,295,2651,322"/>
+<area shape="rect" id="node29" href="$cover__instrument_8h.html" title="Coverage Instrumentation." alt="" coords="2321,295,2469,322"/>
+<area shape="rect" id="node30" href="$namespace_8h.html" title=" " alt="" coords="2233,385,2367,411"/>
+<area shape="rect" id="node31" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="2032,385,2157,411"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1425,467,1468,493"/>
+<area shape="rect" id="node34" href="$ieee__float_8h.html" title=" " alt="" coords="376,295,475,322"/>
+<area shape="rect" id="node35" href="$mp__arith_8h.html" title=" " alt="" coords="222,385,314,411"/>
+<area shape="rect" id="node36" href="$format__spec_8h.html" title=" " alt="" coords="339,385,453,411"/>
+<area shape="rect" id="node42" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="2775,206,2886,233"/>
+<area shape="rect" id="node43" href="$journalling__symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="1245,288,1416,329"/>
+<area shape="rect" id="node44" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="2971,295,3117,322"/>
+<area shape="rect" id="node45" href="$abstract__goto__model_8h.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="2725,295,2896,322"/>
+<area shape="rect" id="node57" href="$goto__diff_8h.html" title="GOTO&#45;DIFF Base Class." alt="" coords="1337,206,1428,233"/>
 </map>

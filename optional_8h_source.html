@@ -94,8 +94,8 @@ $(document).ready(function(){initNavTree('optional_8h_source.html',''); initResi
 <div class="contents">
 <a href="optional_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*******************************************************************\</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">Module: typedef for optional class template. To be replaced with</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">        std::optional once C++17 support is enabled</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">Module: typedef for optional class template. New code should directly</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">        use std::optional.</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">Author: Diffblue Ltd.</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"></span> </div>
@@ -104,54 +104,24 @@ $(document).ready(function(){initNavTree('optional_8h_source.html',''); initResi
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#ifndef CPROVER_UTIL_OPTIONAL_H</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#define CPROVER_UTIL_OPTIONAL_H</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#if defined __clang__</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">  #pragma clang diagnostic push ignore &quot;-Wall&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">  #pragma clang diagnostic push ignore &quot;-Wpedantic&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#elif defined __GNUC__</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">  #pragma GCC diagnostic push ignore &quot;-Wall&quot;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">  #pragma GCC diagnostic push ignore &quot;-Wpedantic&quot;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#elif defined _MSC_VER</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">  #pragma warning(push)</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;nonstd/optional.hpp&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#if defined  __clang__</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">  #pragma clang diagnostic pop</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">  #pragma clang diagnostic pop</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#elif defined  __GNUC__</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">  #pragma GCC diagnostic pop</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">  #pragma GCC diagnostic pop</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#elif defined _MSC_VER</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">  #pragma warning(pop)</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">// Swap for std::optional when switching to C++17</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">   35</a></span>&#160;<span class="keyword">using</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>=nonstd::optional&lt;T&gt;; <span class="comment">// NOLINT template typedef</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="optional_8h.html#a6564b4fa9d0229db6e0b369dac67bd16">   37</a></span>&#160;<span class="keyword">typedef</span> nonstd::bad_optional_access <a class="code" href="optional_8h.html#a6564b4fa9d0229db6e0b369dac67bd16">bad_optional_accesst</a>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">using</span> nonstd::nullopt;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="optional_8h.html#a4db20beee7c0676dba5425b6799cee08">   44</a></span>&#160;T &amp;<a class="code" href="optional_8h.html#a4db20beee7c0676dba5425b6799cee08">get_value_or_abort</a>(<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;T&gt;</a> &amp;<a class="code" href="cegis_8c.html#aa0746596a3298421c7879110ccab3ca3">opt</a>)</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;{</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<a class="code" href="cegis_8c.html#aa0746596a3298421c7879110ccab3ca3">opt</a>.has_value());</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="cegis_8c.html#aa0746596a3298421c7879110ccab3ca3">opt</a>.value();</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="optional_8h.html#ab6f3b289afc2d4312d877493271665a3">   52</a></span>&#160;<span class="keyword">const</span> T &amp;<a class="code" href="optional_8h.html#a4db20beee7c0676dba5425b6799cee08">get_value_or_abort</a>(<span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;T&gt;</a> &amp;<a class="code" href="cegis_8c.html#aa0746596a3298421c7879110ccab3ca3">opt</a>)</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;{</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<a class="code" href="cegis_8c.html#aa0746596a3298421c7879110ccab3ca3">opt</a>.has_value());</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="cegis_8c.html#aa0746596a3298421c7879110ccab3ca3">opt</a>.value();</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_UTIL_OPTIONAL_H</span></div>
-<div class="ttc" id="acegis_8c_html_aa0746596a3298421c7879110ccab3ca3"><div class="ttname"><a href="cegis_8c.html#aa0746596a3298421c7879110ccab3ca3">opt</a></div><div class="ttdeci">unsigned char opt</div><div class="ttdef"><b>Definition:</b> <a href="cegis_8c_source.html#l00020">cegis.c:20</a></div></div>
-<div class="ttc" id="aoptional_8h_html_a4db20beee7c0676dba5425b6799cee08"><div class="ttname"><a href="optional_8h.html#a4db20beee7c0676dba5425b6799cee08">get_value_or_abort</a></div><div class="ttdeci">T &amp; get_value_or_abort(optionalt&lt; T &gt; &amp;opt)</div><div class="ttdoc">Similar to optionalt::value but in case of empty optional, generates an invariant failure instead of ...</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00044">optional.h:44</a></div></div>
-<div class="ttc" id="aoptional_8h_html_a6564b4fa9d0229db6e0b369dac67bd16"><div class="ttname"><a href="optional_8h.html#a6564b4fa9d0229db6e0b369dac67bd16">bad_optional_accesst</a></div><div class="ttdeci">nonstd::bad_optional_access bad_optional_accesst</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00037">optional.h:37</a></div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
-<div class="ttc" id="asrc_2util_2invariant_8h_html_a64cf940b0e83b0486a300085ed000dee"><div class="ttname"><a href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a></div><div class="ttdeci">#define PRECONDITION(CONDITION)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00463">invariant.h:463</a></div></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="deprecate_8h.html">deprecate.h</a>&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;optional&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">using</span> optionalt</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="comment">// Visual Studio doesn&#39;t support [deprecated] in this place</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <a class="code" href="deprecate_8h.html#ad034ea058031ed95e52d3bac1743640a">DEPRECATED</a>(<a class="code" href="deprecate_8h.html#a065a4ac368219a0601f41d050c3d76a5">SINCE</a>(2023, 11, 17, <span class="stringliteral">&quot;directly use std::optional instead&quot;</span>)) =</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  =</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    std::optional&lt;T&gt;; <span class="comment">// NOLINT template typedef</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_UTIL_OPTIONAL_H</span></div>
+<div class="ttc" id="adeprecate_8h_html"><div class="ttname"><a href="deprecate_8h.html">deprecate.h</a></div></div>
+<div class="ttc" id="adeprecate_8h_html_a065a4ac368219a0601f41d050c3d76a5"><div class="ttname"><a href="deprecate_8h.html#a065a4ac368219a0601f41d050c3d76a5">SINCE</a></div><div class="ttdeci">#define SINCE(year, month, day, msg)</div><div class="ttdef"><b>Definition:</b> <a href="deprecate_8h_source.html#l00026">deprecate.h:26</a></div></div>
+<div class="ttc" id="adeprecate_8h_html_ad034ea058031ed95e52d3bac1743640a"><div class="ttname"><a href="deprecate_8h.html#ad034ea058031ed95e52d3bac1743640a">DEPRECATED</a></div><div class="ttdeci">#define DEPRECATED(msg)</div><div class="ttdef"><b>Definition:</b> <a href="deprecate_8h_source.html#l00023">deprecate.h:23</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -101,22 +101,14 @@ $(document).ready(function(){initNavTree('classresponse__or__errort.html',''); i
  <a href="classresponse__or__errort.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="response__or__error_8h_source.html">response_or_error.h</a>&gt;</code></p>
-<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Collaboration diagram for response_or_errort&lt; smtt &gt;:</div>
-<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classresponse__or__errort__coll__graph.svg" width="284" height="335"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
-<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a519f779539b04d2960794f10301025c9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#a519f779539b04d2960794f10301025c9">response_or_errort</a> (smtt <a class="el" href="classresponse__or__errort.html#a6c33a21623a0075079269fa56ed30a7d">smt</a>)</td></tr>
+<tr class="memitem:a519f779539b04d2960794f10301025c9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#a519f779539b04d2960794f10301025c9">response_or_errort</a> (smtt smt)</td></tr>
 <tr class="separator:a519f779539b04d2960794f10301025c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c244a983d6d31d927a0bab754c4a3fe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#a2c244a983d6d31d927a0bab754c4a3fe">response_or_errort</a> (std::string message)</td></tr>
 <tr class="separator:a2c244a983d6d31d927a0bab754c4a3fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf817c4f9e8c3900eeb0f677c9c4a760"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#abf817c4f9e8c3900eeb0f677c9c4a760">response_or_errort</a> (std::vector&lt; std::string &gt; <a class="el" href="classresponse__or__errort.html#a54d247f24ca0fe4149237341c5b8a618">messages</a>)</td></tr>
+<tr class="memitem:abf817c4f9e8c3900eeb0f677c9c4a760"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#abf817c4f9e8c3900eeb0f677c9c4a760">response_or_errort</a> (std::vector&lt; std::string &gt; messages)</td></tr>
 <tr class="separator:abf817c4f9e8c3900eeb0f677c9c4a760"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c63fb79c7ed05685230652908416550"><td class="memItemLeft" align="right" valign="top">const smtt *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#a9c63fb79c7ed05685230652908416550">get_if_valid</a> () const</td></tr>
 <tr class="memdesc:a9c63fb79c7ed05685230652908416550"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the smt response if the response is valid, or returns nullptr otherwise.  <a href="classresponse__or__errort.html#a9c63fb79c7ed05685230652908416550">More...</a><br /></td></tr>
@@ -127,10 +119,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a6c33a21623a0075079269fa56ed30a7d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; smtt &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#a6c33a21623a0075079269fa56ed30a7d">smt</a></td></tr>
-<tr class="separator:a6c33a21623a0075079269fa56ed30a7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54d247f24ca0fe4149237341c5b8a618"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#a54d247f24ca0fe4149237341c5b8a618">messages</a></td></tr>
-<tr class="separator:a54d247f24ca0fe4149237341c5b8a618"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff49c5107b33fc7902596882f7c652b4"><td class="memItemLeft" align="right" valign="top">std::variant&lt; smtt, std::vector&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classresponse__or__errort.html#aff49c5107b33fc7902596882f7c652b4">smt_or_messages</a></td></tr>
+<tr class="separator:aff49c5107b33fc7902596882f7c652b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class smtt&gt;<br />
@@ -264,7 +254,7 @@ template&lt;class smtt &gt; </div>
 
 <p>Gets the error messages if the response is invalid, or returns nullptr otherwise. </p>
 
-<p class="definition">Definition at line <a class="el" href="response__or__error_8h_source.html#l00046">46</a> of file <a class="el" href="response__or__error_8h_source.html">response_or_error.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="response__or__error_8h_source.html#l00042">42</a> of file <a class="el" href="response__or__error_8h_source.html">response_or_error.h</a>.</p>
 
 </div>
 </div>
@@ -300,8 +290,8 @@ template&lt;class smtt &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a54d247f24ca0fe4149237341c5b8a618"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54d247f24ca0fe4149237341c5b8a618">&#9670;&nbsp;</a></span>messages</h2>
+<a id="aff49c5107b33fc7902596882f7c652b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff49c5107b33fc7902596882f7c652b4">&#9670;&nbsp;</a></span>smt_or_messages</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -312,7 +302,7 @@ template&lt;class smtt &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;std::string&gt; <a class="el" href="classresponse__or__errort.html">response_or_errort</a>&lt; smtt &gt;::messages</td>
+          <td class="memname">std::variant&lt;smtt, std::vector&lt;std::string&gt; &gt; <a class="el" href="classresponse__or__errort.html">response_or_errort</a>&lt; smtt &gt;::smt_or_messages</td>
         </tr>
       </table>
   </td>
@@ -322,33 +312,7 @@ template&lt;class smtt &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="response__or__error_8h_source.html#l00061">61</a> of file <a class="el" href="response__or__error_8h_source.html">response_or_error.h</a>.</p>
-
-</div>
-</div>
-<a id="a6c33a21623a0075079269fa56ed30a7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6c33a21623a0075079269fa56ed30a7d">&#9670;&nbsp;</a></span>smt</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class smtt &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;smtt&gt; <a class="el" href="classresponse__or__errort.html">response_or_errort</a>&lt; smtt &gt;::smt</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="response__or__error_8h_source.html#l00060">60</a> of file <a class="el" href="response__or__error_8h_source.html">response_or_error.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="response__or__error_8h_source.html#l00048">48</a> of file <a class="el" href="response__or__error_8h_source.html">response_or_error.h</a>.</p>
 
 </div>
 </div>

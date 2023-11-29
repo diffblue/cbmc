@@ -99,7 +99,6 @@ $(document).ready(function(){initNavTree('struct__encoding_8cpp.html',''); initR
 <code>#include &lt;<a class="el" href="bitvector__expr_8h_source.html">util/bitvector_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="bitvector__types_8h_source.html">util/bitvector_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="make__unique_8h_source.html">util/make_unique.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="namespace_8h_source.html">util/namespace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="range_8h_source.html">util/range.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
@@ -107,13 +106,14 @@ $(document).ready(function(){initNavTree('struct__encoding_8cpp.html',''); initR
 <code>#include &lt;<a class="el" href="nondet__padding_8h_source.html">solvers/smt2_incremental/encoding/nondet_padding.h</a>&gt;</code><br />
 <code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;numeric&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
 <code>#include &lt;queue&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for struct_encoding.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="struct__encoding_8cpp__incl.svg" width="1880" height="1082"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="struct__encoding_8cpp__incl.svg" width="1700" height="1082"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -121,9 +121,9 @@ $(document).ready(function(){initNavTree('struct__encoding_8cpp.html',''); initR
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1b1f2615ff4eed143e650939419f5458"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#a1b1f2615ff4eed143e650939419f5458">needs_width</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classboolbv__widtht.html">boolbv_widtht</a> &amp;boolbv_width)</td></tr>
-<tr class="memdesc:a1b1f2615ff4eed143e650939419f5458"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the given <code>type</code> needs re-encoding as a bit-vector then this function.  <a href="struct__encoding_8cpp.html#a1b1f2615ff4eed143e650939419f5458">More...</a><br /></td></tr>
-<tr class="separator:a1b1f2615ff4eed143e650939419f5458"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae95ac68d46e69884562e003f8207d3df"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#ae95ac68d46e69884562e003f8207d3df">needs_width</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classboolbv__widtht.html">boolbv_widtht</a> &amp;boolbv_width)</td></tr>
+<tr class="memdesc:ae95ac68d46e69884562e003f8207d3df"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the given <code>type</code> needs re-encoding as a bit-vector then this function.  <a href="struct__encoding_8cpp.html#ae95ac68d46e69884562e003f8207d3df">More...</a><br /></td></tr>
+<tr class="separator:ae95ac68d46e69884562e003f8207d3df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affdd2d8bf12da97b18d7945e842d41b5"><td class="memItemLeft" align="right" valign="top">static std::unordered_map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__encoding_8cpp.html#affdd2d8bf12da97b18d7945e842d41b5">extricate_updates</a> (const <a class="el" href="classwith__exprt.html">with_exprt</a> &amp;struct_expr)</td></tr>
 <tr class="memdesc:affdd2d8bf12da97b18d7945e842d41b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the component/field names and new values from a <code><a class="el" href="classwith__exprt.html" title="Operator to update elements in structs and arrays.">with_exprt</a></code> which expresses a new struct value where one or more members of a struct have had their values substituted with new values.  <a href="struct__encoding_8cpp.html#affdd2d8bf12da97b18d7945e842d41b5">More...</a><br /></td></tr>
 <tr class="separator:affdd2d8bf12da97b18d7945e842d41b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -355,8 +355,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a1b1f2615ff4eed143e650939419f5458"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b1f2615ff4eed143e650939419f5458">&#9670;&nbsp;</a></span>needs_width()</h2>
+<a id="ae95ac68d46e69884562e003f8207d3df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae95ac68d46e69884562e003f8207d3df">&#9670;&nbsp;</a></span>needs_width()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -365,7 +365,7 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;std::size_t&gt; needs_width </td>
+          <td class="memname">static std::optional&lt;std::size_t&gt; needs_width </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
           <td class="paramname"><em>type</em>, </td>

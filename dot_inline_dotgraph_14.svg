@@ -342,9 +342,9 @@
 <polygon fill="black" stroke="black" points="514.96,-206.15 512.2,-195.92 507.98,-205.64 514.96,-206.15"/>
 </g>
 <!-- json -->
-<g id="node25" class="node">
+<g id="node24" class="node">
 <title>json</title>
-<g id="a_node25"><a xlink:href="group__json.html" target="_top" xlink:title="json">
+<g id="a_node24"><a xlink:href="group__json.html" target="_top" xlink:title="json">
 <ellipse fill="white" stroke="white" cx="136" cy="-178" rx="29.8" ry="18"/>
 <text text-anchor="middle" x="136" y="-174.3" font-family="Times,serif" font-size="14.00">json</text>
 </a>
@@ -357,9 +357,9 @@
 <polygon fill="black" stroke="black" points="153,-201.75 144.56,-195.35 147.17,-205.62 153,-201.75"/>
 </g>
 <!-- xmllang -->
-<g id="node26" class="node">
+<g id="node25" class="node">
 <title>xmllang</title>
-<g id="a_node26"><a xlink:href="group__xmllang.html" target="_top" xlink:title="xmllang">
+<g id="a_node25"><a xlink:href="group__xmllang.html" target="_top" xlink:title="xmllang">
 <ellipse fill="white" stroke="white" cx="367" cy="-178" rx="48.19" ry="18"/>
 <text text-anchor="middle" x="367" y="-174.3" font-family="Times,serif" font-size="14.00">xmllang</text>
 </a>
@@ -372,9 +372,9 @@
 <polygon fill="black" stroke="black" points="393.35,-199.32 383.54,-195.32 388.71,-204.57 393.35,-199.32"/>
 </g>
 <!-- assembler -->
-<g id="node27" class="node">
+<g id="node26" class="node">
 <title>assembler</title>
-<g id="a_node27"><a xlink:href="group__assembler.html" target="_top" xlink:title="assembler">
+<g id="a_node26"><a xlink:href="group__assembler.html" target="_top" xlink:title="assembler">
 <ellipse fill="white" stroke="white" cx="242" cy="-178" rx="58.49" ry="18"/>
 <text text-anchor="middle" x="242" y="-174.3" font-family="Times,serif" font-size="14.00">assembler</text>
 </a>
@@ -396,16 +396,16 @@
 <g id="node23" class="node">
 <title>util</title>
 <g id="a_node23"><a xlink:href="group__util.html" target="_top" xlink:title="util">
-<ellipse fill="white" stroke="white" cx="282" cy="-106" rx="27" ry="18"/>
-<text text-anchor="middle" x="282" y="-102.3" font-family="Times,serif" font-size="14.00">util</text>
+<ellipse fill="white" stroke="white" cx="304" cy="-106" rx="27" ry="18"/>
+<text text-anchor="middle" x="304" y="-102.3" font-family="Times,serif" font-size="14.00">util</text>
 </a>
 </g>
 </g>
 <!-- solvers&#45;&gt;util -->
 <g id="edge29" class="edge">
 <title>solvers&#45;&gt;util</title>
-<path fill="none" stroke="black" d="M960.66,-390C952.12,-368.98 935.14,-333.15 911,-310 801.68,-205.13 753.29,-198.12 609,-152 507.35,-119.51 380.55,-110.47 318.98,-107.97"/>
-<polygon fill="black" stroke="black" points="319.09,-104.47 308.97,-107.59 318.83,-111.46 319.09,-104.47"/>
+<path fill="none" stroke="black" d="M960.66,-390C952.12,-368.98 935.14,-333.15 911,-310 801.68,-205.13 753.06,-198.82 609,-152 515.79,-121.71 399.89,-111.73 341.43,-108.5"/>
+<polygon fill="black" stroke="black" points="341.37,-104.99 331.21,-107.97 341.01,-111.98 341.37,-104.99"/>
 </g>
 <!-- ansi_c -->
 <g id="node16" class="node">
@@ -474,49 +474,34 @@
 <g id="node21" class="node">
 <title>big_int</title>
 <g id="a_node21"><a xlink:href="group__big-int.html" target="_top" xlink:title="big&#45;int">
-<ellipse fill="white" stroke="white" cx="232" cy="-34" rx="40.89" ry="18"/>
-<text text-anchor="middle" x="232" y="-30.3" font-family="Times,serif" font-size="14.00">big&#45;int</text>
+<ellipse fill="white" stroke="white" cx="304" cy="-34" rx="40.89" ry="18"/>
+<text text-anchor="middle" x="304" y="-30.3" font-family="Times,serif" font-size="14.00">big&#45;int</text>
 </a>
 </g>
 </g>
 <!-- util&#45;&gt;big_int -->
 <g id="edge38" class="edge">
 <title>util&#45;&gt;big_int</title>
-<path fill="none" stroke="black" d="M270.9,-89.46C264.67,-80.74 256.75,-69.65 249.69,-59.76"/>
-<polygon fill="black" stroke="black" points="252.42,-57.57 243.76,-51.47 246.73,-61.64 252.42,-57.57"/>
-</g>
-<!-- nonstd -->
-<g id="node24" class="node">
-<title>nonstd</title>
-<g id="a_node24"><a xlink:href="group__nonstd.html" target="_top" xlink:title="nonstd">
-<ellipse fill="white" stroke="white" cx="333" cy="-34" rx="42.49" ry="18"/>
-<text text-anchor="middle" x="333" y="-30.3" font-family="Times,serif" font-size="14.00">nonstd</text>
-</a>
-</g>
-</g>
-<!-- util&#45;&gt;nonstd -->
-<g id="edge39" class="edge">
-<title>util&#45;&gt;nonstd</title>
-<path fill="none" stroke="black" d="M293.32,-89.46C299.67,-80.74 307.75,-69.65 314.96,-59.76"/>
-<polygon fill="black" stroke="black" points="317.94,-61.61 321,-51.47 312.29,-57.49 317.94,-61.61"/>
+<path fill="none" stroke="black" d="M304,-87.7C304,-79.98 304,-70.71 304,-62.11"/>
+<polygon fill="black" stroke="black" points="307.5,-62.1 304,-52.1 300.5,-62.1 307.5,-62.1"/>
 </g>
 <!-- json&#45;&gt;util -->
 <g id="edge35" class="edge">
 <title>json&#45;&gt;util</title>
-<path fill="none" stroke="black" d="M155.05,-163.86C161.27,-159.82 168.31,-155.52 175,-152 199.28,-139.23 228,-127.32 249.57,-118.96"/>
-<polygon fill="black" stroke="black" points="250.84,-122.22 258.93,-115.38 248.34,-115.68 250.84,-122.22"/>
+<path fill="none" stroke="black" d="M154.52,-163.87C160.84,-159.74 168.06,-155.38 175,-152 206.02,-136.91 243.42,-124.44 269.95,-116.49"/>
+<polygon fill="black" stroke="black" points="270.94,-119.84 279.55,-113.66 268.96,-113.13 270.94,-119.84"/>
 </g>
 <!-- xmllang&#45;&gt;util -->
 <g id="edge36" class="edge">
 <title>xmllang&#45;&gt;util</title>
-<path fill="none" stroke="black" d="M347.71,-161.12C335.38,-150.96 319.29,-137.71 306.12,-126.86"/>
-<polygon fill="black" stroke="black" points="308.3,-124.12 298.35,-120.47 303.85,-129.52 308.3,-124.12"/>
+<path fill="none" stroke="black" d="M352.39,-160.76C343.93,-151.37 333.17,-139.41 323.94,-129.15"/>
+<polygon fill="black" stroke="black" points="326.54,-126.81 317.25,-121.72 321.33,-131.49 326.54,-126.81"/>
 </g>
 <!-- assembler&#45;&gt;util -->
 <g id="edge37" class="edge">
 <title>assembler&#45;&gt;util</title>
-<path fill="none" stroke="black" d="M251.68,-160.05C256.47,-151.68 262.34,-141.4 267.64,-132.13"/>
-<polygon fill="black" stroke="black" points="270.76,-133.73 272.68,-123.31 264.68,-130.25 270.76,-133.73"/>
+<path fill="none" stroke="black" d="M256.69,-160.41C264.83,-151.22 275.06,-139.67 283.93,-129.66"/>
+<polygon fill="black" stroke="black" points="286.67,-131.84 290.68,-122.04 281.43,-127.2 286.67,-131.84"/>
 </g>
 </g>
 </svg>

@@ -22,7 +22,6 @@ var modules =
     [ "json", "group__json.html", null ],
     [ "langapi", "group__langapi.html", null ],
     [ "linking", "group__linking.html", null ],
-    [ "nonstd", "group__nonstd.html", null ],
     [ "pointer-analysis", "group__pointer-analysis.html", null ],
     [ "solvers", "group__solvers.html", null ],
     [ "util", "group__util.html", null ],

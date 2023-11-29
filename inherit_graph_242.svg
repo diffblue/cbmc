@@ -11,9 +11,9 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="struct_elf64___ehdr.html" target="_top" xlink:title=" ">
+<g id="a_node1"><a xlink:href="struct_elf32___shdr.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-19.5 68,-19.5 68,-0.5 0,-0.5"/>
-<text text-anchor="middle" x="34" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">Elf64_Ehdr</text>
+<text text-anchor="middle" x="34" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">Elf32_Shdr</text>
 </a>
 </g>
 </g>

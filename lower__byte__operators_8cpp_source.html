@@ -478,8 +478,8 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="lower__byte__operators_8cpp.html#a1eedcaa27018bb370cb19b601ad628f8">unpack_rec</a>(</div>
 <div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  <span class="keywordtype">bool</span> little_endian,</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;offset_bytes,</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;max_bytes,</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;offset_bytes,</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;max_bytes,</div>
 <div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <span class="keyword">const</span> std::size_t bits_per_byte,</div>
 <div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  <span class="keywordtype">bool</span> unpack_byte_array = <span class="keyword">false</span>);</div>
@@ -576,11 +576,11 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160; </div>
 <div class="line"><a name="l00538"></a><span class="lineno"><a class="line" href="lower__byte__operators_8cpp.html#a0d114b21bd36a944f31f7fc96d2fa315">  538</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="lower__byte__operators_8cpp.html#a0d114b21bd36a944f31f7fc96d2fa315">unpack_array_vector</a>(</div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;src_size,</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;src_size,</div>
 <div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;  <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;element_bits,</div>
 <div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;  <span class="keywordtype">bool</span> little_endian,</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;offset_bytes,</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;max_bytes,</div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;offset_bytes,</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;max_bytes,</div>
 <div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;  <span class="keyword">const</span> std::size_t bits_per_byte,</div>
 <div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;{</div>
@@ -601,7 +601,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160; </div>
 <div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;  <span class="comment">// refine the number of elements to extract in case the element width is known</span></div>
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;  <span class="comment">// and a multiple of bytes; otherwise we will expand the entire array/vector</span></div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> num_elements = src_size;</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;  optionalt&lt;mp_integer&gt; num_elements = src_size;</div>
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;  <span class="keywordflow">if</span>(element_bits &gt; 0 &amp;&amp; element_bits % bits_per_byte == 0)</div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;  {</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    <span class="keywordflow">if</span>(!num_elements.has_value())</div>
@@ -653,10 +653,10 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;    <span class="comment">// recursively unpack each element so that we eventually just have an array</span></div>
 <div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;    <span class="comment">// of bytes left</span></div>
 <div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160; </div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> element_max_bytes =</div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keyword">const</span> optionalt&lt;mp_integer&gt; element_max_bytes =</div>
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;      max_bytes</div>
 <div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;        ? std::min(<a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>{el_bytes}, *max_bytes - byte_operands.size())</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;        : <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a>{};</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;        : optionalt&lt;mp_integer&gt;{};</div>
 <div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;    <span class="keyword">const</span> std::size_t element_max_bytes_int =</div>
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;      element_max_bytes ? numeric_cast_v&lt;std::size_t&gt;(*element_max_bytes)</div>
 <div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;                        : el_bytes;</div>
@@ -683,8 +683,8 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  std::size_t total_bits,</div>
 <div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;  <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;dest,</div>
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;  <span class="keywordtype">bool</span> little_endian,</div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;offset_bytes,</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;max_bytes,</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;offset_bytes,</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;max_bytes,</div>
 <div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;  <span class="keyword">const</span> std::size_t bits_per_byte,</div>
 <div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;{</div>
@@ -709,17 +709,17 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l00691"></a><span class="lineno"><a class="line" href="lower__byte__operators_8cpp.html#aa60cbc6fd2560812af60cc84693c3631">  691</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classarray__exprt.html">array_exprt</a> <a class="code" href="lower__byte__operators_8cpp.html#aa60cbc6fd2560812af60cc84693c3631">unpack_struct</a>(</div>
 <div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
 <div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;  <span class="keywordtype">bool</span> little_endian,</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;offset_bytes,</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;max_bytes,</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;offset_bytes,</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;max_bytes,</div>
 <div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;  <span class="keyword">const</span> std::size_t bits_per_byte,</div>
 <div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;{</div>
 <div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;  <span class="keyword">const</span> <a class="code" href="classstruct__typet.html">struct_typet</a> &amp;struct_type = <a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(ns.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()));</div>
 <div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;  <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_typet::componentst</a> &amp;components = struct_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
 <div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160; </div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> offset_in_member;</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> max_bytes_left;</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::pair&lt;exprt::operandst, std::size_t&gt;</a>&gt; bit_fields;</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;  optionalt&lt;mp_integer&gt; offset_in_member;</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  optionalt&lt;mp_integer&gt; max_bytes_left;</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  optionalt&lt;std::pair&lt;exprt::operandst, std::size_t&gt;&gt; bit_fields;</div>
 <div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160; </div>
 <div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;  <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> <a class="code" href="pointer__offset__size_8cpp.html#a39048fd0fcc861975460c8c80c626028">member_offset_bits</a> = 0;</div>
 <div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;  <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> byte_operands;</div>
@@ -896,8 +896,8 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l00895"></a><span class="lineno"><a class="line" href="lower__byte__operators_8cpp.html#a1eedcaa27018bb370cb19b601ad628f8">  895</a></span>&#160;<span class="comment"></span><span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="lower__byte__operators_8cpp.html#a1eedcaa27018bb370cb19b601ad628f8">unpack_rec</a>(</div>
 <div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;src,</div>
 <div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;  <span class="keywordtype">bool</span> little_endian,</div>
-<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;offset_bytes,</div>
-<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;max_bytes,</div>
+<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;offset_bytes,</div>
+<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;max_bytes,</div>
 <div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;  <span class="keyword">const</span> std::size_t bits_per_byte,</div>
 <div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
 <div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;  <span class="keywordtype">bool</span> unpack_byte_array)</div>
@@ -1093,7 +1093,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;  <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;element_bits,</div>
 <div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;{</div>
-<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;std::size_t&gt;</a> num_elements;</div>
+<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;  optionalt&lt;std::size_t&gt; num_elements;</div>
 <div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_array)</div>
 <div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;    num_elements = numeric_cast&lt;std::size_t&gt;(<a class="code" href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a>(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classarray__typet.html#af68ee4db52013b51d0465c51259a8ed6">size</a>());</div>
 <div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;  <span class="keywordflow">else</span></div>
@@ -1159,7 +1159,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01168"></a><span class="lineno"> 1168</span>&#160;    array_type};</div>
 <div class="line"><a name="l01169"></a><span class="lineno"> 1169</span>&#160;}</div>
 <div class="line"><a name="l01170"></a><span class="lineno"> 1170</span>&#160; </div>
-<div class="line"><a name="l01179"></a><span class="lineno"><a class="line" href="lower__byte__operators_8cpp.html#a2a20f71035d91f155c0ebb5a17dc5448"> 1179</a></span>&#160;<span class="keyword">static</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> <a class="code" href="lower__byte__operators_8cpp.html#a2a20f71035d91f155c0ebb5a17dc5448">lower_byte_extract_complex</a>(</div>
+<div class="line"><a name="l01179"></a><span class="lineno"><a class="line" href="lower__byte__operators_8cpp.html#a2a20f71035d91f155c0ebb5a17dc5448"> 1179</a></span>&#160;<span class="keyword">static</span> optionalt&lt;exprt&gt; <a class="code" href="lower__byte__operators_8cpp.html#a2a20f71035d91f155c0ebb5a17dc5448">lower_byte_extract_complex</a>(</div>
 <div class="line"><a name="l01180"></a><span class="lineno"> 1180</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__extract__exprt.html">byte_extract_exprt</a> &amp;src,</div>
 <div class="line"><a name="l01181"></a><span class="lineno"> 1181</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__extract__exprt.html">byte_extract_exprt</a> &amp;unpacked,</div>
 <div class="line"><a name="l01182"></a><span class="lineno"> 1182</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
@@ -1361,8 +1361,8 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;root = unpacked.<a class="code" href="classbyte__extract__exprt.html#a0e9fe2877103a3f1c82e7dc83a8da6a1">op</a>();</div>
 <div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;offset = unpacked.<a class="code" href="classbyte__extract__exprt.html#aff6e0476347b31a58e874004c5cd25d1">offset</a>();</div>
 <div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160; </div>
-<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;typet&gt;</a> subtype;</div>
-<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;typet&gt;</a> index_type;</div>
+<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;  optionalt&lt;typet&gt; subtype;</div>
+<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;  optionalt&lt;typet&gt; index_type;</div>
 <div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;  <span class="keywordflow">if</span>(root.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_vector)</div>
 <div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;  {</div>
 <div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;    subtype = <a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(root.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>();</div>
@@ -1445,7 +1445,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="lower__byte__operators_8cpp.html#ae47d5791744dda8efbc28b9b35c3df83">lower_byte_update</a>(</div>
 <div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;src,</div>
 <div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value_as_byte_array,</div>
-<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> &amp;non_const_update_bound,</div>
+<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  <span class="keyword">const</span> optionalt&lt;exprt&gt; &amp;non_const_update_bound,</div>
 <div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns);</div>
 <div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160; </div>
 <div class="line"><a name="l01479"></a><span class="lineno"><a class="line" href="lower__byte__operators_8cpp.html#add1e3ce4be89d0842abf769d93d874ba"> 1479</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="lower__byte__operators_8cpp.html#add1e3ce4be89d0842abf769d93d874ba">lower_byte_update_byte_array_vector_non_const</a>(</div>
@@ -1512,7 +1512,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01549"></a><span class="lineno"> 1549</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;src,</div>
 <div class="line"><a name="l01550"></a><span class="lineno"> 1550</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype,</div>
 <div class="line"><a name="l01551"></a><span class="lineno"> 1551</span>&#160;  <span class="keyword">const</span> <a class="code" href="classarray__exprt.html">array_exprt</a> &amp;value_as_byte_array,</div>
-<div class="line"><a name="l01552"></a><span class="lineno"> 1552</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> &amp;non_const_update_bound,</div>
+<div class="line"><a name="l01552"></a><span class="lineno"> 1552</span>&#160;  <span class="keyword">const</span> optionalt&lt;exprt&gt; &amp;non_const_update_bound,</div>
 <div class="line"><a name="l01553"></a><span class="lineno"> 1553</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l01554"></a><span class="lineno"> 1554</span>&#160;{</div>
 <div class="line"><a name="l01555"></a><span class="lineno"> 1555</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(</div>
@@ -1703,7 +1703,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;src,</div>
 <div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype,</div>
 <div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value_as_byte_array,</div>
-<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> &amp;non_const_update_bound,</div>
+<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;  <span class="keyword">const</span> optionalt&lt;exprt&gt; &amp;non_const_update_bound,</div>
 <div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;{</div>
 <div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160;  <span class="comment">// do all arithmetic below using index/offset types - the array theory</span></div>
@@ -1844,7 +1844,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l01918"></a><span class="lineno"> 1918</span>&#160;  <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;subtype_bits,</div>
 <div class="line"><a name="l01919"></a><span class="lineno"> 1919</span>&#160;  <span class="keyword">const</span> <a class="code" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;bits_already_set,</div>
 <div class="line"><a name="l01920"></a><span class="lineno"> 1920</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value_as_byte_array,</div>
-<div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> &amp;non_const_update_bound,</div>
+<div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;  <span class="keyword">const</span> optionalt&lt;exprt&gt; &amp;non_const_update_bound,</div>
 <div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;{</div>
 <div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;  <span class="comment">// We need to take one or more bytes from value_as_byte_array to modify the</span></div>
@@ -1974,7 +1974,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l02048"></a><span class="lineno"> 2048</span>&#160;    new_value,</div>
 <div class="line"><a name="l02049"></a><span class="lineno"> 2049</span>&#160;    src.<a class="code" href="classbyte__update__exprt.html#adbc3fcb92f0f2710696ba57ecebf3600">get_bits_per_byte</a>()};</div>
 <div class="line"><a name="l02050"></a><span class="lineno"> 2050</span>&#160; </div>
-<div class="line"><a name="l02051"></a><span class="lineno"> 2051</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> update_bound;</div>
+<div class="line"><a name="l02051"></a><span class="lineno"> 2051</span>&#160;  optionalt&lt;exprt&gt; update_bound;</div>
 <div class="line"><a name="l02052"></a><span class="lineno"> 2052</span>&#160;  <span class="keywordflow">if</span>(non_const_update_bound.has_value())</div>
 <div class="line"><a name="l02053"></a><span class="lineno"> 2053</span>&#160;  {</div>
 <div class="line"><a name="l02054"></a><span class="lineno"> 2054</span>&#160;    <span class="comment">// The size of the update is not constant, and thus is to be symbolically</span></div>
@@ -2007,9 +2007,9 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l02091"></a><span class="lineno"><a class="line" href="lower__byte__operators_8cpp.html#a39a6a981819c1fbadfc5bce306c39bc9"> 2091</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="lower__byte__operators_8cpp.html#a39a6a981819c1fbadfc5bce306c39bc9">lower_byte_update_array_vector</a>(</div>
 <div class="line"><a name="l02092"></a><span class="lineno"> 2092</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;src,</div>
 <div class="line"><a name="l02093"></a><span class="lineno"> 2093</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype,</div>
-<div class="line"><a name="l02094"></a><span class="lineno"> 2094</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;mp_integer&gt;</a> &amp;subtype_bits,</div>
+<div class="line"><a name="l02094"></a><span class="lineno"> 2094</span>&#160;  <span class="keyword">const</span> optionalt&lt;mp_integer&gt; &amp;subtype_bits,</div>
 <div class="line"><a name="l02095"></a><span class="lineno"> 2095</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value_as_byte_array,</div>
-<div class="line"><a name="l02096"></a><span class="lineno"> 2096</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> &amp;non_const_update_bound,</div>
+<div class="line"><a name="l02096"></a><span class="lineno"> 2096</span>&#160;  <span class="keyword">const</span> optionalt&lt;exprt&gt; &amp;non_const_update_bound,</div>
 <div class="line"><a name="l02097"></a><span class="lineno"> 2097</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l02098"></a><span class="lineno"> 2098</span>&#160;{</div>
 <div class="line"><a name="l02099"></a><span class="lineno"> 2099</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> is_array = src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_array;</div>
@@ -2083,7 +2083,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l02176"></a><span class="lineno"> 2176</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;src,</div>
 <div class="line"><a name="l02177"></a><span class="lineno"> 2177</span>&#160;  <span class="keyword">const</span> <a class="code" href="classstruct__typet.html">struct_typet</a> &amp;struct_type,</div>
 <div class="line"><a name="l02178"></a><span class="lineno"> 2178</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value_as_byte_array,</div>
-<div class="line"><a name="l02179"></a><span class="lineno"> 2179</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> &amp;non_const_update_bound,</div>
+<div class="line"><a name="l02179"></a><span class="lineno"> 2179</span>&#160;  <span class="keyword">const</span> optionalt&lt;exprt&gt; &amp;non_const_update_bound,</div>
 <div class="line"><a name="l02180"></a><span class="lineno"> 2180</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l02181"></a><span class="lineno"> 2181</span>&#160;{</div>
 <div class="line"><a name="l02182"></a><span class="lineno"> 2182</span>&#160;  <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> elements;</div>
@@ -2178,7 +2178,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l02280"></a><span class="lineno"> 2280</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;src,</div>
 <div class="line"><a name="l02281"></a><span class="lineno"> 2281</span>&#160;  <span class="keyword">const</span> <a class="code" href="classunion__typet.html">union_typet</a> &amp;union_type,</div>
 <div class="line"><a name="l02282"></a><span class="lineno"> 2282</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value_as_byte_array,</div>
-<div class="line"><a name="l02283"></a><span class="lineno"> 2283</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> &amp;non_const_update_bound,</div>
+<div class="line"><a name="l02283"></a><span class="lineno"> 2283</span>&#160;  <span class="keyword">const</span> optionalt&lt;exprt&gt; &amp;non_const_update_bound,</div>
 <div class="line"><a name="l02284"></a><span class="lineno"> 2284</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l02285"></a><span class="lineno"> 2285</span>&#160;{</div>
 <div class="line"><a name="l02286"></a><span class="lineno"> 2286</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> widest_member = union_type.<a class="code" href="classunion__typet.html#a5262c291bd43d6cd758fef66c2d4e573">find_widest_union_component</a>(ns);</div>
@@ -2201,12 +2201,12 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l02311"></a><span class="lineno"><a class="line" href="lower__byte__operators_8cpp.html#ae47d5791744dda8efbc28b9b35c3df83"> 2311</a></span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a> <a class="code" href="lower__byte__operators_8cpp.html#ae47d5791744dda8efbc28b9b35c3df83">lower_byte_update</a>(</div>
 <div class="line"><a name="l02312"></a><span class="lineno"> 2312</span>&#160;  <span class="keyword">const</span> <a class="code" href="classbyte__update__exprt.html">byte_update_exprt</a> &amp;src,</div>
 <div class="line"><a name="l02313"></a><span class="lineno"> 2313</span>&#160;  <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;value_as_byte_array,</div>
-<div class="line"><a name="l02314"></a><span class="lineno"> 2314</span>&#160;  <span class="keyword">const</span> <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> &amp;non_const_update_bound,</div>
+<div class="line"><a name="l02314"></a><span class="lineno"> 2314</span>&#160;  <span class="keyword">const</span> optionalt&lt;exprt&gt; &amp;non_const_update_bound,</div>
 <div class="line"><a name="l02315"></a><span class="lineno"> 2315</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l02316"></a><span class="lineno"> 2316</span>&#160;{</div>
 <div class="line"><a name="l02317"></a><span class="lineno"> 2317</span>&#160;  <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_array || src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_vector)</div>
 <div class="line"><a name="l02318"></a><span class="lineno"> 2318</span>&#160;  {</div>
-<div class="line"><a name="l02319"></a><span class="lineno"> 2319</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;typet&gt;</a> subtype;</div>
+<div class="line"><a name="l02319"></a><span class="lineno"> 2319</span>&#160;    optionalt&lt;typet&gt; subtype;</div>
 <div class="line"><a name="l02320"></a><span class="lineno"> 2320</span>&#160;    <span class="keywordflow">if</span>(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_vector)</div>
 <div class="line"><a name="l02321"></a><span class="lineno"> 2321</span>&#160;      subtype = <a class="code" href="std__types_8h.html#a0940051f8c5c8b653861ef24c996a4d2">to_vector_type</a>(src.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classvector__typet.html#ad382a3b88f4f2a79391ec112868db54a">element_type</a>();</div>
 <div class="line"><a name="l02322"></a><span class="lineno"> 2322</span>&#160;    <span class="keywordflow">else</span></div>
@@ -2448,7 +2448,7 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="line"><a name="l02558"></a><span class="lineno"> 2558</span>&#160;  <span class="comment">// use a &quot;with&quot; expression to encode the update; else update the values in</span></div>
 <div class="line"><a name="l02559"></a><span class="lineno"> 2559</span>&#160;  <span class="comment">// place.</span></div>
 <div class="line"><a name="l02560"></a><span class="lineno"> 2560</span>&#160;  <span class="comment">// 4) Construct a new object.</span></div>
-<div class="line"><a name="l02561"></a><span class="lineno"> 2561</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;exprt&gt;</a> non_const_update_bound;</div>
+<div class="line"><a name="l02561"></a><span class="lineno"> 2561</span>&#160;  optionalt&lt;exprt&gt; non_const_update_bound;</div>
 <div class="line"><a name="l02562"></a><span class="lineno"> 2562</span>&#160;  <span class="comment">// update value, may require extension to full bytes</span></div>
 <div class="line"><a name="l02563"></a><span class="lineno"> 2563</span>&#160;  <a class="code" href="classexprt.html">exprt</a> update_value = src.<a class="code" href="classbyte__update__exprt.html#a6f086c89f073dba2c06dc4eb36188322">value</a>();</div>
 <div class="line"><a name="l02564"></a><span class="lineno"> 2564</span>&#160;  <span class="keyword">auto</span> update_size_expr_opt = <a class="code" href="pointer__offset__size_8cpp.html#a22ecef14fd8d85a84c6a579261f56044">size_of_expr</a>(update_value.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), ns);</div>
@@ -2682,7 +2682,6 @@ $(document).ready(function(){initNavTree('lower__byte__operators_8cpp_source.htm
 <div class="ttc" id="alower__byte__operators_8cpp_html_af21d1bbb10c1901cdc457135d830df4b"><div class="ttname"><a href="lower__byte__operators_8cpp.html#af21d1bbb10c1901cdc457135d830df4b">lower_byte_update_array_vector_unbounded</a></div><div class="ttdeci">static exprt lower_byte_update_array_vector_unbounded(const byte_update_exprt &amp;src, const typet &amp;subtype, const exprt &amp;subtype_size, const exprt &amp;value_as_byte_array, const exprt &amp;non_const_update_bound, const exprt &amp;initial_bytes, const exprt &amp;first_index, const exprt &amp;first_update_value, const namespacet &amp;ns)</div><div class="ttdoc">Apply a byte update src to an array/vector typed operand, using the byte array value_as_byte_array as...</div><div class="ttdef"><b>Definition:</b> <a href="lower__byte__operators_8cpp_source.html#l01624">lower_byte_operators.cpp:1624</a></div></div>
 <div class="ttc" id="anamespace_8h_html"><div class="ttname"><a href="namespace_8h.html">namespace.h</a></div></div>
 <div class="ttc" id="anarrow_8h_html"><div class="ttname"><a href="narrow_8h.html">narrow.h</a></div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html_a803796648f3f21fa7835f4509b7ea0a2"><div class="ttname"><a href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a></div><div class="ttdeci">const pointer_typet &amp; to_pointer_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a pointer_typet.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00093">pointer_expr.h:93</a></div></div>
 <div class="ttc" id="apointer__offset__size_8cpp_html_a22ecef14fd8d85a84c6a579261f56044"><div class="ttname"><a href="pointer__offset__size_8cpp.html#a22ecef14fd8d85a84c6a579261f56044">size_of_expr</a></div><div class="ttdeci">optionalt&lt; exprt &gt; size_of_expr(const typet &amp;type, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="pointer__offset__size_8cpp_source.html#l00281">pointer_offset_size.cpp:281</a></div></div>
 <div class="ttc" id="apointer__offset__size_8cpp_html_a39048fd0fcc861975460c8c80c626028"><div class="ttname"><a href="pointer__offset__size_8cpp.html#a39048fd0fcc861975460c8c80c626028">member_offset_bits</a></div><div class="ttdeci">optionalt&lt; mp_integer &gt; member_offset_bits(const struct_typet &amp;type, const irep_idt &amp;member, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="pointer__offset__size_8cpp_source.html#l00066">pointer_offset_size.cpp:66</a></div></div>

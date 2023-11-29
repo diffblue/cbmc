@@ -1,5 +1,10 @@
 var NAVTREEINDEX55 =
 {
+"classreference__counting_1_1dt.html":[8,0,985,0],
+"classreference__counting_1_1dt.html#a6570fec60044ee7f42c9962b61fcba34":[8,0,985,0,0],
+"classreference__counting_1_1dt.html#ac8d6c09f525d92d2046f6a2e7c454c4c":[8,0,985,0,1],
+"classreference__typet.html":[8,0,986],
+"classreference__typet.html#a581175e9fc7d4c80bf7852825d356a67":[8,0,986,0],
 "classreference__typet.html#aa918a37adb926dbb31ad307ec4775e2e":[8,0,986,1],
 "classrefined__string__exprt.html":[8,0,987],
 "classrefined__string__exprt.html#a307fb8d0e79aa9b8d67696bbb432fb2e":[8,0,987,4],
@@ -222,11 +227,10 @@ var NAVTREEINDEX55 =
 "classresponse__or__errort.html":[8,0,1007],
 "classresponse__or__errort.html#a2c244a983d6d31d927a0bab754c4a3fe":[8,0,1007,1],
 "classresponse__or__errort.html#a519f779539b04d2960794f10301025c9":[8,0,1007,0],
-"classresponse__or__errort.html#a54d247f24ca0fe4149237341c5b8a618":[8,0,1007,5],
-"classresponse__or__errort.html#a6c33a21623a0075079269fa56ed30a7d":[8,0,1007,6],
 "classresponse__or__errort.html#a9c63fb79c7ed05685230652908416550":[8,0,1007,4],
 "classresponse__or__errort.html#aa6c32a8f10cfe43738e039f64145d74d":[8,0,1007,3],
 "classresponse__or__errort.html#abf817c4f9e8c3900eeb0f677c9c4a760":[8,0,1007,2],
+"classresponse__or__errort.html#aff49c5107b33fc7902596882f7c652b4":[8,0,1007,5],
 "classrestrictt.html":[8,0,1008],
 "classrestrictt.html#a0559a3d5d8bb6dbef163243400f3a667":[8,0,1008,3],
 "classrestrictt.html#a168973b1cfbaa34082050f82eb1eefea":[8,0,1008,0],
@@ -245,9 +249,5 @@ var NAVTREEINDEX55 =
 "classrw__guarded__range__set__value__sett.html#aa34a39c03dac3e9220df02e67a8e8173":[8,0,1009,8],
 "classrw__guarded__range__set__value__sett.html#acb06827c5669cd32aafbb25bd9513b52":[8,0,1009,4],
 "classrw__guarded__range__set__value__sett.html#ad332129bf794b66ed96771376c384267":[8,0,1009,10],
-"classrw__guarded__range__set__value__sett.html#ae2e453e37f72e1b3cd4b87b3e21db38f":[8,0,1009,1],
-"classrw__guarded__range__set__value__sett.html#aef86c39558d44eb7d655d44f1edd1f1f":[8,0,1009,9],
-"classrw__range__set__value__sett.html":[8,0,1010],
-"classrw__range__set__value__sett.html#a006daa6c082778cf086194a0e4a3cfe2":[8,0,1010,2],
-"classrw__range__set__value__sett.html#a040dd69349dc851cca00fcef8a87690b":[8,0,1010,10]
+"classrw__guarded__range__set__value__sett.html#ae2e453e37f72e1b3cd4b87b3e21db38f":[8,0,1009,1]
 };

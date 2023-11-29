@@ -127,7 +127,7 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">if</span>(val.empty())</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;unsigned&gt;</a> thread_nr;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  optionalt&lt;unsigned&gt; thread_nr;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(val[0]))</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  {</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">auto</span> c_pos = val.find(<span class="charliteral">&#39;:&#39;</span>);</div>
@@ -210,8 +210,8 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      }</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;unsigned&gt;</a> nr;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;source_locationt&gt;</a> location;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        optionalt&lt;unsigned&gt; nr;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        optionalt&lt;source_locationt&gt; location;</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : goto_function.<a class="code" href="classgoto__functiont.html#a2374f74a53fbd62d61a683fc6d4b5a62">body</a>.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        {</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;          <span class="keywordflow">if</span>(</div>
@@ -255,7 +255,7 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    std::string uw_string = val.substr(last_c_pos + 1);</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="comment">// the below initialisation makes g++-5 happy</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;unsigned&gt;</a> uw(0);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    optionalt&lt;unsigned&gt; uw(0);</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">if</span>(uw_string.empty())</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      uw = {};</div>
@@ -281,7 +281,7 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <a class="code" href="classunwindsett.html#a3307f9d27beb3d69fd77e15933ca68b6">parse_unwindset_one_loop</a>(element, message_handler);</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;}</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;unsigned&gt;</a></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;optionalt&lt;unsigned&gt;</div>
 <div class="line"><a name="l00191"></a><span class="lineno"><a class="line" href="classunwindsett.html#a9ab84176b57b4c9f4f8c3b2bfe488b3c">  191</a></span>&#160;<a class="code" href="classunwindsett.html#a9ab84176b57b4c9f4f8c3b2bfe488b3c">unwindsett::get_limit</a>(<span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;loop_id, <span class="keywordtype">unsigned</span> thread_nr)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  <span class="comment">// We use the most specific limit we have</span></div>
@@ -351,7 +351,6 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="ttc" id="actype_8c_html_a3fa45b35c8abf67a950b6d3d4063dede"><div class="ttname"><a href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a></div><div class="ttdeci">int isdigit(int c)</div><div class="ttdef"><b>Definition:</b> <a href="ctype_8c_source.html#l00024">ctype.c:24</a></div></div>
 <div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
 <div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02689">math.c:2689</a></div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="asrc_2util_2message_8h_html"><div class="ttname"><a href="src_2util_2message_8h.html">message.h</a></div></div>
 <div class="ttc" id="astring2int_8cpp_html_a705a41a400940b8bf2df7b0fcee51c72"><div class="ttname"><a href="string2int_8cpp.html#a705a41a400940b8bf2df7b0fcee51c72">string2optional_unsigned</a></div><div class="ttdeci">optionalt&lt; unsigned &gt; string2optional_unsigned(const std::string &amp;str, int base)</div><div class="ttdoc">Convert string to unsigned similar to the stoul or stoull functions, return nullopt when the conversi...</div><div class="ttdef"><b>Definition:</b> <a href="string2int_8cpp_source.html#l00064">string2int.cpp:64</a></div></div>
 <div class="ttc" id="astring2int_8cpp_html_abd0138cd96b5cc4443e92503dd580bc8"><div class="ttname"><a href="string2int_8cpp.html#abd0138cd96b5cc4443e92503dd580bc8">unsafe_string2unsigned</a></div><div class="ttdeci">unsigned unsafe_string2unsigned(const std::string &amp;str, int base)</div><div class="ttdef"><b>Definition:</b> <a href="string2int_8cpp_source.html#l00035">string2int.cpp:35</a></div></div>

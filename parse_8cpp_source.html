@@ -323,7 +323,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#af643b4bcbb6545c23a653135416b507a">rNullDeclaration</a>(<a class="code" href="classcpp__declarationt.html">cpp_declarationt</a> &amp;);</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a92eea3dac09609028be2e6711fe303cb">rTypedef</a>(<a class="code" href="classcpp__declarationt.html">cpp_declarationt</a> &amp;);</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a10ac645d2a91b024550876f1dcb613e0">rTypedefUsing</a>(<a class="code" href="classcpp__declarationt.html">cpp_declarationt</a> &amp;);</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a3632be098ac1a1772e43b90ac6224b26">rTypedefStatement</a>();</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a3632be098ac1a1772e43b90ac6224b26">rTypedefStatement</a>();</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a76782792d490306fc50b3c24e8cb54c4">rTypeSpecifier</a>(<a class="code" href="classtypet.html">typet</a> &amp;, <span class="keywordtype">bool</span>);</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a3816e721b5df6cb656f0271fbcd8f341">isTypeSpecifier</a>();</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a749061c5dd751ae615e8b869dfb30cf6">rLinkageSpec</a>(<a class="code" href="classcpp__linkage__spect.html">cpp_linkage_spect</a> &amp;);</div>
@@ -433,20 +433,20 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#af5c8f6d88abdea29a6d3ce3064bb8725">maybeTemplateArgs</a>();</div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160; </div>
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#adc39addf5dadc956205f8e8e55ee0307">rFunctionBody</a>(<a class="code" href="classcpp__declaratort.html">cpp_declaratort</a> &amp;);</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a6adcb4f1ad4423d2421232bafcd0a74e">rCompoundStatement</a>();</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a0742196e6fd65cf6fa120fe094db54ce">rStatement</a>();</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a81646d6b9ed811c0b5846be553c8e56d">rIfStatement</a>();</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#abeb9c1c4a81c2ee7213c882b66337a05">rSwitchStatement</a>();</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a3d3cb7204320068659dc8298298dd250">rWhileStatement</a>();</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a4c0626f09e4161317b2f7aa360d3f144">rDoStatement</a>();</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#aa3e127a14d12fa7b7cc533a85566723e">rForStatement</a>();</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a560504861d6edf196c3d22034ed7f813">rTryStatement</a>();</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a6adcb4f1ad4423d2421232bafcd0a74e">rCompoundStatement</a>();</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a0742196e6fd65cf6fa120fe094db54ce">rStatement</a>();</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a81646d6b9ed811c0b5846be553c8e56d">rIfStatement</a>();</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#abeb9c1c4a81c2ee7213c882b66337a05">rSwitchStatement</a>();</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a3d3cb7204320068659dc8298298dd250">rWhileStatement</a>();</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a4c0626f09e4161317b2f7aa360d3f144">rDoStatement</a>();</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#aa3e127a14d12fa7b7cc533a85566723e">rForStatement</a>();</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a560504861d6edf196c3d22034ed7f813">rTryStatement</a>();</div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160; </div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a42e078579f9ce25fac31016c8faa2fb1">rExprStatement</a>();</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a5770fbd6c4a103f32556f9654c2899e6">rDeclarationStatement</a>();</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a42e078579f9ce25fac31016c8faa2fb1">rExprStatement</a>();</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a5770fbd6c4a103f32556f9654c2899e6">rDeclarationStatement</a>();</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  optionalt&lt;codet&gt;</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  <a class="code" href="class_parser.html#a503a402a39e4477302dde1da7f5590ae">rIntegralDeclStatement</a>(<a class="code" href="classcpp__storage__spect.html">cpp_storage_spect</a> &amp;, <a class="code" href="classtypet.html">typet</a> &amp;, <a class="code" href="classtypet.html">typet</a> &amp;);</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#aaa048770d8834a3317dc52f0b050de19">rOtherDeclStatement</a>(<a class="code" href="classcpp__storage__spect.html">cpp_storage_spect</a> &amp;, <a class="code" href="classtypet.html">typet</a> &amp;);</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#aaa048770d8834a3317dc52f0b050de19">rOtherDeclStatement</a>(<a class="code" href="classcpp__storage__spect.html">cpp_storage_spect</a> &amp;, <a class="code" href="classtypet.html">typet</a> &amp;);</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a09d5d94ad88aa22bb3a426925f8eb5f5">MaybeTypeNameOrClassTemplate</a>(<a class="code" href="classcpp__tokent.html">cpp_tokent</a> &amp;);</div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_parser.html#a25508e644a2f51d503e0d1fb2b7fa62b">SkipTo</a>(<span class="keywordtype">int</span> token);</div>
@@ -455,13 +455,13 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a3874a3c6664583da7c5e30d103367604">rString</a>(<a class="code" href="classcpp__tokent.html">cpp_tokent</a> &amp;tk);</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="comment">// GCC extensions</span></div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a95ae5c99321bf122920ea8a671f6649d">rGCCAsmStatement</a>();</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a95ae5c99321bf122920ea8a671f6649d">rGCCAsmStatement</a>();</div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160; </div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  <span class="comment">// MSC extensions</span></div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#ad826e63e8675c522d18c2969600ec7c1">rMSC_tryStatement</a>();</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a8c03740da3034cd74ea44189aeae31af">rMSC_leaveStatement</a>();</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a9279c566ac31a02c829c31a35db14b86">rMSCAsmStatement</a>();</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a8f5a44199cb94239837bec657450d742">rMSC_if_existsStatement</a>();</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#ad826e63e8675c522d18c2969600ec7c1">rMSC_tryStatement</a>();</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a8c03740da3034cd74ea44189aeae31af">rMSC_leaveStatement</a>();</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a9279c566ac31a02c829c31a35db14b86">rMSCAsmStatement</a>();</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a8f5a44199cb94239837bec657450d742">rMSC_if_existsStatement</a>();</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a2265ec08ea5a8b5df892c417e533d14b">rTypePredicate</a>(<a class="code" href="classexprt.html">exprt</a> &amp;);</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a5a116f9df1913df389ae76ecb2654ed4">rMSCuuidof</a>(<a class="code" href="classexprt.html">exprt</a> &amp;);</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="class_parser.html#a125014d0eb03ae6fba15a0162cbff268">rMSC_if_existsExpr</a>(<a class="code" href="classexprt.html">exprt</a> &amp;);</div>
@@ -772,7 +772,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;}</div>
 <div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160; </div>
-<div class="line"><a name="l00683"></a><span class="lineno"><a class="line" href="class_parser.html#a3632be098ac1a1772e43b90ac6224b26">  683</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a3632be098ac1a1772e43b90ac6224b26">Parser::rTypedefStatement</a>()</div>
+<div class="line"><a name="l00683"></a><span class="lineno"><a class="line" href="class_parser.html#a3632be098ac1a1772e43b90ac6224b26">  683</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a3632be098ac1a1772e43b90ac6224b26">Parser::rTypedefStatement</a>()</div>
 <div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;{</div>
 <div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;  <a class="code" href="classcpp__declarationt.html">cpp_declarationt</a> declaration;</div>
 <div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="class_parser.html#a92eea3dac09609028be2e6711fe303cb">rTypedef</a>(declaration))</div>
@@ -6665,7 +6665,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l06573"></a><span class="lineno"> 6573</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l06574"></a><span class="lineno"> 6574</span>&#160;}</div>
 <div class="line"><a name="l06575"></a><span class="lineno"> 6575</span>&#160; </div>
-<div class="line"><a name="l06576"></a><span class="lineno"><a class="line" href="class_parser.html#a8f5a44199cb94239837bec657450d742"> 6576</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a8f5a44199cb94239837bec657450d742">Parser::rMSC_if_existsStatement</a>()</div>
+<div class="line"><a name="l06576"></a><span class="lineno"><a class="line" href="class_parser.html#a8f5a44199cb94239837bec657450d742"> 6576</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a8f5a44199cb94239837bec657450d742">Parser::rMSC_if_existsStatement</a>()</div>
 <div class="line"><a name="l06577"></a><span class="lineno"> 6577</span>&#160;{</div>
 <div class="line"><a name="l06578"></a><span class="lineno"> 6578</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk1;</div>
 <div class="line"><a name="l06579"></a><span class="lineno"> 6579</span>&#160; </div>
@@ -7327,7 +7327,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07235"></a><span class="lineno"> 7235</span>&#160;<span class="comment">  compound.statement</span></div>
 <div class="line"><a name="l07236"></a><span class="lineno"> 7236</span>&#160;<span class="comment">  : &#39;{&#39; (statement)* &#39;}&#39;</span></div>
 <div class="line"><a name="l07237"></a><span class="lineno"> 7237</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l07238"></a><span class="lineno"><a class="line" href="class_parser.html#a6adcb4f1ad4423d2421232bafcd0a74e"> 7238</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a6adcb4f1ad4423d2421232bafcd0a74e">Parser::rCompoundStatement</a>()</div>
+<div class="line"><a name="l07238"></a><span class="lineno"><a class="line" href="class_parser.html#a6adcb4f1ad4423d2421232bafcd0a74e"> 7238</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a6adcb4f1ad4423d2421232bafcd0a74e">Parser::rCompoundStatement</a>()</div>
 <div class="line"><a name="l07239"></a><span class="lineno"> 7239</span>&#160;{</div>
 <div class="line"><a name="l07240"></a><span class="lineno"> 7240</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> ob, cb;</div>
 <div class="line"><a name="l07241"></a><span class="lineno"> 7241</span>&#160; </div>
@@ -7388,7 +7388,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07296"></a><span class="lineno"> 7296</span>&#160;<span class="comment">  | USING { NAMESPACE } identifier &#39;;&#39;</span></div>
 <div class="line"><a name="l07297"></a><span class="lineno"> 7297</span>&#160;<span class="comment">  | STATIC_ASSERT ( expression &#39;,&#39; expression ) &#39;;&#39;</span></div>
 <div class="line"><a name="l07298"></a><span class="lineno"> 7298</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l07299"></a><span class="lineno"><a class="line" href="class_parser.html#a0742196e6fd65cf6fa120fe094db54ce"> 7299</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a0742196e6fd65cf6fa120fe094db54ce">Parser::rStatement</a>()</div>
+<div class="line"><a name="l07299"></a><span class="lineno"><a class="line" href="class_parser.html#a0742196e6fd65cf6fa120fe094db54ce"> 7299</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a0742196e6fd65cf6fa120fe094db54ce">Parser::rStatement</a>()</div>
 <div class="line"><a name="l07300"></a><span class="lineno"> 7300</span>&#160;{</div>
 <div class="line"><a name="l07301"></a><span class="lineno"> 7301</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk1, tk2, tk3;</div>
 <div class="line"><a name="l07302"></a><span class="lineno"> 7302</span>&#160;  <span class="keywordtype">int</span> k;</div>
@@ -7640,7 +7640,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07548"></a><span class="lineno"> 7548</span>&#160;<span class="comment">  if.statement</span></div>
 <div class="line"><a name="l07549"></a><span class="lineno"> 7549</span>&#160;<span class="comment">  : IF &#39;(&#39; comma.expression &#39;)&#39; statement { ELSE statement }</span></div>
 <div class="line"><a name="l07550"></a><span class="lineno"> 7550</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l07551"></a><span class="lineno"><a class="line" href="class_parser.html#a81646d6b9ed811c0b5846be553c8e56d"> 7551</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a81646d6b9ed811c0b5846be553c8e56d">Parser::rIfStatement</a>()</div>
+<div class="line"><a name="l07551"></a><span class="lineno"><a class="line" href="class_parser.html#a81646d6b9ed811c0b5846be553c8e56d"> 7551</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a81646d6b9ed811c0b5846be553c8e56d">Parser::rIfStatement</a>()</div>
 <div class="line"><a name="l07552"></a><span class="lineno"> 7552</span>&#160;{</div>
 <div class="line"><a name="l07553"></a><span class="lineno"> 7553</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk1, tk2, tk3, tk4;</div>
 <div class="line"><a name="l07554"></a><span class="lineno"> 7554</span>&#160; </div>
@@ -7687,7 +7687,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07595"></a><span class="lineno"> 7595</span>&#160;<span class="comment">  switch.statement</span></div>
 <div class="line"><a name="l07596"></a><span class="lineno"> 7596</span>&#160;<span class="comment">  : SWITCH &#39;(&#39; comma.expression &#39;)&#39; statement</span></div>
 <div class="line"><a name="l07597"></a><span class="lineno"> 7597</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l07598"></a><span class="lineno"><a class="line" href="class_parser.html#abeb9c1c4a81c2ee7213c882b66337a05"> 7598</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#abeb9c1c4a81c2ee7213c882b66337a05">Parser::rSwitchStatement</a>()</div>
+<div class="line"><a name="l07598"></a><span class="lineno"><a class="line" href="class_parser.html#abeb9c1c4a81c2ee7213c882b66337a05"> 7598</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#abeb9c1c4a81c2ee7213c882b66337a05">Parser::rSwitchStatement</a>()</div>
 <div class="line"><a name="l07599"></a><span class="lineno"> 7599</span>&#160;{</div>
 <div class="line"><a name="l07600"></a><span class="lineno"> 7600</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk1, tk2, tk3;</div>
 <div class="line"><a name="l07601"></a><span class="lineno"> 7601</span>&#160; </div>
@@ -7718,7 +7718,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07626"></a><span class="lineno"> 7626</span>&#160;<span class="comment">  while.statement</span></div>
 <div class="line"><a name="l07627"></a><span class="lineno"> 7627</span>&#160;<span class="comment">  : WHILE &#39;(&#39; comma.expression &#39;)&#39; statement</span></div>
 <div class="line"><a name="l07628"></a><span class="lineno"> 7628</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l07629"></a><span class="lineno"><a class="line" href="class_parser.html#a3d3cb7204320068659dc8298298dd250"> 7629</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a3d3cb7204320068659dc8298298dd250">Parser::rWhileStatement</a>()</div>
+<div class="line"><a name="l07629"></a><span class="lineno"><a class="line" href="class_parser.html#a3d3cb7204320068659dc8298298dd250"> 7629</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a3d3cb7204320068659dc8298298dd250">Parser::rWhileStatement</a>()</div>
 <div class="line"><a name="l07630"></a><span class="lineno"> 7630</span>&#160;{</div>
 <div class="line"><a name="l07631"></a><span class="lineno"> 7631</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk1, tk2, tk3;</div>
 <div class="line"><a name="l07632"></a><span class="lineno"> 7632</span>&#160; </div>
@@ -7749,7 +7749,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07657"></a><span class="lineno"> 7657</span>&#160;<span class="comment">  do.statement</span></div>
 <div class="line"><a name="l07658"></a><span class="lineno"> 7658</span>&#160;<span class="comment">  : DO statement WHILE &#39;(&#39; comma.expression &#39;)&#39; &#39;;&#39;</span></div>
 <div class="line"><a name="l07659"></a><span class="lineno"> 7659</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l07660"></a><span class="lineno"><a class="line" href="class_parser.html#a4c0626f09e4161317b2f7aa360d3f144"> 7660</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a4c0626f09e4161317b2f7aa360d3f144">Parser::rDoStatement</a>()</div>
+<div class="line"><a name="l07660"></a><span class="lineno"><a class="line" href="class_parser.html#a4c0626f09e4161317b2f7aa360d3f144"> 7660</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a4c0626f09e4161317b2f7aa360d3f144">Parser::rDoStatement</a>()</div>
 <div class="line"><a name="l07661"></a><span class="lineno"> 7661</span>&#160;{</div>
 <div class="line"><a name="l07662"></a><span class="lineno"> 7662</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk0, tk1, tk2, tk3, tk4;</div>
 <div class="line"><a name="l07663"></a><span class="lineno"> 7663</span>&#160; </div>
@@ -7786,7 +7786,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07694"></a><span class="lineno"> 7694</span>&#160;<span class="comment">  : FOR &#39;(&#39; expr.statement {comma.expression} &#39;;&#39; {comma.expression} &#39;)&#39;</span></div>
 <div class="line"><a name="l07695"></a><span class="lineno"> 7695</span>&#160;<span class="comment">    statement</span></div>
 <div class="line"><a name="l07696"></a><span class="lineno"> 7696</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l07697"></a><span class="lineno"><a class="line" href="class_parser.html#aa3e127a14d12fa7b7cc533a85566723e"> 7697</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#aa3e127a14d12fa7b7cc533a85566723e">Parser::rForStatement</a>()</div>
+<div class="line"><a name="l07697"></a><span class="lineno"><a class="line" href="class_parser.html#aa3e127a14d12fa7b7cc533a85566723e"> 7697</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#aa3e127a14d12fa7b7cc533a85566723e">Parser::rForStatement</a>()</div>
 <div class="line"><a name="l07698"></a><span class="lineno"> 7698</span>&#160;{</div>
 <div class="line"><a name="l07699"></a><span class="lineno"> 7699</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk1, tk2, tk3, tk4;</div>
 <div class="line"><a name="l07700"></a><span class="lineno"> 7700</span>&#160; </div>
@@ -7843,7 +7843,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07751"></a><span class="lineno"> 7751</span>&#160;<span class="comment">  exception.handler</span></div>
 <div class="line"><a name="l07752"></a><span class="lineno"> 7752</span>&#160;<span class="comment">  : CATCH &#39;(&#39; (arg.declaration | Ellipsis) &#39;)&#39; compound.statement</span></div>
 <div class="line"><a name="l07753"></a><span class="lineno"> 7753</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l07754"></a><span class="lineno"><a class="line" href="class_parser.html#a560504861d6edf196c3d22034ed7f813"> 7754</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a560504861d6edf196c3d22034ed7f813">Parser::rTryStatement</a>()</div>
+<div class="line"><a name="l07754"></a><span class="lineno"><a class="line" href="class_parser.html#a560504861d6edf196c3d22034ed7f813"> 7754</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a560504861d6edf196c3d22034ed7f813">Parser::rTryStatement</a>()</div>
 <div class="line"><a name="l07755"></a><span class="lineno"> 7755</span>&#160;{</div>
 <div class="line"><a name="l07756"></a><span class="lineno"> 7756</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> try_token;</div>
 <div class="line"><a name="l07757"></a><span class="lineno"> 7757</span>&#160; </div>
@@ -7869,7 +7869,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07777"></a><span class="lineno"> 7777</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="class_parser.html#a5f60b827c61c71f01df042a656d310a1">lex</a>.<a class="code" href="classcpp__token__buffert.html#a2a3a9ab48433a3ac35cda54fa13d4904">get_token</a>(op_token)!=<span class="charliteral">&#39;(&#39;</span>)</div>
 <div class="line"><a name="l07778"></a><span class="lineno"> 7778</span>&#160;      <span class="keywordflow">return</span> {};</div>
 <div class="line"><a name="l07779"></a><span class="lineno"> 7779</span>&#160; </div>
-<div class="line"><a name="l07780"></a><span class="lineno"> 7780</span>&#160;    <a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> catch_op;</div>
+<div class="line"><a name="l07780"></a><span class="lineno"> 7780</span>&#160;    optionalt&lt;codet&gt; catch_op;</div>
 <div class="line"><a name="l07781"></a><span class="lineno"> 7781</span>&#160; </div>
 <div class="line"><a name="l07782"></a><span class="lineno"> 7782</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="class_parser.html#a5f60b827c61c71f01df042a656d310a1">lex</a>.<a class="code" href="classcpp__token__buffert.html#a021ac8005a1c6120be82fdd7ec2ef1bf">LookAhead</a>(0)==TOK_ELLIPSIS)</div>
 <div class="line"><a name="l07783"></a><span class="lineno"> 7783</span>&#160;    {</div>
@@ -7919,7 +7919,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07827"></a><span class="lineno"> 7827</span>&#160;  <span class="keywordflow">return</span> std::move(statement);</div>
 <div class="line"><a name="l07828"></a><span class="lineno"> 7828</span>&#160;}</div>
 <div class="line"><a name="l07829"></a><span class="lineno"> 7829</span>&#160; </div>
-<div class="line"><a name="l07830"></a><span class="lineno"><a class="line" href="class_parser.html#ad826e63e8675c522d18c2969600ec7c1"> 7830</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#ad826e63e8675c522d18c2969600ec7c1">Parser::rMSC_tryStatement</a>()</div>
+<div class="line"><a name="l07830"></a><span class="lineno"><a class="line" href="class_parser.html#ad826e63e8675c522d18c2969600ec7c1"> 7830</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#ad826e63e8675c522d18c2969600ec7c1">Parser::rMSC_tryStatement</a>()</div>
 <div class="line"><a name="l07831"></a><span class="lineno"> 7831</span>&#160;{</div>
 <div class="line"><a name="l07832"></a><span class="lineno"> 7832</span>&#160;  <span class="comment">// These are for &#39;structured exception handling&#39;,</span></div>
 <div class="line"><a name="l07833"></a><span class="lineno"> 7833</span>&#160;  <span class="comment">// and are a relic from Visual C.</span></div>
@@ -7981,7 +7981,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07889"></a><span class="lineno"> 7889</span>&#160;    <span class="keywordflow">return</span> {};</div>
 <div class="line"><a name="l07890"></a><span class="lineno"> 7890</span>&#160;}</div>
 <div class="line"><a name="l07891"></a><span class="lineno"> 7891</span>&#160; </div>
-<div class="line"><a name="l07892"></a><span class="lineno"><a class="line" href="class_parser.html#a8c03740da3034cd74ea44189aeae31af"> 7892</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a8c03740da3034cd74ea44189aeae31af">Parser::rMSC_leaveStatement</a>()</div>
+<div class="line"><a name="l07892"></a><span class="lineno"><a class="line" href="class_parser.html#a8c03740da3034cd74ea44189aeae31af"> 7892</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a8c03740da3034cd74ea44189aeae31af">Parser::rMSC_leaveStatement</a>()</div>
 <div class="line"><a name="l07893"></a><span class="lineno"> 7893</span>&#160;{</div>
 <div class="line"><a name="l07894"></a><span class="lineno"> 7894</span>&#160;  <span class="comment">// These are for &#39;structured exception handling&#39;,</span></div>
 <div class="line"><a name="l07895"></a><span class="lineno"> 7895</span>&#160;  <span class="comment">// and are a relic from Visual C.</span></div>
@@ -7997,7 +7997,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l07905"></a><span class="lineno"> 7905</span>&#160;  <span class="keywordflow">return</span> std::move(statement);</div>
 <div class="line"><a name="l07906"></a><span class="lineno"> 7906</span>&#160;}</div>
 <div class="line"><a name="l07907"></a><span class="lineno"> 7907</span>&#160; </div>
-<div class="line"><a name="l07908"></a><span class="lineno"><a class="line" href="class_parser.html#a95ae5c99321bf122920ea8a671f6649d"> 7908</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a95ae5c99321bf122920ea8a671f6649d">Parser::rGCCAsmStatement</a>()</div>
+<div class="line"><a name="l07908"></a><span class="lineno"><a class="line" href="class_parser.html#a95ae5c99321bf122920ea8a671f6649d"> 7908</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a95ae5c99321bf122920ea8a671f6649d">Parser::rGCCAsmStatement</a>()</div>
 <div class="line"><a name="l07909"></a><span class="lineno"> 7909</span>&#160;{</div>
 <div class="line"><a name="l07910"></a><span class="lineno"> 7910</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk;</div>
 <div class="line"><a name="l07911"></a><span class="lineno"> 7911</span>&#160; </div>
@@ -8096,7 +8096,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l08004"></a><span class="lineno"> 8004</span>&#160;  <span class="keywordflow">return</span> std::move(statement);</div>
 <div class="line"><a name="l08005"></a><span class="lineno"> 8005</span>&#160;}</div>
 <div class="line"><a name="l08006"></a><span class="lineno"> 8006</span>&#160; </div>
-<div class="line"><a name="l08007"></a><span class="lineno"><a class="line" href="class_parser.html#a9279c566ac31a02c829c31a35db14b86"> 8007</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a9279c566ac31a02c829c31a35db14b86">Parser::rMSCAsmStatement</a>()</div>
+<div class="line"><a name="l08007"></a><span class="lineno"><a class="line" href="class_parser.html#a9279c566ac31a02c829c31a35db14b86"> 8007</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a9279c566ac31a02c829c31a35db14b86">Parser::rMSCAsmStatement</a>()</div>
 <div class="line"><a name="l08008"></a><span class="lineno"> 8008</span>&#160;{</div>
 <div class="line"><a name="l08009"></a><span class="lineno"> 8009</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk;</div>
 <div class="line"><a name="l08010"></a><span class="lineno"> 8010</span>&#160; </div>
@@ -8172,7 +8172,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l08080"></a><span class="lineno"> 8080</span>&#160;<span class="comment">  | openc++.postfix.expr</span></div>
 <div class="line"><a name="l08081"></a><span class="lineno"> 8081</span>&#160;<span class="comment">  | openc++.primary.exp</span></div>
 <div class="line"><a name="l08082"></a><span class="lineno"> 8082</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l08083"></a><span class="lineno"><a class="line" href="class_parser.html#a42e078579f9ce25fac31016c8faa2fb1"> 8083</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a42e078579f9ce25fac31016c8faa2fb1">Parser::rExprStatement</a>()</div>
+<div class="line"><a name="l08083"></a><span class="lineno"><a class="line" href="class_parser.html#a42e078579f9ce25fac31016c8faa2fb1"> 8083</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a42e078579f9ce25fac31016c8faa2fb1">Parser::rExprStatement</a>()</div>
 <div class="line"><a name="l08084"></a><span class="lineno"> 8084</span>&#160;{</div>
 <div class="line"><a name="l08085"></a><span class="lineno"> 8085</span>&#160;  <a class="code" href="classcpp__tokent.html">cpp_tokent</a> tk;</div>
 <div class="line"><a name="l08086"></a><span class="lineno"> 8086</span>&#160; </div>
@@ -8283,7 +8283,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l08191"></a><span class="lineno"> 8191</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l08192"></a><span class="lineno"> 8192</span>&#160;<span class="comment">  Note: if you modify this function, take a look at rDeclaration(), too.</span></div>
 <div class="line"><a name="l08193"></a><span class="lineno"> 8193</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l08194"></a><span class="lineno"><a class="line" href="class_parser.html#a5770fbd6c4a103f32556f9654c2899e6"> 8194</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a5770fbd6c4a103f32556f9654c2899e6">Parser::rDeclarationStatement</a>()</div>
+<div class="line"><a name="l08194"></a><span class="lineno"><a class="line" href="class_parser.html#a5770fbd6c4a103f32556f9654c2899e6"> 8194</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a5770fbd6c4a103f32556f9654c2899e6">Parser::rDeclarationStatement</a>()</div>
 <div class="line"><a name="l08195"></a><span class="lineno"> 8195</span>&#160;{</div>
 <div class="line"><a name="l08196"></a><span class="lineno"> 8196</span>&#160;  <a class="code" href="classcpp__storage__spect.html">cpp_storage_spect</a> storage_spec;</div>
 <div class="line"><a name="l08197"></a><span class="lineno"> 8197</span>&#160;  <a class="code" href="classtypet.html">typet</a> cv_q, integral;</div>
@@ -8353,7 +8353,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l08261"></a><span class="lineno"> 8261</span>&#160;<span class="comment">  integral.decl.statement</span></div>
 <div class="line"><a name="l08262"></a><span class="lineno"> 8262</span>&#160;<span class="comment">  : decl.head integral.or.class.spec {cv.qualify} {declarators} &#39;;&#39;</span></div>
 <div class="line"><a name="l08263"></a><span class="lineno"> 8263</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l08264"></a><span class="lineno"><a class="line" href="class_parser.html#a503a402a39e4477302dde1da7f5590ae"> 8264</a></span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a> <a class="code" href="class_parser.html#a503a402a39e4477302dde1da7f5590ae">Parser::rIntegralDeclStatement</a>(</div>
+<div class="line"><a name="l08264"></a><span class="lineno"><a class="line" href="class_parser.html#a503a402a39e4477302dde1da7f5590ae"> 8264</a></span>&#160;optionalt&lt;codet&gt; <a class="code" href="class_parser.html#a503a402a39e4477302dde1da7f5590ae">Parser::rIntegralDeclStatement</a>(</div>
 <div class="line"><a name="l08265"></a><span class="lineno"> 8265</span>&#160;  <a class="code" href="classcpp__storage__spect.html">cpp_storage_spect</a> &amp;storage_spec,</div>
 <div class="line"><a name="l08266"></a><span class="lineno"> 8266</span>&#160;  <a class="code" href="classtypet.html">typet</a> &amp;integral,</div>
 <div class="line"><a name="l08267"></a><span class="lineno"> 8267</span>&#160;  <a class="code" href="classtypet.html">typet</a> &amp;cv_q)</div>
@@ -8396,7 +8396,7 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l08304"></a><span class="lineno"> 8304</span>&#160;<span class="comment">   other.decl.statement</span></div>
 <div class="line"><a name="l08305"></a><span class="lineno"> 8305</span>&#160;<span class="comment">   :decl.head name {cv.qualify} declarators &#39;;&#39;</span></div>
 <div class="line"><a name="l08306"></a><span class="lineno"> 8306</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l08307"></a><span class="lineno"> 8307</span>&#160;<a class="code" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt&lt;codet&gt;</a></div>
+<div class="line"><a name="l08307"></a><span class="lineno"> 8307</span>&#160;optionalt&lt;codet&gt;</div>
 <div class="line"><a name="l08308"></a><span class="lineno"><a class="line" href="class_parser.html#aaa048770d8834a3317dc52f0b050de19"> 8308</a></span>&#160;<a class="code" href="class_parser.html#aaa048770d8834a3317dc52f0b050de19">Parser::rOtherDeclStatement</a>(<a class="code" href="classcpp__storage__spect.html">cpp_storage_spect</a> &amp;storage_spec, <a class="code" href="classtypet.html">typet</a> &amp;cv_q)</div>
 <div class="line"><a name="l08309"></a><span class="lineno"> 8309</span>&#160;{</div>
 <div class="line"><a name="l08310"></a><span class="lineno"> 8310</span>&#160;  <a class="code" href="classtypet.html">typet</a> type_name;</div>
@@ -8844,7 +8844,6 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="ttc" id="amath_8c_html_ae09128febbbe6372cde4fa0c65608a42"><div class="ttname"><a href="math_8c.html#ae09128febbbe6372cde4fa0c65608a42">exp</a></div><div class="ttdeci">double exp(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02480">math.c:2480</a></div></div>
 <div class="ttc" id="amerged__type_8h_html"><div class="ttname"><a href="merged__type_8h.html">merged_type.h</a></div></div>
 <div class="ttc" id="amerged__type_8h_html_a84042027132c02f7a3dae92fc7f9953b"><div class="ttname"><a href="merged__type_8h.html#a84042027132c02f7a3dae92fc7f9953b">to_merged_type</a></div><div class="ttdeci">const merged_typet &amp; to_merged_type(const typet &amp;type)</div><div class="ttdoc">conversion to merged_typet</div><div class="ttdef"><b>Definition:</b> <a href="merged__type_8h_source.html#l00029">merged_type.h:29</a></div></div>
-<div class="ttc" id="aoptional_8h_html_ad5436a839660990c49c85e1b84723a69"><div class="ttname"><a href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a></div><div class="ttdeci">nonstd::optional&lt; T &gt; optionalt</div><div class="ttdef"><b>Definition:</b> <a href="optional_8h_source.html#l00035">optional.h:35</a></div></div>
 <div class="ttc" id="aparse_8cpp_html_a34c22eea1c9712a7a236afc5fecd14c7"><div class="ttname"><a href="parse_8cpp.html#a34c22eea1c9712a7a236afc5fecd14c7">cpp_parse</a></div><div class="ttdeci">bool cpp_parse()</div><div class="ttdef"><b>Definition:</b> <a href="parse_8cpp_source.html#l08393">parse.cpp:8393</a></div></div>
 <div class="ttc" id="aparse_8cpp_html_a677203b0b47eaef2d981d78dd173c5fb"><div class="ttname"><a href="parse_8cpp.html#a677203b0b47eaef2d981d78dd173c5fb">ERROR_TOKENS</a></div><div class="ttdeci">#define ERROR_TOKENS</div></div>
 <div class="ttc" id="aparse_8cpp_html_ad0ec9bf9a09f898ee655dd19e15d0daf"><div class="ttname"><a href="parse_8cpp.html#ad0ec9bf9a09f898ee655dd19e15d0daf">is_identifier</a></div><div class="ttdeci">static bool is_identifier(int token)</div><div class="ttdef"><b>Definition:</b> <a href="parse_8cpp_source.html#l00413">parse.cpp:413</a></div></div>

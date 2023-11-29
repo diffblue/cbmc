@@ -6,5 +6,5 @@ var struct__encoding_8cpp =
     [ "encode", "struct__encoding_8cpp.html#a8fbf8c6a27e76629dfe03397c5583367", null ],
     [ "encode", "struct__encoding_8cpp.html#a4f884ff13ac8f98ed17dab3e5fed335d", null ],
     [ "extricate_updates", "struct__encoding_8cpp.html#affdd2d8bf12da97b18d7945e842d41b5", null ],
-    [ "needs_width", "struct__encoding_8cpp.html#a1b1f2615ff4eed143e650939419f5458", null ]
+    [ "needs_width", "struct__encoding_8cpp.html#ae95ac68d46e69884562e003f8207d3df", null ]
 ];

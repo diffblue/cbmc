@@ -122,7 +122,7 @@ $(document).ready(function(){initNavTree('smt2__incremental__decision__procedure
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="smt2__incremental__decision__procedure_8cpp__incl.svg" width="3666" height="856"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="smt2__incremental__decision__procedure_8cpp__incl.svg" width="3336" height="842"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -133,9 +133,9 @@ Functions</h2></td></tr>
 <tr class="memitem:adc59c2c7d051b9a69bbacb59500a3faa"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classsmt__responset.html">smt_responset</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#adc59c2c7d051b9a69bbacb59500a3faa">get_response_to_command</a> (<a class="el" href="classsmt__base__solver__processt.html">smt_base_solver_processt</a> &amp;solver_process, const <a class="el" href="classsmt__commandt.html">smt_commandt</a> &amp;command, const std::unordered_map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classsmt__identifier__termt.html">smt_identifier_termt</a> &gt; &amp;identifier_table)</td></tr>
 <tr class="memdesc:adc59c2c7d051b9a69bbacb59500a3faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issues a command to the solving process which is expected to optionally return a success status followed by the actual response of interest.  <a href="smt2__incremental__decision__procedure_8cpp.html#adc59c2c7d051b9a69bbacb59500a3faa">More...</a><br /></td></tr>
 <tr class="separator:adc59c2c7d051b9a69bbacb59500a3faa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a9eea028e10191a3abaa8e39526dfe4"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#a5a9eea028e10191a3abaa8e39526dfe4">get_problem_messages</a> (const <a class="el" href="classsmt__responset.html">smt_responset</a> &amp;response)</td></tr>
-<tr class="memdesc:a5a9eea028e10191a3abaa8e39526dfe4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a message string describing the problem in the case where the response from the solver is an error status.  <a href="smt2__incremental__decision__procedure_8cpp.html#a5a9eea028e10191a3abaa8e39526dfe4">More...</a><br /></td></tr>
-<tr class="separator:a5a9eea028e10191a3abaa8e39526dfe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a090d7a14b7df8d9c704ce32a45f6e5f5"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#a090d7a14b7df8d9c704ce32a45f6e5f5">get_problem_messages</a> (const <a class="el" href="classsmt__responset.html">smt_responset</a> &amp;response)</td></tr>
+<tr class="memdesc:a090d7a14b7df8d9c704ce32a45f6e5f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a message string describing the problem in the case where the response from the solver is an error status.  <a href="smt2__incremental__decision__procedure_8cpp.html#a090d7a14b7df8d9c704ce32a45f6e5f5">More...</a><br /></td></tr>
+<tr class="separator:a090d7a14b7df8d9c704ce32a45f6e5f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac63d2ae07c21aced31cfd2e80fcac6bc"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__incremental__decision__procedure_8cpp.html#ac63d2ae07c21aced31cfd2e80fcac6bc">gather_dependent_expressions</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;root_expr)</td></tr>
 <tr class="memdesc:ac63d2ae07c21aced31cfd2e80fcac6bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find all sub expressions of the given <code>expr</code> which need to be expressed as separate smt commands.  <a href="smt2__incremental__decision__procedure_8cpp.html#ac63d2ae07c21aced31cfd2e80fcac6bc">More...</a><br /></td></tr>
 <tr class="separator:ac63d2ae07c21aced31cfd2e80fcac6bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -223,8 +223,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5a9eea028e10191a3abaa8e39526dfe4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a9eea028e10191a3abaa8e39526dfe4">&#9670;&nbsp;</a></span>get_problem_messages()</h2>
+<a id="a090d7a14b7df8d9c704ce32a45f6e5f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a090d7a14b7df8d9c704ce32a45f6e5f5">&#9670;&nbsp;</a></span>get_problem_messages()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -233,7 +233,7 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;std::string&gt; get_problem_messages </td>
+          <td class="memname">static std::optional&lt;std::string&gt; get_problem_messages </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classsmt__responset.html">smt_responset</a> &amp;&#160;</td>
           <td class="paramname"><em>response</em></td><td>)</td>
