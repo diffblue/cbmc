@@ -1454,7 +1454,7 @@ SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
   const nodet *lp = get_leaf_node(k);
 
   if(lp == nullptr)
-    return {};
+    return std::nullopt;
 
   return optionalt<std::reference_wrapper<const mapped_type>>(lp->get_value());
 }

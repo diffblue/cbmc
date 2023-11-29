@@ -52,7 +52,7 @@ public:
     const auto it = numbers_.find(a);
     if(it == numbers_.end())
     {
-      return {};
+      return std::nullopt;
     }
     return it->second;
   }

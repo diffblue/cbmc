@@ -82,7 +82,7 @@ public:
   {
     const auto it = map.find(method_id);
     if(it == map.end())
-      return opt_reft();
+      return std::nullopt;
     return std::cref(it->second);
   }
 };

@@ -94,7 +94,7 @@ public:
       // to_long converts to long long which is the largest signed numeric type
       return static_cast<T>(get_val(mpi));
     else
-      return {};
+      return std::nullopt;
   }
 
   // Conversion from expression
@@ -103,7 +103,7 @@ public:
     if(expr.is_constant())
       return numeric_castt<T>{}(to_constant_expr(expr));
     else
-      return {};
+      return std::nullopt;
   }
 
   // Conversion from expression
@@ -112,7 +112,7 @@ public:
     if(auto mpi_opt = numeric_castt<mp_integer>{}(expr))
       return numeric_castt<T>{}(*mpi_opt);
     else
-      return {};
+      return std::nullopt;
   }
 };
 
