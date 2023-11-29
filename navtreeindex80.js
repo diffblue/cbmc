@@ -1,6 +1,5 @@
 var NAVTREEINDEX80 =
 {
-"folder-walkthrough.html#autotoc_md185":[0],
 "folder-walkthrough.html#autotoc_md186":[1],
 "folder-walkthrough.html#autotoc_md187":[2],
 "folder-walkthrough.html#autotoc_md188":[3],
@@ -173,8 +172,8 @@ var NAVTREEINDEX80 =
 "functions_enum.html":[8,2,4],
 "functions_eval.html":[8,2,5],
 "functions_f.html":[8,2,0,6],
-"functions_func.html":[8,2,1],
 "functions_func.html":[8,2,1,0],
+"functions_func.html":[8,2,1],
 "functions_func_a.html":[8,2,1,1],
 "functions_func_b.html":[8,2,1,2],
 "functions_func_c.html":[8,2,1,3],
@@ -249,5 +248,6 @@ var NAVTREEINDEX80 =
 "functions_vars_b.html":[8,2,2,2],
 "functions_vars_c.html":[8,2,2,3],
 "functions_vars_d.html":[8,2,2,4],
-"functions_vars_e.html":[8,2,2,5]
+"functions_vars_e.html":[8,2,2,5],
+"functions_vars_f.html":[8,2,2,6]
 };

@@ -1,8 +1,5 @@
 var NAVTREEINDEX135 =
 {
-"structmz__zip__archive__file__stat.html#a79ac549bef6a828b37e4dc72d9282d1e":[8,0,848,1],
-"structmz__zip__archive__file__stat.html#a952eb97b58881df827ce3808071e7754":[8,0,848,11],
-"structmz__zip__archive__file__stat.html#a9a7f0737f031b23a29c58fc7ff2bd131":[8,0,848,7],
 "structmz__zip__archive__file__stat.html#aa55ee3580a844400d4bd43be27ae3808":[8,0,848,16],
 "structmz__zip__archive__file__stat.html#aacf4d95d27894acac1303f51542c51b6":[8,0,848,3],
 "structmz__zip__archive__file__stat.html#ac9fdb10d21124d44be05ef0c04c1ad15":[8,0,848,0],
@@ -56,6 +53,8 @@ var NAVTREEINDEX135 =
 "structnfat_1_1transitiont.html#a89fc78b413759d84273d8a321c82d673":[8,0,862,1,1],
 "structnumeric__castt.html":[8,0,878],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html":[8,0,880],
+"new_8c.html#a902f40dabd30289e7b6fb861d724e54a":[9,0,2,5,0,1,4],
+"namespacerequire__type.html#a3cd16ad374dc241a1e4199a88a9858ca":[7,0,9,28],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#a01ab6a24156c250cb77e1a3827ec419d":[8,0,880,4],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#a03aa9941fb599001e15840f9d0dff895":[8,0,880,0],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#a766843ef013ce7ffd0074b6e49c3c610":[8,0,880,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX135 =
 "structsharing__mapt_1_1noop__value__comparatort.html#a3dd6a882d35a454ae4f598cdc93c1949":[8,0,1051,2,1],
 "structsharing__mapt_1_1noop__value__comparatort.html#a4acc47b49ef08b43bcd9a15c6a2f54ac":[8,0,1051,2,0],
 "structsharing__mapt_1_1real__value__comparatort.html":[8,0,1051,3],
-"structsharing__mapt_1_1real__value__comparatort.html#a778c4dd17de23128f59a765a856f9838":[8,0,1051,3,1]
+"structsharing__mapt_1_1real__value__comparatort.html#a778c4dd17de23128f59a765a856f9838":[8,0,1051,3,1],
+"structsharing__mapt_1_1real__value__comparatort.html#aacd1edd2aa1a8519bc03f0c126dc0c8a":[8,0,1051,3,0]
 };
