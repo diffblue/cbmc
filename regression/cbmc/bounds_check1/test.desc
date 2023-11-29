@@ -1,6 +1,6 @@
 CORE thorough-smt-backend no-new-smt
 main.c
---bounds-check --pointer-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 \[\(.*\)i2\]: FAILURE

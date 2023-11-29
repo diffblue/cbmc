@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 10 --show-goto-functions
+--unwind 10 --show-goto-functions --no-standard-checks
 activate-multi-line-match
 (?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*DEAD .*newAlloc0[\s]*(?P>comment_block)[\s]*DEAD .*pc[\s]*(?P>comment_block)[\s]*DEAD .*literal[\s]*(?P>comment_block)[\s]*8: END_FUNCTION
 ^EXIT=0$

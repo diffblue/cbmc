@@ -1,6 +1,6 @@
 CORE
 test.c
-
+--no-bounds-check
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

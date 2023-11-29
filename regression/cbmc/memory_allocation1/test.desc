@@ -1,6 +1,6 @@
 CORE broken-smt-backend
 main.c
---pointer-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.pointer_dereference\.2\] .* dereference failure: invalid integer address in \*p: SUCCESS$

@@ -4,5 +4,5 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\*\* 6 of 8 failed.*$
+^\*\* 6 of \d+ failed.*$
 --

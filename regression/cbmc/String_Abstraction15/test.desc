@@ -1,6 +1,6 @@
 CORE
 pass-in.c
---string-abstraction
+--string-abstraction --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -8,7 +8,7 @@ fixed.c
 ^\[main.assertion.8\] line 36 assertion .*: SUCCESS$
 ^\[main.assertion.9\] line 38 assertion .*: SUCCESS$
 ^\[main.assertion.10\] line 39 assertion .*: SUCCESS$
-^\*\* 4 of 10 failed
+^\*\* 4 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

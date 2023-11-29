@@ -8,7 +8,7 @@ main.c
 ^\[main.assertion.4\] .* NotExists-Forall: failed: FAILURE$
 ^\[main.assertion.5\] .* NotForall-Forall: successful: SUCCESS$
 ^\[main.assertion.6\] .* NotForall-NotForall: successful: SUCCESS$
-^\*\* 3 of 6 failed
+^\*\* 3 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
