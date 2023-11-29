@@ -116,17 +116,21 @@ private:
   // operator++ that skips unset values.
   template <class UnderlyingIterator, class UnderlyingValue>
   class iterator_templatet
-    : public std::iterator<std::forward_iterator_tag, UnderlyingValue>
   {
-    // Type of the std::iterator support class we inherit
-    typedef std::iterator<std::forward_iterator_tag, UnderlyingValue>
-      base_typet;
     // Type of this template instantiation
     typedef iterator_templatet<UnderlyingIterator, UnderlyingValue> self_typet;
     // Type of our containing \ref dense_integer_mapt
     typedef dense_integer_mapt<K, V, KeyToDenseInteger> map_typet;
 
   public:
+    // These types are defined such that the class is compatible with being
+    // treated as an STL iterator. For this to work, they must not be renamed.
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = UnderlyingValue;
+    using difference_type = std::ptrdiff_t;
+    using pointer = UnderlyingValue *;
+    using reference = UnderlyingValue &;
+
     iterator_templatet(UnderlyingIterator it, const map_typet &underlying_map)
       : underlying_iterator(it), underlying_map(underlying_map)
     {
@@ -153,11 +157,11 @@ private:
       underlying_iterator = advance(underlying_iterator);
       return *this;
     }
-    typename base_typet::reference operator*() const
+    reference operator*() const
     {
       return *underlying_iterator;
     }
-    typename base_typet::pointer operator->() const
+    pointer operator->() const
     {
       return &*underlying_iterator;
     }

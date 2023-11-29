@@ -105,8 +105,15 @@ public:
   {
     explicit option_namest(const cmdlinet &command_line);
     struct option_names_iteratort
-      : public std::iterator<std::forward_iterator_tag, std::string>
     {
+      // These types are defined such that the class is compatible with being
+      // treated as an STL iterator. For this to work, they must not be renamed.
+      using iterator_category = std::forward_iterator_tag;
+      using value_type = std::string;
+      using difference_type = std::ptrdiff_t;
+      using pointer = const std::string *;
+      using reference = const std::string &;
+
       option_names_iteratort() = default;
       explicit option_names_iteratort(
         const cmdlinet *command_line,
