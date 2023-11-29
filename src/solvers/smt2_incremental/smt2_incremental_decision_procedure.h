@@ -56,13 +56,13 @@ public:
   /// Gets the value of \p descriptor from the solver and returns the solver
   /// response expressed as an exprt of type \p type. This is an implementation
   /// detail of the `get(exprt)` member function.
-  optionalt<exprt>
+  std::optional<exprt>
   get_expr(const smt_termt &descriptor, const typet &type) const;
-  optionalt<exprt>
+  std::optional<exprt>
   get_expr(const smt_termt &struct_term, const struct_tag_typet &type) const;
-  optionalt<exprt>
+  std::optional<exprt>
   get_expr(const smt_termt &union_term, const union_tag_typet &type) const;
-  optionalt<exprt>
+  std::optional<exprt>
   get_expr(const smt_termt &array, const array_typet &type) const;
 
 protected:
@@ -117,7 +117,7 @@ protected:
   /// possible expression forms by expressing these in terms of the remaining
   /// language features.
   exprt lower(exprt expression) const;
-  optionalt<smt_termt> get_identifier(const exprt &expr) const;
+  std::optional<smt_termt> get_identifier(const exprt &expr) const;
 
   /// Namespace for looking up the expressions which symbol_exprts relate to.
   /// This includes the symbols defined outside of the decision procedure but

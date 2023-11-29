@@ -14,7 +14,7 @@ class smt_indext : protected irept
 {
 public:
   // smt_indext does not support the notion of an empty / null state. Use
-  // optionalt<smt_indext> instead if an empty index is required.
+  // std::optional<smt_indext> instead if an empty index is required.
   smt_indext() = delete;
 
   using irept::pretty;

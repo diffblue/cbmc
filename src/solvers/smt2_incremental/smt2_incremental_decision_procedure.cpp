@@ -44,7 +44,7 @@ static smt_responset get_response_to_command(
 
 /// Returns a message string describing the problem in the case where the
 /// response from the solver is an error status. Returns empty otherwise.
-static optionalt<std::string>
+static std::optional<std::string>
 get_problem_messages(const smt_responset &response)
 {
   if(const auto error = response.cast<smt_error_responset>())
@@ -413,7 +413,7 @@ exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
   return expr;
 }
 
-optionalt<smt_termt>
+std::optional<smt_termt>
 smt2_incremental_decision_proceduret::get_identifier(const exprt &expr) const
 {
   // Lookup the non-lowered form first.
@@ -437,7 +437,7 @@ smt2_incremental_decision_proceduret::get_identifier(const exprt &expr) const
   return {};
 }
 
-optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
+std::optional<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &array,
   const array_typet &type) const
 {
@@ -467,7 +467,7 @@ optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   return array_exprt{elements, type};
 }
 
-optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
+std::optional<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &struct_term,
   const struct_tag_typet &type) const
 {
@@ -478,7 +478,7 @@ optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   return {struct_encoding.decode(*encoded_result, type)};
 }
 
-optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
+std::optional<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &union_term,
   const union_tag_typet &type) const
 {
@@ -489,7 +489,7 @@ optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
   return {struct_encoding.decode(*encoded_result, type)};
 }
 
-optionalt<exprt> smt2_incremental_decision_proceduret::get_expr(
+std::optional<exprt> smt2_incremental_decision_proceduret::get_expr(
   const smt_termt &descriptor,
   const typet &type) const
 {
@@ -556,7 +556,7 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`get` - \n  " + expr.pretty(2, 0) << messaget::eom;
   });
-  auto descriptor = [&]() -> optionalt<smt_termt> {
+  auto descriptor = [&]() -> std::optional<smt_termt> {
     if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
     {
       const auto array = get_identifier(index_expr->array());

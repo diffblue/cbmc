@@ -8,8 +8,8 @@
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_SMT_SORTS_H
 
 #include <util/irep.h>
-#include <util/optional.h>
 
+#include <optional>
 #include <type_traits>
 
 class smt_sort_const_downcast_visitort;
@@ -18,7 +18,7 @@ class smt_sortt : protected irept
 {
 public:
   // smt_sortt does not support the notion of an empty / null state. Use
-  // optionalt<smt_sortt> instead if an empty sort is required.
+  // std::optional<smt_sortt> instead if an empty sort is required.
   smt_sortt() = delete;
 
   using irept::pretty;
@@ -47,7 +47,7 @@ public:
   const sub_classt *cast() const &;
 
   template <typename sub_classt>
-  optionalt<sub_classt> cast() &&;
+  std::optional<sub_classt> cast() &&;
 
 protected:
   using irept::irept;

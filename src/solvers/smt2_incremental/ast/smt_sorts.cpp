@@ -24,7 +24,8 @@
 
 #define SORT_ID(the_id)                                                        \
   template <>                                                                  \
-  optionalt<smt_##the_id##_sortt> smt_sortt::cast<smt_##the_id##_sortt>() &&   \
+  std::optional<smt_##the_id##_sortt> smt_sortt::cast<smt_##the_id##_sortt>()  \
+    &&                                                                         \
   {                                                                            \
     if(id() == ID_smt_##the_id##_sort)                                         \
       return {std::move(*static_cast<const smt_##the_id##_sortt *>(this))};    \

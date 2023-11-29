@@ -206,7 +206,7 @@ struct sort_based_cast_to_bit_vector_convertert final
   const smt_termt &from_term;
   const typet &from_type;
   const bitvector_typet &to_type;
-  optionalt<smt_termt> result;
+  std::optional<smt_termt> result;
 
   sort_based_cast_to_bit_vector_convertert(
     const smt_termt &from_term,
@@ -299,7 +299,7 @@ static smt_termt convert_expr_to_smt(
 struct sort_based_literal_convertert : public smt_sort_const_downcast_visitort
 {
   const constant_exprt &member_input;
-  optionalt<smt_termt> result;
+  std::optional<smt_termt> result;
 
   explicit sort_based_literal_convertert(const constant_exprt &input)
     : member_input{input}
@@ -591,7 +591,7 @@ static smt_termt convert_relational_to_smt(
     binary_relation.pretty());
 }
 
-static optionalt<smt_termt> try_relational_conversion(
+static std::optional<smt_termt> try_relational_conversion(
   const exprt &expr,
   const sub_expression_mapt &converted)
 {

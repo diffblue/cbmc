@@ -11,7 +11,7 @@ class smt_responset : protected irept
 {
 public:
   // smt_responset does not support the notion of an empty / null state. Use
-  // optionalt<smt_responset> instead if an empty response is required.
+  // std::optional<smt_responset> instead if an empty response is required.
   smt_responset() = delete;
 
   using irept::pretty;
@@ -36,7 +36,7 @@ class smt_check_sat_response_kindt : protected irept
 {
 public:
   // smt_responset does not support the notion of an empty / null state. Use
-  // optionalt<smt_responset> instead if an empty response is required.
+  // std::optional<smt_responset> instead if an empty response is required.
   smt_check_sat_response_kindt() = delete;
 
   using irept::pretty;
