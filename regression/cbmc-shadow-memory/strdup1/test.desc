@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 4
+--unwind 4 --no-standard-checks --no-built-in-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
