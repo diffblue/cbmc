@@ -360,8 +360,8 @@ protected:
     const source_locationt &source_location,
     goto_programt &dest,
     const irep_idt &mode,
-    std::optional<node_indext> destructor_start_point = {},
-    std::optional<node_indext> destructor_end_point = {});
+    std::optional<node_indext> destructor_end_point = {},
+    std::optional<node_indext> destructor_start_point = {});
 
   void build_declaration_hops(
     goto_programt &dest,
