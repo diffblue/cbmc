@@ -107,6 +107,9 @@ public:
   /// Fetches the destructor value for the passed-in node index.
   std::optional<codet> &get_destructor(node_indext index);
 
+  /// Fetches the declaration value for the passed-in node index.
+  std::optional<goto_programt::targett> &get_declaration(node_indext index);
+
   /// Builds a vector of destructors that start from starting_index and ends
   /// at end_index.
   /// \param end_index Index of the first variable to keep.
@@ -147,11 +150,12 @@ private:
   public:
     scope_nodet() = default;
 
-    explicit scope_nodet(codet destructor)
-      : destructor_value(std::move(destructor))
-    {
-    }
+    explicit scope_nodet(
+      codet destructor,
+      std::optional<goto_programt::targett> declaration);
+
     std::optional<codet> destructor_value;
+    std::optional<goto_programt::targett> declaration_value;
   };
 
   grapht<scope_nodet> scope_graph;
