@@ -1,6 +1,6 @@
 /*******************************************************************\
 
- Module: Destructor Tree
+ Module: Scope Tree
 
  Author: John Dumbell, john.dumbell@diffblue.com
 
@@ -87,13 +87,13 @@ public:
 /// required to get there from 'c' was 2 and 'e' was 1, which also tells
 /// you if a certain branch is a prefix or not. In this case neither are a
 /// prefix of the other.
-class destructor_treet
+class scope_treet
 {
 public:
-  destructor_treet()
+  scope_treet()
   {
     // We add a default node to the graph to act as a root for path traversal.
-    this->destruction_graph.add_node();
+    this->scope_graph.add_node();
   }
 
   /// Adds a destructor/declaration pair to the current stack, attaching it to
@@ -142,19 +142,19 @@ public:
   void descend_tree();
 
 private:
-  class destructor_nodet : public graph_nodet<empty_edget>
+  class scope_nodet : public graph_nodet<empty_edget>
   {
   public:
-    destructor_nodet() = default;
+    scope_nodet() = default;
 
-    explicit destructor_nodet(codet destructor)
+    explicit scope_nodet(codet destructor)
       : destructor_value(std::move(destructor))
     {
     }
     std::optional<codet> destructor_value;
   };
 
-  grapht<destructor_nodet> destruction_graph;
+  grapht<scope_nodet> scope_graph;
   node_indext current_node = 0;
 };
 

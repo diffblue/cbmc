@@ -148,7 +148,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
       // Compare the currently-live variables on the path of the GOTO and label.
       // We want to work out what variables should die during the jump.
       ancestry_resultt intersection_result =
-        targets.destructor_stack.get_nearest_common_ancestor_info(
+        targets.scope_stack.get_nearest_common_ancestor_info(
           goto_target, label_target);
 
       // If our goto had no variables of note, just skip
@@ -339,7 +339,7 @@ void goto_convertt::convert_label(
     dest.destructive_append(tmp);
 
     targets.labels.insert(
-      {label, {target, targets.destructor_stack.get_current_node()}});
+      {label, {target, targets.scope_stack.get_current_node()}});
     target->labels.push_front(label);
   }
 }
@@ -545,8 +545,7 @@ void goto_convertt::convert_block(
   const source_locationt &end_location=code.end_location();
 
   // this saves the index of the destructor stack
-  node_indext old_stack_top =
-    targets.destructor_stack.get_current_node();
+  node_indext old_stack_top = targets.scope_stack.get_current_node();
 
   // now convert block
   for(const auto &b_code : code.statements())
@@ -564,7 +563,7 @@ void goto_convertt::convert_block(
     unwind_destructor_stack(end_location, dest, mode, old_stack_top);
 
   // Set the current node of our destructor stack back to before the block.
-  targets.destructor_stack.set_current_node(old_stack_top);
+  targets.scope_stack.set_current_node(old_stack_top);
 }
 
 void goto_convertt::convert_expression(
@@ -653,7 +652,7 @@ void goto_convertt::convert_frontend_decl(
 
   {
     code_deadt code_dead(symbol_expr);
-    targets.destructor_stack.add(code_dead, {});
+    targets.scope_stack.add(code_dead, {});
   }
 
   // do destructor
@@ -665,7 +664,7 @@ void goto_convertt::convert_frontend_decl(
     address_of_exprt this_expr(symbol_expr, pointer_type(symbol.type));
     destructor.arguments().push_back(this_expr);
 
-    targets.destructor_stack.add(destructor, {});
+    targets.scope_stack.add(destructor, {});
   }
 }
 
@@ -1367,7 +1366,7 @@ void goto_convertt::convert_goto(const code_gotot &code, goto_programt &dest)
     dest.add(goto_programt::make_incomplete_goto(code, code.source_location()));
 
   // remember it to do the target later
-  targets.gotos.emplace_back(t, targets.destructor_stack.get_current_node());
+  targets.gotos.emplace_back(t, targets.scope_stack.get_current_node());
 }
 
 void goto_convertt::convert_gcc_computed_goto(
@@ -1391,7 +1390,7 @@ void goto_convertt::convert_start_thread(
 
   // remember it to do target later
   targets.gotos.emplace_back(
-    start_thread, targets.destructor_stack.get_current_node());
+    start_thread, targets.scope_stack.get_current_node());
 }
 
 void goto_convertt::convert_end_thread(
