@@ -616,12 +616,13 @@ void goto_convertt::convert_frontend_decl(
      symbol.type.id()==ID_code)
     return; // this is a SKIP!
 
-  if(code.operands().size()==1)
-  {
-    copy(code, DECL, dest);
-  }
-  else
-  {
+  const goto_programt::targett declaration_iterator = [&]() {
+    if(code.operands().size() == 1)
+    {
+      copy(code, DECL, dest);
+      return std::prev(dest.instructions.end());
+    }
+
     exprt initializer = code.op1();
 
     codet tmp=code;
@@ -632,6 +633,7 @@ void goto_convertt::convert_frontend_decl(
     // Break up into decl and assignment.
     // Decl must be visible before initializer.
     copy(tmp, DECL, dest);
+    const auto declaration_iterator = std::prev(dest.instructions.end());
 
     auto initializer_location = initializer.find_source_location();
     clean_expr(initializer, dest, mode);
@@ -643,7 +645,9 @@ void goto_convertt::convert_frontend_decl(
 
       convert_assign(assign, dest, mode);
     }
-  }
+
+    return declaration_iterator;
+  }();
 
   // now create a 'dead' instruction -- will be added after the
   // destructor created below as unwind_destructor_stack pops off the
@@ -652,7 +656,8 @@ void goto_convertt::convert_frontend_decl(
 
   {
     code_deadt code_dead(symbol_expr);
-    targets.scope_stack.add(code_dead, {});
+
+    targets.scope_stack.add(code_dead, {declaration_iterator});
   }
 
   // do destructor
