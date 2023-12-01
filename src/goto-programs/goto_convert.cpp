@@ -653,7 +653,7 @@ void goto_convertt::convert_frontend_decl(
 
   {
     code_deadt code_dead(symbol_expr);
-    targets.destructor_stack.add(code_dead);
+    targets.destructor_stack.add(code_dead, {});
   }
 
   // do destructor
@@ -665,7 +665,7 @@ void goto_convertt::convert_frontend_decl(
     address_of_exprt this_expr(symbol_expr, pointer_type(symbol.type));
     destructor.arguments().push_back(this_expr);
 
-    targets.destructor_stack.add(destructor);
+    targets.destructor_stack.add(destructor, {});
   }
 }
 

@@ -12,6 +12,8 @@
 #include <util/graph.h>
 #include <util/std_code_base.h>
 
+#include <goto-programs/goto_program.h>
+
 typedef std::size_t node_indext;
 
 /// Result of an attempt to find ancestor information about two nodes. Holds
@@ -94,9 +96,13 @@ public:
     this->destruction_graph.add_node();
   }
 
-  /// Adds a destructor to the current stack, attaching itself to the
-  /// current node.
-  void add(const codet &destructor);
+  /// Adds a destructor/declaration pair to the current stack, attaching it to
+  /// the current node.
+  /// \param destructor Code which is called when the current scope is left.
+  /// \param declaration Instruction which causes the scope to be entered.
+  void add(
+    const codet &destructor,
+    std::optional<goto_programt::targett> declaration);
 
   /// Fetches the destructor value for the passed-in node index.
   std::optional<codet> &get_destructor(node_indext index);

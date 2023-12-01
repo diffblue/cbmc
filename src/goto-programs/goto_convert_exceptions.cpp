@@ -34,7 +34,7 @@ void goto_convertt::convert_msc_try_finally(
 
     // first put 'finally' code onto destructor stack
     node_indext old_stack_top = targets.destructor_stack.get_current_node();
-    targets.destructor_stack.add(to_code(code.op1()));
+    targets.destructor_stack.add(to_code(code.op1()), {});
 
     // do 'try' code
     convert(to_code(code.op0()), dest, mode);
@@ -166,7 +166,7 @@ void goto_convertt::convert_CPROVER_try_catch(
 
   // Store the point before the temp catch code.
   node_indext old_stack_top = targets.destructor_stack.get_current_node();
-  targets.destructor_stack.add(catch_code);
+  targets.destructor_stack.add(catch_code, {});
 
   // now convert 'try' code
   convert(to_code(code.op0()), dest, mode);
@@ -221,7 +221,7 @@ void goto_convertt::convert_CPROVER_try_finally(
 
   // first put 'finally' code onto destructor stack
   node_indext old_stack_top = targets.destructor_stack.get_current_node();
-  targets.destructor_stack.add(to_code(code.op1()));
+  targets.destructor_stack.add(to_code(code.op1()), {});
 
   // do 'try' code
   convert(to_code(code.op0()), dest, mode);

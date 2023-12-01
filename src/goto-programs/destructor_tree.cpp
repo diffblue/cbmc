@@ -8,7 +8,9 @@
 
 #include "destructor_tree.h"
 
-void destructor_treet::add(const codet &destructor)
+void destructor_treet::add(
+  const codet &destructor,
+  std::optional<goto_programt::targett> declaration)
 {
   auto previous_node = get_current_node();
   auto new_node = destruction_graph.add_node(destructor);
