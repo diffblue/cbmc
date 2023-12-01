@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include "destructor_tree.h"
+#include "scope_tree.h"
 
 void scope_treet::add(
   const codet &destructor,

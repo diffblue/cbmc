@@ -12,18 +12,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_CLASS_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_CLASS_H
 
-#include <list>
-#include <vector>
-#include <unordered_set>
-
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/replace_expr.h>
 #include <util/std_code.h>
 
 #include "allocate_objects.h"
-#include "destructor_tree.h"
 #include "goto_program.h"
+#include "scope_tree.h"
+
+#include <list>
+#include <unordered_set>
+#include <vector>
 
 class side_effect_expr_overflowt;
 
