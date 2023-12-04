@@ -14,6 +14,8 @@
 
 #include <goto-programs/goto_program.h>
 
+#include <unordered_set>
+
 typedef std::size_t node_indext;
 
 /// Result of an attempt to find ancestor information about two nodes. Holds
@@ -90,6 +92,25 @@ public:
 class scope_treet
 {
 public:
+  struct declaration_statet
+  {
+    /// This is an iterator which points to the instruction where the
+    /// declaration takes place.
+    goto_programt::targett instruction;
+    /// In order to handle user goto statements which jump into a scope the
+    /// declaration may need to be followed by instructions which handle flags
+    /// which are intended to cause control flow to continue to a specific point
+    /// within that scope. The addition of the checks for each flag is performed
+    /// in a lazy fashion, as each goto which jumps into a scope is finalised.
+    /// In the case where multiple goto statements jump to the same label, a
+    /// flag and its associated control flow may be reused. This set is used
+    /// to track which flags have been accounted for in the code following this
+    /// declaration. Each additional goto for the same label may need to account
+    /// for more declarations. This is due to the possibility of different goto
+    /// statements causing additional declarations to be added to the scope.
+    std::unordered_set<irep_idt, irep_id_hash> accounted_flags;
+  };
+
   scope_treet()
   {
     // We add a default node to the graph to act as a root for path traversal.
@@ -108,7 +129,7 @@ public:
   std::optional<codet> &get_destructor(node_indext index);
 
   /// Fetches the declaration value for the passed-in node index.
-  std::optional<goto_programt::targett> &get_declaration(node_indext index);
+  std::optional<declaration_statet> &get_declaration(node_indext index);
 
   /// Builds a vector of destructors that start from starting_index and ends
   /// at end_index.
@@ -152,10 +173,10 @@ private:
 
     explicit scope_nodet(
       codet destructor,
-      std::optional<goto_programt::targett> declaration);
+      std::optional<declaration_statet> declaration);
 
     std::optional<codet> destructor_value;
-    std::optional<goto_programt::targett> declaration_value;
+    std::optional<declaration_statet> declaration;
   };
 
   grapht<scope_nodet> scope_graph;

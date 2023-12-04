@@ -13,7 +13,10 @@ void scope_treet::add(
   std::optional<goto_programt::targett> declaration)
 {
   auto previous_node = get_current_node();
-  auto new_node = scope_graph.add_node(destructor, declaration);
+  using declaration_optt = std::optional<declaration_statet>;
+  auto declaration_opt =
+    declaration ? declaration_optt{{*declaration}} : declaration_optt{};
+  auto new_node = scope_graph.add_node(destructor, std::move(declaration_opt));
   scope_graph.add_edge(previous_node, new_node);
   current_node = new_node;
 }
@@ -24,11 +27,11 @@ std::optional<codet> &scope_treet::get_destructor(node_indext index)
   return scope_graph[index].destructor_value;
 }
 
-std::optional<goto_programt::targett> &
+std::optional<scope_treet::declaration_statet> &
 scope_treet::get_declaration(node_indext index)
 {
   PRECONDITION(index < scope_graph.size());
-  return scope_graph[index].declaration_value;
+  return scope_graph[index].declaration;
 }
 
 const ancestry_resultt scope_treet::get_nearest_common_ancestor_info(
@@ -110,8 +113,7 @@ node_indext scope_treet::get_current_node() const
 
 scope_treet::scope_nodet::scope_nodet(
   codet destructor,
-  std::optional<goto_programt::targett> declaration)
-  : destructor_value(std::move(destructor)),
-    declaration_value(std::move(declaration))
+  std::optional<declaration_statet> declaration)
+  : destructor_value(std::move(destructor)), declaration(std::move(declaration))
 {
 }
