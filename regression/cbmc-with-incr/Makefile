@@ -1,10 +1,10 @@
 default: tests.log
 
 test:
-	@../test.pl -c "../../../src/cbmc/cbmc --incremental"
+	@../test.pl -c "../../../src/cbmc/cbmc --no-standard-checks --incremental"
 
 tests.log: ../test.pl
-	@../test.pl -c "../../../src/cbmc/cbmc --incremental"
+	@../test.pl -c "../../../src/cbmc/cbmc --no-standard-checks --incremental"
 
 clean:
 	@$(RM) *.log
