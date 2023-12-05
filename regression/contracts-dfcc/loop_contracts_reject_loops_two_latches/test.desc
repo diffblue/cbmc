@@ -1,10 +1,10 @@
 CORE dfcc-only
 main.c
 --dfcc main --apply-loop-contracts
-^Found loop with more than one latch instruction$
-^EXIT=(6|10)$
+^EXIT=10$
 ^SIGNAL=0$
 --
+^Found loop with more than one latch instruction$
 --
-This test checks that our loop contract instrumentation verifies that loops
-nested in loops with contracts also have contracts.
+This test checks that our loop contract instrumentation first transforms loops
+so as to only have a single loop latch.

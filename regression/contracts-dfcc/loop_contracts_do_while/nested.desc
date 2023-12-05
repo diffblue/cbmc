@@ -1,0 +1,9 @@
+KNOWNBUG
+nested.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+We spuriously report that x is not assignable.
