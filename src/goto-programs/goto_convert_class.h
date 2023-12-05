@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 
 class side_effect_expr_overflowt;
+struct build_declaration_hops_inputst;
 
 class goto_convertt:public messaget
 {
@@ -361,6 +362,11 @@ protected:
     const irep_idt &mode,
     std::optional<node_indext> destructor_start_point = {},
     std::optional<node_indext> destructor_end_point = {});
+
+  void build_declaration_hops(
+    goto_programt &dest,
+    std::unordered_map<irep_idt, symbolt, irep_id_hash> &label_flags,
+    const build_declaration_hops_inputst &inputs);
 
   //
   // gotos

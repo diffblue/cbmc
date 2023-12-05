@@ -93,6 +93,141 @@ static void finish_catch_push_targets(goto_programt &dest)
   }
 }
 
+struct build_declaration_hops_inputst
+{
+  irep_idt mode;
+  irep_idt label;
+  goto_programt::targett goto_instruction;
+  goto_programt::targett label_instruction;
+  node_indext label_scope_index = 0;
+  node_indext end_scope_index = 0;
+};
+
+void goto_convertt::build_declaration_hops(
+  goto_programt &program,
+  std::unordered_map<irep_idt, symbolt, irep_id_hash> &label_flags,
+  const build_declaration_hops_inputst &inputs)
+{
+  // In the case of a goto jumping into a scope, the declarations (but not the
+  // initialisations) need to be executed. This function performs a
+  // transformation from code that looks like -
+  //   {
+  //     statement_block_a();
+  //     if(...)
+  //       goto user_label;
+  //     statement_block_b();
+  //     int x;
+  //     x = 0;
+  //     statement_block_c();
+  //     int y;
+  //     y = 0;
+  //     statement_block_d();
+  //   user_label:
+  //     statement_block_e();
+  //   }
+  // to code which looks like -
+  //   {
+  //     __CPROVER_bool going_to::user_label;
+  //     going_to::user_label = false;
+  //     statement_block_a();
+  //     if(...)
+  //     {
+  //       going_to::user_label = true;
+  //       goto scope_x_label;
+  //     }
+  //     statement_block_b();
+  //   scope_x_label:
+  //     int x;
+  //     if going_to::user_label goto scope_y_label:
+  //     x = 0;
+  //     statement_block_c();
+  //   scope_y_label:
+  //     int y;
+  //     if going_to::user_label goto user_label:
+  //     y = 0;
+  //     statement_block_d();
+  //   user_label:
+  //     going_to::user_label = false;
+  //     statement_block_e();
+  //   }
+
+  PRECONDITION(inputs.label_scope_index != inputs.end_scope_index);
+
+  const auto flag = [&]() -> symbolt {
+    const auto existing_flag = label_flags.find(inputs.label);
+    if(existing_flag != label_flags.end())
+      return existing_flag->second;
+    source_locationt label_location =
+      inputs.label_instruction->source_location();
+    label_location.set_hide();
+    const symbolt &new_flag = get_fresh_aux_symbol(
+      bool_typet{},
+      "going_to",
+      id2string(inputs.label),
+      label_location,
+      inputs.mode,
+      symbol_table);
+    label_flags.emplace(inputs.label, new_flag);
+
+    // Create and initialise flag.
+    goto_programt flag_creation;
+    flag_creation.instructions.push_back(
+      goto_programt::make_decl(new_flag.symbol_expr(), label_location));
+    const auto make_clear_flag = [&]() -> goto_programt::instructiont {
+      return goto_programt::make_assignment(
+        new_flag.symbol_expr(), false_exprt{}, label_location);
+    };
+    flag_creation.instructions.push_back(make_clear_flag());
+    program.destructive_insert(program.instructions.begin(), flag_creation);
+
+    // Clear flag on arrival at label.
+    auto clear_on_arrival = make_clear_flag();
+    program.insert_before_swap(inputs.label_instruction, clear_on_arrival);
+    return new_flag;
+  }();
+
+  auto goto_instruction = inputs.goto_instruction;
+  {
+    // Set flag before the goto.
+    auto goto_location = goto_instruction->source_location();
+    goto_location.set_hide();
+    auto set_flag = goto_programt::make_assignment(
+      flag.symbol_expr(), true_exprt{}, goto_location);
+    program.insert_before_swap(goto_instruction, set_flag);
+    // Keep this iterator referring to the goto instruction, not the assignment.
+    ++goto_instruction;
+  }
+
+  auto target = inputs.label_instruction;
+  targets.scope_stack.set_current_node(inputs.label_scope_index);
+  while(targets.scope_stack.get_current_node() > inputs.end_scope_index)
+  {
+    node_indext current_node = targets.scope_stack.get_current_node();
+    auto &declaration = targets.scope_stack.get_declaration(current_node);
+    targets.scope_stack.descend_tree();
+    if(!declaration)
+      continue;
+
+    bool add_if = declaration->accounted_flags.find(flag.name) ==
+                  declaration->accounted_flags.end();
+    if(add_if)
+    {
+      auto declaration_location = declaration->instruction->source_location();
+      declaration_location.set_hide();
+      auto if_goto = goto_programt::make_goto(
+        target, flag.symbol_expr(), declaration_location);
+      program.instructions.insert(
+        std::next(declaration->instruction), std::move(if_goto));
+      declaration->accounted_flags.insert(flag.name);
+    }
+    target = declaration->instruction;
+  }
+
+  // Update the goto so that it goes to the first declaration rather than its
+  // original/final destination.
+  goto_instruction->set_target(target);
+}
+
 /*******************************************************************	\
 
 Function: goto_convertt::finish_gotos
@@ -107,6 +242,8 @@ Function: goto_convertt::finish_gotos
 
 void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
 {
+  std::unordered_map<irep_idt, symbolt, irep_id_hash> label_flags;
+
   for(const auto &g_it : targets.gotos)
   {
     goto_programt::instructiont &i=*(g_it.first);
@@ -174,17 +311,29 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         // goto_programt::instructionst is std::list.
       }
 
-      // We don't currently handle variables *entering* scope, which
-      // is illegal for C++ non-pod types and impossible in Java in any case.
-      // This is however valid C.
+      // Variables *entering* scope on goto, is illegal for C++ non-pod types
+      // and impossible in Java. However, with the exception of Variable Length
+      // Arrays (VLAs), this is valid C and should be taken into account.
       const bool variables_added_to_scope =
         intersection_result.right_depth_below_common_ancestor > 0;
       if(variables_added_to_scope)
       {
+        // If the goto recorded a destructor stack, execute as much as is
+        // appropriate for however many automatic variables leave scope.
         debug().source_location = i.source_location();
         debug() << "encountered goto '" << goto_label
                 << "' that enters one or more lexical blocks; "
-                << "omitting constructors." << eom;
+                << "adding declaration code on jump to '" << goto_label << "'"
+                << eom;
+
+        build_declaration_hops_inputst inputs;
+        inputs.mode = mode;
+        inputs.label = l_it->first;
+        inputs.goto_instruction = g_it.first;
+        inputs.label_instruction = l_it->second.first;
+        inputs.label_scope_index = label_target;
+        inputs.end_scope_index = intersection_result.common_ancestor;
+        build_declaration_hops(dest, label_flags, inputs);
       }
     }
     else

@@ -2,21 +2,21 @@ CORE
 main.c
 --unwind 10 --show-goto-functions --no-standard-checks
 activate-multi-line-match
-(?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*DEAD .*newAlloc0[\s]*(?P>comment_block)[\s]*DEAD .*pc[\s]*(?P>comment_block)[\s]*DEAD .*literal[\s]*(?P>comment_block)[\s]*8: END_FUNCTION
+(?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*DEAD .*newAlloc0[\s]*(?P>comment_block)[\s]*DEAD .*pc[\s]*(?P>comment_block)[\s]*DEAD .*literal[\s]*(?P>comment_block)[\s]*9: END_FUNCTION
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
 Checks for:
 
-       // 49 file main.c line 44 function main
-       DEAD main::1::newAlloc0
-       // 50 file main.c line 44 function main
-       DEAD main::1::pc
-       // 51 file main.c line 44 function main
-       DEAD main::$tmp::literal
-       // 52 file main.c line 45 function main
-    8: END_FUNCTION
+        // 57 file main.c line 44 function main
+        DEAD main::1::newAlloc0
+        // 58 file main.c line 44 function main
+        DEAD main::1::pc
+        // 59 file main.c line 44 function main
+        DEAD main::$tmp::literal
+        // 60 file main.c line 45 function main
+     9: END_FUNCTION
 
 This asserts that when you've created a compound literal that both temp and real
 variable gets killed.
