@@ -1,0 +1,12 @@
+CORE
+multiple_goto_single_label.c
+
+\[main\.assertion\.1\] line \d+ assertion i \=\= 3 \|\| m \=\= 9 \|\| l \=\= 3\: FAILURE
+\[main\.assertion\.2\] line \d+ assertion i \=\= 3 \|\| m \=\= 9 \|\| l \=\= 4\: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Test for the case where there are multiple gotos which target the same label
+and both introduce variables into the scope.

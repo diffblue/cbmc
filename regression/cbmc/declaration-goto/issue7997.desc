@@ -1,0 +1,12 @@
+CORE
+issue7997.c
+--trace
+\[main\.assertion\.1\] line \d+ assertion tmp_ndt_4 \> 0\: FAILURE
+return_value___VERIFIER_nondet_int=\-?[1-9]\d*
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+The assertion should be falsifiable when `goto switch_2_1` introduces
+`tmp_ndt_4` to the scope without initialising it.
