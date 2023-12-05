@@ -1,5 +1,7 @@
 var NAVTREEINDEX135 =
 {
+"structmz__zip__archive__file__stat.html#a952eb97b58881df827ce3808071e7754":[8,0,848,11],
+"structmz__zip__archive__file__stat.html#a9a7f0737f031b23a29c58fc7ff2bd131":[8,0,848,7],
 "structmz__zip__archive__file__stat.html#aa55ee3580a844400d4bd43be27ae3808":[8,0,848,16],
 "structmz__zip__archive__file__stat.html#aacf4d95d27894acac1303f51542c51b6":[8,0,848,3],
 "structmz__zip__archive__file__stat.html#ac9fdb10d21124d44be05ef0c04c1ad15":[8,0,848,0],
@@ -53,8 +55,6 @@ var NAVTREEINDEX135 =
 "structnfat_1_1transitiont.html#a89fc78b413759d84273d8a321c82d673":[8,0,862,1,1],
 "structnumeric__castt.html":[8,0,878],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html":[8,0,880],
-"new_8c.html#a902f40dabd30289e7b6fb861d724e54a":[9,0,2,5,0,1,4],
-"namespacerequire__type.html#a3cd16ad374dc241a1e4199a88a9858ca":[7,0,9,28],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#a01ab6a24156c250cb77e1a3827ec419d":[8,0,880,4],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#a03aa9941fb599001e15840f9d0dff895":[8,0,880,0],
 "structnumeric__castt_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1is__integral_3_01_t_01_4_1_1value_01_4_1_1type_01_4.html#a766843ef013ce7ffd0074b6e49c3c610":[8,0,880,2],
