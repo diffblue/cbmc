@@ -1,10 +1,10 @@
 default: tests.log
 
 test:
-	@../test.pl -e -p -c ../../../src/goto-analyzer/goto-analyzer
+	@../test.pl -e -p -c "../../../src/goto-analyzer/goto-analyzer --no-standard-checks"
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c ../../../src/goto-analyzer/goto-analyzer
+	@../test.pl -e -p -c "../../../src/goto-analyzer/goto-analyzer --no-standard-checks"
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
