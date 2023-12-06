@@ -126,10 +126,9 @@ public:
     return {};
   }
 
-  literalt lselect(literalt, literalt, literalt) override
+  literalt lselect(literalt c, literalt t, literalt f) override
   {
-    UNREACHABLE;
-    return {};
+    return to_literal((to_bdd(!c) | to_bdd(t)) & (to_bdd(c) | to_bdd(f)));
   }
 
   void lcnf(const bvt &) override

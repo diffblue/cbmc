@@ -79,6 +79,8 @@ public:
   bvt shift(const bvt &op, const shiftt shift, const bvt &distance);
 
   bvt unsigned_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_karatsuba_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_toom_cook_multiplier(const bvt &op0, const bvt &op1);
   bvt signed_multiplier(const bvt &op0, const bvt &op1);
   bvt multiplier(const bvt &op0, const bvt &op1, representationt rep);
   bvt multiplier_no_overflow(
