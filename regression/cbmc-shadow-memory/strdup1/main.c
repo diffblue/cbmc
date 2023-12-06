@@ -8,6 +8,9 @@ int main()
   __CPROVER_field_decl_global("field1", (unsigned __CPROVER_bitvector[2])0);
 
   char *s = (char *)malloc(3 * sizeof(char));
+  // Terminate string so that `strdup` will not call `strlen`
+  // on a string without a null-terminator.
+  s[2] = '\0';
   assert(__CPROVER_get_field(&s[0], "field1") == 0);
   assert(__CPROVER_get_field(&s[1], "field1") == 0);
 
