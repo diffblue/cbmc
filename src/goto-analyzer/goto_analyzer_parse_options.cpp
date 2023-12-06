@@ -56,6 +56,25 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
 {
 }
 
+void goto_analyzer_parse_optionst::set_default_analysis_flags(optionst &options)
+{
+  // Checks enabled by default in v6.0+.
+  options.set_option("bounds-check", true);
+  options.set_option("pointer-check", true);
+  options.set_option("pointer-primitive-check", true);
+  options.set_option("div-by-zero-check", true);
+  options.set_option("signed-overflow-check", true);
+  options.set_option("undefined-shift-check", true);
+
+  // Default malloc failure profile chosen to be returning null.
+  options.set_option("malloc-may-fail", true);
+  options.set_option("malloc-fail-null", true);
+
+  // This is in-line with the options we set for CBMC in cbmc_parse_optionst
+  // with the exception of unwinding-assertions, which don't make sense in
+  // the context of abstract interpretation.
+}
+
 void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
@@ -67,7 +86,19 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("function"))
     options.set_option("function", cmdline.get_value("function"));
 
-  // all checks supported by goto_check
+  // Enable flags that in combination provide analysis with no surprises
+  // (expected checks and no unsoundness by missing checks).
+  if(!cmdline.isset("no-standard-checks"))
+  {
+    goto_analyzer_parse_optionst::set_default_analysis_flags(options);
+    PARSE_OPTIONS_GOTO_CHECK_NEGATIVE_DEFAULT_CHECKS(cmdline, options);
+  }
+  else if(cmdline.isset("no-standard-checks"))
+  {
+    PARSE_OPTIONS_GOTO_CHECK_POSITIVE_DEFAULT_CHECKS(cmdline, options);
+  }
+
+  // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // The user should either select:
