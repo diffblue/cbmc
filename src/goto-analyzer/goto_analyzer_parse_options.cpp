@@ -66,7 +66,9 @@ void goto_analyzer_parse_optionst::set_default_analysis_flags(optionst &options)
   options.set_option("signed-overflow-check", true);
   options.set_option("undefined-shift-check", true);
 
-  // Default malloc failure profile chosen to be returning null.
+  // Default malloc failure profile chosen to be returning null. These options
+  // are not strictly *needed*, but they are staying here as part of documentation
+  // of the default option set for the tool.
   options.set_option("malloc-may-fail", true);
   options.set_option("malloc-fail-null", true);
 
@@ -91,11 +93,24 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(!cmdline.isset("no-standard-checks"))
   {
     goto_analyzer_parse_optionst::set_default_analysis_flags(options);
+    // The malloc failure mode is by default handled by the `config.set` call
+    // which only looks at the `cmdline` flags. In the case of default checks,
+    // these haven't been set - we need to overwrite the config object to manually
+    // bootstrap the malloc-may-fail behaviour
+    if(!config.ansi_c.malloc_may_fail && options.is_set("malloc-may-fail"))
+    {
+      config.ansi_c.malloc_may_fail = true;
+      config.ansi_c.malloc_failure_mode =
+        configt::ansi_ct::malloc_failure_modet::malloc_failure_mode_return_null;
+    }
     PARSE_OPTIONS_GOTO_CHECK_NEGATIVE_DEFAULT_CHECKS(cmdline, options);
   }
   else if(cmdline.isset("no-standard-checks"))
   {
     PARSE_OPTIONS_GOTO_CHECK_POSITIVE_DEFAULT_CHECKS(cmdline, options);
+    // If the user opts for no standard checks, it's safe to assume he also
+    // wants to control the malloc failure behaviour, in which case we can
+    // also assume that it's going to be setup in the `config.set` call above.
   }
 
   // all (other) checks supported by goto_check
