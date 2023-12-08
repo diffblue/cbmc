@@ -52,33 +52,47 @@ void goto_check_c(
   "(no-pointer-primitive-check)(no-undefined-shift-check)"                     \
   "(no-div-by-zero-check)"
 
-#define HELP_GOTO_CHECK                                                        \
-  " {y--bounds-check} \t enable array bounds checks\n"                         \
-  " {y--pointer-check} \t enable pointer checks\n"                             \
+// clang-format off
+#define HELP_GOTO_CHECK \
+  " {y--no-standard-checks} \t disable default checks (more information in manpage)" /* NOLINT(whitespace/line_length) */ \
+  " {y--bounds-check} \t enable array bounds checks (default on)\n"            \
+  " {y--no-bounds-check} \t disable array bounds checks\n"                     \
+  " {y--pointer-check} \t enable pointer checks (default on)\n"                \
+  " {y--no-pointer-check} \t disable pointer checks\n"                         \
   " {y--memory-leak-check} \t enable memory leak checks\n"                     \
   " {y--memory-cleanup-check} \t enable memory cleanup checks\n"               \
-  " {y--div-by-zero-check} \t enable division by zero checks\n"                \
+  " {y--div-by-zero-check} \t enable division by zero checks (default on)\n"   \
+  " {y--no-div-by-zero-check} \t disable division by zero checks\n"            \
   " {y--signed-overflow-check} \t "                                            \
-  "enable signed arithmetic over- and underflow checks\n"                      \
+  "enable signed arithmetic over- and underflow checks (default on)\n"         \
+  " {y--no-signed-overflow-check} \t "                                         \
+  "disable signed arithmetic over- and underflow checks\n"                     \
   " {y--unsigned-overflow-check} \t "                                          \
   "enable arithmetic over- and underflow checks\n"                             \
   " {y--pointer-overflow-check} \t "                                           \
   "enable pointer arithmetic over- and underflow checks\n"                     \
   " {y--conversion-check} \t "                                                 \
   "check whether values can be represented after type cast\n"                  \
-  " {y--undefined-shift-check} \t check shift greater than bit-width\n"        \
+  " {y--undefined-shift-check} \t check shift greater than bit-width "         \
+  "(default on)\n"                                                             \
+  " {y--no-undefined-shift-check} \t disable check for shift greater than "    \
+  "bit-width\n"                                                                \
   " {y--float-overflow-check} \t check floating-point for +/-Inf\n"            \
   " {y--nan-check} \t check floating-point for NaN\n"                          \
   " {y--enum-range-check} \t "                                                 \
   "checks that all enum type expressions have values in the enum range\n"      \
   " {y--pointer-primitive-check} \t "                                          \
-  "checks that all pointers in pointer primitives are valid or null\n"         \
+  "checks that all pointers in pointer primitives are valid or null (default " \
+  "on)\n"                                                                      \
+  " {y--no-pointer-primitive-check} \t "                                       \
+  "disable checks that all pointers in pointer primitives are valid or null\n" \
   " {y--retain-trivial-checks} \t include checks that are trivially true\n"    \
   " {y--error-label} {ulabel} \t check that label {ulabel} is unreachable\n"   \
   " {y--no-built-in-assertions} \t ignore assertions in built-in library\n"    \
   " {y--no-assertions} \t ignore user assertions\n"                            \
   " {y--no-assumptions} \t ignore user assumptions\n"                          \
   " {y--assert-to-assume} \t convert user assertions to assumptions\n"
+// clang-format on
 
 // clang-format off
  #define PARSE_OPTIONS_GOTO_CHECK_NEGATIVE_DEFAULT_CHECKS(cmdline, options) \
