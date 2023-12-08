@@ -21,4 +21,4 @@ else
   $goto_cc "${main}.gb" "${next}.gb" -o "final.gb"
 fi
 
-$cbmc --validate-goto-model "final.gb"
+$cbmc --no-standard-checks --validate-goto-model "final.gb"
