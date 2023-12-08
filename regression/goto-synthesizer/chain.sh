@@ -57,5 +57,5 @@ if echo $args_synthesizer | grep -q -- "--dump-loop-contracts" ; then
 else
   $goto_synthesizer ${args_synthesizer} "${name}-mod.gb" "${name}-mod-2.gb"
   echo "Running CBMC: "
-  $cbmc ${args_cbmc} "${name}-mod-2.gb"
+  $cbmc --no-standard-checks ${args_cbmc} "${name}-mod-2.gb"
 fi
