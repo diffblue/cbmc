@@ -1,6 +1,6 @@
 CORE
 main.c
-lib.c
+--no-standard-checks lib.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

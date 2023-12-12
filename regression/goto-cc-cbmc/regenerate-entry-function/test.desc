@@ -1,6 +1,6 @@
 CORE
 main.c
-'--function fun'
+--no-standard-checks '--function fun'
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
