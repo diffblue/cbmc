@@ -17,7 +17,7 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
     [ "count_eloc.h", "count__eloc_8h.html", "count__eloc_8h" ],
     [ "cover.cpp", "cover_8cpp.html", "cover_8cpp" ],
     [ "cover.h", "cover_8h.html", "cover_8h" ],
-    [ "cover_basic_blocks.cpp", "cover__basic__blocks_8cpp.html", null ],
+    [ "cover_basic_blocks.cpp", "cover__basic__blocks_8cpp.html", "cover__basic__blocks_8cpp" ],
     [ "cover_basic_blocks.h", "cover__basic__blocks_8h.html", [
       [ "cover_blocks_baset", "classcover__blocks__baset.html", "classcover__blocks__baset" ],
       [ "cover_basic_blockst", "classcover__basic__blockst.html", "classcover__basic__blockst" ],

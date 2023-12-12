@@ -1,6 +1,5 @@
 var NAVTREEINDEX69 =
 {
-"classunsupported__operation__exceptiont.html#afcfc52e588da86cdebffc468b4aaab12":[8,0,1320,0],
 "classunwindsett.html":[8,0,1321],
 "classunwindsett.html#a05c9336ffcfa98048cb54101e636a865":[8,0,1321,10],
 "classunwindsett.html#a3307f9d27beb3d69fd77e15933ca68b6":[8,0,1321,7],
@@ -249,5 +248,6 @@ var NAVTREEINDEX69 =
 "classvalue__set__fit_1_1object__map__dt.html#ae8afd1120feeb59414d640340ab7e741":[8,0,1336,1,5],
 "classvalue__set__fit_1_1object__map__dt.html#ae9835d9f9ee11fd6419845cd8a3acb33":[8,0,1336,1,0],
 "classvalue__set__fit_1_1object__map__dt.html#af4e23d6b5914b9ca18bc2f2fe5a0c3ac":[8,0,1336,1,8],
-"classvalue__set__fit_1_1object__map__dt.html#af9058904f1aafc73df583c354651a8e1":[8,0,1336,1,15]
+"classvalue__set__fit_1_1object__map__dt.html#af9058904f1aafc73df583c354651a8e1":[8,0,1336,1,15],
+"classvalue__set__fit_1_1object__map__dt.html#af96a71b0c11d7e5865688cb7feef0196":[8,0,1336,1,14]
 };
