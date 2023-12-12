@@ -1,6 +1,6 @@
 CORE
 Linking7-main.c
-Linking7-module2.c
+--no-standard-checks Linking7-module2.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
