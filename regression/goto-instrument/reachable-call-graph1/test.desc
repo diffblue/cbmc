@@ -1,6 +1,6 @@
 CORE
 main.c
---reachable-call-graph
+--no-standard-checks --reachable-call-graph
 ^EXIT=0$
 ^SIGNAL=0$
 ^main -> func2$

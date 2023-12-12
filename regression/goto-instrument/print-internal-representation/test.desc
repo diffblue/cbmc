@@ -1,6 +1,6 @@
 CORE
 main.c
---print-internal-representation
+--no-standard-checks --print-internal-representation
 ^EXIT=0$
 ^SIGNAL=0$
 \* identifier: __CPROVER_initialize$

@@ -1,6 +1,6 @@
 CORE
 main.c
---constant-propagator
+--no-standard-checks --constant-propagator
 ^EXIT=10$
 ^SIGNAL=0$
 Removing returns

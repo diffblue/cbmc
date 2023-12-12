@@ -1,6 +1,6 @@
 CORE
 main.c
---aggressive-slice --aggressive-slice-call-depth 1
+--no-standard-checks --aggressive-slice --aggressive-slice-call-depth 1
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

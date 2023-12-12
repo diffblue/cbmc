@@ -1,6 +1,6 @@
 CORE
 main.c
---reachability-slice
+--no-standard-checks --reachability-slice
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

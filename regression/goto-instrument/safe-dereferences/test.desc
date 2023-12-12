@@ -1,6 +1,6 @@
 CORE
 main.c
---show-safe-dereferences
+--no-standard-checks --show-safe-dereferences
 ^EXIT=0$
 ^SIGNAL=0$
 Safe \(known-not-null\) dereferences: \{main::[0-9]+::ptr1\}

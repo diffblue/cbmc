@@ -1,6 +1,6 @@
 CORE
 main.c
---full-slice
+--no-standard-checks --full-slice
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

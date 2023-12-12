@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --full-slice
+--no-standard-checks --pointer-check --full-slice
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

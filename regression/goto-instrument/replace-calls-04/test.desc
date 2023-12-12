@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-calls f:g
+--no-standard-checks --replace-calls f:g
 functions f and g are not type-compatible
 ^EXIT=1$
 ^SIGNAL=0$

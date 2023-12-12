@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-calls f:g
+--no-standard-checks --replace-calls f:g
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

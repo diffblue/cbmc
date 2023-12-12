@@ -1,6 +1,6 @@
 CORE
 main.c
---fp-reachability-slice c
+--no-standard-checks --fp-reachability-slice c
 ^EXIT=0$
 ^SIGNAL=0$
 1: ASSUME false

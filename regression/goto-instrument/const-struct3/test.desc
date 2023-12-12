@@ -1,6 +1,6 @@
 CORE
 main.c
---dump-c
+--no-standard-checks --dump-c
 ^\s*const struct struct_tag_name my_struct_var
 ^\s*const double z
 ^EXIT=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---splice-call main,moo
+--no-standard-checks --splice-call main,moo
 activate-multi-line-match
 moo\(\)\n.*function main.*
 ^EXIT=0$

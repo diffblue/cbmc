@@ -1,6 +1,6 @@
 CORE
 test.c
---nondet-volatile-model a:model
+--no-standard-checks --nondet-volatile-model a:model
 ^Invalid User Input$
 return type of model .* is not compatible with the type of the modelled variable
 ^EXIT=1$

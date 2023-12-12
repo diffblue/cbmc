@@ -1,6 +1,6 @@
 CORE
 test.c
---show-lexical-loops
+--no-standard-checks --show-lexical-loops
 ^Note not all loops were in lexical loop form$
 ^2 is head of \{ 2, 3, 4, 5 \(backedge\) \}
 ^EXIT=0$

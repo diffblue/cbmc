@@ -1,6 +1,6 @@
 CORE
 main.c
---model-argc-argv 3 --dump-c --harness
+--no-standard-checks --model-argc-argv 3 --dump-c --harness
 ^EXIT=0$
 ^SIGNAL=0$
 Adding up to 3 command line arguments

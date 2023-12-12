@@ -1,6 +1,6 @@
 CORE
 main.c
---show-escape-analysis
+--no-standard-checks --show-escape-analysis
 ^EXIT=0$
 ^SIGNAL=0$
 ^Aliases:.*(malloc.*leaked|leaked.*malloc)

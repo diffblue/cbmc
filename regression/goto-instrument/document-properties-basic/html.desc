@@ -1,6 +1,6 @@
 CORE
 main.c
---document-properties-html
+--no-standard-checks --document-properties-html
 ^EXIT=0$
 ^SIGNAL=0$
 ^\s*\d+&nbsp;&nbsp;<em>  assert\(1 == 1\);<\/em>$

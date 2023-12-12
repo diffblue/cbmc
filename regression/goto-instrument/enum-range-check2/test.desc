@@ -1,6 +1,6 @@
 CORE
 main.c
---enum-range-check
+--no-standard-checks --enum-range-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

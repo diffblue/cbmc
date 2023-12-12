@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-calls f:g --replace-calls h:i
+--no-standard-checks --replace-calls f:g --replace-calls h:i
 g\(\)
 i\(\)
 ^VERIFICATION SUCCESSFUL$

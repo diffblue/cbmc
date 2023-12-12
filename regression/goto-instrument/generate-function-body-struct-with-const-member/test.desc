@@ -1,6 +1,6 @@
 CORE
 main.c
---generate-function-body 'havoc_struct' --generate-function-body-options 'havoc,params:.*,globals:(?!__).*'
+--no-standard-checks --generate-function-body 'havoc_struct' --generate-function-body-options 'havoc,params:.*,globals:(?!__).*'
 ^SIGNAL=0$
 ^EXIT=10$
 ^\[main.assertion.1\] .* assertion globalStruct.non_const == 10: FAILURE$

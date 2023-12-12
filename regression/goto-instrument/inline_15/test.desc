@@ -1,6 +1,6 @@
 CORE
 main.c
---function-inline main --log - --no-caching --verbosity 9
+--no-standard-checks --function-inline main --log - --no-caching --verbosity 9
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

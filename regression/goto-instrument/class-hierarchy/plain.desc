@@ -1,5 +1,5 @@
 CORE
 main.c
---show-class-hierarchy
+--no-standard-checks --show-class-hierarchy
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 package1/file.c package2/file.c main.c
---nondet-static-exclude package1/file.c:myVal --nondet-static-exclude package2/file.c:myVal2
+--no-standard-checks --nondet-static-exclude package1/file.c:myVal --nondet-static-exclude package2/file.c:myVal2
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 9 --unwinding-assertions
+--no-standard-checks --unwind 9 --unwinding-assertions
 ^\[main.assertion.1\] line 6 fails when fully unwinding the loop: SUCCESS$
 ^\*\* 1 of 2 failed
 ^EXIT=10$

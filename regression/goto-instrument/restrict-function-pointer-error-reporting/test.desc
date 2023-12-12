@@ -1,6 +1,6 @@
 CORE
 main.c
---restrict-function-pointer fun_ptr.function_pointer_call.1/foo
+--no-standard-checks --restrict-function-pointer fun_ptr.function_pointer_call.1/foo
 ^Reason: fun_ptr.function_pointer_call.1 not found in the symbol table$
 ^EXIT=1$
 ^SIGNAL=0$

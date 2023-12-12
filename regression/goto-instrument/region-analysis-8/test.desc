@@ -1,6 +1,6 @@
 CORE
 test.c
---show-sese-regions
+--no-standard-checks --show-sese-regions
 ^Function contains 3 single-entry, single-exit regions:$
 ^Region starting at \(5, [0-9]+\) .*::y := 0 ends at \(10, [0-9]+\) 3: SKIP$
 ^Region starting at \(0, [0-9]+\) IF .*5.* THEN GOTO 5 ends at \(18, [0-9]+\) 6: SKIP$

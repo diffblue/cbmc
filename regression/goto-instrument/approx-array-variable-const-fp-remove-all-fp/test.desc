@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --remove-function-pointers
+--no-standard-checks --pointer-check --remove-function-pointers
 ^\s*IF fp_tbl\[.*i.*\] = address_of\(f2\) THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[.*i.*\] = address_of\(f3\) THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[.*i.*\] = address_of\(f4\) THEN GOTO [0-9]$

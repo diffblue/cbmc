@@ -1,6 +1,6 @@
 CORE
 main.c
---full-slice --add-library
+--no-standard-checks --full-slice --add-library
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

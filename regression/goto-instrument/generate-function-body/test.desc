@@ -1,6 +1,6 @@
 CORE
 main.c
---generate-function-body '(?!__).*' --generate-function-body-options assert-false
+--no-standard-checks --generate-function-body '(?!__).*' --generate-function-body-options assert-false
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

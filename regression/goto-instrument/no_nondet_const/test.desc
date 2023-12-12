@@ -1,6 +1,6 @@
 CORE
 main.c
---nondet-static
+--no-standard-checks --nondet-static
 ^EXIT=0$
 ^SIGNAL=0$
 --

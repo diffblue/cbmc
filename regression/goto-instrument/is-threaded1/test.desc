@@ -1,6 +1,6 @@
 CORE
 main.c
---show-threaded
+--no-standard-checks --show-threaded
 activate-multi-line-match
 ASSIGN x := 2\nIs threaded: True
 ^EXIT=0$

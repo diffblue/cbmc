@@ -1,6 +1,6 @@
 CORE
 ../../cbmc/Recursion6/main.c
---show-reaching-definitions
+--no-standard-checks --show-reaching-definitions
 activate-multi-line-match
 recursion::1::some_local\[0:32@\d+\]\n(\s+(__CPROVER|recursion).*\n)*\s*\n\s+//.*\n\s+ASSERT .*recursion::1::some_local = 1
 ^EXIT=0$

@@ -1,6 +1,6 @@
 CORE
 test.c
---show-lexical-loops
+--no-standard-checks --show-lexical-loops
 ^Note not all loops were in lexical loop form$
 ^EXIT=0$
 ^SIGNAL=0$

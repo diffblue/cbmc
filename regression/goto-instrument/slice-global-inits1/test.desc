@@ -1,6 +1,6 @@
 CORE
 main.c
---slice-global-inits
+--no-standard-checks --slice-global-inits
 z := 0$
 a :=
 s2 :=

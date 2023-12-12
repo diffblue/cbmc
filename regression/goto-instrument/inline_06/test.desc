@@ -1,6 +1,6 @@
 CORE
 main.c
---partial-inline
+--no-standard-checks --partial-inline
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

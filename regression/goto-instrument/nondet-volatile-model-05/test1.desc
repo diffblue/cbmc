@@ -1,6 +1,6 @@
 CORE
 test.c
---nondet-volatile-model a:model_a --nondet-volatile-model a:model_b
+--no-standard-checks --nondet-volatile-model a:model_a --nondet-volatile-model a:model_b
 ^Invalid User Input$
 conflicting models for variable
 ^EXIT=1$

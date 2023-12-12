@@ -1,6 +1,6 @@
 CORE
 main.c
---nondet-static-matching '.*\.c:.*nondet.*'
+--no-standard-checks --nondet-static-matching '.*\.c:.*nondet.*'
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

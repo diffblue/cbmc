@@ -1,6 +1,6 @@
 CORE
 test.c
---value-set-fi-fp-removal
+--no-standard-checks --value-set-fi-fp-removal
 ^EXIT=0$
 ^SIGNAL=0$
 ^  function: f$

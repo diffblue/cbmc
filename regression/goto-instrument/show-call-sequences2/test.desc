@@ -1,6 +1,6 @@
 CORE
 main.c
---show-call-sequences
+--no-standard-checks --show-call-sequences
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

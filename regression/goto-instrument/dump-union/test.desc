@@ -1,6 +1,6 @@
 CORE
 main.c
---dump-c
+--no-standard-checks --dump-c
 =(\(signed int \*\))?42
 VERIFICATION SUCCESSFUL
 ^EXIT=0$

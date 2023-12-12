@@ -1,6 +1,6 @@
 CORE
 test.c
---nondet-volatile
+--no-standard-checks --nondet-volatile
 ^EXIT=10$
 ^SIGNAL=0$
 --

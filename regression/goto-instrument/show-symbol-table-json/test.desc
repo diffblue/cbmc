@@ -1,6 +1,6 @@
 CORE
 test.c
---show-symbol-table --json-ui
+--no-standard-checks --show-symbol-table --json-ui
 "symbolTable": \{
 "main": \{
 "main::1::x": \{

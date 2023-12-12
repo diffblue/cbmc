@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^\[main.array_bounds.\d+\] line \d+ array 'a' upper bound in a\[(\(signed .* int\))?2\]: FAILURE
 ^VERIFICATION FAILED
 ^EXIT=10$

@@ -1,6 +1,6 @@
 CORE
 main.c
---model-argc-argv 2
+--no-standard-checks --model-argc-argv 2
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

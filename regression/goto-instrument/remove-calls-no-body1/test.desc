@@ -1,6 +1,6 @@
 CORE
 main.c
---remove-calls-no-body
+--no-standard-checks --remove-calls-no-body
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

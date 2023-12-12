@@ -1,6 +1,6 @@
 CORE
 main.c
---dump-c --use-all-headers
+--no-standard-checks --dump-c --use-all-headers
 #include <(stdint.h|_types/_intmax_t.h)>
 intmax_t
 ^EXIT=0$

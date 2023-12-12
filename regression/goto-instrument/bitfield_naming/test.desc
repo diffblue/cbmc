@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --json-ui
+--no-standard-checks --show-goto-functions --json-ui
 ^EXIT=0$
 ^SIGNAL=0$
 BF1\{U8\}\'b11\'

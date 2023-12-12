@@ -1,6 +1,6 @@
 CORE
 main.c
---generate-function-body touches_parameter --generate-function-body-options 'havoc,params:0;2'
+--no-standard-checks --generate-function-body touches_parameter --generate-function-body-options 'havoc,params:0;2'
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

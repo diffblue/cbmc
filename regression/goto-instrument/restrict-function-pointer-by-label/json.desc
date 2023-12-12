@@ -1,6 +1,6 @@
 CORE
 test.c
---function-pointer-restrictions-file restriction.json
+--no-standard-checks --function-pointer-restrictions-file restriction.json
 \[use_f\.assertion\.1\] line \d+ assertion fptr\(10\) == 11: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$

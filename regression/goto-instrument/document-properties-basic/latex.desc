@@ -1,6 +1,6 @@
 CORE
 main.c
---document-properties-latex
+--no-standard-checks --document-properties-latex
 ^EXIT=0$
 ^SIGNAL=0$
 ^\\claim\{assertion 1 == 1\}$

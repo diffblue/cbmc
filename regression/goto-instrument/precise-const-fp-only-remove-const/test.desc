@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --remove-const-function-pointers
+--no-standard-checks --pointer-check --remove-const-function-pointers
 ^\s*CALL f2\(\)
 ^EXIT=0$
 ^SIGNAL=0$

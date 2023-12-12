@@ -1,6 +1,6 @@
 CORE
 main.c
---show-call-sequences
+--no-standard-checks --show-call-sequences
 ^SIGNAL=0$
 ^EXIT=0$
 recurse -> recurse

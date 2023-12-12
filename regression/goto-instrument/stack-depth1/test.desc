@@ -1,6 +1,6 @@
 CORE
 main.c
---stack-depth 2
+--no-standard-checks --stack-depth 2
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL

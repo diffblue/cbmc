@@ -1,6 +1,6 @@
 CORE
 main.c
---show-symbol-table
+--no-standard-checks --show-symbol-table
 ^Type\.*: volatile struct struct_tag_name$
 ^Type\.*: const double$
 ^EXIT=0$

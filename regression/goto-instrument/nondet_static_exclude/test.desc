@@ -1,6 +1,6 @@
 CORE
 main_1.c main.c 
---nondet-static --nondet-static-exclude test1 --nondet-static-exclude test3 --nondet-static-exclude test4 --nondet-static-exclude main_1.c:value
+--no-standard-checks --nondet-static --nondet-static-exclude test1 --nondet-static-exclude test3 --nondet-static-exclude test4 --nondet-static-exclude main_1.c:value
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 test.c
---nondet-volatile
+--no-standard-checks --nondet-volatile
 ^\[main.assertion.1\] line \d+ assertion x == y: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---constant-propagator
+--no-standard-checks --constant-propagator
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL

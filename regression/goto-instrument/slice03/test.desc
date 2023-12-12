@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 10 --pointer-check --bounds-check --full-slice
+--no-standard-checks --unwind 10 --pointer-check --bounds-check --full-slice
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 main.c
---generate-function-body touches_globals --generate-function-body-options 'havoc,globals:(?!__).*'
+--no-standard-checks --generate-function-body touches_globals --generate-function-body-options 'havoc,globals:(?!__).*'
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

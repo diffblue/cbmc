@@ -1,6 +1,6 @@
 CORE
 main.c
---generate-function-body 'havoc_complex_struct' --generate-function-body-options 'havoc,params:.*'
+--no-standard-checks --generate-function-body 'havoc_complex_struct' --generate-function-body-options 'havoc,params:.*'
 ^SIGNAL=0$
 ^EXIT=10$
 \[main.assertion.1\] .* assertion main_struct.pointer_contents->struct_contents.some_variable == 11: SUCCESS

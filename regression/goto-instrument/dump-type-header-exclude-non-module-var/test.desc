@@ -1,6 +1,6 @@
 CORE
 main.c
---dump-c-type-header main 
+--no-standard-checks --dump-c-type-header main 
 ^EXIT=10$
 ^SIGNAL=0$
 struct B

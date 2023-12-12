@@ -1,6 +1,6 @@
 CORE
 main.c
---dump-c
+--no-standard-checks --dump-c
 enum hex \{ .* \};
 h=/\*enum\*/V10;
 ^EXIT=0$

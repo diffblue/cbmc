@@ -1,6 +1,6 @@
 CORE
 main.c
---fp-reachability-slice a,c
+--no-standard-checks --fp-reachability-slice a,c
 ^EXIT=0$
 ^SIGNAL=0$
 DEAD .*::d

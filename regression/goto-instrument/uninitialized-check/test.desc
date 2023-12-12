@@ -1,6 +1,6 @@
 CORE
 main.c
---uninitialized-check
+--no-standard-checks --uninitialized-check
 ^\[main.uninitialized_local.1\] line \d+ use of uninitialized local variable main::1::definitely_uninitialized: FAILURE$
 ^\[main.uninitialized_local.2\] line \d+ use of uninitialized local variable main::1::maybe_uninitialized: FAILURE$
 ^\[main.uninitialized_local.3\] line \d+ use of uninitialized local variable main::1::actually_initialized: SUCCESS$

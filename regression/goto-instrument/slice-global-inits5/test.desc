@@ -1,6 +1,6 @@
 CORE
 main.c
---remove-function-pointers --slice-global-inits
+--no-standard-checks --remove-function-pointers --slice-global-inits
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
