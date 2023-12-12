@@ -1,6 +1,6 @@
 CORE
 test.c
---function test_function --harness-type call-function
+--no-standard-checks --function test_function --harness-type call-function
 \[test_function\.assertion\.1\] line \d+ assertion test != 42
 ^EXIT=10$
 ^SIGNAL=0$

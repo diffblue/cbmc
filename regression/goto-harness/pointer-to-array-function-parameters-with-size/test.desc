@@ -1,6 +1,6 @@
 CORE
 test.c
---harness-type call-function --function test --treat-pointer-as-array arr --associated-array-size arr:sz
+--no-standard-checks --harness-type call-function --function test --treat-pointer-as-array arr --associated-array-size arr:sz
 ^EXIT=0$
 ^SIGNAL=0$
 \[test.pointer_dereference.1\] line \d+ dereference failure: pointer NULL in arr\[(\(signed( long)* int\))?i\]: SUCCESS

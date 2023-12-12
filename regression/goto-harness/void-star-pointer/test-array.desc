@@ -1,6 +1,6 @@
 CORE
 main.c
---harness-type call-function --function test_void_array
+--no-standard-checks --harness-type call-function --function test_void_array
 \[test_void_array\.assertion\.1\] line \d+ assertion input_array\[0\] == 0: SUCCESS
 \[test_void_array\.assertion\.2\] line \d+ assertion .*: FAILURE
 ^VERIFICATION FAILED$

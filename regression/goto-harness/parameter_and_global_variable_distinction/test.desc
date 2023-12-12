@@ -1,6 +1,6 @@
 CORE
 test.c
---harness-type call-function --function function --function-pointer-can-be-null function::f
+--no-standard-checks --harness-type call-function --function function --function-pointer-can-be-null function::f
 ^EXIT=10$
 ^SIGNAL=0$
 \[function.assertion.1\] line \d+ assertion f\(\) == call_f\(\): SUCCESS

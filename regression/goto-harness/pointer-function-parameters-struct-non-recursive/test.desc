@@ -1,6 +1,6 @@
 CORE
 main.c
---function func --min-null-tree-depth 10 --harness-type call-function
+--no-standard-checks --function func --min-null-tree-depth 10 --harness-type call-function
 ^EXIT=10$
 ^SIGNAL=0$
 \[func.assertion.1\] line [0-9]+ assertion p != .*((NULL)|0).*: SUCCESS

@@ -1,6 +1,6 @@
 CORE
 main.c
---harness-type call-function --function test_function --treat-pointer-as-array input
+--no-standard-checks --harness-type call-function --function test_function --treat-pointer-as-array input
 \[test_function\.assertion\.1\] line \d+ assertion input == 0: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
