@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 \[main.assertion.1\] line \d+ assertion __CPROVER_POINTER_OFFSET\(p\) >= 0: SUCCESS

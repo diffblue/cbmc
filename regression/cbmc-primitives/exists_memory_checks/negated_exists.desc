@@ -1,6 +1,6 @@
 CORE no-new-smt
 negated_exists.c
---pointer-check
+--no-standard-checks --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 main.c
---no-simplify --no-propagation
+--no-standard-checks --no-simplify --no-propagation
 ^EXIT=10$
 ^SIGNAL=0$
 \[main.assertion.1\] line \d+ assertion __CPROVER_DYNAMIC_OBJECT\(p\): FAILURE

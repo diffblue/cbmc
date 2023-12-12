@@ -1,6 +1,6 @@
 CORE
 --div-by-zero-check
-test.c
+--no-standard-checks test.c
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line \d 10 / y is expected to succeed: SUCCESS

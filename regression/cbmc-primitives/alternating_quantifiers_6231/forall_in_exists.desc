@@ -1,6 +1,6 @@
 CORE no-new-smt
 forall_in_exists.c
---pointer-check
+--no-standard-checks --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line \d* there exists a z between 0 and 2 so that for all o between 10 and 20, o > z and z = 1: SUCCESS

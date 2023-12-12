@@ -1,6 +1,6 @@
 CORE
 test.c
---div-by-zero-check
+--no-standard-checks --div-by-zero-check
 ^EXIT=10$
 ^SIGNAL=0$
 \[main\.division-by-zero\.1] line \d+ division by zero in n / 0: FAILURE

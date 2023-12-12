@@ -1,6 +1,6 @@
 CORE
 test.c
---pointer-check
+--no-standard-checks --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.2\] line \d+ assertion __CPROVER_forall \{ int i ; \(0 <= i && i < 1\) ==> \*\(a\+i\) == \*\(a\+i\) \}: SUCCESS
