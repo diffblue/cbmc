@@ -1,3 +1,3 @@
 add_test_pl_tests(
-    "perl ../timeout.pl 8 $<TARGET_FILE:cbmc> --no-standard-checks --slice-formula"
+    "perl ../timeout.pl 8 $<TARGET_FILE:cbmc> --slice-formula"
 )
