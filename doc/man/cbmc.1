@@ -8,6 +8,12 @@ cbmc \- Bounded Model Checker for C/C++ and Java programs
 
 .B cbmc [--all-properties] \fIfile.c\fB ...
 
+.B cbmc [--no-standard-checks] \fIfile.c\fB ...
+
+.B cbmc [--no-standard-checks] [--pointer-check] \fIfile.c\fB ...
+
+.B cbmc [--no-bounds-check] \fIfile.c\fB ...
+
 .B goto-cc [-I \fIinclude-path\fB] [-c] \fIfile.c\fB [-o \fIoutfile.o\fB]
 
 .B goto-instrument \fIinfile\fB \fIoutfile\fR
@@ -41,7 +47,78 @@ The usual flow is to (1) translate source into a GOTO binary using
 goto-cc, then (2) perform instrumentation with goto-instrument, and
 finally (3) perform the analysis with cbmc.
 .SH OPTIONS
+.SS "Standard Checks"
+From version \fB6.0\fR onwards, \fBcbmc\fR, \fBgoto-analyzer\fR and some other tools
+apply some checks to the program by default (called the "standard checks"), with the
+aim to provide a better user experience for a non-expert user of the tool. These checks are:
+.TP
+\fB\-\-pointer\-check\fR
+enable pointer checks
+.TP
+\fB\-\-bounds\-check\fR
+enable array bounds checks
+.TP
+\fB\-\-undefined\-shift\-check\fR
+check shift greater than bit\-width
+.TP
+\fB\-\-div\-by\-zero\-check\fR
+enable division by zero checks
+.TP
+\fB\-\-pointer\-primitive\-check\fR
+checks that all pointers in pointer primitives are valid or null
+.TP
+\fB\-\-signed\-overflow\-check\fR
+enable signed arithmetic over\- and underflow checks
+.TP
+\fB\-\-malloc\-may\-fail\fR
+allow malloc calls to return a null pointer
+.TP
+\fB\-\-malloc\-fail\-null\fR
+set malloc failure mode to return null
+.TP
+\fB\-\-unwinding\-assertions\fR (\fBcbmc\fR\-only)
+generate unwinding assertions (cannot be
+used with \fB\-\-cover\fR)
+.PP
+These checks can all be deactivated at once by using the \fB\-\-no\-standard\-checks\fR flag
+like in the header example, or individually, by prepending a \fBno\-\fR before the flag, like
+so:
+.TP
+\fB\-\-no\-pointer\-check\fR
+disable pointer checks
+.TP
+\fB\-\-no\-bounds\-check\fR
+disable array bounds checks
+.TP
+\fB\-\-no\-undefined\-shift\-check\fR
+do not perform check for shift greater than bit\-width
+.TP
+\fB\-\-no\-div\-by\-zero\-check\fR
+disable division by zero checks
+.TP
+\fB\-\-no\-pointer\-primitive\-check\fR
+do not check that all pointers in pointer primitives are valid or null
+.TP
+\fB\-\-no\-signed\-overflow\-check\fR
+disable signed arithmetic over\- and underflow checks
+.TP
+\fB\-\-no\-malloc\-may\-fail\fR
+do not allow malloc calls to fail by default
+.TP
+\fB\-\-no\-malloc\-fail\-null\fR
+do not set malloc failure mode to return null pointer
+.TP
+\fB\-\-no\-unwinding\-assertions\fR (\fBcbmc\fR\-only)
+do not generate unwinding assertions (cannot be
+used with \fB\-\-cover\fR)
+.PP
+If an already set flag is re-set, like calling \fB\-\-pointer\-check\fR
+when default checks are already on, the flag is simply ignored.
 .SS "Analysis options:"
+.TP
+\fB\-\-no\-standard\-checks\fR
+disable the standard (default) checks applied to a C/GOTO program
+(see above for more information)
 .TP
 \fB\-\-show\-properties\fR
 show the properties, but don't run analysis
