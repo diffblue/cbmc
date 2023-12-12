@@ -1,6 +1,6 @@
 CORE
 main.c
---incremental-loop main.0 --unwind-max 15
+--no-standard-checks --incremental-loop main.0 --unwind-max 15
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

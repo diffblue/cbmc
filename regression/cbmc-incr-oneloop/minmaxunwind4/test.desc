@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind-min 6 --unwind-max 8 --incremental-loop main.0 --ignore-properties-before-unwind-min
+--no-standard-checks --unwind-min 6 --unwind-max 8 --incremental-loop main.0 --ignore-properties-before-unwind-min
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

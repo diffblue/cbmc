@@ -1,6 +1,6 @@
 CORE
 main.c
---incremental-loop main.0 --unwinding-assertions --dimacs
+--no-standard-checks --incremental-loop main.0 --unwinding-assertions --dimacs
 ^Invalid User Input$
 ^Option: --incremental-loop$
 ^Reason: the chosen solver does not support incremental solving$

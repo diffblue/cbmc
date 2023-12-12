@@ -1,6 +1,6 @@
 CORE
 test.c
---incremental-loop main.0
+--no-standard-checks --incremental-loop main.0
 activate-multi-line-match
 Incremental status: INCONCLUSIVE\nCurrent unwinding: 2
 Incremental status: INCONCLUSIVE\nCurrent unwinding: 6
