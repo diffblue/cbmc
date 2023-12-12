@@ -9,7 +9,8 @@ main.c
 ^\[func.coverage.2\] file main.c line 6 function func block 2.*: FAILED$
 ^\[func.coverage.3\] file main.c line 8 function func block 3.*: FAILED$
 ^\[func.coverage.4\] file main.c line 12 function func block 4.*: FAILED$
-^\[func.coverage.5\] file main.c line 15 function func block 5.*: SATISFIED$
-^\*\* 4 of 7 covered \(57.1%\)
+^\[func.coverage.5\] file main.c line 14 function func block 5.*: FAILED$
+^\[func.coverage.6\] file main.c line 15 function func block 6.*: SATISFIED$
+^\*\* 4 of 8 covered \(50.0%\)
 --
 ^warning: ignoring

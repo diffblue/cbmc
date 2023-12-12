@@ -1,0 +1,14 @@
+CORE
+end.c
+--pointer-check --div-by-zero-check --cover location
+^EXIT=0$
+^SIGNAL=0$
+^\[main.coverage.1\] file end.c line 5 function main block 1 \(lines end\.c:main:5-8\): SATISFIED$
+^\[main.coverage.2\] file end.c line 9 function main block 2 \(lines end\.c:main:9\): SATISFIED$
+^\*\* 2 of 2 covered \(100.0%\)
+--
+^warning: ignoring
+--
+Test that in the case where multiple assertions are added on the same line of
+code due to the addition of instrumentation checks, these do not result in
+further splitting blocks.

@@ -23,6 +23,7 @@ init_function_symbols(std::unordered_set<irep_idt> &function_symbols)
   if(function_symbols.empty())
   {
     function_symbols.insert(CPROVER_PREFIX "_start");
+    function_symbols.insert(CPROVER_PREFIX "allocated_memory");
     function_symbols.insert(CPROVER_PREFIX "array_copy");
     function_symbols.insert(CPROVER_PREFIX "array_replace");
     function_symbols.insert(CPROVER_PREFIX "array_set");

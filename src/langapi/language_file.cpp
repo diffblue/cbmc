@@ -8,9 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "language_file.h"
 
-#include <fstream>
+#include <util/message.h>
 
 #include "language.h"
+
+#include <fstream>
 
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),
@@ -37,15 +39,18 @@ void language_filet::get_modules()
 
 void language_filet::convert_lazy_method(
   const irep_idt &id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
-  language->convert_lazy_method(id, symbol_table);
+  language->convert_lazy_method(id, symbol_table, message_handler);
 }
 
-void language_filest::show_parse(std::ostream &out)
+void language_filest::show_parse(
+  std::ostream &out,
+  message_handlert &message_handler)
 {
   for(const auto &file : file_map)
-    file.second.language->show_parse(out);
+    file.second.language->show_parse(out, message_handler);
 }
 
 bool language_filest::parse(message_handlert &message_handler)
@@ -68,7 +73,7 @@ bool language_filest::parse(message_handlert &message_handler)
 
     languaget &language=*(file.second.language);
 
-    if(language.parse(infile, file.first))
+    if(language.parse(infile, file.first, message_handler))
     {
       log.error() << "Parsing of " << file.first << " failed" << messaget::eom;
       return true;
@@ -91,7 +96,7 @@ bool language_filest::typecheck(
 
   for(auto &file : file_map)
   {
-    if(file.second.language->interfaces(symbol_table))
+    if(file.second.language->interfaces(symbol_table, message_handler))
       return true;
   }
 
@@ -134,12 +139,13 @@ bool language_filest::typecheck(
     {
       if(file.second.language->can_keep_file_local())
       {
-        if(file.second.language->typecheck(symbol_table, "", keep_file_local))
+        if(file.second.language->typecheck(
+             symbol_table, "", message_handler, keep_file_local))
           return true;
       }
       else
       {
-        if(file.second.language->typecheck(symbol_table, ""))
+        if(file.second.language->typecheck(symbol_table, "", message_handler))
           return true;
       }
       // register lazy methods.
@@ -165,14 +171,16 @@ bool language_filest::typecheck(
 }
 
 bool language_filest::generate_support_functions(
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   std::set<std::string> languages;
 
   for(auto &file : file_map)
   {
     if(languages.insert(file.second.language->id()).second)
-      if(file.second.language->generate_support_functions(symbol_table))
+      if(file.second.language->generate_support_functions(
+           symbol_table, message_handler))
         return true;
   }
 
@@ -193,11 +201,13 @@ bool language_filest::final(symbol_table_baset &symbol_table)
   return false;
 }
 
-bool language_filest::interfaces(symbol_table_baset &symbol_table)
+bool language_filest::interfaces(
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   for(auto &file : file_map)
   {
-    if(file.second.language->interfaces(symbol_table))
+    if(file.second.language->interfaces(symbol_table, message_handler))
       return true;
   }
 
@@ -273,12 +283,12 @@ bool language_filest::typecheck_module(
   if(module.file->language->can_keep_file_local())
   {
     module.in_progress = !module.file->language->typecheck(
-      symbol_table, module.name, keep_file_local);
+      symbol_table, module.name, message_handler, keep_file_local);
   }
   else
   {
-    module.in_progress =
-      !module.file->language->typecheck(symbol_table, module.name);
+    module.in_progress = !module.file->language->typecheck(
+      symbol_table, module.name, message_handler);
   }
 
   if(!module.in_progress)

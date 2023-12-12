@@ -51,10 +51,9 @@ goto_modelt get_goto_model_from_c(std::istream &in)
   CHECK_RETURN(language_file.language);
 
   languaget &language = *language_file.language;
-  language.set_message_handler(null_message_handler);
 
   {
-    const bool error = language.parse(in, "");
+    const bool error = language.parse(in, "", null_message_handler);
 
     if(error)
       throw invalid_input_exceptiont("parsing failed");
@@ -73,8 +72,8 @@ goto_modelt get_goto_model_from_c(std::istream &in)
   }
 
   {
-    const bool error =
-      language_files.generate_support_functions(goto_model.symbol_table);
+    const bool error = language_files.generate_support_functions(
+      goto_model.symbol_table, null_message_handler);
 
     if(error)
       throw invalid_input_exceptiont("support function generation failed");

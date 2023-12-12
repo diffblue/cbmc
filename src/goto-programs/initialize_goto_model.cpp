@@ -52,9 +52,9 @@ static bool generate_entry_point_for_function(
   PRECONDITION(!entry_point_mode.empty());
   auto const entry_language = get_language_from_mode(entry_point_mode);
   CHECK_RETURN(entry_language != nullptr);
-  entry_language->set_message_handler(message_handler);
-  entry_language->set_language_options(options);
-  return entry_language->generate_support_functions(symbol_table);
+  entry_language->set_language_options(options, message_handler);
+  return entry_language->generate_support_functions(
+    symbol_table, message_handler);
 }
 
 void initialize_from_source_files(
@@ -88,12 +88,11 @@ void initialize_from_source_files(
     }
 
     languaget &language = *lf.language;
-    language.set_message_handler(message_handler);
-    language.set_language_options(options);
+    language.set_language_options(options, message_handler);
 
     msg.status() << "Parsing " << filename << messaget::eom;
 
-    if(language.parse(infile, filename))
+    if(language.parse(infile, filename, message_handler))
     {
       throw invalid_input_exceptiont("PARSING ERROR");
     }
@@ -137,7 +136,7 @@ void set_up_custom_entry_point(
 
     // Create the new entry-point
     entry_point_generation_failed =
-      language->generate_support_functions(symbol_table);
+      language->generate_support_functions(symbol_table, message_handler);
 
     // Remove the function from the goto functions so it is copied back in
     // from the symbol table during goto_convert
@@ -159,8 +158,8 @@ void set_up_custom_entry_point(
     {
       // Allow all language front-ends to try to provide the user-specified
       // (--function) entry-point, or some language-specific default:
-      entry_point_generation_failed =
-        language_files.generate_support_functions(symbol_table);
+      entry_point_generation_failed = language_files.generate_support_functions(
+        symbol_table, message_handler);
     }
   }
 

@@ -72,9 +72,7 @@ bool constant_simplification_mockt::ai_simplify(
 SCENARIO("ai_domain_baset::ai_simplify_lhs",
   "[core][analyses][ai][ai_simplify_lhs]")
 {
-  ui_message_handlert message_handler(null_message_handler);
   ansi_c_languaget language;
-  language.set_message_handler(message_handler);
 
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -87,8 +85,8 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
   {
     // Construct an expression that the simplify_expr can simplify
     exprt simplifiable_expression;
-    bool compile_failed=
-      language.to_expr("1 + 1", "", simplifiable_expression, ns);
+    bool compile_failed = language.to_expr(
+      "1 + 1", "", simplifiable_expression, ns, null_message_handler);
 
     const unsigned int array_size=5;
     array_typet array_type(

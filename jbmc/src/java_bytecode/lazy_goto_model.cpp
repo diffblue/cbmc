@@ -141,12 +141,11 @@ void lazy_goto_modelt::initialize(
     CHECK_RETURN(lf.language != nullptr);
 
     languaget &language = *lf.language;
-    language.set_message_handler(message_handler);
-    language.set_language_options(options);
+    language.set_language_options(options, message_handler);
 
     msg.status() << "Parsing ..." << messaget::eom;
 
-    if(dynamic_cast<java_bytecode_languaget &>(language).parse())
+    if(dynamic_cast<java_bytecode_languaget &>(language).parse(message_handler))
     {
       throw invalid_input_exceptiont("PARSING ERROR");
     }

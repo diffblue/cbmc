@@ -151,42 +151,40 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         targets.destructor_stack.get_nearest_common_ancestor_info(
           goto_target, label_target);
 
-      bool not_prefix =
-        intersection_result.right_depth_below_common_ancestor != 0;
-
       // If our goto had no variables of note, just skip
       if(goto_target != 0)
       {
         // If the goto recorded a destructor stack, execute as much as is
         // appropriate for however many automatic variables leave scope.
-        // We don't currently handle variables *entering* scope, which
-        // is illegal for C++ non-pod types and impossible in Java in any case.
-        if(not_prefix)
-        {
-          debug().source_location = i.source_location();
-          debug() << "encountered goto '" << goto_label
-                  << "' that enters one or more lexical blocks; "
-                  << "omitting constructors and destructors" << eom;
-        }
-        else
-        {
-          debug().source_location = i.source_location();
-          debug() << "adding goto-destructor code on jump to '" << goto_label
-                  << "'" << eom;
+        debug().source_location = i.source_location();
+        debug() << "adding goto-destructor code on jump to '" << goto_label
+                << "'" << eom;
 
-          node_indext end_destruct = intersection_result.common_ancestor;
-          goto_programt destructor_code;
-          unwind_destructor_stack(
-            i.source_location(),
-            destructor_code,
-            mode,
-            end_destruct,
-            goto_target);
-          dest.destructive_insert(g_it.first, destructor_code);
+        node_indext end_destruct = intersection_result.common_ancestor;
+        goto_programt destructor_code;
+        unwind_destructor_stack(
+          i.source_location(),
+          destructor_code,
+          mode,
+          end_destruct,
+          goto_target);
+        dest.destructive_insert(g_it.first, destructor_code);
 
-          // This should leave iterators intact, as long as
-          // goto_programt::instructionst is std::list.
-        }
+        // This should leave iterators intact, as long as
+        // goto_programt::instructionst is std::list.
+      }
+
+      // We don't currently handle variables *entering* scope, which
+      // is illegal for C++ non-pod types and impossible in Java in any case.
+      // This is however valid C.
+      const bool variables_added_to_scope =
+        intersection_result.right_depth_below_common_ancestor > 0;
+      if(variables_added_to_scope)
+      {
+        debug().source_location = i.source_location();
+        debug() << "encountered goto '" << goto_label
+                << "' that enters one or more lexical blocks; "
+                << "omitting constructors." << eom;
       }
     }
     else
