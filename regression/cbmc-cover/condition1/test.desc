@@ -1,6 +1,6 @@
 CORE
 main.c
---cover condition
+--no-standard-checks --cover condition
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1] file main.c line 8 function main condition .* false: SATISFIED

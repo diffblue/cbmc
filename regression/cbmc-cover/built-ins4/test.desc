@@ -1,6 +1,6 @@
 CORE
 main.c
---cover branch --unwind 5
+--no-standard-checks --cover branch --unwind 5
 ^EXIT=0$
 ^SIGNAL=0$
 ^\*\* 5 of 5 covered

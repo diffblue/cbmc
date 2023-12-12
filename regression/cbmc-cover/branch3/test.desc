@@ -1,6 +1,6 @@
 CORE
 main.c
---cover branch --unwind 6
+--no-standard-checks --cover branch --unwind 6
 ^EXIT=0$
 ^SIGNAL=0$
 ^\*\* .* of .* covered \(.*\)$

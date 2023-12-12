@@ -1,6 +1,6 @@
 CORE
 main.c
---json-ui --cover location
+--no-standard-checks --json-ui --cover location
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

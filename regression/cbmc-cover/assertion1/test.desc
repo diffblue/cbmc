@@ -1,6 +1,6 @@
 CORE
 main.c
---cover assertion
+--no-standard-checks --cover assertion
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1\] file main.c line 9 function main assertion: SATISFIED$

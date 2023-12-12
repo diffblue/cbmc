@@ -1,6 +1,6 @@
 CORE
 main.c
---cover mcdc
+--no-standard-checks --cover mcdc
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.\d+\] file main.c line 10 function main MC/DC independence condition 'A && !B && C && !D.*: SATISFIED$

@@ -1,6 +1,6 @@
 CORE
 main.c
---cover branch --unwind 2
+--no-standard-checks --cover branch --unwind 2
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1\] file main.c line 5 function main entry point: SATISFIED$
