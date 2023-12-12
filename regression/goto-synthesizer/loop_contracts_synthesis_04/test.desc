@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check _ --verbosity 9
+--no-standard-checks --pointer-check _ --verbosity 9
 ^EXIT=0$
 ^SIGNAL=0$
 Quick filter\: 6.* out of 67 candidates were filtered out\.
