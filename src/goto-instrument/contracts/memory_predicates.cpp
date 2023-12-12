@@ -172,14 +172,14 @@ void is_fresh_baset::add_declarations(const std::string &decl_string)
   std::istringstream iss(decl_string);
 
   ansi_c_languaget ansi_c_language;
-  ansi_c_language.set_message_handler(message_handler);
   configt::ansi_ct::preprocessort pp = config.ansi_c.preprocessor;
   config.ansi_c.preprocessor = configt::ansi_ct::preprocessort::NONE;
-  ansi_c_language.parse(iss, "");
+  ansi_c_language.parse(iss, "", log.get_message_handler());
   config.ansi_c.preprocessor = pp;
 
   symbol_tablet tmp_symbol_table;
-  ansi_c_language.typecheck(tmp_symbol_table, "<built-in-library>");
+  ansi_c_language.typecheck(
+    tmp_symbol_table, "<built-in-library>", log.get_message_handler());
   exprt value = nil_exprt();
 
   goto_functionst tmp_functions;

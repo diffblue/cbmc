@@ -18,7 +18,7 @@ bool languaget::final(symbol_table_baset &)
   return false;
 }
 
-bool languaget::interfaces(symbol_table_baset &)
+bool languaget::interfaces(symbol_table_baset &, message_handlert &)
 {
   return false;
 }

@@ -24,16 +24,24 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 class json_symtab_languaget : public languaget
 {
 public:
-  bool parse(std::istream &instream, const std::string &path) override;
+  bool parse(
+    std::istream &instream,
+    const std::string &path,
+    message_handlert &message_handler) override;
 
-  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
-    override;
+  bool typecheck(
+    symbol_table_baset &symbol_table,
+    const std::string &module,
+    message_handlert &message_handler) override;
 
-  void show_parse(std::ostream &out) override;
+  void show_parse(std::ostream &out, message_handlert &) override;
 
-  bool
-  to_expr(const std::string &, const std::string &, exprt &, const namespacet &)
-    override
+  bool to_expr(
+    const std::string &,
+    const std::string &,
+    exprt &,
+    const namespacet &,
+    message_handlert &) override
   {
     UNIMPLEMENTED;
   }
@@ -57,7 +65,9 @@ public:
     return std::make_unique<json_symtab_languaget>();
   }
 
-  bool generate_support_functions(symbol_table_baset &symbol_table) override
+  bool generate_support_functions(
+    symbol_table_baset &symbol_table,
+    message_handlert &) override
   {
     // check if entry point is already there
     bool entry_point_exists =

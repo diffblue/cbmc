@@ -39,18 +39,20 @@ void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
 bool ansi_c_languaget::preprocess(
   std::istream &instream,
   const std::string &path,
-  std::ostream &outstream)
+  std::ostream &outstream,
+  message_handlert &message_handler)
 {
   // stdin?
   if(path.empty())
-    return c_preprocess(instream, outstream, get_message_handler());
+    return c_preprocess(instream, outstream, message_handler);
 
-  return c_preprocess(path, outstream, get_message_handler());
+  return c_preprocess(path, outstream, message_handler);
 }
 
 bool ansi_c_languaget::parse(
   std::istream &instream,
-  const std::string &path)
+  const std::string &path,
+  message_handlert &message_handler)
 {
   // store the path
   parse_path=path;
@@ -58,7 +60,7 @@ bool ansi_c_languaget::parse(
   // preprocessing
   std::ostringstream o_preprocessed;
 
-  if(preprocess(instream, path, o_preprocessed))
+  if(preprocess(instream, path, o_preprocessed, message_handler))
     return true;
 
   std::istringstream i_preprocessed(o_preprocessed.str());
@@ -72,7 +74,7 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.clear();
   ansi_c_parser.set_file(ID_built_in);
   ansi_c_parser.in=&codestr;
-  ansi_c_parser.log.set_message_handler(get_message_handler());
+  ansi_c_parser.log.set_message_handler(message_handler);
   ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
   ansi_c_parser.cpp98=false; // it's not C++
@@ -104,46 +106,45 @@ bool ansi_c_languaget::parse(
 bool ansi_c_languaget::typecheck(
   symbol_table_baset &symbol_table,
   const std::string &module,
+  message_handlert &message_handler,
   const bool keep_file_local)
 {
-  return typecheck(symbol_table, module, keep_file_local, {});
+  return typecheck(symbol_table, module, message_handler, keep_file_local, {});
 }
 
 bool ansi_c_languaget::typecheck(
   symbol_table_baset &symbol_table,
   const std::string &module,
+  message_handlert &message_handler,
   const bool keep_file_local,
   const std::set<irep_idt> &keep)
 {
   symbol_tablet new_symbol_table;
 
-  if(ansi_c_typecheck(
-    parse_tree,
-    new_symbol_table,
-    module,
-    get_message_handler()))
+  if(ansi_c_typecheck(parse_tree, new_symbol_table, module, message_handler))
   {
     return true;
   }
 
   remove_internal_symbols(
-    new_symbol_table, this->get_message_handler(), keep_file_local, keep);
+    new_symbol_table, message_handler, keep_file_local, keep);
 
-  if(linking(symbol_table, new_symbol_table, get_message_handler()))
+  if(linking(symbol_table, new_symbol_table, message_handler))
     return true;
 
   return false;
 }
 
 bool ansi_c_languaget::generate_support_functions(
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   // This creates __CPROVER_start and __CPROVER_initialize:
   return ansi_c_entry_point(
-    symbol_table, get_message_handler(), object_factory_params);
+    symbol_table, message_handler, object_factory_params);
 }
 
-void ansi_c_languaget::show_parse(std::ostream &out)
+void ansi_c_languaget::show_parse(std::ostream &out, message_handlert &)
 {
   parse_tree.output(out);
 }
@@ -184,7 +185,8 @@ bool ansi_c_languaget::to_expr(
   const std::string &code,
   const std::string &,
   exprt &expr,
-  const namespacet &ns)
+  const namespacet &ns,
+  message_handlert &message_handler)
 {
   expr.make_nil();
 
@@ -198,7 +200,7 @@ bool ansi_c_languaget::to_expr(
   ansi_c_parser.clear();
   ansi_c_parser.set_file(irep_idt());
   ansi_c_parser.in=&i_preprocessed;
-  ansi_c_parser.log.set_message_handler(get_message_handler());
+  ansi_c_parser.log.set_message_handler(message_handler);
   ansi_c_parser.mode=config.ansi_c.mode;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
   ansi_c_scanner_init();
@@ -212,7 +214,7 @@ bool ansi_c_languaget::to_expr(
     expr=ansi_c_parser.parse_tree.items.front().declarator().value();
 
     // typecheck it
-    result=ansi_c_typecheck(expr, get_message_handler(), ns);
+    result = ansi_c_typecheck(expr, message_handler, ns);
   }
 
   // save some memory

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/journalling_symbol_table.h>
+#include <util/message.h>
 #include <util/suffix.h>
 
 #include <goto-programs/adjust_float_expressions.h>

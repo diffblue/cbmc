@@ -9,6 +9,7 @@ Author: Diffblue Ltd.
 #include "ci_lazy_methods.h"
 
 #include <util/expr_iterator.h>
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/suffix.h>
 #include <util/symbol_table.h>
