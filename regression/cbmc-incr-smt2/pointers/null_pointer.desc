@@ -1,6 +1,6 @@
 CORE
 null_pointer.c
---trace
+--no-standard-checks --trace
 Passing problem to incremental SMT2 solving
 line 14 assertion \(\(uint64_t\)ptr\) > 1: SUCCESS
 line 20 assertion \(\(uint64_t\)ptr\) != 0: FAILURE

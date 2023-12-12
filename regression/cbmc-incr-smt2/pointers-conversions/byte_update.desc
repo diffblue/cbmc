@@ -1,6 +1,6 @@
 CORE
 byte_update.c
---trace
+--no-standard-checks --trace
 Running incremental SMT2 solving via
 Building error trace
 \[main\.assertion\.\d+\] line \d+ assertion x != 256u: FAILURE

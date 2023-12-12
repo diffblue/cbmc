@@ -1,6 +1,6 @@
 CORE
 pointers_assume.c
---trace
+--no-standard-checks --trace
 \[main\.assertion\.1\] line \d+ x == y: expected failure: FAILURE
 \[main\.assertion\.2\] line \d+ z >= x: expected successful: SUCCESS
 \[main\.assertion\.3\] line \d+ z <= y: expected successful: SUCCESS

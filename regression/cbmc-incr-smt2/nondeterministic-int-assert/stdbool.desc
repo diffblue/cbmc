@@ -1,6 +1,6 @@
 CORE
 stdbool_example.c
---trace
+--no-standard-checks --trace
 Passing problem to incremental SMT2 solving via
 VERIFICATION FAILED
 equal=FALSE\s*\([0 ]+\)

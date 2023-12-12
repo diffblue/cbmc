@@ -1,6 +1,6 @@
 CORE
 large_array_of_struct_nondet_index.c
---trace
+--no-standard-checks --trace
 Passing problem to incremental SMT2 solving
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 array-misalign-between.c
-
+--no-standard-checks
 \[main\.assertion\.1\] line \d+ assertion x\[0\] == 256 \|\| x\[0\] == 1: SUCCESS
 \[main\.assertion\.2\] line \d+ assertion x\[0\] == 0: FAILURE
 \[main\.assertion\.3\] line \d+ assertion x\[1\] == 0: SUCCESS

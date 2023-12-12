@@ -1,6 +1,6 @@
 CORE
 pointer_object2.c
---trace --verbosity 10
+--no-standard-checks --trace --verbosity 10
 \[main\.assertion\.1\] line 13 Can be violated.: FAILURE
 nondet1=FALSE
 nondet2=TRUE

@@ -1,6 +1,6 @@
 CORE
 padded.c
---trace
+--no-standard-checks --trace
 Passing problem to incremental SMT2 solving
 \[main\.assertion\.1\] line 13 assertion my_union\.a \=\= 5\: FAILURE
 my_union\=\{ \.a\=\d+ \} \(\d{8} 00000101\)

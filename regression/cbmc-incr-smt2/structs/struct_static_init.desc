@@ -1,6 +1,6 @@
 CORE
 struct_static_init.c
-
+--no-standard-checks
 Passing problem to incremental SMT2 solving
 line \d+ assertion p->w != 0xdead: FAILURE
 ^EXIT=10$

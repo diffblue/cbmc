@@ -1,6 +1,6 @@
 CORE
 pointer_values.c
---trace
+--no-standard-checks --trace
 \[main\.assertion\.1\] line \d+ should fail because a can be any pointer val, including NULL: FAILURE
 \[main\.assertion\.2\] line \d+ should fail because a and c can point to same object: FAILURE
 a=\(\(signed int \*\)NULL\)

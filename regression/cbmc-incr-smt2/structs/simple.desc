@@ -1,6 +1,6 @@
 CORE
 simple.c
---trace
+--no-standard-checks --trace
 Passing problem to incremental SMT2 solving
 line 20 assertion my_struct.b != 30 || struct_copy.a != 10: FAILURE
 nondet=3

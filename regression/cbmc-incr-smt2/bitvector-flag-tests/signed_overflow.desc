@@ -1,6 +1,6 @@
 CORE
 signed_overflow.c
---signed-overflow-check --trace
+--no-standard-checks --signed-overflow-check --trace
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

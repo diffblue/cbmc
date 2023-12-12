@@ -1,6 +1,6 @@
 CORE
 array_read.c
-
+--no-standard-checks
 Passing problem to incremental SMT2 solving
 \[main\.assertion\.1\] line \d+ Array condition: FAILURE
 ^EXIT=10$

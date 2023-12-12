@@ -1,6 +1,6 @@
 CORE
 pointer_offset.c
---trace
+--no-standard-checks --trace
 \[main\.assertion\.1\] line \d+ expected failure because offsets should be the same: FAILURE
 ^VERIFICATION FAILED$
 ^EXIT=10$

@@ -1,6 +1,6 @@
 CORE
 pointer_is_invalid.c
-
+--no-standard-checks
 Passing problem to incremental SMT2 solving
 \[main\.assertion\.1\] line \d+ INVALID pointer, so passing: SUCCESS
 \[main\.assertion\.2\] line \d+ VALID pointer, so failing: FAILURE

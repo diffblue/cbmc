@@ -1,6 +1,6 @@
 CORE
 pointer_subtraction_unsigned.c
---trace
+--no-standard-checks --trace
 \[main\.assertion\.1\] line \d+ expected failure after pointer manipulation: FAILURE
 \[main\.assertion\.2\] line \d+ expected success after pointer manipulation: SUCCESS
 ^EXIT=10$

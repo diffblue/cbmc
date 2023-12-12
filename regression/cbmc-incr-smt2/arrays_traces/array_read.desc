@@ -1,6 +1,6 @@
 CORE
 array_read.c
---trace
+--no-standard-checks --trace
 Passing problem to incremental SMT2 solving
 \[main\.assertion\.1\] line \d+ Array condition: FAILURE
 ^Trace for main\.assertion\.1

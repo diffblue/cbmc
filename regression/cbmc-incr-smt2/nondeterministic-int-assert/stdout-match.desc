@@ -1,6 +1,6 @@
 CORE
 test.c
---outfile -
+--no-standard-checks --outfile -
 Starting Bounded Model Checking
 ^\(set-option :produce-models true\)$
 ^\(set-logic ALL\)$

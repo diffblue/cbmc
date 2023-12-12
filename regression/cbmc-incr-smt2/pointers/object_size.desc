@@ -1,6 +1,6 @@
 CORE
 object_size.c
---trace
+--no-standard-checks --trace
 line 12 Expected int sizes\.: SUCCESS
 line 13 Size is always 2\. \(Can be disproved\.\): FAILURE
 line 14 Size is always 4\. \(Can be disproved\.\): FAILURE

@@ -1,6 +1,6 @@
 CORE
 enum_in_array.c
---trace
+--no-standard-checks --trace
 Passing problem to incremental SMT2 solving
 line 18 Array at index 0 is V0, so this should fail: FAILURE
 i=0u \(00000000 00000000 00000000 00000000\)

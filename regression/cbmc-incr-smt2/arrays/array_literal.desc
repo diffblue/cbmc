@@ -1,6 +1,6 @@
 CORE
 array_literal.c
-
+--no-standard-checks
 Passing problem to incremental SMT2 solving
 line \d+ Non-existent element: SUCCESS
 line \d+ Index 0: FAILURE

@@ -1,6 +1,6 @@
 CORE
 simple.c
---trace
+--no-standard-checks --trace
 Passing problem to incremental SMT2 solving
 line 15 Variable e is V1, so this should fail: FAILURE
 e=/\*enum\*/V0 \(00000000 00000000 00000000 00000000\)

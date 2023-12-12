@@ -1,6 +1,6 @@
 CORE
 valid_unsat.c
---verbosity 10
+--no-standard-checks --verbosity 10
 Passing problem to incremental SMT2 solving via
 Sending command to SMT2 solver - \(check-sat\)
 Solver response - unsat

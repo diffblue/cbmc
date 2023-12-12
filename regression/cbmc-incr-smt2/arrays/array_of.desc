@@ -1,6 +1,6 @@
 CORE
 array_of.c
---slice-formula
+--no-standard-checks --slice-formula
 Passing problem to incremental SMT2 solving
 line \d+ False array condition: FAILURE
 line \d+ Valid array condition: SUCCESS
