@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="3048,5,3245,76"/>
-<area shape="rect" id="node2" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="1489,131,1551,158"/>
-<area shape="rect" id="node11" href="$namespace_8h.html" title=" " alt="" coords="1938,399,2073,426"/>
-<area shape="rect" id="node12" href="$optional_8h.html" title=" " alt="" coords="2227,481,2314,508"/>
-<area shape="rect" id="node14" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="2402,399,2491,426"/>
-<area shape="rect" id="node22" href="$dfcc__lift__memory__predicates_8h.html" title="Collects all user&#45;defined predicates that call functions is_fresh, pointer_in_range,..." alt="" coords="950,399,1173,426"/>
-<area shape="rect" id="node25" href="$goto__convert__functions_8h.html" title="Goto Programs with Functions." alt="" coords="200,303,357,344"/>
-<area shape="rect" id="node26" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="203,399,333,426"/>
-<area shape="rect" id="node27" href="$config_8h.html" title=" " alt="" coords="4261,399,4360,426"/>
-<area shape="rect" id="node30" href="$expr__util_8h.html" title="Deprecated expression utility functions." alt="" coords="3737,399,3853,426"/>
-<area shape="rect" id="node31" href="$format__expr_8h.html" title=" " alt="" coords="4048,399,4187,426"/>
-<area shape="rect" id="node33" href="$format__type_8h.html" title=" " alt="" coords="4032,221,4171,247"/>
-<area shape="rect" id="node34" href="$fresh__symbol_8h.html" title="Fresh auxiliary symbol creation." alt="" coords="3877,399,4024,426"/>
-<area shape="rect" id="node35" href="$mathematical__expr_8h.html" title="API to expression classes for &#39;mathematical&#39; expressions." alt="" coords="3054,310,3239,337"/>
-<area shape="rect" id="node36" href="$mathematical__types_8h.html" title="Mathematical types." alt="" coords="3072,399,3240,426"/>
-<area shape="rect" id="node38" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="2557,221,2672,247"/>
-<area shape="rect" id="node39" href="$pointer__offset__size_8h.html" title="Pointer Logic." alt="" coords="2910,392,3047,433"/>
-<area shape="rect" id="node40" href="$pointer__predicates_8h.html" title="Various predicates over pointers in programs." alt="" coords="2697,221,2877,247"/>
-<area shape="rect" id="node41" href="$prefix_8h.html" title=" " alt="" coords="4160,556,4256,583"/>
-<area shape="rect" id="node42" href="$string__utils_8h.html" title=" " alt="" coords="4331,556,4461,583"/>
-<area shape="rect" id="node43" href="$goto__inline_8h.html" title="Function Inlining This gives a number of different interfaces to the function inlining functionality ..." alt="" coords="4414,124,4565,165"/>
-<area shape="rect" id="node44" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="547,303,698,344"/>
-<area shape="rect" id="node45" href="$initialize__goto__model_8h.html" title="Initialize a Goto Program." alt="" coords="428,213,607,255"/>
-<area shape="rect" id="node46" href="$link__to__library_8h.html" title="Library Linking." alt="" coords="3264,392,3411,433"/>
-<area shape="rect" id="node47" href="$remove__skip_8h.html" title="Program Transformation." alt="" coords="4589,124,4761,165"/>
-<area shape="rect" id="node48" href="$remove__unused__functions_8h.html" title="Unused function removal." alt="" coords="2515,392,2687,433"/>
-<area shape="rect" id="node49" href="$ansi__c__entry__point_8h.html" title=" " alt="" coords="4785,124,4932,165"/>
-<area shape="rect" id="node50" href="$c__expr_8h.html" title="API to expression classes that are internal to the C frontend." alt="" coords="4957,131,5075,158"/>
-<area shape="rect" id="node51" href="$c__object__factory__parameters_8h.html" title=" " alt="" coords="5099,124,5271,165"/>
-<area shape="rect" id="node52" href="$ansi-c_2cprover__library_8h.html" title=" " alt="" coords="2712,399,2885,426"/>
-<area shape="rect" id="node53" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="1179,213,1370,255"/>
-<area shape="rect" id="node54" href="$utils_8h.html" title=" " alt="" coords="631,213,822,255"/>
-<area shape="rect" id="node55" href="$nondet__static_8h.html" title="Nondeterministically initializes global scope variables, except for constants (such as string literal..." alt="" coords="3485,392,3661,433"/>
-<area shape="rect" id="node56" href="$language_8h.html" title="Abstract interface to support a programming language." alt="" coords="779,399,925,426"/>
-<area shape="rect" id="node57" href="$language__file_8h.html" title=" " alt="" coords="5,399,179,426"/>
-<area shape="rect" id="node58" href="$mode_8h.html" title=" " alt="" coords="3571,221,3693,247"/>
-<area shape="rect" id="node59" href="$static__lifetime__init_8h.html" title=" " alt="" coords="5295,124,5459,165"/>
-<area shape="rect" id="node60" title=" " alt="" coords="5484,131,5564,158"/>
-<area shape="rect" id="node3" href="$exception__utils_8h.html" title=" " alt="" coords="1314,481,1473,508"/>
-<area shape="rect" id="node6" href="$irep_8h.html" title=" " alt="" coords="3308,481,3367,508"/>
-<area shape="rect" id="node7" href="$src_2util_2message_8h.html" title=" " alt="" coords="1549,481,1667,508"/>
-<area shape="rect" id="node10" href="$dfcc__contract__clauses__codegen_8h.html" title="Translates assigns and frees clauses of a function contract or loop contract into goto programs that ..." alt="" coords="2165,303,2331,344"/>
-<area shape="rect" id="node16" title=" " alt="" coords="1692,481,1735,508"/>
-<area shape="rect" id="node17" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="1915,310,2091,337"/>
-<area shape="rect" id="node18" href="$dfcc__instrument_8h.html" title="Add instrumentation to a goto program to perform frame condition checks." alt="" coords="1360,310,1499,337"/>
-<area shape="rect" id="node19" href="$dfcc__loop__contract__mode_8h.html" title="Enumeration representing the instrumentation mode for loop contracts." alt="" coords="357,392,501,433"/>
-<area shape="rect" id="node20" title=" " alt="" coords="589,481,640,508"/>
-<area shape="rect" id="node21" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="1703,399,1811,426"/>
-<area shape="rect" id="node23" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="1624,310,1789,337"/>
-<area shape="rect" id="node24" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="1497,221,1669,247"/>
-<area shape="rect" id="node4" title=" " alt="" coords="2776,631,2835,657"/>
-<area shape="rect" id="node5" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="2169,556,2261,583"/>
-<area shape="rect" id="node8" title=" " alt="" coords="3213,556,3299,583"/>
-<area shape="rect" id="node9" href="$deprecate_8h.html" title=" " alt="" coords="1956,556,2055,583"/>
-<area shape="rect" id="node13" title=" " alt="" coords="2285,556,2360,583"/>
-<area shape="rect" id="node15" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="2398,481,2495,508"/>
-<area shape="rect" id="node28" title=" " alt="" coords="4311,481,4353,508"/>
-<area shape="rect" id="node29" href="$ieee__float_8h.html" title=" " alt="" coords="4188,481,4287,508"/>
-<area shape="rect" id="node32" href="$format_8h.html" title=" " alt="" coords="4078,481,4157,508"/>
-<area shape="rect" id="node37" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="3125,481,3187,508"/>
+<area shape="rect" id="node1" title=" " alt="" coords="3017,5,3214,76"/>
+<area shape="rect" id="node2" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="1969,131,2030,158"/>
+<area shape="rect" id="node11" href="$namespace_8h.html" title=" " alt="" coords="1052,399,1187,426"/>
+<area shape="rect" id="node12" href="$optional_8h.html" title=" " alt="" coords="1996,481,2083,508"/>
+<area shape="rect" id="node14" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="1466,399,1555,426"/>
+<area shape="rect" id="node22" href="$dfcc__lift__memory__predicates_8h.html" title="Collects all user&#45;defined predicates that call functions is_fresh, pointer_in_range,..." alt="" coords="552,399,775,426"/>
+<area shape="rect" id="node25" href="$goto__convert__functions_8h.html" title="Goto Programs with Functions." alt="" coords="44,303,201,344"/>
+<area shape="rect" id="node26" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="104,399,234,426"/>
+<area shape="rect" id="node27" href="$config_8h.html" title=" " alt="" coords="4193,399,4292,426"/>
+<area shape="rect" id="node30" href="$expr__util_8h.html" title="Deprecated expression utility functions." alt="" coords="3882,399,3998,426"/>
+<area shape="rect" id="node31" href="$format__expr_8h.html" title=" " alt="" coords="4316,399,4454,426"/>
+<area shape="rect" id="node33" href="$format__type_8h.html" title=" " alt="" coords="3937,221,4076,247"/>
+<area shape="rect" id="node34" href="$fresh__symbol_8h.html" title="Fresh auxiliary symbol creation." alt="" coords="4022,399,4169,426"/>
+<area shape="rect" id="node35" href="$mathematical__expr_8h.html" title="API to expression classes for &#39;mathematical&#39; expressions." alt="" coords="2791,310,2976,337"/>
+<area shape="rect" id="node36" href="$mathematical__types_8h.html" title="Mathematical types." alt="" coords="3489,399,3657,426"/>
+<area shape="rect" id="node38" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="1320,221,1434,247"/>
+<area shape="rect" id="node39" href="$pointer__offset__size_8h.html" title="Pointer Logic." alt="" coords="2887,392,3024,433"/>
+<area shape="rect" id="node40" href="$pointer__predicates_8h.html" title="Various predicates over pointers in programs." alt="" coords="1560,221,1740,247"/>
+<area shape="rect" id="node41" href="$prefix_8h.html" title=" " alt="" coords="4325,556,4421,583"/>
+<area shape="rect" id="node42" href="$string__utils_8h.html" title=" " alt="" coords="4486,556,4617,583"/>
+<area shape="rect" id="node43" href="$goto__inline_8h.html" title="Function Inlining This gives a number of different interfaces to the function inlining functionality ..." alt="" coords="3946,124,4096,165"/>
+<area shape="rect" id="node44" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="394,303,544,344"/>
+<area shape="rect" id="node45" href="$initialize__goto__model_8h.html" title="Initialize a Goto Program." alt="" coords="444,213,622,255"/>
+<area shape="rect" id="node46" href="$link__to__library_8h.html" title="Library Linking." alt="" coords="3100,392,3246,433"/>
+<area shape="rect" id="node47" href="$remove__skip_8h.html" title="Program Transformation." alt="" coords="4120,124,4292,165"/>
+<area shape="rect" id="node48" href="$remove__unused__functions_8h.html" title="Unused function removal." alt="" coords="2220,392,2392,433"/>
+<area shape="rect" id="node49" href="$ansi__c__entry__point_8h.html" title=" " alt="" coords="4317,124,4464,165"/>
+<area shape="rect" id="node50" href="$c__expr_8h.html" title="API to expression classes that are internal to the C frontend." alt="" coords="4488,131,4607,158"/>
+<area shape="rect" id="node51" href="$c__object__factory__parameters_8h.html" title=" " alt="" coords="4631,124,4803,165"/>
+<area shape="rect" id="node52" href="$ansi-c_2cprover__library_8h.html" title=" " alt="" coords="2638,399,2812,426"/>
+<area shape="rect" id="node53" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="799,213,990,255"/>
+<area shape="rect" id="node54" href="$utils_8h.html" title=" " alt="" coords="178,213,368,255"/>
+<area shape="rect" id="node55" href="$nondet__static_8h.html" title="Nondeterministically initializes global scope variables, except for constants (such as string literal..." alt="" coords="3681,392,3857,433"/>
+<area shape="rect" id="node56" href="$language_8h.html" title="Abstract interface to support a programming language." alt="" coords="2417,399,2564,426"/>
+<area shape="rect" id="node57" href="$language__file_8h.html" title=" " alt="" coords="305,399,478,426"/>
+<area shape="rect" id="node58" href="$mode_8h.html" title=" " alt="" coords="3297,221,3420,247"/>
+<area shape="rect" id="node59" href="$static__lifetime__init_8h.html" title=" " alt="" coords="4827,124,4991,165"/>
+<area shape="rect" id="node60" title=" " alt="" coords="5016,131,5096,158"/>
+<area shape="rect" id="node3" href="$exception__utils_8h.html" title=" " alt="" coords="2294,481,2452,508"/>
+<area shape="rect" id="node6" href="$irep_8h.html" title=" " alt="" coords="3029,481,3088,508"/>
+<area shape="rect" id="node7" href="$src_2util_2message_8h.html" title=" " alt="" coords="1694,481,1812,508"/>
+<area shape="rect" id="node10" href="$dfcc__contract__clauses__codegen_8h.html" title="Translates assigns and frees clauses of a function contract or loop contract into goto programs that ..." alt="" coords="1052,303,1217,344"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1837,481,1880,508"/>
+<area shape="rect" id="node17" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="1657,310,1833,337"/>
+<area shape="rect" id="node18" href="$dfcc__instrument_8h.html" title="Add instrumentation to a goto program to perform frame condition checks." alt="" coords="1241,310,1380,337"/>
+<area shape="rect" id="node19" href="$dfcc__loop__contract__mode_8h.html" title="Enumeration representing the instrumentation mode for loop contracts." alt="" coords="3270,392,3414,433"/>
+<area shape="rect" id="node20" title=" " alt="" coords="738,481,789,508"/>
+<area shape="rect" id="node21" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="1986,399,2094,426"/>
+<area shape="rect" id="node23" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="1857,310,2022,337"/>
+<area shape="rect" id="node24" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="1764,221,1936,247"/>
+<area shape="rect" id="node4" title=" " alt="" coords="3189,631,3248,657"/>
+<area shape="rect" id="node5" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="2428,556,2520,583"/>
+<area shape="rect" id="node8" title=" " alt="" coords="3132,556,3219,583"/>
+<area shape="rect" id="node9" href="$deprecate_8h.html" title=" " alt="" coords="1866,556,1965,583"/>
+<area shape="rect" id="node13" title=" " alt="" coords="2002,556,2077,583"/>
+<area shape="rect" id="node15" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="2596,481,2694,508"/>
+<area shape="rect" id="node28" title=" " alt="" coords="4126,481,4169,508"/>
+<area shape="rect" id="node29" href="$ieee__float_8h.html" title=" " alt="" coords="4193,481,4292,508"/>
+<area shape="rect" id="node32" href="$format_8h.html" title=" " alt="" coords="4367,481,4446,508"/>
+<area shape="rect" id="node37" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="3542,481,3604,508"/>
 </map>

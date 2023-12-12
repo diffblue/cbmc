@@ -1,6 +1,6 @@
 var structjava__bytecode__language__optionst =
 [
-    [ "java_bytecode_language_optionst", "structjava__bytecode__language__optionst.html#a09441436cefa78497020ddb34ba36e7a", null ],
+    [ "java_bytecode_language_optionst", "structjava__bytecode__language__optionst.html#afc125427323ad5a306deef440460f74b", null ],
     [ "java_bytecode_language_optionst", "structjava__bytecode__language__optionst.html#ad75a452b5e47886bfb1f2ff61b240059", null ],
     [ "assert_no_exceptions_thrown", "structjava__bytecode__language__optionst.html#a2d4e0cb870e43c97e15c5404427c4dc9", null ],
     [ "assert_uncaught_exceptions", "structjava__bytecode__language__optionst.html#a24cc0a60a7c8ed6a4cb734ee9d050fab", null ],

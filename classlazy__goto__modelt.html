@@ -456,7 +456,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 
 <p>Implements <a class="el" href="classabstract__goto__modelt.html#a6f99b3d8d5a53ba4ea6494863376c8a9">abstract_goto_modelt</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00237">237</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00236">236</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
 
 </div>
 </div>
@@ -483,7 +483,7 @@ std::unique_ptr&lt;goto_modelt&gt; concrete_model =
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00212">212</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00211">211</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
 
 </div>
 </div>
@@ -578,7 +578,7 @@ template&lt;typename THandler &gt; </div>
 <li>If we already have a GOTO function body for <code>id</code>, return it.</li>
 <li>If the user's <code>driver_program_generate_function_body</code> function provides a body, pass it through the user's <code>post_process_function</code> callback, store and return it.</li>
 <li>If we already have a <code>codet</code> for the function stored in the symbol table, <code>goto_convert</code> it, pass it through the user's <code>post_process_function</code> callback, store it and return it.</li>
-<li>Otherwise, if some <code>languaget</code> claims to be able to produce it (this is determined by <code><a class="el" href="classlanguaget.html#af1e5abdaf9c6aea7f4dcf8d4ebd75d7a" title="Should fill methods with the symbol identifiers of all methods this languaget can provide a body for,...">languaget::methods_provided</a></code>), call its <code><a class="el" href="classlanguaget.html#abaedee01126518c514653b28f955253a" title="Requests this languaget should populate the body of method function_id in symbol_table.">languaget::convert_lazy_method</a></code> function. If that results in a <code>codet</code> representation of the function stored in the symbol table, convert it to GOTO and return it as in step (3). </li>
+<li>Otherwise, if some <code>languaget</code> claims to be able to produce it (this is determined by <code><a class="el" href="classlanguaget.html#af1e5abdaf9c6aea7f4dcf8d4ebd75d7a" title="Should fill methods with the symbol identifiers of all methods this languaget can provide a body for,...">languaget::methods_provided</a></code>), call its <code><a class="el" href="classlanguaget.html#a8d5ac6e2cf32a1cb5d42ab452afe84d0" title="Requests this languaget should populate the body of method function_id in symbol_table.">languaget::convert_lazy_method</a></code> function. If that results in a <code>codet</code> representation of the function stored in the symbol table, convert it to GOTO and return it as in step (3). </li>
 </ol>
 
 <p>Implements <a class="el" href="classabstract__goto__modelt.html#a2333a60a1d158c1936ba8541d4d00870">abstract_goto_modelt</a>.</p>
@@ -679,7 +679,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Performs initial symbol table and <code><a class="el" href="classlanguage__filest.html">language_filest</a></code> initialization from a given commandline and parsed options. </p>
 <p>This is much the same as the initial parsing phase of <code>initialize_goto_model</code>, except that all function bodies may be left blank until <code>get_goto_function</code> is called for the first time. This <em>must</em> be called before <code>get_goto_function</code> is called.</p>
-<p>Whether they are in fact left blank depends on the language front-end responsible for a particular function: it may be fully eager, in which case only the <code>goto_convert</code> phase is performed lazily, or fully lazy, in which case no function has a body until <code>get_goto_function</code> is called, or anything in between. At the time of writing only Java-specific frontend programs use <code><a class="el" href="classlazy__goto__modelt.html" title="A GOTO model that produces function bodies on demand.">lazy_goto_modelt</a></code>, so only <code><a class="el" href="classjava__bytecode__languaget.html">java_bytecode_languaget</a></code> is relevant, and that front-end supplies practically all methods lazily, apart from <code>__CPROVER__start</code> and <code>__CPROVER_initialize</code>. In general check whether a language implements <code><a class="el" href="classlanguaget.html#abaedee01126518c514653b28f955253a" title="Requests this languaget should populate the body of method function_id in symbol_table.">languaget::convert_lazy_method</a></code>; any method not handled there must be populated eagerly. See <code><a class="el" href="classlazy__goto__modelt.html#a547f0cc34eb2eb0be1c29306cb4f91e2" title="Get a GOTO function body.">lazy_goto_modelt::get_goto_function</a></code> for more detail. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Whether they are in fact left blank depends on the language front-end responsible for a particular function: it may be fully eager, in which case only the <code>goto_convert</code> phase is performed lazily, or fully lazy, in which case no function has a body until <code>get_goto_function</code> is called, or anything in between. At the time of writing only Java-specific frontend programs use <code><a class="el" href="classlazy__goto__modelt.html" title="A GOTO model that produces function bodies on demand.">lazy_goto_modelt</a></code>, so only <code><a class="el" href="classjava__bytecode__languaget.html">java_bytecode_languaget</a></code> is relevant, and that front-end supplies practically all methods lazily, apart from <code>__CPROVER__start</code> and <code>__CPROVER_initialize</code>. In general check whether a language implements <code><a class="el" href="classlanguaget.html#a8d5ac6e2cf32a1cb5d42ab452afe84d0" title="Requests this languaget should populate the body of method function_id in symbol_table.">languaget::convert_lazy_method</a></code>; any method not handled there must be populated eagerly. See <code><a class="el" href="classlazy__goto__modelt.html#a547f0cc34eb2eb0be1c29306cb4f91e2" title="Get a GOTO function body.">lazy_goto_modelt::get_goto_function</a></code> for more detail. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">files</td><td>source files and GOTO binaries to load </td></tr>
     <tr><td class="paramname">options</td><td>options to pass on to the language front-ends </td></tr>
@@ -708,7 +708,7 @@ template&lt;typename THandler &gt; </div>
 
 <p>Eagerly loads all functions from the symbol table. </p>
 
-<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00183">183</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lazy__goto__model_8cpp_source.html#l00182">182</a> of file <a class="el" href="lazy__goto__model_8cpp_source.html">lazy_goto_model.cpp</a>.</p>
 
 </div>
 </div>

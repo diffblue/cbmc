@@ -1003,6 +1003,14 @@ var hierarchy =
     [ "language_filest", "classlanguage__filest.html", null ],
     [ "language_filet", "classlanguage__filet.html", null ],
     [ "language_modulet", "classlanguage__modulet.html", null ],
+    [ "languaget", "classlanguaget.html", [
+      [ "ansi_c_languaget", "classansi__c__languaget.html", null ],
+      [ "cpp_languaget", "classcpp__languaget.html", null ],
+      [ "java_bytecode_languaget", "classjava__bytecode__languaget.html", null ],
+      [ "jsil_languaget", "classjsil__languaget.html", null ],
+      [ "json_symtab_languaget", "classjson__symtab__languaget.html", null ],
+      [ "statement_list_languaget", "classstatement__list__languaget.html", null ]
+    ] ],
     [ "lazy_class_to_declared_symbols_mapt", "classlazy__class__to__declared__symbols__mapt.html", null ],
     [ "arrayst::lazy_constraintt", "structarrayst_1_1lazy__constraintt.html", null ],
     [ "lazy_goto_functions_mapt", "classlazy__goto__functions__mapt.html", null ],
@@ -1091,14 +1099,6 @@ var hierarchy =
       [ "goto_convertt", "classgoto__convertt.html", [
         [ "cleanert", "classcleanert.html", null ],
         [ "goto_convert_functionst", "classgoto__convert__functionst.html", null ]
-      ] ],
-      [ "languaget", "classlanguaget.html", [
-        [ "ansi_c_languaget", "classansi__c__languaget.html", null ],
-        [ "cpp_languaget", "classcpp__languaget.html", null ],
-        [ "java_bytecode_languaget", "classjava__bytecode__languaget.html", null ],
-        [ "jsil_languaget", "classjsil__languaget.html", null ],
-        [ "json_symtab_languaget", "classjson__symtab__languaget.html", null ],
-        [ "statement_list_languaget", "classstatement__list__languaget.html", null ]
       ] ],
       [ "preprocessort", "classpreprocessort.html", null ],
       [ "safety_checkert", "classsafety__checkert.html", null ],
