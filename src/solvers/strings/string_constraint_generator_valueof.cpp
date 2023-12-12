@@ -174,84 +174,6 @@ string_constraint_generatort::add_axioms_for_string_of_int_with_radix(
   return {from_integer(0, get_return_code_type()), std::move(result2)};
 }
 
-/// Returns the integer value represented by the character.
-/// \param chr: a character expression in the following set:
-///   0123456789abcdef
-/// \return an integer expression
-static exprt int_of_hex_char(const exprt &chr)
-{
-  const exprt zero_char = from_integer('0', chr.type());
-  const exprt nine_char = from_integer('9', chr.type());
-  const exprt a_char = from_integer('a', chr.type());
-  return if_exprt(
-    binary_relation_exprt(chr, ID_gt, nine_char),
-    plus_exprt(from_integer(10, chr.type()), minus_exprt(chr, a_char)),
-    minus_exprt(chr, zero_char));
-}
-
-/// Add axioms stating that the string `res` corresponds to the integer
-/// argument written in hexadecimal.
-/// \deprecated use add_axioms_from_int_with_radix instead
-/// \param res: string expression for the result
-/// \param i: an integer argument
-/// \return code 0 on success
-DEPRECATED(SINCE(2017, 10, 5, "use add_axioms_for_string_of_int_with_radix"))
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_int_hex(
-  const array_string_exprt &res,
-  const exprt &i)
-{
-  const typet &type = i.type();
-  PRECONDITION(type.id() == ID_signedbv);
-  string_constraintst constraints;
-  const typet &index_type = res.length_type();
-  const typet &char_type = to_type_with_subtype(res.content().type()).subtype();
-  exprt sixteen = from_integer(16, index_type);
-  exprt minus_char = from_integer('-', char_type);
-  exprt zero_char = from_integer('0', char_type);
-  exprt nine_char = from_integer('9', char_type);
-  exprt a_char = from_integer('a', char_type);
-  exprt f_char = from_integer('f', char_type);
-
-  size_t max_size = 8;
-  constraints.existential.push_back(and_exprt(
-    greater_than(array_pool.get_or_create_length(res), 0),
-    less_than_or_equal_to(array_pool.get_or_create_length(res), max_size)));
-
-  for(size_t size = 1; size <= max_size; size++)
-  {
-    exprt sum = from_integer(0, type);
-    exprt all_numbers = true_exprt();
-    exprt chr = res[0];
-
-    for(size_t j = 0; j < size; j++)
-    {
-      chr = res[j];
-      exprt chr_int = int_of_hex_char(chr);
-      sum = plus_exprt(mult_exprt(sum, sixteen), typecast_exprt(chr_int, type));
-      or_exprt is_number(
-        and_exprt(
-          binary_relation_exprt(chr, ID_ge, zero_char),
-          binary_relation_exprt(chr, ID_le, nine_char)),
-        and_exprt(
-          binary_relation_exprt(chr, ID_ge, a_char),
-          binary_relation_exprt(chr, ID_le, f_char)));
-      all_numbers = and_exprt(all_numbers, is_number);
-    }
-
-    const equal_exprt premise =
-      equal_to(array_pool.get_or_create_length(res), size);
-    constraints.existential.push_back(
-      implies_exprt(premise, and_exprt(equal_exprt(i, sum), all_numbers)));
-
-    // disallow 0s at the beginning
-    if(size > 1)
-      constraints.existential.push_back(
-        implies_exprt(premise, not_exprt(equal_exprt(res[0], zero_char))));
-  }
-  return {from_integer(0, get_return_code_type()), std::move(constraints)};
-}
-
 /// Add axioms corresponding to the Integer.toHexString(I) java function
 /// \param f: function application with an integer argument
 /// \return code 0 on success
@@ -262,7 +184,7 @@ string_constraint_generatort::add_axioms_from_int_hex(
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_int_hex(res, f.arguments()[2]);
+  return add_axioms_for_string_of_int_with_radix(res, f.arguments()[2], from_integer(16, unsignedbv_typet{8}) , 0);
 }
 
 /// Add axioms making the return value true if the given string is a correct
