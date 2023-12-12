@@ -1,6 +1,6 @@
 CORE
 abs.c
---function abs
+--no-standard-checks --function abs
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

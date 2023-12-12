@@ -1,6 +1,6 @@
 CORE
 lock.c
---depth 10
+--no-standard-checks --depth 10
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

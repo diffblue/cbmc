@@ -1,6 +1,6 @@
 CORE no-new-smt
 pid.c
---cover mcdc --unwind 6
+--no-standard-checks --cover mcdc --unwind 6
 ^EXIT=0$
 ^SIGNAL=0$
 coverage results
