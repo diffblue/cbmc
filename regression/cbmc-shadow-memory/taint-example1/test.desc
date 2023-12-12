@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 15
+--no-standard-checks --unwind 15
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

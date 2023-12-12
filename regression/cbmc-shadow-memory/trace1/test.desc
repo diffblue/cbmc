@@ -1,6 +1,6 @@
 CORE
 main.c
---stop-on-fail --unwind 5
+--no-standard-checks --stop-on-fail --unwind 5
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED

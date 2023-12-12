@@ -1,6 +1,6 @@
 CORE
 good.c
---function good_declarations --verbosity 10
+--no-standard-checks --function good_declarations --verbosity 10
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
