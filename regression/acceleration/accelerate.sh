@@ -16,7 +16,7 @@ is_windows=$4
 shift 4
 
 cfile=""
-cbmcargs="--no-standard-checks"
+cbmcargs=""
 
 # create the temporary directory relative to the current directory, thus
 # avoiding file names that start with a "/", which confuses goto-cl (Windows)
