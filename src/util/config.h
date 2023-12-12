@@ -70,7 +70,7 @@ class symbol_table_baset;
     " {y--no-library} \t disable built-in abstract C library\n"
 
 #define OPT_CONFIG_LIBRARY                                                     \
-  "(malloc-fail-assert)(malloc-fail-null)(malloc-may-fail)"                    \
+  "(malloc-fail-assert)(malloc-fail-null)(malloc-may-fail)(no-malloc-fail)"    \
   "(string-abstraction)"
 
 #define HELP_CONFIG_LIBRARY                                                    \
@@ -78,6 +78,7 @@ class symbol_table_baset;
   " {y--malloc-fail-assert} \t "                                               \
   "set malloc failure mode to assert-then-assume\n"                            \
   " {y--malloc-fail-null} \t set malloc failure mode to return null\n"         \
+  " {y--no-malloc-fail} \t Disable potential malloc failure.\n"                \
   " {y--string-abstraction} \t track C string lengths and zero-termination\n"
 
 #define OPT_CONFIG_JAVA "(classpath)(cp)(main-class)"
