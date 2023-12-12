@@ -10,7 +10,7 @@ POSIX_ONLY =
 endif
 
 test:
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --no-standard-checks --validate-goto-model --validate-ssa-equation" $(POSIX_ONLY)
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(POSIX_ONLY)
 
 tests.log: ../test.pl test
 
