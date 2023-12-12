@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^\[main\.array_bounds\.1\] line \d+ array 'y' upper bound.*FAILURE$
 ^\[main\.overflow\.1\] line \d+ arithmetic overflow on signed.*FAILURE$
 ^\*\* 2 of 2 failed

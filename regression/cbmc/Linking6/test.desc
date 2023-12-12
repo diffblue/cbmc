@@ -1,6 +1,6 @@
 CORE
 main.c
-module.c --pointer-check
+--no-standard-checks module.c --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

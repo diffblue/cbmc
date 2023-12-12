@@ -1,6 +1,6 @@
 CORE
 dummy.c
---traec
+--no-standard-checks --traec
 did you mean --trace
 ^EXIT=(1|64)$
 ^SIGNAL=0$

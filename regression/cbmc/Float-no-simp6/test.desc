@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---floatbv --no-simplify
+--no-standard-checks --floatbv --no-simplify
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

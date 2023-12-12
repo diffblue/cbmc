@@ -1,6 +1,6 @@
 CORE
 main.c
---show-array-constraints
+--no-standard-checks --show-array-constraints
 ^EXIT=1$
 ^SIGNAL=0$
 --

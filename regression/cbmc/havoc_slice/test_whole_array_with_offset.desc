@@ -1,6 +1,6 @@
 CORE
 test_whole_array_with_offset.c
-
+--no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

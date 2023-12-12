@@ -1,6 +1,6 @@
 CORE smt-backend
 original_repro.c
---smt2
+--no-standard-checks --smt2
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

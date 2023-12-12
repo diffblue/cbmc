@@ -1,6 +1,6 @@
 CORE smt-backend no-new-smt
 main.c
---smt2 --fpa
+--no-standard-checks --smt2 --fpa
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

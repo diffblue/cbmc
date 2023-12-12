@@ -1,6 +1,6 @@
 CORE broken-cprover-smt-backend no-new-smt
 test_struct_raw_bytes.c
-
+--no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

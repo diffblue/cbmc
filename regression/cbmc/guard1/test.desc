@@ -1,6 +1,6 @@
 CORE
 main.c
---depth 19
+--no-standard-checks --depth 19
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

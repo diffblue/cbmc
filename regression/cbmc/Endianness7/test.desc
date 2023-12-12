@@ -1,6 +1,6 @@
 CORE
 main.c
---big-endian --no-simplify
+--no-standard-checks --big-endian --no-simplify
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

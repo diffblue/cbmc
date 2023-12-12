@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---nan-check
+--no-standard-checks --nan-check
 \[main.NaN.1\] line \d+ NaN on \+ in byte_extract_(big|little)_endian\(c, (0|0l|0ll), float\) \+ myzero: SUCCESS
 \[main.NaN.2\] line \d+ NaN on / in myzero / myzero: FAILURE
 \[main.NaN.3\] line \d+ NaN on / in \(float\)n / myinf: FAILURE

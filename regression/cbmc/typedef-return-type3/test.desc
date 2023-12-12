@@ -1,6 +1,6 @@
 CORE
 main.c
---show-symbol-table --function fun
+--no-standard-checks --show-symbol-table --function fun
 // Enable multi-line checking
 activate-multi-line-match
 Base name\.+: fun\nMode\.+: C\nType\.+: MYINT \(void\)

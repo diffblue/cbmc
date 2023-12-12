@@ -1,6 +1,6 @@
 CORE
 main.i
---32
+--no-standard-checks --32
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

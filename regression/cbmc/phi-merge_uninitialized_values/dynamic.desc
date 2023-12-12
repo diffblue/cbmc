@@ -1,6 +1,6 @@
 CORE 
 test.c
---function dynamicAllocationUninitialized --show-vcc
+--no-standard-checks --function dynamicAllocationUninitialized --show-vcc
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---verbosity 10 --xml-ui
+--no-standard-checks --verbosity 10 --xml-ui
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED

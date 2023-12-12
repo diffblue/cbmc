@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions
+--no-standard-checks --show-goto-functions
 ASSERT saturating-\(.*\)
 ASSERT saturating\+\(.*\)
 ^EXIT=0$

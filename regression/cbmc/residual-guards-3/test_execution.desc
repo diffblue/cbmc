@@ -1,6 +1,6 @@
 CORE
 test.c
---depth 1000
+--no-standard-checks --depth 1000
 ^\[main\.assertion\.[0-9]+\] line [0-9]+ assertion argc == 1: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$

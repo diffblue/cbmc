@@ -1,6 +1,6 @@
 CORE
 main.c
---little-endian
+--no-standard-checks --little-endian
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.2\] .*: FAILURE$

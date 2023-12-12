@@ -1,6 +1,6 @@
 CORE
 bool4.c
-
+--no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

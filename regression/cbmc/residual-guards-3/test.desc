@@ -1,6 +1,6 @@
 CORE paths-lifo-expected-failure
 test.c
---show-vcc --depth 1000
+--no-standard-checks --show-vcc --depth 1000
 ^\{1\} main::argc!0@1#1 = 1$
 ^EXIT=0$
 ^SIGNAL=0$

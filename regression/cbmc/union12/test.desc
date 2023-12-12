@@ -1,6 +1,6 @@
 CORE broken-smt-backend
 main.c
---pointer-check
+--no-standard-checks --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.2\] line 20 should fail: FAILURE$

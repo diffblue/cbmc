@@ -1,6 +1,6 @@
 CORE
 main.c
---big-endian -DUSE_BIG_ENDIAN
+--no-standard-checks --big-endian -DUSE_BIG_ENDIAN
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

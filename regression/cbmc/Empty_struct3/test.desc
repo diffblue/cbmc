@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
---json-ui
+--no-standard-checks --json-ui
 VERIFICATION FAILED
 ^EXIT=10$
 ^SIGNAL=0$

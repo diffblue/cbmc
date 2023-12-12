@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^file main.c line \d+ function main: Found enable and disable pragmas for pointer-primitive-check
 ^file main.c line \d+ function main: syntax error before ' check enable "pointer-primitive"'
 ^PARSING ERROR$

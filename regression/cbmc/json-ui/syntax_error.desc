@@ -1,6 +1,6 @@
 CORE
 syntax_error.c
---json-ui
+--no-standard-checks --json-ui
 activate-multi-line-match
 ^EXIT=6$
 ^SIGNAL=0$

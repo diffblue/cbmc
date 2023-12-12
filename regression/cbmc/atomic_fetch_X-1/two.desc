@@ -1,6 +1,6 @@
 CORE
 two.c
-
+--no-standard-checks
 ^EXIT=6$
 ^SIGNAL=0$
 take three arguments

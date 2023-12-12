@@ -1,6 +1,6 @@
 CORE
 main.c
---function foo
+--no-standard-checks --function foo
 ^\[foo.assertion.\d+\] line \d+ assertion other_function\(4\) == 5: FAILURE$
 ^\[foo.assertion.\d+\] line \d+ assertion other_function\(4\) >= 4: SUCCESS$
 ^EXIT=10$

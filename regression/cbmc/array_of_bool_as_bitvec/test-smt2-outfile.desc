@@ -1,6 +1,6 @@
 CORE broken-smt-backend no-new-smt
 main.c
---smt2 --outfile -
+--no-standard-checks --smt2 --outfile -
 \(= \(select array_of\.0 i\) \(ite false #b1 #b0\)\)
 \(= \(select array\.1 \(\(_ zero_extend \d+\) \|main::1::idx!0@1#1\|\)\) #b1\)
 \(= \(select array\.1 \(_ bv\d+ \d+\)\) \(ite false #b1 #b0\)\)

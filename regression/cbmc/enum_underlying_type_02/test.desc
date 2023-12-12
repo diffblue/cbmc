@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^EXIT=6$
 ^SIGNAL=0$
 ^file main.c line \d+: enumerator value is not representable in the underlying type 'unsigned_char'$

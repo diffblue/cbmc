@@ -1,6 +1,6 @@
 CORE paths-lifo-expected-failure
 access.c
---program-only
+--no-standard-checks --program-only
 ^EXIT=0$
 ^SIGNAL=0$
 s!0@1#2\.\.n == \{ s!0@1#1\.\.n\[\[0\]\], s!0@1#1\.\.n\[\[1\]\], s!0@1#1\.\.n\[\[2\]\], s!0@1#1\.\.n\[\[3\]\] } WITH \[\(.*\)i!0@1#2:=k!0@1#1\]

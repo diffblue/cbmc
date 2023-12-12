@@ -1,6 +1,6 @@
 CORE
 test.c
---show-vcc
+--no-standard-checks --show-vcc
 \(main::1::p!0@1#2 = address_of
 ^EXIT=0$
 ^SIGNAL=0$

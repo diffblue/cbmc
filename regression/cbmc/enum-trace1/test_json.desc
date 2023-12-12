@@ -1,6 +1,6 @@
 CORE
 main.c
---json-ui --function test --trace
+--no-standard-checks --json-ui --function test --trace
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$

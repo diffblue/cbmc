@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions
+--no-standard-checks --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
 ^__sync_lock_release_S8

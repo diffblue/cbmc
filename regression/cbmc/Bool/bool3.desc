@@ -1,6 +1,6 @@
 CORE no-new-smt
 bool3.c
---json-ui
+--no-standard-checks --json-ui
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED

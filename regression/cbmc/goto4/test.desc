@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 1 --unwinding-assertions
+--no-standard-checks --unwind 1 --unwinding-assertions
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*] line 5 assertion g == 0: SUCCESS$

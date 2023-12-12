@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 __CPROVER_[rw]_ok\(arbitrary_size, n \+ 1\): FAILURE$
 ^\*\* 2 of 12 failed
 ^VERIFICATION FAILED$

@@ -1,6 +1,6 @@
 CORE
 main.c
---function testFunc
+--no-standard-checks --function testFunc
 ^EXIT=0$
 ^SIGNAL=0$
 --

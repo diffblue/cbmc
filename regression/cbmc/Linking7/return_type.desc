@@ -1,6 +1,6 @@
 CORE
 return_type1.c
-return_type2.c
+--no-standard-checks return_type2.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

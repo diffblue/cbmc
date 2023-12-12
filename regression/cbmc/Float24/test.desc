@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.i
---win32 --xml-ui
+--no-standard-checks --win32 --xml-ui
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED

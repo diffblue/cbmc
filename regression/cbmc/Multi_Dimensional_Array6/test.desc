@@ -1,6 +1,6 @@
 CORE thorough-paths
 main.c
---unwind 3 --no-unwinding-assertions
+--no-standard-checks --unwind 3 --no-unwinding-assertions
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] .*: SUCCESS$

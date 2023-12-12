@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^.*free argument must be dynamic object: FAILURE$

@@ -1,6 +1,6 @@
 CORE
 test.c
---show-vcc
+--no-standard-checks --show-vcc
 main::1::array!0@1#2\[\[0\]\] =
 main::1::array!0@1#2\[\[1\]\] =
 main::1::array!0@1#2\[\[2\]\] =

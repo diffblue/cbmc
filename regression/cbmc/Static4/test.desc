@@ -1,6 +1,6 @@
 CORE
 main.c
---show-symbol-table
+--no-standard-checks --show-symbol-table
 ^EXIT=0$
 ^SIGNAL=0$
 --

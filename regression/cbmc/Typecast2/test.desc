@@ -1,6 +1,6 @@
 CORE
 main.i
---no-propagation --64
+--no-standard-checks --no-propagation --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

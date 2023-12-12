@@ -1,6 +1,6 @@
 CORE
 leftshift_overflow.c
---signed-overflow-check --c89
+--no-standard-checks --signed-overflow-check --c89
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*\] line 8 arithmetic overflow on signed shl in .*: FAILURE$

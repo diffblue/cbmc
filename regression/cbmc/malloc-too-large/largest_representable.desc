@@ -1,6 +1,6 @@
 CORE
 largest_representable.c
---malloc-fail-assert
+--no-standard-checks --malloc-fail-assert
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[malloc.assertion.\d+\] line \d+ max allocation size exceeded: SUCCESS$

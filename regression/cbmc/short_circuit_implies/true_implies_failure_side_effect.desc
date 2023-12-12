@@ -1,6 +1,6 @@
 CORE
 true_implies_failure_side_effect.c
-
+--no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 line 5 fail function: FAILURE

@@ -1,6 +1,6 @@
 CORE
 main.c
---no-simplify
+--no-standard-checks --no-simplify
 VERIFICATION SUCCESSFUL
 ^EXIT=0$
 ^SIGNAL=0$

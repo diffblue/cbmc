@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---full-slice
+--no-standard-checks --full-slice
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[test_copy\.assertion\.4\] .* expected to fail: FAILURE$

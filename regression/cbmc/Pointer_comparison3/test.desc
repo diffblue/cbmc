@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
-
+--no-standard-checks
 ^\[main.assertion.3\] line 21 always false for different objects: FAILURE$
 ^\[main.assertion.4\] line 23 always false for different objects: FAILURE$
 ^\*\* 2 of 7 failed

@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
-
+--no-standard-checks
 ^\[main.precondition_instance.1\] line .* memset destination region writeable: FAILURE$
 ^\[main.precondition_instance.2\] line .* memset destination region writeable: FAILURE$
 ^EXIT=10$

@@ -1,6 +1,6 @@
 CORE
 test.c
---show-vcc
+--no-standard-checks --show-vcc
 main::1::b1!0@1#2\.\.a\.\.x =
 main::1::b2!0@1#2\.\.a\.\.x =
 ^EXIT=0$

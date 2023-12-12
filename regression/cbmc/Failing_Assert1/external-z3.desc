@@ -1,6 +1,6 @@
 CORE gcc-only no-new-smt
 main.c
---external-sat-solver ./z3-wrapper.sh --trace
+--no-standard-checks --external-sat-solver ./z3-wrapper.sh --trace
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 no_duplicate.c
---enum-range-check
+--no-standard-checks --enum-range-check
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

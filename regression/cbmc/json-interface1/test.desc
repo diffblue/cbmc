@@ -1,6 +1,6 @@
 CORE
 --json-interface
-< test.json
+--no-standard-checks < test.json
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 enum_test4.c
-
+--no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] line \d+ assertion __CPROVER_enum_is_in_range\(ev1\): FAILURE$

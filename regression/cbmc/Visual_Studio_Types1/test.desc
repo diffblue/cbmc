@@ -1,6 +1,6 @@
 CORE
 main.i
---i386-win32
+--no-standard-checks --i386-win32
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

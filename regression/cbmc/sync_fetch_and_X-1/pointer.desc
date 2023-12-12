@@ -1,6 +1,6 @@
 CORE
 pointer.c
-
+--no-standard-checks
 ^EXIT=6$
 ^SIGNAL=0$
 takes a pointer as first argument

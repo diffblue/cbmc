@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---trace
+--no-standard-checks --trace
 ^\s*ub.*=(\(char \*\)&)?dynamic_object \+ \d+
 ^\s*offset_ubp1=\d+ul* \(00000000 1[0 ]+1\)$
 ^VERIFICATION FAILED$

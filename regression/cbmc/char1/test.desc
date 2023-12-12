@@ -1,6 +1,6 @@
 CORE
 main.c
---unsigned-char
+--no-standard-checks --unsigned-char
 ^EXIT=0$
 ^SIGNAL=0$
 --

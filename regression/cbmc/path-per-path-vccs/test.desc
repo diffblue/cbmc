@@ -1,6 +1,6 @@
 CORE
 main.c
---paths lifo --unwind 1 --pointer-check
+--no-standard-checks --paths lifo --unwind 1 --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

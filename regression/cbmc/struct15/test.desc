@@ -1,6 +1,6 @@
 CORE smt-backend
 main.c
---trace --z3
+--no-standard-checks --trace --z3
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

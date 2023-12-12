@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
-
+--no-standard-checks
 ^\*\* Results:$
 ^\[main.assertion.1\] .* Exists-Exists: successful: SUCCESS$
 ^\[main.assertion.2\] .* NotExists-NotExists: failed: FAILURE$

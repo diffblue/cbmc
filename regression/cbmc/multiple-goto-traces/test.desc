@@ -1,6 +1,6 @@
 CORE
 main.c
---trace
+--no-standard-checks --trace
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$

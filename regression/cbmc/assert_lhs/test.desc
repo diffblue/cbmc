@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 function .* is not declared
 ^EXIT=6$
 ^SIGNAL=0$

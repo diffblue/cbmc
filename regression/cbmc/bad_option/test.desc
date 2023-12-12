@@ -1,6 +1,6 @@
 CORE
 main.c
--foo
+--no-standard-checks -foo
 ^EXIT=(64|1)$
 ^SIGNAL=0$
 Unknown option: -foo

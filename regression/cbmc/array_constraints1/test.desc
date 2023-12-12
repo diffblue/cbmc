@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---unwind 2 --pointer-check
+--no-standard-checks --unwind 2 --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

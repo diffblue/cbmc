@@ -1,6 +1,6 @@
 CORE
 union_member.c
-
+--no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line \d+ should fail: FAILURE$

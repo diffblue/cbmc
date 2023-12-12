@@ -1,6 +1,6 @@
 CORE
 typesmain.c
-types1.c types2.c types3.c
+--no-standard-checks types1.c types2.c types3.c
 warning: pointer parameter types differ between declaration and definition "bar"
 warning: pointer parameter types differ between declaration and definition "foo"
 ^VERIFICATION SUCCESSFUL$

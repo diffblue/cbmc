@@ -1,6 +1,6 @@
 CORE
 main.c
---string-abstraction
+--no-standard-checks --string-abstraction
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

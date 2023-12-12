@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^\[main\.overflow\.1\] line 13 arithmetic overflow on signed \+ in n \+ n: FAILURE$
 ^\[main\.overflow\.2\] line 14 arithmetic overflow on signed \+ in n \+ 1: FAILURE$
 ^\[main\.overflow\.3\] line 15 arithmetic overflow on signed \+ in n \+ 1: FAILURE$

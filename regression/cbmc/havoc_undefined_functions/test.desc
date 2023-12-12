@@ -1,6 +1,6 @@
 CORE
 main.c
---havoc-undefined-functions
+--no-standard-checks --havoc-undefined-functions
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

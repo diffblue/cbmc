@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
-
+--no-standard-checks
 ^\[main\.assertion\.\d+\] line 9 assertion havoc_slice W_OK.*: FAILURE$
 ^\[main\.assertion\.\d+\] line 13 assertion havoc_slice W_OK.*: FAILURE$
 ^\[main\.assertion\.\d+\] line 18 assertion havoc_slice W_OK.*: FAILURE$

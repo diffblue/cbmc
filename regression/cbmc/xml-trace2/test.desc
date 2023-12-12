@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---xml-ui
+--no-standard-checks --xml-ui
 <full_lhs_value( binary="[01]+")?>\{ 14, 0 \}</full_lhs_value>
 ^EXIT=10$
 ^SIGNAL=0$

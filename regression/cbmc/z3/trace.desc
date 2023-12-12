@@ -1,6 +1,6 @@
 CORE smt-backend no-new-smt
 trace.c
---trace --z3
+--no-standard-checks --trace --z3
 ^EXIT=10$
 ^SIGNAL=0$
 arr=\{ 0, 1, 2, 3, 4, 5, 6, 17 \}

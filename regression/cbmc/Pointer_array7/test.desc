@@ -1,6 +1,6 @@
 CORE
 main.c
---little-endian -DUSE_LITTLE_ENDIAN
+--no-standard-checks --little-endian -DUSE_LITTLE_ENDIAN
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

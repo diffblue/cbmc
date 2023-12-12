@@ -1,6 +1,6 @@
 CORE paths-lifo-expected-failure
 main.c
---show-vcc
+--no-standard-checks --show-vcc
 ^EXIT=0$
 ^SIGNAL=0$
 main::1::c1!0@1#. = 1

@@ -1,6 +1,6 @@
 CORE broken-z3-smt-backend no-new-smt
 main.c
-
+--no-standard-checks
 ^\*\* Results:$
 ^\[main.assertion.1\] .* forall a\[\]: SUCCESS$
 ^\[main.assertion.2\] .* assertion a\[.*\] > a\[.*\]: SUCCESS$

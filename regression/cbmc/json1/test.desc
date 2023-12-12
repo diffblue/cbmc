@@ -1,6 +1,6 @@
 CORE
 main.c
---json-ui --stop-on-fail
+--no-standard-checks --json-ui --stop-on-fail
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$

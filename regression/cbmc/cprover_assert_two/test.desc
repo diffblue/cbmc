@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^EXIT=6$
 ^SIGNAL=0$
 wrong number of function arguments

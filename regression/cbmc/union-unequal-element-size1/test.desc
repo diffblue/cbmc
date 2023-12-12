@@ -1,6 +1,6 @@
 CORE
 main.c
---verbosity 10
+--no-standard-checks --verbosity 10
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

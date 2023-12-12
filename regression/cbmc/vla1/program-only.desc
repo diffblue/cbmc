@@ -1,6 +1,6 @@
 CORE
 main.c
---program-only
+--no-standard-checks --program-only
 ^EXIT=0$
 ^SIGNAL=0$
 --

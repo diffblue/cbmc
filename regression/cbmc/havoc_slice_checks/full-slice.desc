@@ -1,6 +1,6 @@
 CORE
 main.c
---full-slice
+--no-standard-checks --full-slice
 ^\[main\.assertion\.\d+\] line 9 assertion havoc_slice W_OK.*: FAILURE$
 ^\[main\.assertion\.\d+\] line 13 assertion havoc_slice W_OK.*: FAILURE$
 ^\[main\.assertion\.\d+\] line 18 assertion havoc_slice W_OK.*: FAILURE$

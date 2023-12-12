@@ -1,6 +1,6 @@
 CORE
 main.c
---trace --trace-show-code
+--no-standard-checks --trace --trace-show-code
 ^EXIT=10$
 ^SIGNAL=0$
 local = 1

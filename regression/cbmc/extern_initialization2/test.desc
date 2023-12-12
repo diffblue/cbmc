@@ -1,6 +1,6 @@
 CORE
 file1.c
-file2.c
+--no-standard-checks file2.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

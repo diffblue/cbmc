@@ -1,6 +1,6 @@
 CORE no-new-smt
 test.c
-
+--no-standard-checks
 ^VERIFICATION FAILED$
 ^\[main.assertion\.1\] line 20.*SUCCESS$
 ^\[main.assertion\.2\] line 21.*FAILURE$

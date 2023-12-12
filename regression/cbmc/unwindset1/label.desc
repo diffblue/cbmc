@@ -1,6 +1,6 @@
 CORE
 main.c
---unwindset main.for_loop:2,main.1:6
+--no-standard-checks --unwindset main.for_loop:2,main.1:6
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

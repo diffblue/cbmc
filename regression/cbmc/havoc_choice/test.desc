@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 \[main\.assertion\.1\] line \d+ assertion a \=\= \'a\'\: FAILURE
 \[main\.assertion\.2\] line \d+ assertion a \=\= \'a\'\: SUCCESS
 \[main\.assertion\.3\] line \d+ assertion b \=\= \'b\'\: FAILURE

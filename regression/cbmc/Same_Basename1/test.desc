@@ -1,6 +1,6 @@
 CORE
 bar.c
-foo/bar.c
+--no-standard-checks foo/bar.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

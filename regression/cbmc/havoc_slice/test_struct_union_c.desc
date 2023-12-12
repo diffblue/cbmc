@@ -1,6 +1,6 @@
 CORE no-new-smt
 test_struct_union_c.c
-
+--no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

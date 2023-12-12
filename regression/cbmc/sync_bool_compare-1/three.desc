@@ -1,6 +1,6 @@
 CORE
 three.c
-
+--no-standard-checks
 ^EXIT=6$
 ^SIGNAL=0$
 expects at least three arguments

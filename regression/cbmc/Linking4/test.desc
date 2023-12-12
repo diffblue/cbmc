@@ -1,6 +1,6 @@
 CORE
 link1.c
-link2.c
+--no-standard-checks link2.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

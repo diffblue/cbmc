@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 1 --unwinding-assertions --no-self-loops-to-assumptions
+--no-standard-checks --unwind 1 --unwinding-assertions --no-self-loops-to-assumptions
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

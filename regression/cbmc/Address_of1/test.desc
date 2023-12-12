@@ -1,6 +1,6 @@
 CORE
 main.c
---stop-on-fail
+--no-standard-checks --stop-on-fail
 ^\[main\.assertion
 ^EXIT=0$
 ^SIGNAL=0$

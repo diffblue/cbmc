@@ -1,6 +1,6 @@
 CORE
 bitreverse-typeconflict.c
-file bitreverse-typeconflict.c line 5 function main: error: __builtin_bitreverse8 expects one operand
+--no-standard-checks file bitreverse-typeconflict.c line 5 function main: error: __builtin_bitreverse8 expects one operand
 ^EXIT=6$
 ^SIGNAL=0$
 --

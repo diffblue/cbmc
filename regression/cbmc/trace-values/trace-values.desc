@@ -1,6 +1,6 @@
 CORE no-new-smt
 trace-values.c
---trace
+--no-standard-checks --trace
 ^EXIT=10$
 ^SIGNAL=0$
 ^  s=\{ \.f=-?\d+, \.array=\{ -?\d+, -?\d+, -?\d+ \} \} \(\{ [01 ]+, \{ [01 ]+, [01 ]+, [01 ]+ \} \}\)$

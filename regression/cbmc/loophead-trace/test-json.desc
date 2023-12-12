@@ -1,6 +1,6 @@
 CORE
 test.c
---unwind 6 test.c --trace --json-ui --partial-loops --slice-formula
+--no-standard-checks --unwind 6 test.c --trace --json-ui --partial-loops --slice-formula
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$

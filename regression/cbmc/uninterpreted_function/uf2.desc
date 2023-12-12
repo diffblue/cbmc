@@ -1,6 +1,6 @@
 CORE no-new-smt
 uf2.c
-
+--no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

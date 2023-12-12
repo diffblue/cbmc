@@ -1,6 +1,6 @@
 CORE broken-z3-smt-backend no-new-smt
 fixed.c
-
+--no-standard-checks
 ^\*\* Results:$
 ^\[main.assertion.5\] line 31 assertion a\[.*\]\[.*\] > 10: SUCCESS$
 ^\[main.assertion.6\] line 33 assertion .*: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 test.c
---trace --json-ui --trace-json-extended
+--no-standard-checks --trace --json-ui --trace-json-extended
 ^EXIT=10$
 ^SIGNAL=0$
 rawLhs

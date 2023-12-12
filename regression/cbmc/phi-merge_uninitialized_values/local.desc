@@ -1,6 +1,6 @@
 CORE 
 test.c
---function localUninitialized --show-vcc
+--no-standard-checks --function localUninitialized --show-vcc
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---arch none --little-endian
+--no-standard-checks --arch none --little-endian
 (Starting CEGAR Loop|^Generated 1 VCC\(s\), 1 remaining after simplification$)
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---show-points-to-sets
+--no-standard-checks --show-points-to-sets
 ^EXIT=1$
 ^SIGNAL=0$
 --

@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
--DMISSING_CAST
+--no-standard-checks -DMISSING_CAST
 pointer subtraction over different types
 CONVERSION ERROR
 ^EXIT=6$

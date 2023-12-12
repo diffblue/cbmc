@@ -1,6 +1,6 @@
 CORE
 main_prec.c
---show-vcc
+--no-standard-checks --show-vcc
 ^EXIT=0$
 ^SIGNAL=0$
 ^some property$

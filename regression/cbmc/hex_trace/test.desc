@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---trace-hex --trace
+--no-standard-checks --trace-hex --trace
 ^EXIT=10$
 ^SIGNAL=0$
 a=0 \s*\(0x0\)

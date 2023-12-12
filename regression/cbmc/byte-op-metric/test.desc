@@ -1,6 +1,6 @@
 CORE
 main.c
---show-byte-ops
+--no-standard-checks --show-byte-ops
 ^EXIT=0$
 ^SIGNAL=0$
 ^Byte Extracts:$

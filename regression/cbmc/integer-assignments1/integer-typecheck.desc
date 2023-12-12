@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions
+--no-standard-checks --show-goto-functions
 ^[[:space:]]*ASSIGN main::1::b := main::1::b \* cast\(100, ℤ\)$
 ^EXIT=0$
 ^SIGNAL=0$

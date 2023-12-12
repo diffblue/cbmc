@@ -1,6 +1,6 @@
 CORE smt-backend no-new-smt
 main.c
---smt2
+--no-standard-checks --smt2
 ^EXIT=10$
 ^SIGNAL=0$
 --

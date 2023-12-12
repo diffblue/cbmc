@@ -1,6 +1,6 @@
 CORE
 main.c
---nondet-static
+--no-standard-checks --nondet-static
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

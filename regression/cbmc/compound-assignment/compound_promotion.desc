@@ -1,6 +1,6 @@
 CORE
 compound_promotion.c
-
+--no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

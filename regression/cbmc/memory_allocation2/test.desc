@@ -1,6 +1,6 @@
 CORE
 main.c
---bounds-check
+--no-standard-checks --bounds-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.array_bounds\.[1-2]\] .*: SUCCESS$

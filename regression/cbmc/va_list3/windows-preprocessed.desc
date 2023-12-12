@@ -1,6 +1,6 @@
 CORE broken-smt-backend no-new-smt
 windows-preprocessed.i
---winx64
+--no-standard-checks --winx64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

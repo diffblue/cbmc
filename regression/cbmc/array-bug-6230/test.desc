@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---malloc-may-fail --malloc-fail-null --pointer-check
+--no-standard-checks --malloc-may-fail --malloc-fail-null --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

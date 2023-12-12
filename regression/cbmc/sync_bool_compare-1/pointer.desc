@@ -1,6 +1,6 @@
 CORE
 pointer.c
-
+--no-standard-checks
 ^EXIT=6$
 ^SIGNAL=0$
 __sync_bool_compare_and_swap takes a pointer as first argument

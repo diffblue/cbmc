@@ -1,6 +1,6 @@
 CORE
 quantifier-with-side-effect.c
-
+--no-standard-checks
 ^EXIT=6$
 ^SIGNAL=0$
 ^file .* line 10 function main: quantifier must not contain side effects$

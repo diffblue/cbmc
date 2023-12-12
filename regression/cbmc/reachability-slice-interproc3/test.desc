@@ -1,6 +1,6 @@
 CORE
 main.c
---reachability-slice-fb --show-goto-functions
+--no-standard-checks --reachability-slice-fb --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
 SET RETURN VALUE 1$

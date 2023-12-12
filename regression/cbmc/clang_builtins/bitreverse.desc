@@ -1,6 +1,6 @@
 CORE thorough-paths no-new-smt
 bitreverse.c
-
+--no-standard-checks
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

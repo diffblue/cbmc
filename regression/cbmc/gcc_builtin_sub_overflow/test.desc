@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
-
+--no-standard-checks
 \[check_int.assertion.1\] line \d+ assertion !__builtin_ssub_overflow\(1, 1, &result\): SUCCESS
 \[check_int.assertion.2\] line \d+ assertion result == 0: SUCCESS
 \[check_int.assertion.3\] line \d+ assertion __builtin_ssub_overflow\(.*, 1, &result\): SUCCESS

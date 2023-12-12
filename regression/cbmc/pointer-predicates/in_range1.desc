@@ -1,6 +1,6 @@
 CORE
 in_range1.c
-
+--no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 --

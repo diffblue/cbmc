@@ -1,6 +1,6 @@
 CORE
 main1.c
-main2.c
+--no-standard-checks main2.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

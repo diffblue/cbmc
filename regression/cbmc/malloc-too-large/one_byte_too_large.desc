@@ -1,6 +1,6 @@
 CORE
 one_byte_too_large.c
---malloc-fail-null
+--no-standard-checks --malloc-fail-null
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.\d+\] line \d+ assertion p: FAILURE$

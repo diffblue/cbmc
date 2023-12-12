@@ -1,6 +1,6 @@
 CORE
 main.c
---trace
+--no-standard-checks --trace
 ^State \d+ file main.c function main line 20 thread 0$
 ^State \d+ file main.c function main line 36 thread 0$
 ^State \d+ file main.c function main line 44 thread 0$

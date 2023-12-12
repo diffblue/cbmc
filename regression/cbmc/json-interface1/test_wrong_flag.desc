@@ -1,6 +1,6 @@
 CORE
 --json-interface
-< test_wrong_flag.json
+--no-standard-checks < test_wrong_flag.json
 ^EXIT=6$
 ^SIGNAL=0$
 unknown command line option

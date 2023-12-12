@@ -1,6 +1,6 @@
 CORE
 main.c
---reachability-slice --show-goto-functions
+--no-standard-checks --reachability-slice --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
 main\(\)

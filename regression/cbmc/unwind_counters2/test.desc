@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 3 --unwinding-assertions
+--no-standard-checks --unwind 3 --unwinding-assertions
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

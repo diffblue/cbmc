@@ -1,6 +1,6 @@
 CORE
 main.c
---program-only
+--no-standard-checks --program-only
 ASSERT\(__CPROVER_saturating_minus\(.*\)
 ASSERT\(__CPROVER_saturating_plus\(.*\)
 ^EXIT=0$

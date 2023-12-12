@@ -1,6 +1,6 @@
 CORE
 structs.c
---string-abstraction
+--no-standard-checks --string-abstraction
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

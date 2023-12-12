@@ -1,6 +1,6 @@
 CORE
 test.c
-
+--no-standard-checks
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

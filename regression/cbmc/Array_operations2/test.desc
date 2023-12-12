@@ -1,6 +1,6 @@
 CORE broken-cprover-smt-backend no-new-smt
 main.c
-
+--no-standard-checks
 ^\[main.assertion.12\] line 34 assertion arr\[1\].c\[2\] == 0: FAILURE$
 ^\[main.assertion.13\] line 35 assertion arr\[1\].c\[3\] == 0: FAILURE$
 ^\[main.assertion.14\] line 36 assertion arr\[1\].c\[4\] == 0: FAILURE$

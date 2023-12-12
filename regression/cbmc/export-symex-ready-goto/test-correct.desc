@@ -1,6 +1,6 @@
 CORE
 test.c
---export-symex-ready-goto exported.symex.ready.goto
+--no-standard-checks --export-symex-ready-goto exported.symex.ready.goto
 ^Parsing test.c$
 ^Converting$
 ^Type-checking test$

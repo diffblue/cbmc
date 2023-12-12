@@ -1,6 +1,6 @@
 CORE
 main.c
---no-propagation
+--no-standard-checks --no-propagation
 Generated 1 VCC\(s\), 1 remaining after simplification
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

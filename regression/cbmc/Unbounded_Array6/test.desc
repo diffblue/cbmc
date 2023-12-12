@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---trace
+--no-standard-checks --trace
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

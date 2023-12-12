@@ -1,6 +1,6 @@
 CORE
 test.c
---trace --json-ui
+--no-standard-checks --trace --json-ui
 ^EXIT=10$
 ^SIGNAL=0$
 --

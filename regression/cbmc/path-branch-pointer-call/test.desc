@@ -1,6 +1,6 @@
 CORE
 main.c
---paths lifo
+--no-standard-checks --paths lifo
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

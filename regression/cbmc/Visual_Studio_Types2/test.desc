@@ -1,6 +1,6 @@
 CORE
 main.i
---winx64
+--no-standard-checks --winx64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

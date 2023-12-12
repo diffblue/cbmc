@@ -1,6 +1,6 @@
 CORE
 main.c
-module.c
+--no-standard-checks module.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

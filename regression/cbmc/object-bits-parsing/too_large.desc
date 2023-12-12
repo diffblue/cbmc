@@ -1,6 +1,6 @@
 CORE
 test.c
---object-bits 65
+--no-standard-checks --object-bits 65
 Value of "65" given for object-bits is out of range.
 object-bits must be positive and less than the pointer width
 ^EXIT=1$

@@ -1,6 +1,6 @@
 CORE
 test.c
---show-vcc
+--no-standard-checks --show-vcc
 main::1::a1!0@1#2 =
 main::1::a2!0@1#2 =
 main::1::a1!0@1#2\.\.x =

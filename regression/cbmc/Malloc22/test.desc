@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 2 --smt2 --outfile main.smt2
+--no-standard-checks --unwind 2 --smt2 --outfile main.smt2
 ^EXIT=0$
 ^SIGNAL=0$
 --

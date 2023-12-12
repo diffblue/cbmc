@@ -1,6 +1,6 @@
 CORE paths-lifo-expected-failure
 test.c
---function test --show-vcc
+--no-standard-checks --function test --show-vcc
 ^EXIT=0$
 ^SIGNAL=0$
 test::1::unconditionally_reachable_1[^\s]+ = 7$

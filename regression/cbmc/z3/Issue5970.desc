@@ -1,6 +1,6 @@
 CORE smt-backend broken-cprover-smt-backend no-new-smt
 Issue5970.c
---z3
+--no-standard-checks --z3
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line [0-9]+ assertion x\[0\] > 0: FAILURE$

@@ -1,6 +1,6 @@
 CORE thorough-paths no-new-smt
 test.c
---no-simplify --unwind 300 --object-bits 8
+--no-standard-checks --no-simplify --unwind 300 --object-bits 8
 too many addressed objects
 ^EXIT=6$
 ^SIGNAL=0$

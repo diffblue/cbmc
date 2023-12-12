@@ -1,6 +1,6 @@
 CORE
 main.c
---show-vcc
+--no-standard-checks --show-vcc
 ^EXIT=0$
 ^SIGNAL=0$
 ptr10\$object

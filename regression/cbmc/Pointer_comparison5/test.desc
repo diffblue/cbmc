@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-standard-checks
 ^Generated \d+ VCC\(s\), 1 remaining after simplification$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
