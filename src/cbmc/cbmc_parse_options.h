@@ -96,7 +96,7 @@ public:
   ///
   /// This function sets up the default analysis checks as discussed
   /// in RFC https://github.com/diffblue/cbmc/issues/7975.
-  static void set_default_analysis_flags(optionst &);
+  static void set_default_analysis_flags(optionst &, const bool enabled);
   static bool process_goto_program(goto_modelt &, const optionst &, messaget &);
 
   static int get_goto_program(

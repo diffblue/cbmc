@@ -191,7 +191,7 @@ protected:
   virtual int perform_analysis(const optionst &options);
 
   // TODO: Add documentation
-  static void set_default_analysis_flags(optionst &options);
+  static void set_default_analysis_flags(optionst &options, const bool enabled);
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H

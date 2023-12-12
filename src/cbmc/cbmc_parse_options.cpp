@@ -106,25 +106,27 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("depth", UINT32_MAX);
 }
 
-void cbmc_parse_optionst::set_default_analysis_flags(optionst &options)
+void cbmc_parse_optionst::set_default_analysis_flags(
+  optionst &options,
+  const bool enabled)
 {
   // Checks enabled by default in v6.0+.
-  options.set_option("bounds-check", true);
-  options.set_option("pointer-check", true);
-  options.set_option("pointer-primitive-check", true);
-  options.set_option("div-by-zero-check", true);
-  options.set_option("signed-overflow-check", true);
-  options.set_option("undefined-shift-check", true);
+  options.set_option("bounds-check", enabled);
+  options.set_option("pointer-check", enabled);
+  options.set_option("pointer-primitive-check", enabled);
+  options.set_option("div-by-zero-check", enabled);
+  options.set_option("signed-overflow-check", enabled);
+  options.set_option("undefined-shift-check", enabled);
 
   // Default malloc failure profile chosen to be returning null. These options
   // are not strictly needed, but they are staying here as part of documentation
   // of the default option set for the tool.
-  options.set_option("malloc-may-fail", true);
-  options.set_option("malloc-fail-null", true);
+  options.set_option("malloc-may-fail", enabled);
+  options.set_option("malloc-fail-null", enabled);
 
   // Unwinding assertions required in certain cases for sound verification
   // results. See https://github.com/diffblue/cbmc/issues/6561 for elaboration.
-  options.set_option("unwinding-assertions", true);
+  options.set_option("unwinding-assertions", enabled);
 }
 
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
@@ -336,9 +338,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // Enable flags that in combination provide analysis with no surprises
   // (expected checks and no unsoundness by missing checks).
+  cbmc_parse_optionst::set_default_analysis_flags(
+    options, !cmdline.isset("no-standard-checks"));
+
   if(!cmdline.isset("no-standard-checks"))
   {
-    cbmc_parse_optionst::set_default_analysis_flags(options);
     // The malloc failure mode is by default handled by the `config.set` call
     // which only looks at the `cmdline` flags. In the case of default checks,
     // these haven't been set - we need to overwrite the config object to manually
