@@ -24,7 +24,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #define MAX_TEXT 20
 
-optionalt<code_with_contract_typet>
+std::optional<code_with_contract_typet>
 get_contract(const irep_idt &function_identifier, const namespacet &ns)
 {
   // contracts are in a separate symbol, with prefix "contract::"
@@ -343,7 +343,7 @@ void instrument_contract_checks(
   {
     for(auto &instruction : body.instructions)
       instruction.transform(
-        [&old_prefix, &old_exprs](exprt expr) -> optionalt<exprt> {
+        [&old_prefix, &old_exprs](exprt expr) -> std::optional<exprt> {
           return replace_old(expr, old_prefix, old_exprs);
         });
   }

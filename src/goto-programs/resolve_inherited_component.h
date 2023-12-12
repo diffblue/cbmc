@@ -14,9 +14,9 @@ Author: Diffblue Ltd.
 #define CPROVER_GOTO_PROGRAMS_RESOLVE_INHERITED_COMPONENT_H
 
 #include <util/irep.h>
-#include <util/optional.h>
 
 #include <functional>
+#include <optional>
 
 class symbolt;
 class symbol_table_baset;
@@ -47,7 +47,7 @@ public:
     irep_idt component_identifier;
   };
 
-  optionalt<inherited_componentt> operator()(
+  std::optional<inherited_componentt> operator()(
     const irep_idt &class_id,
     const irep_idt &component_name,
     bool include_interfaces,
@@ -62,7 +62,7 @@ private:
   const symbol_table_baset &symbol_table;
 };
 
-optionalt<resolve_inherited_componentt::inherited_componentt>
+std::optional<resolve_inherited_componentt::inherited_componentt>
 get_inherited_method_implementation(
   const irep_idt &call_basename,
   const irep_idt &classname,

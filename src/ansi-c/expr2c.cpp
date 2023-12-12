@@ -1719,7 +1719,7 @@ std::string expr2ct::convert_object_descriptor(
   return result;
 }
 
-static optionalt<exprt>
+static std::optional<exprt>
 build_sizeof_expr(const constant_exprt &expr, const namespacet &ns)
 {
   const typet &type = static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
@@ -1728,7 +1728,7 @@ build_sizeof_expr(const constant_exprt &expr, const namespacet &ns)
     return {};
 
   const auto type_size_expr = size_of_expr(type, ns);
-  optionalt<mp_integer> type_size;
+  std::optional<mp_integer> type_size;
   if(type_size_expr.has_value())
     type_size = numeric_cast<mp_integer>(*type_size_expr);
   auto val = numeric_cast<mp_integer>(expr);
@@ -4066,7 +4066,7 @@ std::string expr2ct::convert_with_precedence(
   return convert_norep(src, precedence);
 }
 
-optionalt<std::string> expr2ct::convert_function(const exprt &src)
+std::optional<std::string> expr2ct::convert_function(const exprt &src)
 {
   static const std::map<irep_idt, std::string> function_names = {
     {"buffer_size", "BUFFER_SIZE"},

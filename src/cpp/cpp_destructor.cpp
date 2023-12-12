@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 
 /// \return typechecked code
-optionalt<codet> cpp_typecheckt::cpp_destructor(
+std::optional<codet> cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
   const exprt &object)
 {

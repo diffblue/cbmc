@@ -11,7 +11,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #define CPROVER_UTIL_STRING2INT_H
 
 #include "narrow.h"
-#include "optional.h"
+
+#include <optional>
 #include <string>
 #include <type_traits>
 
@@ -38,18 +39,18 @@ long long unsigned int unsafe_string2unsignedlonglong(
 
 /// Convert string to integer as per stoi, but return nullopt when
 /// stoi would throw
-optionalt<int> string2optional_int(const std::string &, int base = 10);
+std::optional<int> string2optional_int(const std::string &, int base = 10);
 
 /// Convert string to unsigned similar to the stoul or stoull functions,
 /// return nullopt when the conversion fails.
 /// Note: Unlike stoul or stoull negative inputs are disallowed
-optionalt<unsigned>
+std::optional<unsigned>
 string2optional_unsigned(const std::string &, int base = 10);
 
 /// Convert string to size_t similar to the stoul or stoull functions,
 /// return nullopt when the conversion fails.
 /// Note: Unlike stoul or stoull negative inputs are disallowed
-optionalt<std::size_t>
+std::optional<std::size_t>
 string2optional_size_t(const std::string &, int base = 10);
 
 /// convert string to signed long long if T is signed
@@ -86,7 +87,7 @@ auto string2optional_base(const std::string &str, int base) ->
 /// with out_of_range or invalid_argument
 template <typename do_conversiont>
 auto wrap_string_conversion(do_conversiont do_conversion)
-  -> optionalt<decltype(do_conversion())>
+  -> std::optional<decltype(do_conversion())>
 {
   try
   {
@@ -107,7 +108,7 @@ auto wrap_string_conversion(do_conversiont do_conversion)
 ///   (unsigned) long long
 /// does not accept negative inputs when the result type is unsigned
 template <typename T>
-optionalt<T> string2optional(const std::string &str, int base = 10)
+std::optional<T> string2optional(const std::string &str, int base = 10)
 {
   return wrap_string_conversion([&]() {
     return narrow_or_throw_out_of_range<T>(string2optional_base<T>(str, base));

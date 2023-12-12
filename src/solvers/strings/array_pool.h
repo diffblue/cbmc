@@ -68,7 +68,7 @@ public:
   /// return an empty optional.
   /// \param s: array expression representing a string
   /// \return expression for the length of `s`, or empty optional
-  optionalt<exprt> get_length_if_exists(const array_string_exprt &s) const;
+  std::optional<exprt> get_length_if_exists(const array_string_exprt &s) const;
 
   void insert(const exprt &pointer_expr, const array_string_exprt &array);
 

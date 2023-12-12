@@ -14,7 +14,6 @@ Author: Diffblue Ltd.
 #include <unordered_set>
 
 #include <util/cprover_prefix.h>
-#include <util/optional.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
@@ -123,7 +122,7 @@ private:
   irep_idt max_depth_var_name;
   irep_idt min_depth_var_name;
   type_constructor_namest type_constructor_names;
-  std::vector<optionalt<exprt>> common_arguments_origins;
+  std::vector<std::optional<exprt>> common_arguments_origins;
 
   /// Get the malloc function as symbol exprt,
   /// and inserts it into the goto-model if it doesn't
@@ -131,9 +130,10 @@ private:
   symbol_exprt get_malloc_function();
 
   bool should_be_treated_as_array(const irep_idt &pointer_name) const;
-  optionalt<equal_cluster_idt> find_equal_cluster(const irep_idt &name) const;
+  std::optional<equal_cluster_idt>
+  find_equal_cluster(const irep_idt &name) const;
   bool is_array_size_parameter(const irep_idt &cmdline_arg) const;
-  optionalt<irep_idt>
+  std::optional<irep_idt>
   get_associated_size_variable(const irep_idt &array_name) const;
   bool should_be_treated_as_cstring(const irep_idt &pointer_name) const;
 
@@ -201,8 +201,8 @@ private:
   code_blockt build_constructor_body(
     const exprt &depth_symbol,
     const symbol_exprt &result_symbol,
-    const optionalt<exprt> &size_symbol,
-    const optionalt<irep_idt> &lhs_name,
+    const std::optional<exprt> &size_symbol,
+    const std::optional<irep_idt> &lhs_name,
     const bool is_nullable);
 
   /// Check if a constructor for the type of \p expr already exists and create
@@ -260,7 +260,7 @@ private:
     const exprt &depth,
     const symbol_exprt &result,
     const exprt &size,
-    const optionalt<irep_idt> &lhs_name);
+    const std::optional<irep_idt> &lhs_name);
 
   /// Select the specified struct-member to be non-deterministically
   ///   initialized.

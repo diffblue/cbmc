@@ -45,13 +45,13 @@ private:
   const class_hierarchyt &class_hierarchy;
 
   typedef std::function<
-    optionalt<resolve_inherited_componentt::inherited_componentt>(
+    std::optional<resolve_inherited_componentt::inherited_componentt>(
       const irep_idt &,
       const irep_idt &)>
     function_call_resolvert;
   void get_child_functions_rec(
     const irep_idt &,
-    const optionalt<symbol_exprt> &,
+    const std::optional<symbol_exprt> &,
     const irep_idt &,
     dispatch_table_entriest &,
     dispatch_table_entries_mapt &) const;
@@ -507,7 +507,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 /// \param entry_map: map of class identifiers to dispatch table entries
 void get_virtual_calleest::get_child_functions_rec(
   const irep_idt &this_id,
-  const optionalt<symbol_exprt> &last_method_defn,
+  const std::optional<symbol_exprt> &last_method_defn,
   const irep_idt &component_name,
   dispatch_table_entriest &functions,
   dispatch_table_entries_mapt &entry_map) const

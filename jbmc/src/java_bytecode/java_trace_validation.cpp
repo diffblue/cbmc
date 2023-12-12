@@ -36,7 +36,7 @@ static bool may_be_lvalue(const exprt &expr)
          can_cast_expr<byte_extract_exprt>(expr);
 }
 
-optionalt<symbol_exprt> get_inner_symbol_expr(exprt expr)
+std::optional<symbol_exprt> get_inner_symbol_expr(exprt expr)
 {
   while(expr.has_operands())
   {

@@ -132,7 +132,7 @@ java_class_loader_baset::class_name_to_os_file(const irep_idt &class_name)
 }
 
 /// attempt to load a class from a classpath_entry
-optionalt<java_bytecode_parse_treet> java_class_loader_baset::load_class(
+std::optional<java_bytecode_parse_treet> java_class_loader_baset::load_class(
   const irep_idt &class_name,
   const classpath_entryt &cp_entry,
   message_handlert &message_handler)
@@ -154,7 +154,7 @@ optionalt<java_bytecode_parse_treet> java_class_loader_baset::load_class(
 /// \param jar_file: path of the jar file
 /// \param message_handler: message handler
 /// \return optional value of parse tree, empty if class cannot be loaded
-optionalt<java_bytecode_parse_treet>
+std::optional<java_bytecode_parse_treet>
 java_class_loader_baset::get_class_from_jar(
   const irep_idt &class_name,
   const std::string &jar_file,
@@ -189,7 +189,7 @@ java_class_loader_baset::get_class_from_jar(
 /// \param path: directory to load from
 /// \param message_handler: message handler
 /// \return optional value of parse tree, empty if class cannot be loaded
-optionalt<java_bytecode_parse_treet>
+std::optional<java_bytecode_parse_treet>
 java_class_loader_baset::get_class_from_directory(
   const irep_idt &class_name,
   const std::string &path,

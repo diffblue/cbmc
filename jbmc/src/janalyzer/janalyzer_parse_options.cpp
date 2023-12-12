@@ -445,7 +445,7 @@ int janalyzer_parse_optionst::perform_analysis(
     }
     else
     {
-      optionalt<std::string> json_file;
+      std::optional<std::string> json_file;
       if(cmdline.isset("json"))
         json_file = cmdline.get_value("json");
       bool result = taint_analysis(

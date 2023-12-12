@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "deprecate.h"
 #include "irep.h"
-#include "optional.h"
 
+#include <optional>
 #include <string>
 
 class source_locationt:public irept
@@ -189,7 +189,7 @@ public:
     return static_cast<const source_locationt &>(get_nil_irep());
   }
 
-  optionalt<std::string> full_path() const;
+  std::optional<std::string> full_path() const;
 
   void add_pragma(const irep_idt &pragma)
   {

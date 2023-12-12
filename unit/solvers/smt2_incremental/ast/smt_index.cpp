@@ -1,9 +1,9 @@
 // Author: Diffblue Ltd.
 
-#include <util/optional.h>
-
 #include <solvers/smt2_incremental/ast/smt_index.h>
 #include <testing-utils/use_catch.h>
+
+#include <optional>
 
 TEST_CASE("Test smt_indext.pretty is accessible.", "[core][smt2_incremental]")
 {
@@ -35,8 +35,8 @@ TEST_CASE("Visiting smt_indext", "[core][smt2_incremental]")
   class : public smt_index_const_downcast_visitort
   {
   public:
-    optionalt<std::size_t> numeral_visited{};
-    optionalt<irep_idt> symbol_visited{};
+    std::optional<std::size_t> numeral_visited{};
+    std::optional<irep_idt> symbol_visited{};
 
     void visit(const smt_numeral_indext &numeral) override
     {

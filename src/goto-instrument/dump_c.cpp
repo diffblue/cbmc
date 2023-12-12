@@ -728,7 +728,7 @@ void dump_ct::cleanup_decl(
   goto_programt tmp;
   tmp.add(goto_programt::make_decl(decl.symbol()));
 
-  if(optionalt<exprt> value = decl.initial_value())
+  if(std::optional<exprt> value = decl.initial_value())
   {
     decl.set_initial_value({});
     tmp.add(goto_programt::make_assignment(decl.symbol(), std::move(*value)));
@@ -1536,7 +1536,7 @@ void dump_ct::cleanup_expr(exprt &expr)
       }
     }
 
-    optionalt<exprt> clean_init;
+    std::optional<exprt> clean_init;
     if(
       ns.follow(bu.type()).id() == ID_union &&
       bu.source_location().get_function().empty())

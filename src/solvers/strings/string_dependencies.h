@@ -64,7 +64,7 @@ public:
     // \todo should these we shared pointers?
     std::vector<std::size_t> dependencies;
     // builtin function of which it is the result
-    optionalt<std::size_t> result_from;
+    std::optional<std::size_t> result_from;
 
     explicit string_nodet(array_string_exprt e, const std::size_t index)
       : expr(std::move(e)), index(index)
@@ -101,7 +101,7 @@ public:
   /// of strings on which it depends
   /// Warning: eval uses a cache which must be cleaned everytime the valuations
   /// given by get_value can change.
-  optionalt<exprt> eval(
+  std::optional<exprt> eval(
     const array_string_exprt &s,
     const std::function<exprt(const exprt &)> &get_value) const;
 
@@ -169,7 +169,7 @@ private:
     }
   };
 
-  mutable std::vector<optionalt<exprt>> eval_string_cache;
+  mutable std::vector<std::optional<exprt>> eval_string_cache;
 
   /// Applies `f` on all nodes
   void for_each_node(const std::function<void(const nodet &)> &f) const;
@@ -197,7 +197,7 @@ private:
 ///   builtin function. Or an empty optional when no function applications has
 ///   been encountered
 /// \todo there should be a class with just the three functions we require here
-optionalt<exprt> add_node(
+std::optional<exprt> add_node(
   string_dependenciest &dependencies,
   const exprt &expr,
   array_poolt &array_pool,

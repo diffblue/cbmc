@@ -16,7 +16,7 @@ void destructor_treet::add(const codet &destructor)
   current_node = new_node;
 }
 
-optionalt<codet> &destructor_treet::get_destructor(node_indext index)
+std::optional<codet> &destructor_treet::get_destructor(node_indext index)
 {
   PRECONDITION(index < destruction_graph.size());
   return destruction_graph[index].destructor_value;
@@ -54,8 +54,8 @@ const ancestry_resultt destructor_treet::get_nearest_common_ancestor_info(
 }
 
 const std::vector<destructor_and_idt> destructor_treet::get_destructors(
-  optionalt<node_indext> end_index,
-  optionalt<node_indext> starting_index)
+  std::optional<node_indext> end_index,
+  std::optional<node_indext> starting_index)
 {
   node_indext next_id = starting_index.value_or(get_current_node());
   node_indext end_id = end_index.value_or(0);
@@ -74,7 +74,7 @@ const std::vector<destructor_and_idt> destructor_treet::get_destructors(
   return codes;
 }
 
-void destructor_treet::set_current_node(optionalt<node_indext> val)
+void destructor_treet::set_current_node(std::optional<node_indext> val)
 {
   if(val)
     set_current_node(*val);

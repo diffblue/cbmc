@@ -13,11 +13,11 @@ Author: Daniel Kroening, dkr@amazon.com
 #define CPROVER_CPROVER_STATE_ENCODING_H
 
 #include <util/irep.h>
-#include <util/optional.h>
 
 #include "solver.h"
 
 #include <iosfwd>
+#include <optional>
 
 class goto_modelt;
 
@@ -31,13 +31,13 @@ void state_encoding(
   const goto_modelt &,
   state_encoding_formatt,
   bool program_is_inlined,
-  optionalt<irep_idt> contract,
+  std::optional<irep_idt> contract,
   std::ostream &out);
 
 solver_resultt state_encoding_solver(
   const goto_modelt &,
   bool program_is_inlined,
-  optionalt<irep_idt> contract,
+  std::optional<irep_idt> contract,
   const solver_optionst &);
 
 void variable_encoding(

@@ -114,7 +114,7 @@ bool c_declarationt::has_body() const
   return !initializer.empty() && initializer.front() == '{';
 }
 
-optionalt<ctokent> c_declarationt::declared_identifier() const
+std::optional<ctokent> c_declarationt::declared_identifier() const
 {
   for(auto &t : declarator)
     if(is_identifier(t))

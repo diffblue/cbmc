@@ -13,14 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_PROGRAMS_READ_GOTO_BINARY_H
 
 #include <list>
+#include <optional>
 #include <string>
-
-#include <util/optional.h>
 
 class goto_modelt;
 class message_handlert;
 
-optionalt<goto_modelt>
+std::optional<goto_modelt>
 read_goto_binary(const std::string &filename, message_handlert &);
 
 bool is_goto_binary(const std::string &filename, message_handlert &);

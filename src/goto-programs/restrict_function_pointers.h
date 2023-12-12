@@ -22,7 +22,6 @@ Author: Diffblue Ltd.
 
 #include <util/exception_utils.h>
 #include <util/irep.h>
-#include <util/optional.h>
 
 #include "goto_program.h"
 
@@ -132,7 +131,7 @@ protected:
     const std::string &option,
     const goto_modelt &goto_model);
 
-  static optionalt<restrictiont> get_by_name_restriction(
+  static std::optional<restrictiont> get_by_name_restriction(
     const goto_functiont &goto_function,
     const function_pointer_restrictionst::restrictionst &by_name_restrictions,
     const goto_programt::const_targett &location);

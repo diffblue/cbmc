@@ -10,10 +10,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSER_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSER_H
 
-#include <iosfwd>
-#include <string>
 #include <util/irep.h>
-#include <util/optional.h>
+
+#include <iosfwd>
+#include <optional>
+#include <string>
 
 struct java_bytecode_parse_treet;
 
@@ -23,8 +24,8 @@ struct java_bytecode_parse_treet;
 /// \param msg: handles log messages
 /// \param skip_instructions: if true, the loaded class's methods will all be
 ///   empty. Saves time and memory for consumers that only want signature info.
-/// \return parse tree, or empty optionalt on failure
-optionalt<java_bytecode_parse_treet> java_bytecode_parse(
+/// \return parse tree, or empty std::optional on failure
+std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   const std::string &file,
   const irep_idt &class_name,
   class message_handlert &msg,
@@ -36,8 +37,8 @@ optionalt<java_bytecode_parse_treet> java_bytecode_parse(
 /// \param msg: handles log messages
 /// \param skip_instructions: if true, the loaded class's methods will all be
 ///   empty. Saves time and memory for consumers that only want signature info.
-/// \return parse tree, or empty optionalt on failure
-optionalt<java_bytecode_parse_treet> java_bytecode_parse(
+/// \return parse tree, or empty std::optional on failure
+std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   std::istream &stream,
   const irep_idt &class_name,
   class message_handlert &msg,

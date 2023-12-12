@@ -17,6 +17,7 @@ Author: Daniel Poetzl
 #endif
 
 #include <forward_list>
+#include <functional>
 #include <type_traits>
 
 #ifndef SN_SMALL_MAP

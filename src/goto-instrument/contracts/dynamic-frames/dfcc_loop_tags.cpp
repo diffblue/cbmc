@@ -23,7 +23,7 @@ void dfcc_set_loop_id(
   target->source_location_nonconst().set(ID_loop_id, loop_id);
 }
 
-optionalt<std::size_t>
+std::optional<std::size_t>
 dfcc_get_loop_id(const goto_programt::instructiont::const_targett &target)
 {
   if(target->source_location().get(ID_loop_id).empty())

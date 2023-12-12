@@ -228,14 +228,14 @@ protected:
     const irep_idt &arith_op);
   exprt
   typecheck_saturating_arithmetic(const side_effect_expr_function_callt &expr);
-  virtual optionalt<symbol_exprt> typecheck_gcc_polymorphic_builtin(
+  virtual std::optional<symbol_exprt> typecheck_gcc_polymorphic_builtin(
     const irep_idt &identifier,
     const exprt::operandst &arguments,
     const source_locationt &source_location);
   virtual code_blockt instantiate_gcc_polymorphic_builtin(
     const irep_idt &identifier,
     const symbol_exprt &function_symbol);
-  virtual optionalt<symbol_exprt>
+  virtual std::optional<symbol_exprt>
   typecheck_shadow_memory_builtin(const side_effect_expr_function_callt &expr);
   virtual exprt
   typecheck_shuffle_vector(const side_effect_expr_function_callt &expr);

@@ -752,7 +752,7 @@ void dfcc_instrumentt::instrument_lhs(
 /// Checks if lhs is the `dead_object`, and if the rhs
 /// is an `if_exprt(nondet, ptr, dead_object)` expression.
 /// Returns `ptr` if the pattern was matched, nullptr otherwise.
-optionalt<exprt>
+std::optional<exprt>
 dfcc_instrumentt::is_dead_object_update(const exprt &lhs, const exprt &rhs)
 {
   if(

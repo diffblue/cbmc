@@ -79,7 +79,7 @@ public:
       const std::string &address = "",
       const std::string &pointee = "",
       const std::string &character = "",
-      const optionalt<std::string> &string = {},
+      const std::optional<std::string> &string = {},
       const bool valid = false)
       : address(address),
         pointee(pointee),
@@ -92,7 +92,7 @@ public:
     memory_addresst address;
     std::string pointee;
     std::string character;
-    optionalt<std::string> string;
+    std::optional<std::string> string;
 
     bool has_known_offset() const
     {
@@ -127,7 +127,7 @@ public:
   /// \param expr: an expression of pointer type (e.g., `&x` with `x` being of
   ///   type `int` or `p` with `p` being of type `int *`)
   /// \return memory address in hex format
-  optionalt<std::string> get_value(const std::string &expr);
+  std::optional<std::string> get_value(const std::string &expr);
 
   /// Get the value of a pointer associated with \p expr
   /// \param expr: the expression to be analyzed

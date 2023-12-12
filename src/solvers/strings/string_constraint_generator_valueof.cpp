@@ -421,7 +421,7 @@ string_constraint_generatort::add_axioms_for_characters_in_integer_string(
     // a digit, which is `max_string_length - 2` because of the space left for
     // a minus sign. That assumes that we were able to identify the radix. If we
     // weren't then we check for overflow on every index.
-    optionalt<exprt> no_overflow;
+    std::optional<exprt> no_overflow;
     if(size - 1 >= max_string_length - 2 || radix_ul == 0)
     {
       no_overflow = and_exprt{equal_exprt(sum, div_exprt(radix_sum, radix)),

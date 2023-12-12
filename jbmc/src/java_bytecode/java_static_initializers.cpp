@@ -782,7 +782,7 @@ class_to_declared_symbols(const symbol_table_baset &symbol_table)
   for(const auto &symbol_pair : symbol_table)
   {
     const symbolt &symbol = symbol_pair.second;
-    if(optionalt<irep_idt> declaring = declaring_class(symbol))
+    if(std::optional<irep_idt> declaring = declaring_class(symbol))
       result.emplace(*declaring, symbol);
   }
   return result;
@@ -792,7 +792,7 @@ code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
   const json_objectt &static_values_json,
   symbol_table_baset &symbol_table,
-  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
   size_t max_user_array_length,
   std::unordered_map<std::string, object_creation_referencet> &references,
   const std::unordered_multimap<irep_idt, symbolt>

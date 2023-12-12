@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_CONFIG_H
 #define CPROVER_UTIL_CONFIG_H
 
-#include <list>
-
 #include "ieee_float.h"
 #include "irep.h"
-#include "optional.h"
+
+#include <list>
+#include <optional>
 
 class cmdlinet;
 class symbol_table_baset;
@@ -287,7 +287,7 @@ public:
     /// Maximum value of argc, which is operating-systems dependent: Windows
     /// limits the number of characters accepte by CreateProcess, and Unix
     /// systems have sysconf(ARG_MAX).
-    optionalt<mp_integer> max_argc;
+    std::optional<mp_integer> max_argc;
   } ansi_c;
 
   struct cppt
@@ -348,7 +348,7 @@ public:
   } bv_encoding;
 
   // this is the function to start executing
-  optionalt<std::string> main;
+  std::optional<std::string> main;
 
   void set_arch(const irep_idt &);
 

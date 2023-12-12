@@ -231,7 +231,7 @@ protected:
   bool rNullDeclaration(cpp_declarationt &);
   bool rTypedef(cpp_declarationt &);
   bool rTypedefUsing(cpp_declarationt &);
-  optionalt<codet> rTypedefStatement();
+  std::optional<codet> rTypedefStatement();
   bool rTypeSpecifier(typet &, bool);
   bool isTypeSpecifier();
   bool rLinkageSpec(cpp_linkage_spect &);
@@ -341,20 +341,20 @@ protected:
   bool maybeTemplateArgs();
 
   bool rFunctionBody(cpp_declaratort &);
-  optionalt<codet> rCompoundStatement();
-  optionalt<codet> rStatement();
-  optionalt<codet> rIfStatement();
-  optionalt<codet> rSwitchStatement();
-  optionalt<codet> rWhileStatement();
-  optionalt<codet> rDoStatement();
-  optionalt<codet> rForStatement();
-  optionalt<codet> rTryStatement();
+  std::optional<codet> rCompoundStatement();
+  std::optional<codet> rStatement();
+  std::optional<codet> rIfStatement();
+  std::optional<codet> rSwitchStatement();
+  std::optional<codet> rWhileStatement();
+  std::optional<codet> rDoStatement();
+  std::optional<codet> rForStatement();
+  std::optional<codet> rTryStatement();
 
-  optionalt<codet> rExprStatement();
-  optionalt<codet> rDeclarationStatement();
-  optionalt<codet>
+  std::optional<codet> rExprStatement();
+  std::optional<codet> rDeclarationStatement();
+  std::optional<codet>
   rIntegralDeclStatement(cpp_storage_spect &, typet &, typet &);
-  optionalt<codet> rOtherDeclStatement(cpp_storage_spect &, typet &);
+  std::optional<codet> rOtherDeclStatement(cpp_storage_spect &, typet &);
 
   bool MaybeTypeNameOrClassTemplate(cpp_tokent &);
   void SkipTo(int token);
@@ -363,13 +363,13 @@ protected:
   bool rString(cpp_tokent &tk);
 
   // GCC extensions
-  optionalt<codet> rGCCAsmStatement();
+  std::optional<codet> rGCCAsmStatement();
 
   // MSC extensions
-  optionalt<codet> rMSC_tryStatement();
-  optionalt<codet> rMSC_leaveStatement();
-  optionalt<codet> rMSCAsmStatement();
-  optionalt<codet> rMSC_if_existsStatement();
+  std::optional<codet> rMSC_tryStatement();
+  std::optional<codet> rMSC_leaveStatement();
+  std::optional<codet> rMSCAsmStatement();
+  std::optional<codet> rMSC_if_existsStatement();
   bool rTypePredicate(exprt &);
   bool rMSCuuidof(exprt &);
   bool rMSC_if_existsExpr(exprt &);
@@ -680,7 +680,7 @@ bool Parser::rTypedefUsing(cpp_declarationt &declaration)
   return true;
 }
 
-optionalt<codet> Parser::rTypedefStatement()
+std::optional<codet> Parser::rTypedefStatement()
 {
   cpp_declarationt declaration;
   if(!rTypedef(declaration))
@@ -6573,7 +6573,7 @@ bool Parser::rMSC_if_existsExpr(exprt &expr)
   return true;
 }
 
-optionalt<codet> Parser::rMSC_if_existsStatement()
+std::optional<codet> Parser::rMSC_if_existsStatement()
 {
   cpp_tokent tk1;
 
@@ -7235,7 +7235,7 @@ bool Parser::rFunctionBody(cpp_declaratort &declarator)
   compound.statement
   : '{' (statement)* '}'
 */
-optionalt<codet> Parser::rCompoundStatement()
+std::optional<codet> Parser::rCompoundStatement()
 {
   cpp_tokent ob, cb;
 
@@ -7296,7 +7296,7 @@ optionalt<codet> Parser::rCompoundStatement()
   | USING { NAMESPACE } identifier ';'
   | STATIC_ASSERT ( expression ',' expression ) ';'
 */
-optionalt<codet> Parser::rStatement()
+std::optional<codet> Parser::rStatement()
 {
   cpp_tokent tk1, tk2, tk3;
   int k;
@@ -7548,7 +7548,7 @@ optionalt<codet> Parser::rStatement()
   if.statement
   : IF '(' comma.expression ')' statement { ELSE statement }
 */
-optionalt<codet> Parser::rIfStatement()
+std::optional<codet> Parser::rIfStatement()
 {
   cpp_tokent tk1, tk2, tk3, tk4;
 
@@ -7595,7 +7595,7 @@ optionalt<codet> Parser::rIfStatement()
   switch.statement
   : SWITCH '(' comma.expression ')' statement
 */
-optionalt<codet> Parser::rSwitchStatement()
+std::optional<codet> Parser::rSwitchStatement()
 {
   cpp_tokent tk1, tk2, tk3;
 
@@ -7626,7 +7626,7 @@ optionalt<codet> Parser::rSwitchStatement()
   while.statement
   : WHILE '(' comma.expression ')' statement
 */
-optionalt<codet> Parser::rWhileStatement()
+std::optional<codet> Parser::rWhileStatement()
 {
   cpp_tokent tk1, tk2, tk3;
 
@@ -7657,7 +7657,7 @@ optionalt<codet> Parser::rWhileStatement()
   do.statement
   : DO statement WHILE '(' comma.expression ')' ';'
 */
-optionalt<codet> Parser::rDoStatement()
+std::optional<codet> Parser::rDoStatement()
 {
   cpp_tokent tk0, tk1, tk2, tk3, tk4;
 
@@ -7694,7 +7694,7 @@ optionalt<codet> Parser::rDoStatement()
   : FOR '(' expr.statement {comma.expression} ';' {comma.expression} ')'
     statement
 */
-optionalt<codet> Parser::rForStatement()
+std::optional<codet> Parser::rForStatement()
 {
   cpp_tokent tk1, tk2, tk3, tk4;
 
@@ -7751,7 +7751,7 @@ optionalt<codet> Parser::rForStatement()
   exception.handler
   : CATCH '(' (arg.declaration | Ellipsis) ')' compound.statement
 */
-optionalt<codet> Parser::rTryStatement()
+std::optional<codet> Parser::rTryStatement()
 {
   cpp_tokent try_token;
 
@@ -7777,7 +7777,7 @@ optionalt<codet> Parser::rTryStatement()
     if(lex.get_token(op_token)!='(')
       return {};
 
-    optionalt<codet> catch_op;
+    std::optional<codet> catch_op;
 
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
@@ -7827,7 +7827,7 @@ optionalt<codet> Parser::rTryStatement()
   return std::move(statement);
 }
 
-optionalt<codet> Parser::rMSC_tryStatement()
+std::optional<codet> Parser::rMSC_tryStatement()
 {
   // These are for 'structured exception handling',
   // and are a relic from Visual C.
@@ -7889,7 +7889,7 @@ optionalt<codet> Parser::rMSC_tryStatement()
     return {};
 }
 
-optionalt<codet> Parser::rMSC_leaveStatement()
+std::optional<codet> Parser::rMSC_leaveStatement()
 {
   // These are for 'structured exception handling',
   // and are a relic from Visual C.
@@ -7905,7 +7905,7 @@ optionalt<codet> Parser::rMSC_leaveStatement()
   return std::move(statement);
 }
 
-optionalt<codet> Parser::rGCCAsmStatement()
+std::optional<codet> Parser::rGCCAsmStatement()
 {
   cpp_tokent tk;
 
@@ -8004,7 +8004,7 @@ optionalt<codet> Parser::rGCCAsmStatement()
   return std::move(statement);
 }
 
-optionalt<codet> Parser::rMSCAsmStatement()
+std::optional<codet> Parser::rMSCAsmStatement()
 {
   cpp_tokent tk;
 
@@ -8080,7 +8080,7 @@ optionalt<codet> Parser::rMSCAsmStatement()
   | openc++.postfix.expr
   | openc++.primary.exp
 */
-optionalt<codet> Parser::rExprStatement()
+std::optional<codet> Parser::rExprStatement()
 {
   cpp_tokent tk;
 
@@ -8191,7 +8191,7 @@ bool Parser::rCondition(exprt &statement)
 
   Note: if you modify this function, take a look at rDeclaration(), too.
 */
-optionalt<codet> Parser::rDeclarationStatement()
+std::optional<codet> Parser::rDeclarationStatement()
 {
   cpp_storage_spect storage_spec;
   typet cv_q, integral;
@@ -8261,7 +8261,7 @@ optionalt<codet> Parser::rDeclarationStatement()
   integral.decl.statement
   : decl.head integral.or.class.spec {cv.qualify} {declarators} ';'
 */
-optionalt<codet> Parser::rIntegralDeclStatement(
+std::optional<codet> Parser::rIntegralDeclStatement(
   cpp_storage_spect &storage_spec,
   typet &integral,
   typet &cv_q)
@@ -8304,7 +8304,7 @@ optionalt<codet> Parser::rIntegralDeclStatement(
    other.decl.statement
    :decl.head name {cv.qualify} declarators ';'
 */
-optionalt<codet>
+std::optional<codet>
 Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
 {
   typet type_name;

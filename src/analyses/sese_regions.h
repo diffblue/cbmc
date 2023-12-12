@@ -12,13 +12,11 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_ANALYSES_SESE_REGIONS_H
 #define CPROVER_ANALYSES_SESE_REGIONS_H
 
-#include <util/optional.h>
-
 class sese_region_analysist
 {
 public:
   void operator()(const goto_programt &goto_program);
-  optionalt<goto_programt::const_targett>
+  std::optional<goto_programt::const_targett>
   get_region_exit(goto_programt::const_targett entry) const
   {
     auto find_result = sese_regions.find(entry);

@@ -32,8 +32,8 @@ struct goto_null_checkt
 /// \param expr: expression to check
 /// \return a `goto_null_checkt` indicating what expression is tested and
 ///   whether the check applies on the taken or not-taken branch, or an empty
-///   optionalt if this isn't a null check.
-static optionalt<goto_null_checkt> get_null_checked_expr(const exprt &expr)
+///   std::optional if this isn't a null check.
+static std::optional<goto_null_checkt> get_null_checked_expr(const exprt &expr)
 {
   exprt normalized_expr = expr;
   // If true, then a null check is made when test `expr` passes; if false,

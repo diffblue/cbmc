@@ -625,7 +625,7 @@ void code_contractst::apply_function_contract(
   exprt::operandst instantiation_values;
 
   // keep track of the call's return expression to make it nondet later
-  optionalt<exprt> call_ret_opt = {};
+  std::optional<exprt> call_ret_opt = {};
 
   // if true, the call return variable variable was created during replacement
   bool call_ret_is_fresh_var = false;
@@ -1272,7 +1272,7 @@ void code_contractst::add_contract_check(
   source_location.set_function(wrapper_function);
 
   // decl ret
-  optionalt<code_returnt> return_stmt;
+  std::optional<code_returnt> return_stmt;
   if(code_type.return_type() != empty_typet())
   {
     symbol_exprt r = get_fresh_aux_symbol(

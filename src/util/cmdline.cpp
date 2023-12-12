@@ -132,22 +132,22 @@ cmdlinet::get_comma_separated_values(const char *option) const
   return separated_values;
 }
 
-optionalt<std::size_t> cmdlinet::getoptnr(char option) const
+std::optional<std::size_t> cmdlinet::getoptnr(char option) const
 {
   for(std::size_t i=0; i<options.size(); i++)
     if(options[i].optchar==option)
       return i;
 
-  return optionalt<std::size_t>();
+  return std::optional<std::size_t>();
 }
 
-optionalt<std::size_t> cmdlinet::getoptnr(const std::string &option) const
+std::optional<std::size_t> cmdlinet::getoptnr(const std::string &option) const
 {
   for(std::size_t i=0; i<options.size(); i++)
     if(options[i].optstring==option)
       return i;
 
-  return optionalt<std::size_t>();
+  return std::optional<std::size_t>();
 }
 
 bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
@@ -274,7 +274,7 @@ bool cmdlinet::parse_arguments(int argc, const char **argv)
       args.push_back(argv[i]);
     else
     {
-      optionalt<std::size_t> optnr;
+      std::optional<std::size_t> optnr;
 
       if(argv[i][1] != 0 && argv[i][2] == 0)
         optnr = getoptnr(argv[i][1]); // single-letter option -X

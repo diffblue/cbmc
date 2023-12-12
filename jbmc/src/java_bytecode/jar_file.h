@@ -9,13 +9,12 @@ Author: Diffblue Ltd
 #ifndef CPROVER_JAVA_BYTECODE_JAR_FILE_H
 #define CPROVER_JAVA_BYTECODE_JAR_FILE_H
 
-#include <unordered_map>
-#include <string>
-#include <vector>
-
-#include <util/optional.h>
-
 #include "mz_zip_archive.h"
+
+#include <optional>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 /// Class representing a .jar archive. Uses miniz to decompress and index
 /// archive.
@@ -42,7 +41,7 @@ public:
   /// Get contents of a file in the jar archive.
   /// Returns nullopt if file doesn't exist.
   /// \param filename: Name of the file in the archive
-  optionalt<std::string> get_entry(const std::string &filename);
+  std::optional<std::string> get_entry(const std::string &filename);
 
   /// Get contents of the Manifest file in the jar archive as a key-value map
   /// (both as strings)

@@ -445,7 +445,7 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
 ///   ancestors including interfaces, rather than just parents.
 /// \return the concrete component referred to if any is found, or an invalid
 ///   resolve_inherited_componentt::inherited_componentt otherwise.
-optionalt<resolve_inherited_componentt::inherited_componentt>
+std::optional<resolve_inherited_componentt::inherited_componentt>
 get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
@@ -566,10 +566,10 @@ symbolt &fresh_java_symbol(
     type, name_prefix, basename_prefix, source_location, ID_java, symbol_table);
 }
 
-optionalt<irep_idt> declaring_class(const symbolt &symbol)
+std::optional<irep_idt> declaring_class(const symbolt &symbol)
 {
   const irep_idt &class_id = symbol.type.get(ID_C_class);
-  return class_id.empty() ? optionalt<irep_idt>{} : class_id;
+  return class_id.empty() ? std::optional<irep_idt>{} : class_id;
 }
 
 void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class)
@@ -577,7 +577,7 @@ void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class)
   symbol.type.set(ID_C_class, declaring_class);
 }
 
-[[nodiscard]] optionalt<std::string>
+[[nodiscard]] std::optional<std::string>
 class_name_from_method_name(const std::string &method_name)
 {
   const auto signature_index = method_name.rfind(":");

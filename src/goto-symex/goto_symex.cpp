@@ -362,7 +362,7 @@ void goto_symext::associate_array_to_pointer(
     ssa_expr, expr_skeletont{}, array_to_pointer_app, {});
 }
 
-optionalt<std::reference_wrapper<const array_exprt>>
+std::optional<std::reference_wrapper<const array_exprt>>
 goto_symext::try_evaluate_constant_string(
   const statet &state,
   const exprt &content)
@@ -383,7 +383,7 @@ goto_symext::try_evaluate_constant_string(
   return try_get_string_data_array(s_pointer_opt->get(), ns);
 }
 
-optionalt<std::reference_wrapper<const constant_exprt>>
+std::optional<std::reference_wrapper<const constant_exprt>>
 goto_symext::try_evaluate_constant(const statet &state, const exprt &expr)
 {
   if(expr.id() != ID_symbol)
@@ -399,7 +399,7 @@ goto_symext::try_evaluate_constant(const statet &state, const exprt &expr)
     return {};
   }
 
-  return optionalt<std::reference_wrapper<const constant_exprt>>(
+  return std::optional<std::reference_wrapper<const constant_exprt>>(
     to_constant_expr(constant_expr_opt->get()));
 }
 

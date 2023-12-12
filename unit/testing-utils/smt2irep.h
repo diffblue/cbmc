@@ -3,16 +3,16 @@
 #ifndef CPROVER_TESTING_UTILS_SMT2IREP_H
 #define CPROVER_TESTING_UTILS_SMT2IREP_H
 
+#include <util/irep.h>
+
 #include <testing-utils/use_catch.h>
 
-#include <util/irep.h>
-#include <util/optional.h>
-
+#include <optional>
 #include <string>
 
 struct smt2_parser_test_resultt
 {
-  optionalt<irept> parsed_output;
+  std::optional<irept> parsed_output;
   std::string messages;
 };
 

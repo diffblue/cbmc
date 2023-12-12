@@ -165,7 +165,7 @@ static void add_dependency_to_string_subexprs(
   }
 }
 
-optionalt<exprt> string_dependenciest::eval(
+std::optional<exprt> string_dependenciest::eval(
   const array_string_exprt &s,
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -194,7 +194,7 @@ void string_dependenciest::clean_cache()
     e.reset();
 }
 
-optionalt<exprt> add_node(
+std::optional<exprt> add_node(
   string_dependenciest &dependencies,
   const exprt &expr,
   array_poolt &array_pool,

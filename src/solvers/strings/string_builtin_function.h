@@ -75,7 +75,7 @@ public:
   string_builtin_functiont(const string_builtin_functiont &) = delete;
   virtual ~string_builtin_functiont() = default;
 
-  virtual optionalt<array_string_exprt> string_result() const
+  virtual std::optional<array_string_exprt> string_result() const
   {
     return {};
   }
@@ -89,7 +89,7 @@ public:
   /// attempt to find the result of the builtin function.
   /// If not enough information can be gathered from `get_value`, return an
   /// empty optional.
-  virtual optionalt<exprt>
+  virtual std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const = 0;
 
   virtual std::string name() const = 0;
@@ -154,7 +154,7 @@ public:
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
 
-  optionalt<array_string_exprt> string_result() const override
+  std::optional<array_string_exprt> string_result() const override
   {
     return result;
   }
@@ -189,7 +189,7 @@ public:
     character = fun_args[3];
   }
 
-  optionalt<exprt>
+  std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
   std::string name() const override
@@ -227,7 +227,7 @@ public:
     character = fun_args[4];
   }
 
-  optionalt<exprt>
+  std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
   std::string name() const override
@@ -258,7 +258,7 @@ public:
   {
   }
 
-  optionalt<exprt>
+  std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
   std::string name() const override
@@ -307,7 +307,7 @@ public:
   {
   }
 
-  optionalt<exprt>
+  std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
   std::string name() const override
@@ -348,7 +348,7 @@ public:
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
 
-  optionalt<array_string_exprt> string_result() const override
+  std::optional<array_string_exprt> string_result() const override
   {
     return result;
   }
@@ -376,7 +376,7 @@ public:
       radix = from_integer(10, arg.type());
   };
 
-  optionalt<exprt>
+  std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
   std::string name() const override
@@ -415,7 +415,7 @@ class string_builtin_function_with_no_evalt : public string_builtin_functiont
 {
 public:
   function_application_exprt function_application;
-  optionalt<array_string_exprt> string_res;
+  std::optional<array_string_exprt> string_res;
   std::vector<array_string_exprt> string_args;
   std::vector<exprt> args;
 
@@ -434,12 +434,12 @@ public:
   {
     return std::vector<array_string_exprt>(string_args);
   }
-  optionalt<array_string_exprt> string_result() const override
+  std::optional<array_string_exprt> string_result() const override
   {
     return string_res;
   }
 
-  optionalt<exprt>
+  std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &) const override
   {
     return {};
@@ -460,7 +460,7 @@ public:
 /// Given a function `get_value` which gives a valuation to expressions, attempt
 /// to find the current value of the array `a`. If the valuation of some
 /// characters are missing, then return an empty optional.
-optionalt<std::vector<mp_integer>> eval_string(
+std::optional<std::vector<mp_integer>> eval_string(
   const array_string_exprt &a,
   const std::function<exprt(const exprt &)> &get_value);
 

@@ -64,7 +64,7 @@ protected:
   exprt
   bv_get_rec(const exprt &, const bvt &, std::size_t offset) const override;
 
-  [[nodiscard]] optionalt<bvt> convert_address_of_rec(const exprt &);
+  [[nodiscard]] std::optional<bvt> convert_address_of_rec(const exprt &);
 
   [[nodiscard]] bvt
   offset_arithmetic(const pointer_typet &, const bvt &, const mp_integer &);

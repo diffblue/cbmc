@@ -91,7 +91,7 @@ SCENARIO(
 
     const reference_typet test_class_type =
       reference_type(struct_tag_typet{"java::TestClass"});
-    optionalt<ci_lazy_methods_neededt> option{};
+    std::optional<ci_lazy_methods_neededt> option{};
     const code_with_references_listt code = assign_from_json(
       symbol_exprt{"symbol_to_assign", test_class_type},
       json,
@@ -180,7 +180,7 @@ SCENARIO(
 
     const reference_typet test_class_type =
       reference_type(struct_tag_typet{"java::TestClass"});
-    optionalt<ci_lazy_methods_neededt> option{};
+    std::optional<ci_lazy_methods_neededt> option{};
     const code_with_references_listt code = assign_from_json(
       symbol_exprt{"symbol_to_assign", test_class_type},
       json,
@@ -303,7 +303,7 @@ SCENARIO(
 
     const reference_typet test_class_type =
       reference_type(struct_tag_typet{"java::TestClass"});
-    optionalt<ci_lazy_methods_neededt> option{};
+    std::optional<ci_lazy_methods_neededt> option{};
     const code_with_references_listt code = assign_from_json(
       symbol_exprt{"symbol_to_assign", test_class_type},
       json,
@@ -467,7 +467,7 @@ SCENARIO(
 
     const reference_typet test_class_type =
       reference_type(struct_tag_typet{"java::TestClass"});
-    optionalt<ci_lazy_methods_neededt> option{};
+    std::optional<ci_lazy_methods_neededt> option{};
     const code_with_references_listt code = assign_from_json(
       symbol_exprt{"symbol_to_assign", test_class_type},
       json,

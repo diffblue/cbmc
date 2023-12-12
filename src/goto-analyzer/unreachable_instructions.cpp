@@ -100,7 +100,7 @@ static void add_to_xml(
   return;
 }
 
-static optionalt<std::string>
+static std::optional<std::string>
 file_name_string_opt(const source_locationt &source_location)
 {
   if(source_location.get_file().empty())
@@ -249,7 +249,7 @@ bool static_unreachable_instructions(
   return false;
 }
 
-static optionalt<std::string>
+static std::optional<std::string>
 line_string_opt(const source_locationt &source_location)
 {
   const irep_idt &line = source_location.get_line();

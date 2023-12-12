@@ -17,7 +17,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "state.h"
 
-optionalt<exprt> sentinel_dll_member(
+std::optional<exprt> sentinel_dll_member(
   const exprt &state,
   const exprt &node,
   bool next, // vs. prev
@@ -69,13 +69,13 @@ optionalt<exprt> sentinel_dll_member(
   return evaluate_exprt(state, field_address, component.type());
 }
 
-optionalt<exprt>
+std::optional<exprt>
 sentinel_dll_next(const exprt &state, const exprt &node, const namespacet &ns)
 {
   return sentinel_dll_member(state, node, true, ns);
 }
 
-optionalt<exprt>
+std::optional<exprt>
 sentinel_dll_prev(const exprt &state, const exprt &node, const namespacet &ns)
 {
   return sentinel_dll_member(state, node, false, ns);

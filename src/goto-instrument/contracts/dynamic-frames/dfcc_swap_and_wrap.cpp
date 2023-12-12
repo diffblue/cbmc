@@ -16,7 +16,6 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
-#include <util/optional.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>

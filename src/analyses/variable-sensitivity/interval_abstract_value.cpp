@@ -117,7 +117,8 @@ interval_from_x_ge_value(const exprt &value)
 static inline mp_integer force_value_from_expr(const exprt &value)
 {
   PRECONDITION(constant_interval_exprt::is_int(value.type()));
-  optionalt<mp_integer> maybe_integer_value = numeric_cast<mp_integer>(value);
+  std::optional<mp_integer> maybe_integer_value =
+    numeric_cast<mp_integer>(value);
   INVARIANT(maybe_integer_value.has_value(), "Input has to have a value");
   return maybe_integer_value.value();
 }

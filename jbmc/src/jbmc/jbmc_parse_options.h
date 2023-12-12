@@ -135,7 +135,7 @@ protected:
   /// See java_bytecode_languaget::method_context.
   /// The two fields are initialized in exactly the same way.
   /// TODO Refactor this so it only needs to be computed once, in one place.
-  optionalt<prefix_filtert> method_context;
+  std::optional<prefix_filtert> method_context;
 };
 
 #endif // CPROVER_JBMC_JBMC_PARSE_OPTIONS_H

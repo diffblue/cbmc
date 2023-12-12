@@ -411,7 +411,7 @@ public:
   /// `const char *` and one or more corresponding expression arguments follow.
   explicit code_inputt(
     std::vector<exprt> arguments,
-    optionalt<source_locationt> location = {});
+    std::optional<source_locationt> location = {});
 
   /// This constructor is intended for generating input instructions as part of
   /// synthetic entry point code, rather than as part of user code.
@@ -424,7 +424,7 @@ public:
   code_inputt(
     const irep_idt &description,
     exprt expression,
-    optionalt<source_locationt> location = {});
+    std::optional<source_locationt> location = {});
 
   static void check(
     const goto_instruction_codet &code,
@@ -458,7 +458,7 @@ public:
   /// `const char *` and one or more corresponding expression arguments follow.
   explicit code_outputt(
     std::vector<exprt> arguments,
-    optionalt<source_locationt> location = {});
+    std::optional<source_locationt> location = {});
 
   /// This constructor is intended for generating output instructions as part of
   /// synthetic entry point code, rather than as part of user code.
@@ -470,7 +470,7 @@ public:
   code_outputt(
     const irep_idt &description,
     exprt expression,
-    optionalt<source_locationt> location = {});
+    std::optional<source_locationt> location = {});
 
   static void check(
     const goto_instruction_codet &code,

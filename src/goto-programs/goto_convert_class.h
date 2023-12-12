@@ -359,8 +359,8 @@ protected:
     const source_locationt &source_location,
     goto_programt &dest,
     const irep_idt &mode,
-    optionalt<node_indext> destructor_start_point = {},
-    optionalt<node_indext> destructor_end_point = {});
+    std::optional<node_indext> destructor_start_point = {},
+    std::optional<node_indext> destructor_end_point = {});
 
   //
   // gotos

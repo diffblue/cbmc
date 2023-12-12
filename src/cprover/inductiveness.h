@@ -45,7 +45,7 @@ public:
     return result;
   }
 
-  optionalt<workt> work;
+  std::optional<workt> work;
 
 private:
   explicit inductiveness_resultt(outcomet __outcome) : outcome(__outcome)

@@ -13,9 +13,9 @@ Author: Daniel Kroening, dkr@amazon.com
 /// Symbol Substitution
 
 #include "irep.h"
-#include "optional.h"
 
 #include <map>
+#include <optional>
 
 class exprt;
 
@@ -25,7 +25,7 @@ class exprt;
 /// substituted.
 /// \returns expression after substitution,
 /// or {} when no substitution took place
-optionalt<exprt>
+std::optional<exprt>
 substitute_symbols(const std::map<irep_idt, exprt> &substitutions, exprt);
 
 #endif // CPROVER_UTIL_SUBSTITUTE_SYMBOLS_H

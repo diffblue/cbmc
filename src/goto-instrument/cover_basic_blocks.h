@@ -12,8 +12,6 @@ Author: Daniel Kroening
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_BASIC_BLOCKS_H
 
-#include <util/optional.h>
-
 #include <goto-programs/goto_program.h>
 
 #include "source_lines.h"
@@ -32,7 +30,7 @@ public:
   /// \param block_nr: a block number
   /// \return the instruction selected for
   ///   instrumentation representative of the given block
-  virtual optionalt<goto_programt::const_targett>
+  virtual std::optional<goto_programt::const_targett>
   instruction_of(std::size_t block_nr) const = 0;
 
   /// \param block_nr: a block number
@@ -77,7 +75,7 @@ public:
   /// \param block_nr: a block number
   /// \return the instruction selected for
   ///   instrumentation representative of the given block
-  optionalt<goto_programt::const_targett>
+  std::optional<goto_programt::const_targett>
   instruction_of(std::size_t block_nr) const override;
 
   /// \param block_nr: a block number
@@ -112,7 +110,7 @@ private:
   struct block_infot
   {
     /// the program location to instrument for this block
-    optionalt<goto_programt::const_targett> representative_inst;
+    std::optional<goto_programt::const_targett> representative_inst;
 
     /// the source location representative for this block
     /// (we need a separate copy of source locations because we attach
@@ -135,7 +133,7 @@ private:
 
   /// If this block is a continuation of a previous block through unconditional
   /// forward gotos, return this blocks number.
-  static optionalt<std::size_t> continuation_of_block(
+  static std::optional<std::size_t> continuation_of_block(
     const goto_programt::const_targett &instruction,
     block_mapt &block_map);
 };
@@ -161,7 +159,7 @@ public:
 
   /// \param block_number: a block number
   /// \return first instruction of the given block
-  optionalt<goto_programt::const_targett>
+  std::optional<goto_programt::const_targett>
   instruction_of(std::size_t block_number) const override;
 
   /// \param block_number: a block number

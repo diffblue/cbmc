@@ -48,7 +48,7 @@ bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
 
 std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
 {
-  optionalt<std::size_t> optnr;
+  std::optional<std::size_t> optnr;
   cmdlinet::optiont option;
 
   if(has_prefix(opt_string, "--")) // starts with -- ?

@@ -65,8 +65,8 @@ TEST_CASE("Value expr construction from smt.", "[core][smt2_incremental]")
     make_c_enum_tag_instance_symbol(enum_type_symbol);
   symbol_table.insert(enum_type_symbol);
   symbol_table.insert(enum_tag_value_symbol);
-  optionalt<smt_termt> input_term;
-  optionalt<exprt> expected_result;
+  std::optional<smt_termt> input_term;
+  std::optional<exprt> expected_result;
 
   using rowt = std::pair<smt_termt, exprt>;
 
@@ -143,8 +143,8 @@ TEST_CASE(
     make_c_enum_tag_instance_symbol(enum_type_symbol);
   symbol_table.insert(enum_type_symbol);
   symbol_table.insert(enum_tag_value_symbol);
-  optionalt<smt_termt> input_term;
-  optionalt<typet> input_type;
+  std::optional<smt_termt> input_term;
+  std::optional<typet> input_type;
   std::string invariant_reason;
 
   using rowt = std::tuple<smt_termt, typet, std::string>;

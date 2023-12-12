@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 code_inputt::code_inputt(
   std::vector<exprt> arguments,
-  optionalt<source_locationt> location)
+  std::optional<source_locationt> location)
   : codet{ID_input, std::move(arguments)}
 {
   if(location)
@@ -32,12 +32,13 @@ code_inputt::code_inputt(
 code_inputt::code_inputt(
   const irep_idt &description,
   exprt expression,
-  optionalt<source_locationt> location)
-  : code_inputt{{address_of_exprt(index_exprt(
-                   string_constantt(description),
-                   from_integer(0, c_index_type()))),
-                 std::move(expression)},
-                std::move(location)}
+  std::optional<source_locationt> location)
+  : code_inputt{
+      {address_of_exprt(index_exprt(
+         string_constantt(description),
+         from_integer(0, c_index_type()))),
+       std::move(expression)},
+      std::move(location)}
 {
 }
 
@@ -49,7 +50,7 @@ void code_inputt::check(const codet &code, const validation_modet vm)
 
 code_outputt::code_outputt(
   std::vector<exprt> arguments,
-  optionalt<source_locationt> location)
+  std::optional<source_locationt> location)
   : codet{ID_output, std::move(arguments)}
 {
   if(location)
@@ -60,12 +61,13 @@ code_outputt::code_outputt(
 code_outputt::code_outputt(
   const irep_idt &description,
   exprt expression,
-  optionalt<source_locationt> location)
-  : code_outputt{{address_of_exprt(index_exprt(
-                    string_constantt(description),
-                    from_integer(0, c_index_type()))),
-                  std::move(expression)},
-                 std::move(location)}
+  std::optional<source_locationt> location)
+  : code_outputt{
+      {address_of_exprt(index_exprt(
+         string_constantt(description),
+         from_integer(0, c_index_type()))),
+       std::move(expression)},
+      std::move(location)}
 {
 }
 

@@ -17,7 +17,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include <iomanip>
 
-optionalt<exprt> address_to_lvalue(exprt src)
+std::optional<exprt> address_to_lvalue(exprt src)
 {
   if(src.id() == ID_object_address)
     return to_object_address_expr(src).object_expr();

@@ -78,7 +78,7 @@ public:
 
   /// Represents the offset into an object: either a unique integer offset,
   /// or an unknown value, represented by `!offset`.
-  typedef optionalt<mp_integer> offsett;
+  typedef std::optional<mp_integer> offsett;
 
   /// Represents a set of expressions (`exprt` instances) with corresponding
   /// offsets (`offsett` instances). This is the RHS set of a single row of
@@ -417,7 +417,7 @@ public:
   /// \param ns: The global namespace, for following \p type if it is a
   ///   struct tag type or a union tag type
   /// \return The index if the symbol is known, else `nullopt`.
-  optionalt<irep_idt> get_index_of_symbol(
+  std::optional<irep_idt> get_index_of_symbol(
     irep_idt identifier,
     const typet &type,
     const std::string &suffix,

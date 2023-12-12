@@ -67,7 +67,7 @@ public:
   /// Associate array to pointer, and array to length
   /// \return an expression if the given function application is one of
   ///   associate pointer and associate length
-  optionalt<exprt> make_array_pointer_association(
+  std::optional<exprt> make_array_pointer_association(
     const exprt &return_code,
     const function_application_exprt &expr);
 

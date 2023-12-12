@@ -35,7 +35,7 @@ static bool read_goto_binary(
 /// \param filename: the file name of the goto binary
 /// \param message_handler: for diagnostics
 /// \return goto model on success, {} on failure
-optionalt<goto_modelt>
+std::optional<goto_modelt>
 read_goto_binary(const std::string &filename, message_handlert &message_handler)
 {
   goto_modelt dest;
@@ -261,7 +261,7 @@ bool is_goto_binary(
 /// \param dest: the goto model returned
 /// \param message_handler: for diagnostics
 /// \return nullopt on error, type replacements to be applied otherwise
-static optionalt<replace_symbolt::expr_mapt> read_object_and_link(
+static std::optional<replace_symbolt::expr_mapt> read_object_and_link(
   const std::string &file_name,
   goto_modelt &dest,
   message_handlert &message_handler)

@@ -44,7 +44,7 @@ struct symex_level1t
   /// Set the index for \p ssa to index.
   /// \return if an index for \p ssa was already know, returns it's previous
   ///   value.
-  optionalt<std::pair<ssa_exprt, std::size_t>>
+  std::optional<std::pair<ssa_exprt, std::size_t>>
   insert_or_replace(const renamedt<ssa_exprt, L0> &ssa, std::size_t index);
 
   /// \return true if \p ssa has an associated index

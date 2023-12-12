@@ -13,7 +13,7 @@ Author: Michael Tautschnig
 
 #include <goto-programs/goto_model.h>
 
-static optionalt<exprt> rewrite_rw_ok(exprt expr, const namespacet &ns)
+static std::optional<exprt> rewrite_rw_ok(exprt expr, const namespacet &ns)
 {
   bool unchanged = true;
 

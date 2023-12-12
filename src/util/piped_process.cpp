@@ -90,7 +90,6 @@
 #include "exception_utils.h"
 #include "invariant.h"
 #include "narrow.h"
-#include "optional.h"
 #include "piped_process.h"
 
 #include <cstring> // library for strerror function (on linux)
@@ -448,7 +447,7 @@ piped_processt::statet piped_processt::get_status()
   return process_state;
 }
 
-bool piped_processt::can_receive(optionalt<std::size_t> wait_time)
+bool piped_processt::can_receive(std::optional<std::size_t> wait_time)
 {
   // unwrap the optional argument here
   const int timeout = wait_time ? narrow<int>(*wait_time) : -1;

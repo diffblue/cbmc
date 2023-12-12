@@ -546,7 +546,7 @@ void cegis_verifiert::restore_functions()
   }
 }
 
-optionalt<cext> cegis_verifiert::verify()
+std::optional<cext> cegis_verifiert::verify()
 {
   // This method does the following three things to verify the `goto_model` and
   // return a formatted counterexample if there is any violated property.
@@ -617,7 +617,7 @@ optionalt<cext> cegis_verifiert::verify()
   if(result == resultt::PASS)
   {
     restore_functions();
-    return optionalt<cext>();
+    return std::optional<cext>();
   }
 
   if(result == resultt::ERROR || result == resultt::UNKNOWN)
@@ -660,7 +660,7 @@ optionalt<cext> cegis_verifiert::verify()
   if(target_violation == properties.end())
   {
     restore_functions();
-    return optionalt<cext>();
+    return std::optional<cext>();
   }
 
   target_violation_id = target_violation->first;

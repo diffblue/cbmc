@@ -34,8 +34,9 @@ endianness_mapt boolbvt::endianness_map(const typet &type) const
 /// Convert expression to vector of literalts, using an internal
 /// cache to speed up conversion if available. Also assert the resultant
 /// vector is of a specific size, and freeze any elements if appropriate.
-const bvt &
-boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
+const bvt &boolbvt::convert_bv(
+  const exprt &expr,
+  std::optional<std::size_t> expected_width)
 {
   // check cache first
   std::pair<bv_cachet::iterator, bool> cache_result=

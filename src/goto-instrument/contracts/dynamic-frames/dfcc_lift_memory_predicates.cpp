@@ -180,7 +180,7 @@ std::set<irep_idt> dfcc_lift_memory_predicatest::lift_predicates(
 }
 
 // returns an optional rank
-static optionalt<std::size_t> is_param_expr(
+static std::optional<std::size_t> is_param_expr(
   const exprt &expr,
   const std::map<irep_idt, std::size_t> &parameter_rank)
 {
@@ -331,7 +331,7 @@ void dfcc_lift_memory_predicatest::lift_parameters_and_update_body(
     // rewrite all occurrences of lifted parameters
     instruction.transform([&replace_lifted_params](exprt expr) {
       const bool changed = !replace_lifted_params.replace(expr);
-      return changed ? optionalt<exprt>{expr} : std::nullopt;
+      return changed ? std::optional<exprt>{expr} : std::nullopt;
     });
 
     // add address-of to all arguments expressions passed in lifted position to

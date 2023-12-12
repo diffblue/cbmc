@@ -193,7 +193,7 @@ bool check_value_set_contains_only_null_ptr(
 ///    set, then we get back an `if e1 then e2 else (if e3 else e4...`
 ///    expression, where `e1`, `e3`, ... are guards (conditions) and `e2`, `e4`,
 ///    etc are the possible values of the object within the value set.
-optionalt<exprt> get_shadow_memory(
+std::optional<exprt> get_shadow_memory(
   const exprt &expr,
   const std::vector<exprt> &value_set,
   const std::vector<shadow_memory_statet::shadowed_addresst> &addresses,

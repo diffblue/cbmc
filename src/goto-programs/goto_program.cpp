@@ -982,7 +982,7 @@ void goto_programt::instructiont::validate(
 }
 
 void goto_programt::instructiont::transform(
-  std::function<optionalt<exprt>(exprt)> f)
+  std::function<std::optional<exprt>(exprt)> f)
 {
   switch(_type)
   {

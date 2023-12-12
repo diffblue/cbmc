@@ -87,7 +87,7 @@ void add_failed_symbols(symbol_table_baset &symbol_table)
     add_failed_symbol_if_needed(*symbol, symbol_table);
 }
 
-optionalt<symbol_exprt>
+std::optional<symbol_exprt>
 get_failed_symbol(const symbol_exprt &expr, const namespacet &ns)
 {
   const symbolt &symbol=ns.lookup(expr);

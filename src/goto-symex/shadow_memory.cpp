@@ -126,7 +126,7 @@ void shadow_memoryt::symex_set_field(
   // build lhs
   const exprt &rhs = value;
   size_t mux_size = 0;
-  optionalt<exprt> maybe_lhs =
+  std::optional<exprt> maybe_lhs =
     get_shadow_memory(expr, value_set, addresses, ns, log, mux_size);
 
   // add to equation

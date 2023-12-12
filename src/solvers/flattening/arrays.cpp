@@ -715,7 +715,7 @@ void arrayst::add_array_constraints_array_constant(
       // We have a constant index - just pick the element at that index from the
       // array constant.
 
-      const optionalt<std::size_t> i =
+      const std::optional<std::size_t> i =
         numeric_cast<std::size_t>(to_constant_expr(index));
       // if the access is out of bounds, we leave it unconstrained
       if(!i.has_value() || *i >= operands.size())

@@ -213,7 +213,7 @@ protected:
   ///   checking
   bool requires_pointer_primitive_check(const exprt &expr);
 
-  optionalt<goto_check_ct::conditiont>
+  std::optional<goto_check_ct::conditiont>
   get_pointer_is_null_condition(const exprt &address, const exprt &size);
   conditionst get_pointer_points_to_valid_memory_conditions(
     const exprt &address,
@@ -322,7 +322,7 @@ protected:
   } check_statust;
 
   /// optional (named-check, status) pair
-  using named_check_statust = optionalt<std::pair<irep_idt, check_statust>>;
+  using named_check_statust = std::optional<std::pair<irep_idt, check_statust>>;
 
   /// Matches a named-check string of the form
   ///
@@ -2343,7 +2343,7 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
   return conditions;
 }
 
-optionalt<goto_check_ct::conditiont>
+std::optional<goto_check_ct::conditiont>
 goto_check_ct::get_pointer_is_null_condition(
   const exprt &address,
   const exprt &size)

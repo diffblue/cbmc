@@ -223,7 +223,7 @@ static symbol_exprt typecheck_set_field(
 
 /// Typecheck the function if it is a shadow_memory builtin and return a symbol
 /// for it. Otherwise return empty.
-optionalt<symbol_exprt> c_typecheck_baset::typecheck_shadow_memory_builtin(
+std::optional<symbol_exprt> c_typecheck_baset::typecheck_shadow_memory_builtin(
   const side_effect_expr_function_callt &expr)
 {
   const exprt &f_op = expr.function();

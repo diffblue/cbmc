@@ -425,7 +425,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     if(std::string(s, 1, std::string::npos)==ms_cl_flags[j])
     {
       cmdlinet::optiont option;
-      optionalt<std::size_t> optnr;
+      std::optional<std::size_t> optnr;
 
       if(s.size()==2)
       {
@@ -461,7 +461,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     {
       cmdlinet::optiont option;
 
-      optionalt<std::size_t> optnr;
+      std::optional<std::size_t> optnr;
 
       if(ms_cl_prefix.size()==1)
       {

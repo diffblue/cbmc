@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \param object: non-typechecked object
 /// \param operands: non-typechecked operands
 /// \return typechecked code
-optionalt<codet> cpp_typecheckt::cpp_constructor(
+std::optional<codet> cpp_typecheckt::cpp_constructor(
   const source_locationt &source_location,
   const exprt &object,
   const exprt::operandst &operands)

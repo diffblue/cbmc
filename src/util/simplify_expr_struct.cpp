@@ -221,7 +221,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     // type and offset with respect to x.
     if(op_type.id() == ID_struct)
     {
-      optionalt<mp_integer> requested_offset =
+      std::optional<mp_integer> requested_offset =
         member_offset(to_struct_type(op_type), component_name, ns);
       if(requested_offset.has_value())
       {

@@ -12,12 +12,12 @@ Author: CM Wintersteiger
 #ifndef CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H
 #define CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H
 
-#include <string>
-#include <list>
-
 #include <util/irep.h>
 #include <util/mp_arith.h>
-#include <util/optional.h>
+
+#include <list>
+#include <optional>
+#include <string>
 
 class typet;
 
@@ -91,6 +91,6 @@ typedef std::list<format_tokent> format_token_listt;
 
 format_token_listt parse_format_string(const std::string &);
 
-optionalt<typet> get_type(const format_tokent &);
+std::optional<typet> get_type(const format_tokent &);
 
 #endif // CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H

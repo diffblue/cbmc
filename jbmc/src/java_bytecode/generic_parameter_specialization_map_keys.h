@@ -17,7 +17,7 @@ private:
   /// Generic parameter specialization map to modify
   generic_parameter_specialization_mapt &generic_parameter_specialization_map;
   /// Key of the container to pop on destruction
-  optionalt<std::size_t> container_id;
+  std::optional<std::size_t> container_id;
 
 public:
   /// Initialize a generic-parameter-specialization-map entry owner operating

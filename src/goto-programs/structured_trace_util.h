@@ -46,7 +46,7 @@ struct default_trace_stept
   source_locationt location;
 };
 
-optionalt<default_trace_stept> default_step(
+std::optional<default_trace_stept> default_step(
   const goto_trace_stept &step,
   const source_locationt &previous_source_location);
 

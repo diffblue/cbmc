@@ -22,7 +22,7 @@ static bool expr_eq(const exprt &expr1, const exprt &expr2)
 /// To obtain the min value for the quantifier variable of the specified
 /// forall/exists operator. The min variable is in the form of "!(var_expr >
 /// constant)".
-static optionalt<constant_exprt>
+static std::optional<constant_exprt>
 get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
 {
   if(quantifier_expr.id()==ID_or)
@@ -74,7 +74,7 @@ get_quantifier_var_min(const exprt &var_expr, const exprt &quantifier_expr)
 
 /// To obtain the max value for the quantifier variable of the specified
 /// forall/exists operator.
-static optionalt<constant_exprt>
+static std::optional<constant_exprt>
 get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
 {
   if(quantifier_expr.id()==ID_or)
@@ -149,7 +149,7 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
   return {};
 }
 
-static optionalt<exprt> eager_quantifier_instantiation(
+static std::optional<exprt> eager_quantifier_instantiation(
   const quantifier_exprt &expr,
   const namespacet &ns)
 {
@@ -199,9 +199,9 @@ static optionalt<exprt> eager_quantifier_instantiation(
       UNREACHABLE;
   }
 
-  const optionalt<constant_exprt> min_i =
+  const std::optional<constant_exprt> min_i =
     get_quantifier_var_min(var_expr, where_simplified);
-  const optionalt<constant_exprt> max_i =
+  const std::optional<constant_exprt> max_i =
     get_quantifier_var_max(var_expr, where_simplified);
 
   if(!min_i.has_value() || !max_i.has_value())

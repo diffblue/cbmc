@@ -36,7 +36,7 @@ struct framet
   guardt guard_at_function_start;
   goto_programt::const_targett end_of_function;
   exprt call_lhs = nil_exprt();                // cleaned, but not renamed
-  optionalt<symbol_exprt> return_value_symbol; // not renamed
+  std::optional<symbol_exprt> return_value_symbol; // not renamed
   bool hidden_function = false;
 
   symex_level1t old_level1;

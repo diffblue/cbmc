@@ -54,7 +54,7 @@ bool levenshtein_automatont::matches(const std::string &string) const
   return get_edit_distance(string).has_value();
 }
 
-optionalt<std::size_t>
+std::optional<std::size_t>
 levenshtein_automatont::get_edit_distance(const std::string &string) const
 {
   auto current = nfa.initial_state(0);

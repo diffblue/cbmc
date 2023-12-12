@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 shuffle_vector_exprt::shuffle_vector_exprt(
   exprt vector1,
-  optionalt<exprt> vector2,
+  std::optional<exprt> vector2,
   exprt::operandst indices)
   : multi_ary_exprt(
       ID_shuffle_vector,

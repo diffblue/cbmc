@@ -109,7 +109,7 @@ private:
   void get_annotation_class_refs(const std::vector<annotationt> &annotations);
   void get_annotation_value_class_refs(const exprt &value);
   void parse_local_variable_type_table(methodt &method);
-  optionalt<lambda_method_handlet>
+  std::optional<lambda_method_handlet>
   parse_method_handle(const class method_handle_infot &entry);
   void read_bootstrapmethods_entry();
 
@@ -1803,7 +1803,7 @@ void java_bytecode_parsert::rmethod()
     rmethod_attribute(method);
 }
 
-optionalt<java_bytecode_parse_treet> java_bytecode_parse(
+std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   std::istream &istream,
   const irep_idt &class_name,
   message_handlert &message_handler,
@@ -1825,7 +1825,7 @@ optionalt<java_bytecode_parse_treet> java_bytecode_parse(
   return std::move(java_bytecode_parser.parse_tree);
 }
 
-optionalt<java_bytecode_parse_treet> java_bytecode_parse(
+std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   const std::string &file,
   const irep_idt &class_name,
   message_handlert &message_handler,
@@ -1914,7 +1914,7 @@ static java_class_typet::method_handle_kindt get_method_handle_type(
 /// \param entry: the constant pool entry of the methodhandle_info structure
 /// \return the method_handle type of the methodhandle_structure,
 ///   either for a recognized bootstrap method or for a lambda function
-optionalt<java_bytecode_parsert::lambda_method_handlet>
+std::optional<java_bytecode_parsert::lambda_method_handlet>
 java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
 {
   const std::function<pool_entryt &(u2)> pool_entry_lambda =
@@ -2071,7 +2071,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
     }
 
     log.debug() << "INFO: parse lambda handle" << messaget::eom;
-    optionalt<lambda_method_handlet> lambda_method_handle =
+    std::optional<lambda_method_handlet> lambda_method_handle =
       parse_method_handle(method_handle_infot{method_handle_argument});
 
     if(!lambda_method_handle.has_value())

@@ -754,18 +754,18 @@ void goto_symext::kill_instruction_local_symbols(statet &state)
 /// multiple times)
 /// \param expr: The expression to examine
 /// \return If only one unique symbol occurs in \p expr then return it;
-///   otherwise return an empty optionalt
-static optionalt<symbol_exprt>
+///   otherwise return an empty std::optional
+static std::optional<symbol_exprt>
 find_unique_pointer_typed_symbol(const exprt &expr)
 {
-  optionalt<symbol_exprt> return_value;
+  std::optional<symbol_exprt> return_value;
   for(auto it = expr.depth_cbegin(); it != expr.depth_cend(); ++it)
   {
     const symbol_exprt *symbol_expr = expr_try_dynamic_cast<symbol_exprt>(*it);
     if(symbol_expr && can_cast_type<pointer_typet>(symbol_expr->type()))
     {
       // If we already have a potential return value, check if it is the same
-      // symbol, and return an empty optionalt if not
+      // symbol, and return an empty std::optional if not
       if(return_value && *symbol_expr != *return_value)
       {
         return {};
@@ -789,7 +789,7 @@ void goto_symext::try_filter_value_sets(
 {
   condition = state.rename<L1>(std::move(condition), ns).get();
 
-  optionalt<symbol_exprt> symbol_expr =
+  std::optional<symbol_exprt> symbol_expr =
     find_unique_pointer_typed_symbol(condition);
 
   if(!symbol_expr)

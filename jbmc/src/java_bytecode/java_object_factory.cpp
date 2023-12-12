@@ -100,7 +100,7 @@ public:
     bool is_sub,
     bool skip_classid,
     lifetimet lifetime,
-    const optionalt<typet> &override_type,
+    const std::optional<typet> &override_type,
     size_t depth,
     update_in_placet,
     const source_locationt &location);
@@ -910,7 +910,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   resolve_inherited_componentt resolve_inherited_component{symbol_table};
-  optionalt<resolve_inherited_componentt::inherited_componentt>
+  std::optional<resolve_inherited_componentt::inherited_componentt>
     cprover_nondet_initialize = resolve_inherited_component(
       "java::" + id2string(struct_tag), "cproverNondetInitialize:()V", true);
 
@@ -1002,7 +1002,7 @@ void java_object_factoryt::gen_nondet_init(
   bool is_sub,
   bool skip_classid,
   lifetimet lifetime,
-  const optionalt<typet> &override_type,
+  const std::optional<typet> &override_type,
   size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location)

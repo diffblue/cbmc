@@ -103,8 +103,8 @@ static json_objectt value_set_dereference_stats_to_json(
 
 /// If `expr` is of the form (c1 ? e1[o1] : c2 ? e2[o2] : c3 ? ...)
 /// then return `c1 ? e1[o1 + offset] : e2[o2 + offset] : c3 ? ...`
-/// otherwise return an empty optionalt.
-static optionalt<exprt>
+/// otherwise return an empty std::optional.
+static std::optional<exprt>
 try_add_offset_to_indices(const exprt &expr, const exprt &offset_elements)
 {
   if(const auto *index_expr = expr_try_dynamic_cast<index_exprt>(expr))
@@ -773,7 +773,7 @@ bool value_set_dereferencet::memory_model_bytes(
   auto from_type_element_type_size =
     from_type.id() == ID_array
       ? pointer_offset_size(to_array_type(from_type).element_type(), ns)
-      : optionalt<mp_integer>{};
+      : std::optional<mp_integer>{};
 
   auto to_type_size = pointer_offset_size(to_type, ns);
 

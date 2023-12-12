@@ -147,7 +147,7 @@ public:
     /// Find the graph node by function name
     /// \param function: function to find
     /// \return none if function is not in this graph, or some index otherwise.
-    optionalt<node_indext> get_node_index(const irep_idt &function) const;
+    std::optional<node_indext> get_node_index(const irep_idt &function) const;
 
     /// Type of the node name -> node index map.
     typedef std::unordered_map<irep_idt, node_indext> nodes_by_namet;

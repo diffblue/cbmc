@@ -335,7 +335,7 @@ void ms_link_cmdlinet::process_link_option(const std::string &s)
       to_upper_string(std::string(s, 1, std::string::npos)) == ms_link_option ||
       to_upper_string(std::string(s, 1, ms_link_option.size() + 1)) == ms_link_option + ':')
     {
-      optionalt<std::size_t> optnr = getoptnr(ms_link_option);
+      std::optional<std::size_t> optnr = getoptnr(ms_link_option);
 
       if(!optnr.has_value())
       {

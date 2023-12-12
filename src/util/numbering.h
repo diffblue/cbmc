@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_NUMBERING_H
 #define CPROVER_UTIL_NUMBERING_H
 
+#include "invariant.h"
+
+#include <optional>
 #include <unordered_map>
 #include <vector>
-
-#include "invariant.h"
-#include "optional.h"
 
 /// \tparam keyt: The type of keys which will be numbered.
 /// \tparam hasht: The type of hashing functor used to hash keys.
@@ -47,7 +47,7 @@ public:
     return (result.first)->second;
   }
 
-  optionalt<number_type> get_number(const key_type &a) const
+  std::optional<number_type> get_number(const key_type &a) const
   {
     const auto it = numbers_.find(a);
     if(it == numbers_.end())

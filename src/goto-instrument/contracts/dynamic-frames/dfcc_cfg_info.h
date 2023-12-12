@@ -92,7 +92,7 @@ public:
   /// instrumented in any other manner that might not maintain or copy the
   /// source location tags properly then nothing of the argument above is
   /// expected to hold anymore and you then use this method at your own risk.
-  optionalt<goto_programt::targett>
+  std::optional<goto_programt::targett>
   find_head(goto_programt &goto_program) const;
 
   // Finds the last instruction tagged as loop latch and having the same loop
@@ -104,7 +104,7 @@ public:
   // in the program and turning loops into non-loops. For an explanation of why
   // this would work please read the documentation of find head, and mentally
   // replace `head` by `latch` and `start` by `end` in the explanation.
-  optionalt<goto_programt::targett>
+  std::optional<goto_programt::targett>
   find_latch(goto_programt &goto_program) const;
 
   /// Loop identifier assigned by DFCC to this loop.
@@ -272,7 +272,7 @@ public:
 
   /// Finds the DFCC id of the loop that contains the given loop, returns
   /// nullopt when the loop has no outer loop.
-  const optionalt<std::size_t>
+  const std::optional<std::size_t>
   get_outer_loop_identifier(const std::size_t loop_id) const;
 
   /// True iff a DECL ident must be tracked in the write set of the loop

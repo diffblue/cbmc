@@ -185,7 +185,7 @@ private:
   /// \param point: potentially dynamically allocated memory address
   /// \param member_size: size of each allocated element
   /// \return pointee as a string if we have a record of the allocation
-  optionalt<std::string>
+  std::optional<std::string>
   get_malloc_pointee(const memory_addresst &point, mp_integer member_size);
 
   /// Wrapper for call get_offset_pointer_bits

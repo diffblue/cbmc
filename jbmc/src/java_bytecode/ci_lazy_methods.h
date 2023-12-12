@@ -41,7 +41,8 @@ public:
     const java_bytecode_parse_treet::methodt &method;
   };
 
-  typedef optionalt<std::reference_wrapper<const class_method_and_bytecodet>>
+  typedef std::optional<
+    std::reference_wrapper<const class_method_and_bytecodet>>
     opt_reft;
 
 private:

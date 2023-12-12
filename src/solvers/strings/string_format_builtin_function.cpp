@@ -516,7 +516,7 @@ static std::vector<mp_integer> eval_format_specifier(
   INVARIANT(false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
 }
 
-optionalt<exprt> string_format_builtin_functiont::eval(
+std::optional<exprt> string_format_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
   if(!format_string.has_value())

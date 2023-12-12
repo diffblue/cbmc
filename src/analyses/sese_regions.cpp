@@ -146,7 +146,7 @@ void sese_region_analysist::compute_sese_regions(
     // but our current dominator analysis doesn't make it easy to determine an
     // immediate dominator.
 
-    // Ideally I would use `optionalt<std::size_t>` here, but it triggers a
+    // Ideally I would use `std::optional<std::size_t>` here, but it triggers a
     // GCC-5 bug.
     std::size_t closest_exit_index = dominators.cfg.size();
     for(const auto &possible_exit : instruction_postdoms)

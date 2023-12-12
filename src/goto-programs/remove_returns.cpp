@@ -59,11 +59,11 @@ protected:
   void undo_function_calls(
     goto_programt &goto_program);
 
-  optionalt<symbol_exprt>
+  std::optional<symbol_exprt>
   get_or_create_return_value_symbol(const irep_idt &function_id);
 };
 
-optionalt<symbol_exprt>
+std::optional<symbol_exprt>
 remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
 {
   const namespacet ns(symbol_table);
@@ -173,7 +173,7 @@ bool remove_returnst::do_function_calls(
         exprt rhs;
 
         bool is_stub = function_is_stub(function_id);
-        optionalt<symbol_exprt> return_value;
+        std::optional<symbol_exprt> return_value;
 
         if(!is_stub)
           return_value = get_or_create_return_value_symbol(function_id);

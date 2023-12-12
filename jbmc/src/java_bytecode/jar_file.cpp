@@ -54,7 +54,7 @@ jar_filet &jar_filet::operator=(jar_filet &&other)
   return *this;
 }
 
-optionalt<std::string> jar_filet::get_entry(const std::string &name)
+std::optional<std::string> jar_filet::get_entry(const std::string &name)
 {
   const auto entry=m_name_to_index.find(name);
   if(entry==m_name_to_index.end())

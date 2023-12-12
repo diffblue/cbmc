@@ -22,7 +22,7 @@ class message_handlert;
 /// which need to be applied using \ref finalize_linking.
 /// \return nullopt if linking fails, else a (possibly empty) collection of
 ///   replacements to be applied.
-[[nodiscard]] optionalt<replace_symbolt::expr_mapt>
+[[nodiscard]] std::optional<replace_symbolt::expr_mapt>
 link_goto_model(goto_modelt &dest, goto_modelt &&src, message_handlert &);
 
 /// Apply \p type_updates to \p dest, where \p type_updates were constructed

@@ -21,7 +21,7 @@ string_transformation_builtin_functiont::
   result = array_pool.find(fun_args[1], fun_args[0]);
 }
 
-optionalt<std::vector<mp_integer>> eval_string(
+std::optional<std::vector<mp_integer>> eval_string(
   const array_string_exprt &a,
   const std::function<exprt(const exprt &)> &get_value)
 {
@@ -73,7 +73,7 @@ make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
   return make_string(array.begin(), array.end(), array_type);
 }
 
-optionalt<exprt> string_concat_char_builtin_functiont::eval(
+std::optional<exprt> string_concat_char_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
   auto input_opt = eval_string(input, get_value);
@@ -126,7 +126,7 @@ exprt string_concat_char_builtin_functiont::length_constraint() const
   return length_constraint_for_concat_char(result, input, array_pool);
 }
 
-optionalt<exprt> string_set_char_builtin_functiont::eval(
+std::optional<exprt> string_set_char_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
   auto input_opt = eval_string(input, get_value);
@@ -217,7 +217,7 @@ static bool eval_is_upper_case(const mp_integer &c)
          (0xd8 <= c && c <= 0xde);
 }
 
-optionalt<exprt> string_to_lower_case_builtin_functiont::eval(
+std::optional<exprt> string_to_lower_case_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
   auto input_opt = eval_string(input, get_value);
@@ -313,7 +313,7 @@ string_constraintst string_to_lower_case_builtin_functiont::constraints(
   return constraints;
 }
 
-optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
+std::optional<exprt> string_to_upper_case_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
   auto input_opt = eval_string(input, get_value);
@@ -380,7 +380,7 @@ string_creation_builtin_functiont::string_creation_builtin_functiont(
   arg = fun_args[2];
 }
 
-optionalt<exprt> string_of_int_builtin_functiont::eval(
+std::optional<exprt> string_of_int_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
   const auto arg_value = numeric_cast<mp_integer>(get_value(arg));

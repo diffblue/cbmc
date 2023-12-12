@@ -15,9 +15,8 @@
 #include "nfa.h"
 
 #include <cstddef>
+#include <optional>
 #include <string>
-
-#include <util/optional.h>
 
 /// Simple automaton that can detect whether a string can be transformed into
 /// another with a limited number of deletions, insertions or substitutions.
@@ -35,7 +34,7 @@ public:
     std::size_t allowed_errors = 2);
 
   bool matches(const std::string &string) const;
-  optionalt<std::size_t> get_edit_distance(const std::string &string) const;
+  std::optional<std::size_t> get_edit_distance(const std::string &string) const;
 
   void dump_automaton_dot_to(std::ostream &out)
   {

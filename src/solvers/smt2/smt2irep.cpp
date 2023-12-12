@@ -22,13 +22,13 @@ public:
   {
   }
 
-  optionalt<irept> operator()();
+  std::optional<irept> operator()();
 
 protected:
   messaget log;
 };
 
-optionalt<irept> smt2irept::operator()()
+std::optional<irept> smt2irept::operator()()
 {
   try
   {
@@ -88,7 +88,8 @@ optionalt<irept> smt2irept::operator()()
   }
 }
 
-optionalt<irept> smt2irep(std::istream &in, message_handlert &message_handler)
+std::optional<irept>
+smt2irep(std::istream &in, message_handlert &message_handler)
 {
   return smt2irept(in, message_handler)();
 }

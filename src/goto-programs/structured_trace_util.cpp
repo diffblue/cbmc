@@ -36,7 +36,7 @@ std::string default_step_name(const default_step_kindt &step_type)
   UNREACHABLE;
 }
 
-optionalt<default_trace_stept> default_step(
+std::optional<default_trace_stept> default_step(
   const goto_trace_stept &step,
   const source_locationt &previous_source_location)
 {

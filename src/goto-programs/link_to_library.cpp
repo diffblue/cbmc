@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "link_goto_model.h"
 
 /// Try to add \p missing_function from \p library to \p goto_model.
-static std::pair<optionalt<replace_symbolt::expr_mapt>, bool> add_one_function(
+static std::pair<std::optional<replace_symbolt::expr_mapt>, bool>
+add_one_function(
   goto_modelt &goto_model,
   message_handlert &message_handler,
   const std::function<void(

@@ -177,7 +177,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_mult(const mult_exprt &expr)
   // true if we have found a constant
   bool constant_found = false;
 
-  optionalt<typet> c_sizeof_type;
+  std::optional<typet> c_sizeof_type;
 
   // scan all the operands
   for(exprt::operandst::iterator it = new_operands.begin();

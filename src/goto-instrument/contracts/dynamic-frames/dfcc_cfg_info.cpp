@@ -120,7 +120,7 @@ void dfcc_loop_infot::output(std::ostream &out) const
   out << "}\n";
 }
 
-optionalt<goto_programt::targett>
+std::optional<goto_programt::targett>
 dfcc_loop_infot::find_head(goto_programt &goto_program) const
 {
   for(auto target = goto_program.instructions.begin();
@@ -135,10 +135,10 @@ dfcc_loop_infot::find_head(goto_programt &goto_program) const
   return {};
 }
 
-optionalt<goto_programt::targett>
+std::optional<goto_programt::targett>
 dfcc_loop_infot::find_latch(goto_programt &goto_program) const
 {
-  optionalt<goto_programt::targett> result = std::nullopt;
+  std::optional<goto_programt::targett> result = std::nullopt;
   for(auto target = goto_program.instructions.begin();
       target != goto_program.instructions.end();
       target++)
@@ -152,7 +152,7 @@ dfcc_loop_infot::find_latch(goto_programt &goto_program) const
   return result;
 }
 
-static optionalt<goto_programt::targett> check_has_contract_rec(
+static std::optional<goto_programt::targett> check_has_contract_rec(
   const dfcc_loop_nesting_grapht &loop_nesting_graph,
   const std::size_t loop_idx,
   const bool must_have_contract)
@@ -174,7 +174,7 @@ static optionalt<goto_programt::targett> check_has_contract_rec(
 /// Traverses the loop nesting graph from top level loops and checks if all
 /// loops nested in loops that have contracts also have contracts.
 /// Return the head of the first offending loop if it exists, nothing otherwise.
-static optionalt<goto_programt::targett> check_inner_loops_have_contracts(
+static std::optional<goto_programt::targett> check_inner_loops_have_contracts(
   const dfcc_loop_nesting_grapht &loop_nesting_graph)
 {
   for(std::size_t idx = 0; idx < loop_nesting_graph.size(); idx++)
@@ -710,7 +710,7 @@ dfcc_cfg_infot::get_loop_info(const std::size_t loop_id) const
 }
 
 // find the identifier or the immediately enclosing loop in topological order
-const optionalt<std::size_t>
+const std::optional<std::size_t>
 dfcc_cfg_infot::get_outer_loop_identifier(const std::size_t loop_id) const
 {
   PRECONDITION(is_valid_loop_id(loop_id));

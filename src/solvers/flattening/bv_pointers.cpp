@@ -231,7 +231,7 @@ bv_pointerst::bv_pointerst(
 {
 }
 
-optionalt<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
+std::optional<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
 {
   if(expr.id()==ID_symbol)
   {

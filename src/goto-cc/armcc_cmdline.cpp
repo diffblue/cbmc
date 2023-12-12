@@ -269,7 +269,7 @@ static const std::vector<std::string> options_with_arg
 };
 // clang-format on
 
-optionalt<std::string>
+std::optional<std::string>
 prefix_in_list(const std::string &option, const std::vector<std::string> &list)
 {
   const auto found =
@@ -293,7 +293,7 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
     }
 
     // it starts with - and it isn't "-"
-    optionalt<std::string> prefix;
+    std::optional<std::string> prefix;
 
     if(in_list(argv[i], options_no_arg))
     {

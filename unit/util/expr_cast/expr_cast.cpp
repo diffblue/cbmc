@@ -127,7 +127,7 @@ SCENARIO("expr_dynamic_cast",
       "Trying casting from an exprt rvalue reference to a symbol_exprt should "
       "yield a non empty optional.")
     {
-      optionalt<symbol_exprt> result =
+      std::optional<symbol_exprt> result =
         expr_try_dynamic_cast<symbol_exprt>(std::move(expr));
       REQUIRE(result.has_value());
     }
@@ -136,7 +136,8 @@ SCENARIO("expr_dynamic_cast",
       "Trying casting from an exprt rvalue reference to a transt should yield "
       "a empty optional.")
     {
-      optionalt<transt> result = expr_try_dynamic_cast<transt>(std::move(expr));
+      std::optional<transt> result =
+        expr_try_dynamic_cast<transt>(std::move(expr));
       REQUIRE_FALSE(result.has_value());
     }
   }
@@ -242,7 +243,7 @@ SCENARIO("type_dynamic_cast", "[core][utils][expr_cast][type_dynamic_cast]")
       "Trying casting from a typet rvalue reference to a symbol_exprt should "
       "yield a non empty optional.")
     {
-      optionalt<string_typet> result =
+      std::optional<string_typet> result =
         type_try_dynamic_cast<string_typet>(std::move(type));
       REQUIRE(result.has_value());
     }
@@ -251,7 +252,7 @@ SCENARIO("type_dynamic_cast", "[core][utils][expr_cast][type_dynamic_cast]")
       "Trying casting from a typet rvalue reference to a struct_typet should "
       "yield a empty optional.")
     {
-      optionalt<struct_typet> result =
+      std::optional<struct_typet> result =
         type_try_dynamic_cast<struct_typet>(std::move(type));
       REQUIRE_FALSE(result.has_value());
     }

@@ -558,7 +558,7 @@ java_reference_typet java_reference_array_type(const struct_tag_typet &subtype)
 /// \param class_name_prefix: name of class to append to generic type
 ///   variables/parameters
 /// \return internal type representation for GOTO programs
-optionalt<typet> java_type_from_string(
+std::optional<typet> java_type_from_string(
   const std::string &src,
   const std::string &class_name_prefix)
 {
@@ -1072,7 +1072,7 @@ java_generic_struct_tag_typet::java_generic_struct_tag_typet(
 /// in the vector of generic types.
 /// \param type: The parameter type we are looking for.
 /// \return The index of the type in the vector of generic types.
-optionalt<size_t> java_generic_struct_tag_typet::generic_type_index(
+std::optional<size_t> java_generic_struct_tag_typet::generic_type_index(
   const java_generic_parametert &type) const
 {
   const auto &type_variable = type.get_name();

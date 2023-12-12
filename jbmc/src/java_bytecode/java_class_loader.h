@@ -105,7 +105,7 @@ private:
   /// Map from class names to the bytecode parse trees
   parse_tree_with_overridest_mapt class_map;
 
-  optionalt<std::vector<irep_idt>>
+  std::optional<std::vector<irep_idt>>
   read_jar_file(const std::string &jar_path, message_handlert &);
 };
 

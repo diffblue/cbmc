@@ -127,7 +127,7 @@ public:
   exprt full_lhs;
 
   // the object being assigned
-  optionalt<symbol_exprt> get_lhs_object() const;
+  std::optional<symbol_exprt> get_lhs_object() const;
 
   // A constant with the new value of the lhs
   exprt full_lhs_value;

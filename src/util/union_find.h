@@ -172,8 +172,8 @@ public:
   // are 'a' and 'b' in the same set?
   bool same_set(const T &a, const T &b) const
   {
-    const optionalt<number_type> na = numbers.get_number(a);
-    const optionalt<number_type> nb = numbers.get_number(b);
+    const std::optional<number_type> na = numbers.get_number(a);
+    const std::optional<number_type> nb = numbers.get_number(b);
 
     if(na && nb)
       return uuf.same_set(*na, *nb);
@@ -260,7 +260,7 @@ public:
     uuf.isolate(number(a));
   }
 
-  optionalt<number_type> get_number(const T &a) const
+  std::optional<number_type> get_number(const T &a) const
   {
     return numbers.get_number(a);
   }

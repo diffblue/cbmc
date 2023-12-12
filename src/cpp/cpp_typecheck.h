@@ -98,7 +98,7 @@ public:
 
   bool cpp_is_pod(const typet &type) const;
 
-  optionalt<codet> cpp_constructor(
+  std::optional<codet> cpp_constructor(
     const source_locationt &source_location,
     const exprt &object,
     const exprt::operandst &operands);
@@ -430,7 +430,7 @@ protected:
 
   const struct_typet &this_struct_type();
 
-  optionalt<codet>
+  std::optional<codet>
   cpp_destructor(const source_locationt &source_location, const exprt &object);
 
   // expressions

@@ -1238,7 +1238,7 @@ void java_bytecode_languaget::convert_lazy_method(
 ///   be called for each function call in `function_body`.
 static void notify_static_method_calls(
   const codet &function_body,
-  optionalt<ci_lazy_methods_neededt> needed_lazy_methods)
+  std::optional<ci_lazy_methods_neededt> needed_lazy_methods)
 {
   if(needed_lazy_methods)
   {
@@ -1295,7 +1295,7 @@ static void notify_static_method_calls(
 bool java_bytecode_languaget::convert_single_method(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
-  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
   lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
   message_handlert &message_handler)
 {
@@ -1354,7 +1354,7 @@ bool java_bytecode_languaget::convert_single_method(
 bool java_bytecode_languaget::convert_single_method_code(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
-  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
   lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
   message_handlert &message_handler)
 {

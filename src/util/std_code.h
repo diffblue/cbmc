@@ -370,7 +370,7 @@ public:
   /// or empty in the case where no initialisation is included.
   /// \note: Initial values may be present in the front end but they must be
   ///   separated into a separate assignment when used in a `goto_instructiont`.
-  optionalt<exprt> initial_value() const
+  std::optional<exprt> initial_value() const
   {
     if(operands().size() < 2)
       return {};
@@ -381,7 +381,7 @@ public:
   /// variable. Empty optional maybe passed to remove existing initialisation.
   /// \note: Initial values may be present in the front end but they must be
   ///   separated into a separate assignment when used in a `goto_instructiont`.
-  void set_initial_value(optionalt<exprt> initial_value)
+  void set_initial_value(std::optional<exprt> initial_value)
   {
     if(!initial_value)
     {

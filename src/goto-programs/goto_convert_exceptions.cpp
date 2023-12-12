@@ -281,8 +281,8 @@ void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
   goto_programt &dest,
   const irep_idt &mode,
-  optionalt<node_indext> end_index,
-  optionalt<node_indext> starting_index)
+  std::optional<node_indext> end_index,
+  std::optional<node_indext> starting_index)
 {
   // As we go we'll keep targets.destructor_stack.current_node pointing at the
   // next node we intend to destroy, so that if our convert(...) call for each
@@ -305,7 +305,7 @@ void goto_convertt::unwind_destructor_stack(
   {
     node_indext current_node = targets.destructor_stack.get_current_node();
 
-    optionalt<codet> &destructor =
+    std::optional<codet> &destructor =
       targets.destructor_stack.get_destructor(current_node);
 
     // Descend the tree before unwinding so we don't re-do the current node

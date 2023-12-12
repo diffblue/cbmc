@@ -31,7 +31,7 @@ public:
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
 
-  optionalt<array_string_exprt> string_result() const override
+  std::optional<array_string_exprt> string_result() const override
   {
     return result;
   }
@@ -46,7 +46,7 @@ public:
     const std::vector<mp_integer> &input2_value,
     const std::vector<mp_integer> &args_value) const;
 
-  optionalt<exprt>
+  std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
   std::string name() const override

@@ -106,7 +106,7 @@ static bool link_functions(
   return false;
 }
 
-optionalt<replace_symbolt::expr_mapt> link_goto_model(
+std::optional<replace_symbolt::expr_mapt> link_goto_model(
   goto_modelt &dest,
   goto_modelt &&src,
   message_handlert &message_handler)
@@ -217,7 +217,7 @@ void finalize_linking(
         {
           instruction.transform([&object_type_updates](exprt expr) {
             const bool changed = !object_type_updates.replace(expr);
-            return changed ? optionalt<exprt>{expr} : std::nullopt;
+            return changed ? std::optional<exprt>{expr} : std::nullopt;
           });
         }
       }

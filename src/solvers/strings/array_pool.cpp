@@ -44,7 +44,7 @@ exprt array_poolt::get_or_create_length(const array_string_exprt &s)
   return emplace_result.first->second;
 }
 
-optionalt<exprt>
+std::optional<exprt>
 array_poolt::get_length_if_exists(const array_string_exprt &s) const
 {
   auto find_result = length_of_array.find(s);

@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_storage.h"
 
-inline static optionalt<typet> c_sizeof_type_rec(const exprt &expr)
+inline static std::optional<typet> c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
 
@@ -57,7 +57,7 @@ void goto_symext::symex_allocate(
     return; // ignore
 
   exprt size = to_binary_expr(code).op0();
-  optionalt<typet> object_type;
+  std::optional<typet> object_type;
   auto function_symbol = outer_symbol_table.lookup(state.source.function_id);
   INVARIANT(function_symbol, "function associated with allocation not found");
   const irep_idt &mode = function_symbol->mode;
@@ -341,7 +341,7 @@ static irep_idt get_string_argument(const exprt &src, const namespacet &ns)
 
 /// Return an expression if \p operands fulfills all criteria that we expect of
 /// the expression to be a variable argument list.
-static optionalt<exprt> get_va_args(const exprt::operandst &operands)
+static std::optional<exprt> get_va_args(const exprt::operandst &operands)
 {
   if(operands.size() != 2)
     return {};
@@ -379,7 +379,7 @@ void goto_symext::symex_printf(
   std::list<exprt> args;
 
   // we either have any number of operands or a va_list as second operand
-  optionalt<exprt> va_args = get_va_args(operands);
+  std::optional<exprt> va_args = get_va_args(operands);
 
   if(!va_args.has_value())
   {
@@ -475,7 +475,7 @@ void goto_symext::symex_cpp_new(
      code.get(ID_statement) == ID_java_new_array_data);
 
   // value
-  optionalt<typet> type;
+  std::optional<typet> type;
   if(do_array)
   {
     exprt size_arg =

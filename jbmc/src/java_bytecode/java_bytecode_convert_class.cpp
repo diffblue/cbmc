@@ -186,8 +186,8 @@ private:
 /// \param signature: Signature of the class
 /// \return Reference of the generic superclass, or empty if the superclass
 ///   is not generic
-static optionalt<std::string>
-extract_generic_superclass_reference(const optionalt<std::string> &signature)
+static std::optional<std::string> extract_generic_superclass_reference(
+  const std::optional<std::string> &signature)
 {
   if(signature.has_value())
   {
@@ -226,8 +226,8 @@ extract_generic_superclass_reference(const optionalt<std::string> &signature)
 /// \param interface_name: The interface name
 /// \return Reference of the generic interface, or empty if the interface
 ///   is not generic
-static optionalt<std::string> extract_generic_interface_reference(
-  const optionalt<std::string> &signature,
+static std::optional<std::string> extract_generic_interface_reference(
+  const std::optional<std::string> &signature,
   const std::string &interface_name)
 {
   if(signature.has_value())
@@ -355,7 +355,7 @@ void java_bytecode_convert_classt::convert(
     // including the generic info in its signature
     // e.g., signature for class 'A<T>' that extends
     // 'Generic<Integer>' is '<T:Ljava/lang/Object;>LGeneric<LInteger;>;'
-    const optionalt<std::string> &superclass_ref =
+    const std::optional<std::string> &superclass_ref =
       extract_generic_superclass_reference(c.signature);
     if(superclass_ref.has_value())
     {
@@ -397,7 +397,7 @@ void java_bytecode_convert_classt::convert(
     // including the generic info in its signature
     // e.g., signature for class 'A implements GenericInterface<Integer>' is
     // 'Ljava/lang/Object;LGenericInterface<LInteger;>;'
-    const optionalt<std::string> interface_ref =
+    const std::optional<std::string> interface_ref =
       extract_generic_interface_reference(c.signature, id2string(interface));
     if(interface_ref.has_value())
     {

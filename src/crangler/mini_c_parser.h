@@ -12,11 +12,10 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CRANGLER_MINI_C_PARSER_H
 #define CPROVER_CRANGLER_MINI_C_PARSER_H
 
-#include <util/optional.h>
-
 #include "ctoken.h"
 
 #include <iosfwd>
+#include <optional>
 #include <vector>
 
 struct c_declarationt
@@ -32,7 +31,7 @@ struct c_declarationt
   void print(std::ostream &) const;
   bool is_function() const;
   bool has_body() const;
-  optionalt<ctokent> declared_identifier() const;
+  std::optional<ctokent> declared_identifier() const;
 };
 
 using c_translation_unitt = std::vector<c_declarationt>;

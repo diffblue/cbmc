@@ -225,7 +225,7 @@ format_token_listt parse_format_string(const std::string &arg_string)
   return token_list;
 }
 
-optionalt<typet> get_type(const format_tokent &token)
+std::optional<typet> get_type(const format_tokent &token)
 {
   switch(token.type)
   {

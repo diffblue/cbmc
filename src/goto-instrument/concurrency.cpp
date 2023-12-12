@@ -58,14 +58,14 @@ protected:
   {
   public:
     typet type;
-    optionalt<symbol_exprt> array_symbol, w_index_symbol;
+    std::optional<symbol_exprt> array_symbol, w_index_symbol;
   };
 
   class thread_local_vart
   {
   public:
     typet type;
-    optionalt<symbol_exprt> array_symbol;
+    std::optional<symbol_exprt> array_symbol;
   };
 
   typedef std::map<irep_idt, shared_vart> shared_varst;

@@ -152,7 +152,7 @@ static bool restore_union_rec(exprt &expr, const namespacet &ns)
           comp.type().id() == ID_array || comp.type().id() == ID_struct ||
           comp.type().id() == ID_struct_tag)
         {
-          optionalt<exprt> result = get_subexpression_at_offset(
+          std::optional<exprt> result = get_subexpression_at_offset(
             member_exprt{be.op(), comp.get_name(), comp.type()},
             be.offset(),
             be.type(),

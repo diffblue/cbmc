@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H
 
 #include <util/irep.h>
-#include <util/optional.h>
+
+#include <optional>
 
 class json_arrayt;
 class namespacet;
@@ -45,9 +46,8 @@ void show_properties(
 ///   the property
 /// \return optional<source_locationt> the location of the
 ///   property, if found.
-optionalt<source_locationt> find_property(
-    const irep_idt &property,
-    const goto_functionst &goto_functions);
+std::optional<source_locationt>
+find_property(const irep_idt &property, const goto_functionst &goto_functions);
 
 /// \brief Collects the properties in the goto program into a `json_arrayt`
 /// \param json_properties: JSON array to hold the properties

@@ -15,7 +15,6 @@ Date: April 2016
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 
-#include <util/optional.h>
 #include <util/std_expr.h>
 
 #include "goto_program.h"
@@ -96,7 +95,7 @@ public:
   }
 #endif
 
-  optionalt<symbol_exprt> symbol_expr;
+  std::optional<symbol_exprt> symbol_expr;
   irep_idt class_id;
 };
 

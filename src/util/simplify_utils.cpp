@@ -193,7 +193,7 @@ bool join_operands(exprt &expr)
   return sort_and_join(expr, false);
 }
 
-optionalt<exprt> bits2expr(
+std::optional<exprt> bits2expr(
   const std::string &bits,
   const typet &type,
   bool little_endian,
@@ -410,7 +410,7 @@ optionalt<exprt> bits2expr(
   return {};
 }
 
-optionalt<std::string>
+std::optional<std::string>
 expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
 {
   // extract bits from lowest to highest memory address
@@ -485,7 +485,7 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
   return {};
 }
 
-optionalt<std::reference_wrapper<const array_exprt>>
+std::optional<std::reference_wrapper<const array_exprt>>
 try_get_string_data_array(const exprt &content, const namespacet &ns)
 {
   if(content.id() != ID_address_of)
@@ -522,5 +522,5 @@ try_get_string_data_array(const exprt &content, const namespacet &ns)
 
   const auto &char_seq = to_array_expr(symbol_ptr->value);
 
-  return optionalt<std::reference_wrapper<const array_exprt>>(char_seq);
+  return std::optional<std::reference_wrapper<const array_exprt>>(char_seq);
 }

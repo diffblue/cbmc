@@ -9,8 +9,6 @@ Author: Daniel Poetzl
 #ifndef CPROVER_GOTO_HARNESS_MEMORY_SNAPSHOT_HARNESS_GENERATOR_H
 #define CPROVER_GOTO_HARNESS_MEMORY_SNAPSHOT_HARNESS_GENERATOR_H
 
-#include <util/optional.h>
-
 #include <goto-programs/goto_program.h>
 
 #include "goto_harness_generator.h"
@@ -55,7 +53,7 @@ protected:
   struct entry_goto_locationt
   {
     irep_idt function_name;
-    optionalt<unsigned> location_number;
+    std::optional<unsigned> location_number;
 
     entry_goto_locationt() = delete;
     explicit entry_goto_locationt(irep_idt function_name)
@@ -317,7 +315,7 @@ protected:
         searchable_input[item.first] = item.second;
       }
       auto associate_key_with_t =
-        [&searchable_input](const Key &key) -> optionalt<valuet> {
+        [&searchable_input](const Key &key) -> std::optional<valuet> {
         if(searchable_input.count(key) != 0)
           return valuet(key, searchable_input[key]);
         else

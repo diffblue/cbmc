@@ -56,17 +56,19 @@ unsigned long long int unsafe_string2unsignedlonglong(
   return *string2optional<unsigned long long>(str, base);
 }
 
-optionalt<int> string2optional_int(const std::string &str, int base)
+std::optional<int> string2optional_int(const std::string &str, int base)
 {
   return string2optional<int>(str, base);
 }
 
-optionalt<unsigned> string2optional_unsigned(const std::string &str, int base)
+std::optional<unsigned>
+string2optional_unsigned(const std::string &str, int base)
 {
   return string2optional<unsigned>(str, base);
 }
 
-optionalt<std::size_t> string2optional_size_t(const std::string &str, int base)
+std::optional<std::size_t>
+string2optional_size_t(const std::string &str, int base)
 {
   return string2optional<std::size_t>(str, base);
 }

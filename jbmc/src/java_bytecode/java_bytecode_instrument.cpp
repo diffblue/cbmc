@@ -71,7 +71,7 @@ protected:
   void instrument_code(codet &code);
   void add_expr_instrumentation(code_blockt &block, const exprt &expr);
   void prepend_instrumentation(codet &code, code_blockt &instrumentation);
-  optionalt<codet> instrument_expr(const exprt &expr);
+  std::optional<codet> instrument_expr(const exprt &expr);
 };
 
 const std::vector<std::string> exception_needed_classes = {
@@ -218,7 +218,7 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
   pointer_typet voidptr = pointer_type(java_void_type());
   exprt null_check_op = typecast_exprt::conditional_cast(tested_expr, voidptr);
 
-  optionalt<codet> check_code;
+  std::optional<codet> check_code;
   if(throw_runtime_exceptions)
   {
     check_code=
@@ -309,7 +309,7 @@ void java_bytecode_instrumentt::add_expr_instrumentation(
   code_blockt &block,
   const exprt &expr)
 {
-  if(optionalt<codet> expr_instrumentation = instrument_expr(expr))
+  if(std::optional<codet> expr_instrumentation = instrument_expr(expr))
   {
     if(expr_instrumentation->get_statement() == ID_block)
       block.append(to_code_block(*expr_instrumentation));
@@ -447,13 +447,14 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
 /// either assertions or runtime exceptions.
 /// \param expr: the expression for which we compute instrumentation
 /// \return The instrumentation for \p expr if required
-optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
+std::optional<codet>
+java_bytecode_instrumentt::instrument_expr(const exprt &expr)
 {
   code_blockt result;
   // First check our operands:
   for(const auto &op : expr.operands())
   {
-    if(optionalt<codet> op_result = instrument_expr(op))
+    if(std::optional<codet> op_result = instrument_expr(op))
       result.add(std::move(*op_result));
   }
 
