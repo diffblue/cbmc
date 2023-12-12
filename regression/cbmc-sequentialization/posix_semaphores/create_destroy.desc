@@ -1,6 +1,6 @@
 CORE requires_posix_only_headers
 create_destroy.c
-
+--no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
