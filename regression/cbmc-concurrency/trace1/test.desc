@@ -1,6 +1,6 @@
 CORE
 main.c
---mm tso --trace
+--no-standard-checks --mm tso --trace
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

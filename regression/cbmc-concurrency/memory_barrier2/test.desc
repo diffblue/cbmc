@@ -1,6 +1,6 @@
 CORE
 main.c
---mm tso
+--no-standard-checks --mm tso
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

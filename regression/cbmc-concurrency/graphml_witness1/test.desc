@@ -1,6 +1,6 @@
 CORE
 main.c
---graphml-witness -
+--no-standard-checks --graphml-witness -
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

@@ -1,6 +1,6 @@
 CORE
 msvc.c
---mm tso --winx64
+--no-standard-checks --mm tso --winx64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

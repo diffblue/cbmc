@@ -1,6 +1,6 @@
 CORE pthread
 main.c
---unwind 2
+--no-standard-checks --unwind 2
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

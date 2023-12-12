@@ -1,6 +1,6 @@
 CORE
 main.c
---unwindset 1:thr1.0:2,2:thr1.0:3 --unwinding-assertions
+--no-standard-checks --unwindset 1:thr1.0:2,2:thr1.0:3 --unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
