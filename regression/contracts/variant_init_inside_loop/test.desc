@@ -1,6 +1,6 @@
 CORE new-smt-backend
 main.c
---apply-loop-contracts _ --unsigned-overflow-check
+--no-standard-checks --apply-loop-contracts _ --unsigned-overflow-check
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main\.\d+\] .* Check decreases clause on loop iteration: SUCCESS$

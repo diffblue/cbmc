@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract goo
+--no-standard-checks --enforce-contract goo
 ^Function 'goo' was not found in the GOTO program.$
 ^EXIT=6$
 ^SIGNAL=0$

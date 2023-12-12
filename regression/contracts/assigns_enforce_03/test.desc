@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f1 --enforce-contract f2 --enforce-contract f3
+--no-standard-checks --enforce-contract f1 --enforce-contract f2 --enforce-contract f3
 ^\[f1.assigns.\d+\] line 1 Check that \*x1 is valid: SUCCESS$
 ^\[f1.assigns.\d+\] line 1 Check that \*y1 is valid: SUCCESS$
 ^\[f1.assigns.\d+\] line 1 Check that \*z1 is valid: SUCCESS$

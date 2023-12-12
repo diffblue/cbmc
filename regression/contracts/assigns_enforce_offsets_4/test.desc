@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo _ --pointer-check
+--no-standard-checks --enforce-contract foo _ --pointer-check
 ^\[foo.assigns.*\d+\].* line 5 Check that x\[(\(.*\))?10\] is valid: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

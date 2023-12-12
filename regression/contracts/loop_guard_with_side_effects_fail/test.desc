@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-loop-contracts _ --unsigned-overflow-check
+--no-standard-checks --apply-loop-contracts _ --unsigned-overflow-check
 \[check.assigns\.\d+\] line \d+ Check that \*j is assignable: FAILURE$
 \[main\.\d+\] line \d+ Check loop invariant before entry: SUCCESS$
 \[main\.\d+\] line \d+ Check that loop invariant is preserved: SUCCESS$

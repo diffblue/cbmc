@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract bar
+--no-standard-checks --enforce-contract bar
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[bar.postcondition.\d+\] line \d+ Check ensures clause: SUCCESS$

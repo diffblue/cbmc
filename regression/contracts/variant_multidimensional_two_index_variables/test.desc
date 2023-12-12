@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-loop-contracts
+--no-standard-checks --apply-loop-contracts
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
 ^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
 ^\[main\.\d+\] .* Check decreases clause on loop iteration: SUCCESS$

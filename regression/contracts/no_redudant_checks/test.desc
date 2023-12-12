@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-overflow-check _ --pointer-overflow-check --unsigned-overflow-check
+--no-standard-checks --pointer-overflow-check _ --pointer-overflow-check --unsigned-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[malloc.assertion.1\].*: SUCCESS

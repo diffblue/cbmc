@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
 ^main.c function baz$

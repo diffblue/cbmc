@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo --replace-call-with-contract bar _ --pointer-primitive-check
+--no-standard-checks --enforce-contract foo --replace-call-with-contract bar _ --pointer-primitive-check
 ^EXIT=10$
 ^SIGNAL=0$
 \[foo.assigns.\d+\] line \d+ Check that \*z \(assigned by the contract of bar\) is assignable: FAILURE$

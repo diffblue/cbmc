@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 ^main.c function foo$
 ^\[foo.assigns.\d+\] line 10 Check that \*x is valid when .*: SUCCESS$
 ^\[foo.assigns.\d+\] line 16 Check that \*x is assignable: SUCCESS$

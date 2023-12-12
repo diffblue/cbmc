@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 ^\[foo.assigns.\d+\] line 3 Check that z is valid: SUCCESS$
 ^\[foo.assigns.\d+\] line 6 Check that \*x is assignable: FAILURE$
 ^EXIT=10$

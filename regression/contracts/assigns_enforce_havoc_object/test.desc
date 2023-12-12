@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[foo.assigns.\d+\] line \d+ Check that __CPROVER_object_whole\(\(.*\)a1->u.b->c\) is valid: SUCCESS$

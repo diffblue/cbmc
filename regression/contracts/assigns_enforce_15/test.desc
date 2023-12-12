@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo --enforce-contract baz --enforce-contract qux
+--no-standard-checks --enforce-contract foo --enforce-contract baz --enforce-contract qux
 ^\[foo.assigns.\d+\] line \d+ Check that \*x is valid: SUCCESS$
 ^\[baz.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
 ^\[qux.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$

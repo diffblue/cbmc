@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-loop-contracts _ --pointer-check --bounds-check --signed-overflow-check
+--no-standard-checks --apply-loop-contracts _ --pointer-check --bounds-check --signed-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[binary_search\.\d+\] .* Check loop invariant before entry: SUCCESS$

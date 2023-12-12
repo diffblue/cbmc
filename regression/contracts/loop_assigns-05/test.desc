@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-loop-contracts
+--no-standard-checks --apply-loop-contracts
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[body_1.assigns.\d+\] .* Check that j is assignable: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f1 _ --unwind 20 --unwinding-assertions
+--no-standard-checks --enforce-contract f1 _ --unwind 20 --unwinding-assertions
 ^file main\.c line 13 function f2: recursion is ignored on call to 'f2'$
 ^Recursive call to 'f2' during inlining$
 ^EXIT=6$

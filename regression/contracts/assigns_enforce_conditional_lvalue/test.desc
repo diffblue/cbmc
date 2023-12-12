@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 main.c function foo
 ^\[foo.assigns.\d+\] line 3 Check that \*x is valid when a != FALSE: SUCCESS$
 ^\[foo.assigns.\d+\] line 3 Check that \*y is valid when !\(a != FALSE\): SUCCESS$

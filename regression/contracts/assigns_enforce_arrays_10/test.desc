@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f1 --enforce-contract nextIdx
+--no-standard-checks --enforce-contract f1 --enforce-contract nextIdx
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

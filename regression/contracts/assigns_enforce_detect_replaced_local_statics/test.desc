@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo _ --pointer-check
+--no-standard-checks --replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo _ --pointer-check
 ^\[foo.assigns.\d+\] line \d+ Check that __local_static \(assigned by the contract of bar\) is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line \d+ Check that __local_static_arr \(assigned by the contract of bar\) is assignable: SUCCESS$
 ^\[main.assertion.\d+\] line \d+ expecting FAILURE: FAILURE$

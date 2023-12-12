@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo --enforce-contract bar --enforce-contract baz _ --pointer-primitive-check
+--no-standard-checks --enforce-contract foo --enforce-contract bar --enforce-contract baz _ --pointer-primitive-check
 ^\[foo.assigns.\d+\] line 7 Check that \*xp is valid: SUCCESS$
 ^\[foo.assigns.\d+\] line 11 Check that __CPROVER_POINTER_OBJECT\(\(void \*\)yp\) is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line 13 Check that \*xp is assignable: SUCCESS$

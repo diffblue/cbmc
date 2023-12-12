@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-loop-contracts
+--no-standard-checks --apply-loop-contracts
 activate-multi-line-match
 ^The loop at file main.c line 4 function main does not have an invariant.*.\nHence, a default invariant \('true'\) is being used.*.$
 ^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$

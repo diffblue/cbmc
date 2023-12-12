@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract update _ --program-only
+--no-standard-checks --enforce-contract update _ --program-only
 ^EXIT=0$
 ^SIGNAL=0$
 --

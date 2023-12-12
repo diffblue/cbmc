@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f1 --enforce-contract f2 _ --malloc-may-fail --malloc-fail-null --pointer-check
+--no-standard-checks --enforce-contract f1 --enforce-contract f2 _ --malloc-may-fail --malloc-fail-null --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[f1.assigns.\d+\].*line 16 Check that \*p->buf is valid: FAILURE$

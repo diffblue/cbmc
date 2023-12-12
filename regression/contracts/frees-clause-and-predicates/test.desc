@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 ^\[foo.postcondition.\d+\] line \d+ Check ensures clause: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$

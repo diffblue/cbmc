@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f --enforce-contract g
+--no-standard-checks --enforce-contract f --enforce-contract g
 ^\[f.assigns.\d+\] line \d+ Check that a is assignable: SUCCESS$
 ^\[f.assigns.\d+\] line \d+ Check that aa is assignable: SUCCESS$
 ^\[g.assigns.\d+\] line \d+ Check that b is valid: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main.c
---apply-loop-contracts
+--no-standard-checks --apply-loop-contracts
 ^main.c.* error: Tracking history of side_effect expressions is not supported yet.$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$

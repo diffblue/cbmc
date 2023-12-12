@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo _ --malloc-may-fail --malloc-fail-null --pointer-primitive-check
+--no-standard-checks --enforce-contract foo _ --malloc-may-fail --malloc-fail-null --pointer-primitive-check
 \[foo.assigns.\d+\] line 4 Check that \*x is valid: SUCCESS$
 \[foo.assigns.\d+\] line 4 Check that \*p is valid when .*: SUCCESS$
 \[foo.assigns.\d+\] line 4 Check that \*\(\*p\) is valid when .*: SUCCESS$

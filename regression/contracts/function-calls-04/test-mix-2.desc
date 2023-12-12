@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f1 --enforce-contract f2_out --replace-call-with-contract f2_in
+--no-standard-checks --enforce-contract f1 --enforce-contract f2_out --replace-call-with-contract f2_in
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

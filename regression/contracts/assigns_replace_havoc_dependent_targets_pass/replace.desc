@@ -1,6 +1,6 @@
 CORE
 main_replace.c
---replace-call-with-contract resize_vec --enforce-contract resize_vec_incr10 _ --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check
+--no-standard-checks --replace-call-with-contract resize_vec --enforce-contract resize_vec_incr10 _ --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check
 ^VERIFICATION SUCCESSFUL$
 ^\[.*\] .* Check that v->size \(assigned by the contract of resize_vec\) is assignable: SUCCESS
 ^\[.*\] .* Check that v->arr \(assigned by the contract of resize_vec\) is assignable: SUCCESS

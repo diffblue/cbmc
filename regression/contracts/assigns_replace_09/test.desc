@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-call-with-contract bar --enforce-contract foo
+--no-standard-checks --replace-call-with-contract bar --enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[foo.assigns.\d+\] line \d+ Check that \*z is valid: SUCCESS$
