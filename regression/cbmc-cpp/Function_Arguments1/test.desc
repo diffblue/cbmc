@@ -1,6 +1,6 @@
 CORE gcc-only
 main.cpp
-
+--no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

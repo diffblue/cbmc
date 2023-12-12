@@ -1,6 +1,6 @@
 CORE
 main.cpp
---show-symbol-table
+--no-standard-checks --show-symbol-table
 activate-multi-line-match
 Symbol......: main::1::a\nPretty name.: main::1::a\nModule......: main\nBase name...: a\nMode........: cpp\nType........: XYZ\n
 ^EXIT=0$

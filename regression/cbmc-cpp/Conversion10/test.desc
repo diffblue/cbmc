@@ -1,6 +1,6 @@
 CORE
 main.cpp
-
+--no-standard-checks
 ^EXIT=6$
 ^SIGNAL=0$
 ^CONVERSION ERROR$

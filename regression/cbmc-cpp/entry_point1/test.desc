@@ -1,6 +1,6 @@
 CORE
 main.cpp
---function 'mymain()'
+--no-standard-checks --function 'mymain()'
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

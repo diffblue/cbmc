@@ -1,6 +1,6 @@
 CORE
 main.cpp
-
+--no-standard-checks
 instance is SATISFIABLE$
 instance is UNSATISFIABLE$
 ^EXIT=10$
