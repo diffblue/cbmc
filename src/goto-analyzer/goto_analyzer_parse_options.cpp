@@ -107,14 +107,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       config.ansi_c.malloc_failure_mode =
         configt::ansi_ct::malloc_failure_modet::malloc_failure_mode_return_null;
     }
-    PARSE_OPTIONS_GOTO_CHECK_NEGATIVE_DEFAULT_CHECKS(cmdline, options);
-  }
-  else if(cmdline.isset("no-standard-checks"))
-  {
-    PARSE_OPTIONS_GOTO_CHECK_POSITIVE_DEFAULT_CHECKS(cmdline, options);
-    // If the user opts for no standard checks, it's safe to assume he also
-    // wants to control the malloc failure behaviour, in which case we can
-    // also assume that it's going to be setup in the `config.set` call above.
   }
 
   // all (other) checks supported by goto_check

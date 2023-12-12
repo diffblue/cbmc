@@ -94,27 +94,12 @@ void goto_check_c(
   " {y--assert-to-assume} \t convert user assertions to assumptions\n"
 // clang-format on
 
-// clang-format off
- #define PARSE_OPTIONS_GOTO_CHECK_NEGATIVE_DEFAULT_CHECKS(cmdline, options) \
-     options.set_option("bounds-check", !cmdline.isset("no-bounds-check")); \
-     options.set_option("pointer-check", !cmdline.isset("no-pointer-check")); \
-     options.set_option("div-by-zero-check", !cmdline.isset("no-div-by-zero-check")); \
-     options.set_option("signed-overflow-check", !cmdline.isset("no-signed-overflow-check")); /* NOLINT(whitespace/line_length) */ \
-     options.set_option("undefined-shift-check", !cmdline.isset("no-undefined-shift-check")); /* NOLINT(whitespace/line_length) */ \
-     options.set_option("pointer-primitive-check", !cmdline.isset("no-pointer-primitive-check")); /* NOLINT(whitespace/line_length) */ \
-     (void) 0;
-// clang-format on
-
-// clang-format off
- #define PARSE_OPTIONS_GOTO_CHECK_POSITIVE_DEFAULT_CHECKS(cmdline, options) \
-     options.set_option("bounds-check", cmdline.isset("bounds-check")); \
-     options.set_option("pointer-check", cmdline.isset("pointer-check")); \
-     options.set_option("div-by-zero-check", cmdline.isset("div-by-zero-check")); \
-     options.set_option("signed-overflow-check", cmdline.isset("signed-overflow-check")); /* NOLINT(whitespace/line_length) */ \
-     options.set_option("undefined-shift-check", cmdline.isset("undefined-shift-check")); /* NOLINT(whitespace/line_length) */ \
-     options.set_option("pointer-primitive-check", cmdline.isset("pointer-primitive-check")); /* NOLINT(whitespace/line_length) */ \
-     (void) 0;
-// clang-format on
+#define PARSE_OPTION_OVERRIDE(cmdline, options, option)                        \
+  if(cmdline.isset(option))                                                    \
+    options.set_option(option, true);                                          \
+  if(cmdline.isset("no-" option))                                              \
+    options.set_option(option, false);                                         \
+  (void)0
 
 // clang-format off
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
@@ -134,7 +119,13 @@ void goto_check_c(
   options.set_option("assert-to-assume", cmdline.isset("assert-to-assume")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("retain-trivial", cmdline.isset("retain-trivial")); /* NOLINT(whitespace/line_length) */ \
   if(cmdline.isset("error-label")) \
-    options.set_option("error-label", cmdline.get_values("error-label")); \
+    options.set_option("error-label", cmdline.get_values("error-label"));      \
+  PARSE_OPTION_OVERRIDE(cmdline, options, "bounds-check"); \
+  PARSE_OPTION_OVERRIDE(cmdline, options, "pointer-check"); \
+  PARSE_OPTION_OVERRIDE(cmdline, options, "div-by-zero-check"); \
+  PARSE_OPTION_OVERRIDE(cmdline, options, "signed-overflow-check"); \
+  PARSE_OPTION_OVERRIDE(cmdline, options, "undefined-shift-check"); \
+  PARSE_OPTION_OVERRIDE(cmdline, options, "pointer-primitive-check"); \
   (void)0
 // clang-format on
 

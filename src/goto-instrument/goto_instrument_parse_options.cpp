@@ -1026,7 +1026,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     options.set_option("simplify", true);
 
   // all checks supported by goto_check
-  PARSE_OPTIONS_GOTO_CHECK_POSITIVE_DEFAULT_CHECKS(cmdline, options);
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // initialize argv with valid pointers
