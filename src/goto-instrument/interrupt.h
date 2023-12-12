@@ -17,11 +17,13 @@ Date: September 2011
 #include <util/irep.h>
 
 class goto_modelt;
+class message_handlert;
 class value_setst;
 
 void interrupt(
   value_setst &,
   goto_modelt &,
-  const irep_idt &interrupt_handler);
+  const irep_idt &interrupt_handler,
+  message_handlert &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_INTERRUPT_H

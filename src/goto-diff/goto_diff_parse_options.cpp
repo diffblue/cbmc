@@ -147,7 +147,8 @@ int goto_diff_parse_optionst::doit()
       goto_model1,
       goto_model2,
       impact_mode,
-      cmdline.isset("compact-output"));
+      cmdline.isset("compact-output"),
+      ui_message_handler);
 
     return CPROVER_EXIT_SUCCESS;
   }

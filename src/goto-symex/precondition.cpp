@@ -27,12 +27,14 @@ public:
     value_setst &_value_sets,
     const goto_programt::const_targett _target,
     const SSA_stept &_SSA_step,
-    const goto_symex_statet &_s)
+    const goto_symex_statet &_s,
+    message_handlert &message_handler)
     : ns(_ns),
       value_sets(_value_sets),
       target(_target),
       SSA_step(_SSA_step),
-      s(_s)
+      s(_s),
+      message_handler(message_handler)
   {
   }
 
@@ -42,6 +44,7 @@ protected:
   const goto_programt::const_targett target;
   const SSA_stept &SSA_step;
   const goto_symex_statet &s;
+  message_handlert &message_handler;
   void compute_rec(exprt &dest);
 
 public:
@@ -57,14 +60,15 @@ void precondition(
   const goto_programt::const_targett target,
   const symex_target_equationt &equation,
   const goto_symex_statet &s,
-  exprt &dest)
+  exprt &dest,
+  message_handlert &message_handler)
 {
   for(symex_target_equationt::SSA_stepst::const_reverse_iterator
       it=equation.SSA_steps.rbegin();
       it!=equation.SSA_steps.rend();
       it++)
   {
-    preconditiont precondition(ns, value_sets, target, *it, s);
+    preconditiont precondition(ns, value_sets, target, *it, s, message_handler);
     precondition.compute(dest);
     if(dest.is_false())
       return;
@@ -128,7 +132,13 @@ void preconditiont::compute_rec(exprt &dest)
     {
       exprt tmp;
       tmp.swap(deref_expr.pointer());
-      dereference(SSA_step.source.function_id, target, tmp, ns, value_sets);
+      dereference(
+        SSA_step.source.function_id,
+        target,
+        tmp,
+        ns,
+        value_sets,
+        message_handler);
       deref_expr.swap(tmp);
       compute_rec(deref_expr);
     }

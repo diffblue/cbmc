@@ -1023,12 +1023,11 @@ void shared_bufferst::affected_by_delay(
         ns,
         value_sets,
         gf_entry.first,
-        i_it
+        i_it,
 #ifdef LOCAL_MAY
-        ,
-        local_may
+        local_may,
 #endif
-      ); // NOLINT(whitespace/parens)
+        message.get_message_handler()); // NOLINT(whitespace/parens)
       for(const auto &w_entry : rw_set.w_entries)
       {
         for(const auto &r_entry : rw_set.r_entries)
@@ -1090,12 +1089,12 @@ void shared_bufferst::cfg_visitort::weak_memory(
           ns,
           value_sets,
           function_id,
-          i_it
+          i_it,
 #ifdef LOCAL_MAY
-          ,
-          local_may
+          local_may,
 #endif
-        ); // NOLINT(whitespace/parens)
+          shared_buffers.message
+            .get_message_handler()); // NOLINT(whitespace/parens)
 
         if(rw_set.empty())
           continue;

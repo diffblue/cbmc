@@ -906,9 +906,12 @@ bool cbmc_parse_optionst::process_goto_program(
                   << messaget::eom;
     log.status() << "Performing a full slice" << messaget::eom;
     if(options.is_set("property"))
-      property_slicer(goto_model, options.get_list_option("property"));
+      property_slicer(
+        goto_model,
+        options.get_list_option("property"),
+        log.get_message_handler());
     else
-      full_slicer(goto_model);
+      full_slicer(goto_model, log.get_message_handler());
   }
 
   // remove any skips introduced since coverage instrumentation

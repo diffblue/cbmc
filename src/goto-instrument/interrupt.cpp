@@ -64,7 +64,8 @@ static void interrupt(
 #endif
   goto_programt &goto_program,
   const symbol_exprt &interrupt_handler,
-  const rw_set_baset &isr_rw_set)
+  const rw_set_baset &isr_rw_set,
+  message_handlert &message_handler)
 {
   namespacet ns(symbol_table);
 
@@ -79,12 +80,11 @@ static void interrupt(
     ns,
     value_sets,
     function_id,
-    i_it
+    i_it,
 #ifdef LOCAL_MAY
-    ,
-    local_may
+    local_may,
 #endif
-  ); // NOLINT(whitespace/parens)
+    message_handler); // NOLINT(whitespace/parens)
 
     // potential race?
     bool race_on_read=potential_race_on_read(rw_set, isr_rw_set);
@@ -188,15 +188,15 @@ get_isr(const symbol_tablet &symbol_table, const irep_idt &interrupt_handler)
 void interrupt(
   value_setst &value_sets,
   goto_modelt &goto_model,
-  const irep_idt &interrupt_handler)
+  const irep_idt &interrupt_handler,
+  message_handlert &message_handler)
 {
   // look up the ISR
   symbol_exprt isr=
     get_isr(goto_model.symbol_table, interrupt_handler);
 
   // we first figure out which objects are read/written by the ISR
-  rw_set_functiont isr_rw_set(
-    value_sets, goto_model, isr);
+  rw_set_functiont isr_rw_set(value_sets, goto_model, isr, message_handler);
 
   // now instrument
 
@@ -216,7 +216,8 @@ void interrupt(
 #endif
         gf_entry.second.body,
         isr,
-        isr_rw_set);
+        isr_rw_set,
+        message_handler);
     }
   }
 

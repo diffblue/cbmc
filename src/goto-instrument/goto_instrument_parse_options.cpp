@@ -550,8 +550,8 @@ int goto_instrument_parse_optionst::doit()
       const symbolt &symbol=ns.lookup(ID_main);
       symbol_exprt main(symbol.name, symbol.type);
 
-      std::cout <<
-        rw_set_functiont(value_set_analysis, goto_model, main);
+      std::cout << rw_set_functiont(
+        value_set_analysis, goto_model, main, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -567,7 +567,7 @@ int goto_instrument_parse_optionst::doit()
       rewrite_rw_ok(goto_model);
 
       const namespacet ns(goto_model.symbol_table);
-      reaching_definitions_analysist rd_analysis(ns);
+      reaching_definitions_analysist rd_analysis(ns, ui_message_handler);
       rd_analysis(goto_model);
       rd_analysis.output(goto_model, std::cout);
 
@@ -580,7 +580,7 @@ int goto_instrument_parse_optionst::doit()
       rewrite_rw_ok(goto_model);
 
       const namespacet ns(goto_model.symbol_table);
-      dependence_grapht dependence_graph(ns);
+      dependence_grapht dependence_graph(ns, ui_message_handler);
       dependence_graph(goto_model);
       dependence_graph.output(goto_model, std::cout);
       dependence_graph.output_dot(std::cout);
@@ -1524,13 +1524,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     {
       // removing pointers
       log.status() << "Removing Pointers" << messaget::eom;
-      remove_pointers(goto_model, value_set_analysis);
+      remove_pointers(goto_model, value_set_analysis, ui_message_handler);
     }
 
     if(cmdline.isset("race-check"))
     {
       log.status() << "Adding Race Checks" << messaget::eom;
-      race_check(value_set_analysis, goto_model);
+      race_check(value_set_analysis, goto_model, ui_message_handler);
     }
 
     if(cmdline.isset("mm"))
@@ -1627,14 +1627,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       interrupt(
         value_set_analysis,
         goto_model,
-        cmdline.get_value("isr"));
+        cmdline.get_value("isr"),
+        ui_message_handler);
     }
 
     // Memory-mapped I/O
     if(cmdline.isset("mmio"))
     {
       log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
-      mmio(value_set_analysis, goto_model);
+      mmio(value_set_analysis, goto_model, ui_message_handler);
     }
 
     if(cmdline.isset("concurrency"))
@@ -1759,12 +1760,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
                   << messaget::eom;
     log.status() << "Performing a full slice" << messaget::eom;
     if(cmdline.isset("property"))
-      property_slicer(goto_model, cmdline.get_values("property"));
+      property_slicer(
+        goto_model, cmdline.get_values("property"), ui_message_handler);
     else
     {
       // full_slicer requires that the model has unique location numbers:
       goto_model.goto_functions.update();
-      full_slicer(goto_model);
+      full_slicer(goto_model, ui_message_handler);
     }
   }
 

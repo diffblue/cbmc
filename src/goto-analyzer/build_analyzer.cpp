@@ -123,7 +123,7 @@ std::unique_ptr<ai_baset> build_analyzer(
     }
     else if(options.get_bool_option("dependence-graph"))
     {
-      return std::make_unique<dependence_grapht>(ns);
+      return std::make_unique<dependence_grapht>(ns, mh);
     }
     else if(options.get_bool_option("dependence-graph-vs"))
     {

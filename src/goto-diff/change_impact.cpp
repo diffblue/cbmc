@@ -207,7 +207,8 @@ public:
     const goto_modelt &model_old,
     const goto_modelt &model_new,
     impact_modet impact_mode,
-    bool compact_output);
+    bool compact_output,
+    message_handlert &message_handler);
 
   void operator()();
 
@@ -289,19 +290,20 @@ protected:
 };
 
 change_impactt::change_impactt(
-    const goto_modelt &model_old,
-    const goto_modelt &model_new,
-    impact_modet _impact_mode,
-    bool _compact_output):
-  impact_mode(_impact_mode),
-  compact_output(_compact_output),
-  old_goto_functions(model_old.goto_functions),
-  ns_old(model_old.symbol_table),
-  new_goto_functions(model_new.goto_functions),
-  ns_new(model_new.symbol_table),
-  unified_diff(model_old, model_new),
-  old_dep_graph(ns_old),
-  new_dep_graph(ns_new)
+  const goto_modelt &model_old,
+  const goto_modelt &model_new,
+  impact_modet _impact_mode,
+  bool _compact_output,
+  message_handlert &message_handler)
+  : impact_mode(_impact_mode),
+    compact_output(_compact_output),
+    old_goto_functions(model_old.goto_functions),
+    ns_old(model_old.symbol_table),
+    new_goto_functions(model_new.goto_functions),
+    ns_new(model_new.symbol_table),
+    unified_diff(model_old, model_new),
+    old_dep_graph(ns_old, message_handler),
+    new_dep_graph(ns_new, message_handler)
 {
   // syntactic difference?
   if(!unified_diff())
@@ -757,8 +759,10 @@ void change_impact(
   const goto_modelt &model_old,
   const goto_modelt &model_new,
   impact_modet impact_mode,
-  bool compact_output)
+  bool compact_output,
+  message_handlert &message_handler)
 {
-  change_impactt c(model_old, model_new, impact_mode, compact_output);
+  change_impactt c(
+    model_old, model_new, impact_mode, compact_output, message_handler);
   c();
 }

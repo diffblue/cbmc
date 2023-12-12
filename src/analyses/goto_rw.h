@@ -21,7 +21,7 @@ Date: April 2010
 #include <goto-programs/goto_program.h>
 
 class goto_functionst;
-
+class message_handlert;
 class rw_range_sett;
 
 void goto_rw(
@@ -212,8 +212,8 @@ public:
 
   virtual ~rw_range_sett();
 
-  explicit rw_range_sett(const namespacet &_ns):
-    ns(_ns)
+  rw_range_sett(const namespacet &_ns, message_handlert &message_handler)
+    : ns(_ns), message_handler(message_handler)
   {
   }
 
@@ -263,6 +263,7 @@ public:
 
 protected:
   const namespacet &ns;
+  message_handlert &message_handler;
 
   objectst r_range_set, w_range_set;
 
@@ -370,9 +371,9 @@ class rw_range_set_value_sett:public rw_range_sett
 public:
   rw_range_set_value_sett(
     const namespacet &_ns,
-    value_setst &_value_sets):
-    rw_range_sett(_ns),
-    value_sets(_value_sets)
+    value_setst &_value_sets,
+    message_handlert &message_handler)
+    : rw_range_sett(_ns, message_handler), value_sets(_value_sets)
   {
   }
 
@@ -463,8 +464,9 @@ public:
   rw_guarded_range_set_value_sett(
     const namespacet &_ns,
     value_setst &_value_sets,
-    guard_managert &guard_manager)
-    : rw_range_set_value_sett(_ns, _value_sets),
+    guard_managert &guard_manager,
+    message_handlert &message_handler)
+    : rw_range_set_value_sett(_ns, _value_sets, message_handler),
       guard_manager(guard_manager),
       guard(true_exprt(), guard_manager)
   {

@@ -254,7 +254,8 @@ static bool implicit(goto_programt::const_targett target)
 void full_slicert::operator()(
   goto_functionst &goto_functions,
   const namespacet &ns,
-  const slicing_criteriont &criterion)
+  const slicing_criteriont &criterion,
+  message_handlert &message_handler)
 {
   // build the CFG data structure
   cfg(goto_functions);
@@ -296,7 +297,7 @@ void full_slicert::operator()(
   }
 
   // compute program dependence graph (and post-dominators)
-  dependence_grapht dep_graph(ns);
+  dependence_grapht dep_graph(ns, message_handler);
   dep_graph(goto_functions, ns);
 
   // compute the fixedpoint
@@ -347,41 +348,45 @@ void full_slicert::operator()(
 void full_slicer(
   goto_functionst &goto_functions,
   const namespacet &ns,
-  const slicing_criteriont &criterion)
+  const slicing_criteriont &criterion,
+  message_handlert &message_handler)
 {
-  full_slicert()(goto_functions, ns, criterion);
+  full_slicert()(goto_functions, ns, criterion, message_handler);
 }
 
 void full_slicer(
   goto_functionst &goto_functions,
-  const namespacet &ns)
+  const namespacet &ns,
+  message_handlert &message_handler)
 {
   assert_criteriont a;
-  full_slicert()(goto_functions, ns, a);
+  full_slicert()(goto_functions, ns, a, message_handler);
 }
 
-void full_slicer(goto_modelt &goto_model)
+void full_slicer(goto_modelt &goto_model, message_handlert &message_handler)
 {
   assert_criteriont a;
   const namespacet ns(goto_model.symbol_table);
-  full_slicert()(goto_model.goto_functions, ns, a);
+  full_slicert()(goto_model.goto_functions, ns, a, message_handler);
 }
 
 void property_slicer(
   goto_functionst &goto_functions,
   const namespacet &ns,
-  const std::list<std::string> &properties)
+  const std::list<std::string> &properties,
+  message_handlert &message_handler)
 {
   properties_criteriont p(properties);
-  full_slicert()(goto_functions, ns, p);
+  full_slicert()(goto_functions, ns, p, message_handler);
 }
 
 void property_slicer(
   goto_modelt &goto_model,
-  const std::list<std::string> &properties)
+  const std::list<std::string> &properties,
+  message_handlert &message_handler)
 {
   const namespacet ns(goto_model.symbol_table);
-  property_slicer(goto_model.goto_functions, ns, properties);
+  property_slicer(goto_model.goto_functions, ns, properties, message_handler);
 }
 
 slicing_criteriont::~slicing_criteriont()

@@ -65,12 +65,11 @@ void introduce_temporaries(
         ns,
         value_sets,
         function_id,
-        i_it
+        i_it,
 #ifdef LOCAL_MAY
-        ,
-        local_may
+        local_may,
 #endif
-      ); // NOLINT(whitespace/parens)
+        message.get_message_handler()); // NOLINT(whitespace/parens)
       if(rw_set.empty())
         continue;
 

@@ -144,7 +144,11 @@ int jdiff_parse_optionst::doit()
         : (cmdline.isset("backward-impact") ? impact_modet::BACKWARD
                                             : impact_modet::BOTH);
     change_impact(
-      goto_model1, goto_model2, impact_mode, cmdline.isset("compact-output"));
+      goto_model1,
+      goto_model2,
+      impact_mode,
+      cmdline.isset("compact-output"),
+      ui_message_handler);
 
     return CPROVER_EXIT_SUCCESS;
   }

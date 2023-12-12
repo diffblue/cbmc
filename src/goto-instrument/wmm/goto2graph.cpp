@@ -428,12 +428,11 @@ bool instrumentert::cfg_visitort::contains_shared_array(
       ns,
       value_sets,
       function_id,
-      cur
+      cur,
 #ifdef LOCAL_MAY
-      ,
-      local_may
+      local_may,
 #endif
-    ); // NOLINT(whitespace/parens)
+      instrumenter.message.get_message_handler()); // NOLINT(whitespace/parens)
     instrumenter.message.debug() << "Writes: "<<rw_set.w_entries.size()
       <<"; Reads:"<<rw_set.r_entries.size() << messaget::eom;
 
@@ -857,12 +856,11 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     ns,
     value_sets,
     function_id,
-    i_it
+    i_it,
 #ifdef LOCAL_MAY
-    ,
-    local_may
+    local_may,
 #endif
-  ); // NOLINT(whitespace/parens)
+    instrumenter.message.get_message_handler()); // NOLINT(whitespace/parens)
 
   event_idt previous=std::numeric_limits<event_idt>::max();
   event_idt previous_gnode=std::numeric_limits<event_idt>::max();

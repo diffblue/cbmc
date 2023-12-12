@@ -22,6 +22,7 @@ Date: February 2006
 
 class goto_modelt;
 class goto_programt;
+class message_handlert;
 class value_setst;
 
 void race_check(
@@ -31,8 +32,9 @@ void race_check(
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
-  goto_programt &goto_program);
+  goto_programt &goto_program,
+  message_handlert &);
 
-void race_check(value_setst &, goto_modelt &);
+void race_check(value_setst &, goto_modelt &, message_handlert &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_RACE_CHECK_H
