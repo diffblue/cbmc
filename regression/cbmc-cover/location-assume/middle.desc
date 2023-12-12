@@ -1,0 +1,15 @@
+CORE
+middle.c
+--cover location
+^EXIT=0$
+^SIGNAL=0$
+^\[main.coverage.1\] file middle.c line 5 function main block 1 \(lines middle\.c:main:5-8\): SATISFIED$
+^\[main.coverage.2\] file middle.c line 9 function main block 2 \(lines middle\.c:main:9-11\): FAILED$
+^\*\* 1 of 2 covered \(50.0%\)
+--
+^warning: ignoring
+--
+This test confirms that assumptions in the middle of what would otherwise be a
+single blocks without control flow will cause the code to be split into 2
+coverage blocks. This is required as an unsatisfiable assumption can result in
+the following statements being unreachable.

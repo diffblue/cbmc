@@ -29,15 +29,34 @@ optionalt<std::size_t> cover_basic_blockst::continuation_of_block(
   return {};
 }
 
+static bool
+same_source_line(const source_locationt &a, const source_locationt &b)
+{
+  return a.get_file() == b.get_file() && a.get_line() == b.get_line();
+}
+
 cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
 {
   bool next_is_target = true;
+  const goto_programt::instructiont *preceding_assume = nullptr;
   std::size_t current_block = 0;
 
   forall_goto_program_instructions(it, goto_program)
   {
+    // For the purposes of coverage blocks, multiple consecutive assume
+    // instructions with the same source location are considered to be part of
+    // the same block. Assumptions should terminate a block, as subsequent
+    // instructions may be unreachable. However check instrumentation passes
+    // may insert multiple assertions in the same program location. Therefore
+    // these are combined for reasons of readability of the coverage output.
+    bool end_of_assume_group =
+      preceding_assume &&
+      !(it->is_assume() &&
+        same_source_line(
+          preceding_assume->source_location(), it->source_location()));
+
     // Is it a potential beginning of a block?
-    if(next_is_target || it->is_target())
+    if(next_is_target || it->is_target() || end_of_assume_group)
     {
       if(auto block_number = continuation_of_block(it, block_map))
       {
@@ -72,13 +91,8 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
       block_info.source_location = it->source_location();
     }
 
-    next_is_target =
-#if 0
-      // Disabled for being too messy
-      it->is_goto() || it->is_function_call() || it->is_assume();
-#else
-      it->is_goto() || it->is_function_call();
-#endif
+    next_is_target = it->is_goto() || it->is_function_call();
+    preceding_assume = it->is_assume() ? &*it : nullptr;
   }
 }
 
