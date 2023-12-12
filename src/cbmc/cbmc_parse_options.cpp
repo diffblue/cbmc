@@ -143,11 +143,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("function"))
     options.set_option("function", cmdline.get_value("function"));
 
-  if(
-    cmdline.isset("cover") &&
-    // The option is set by default, or passed in the by the user.
-    (options.get_bool_option("unwinding-assertions") ||
-     cmdline.isset("unwinding-assertions")))
+  if(cmdline.isset("cover") && cmdline.isset("unwinding-assertions"))
   {
     log.error()
       << "--cover and --unwinding-assertions must not be given together"
@@ -204,7 +200,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-vcc", true);
 
   if(cmdline.isset("cover"))
+  {
     parse_cover_options(cmdline, options);
+    // The default unwinding assertions option needs to be switched off when
+    // performing coverage checks because we intend to solve for coverage rather
+    // than assertions.
+    options.set_option("unwinding-assertions", false);
+  }
 
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
