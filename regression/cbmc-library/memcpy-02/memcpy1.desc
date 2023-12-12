@@ -1,6 +1,6 @@
 CORE
 memcpy1.c
---bounds-check --pointer-check
+--no-standard-checks --bounds-check --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

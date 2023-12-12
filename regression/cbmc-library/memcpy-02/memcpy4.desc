@@ -1,6 +1,6 @@
 CORE
 memcpy4.c
---pointer-check
+--no-standard-checks --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*] line 8 memcpy src/dst overlap: SUCCESS$

@@ -1,6 +1,6 @@
 CORE unix
 main.c
---pointer-check --bounds-check --conversion-check
+--no-standard-checks --pointer-check --bounds-check --conversion-check
 ^\[main.assertion.\d+\] line \d+ ARG\_MAX is not supported: FAILURE$
 ^\[main.assertion.\d+\] line \d+ sysconf\(\) error: FAILURE$
 ^\[main.assertion.\d+\] line \d+ ARG\_MAX is supported: FAILURE$

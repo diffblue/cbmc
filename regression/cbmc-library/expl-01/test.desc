@@ -1,6 +1,6 @@
 CORE
 main.c
---float-overflow-check --nan-check
+--no-standard-checks --float-overflow-check --nan-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 test.c
---show-goto-functions
+--no-standard-checks --show-goto-functions
 IF ¬\(cast\(\*\(strlen::s \+ cast\(strlen::1::len, signedbv\[.*\]\)\), signedbv\[32\]\) ≠ 0\) THEN GOTO 2
 ^EXIT=0$
 ^SIGNAL=0$

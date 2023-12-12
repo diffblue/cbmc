@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check --program-only
+--no-standard-checks --pointer-check --bounds-check --program-only
 ^EXIT=0$
 ^SIGNAL=0$
 --

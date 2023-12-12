@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check --unwind 3 --unwinding-assertions
+--no-standard-checks --pointer-check --bounds-check --unwind 3 --unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check
+--no-standard-checks --pointer-check --bounds-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\*\* 1 of \d+ failed

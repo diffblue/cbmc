@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check
+--no-standard-checks --pointer-check
 dereference failure: dead object in \*from_foo: FAILURE$
 ^\*\* 2 of 7 failed
 ^VERIFICATION FAILED$

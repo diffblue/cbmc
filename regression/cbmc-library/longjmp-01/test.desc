@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check
+--no-standard-checks --pointer-check --bounds-check
 ^\[longjmp.assertion.1\] line 12 longjmp requires instrumentation: FAILURE$
 ^\[main.assertion.1\] line 8 unreachable: SUCCESS$
 ^VERIFICATION FAILED$

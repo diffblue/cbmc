@@ -1,6 +1,6 @@
 CORE unix
 main.c
---bounds-check
+--no-standard-checks --bounds-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\*\* 1 of 3 failed

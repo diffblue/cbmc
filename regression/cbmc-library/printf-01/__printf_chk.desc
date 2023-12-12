@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check -D_FORTIFY_SOURCE=2 -D__OPTIMIZE__=2
+--no-standard-checks --pointer-check --bounds-check -D_FORTIFY_SOURCE=2 -D__OPTIMIZE__=2
 ^EXIT=10$
 ^SIGNAL=0$
 ^\*\* 1 of \d+ failed

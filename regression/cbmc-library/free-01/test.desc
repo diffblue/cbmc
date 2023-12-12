@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --bounds-check --stop-on-fail
+--no-standard-checks --pointer-check --bounds-check --stop-on-fail
 free argument (must be (NULL or valid pointer|dynamic object)|has offset zero)
 ^EXIT=10$
 ^SIGNAL=0$

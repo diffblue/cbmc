@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
-
+--no-standard-checks
 function 'memcpy' is not declared
 parameter "memcpy::dst" type mismatch
 ^EXIT=6$

@@ -1,6 +1,6 @@
 CORE
 missing_parameters.c
-
+--no-standard-checks
 file missing_parameters\.c line 10 function main: 'alloca' function called, but 'alloca' has not been declared with expected single 'size_t' parameter\.
 ^EXIT=6$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---floatbv --refine
+--no-standard-checks --floatbv --refine
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

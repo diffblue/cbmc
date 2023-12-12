@@ -1,6 +1,6 @@
 CORE
 msvc.c
---pointer-check --bounds-check --winx64
+--no-standard-checks --pointer-check --bounds-check --winx64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
