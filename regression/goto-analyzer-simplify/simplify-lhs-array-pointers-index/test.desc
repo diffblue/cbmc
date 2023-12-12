@@ -1,6 +1,6 @@
 CORE
 main.c
---vsd --vsd-arrays every-element --vsd-pointers value-set
+--no-standard-checks --vsd --vsd-arrays every-element --vsd-pointers value-set
 symbol_a := 1
 symbol_b := 2
 \*\(.*::arr\[2\]\) := 3

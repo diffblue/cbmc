@@ -1,6 +1,6 @@
 CORE
 main.c
---vsd --vsd-arrays every-element --vsd-pointers value-set --vsd-structs every-field
+--no-standard-checks --vsd --vsd-arrays every-element --vsd-pointers value-set --vsd-structs every-field
 symbol := 5
 \*\(.*::value\.pointer_component\) := 6
 value\.array\[1\] := 2

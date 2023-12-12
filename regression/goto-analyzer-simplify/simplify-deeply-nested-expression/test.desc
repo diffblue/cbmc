@@ -1,6 +1,6 @@
 CORE
 main.c
---vsd
+--no-standard-checks --vsd
 ^SIGNAL=0$
 ^EXIT=0$
 --

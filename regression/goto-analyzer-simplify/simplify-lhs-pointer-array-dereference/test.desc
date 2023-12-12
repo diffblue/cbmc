@@ -1,6 +1,6 @@
 CORE
 main.c
---vsd --vsd-arrays every-element --vsd-pointers value-set
+--no-standard-checks --vsd --vsd-arrays every-element --vsd-pointers value-set
 array\[0\] := 5
 array\[.*nondet.*\] := 6
 new_array\[1\] := 7

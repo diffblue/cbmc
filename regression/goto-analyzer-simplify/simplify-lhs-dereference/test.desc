@@ -1,6 +1,6 @@
 CORE
 main.c
---vsd --vsd-pointers value-set
+--no-standard-checks --vsd --vsd-pointers value-set
 symbol := 5
 \*.*::pointer := 6
 ^SIGNAL=0$

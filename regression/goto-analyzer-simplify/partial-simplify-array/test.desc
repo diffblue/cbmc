@@ -1,6 +1,6 @@
 CORE
 main.c
---vsd --vsd-arrays every-element
+--no-standard-checks --vsd --vsd-arrays every-element
 arr\[0l?l?\]
 ^SIGNAL=0$
 ^EXIT=0$
