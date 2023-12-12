@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^\[foo.assigns.\d+\] line \d+ Check that nondet_var is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line \d+ Check that __VERIFIER_var is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line \d+ Check that __CPROVER_var is assignable: SUCCESS$

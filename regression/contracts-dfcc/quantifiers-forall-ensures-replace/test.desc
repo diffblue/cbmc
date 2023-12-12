@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract f1
+--no-standard-checks --dfcc main --replace-call-with-contract f1
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] line .* assertion check: FAILURE$

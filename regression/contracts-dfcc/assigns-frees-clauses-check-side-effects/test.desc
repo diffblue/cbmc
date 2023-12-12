@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo --malloc-may-fail --malloc-fail-null
+--no-standard-checks --dfcc main --enforce-contract foo --malloc-may-fail --malloc-fail-null
 ^\[foo_assigns.assigns.\d+\] line \d+ Check that ptr\[(\(.* int\))?0\] is assignable: FAILURE$
 ^\[foo_frees.assigns.\d+\] line \d+ Check that ptr\[(\(.* int\))?0\] is assignable: FAILURE$
 ^VERIFICATION FAILED$

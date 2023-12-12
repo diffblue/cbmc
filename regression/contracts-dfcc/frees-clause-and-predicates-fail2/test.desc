@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 ^main.c.* error: expecting void return type for function 'foo_frees' called in frees clause$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$

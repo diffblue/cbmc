@@ -1,6 +1,6 @@
 CORE dfcc-only
 main_even.c
---dfcc main --enforce-contract-rec even
+--no-standard-checks --dfcc main --enforce-contract-rec even
 ^\[even.assigns.\d+\].*Check that the assigns clause of contract::even is included in the caller's assigns clause: SUCCESS$
 ^\[even.frees.\d+\].*Check that the frees clause of contract::even is included in the caller's frees clause: SUCCESS$
 ^\[even.precondition.\d+\].*Check requires clause of contract contract::even for function even: SUCCESS$

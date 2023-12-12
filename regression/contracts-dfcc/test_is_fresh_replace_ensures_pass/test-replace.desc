@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --replace-call-with-contract foo
+--no-standard-checks --dfcc main --replace-call-with-contract foo
 ^\[main.assertion.\d+\].*out1 is rw_ok: SUCCESS$
 ^\[main.assertion.\d+\].*out2 is rw_ok: SUCCESS$
 ^\[main.assertion.\d+\].*out1 and out2 are not aliased: SUCCESS$

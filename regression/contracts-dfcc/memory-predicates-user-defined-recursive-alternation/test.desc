@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
+--no-standard-checks --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

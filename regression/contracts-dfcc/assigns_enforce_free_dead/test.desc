@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-primitive-check
+--no-standard-checks --malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-primitive-check
 ^\[foo.assigns.\d+\] line 6 Check that \*x is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line 9 Check that \*\(\*y\) is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line 21 Check that \*\(\*y\) is assignable: FAILURE$

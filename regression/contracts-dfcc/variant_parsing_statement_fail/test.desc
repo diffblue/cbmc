@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 activate-multi-line-match
 ^main.c.*error: syntax error before 'int'\n.*__CPROVER_decreases\(int x = 0\)$
 ^PARSING ERROR$

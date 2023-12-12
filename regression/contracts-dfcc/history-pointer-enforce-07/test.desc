@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 ^EXIT=(1|64)$
 ^SIGNAL=0$
 ^CONVERSION ERROR$

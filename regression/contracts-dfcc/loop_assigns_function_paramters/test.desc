@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts --enforce-contract decr
+--no-standard-checks --dfcc main --apply-loop-contracts --enforce-contract decr
 ^\[decr.loop_assigns.\d+] line \d+ Check assigns clause inclusion for loop decr.0: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

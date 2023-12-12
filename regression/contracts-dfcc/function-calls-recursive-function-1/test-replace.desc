@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract f --replace-call-with-contract g
+--no-standard-checks --dfcc main --enforce-contract f --replace-call-with-contract g
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --replace-call-with-contract f
+--no-standard-checks --dfcc main --replace-call-with-contract f
 ^\[f.precondition.\d+\] .* Check requires clause of contract contract::f for function f: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$

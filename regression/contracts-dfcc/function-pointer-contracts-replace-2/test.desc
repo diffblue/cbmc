@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract bar --replace-call-with-contract foo --replace-call-with-contract get_arr_fun
+--no-standard-checks --dfcc main --enforce-contract bar --replace-call-with-contract foo --replace-call-with-contract get_arr_fun
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

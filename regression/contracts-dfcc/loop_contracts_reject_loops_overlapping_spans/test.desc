@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^Found loops with overlapping instruction spans$
 ^EXIT=(6|10)$
 ^SIGNAL=0$

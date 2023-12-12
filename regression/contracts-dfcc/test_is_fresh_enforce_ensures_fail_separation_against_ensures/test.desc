@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 ^\[foo.assigns.\d+\].*Check that \*out1 is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].*Check that \*out2 is assignable: SUCCESS$
 ^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: FAILURE$

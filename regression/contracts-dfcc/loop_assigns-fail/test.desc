@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^\[main.assigns.\d+\] line 20 Check that b->data\[\(.*\)i\] is assignable: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

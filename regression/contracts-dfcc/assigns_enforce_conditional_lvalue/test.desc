@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 main.c function foo
 ^\[foo.assigns.\d+\] line 7 Check that \*x is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line 8 Check that \*y is assignable: FAILURE$

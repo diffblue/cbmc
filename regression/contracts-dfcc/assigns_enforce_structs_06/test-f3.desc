@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract f3
+--no-standard-checks --dfcc main --enforce-contract f3
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[f3.assigns.\d+\] line \d+ Check that p->buf is assignable: SUCCESS$

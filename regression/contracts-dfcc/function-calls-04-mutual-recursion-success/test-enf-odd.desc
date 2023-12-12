@@ -1,6 +1,6 @@
 CORE dfcc-only
 main_odd.c
---dfcc main --enforce-contract odd
+--no-standard-checks --dfcc main --enforce-contract odd
 ^\[.*\].*No recursive call to function odd when checking contract odd: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

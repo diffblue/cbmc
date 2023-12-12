@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract f2 --replace-call-with-contract f3
+--no-standard-checks --dfcc main --replace-call-with-contract f2 --replace-call-with-contract f3
 main.c function main
 ^\[.*\d+\] line 29 assertion p > 100: SUCCESS$
 ^\[.*\d+\] line 30 assertion q == 2: SUCCESS$

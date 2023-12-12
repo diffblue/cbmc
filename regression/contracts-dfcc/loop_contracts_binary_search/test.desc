@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts _ --pointer-check --bounds-check --signed-overflow-check
+--no-standard-checks --dfcc main --apply-loop-contracts _ --pointer-check --bounds-check --signed-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[binary_search.loop_assigns.\d+\] line 15 Check assigns clause inclusion for loop .*: SUCCESS$

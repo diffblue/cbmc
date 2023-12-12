@@ -1,6 +1,6 @@
 CORE dfcc-only
 main_bounded.c
---malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check --pointer-overflow-check
+--no-standard-checks --malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo _ --pointer-check --pointer-primitive-check --pointer-overflow-check
 ^\[__CPROVER_contracts_car_set_insert.assertion.\d+\] line \d+ CAR size is less than __CPROVER_max_malloc_size: SUCCESS$
 ^\[__CPROVER_contracts_write_set_check_assignment.assertion.\d+\] line \d+ ptr NULL or writable up to size: SUCCESS$
 ^\[__CPROVER_contracts_write_set_check_assignment.assertion.\d+\] line \d+ no offset bits overflow on CAR upper bound computation: SUCCESS$

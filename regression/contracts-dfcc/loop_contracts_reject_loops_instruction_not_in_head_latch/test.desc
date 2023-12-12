@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^Found loop body instruction outside of the \[head, latch\] instruction span$
 ^EXIT=(6|10)$
 ^SIGNAL=0$

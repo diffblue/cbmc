@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts --replace-call-with-contract ackermann
+--no-standard-checks --dfcc main --apply-loop-contracts --replace-call-with-contract ackermann
 ^\[ackermann.precondition\.\d+\] line \d+ Check requires clause of contract contract\:\:ackermann for function ackermann: SUCCESS$
 ^\[ackermann.assigns.\d+\] line \d+ Check that the assigns clause of contract\:\:ackermann is included in the caller\'s assigns clause: SUCCESS$
 ^VERIFICATION SUCCESSFUL$

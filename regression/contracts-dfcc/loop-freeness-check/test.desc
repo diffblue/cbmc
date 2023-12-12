@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 ^\[foo.assigns.\d+\].*Check that i is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].*Check that arr\[(\(.*\))?i\] is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$

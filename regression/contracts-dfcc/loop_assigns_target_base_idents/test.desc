@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo --apply-loop-contracts
+--no-standard-checks --malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo --apply-loop-contracts
 ^\[foo.assigns.\d+\] line .* Check that i is assignable: SUCCESS$
 ^\[foo.loop_assigns.\d+\] line .* Check assigns clause inclusion for loop foo.0: SUCCESS$
 ^\[foo.loop_invariant_base.\d+\] line .* Check invariant before entry for loop foo.0: SUCCESS$

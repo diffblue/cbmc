@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo _ --pointer-primitive-check
+--no-standard-checks --dfcc main --enforce-contract foo _ --pointer-primitive-check
 ^\[foo.assigns.\d+\] line \d+ Check that y is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line \d+ Check that foo\$\$1\$\$x is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line \d+ Check that \*y is assignable: FAILURE$

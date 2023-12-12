@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^Decreases clause is not side-effect free. \(at: file main.c line .* function main\)$
 ^EXIT=70$
 ^SIGNAL=0$

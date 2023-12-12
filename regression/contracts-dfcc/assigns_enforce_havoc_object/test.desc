@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[bar.assigns.\d+\] line \d+ Check that havoc_object\(\(void \*\)a->u\.b->c\) is allowed by the assigns clause: FAILURE$

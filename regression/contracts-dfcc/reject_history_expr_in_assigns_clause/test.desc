@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 ^.*error: assigns clause target must be a non-void lvalue or a call to a function returning void$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$

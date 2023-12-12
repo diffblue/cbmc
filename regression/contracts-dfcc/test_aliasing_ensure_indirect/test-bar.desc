@@ -1,6 +1,6 @@
 CORE dfcc-only
 main_bar.c
---dfcc main --enforce-contract bar
+--no-standard-checks --dfcc main --enforce-contract bar
 ^\[bar.postcondition.\d+\].*Check ensures clause of contract contract::bar for function bar: SUCCESS$
 ^\[bar.assertion.\d+\].*x is r_ok: SUCCESS$
 ^\[bar.assigns.\d+\].*Check that \*x is assignable: SUCCESS$

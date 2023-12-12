@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[body_1.assigns.\d+\] .* Check that j is assignable: SUCCESS$

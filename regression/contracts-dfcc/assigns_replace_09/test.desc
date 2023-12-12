@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --replace-call-with-contract bar --enforce-contract foo
+--no-standard-checks --dfcc main --replace-call-with-contract bar --enforce-contract foo
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[bar.assigns.\d+\].*Check that the assigns clause of contract::bar is included in the caller's assigns clause: SUCCESS$

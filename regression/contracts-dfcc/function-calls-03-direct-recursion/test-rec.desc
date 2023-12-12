@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract-rec f
+--no-standard-checks --dfcc main --enforce-contract-rec f
 ^\[f.postcondition.\d+\].*Check ensures clause of contract contract::f for function f: SUCCESS$
 ^\[f.precondition.\d+\].*Check requires clause of contract contract::f for function f: SUCCESS$
 ^\[f.assigns.\d+\].*Check that the assigns clause of contract::f is included in the caller's assigns clause: SUCCESS$

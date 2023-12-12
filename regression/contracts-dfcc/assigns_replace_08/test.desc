@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo --replace-call-with-contract bar _ --pointer-primitive-check
+--no-standard-checks --dfcc main --enforce-contract foo --replace-call-with-contract bar _ --pointer-primitive-check
 ^\[bar.assigns.\d+\].*Check that the assigns clause of contract::bar is included in the caller's assigns clause: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$

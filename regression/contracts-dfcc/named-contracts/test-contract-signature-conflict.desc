@@ -1,6 +1,6 @@
 CORE
 main-contract-signature-conflict.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 function symbol 'foo' redefined with a different type
 ^EXIT=(64|1)$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo
+--no-standard-checks --malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo
 ^\[foo.assigns.\d+\] line \d+ Check that a\[(\(signed (long (long )?)?int\))?i\] is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line \d+ Check that \*out is assignable: SUCCESS$
 ^EXIT=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract initialize
+--no-standard-checks --dfcc main --enforce-contract initialize
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

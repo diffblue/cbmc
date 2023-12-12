@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --replace-call-with-contract foo
+--no-standard-checks --dfcc main --replace-call-with-contract foo
 ^\[foo.precondition.\d+\] line \d+ Check requires clause of contract contract::foo for function foo: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$

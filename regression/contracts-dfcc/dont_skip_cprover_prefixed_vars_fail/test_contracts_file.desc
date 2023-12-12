@@ -1,6 +1,6 @@
 CORE
 main.c
---loop-contracts-file test.json --dfcc main --apply-loop-contracts
+--no-standard-checks --loop-contracts-file test.json --dfcc main --apply-loop-contracts
 ^\[foo.assigns.\d+\] .* Check that nondet_var is assignable: FAILURE$
 ^\[foo.assigns.\d+\] .* Check that __VERIFIER_var is assignable: FAILURE$
 ^\[foo.assigns.\d+\] .* Check that __CPROVER_var is assignable: FAILURE$

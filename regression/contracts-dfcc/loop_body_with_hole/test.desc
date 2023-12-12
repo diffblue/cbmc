@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^\[main.assigns.\d+\] line 6 Check that sum_to_k is assignable: SUCCESS$
 ^\[main.assigns.\d+\] line 7 Check that flag is assignable: SUCCESS$
 ^\[main.assigns.\d+\] line 9 Check that i is assignable: SUCCESS$

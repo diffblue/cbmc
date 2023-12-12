@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract bar --enforce-contract foo 
+--no-standard-checks --dfcc main --replace-call-with-contract bar --enforce-contract foo 
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract cmp
+--no-standard-checks --dfcc main --replace-call-with-contract cmp
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line \d+ expecting SUCCESS: SUCCESS$

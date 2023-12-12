@@ -1,6 +1,6 @@
 CORE dfcc-only
 main_odd.c
---dfcc main --enforce-contract-rec odd
+--no-standard-checks --dfcc main --enforce-contract-rec odd
 ^\[odd.precondition.\d+\] .* Check requires clause of contract contract::odd for function odd: SUCCESS$
 ^\[odd.postcondition.\d+\] .* Check ensures clause of contract contract::odd for function odd: FAILURE$
 ^EXIT=10$

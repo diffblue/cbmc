@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract f2
+--no-standard-checks --dfcc main --enforce-contract f2
 ^\[f2.assigns.\d+\] line \d+ Check that a\[.*0\] is assignable: SUCCESS$
 ^\[f2.assigns.\d+\] line \d+ Check that a\[.*5\] is assignable: SUCCESS$
 ^EXIT=0$

@@ -1,6 +1,6 @@
 CORE dfcc-only
 main_even.c
---dfcc main --enforce-contract even
+--no-standard-checks --dfcc main --enforce-contract even
 ^\[.*\].*No recursive call to function even when checking contract even: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

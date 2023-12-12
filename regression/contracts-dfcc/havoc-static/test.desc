@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 ^\[foo.assertion.\d+\].* guarded by a: FAILURE$
 ^\[foo.assertion.\d+\].* guarded by b: SUCCESS$
 ^\[foo.assertion.\d+\].* guarded by c: FAILURE$

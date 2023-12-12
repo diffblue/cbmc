@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 ^.*error: the first argument of __CPROVER_obeys_contract must be a function pointer lvalue expression$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$

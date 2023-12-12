@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract f1
+--no-standard-checks --dfcc main --enforce-contract f1
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[f1.assigns.\d+\] line \d+ Check that p->y is assignable: FAILURE$

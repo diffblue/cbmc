@@ -1,6 +1,6 @@
 CORE
 main.c
---loop-contracts-file test_matching_no_function.json --dfcc main --apply-loop-contracts
+--no-standard-checks --loop-contracts-file test_matching_no_function.json --dfcc main --apply-loop-contracts
 ^function .* matches no function
 ^EXIT=6$
 ^SIGNAL=0$

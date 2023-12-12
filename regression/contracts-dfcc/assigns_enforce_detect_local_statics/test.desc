@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract bar
+--no-standard-checks --dfcc main --enforce-contract bar
 ^\[foo.assigns.\d+\] line 17 Check that \*y is assignable: SUCCESS$
 ^\[foo.assigns.\d+\] line 20 Check that \*yy is assignable: FAILURE$
 ^VERIFICATION FAILED$

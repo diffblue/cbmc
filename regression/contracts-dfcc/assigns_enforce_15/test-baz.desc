@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract baz
+--no-standard-checks --dfcc main --enforce-contract baz
 ^\[baz.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$

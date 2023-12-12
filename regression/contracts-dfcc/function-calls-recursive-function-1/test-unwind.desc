@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract f _ --unwind 20 --unwinding-assertions
+--no-standard-checks --dfcc main --enforce-contract f _ --unwind 20 --unwinding-assertions
 ^\[f.postcondition.\d+].*Check ensures clause of contract contract::f for function f: SUCCESS$
 ^\[g.recursion\].*recursion unwinding assertion: SUCCESS$
 ^EXIT=0$

@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --replace-call-with-contract goo
+--no-standard-checks --dfcc main --replace-call-with-contract goo
 ^Function to replace 'goo' not found$
 ^EXIT=(127|134)$
 ^SIGNAL=0$

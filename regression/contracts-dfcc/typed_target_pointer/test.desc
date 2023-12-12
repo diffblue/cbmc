@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo
+--no-standard-checks --enforce-contract foo
 ^\[foo.assigns.\d+\].* Check that __CPROVER_assignable\(\(void \*\)&x, .*, TRUE\) is valid: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that __CPROVER_assignable\(\(void \*\)&\(\*y\), .*, FALSE\) is valid: SUCCESS$
 ^VERIFICATION SUCCESSFUL$

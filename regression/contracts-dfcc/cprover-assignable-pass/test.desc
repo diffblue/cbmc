@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main
+--no-standard-checks --dfcc main
 CALL __CPROVER_object_whole
 CALL __CPROVER_object_upto
 CALL __CPROVER_object_from

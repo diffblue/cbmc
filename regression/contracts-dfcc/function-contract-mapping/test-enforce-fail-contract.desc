@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/ _ --pointer-check --pointer-primitive-check --pointer-overflow-check
+--no-standard-checks --malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/ _ --pointer-check --pointer-primitive-check --pointer-overflow-check
 ^Invalid function-contract mapping$
 ^Reason: couldn't find contract name after '/' in 'foo/'$
 ^EXIT=(10|6)$

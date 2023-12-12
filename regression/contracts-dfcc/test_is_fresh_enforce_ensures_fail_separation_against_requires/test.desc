@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo
+--no-standard-checks --dfcc main --enforce-contract foo
 ^\[foo.assertion.\d+\].*in1 is rw_ok: SUCCESS$
 ^\[foo.assertion.\d+\].*in2 is rw_ok: SUCCESS$
 ^\[foo.assertion.\d+\].*in1 and in2 do not alias: SUCCESS$

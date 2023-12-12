@@ -1,6 +1,6 @@
 CORE
 main-contract-incomplete.c
---dfcc main 
+--no-standard-checks --dfcc main 
 error: code contract on incomplete function re-declaration
 CONVERSION ERROR
 ^EXIT=(1|64)$

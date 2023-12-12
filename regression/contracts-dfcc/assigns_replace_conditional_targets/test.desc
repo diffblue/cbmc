@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract foo
+--no-standard-checks --dfcc main --replace-call-with-contract foo
 ^main.c function main$
 ^\[main\.assertion\.\d+\] line 55 a unchanged, expecting SUCCESS: SUCCESS$
 ^\[main\.assertion\.\d+\] line 57 x changed, expecting FAILURE: FAILURE$

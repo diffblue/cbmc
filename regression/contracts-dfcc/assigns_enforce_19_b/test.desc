@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract f
+--no-standard-checks --dfcc main --enforce-contract f
 ^\[f.assigns.\d+\] line \d+ Check that b is assignable: SUCCESS$
 ^\[f.assigns.\d+\] line \d+ Check that \*points_to_b is assignable: SUCCESS$
 ^\[f.assigns.\d+\] line \d+ Check that c is assignable: FAILURE$

@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo _ --pointer-check
+--no-standard-checks --dfcc main --replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo _ --pointer-check
 ^\[main.assertion.\d+\] line \d+ expecting FAILURE: FAILURE$
 ^\[main.assertion.\d+\] line \d+ expecting FAILURE: FAILURE$
 ^VERIFICATION FAILED$

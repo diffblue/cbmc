@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^main.c.* error: __CPROVER_old is not allowed in loop invariants.$
 ^CONVERSION ERROR$
 ^EXIT=(1|64)$

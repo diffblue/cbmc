@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/bar/my_contract _ --pointer-check --pointer-primitive-check --pointer-overflow-check
+--no-standard-checks --malloc-may-fail --malloc-fail-null --dfcc main --enforce-contract foo/bar/my_contract _ --pointer-check --pointer-primitive-check --pointer-overflow-check
 ^Invalid function-contract mapping$
 ^Reason: couldn't parse 'foo/bar/my_contract'$
 ^EXIT=(10|6)$

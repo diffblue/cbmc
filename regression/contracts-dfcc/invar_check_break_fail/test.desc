@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts
+--no-standard-checks --dfcc main --apply-loop-contracts
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.loop_invariant_base.\d+\] line 8 Check invariant before entry for loop .*: SUCCESS$

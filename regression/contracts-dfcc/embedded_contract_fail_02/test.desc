@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main 
+--no-standard-checks --dfcc main 
 ^.*: Function contracts allowed only at top-level declarations. .*$
 ^PARSING ERROR$
 ^EXIT=(1|64)$

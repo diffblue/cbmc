@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract f
+--no-standard-checks --dfcc main --enforce-contract f
 main.c function f
 ^\[f.assigns.\d+\] line 7 Check that ptr is assignable: SUCCESS$
 ^\[f.assigns.\d+\] line 12 Check that \*ptr is assignable: SUCCESS$
