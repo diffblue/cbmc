@@ -146,7 +146,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(
     cmdline.isset("cover") &&
     // The option is set by default, or passed in the by the user.
-    (options.is_set("unwinding-assertions") ||
+    (options.get_bool_option("unwinding-assertions") ||
      cmdline.isset("unwinding-assertions")))
   {
     log.error()
@@ -289,7 +289,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option("unwind", cmdline.get_value("unwind"));
     if(
-      !options.is_set("unwinding-assertions") &&
+      !options.get_bool_option("unwinding-assertions") &&
       !cmdline.isset("unwinding-assertions"))
     {
       log.warning() << "**** WARNING: Use --unwinding-assertions to obtain "
@@ -318,7 +318,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option(
       "unwindset", cmdline.get_comma_separated_values("unwindset"));
     if(
-      !options.is_set("unwinding-assertions") &&
+      !options.get_bool_option("unwinding-assertions") &&
       !cmdline.isset("unwinding-assertions"))
     {
       log.warning() << "**** WARNING: Use --unwinding-assertions to obtain "
@@ -360,7 +360,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // generate unwinding assertions
   if(
-    options.is_set("unwinding-assertions") ||
+    options.get_bool_option("unwinding-assertions") ||
     cmdline.isset("unwinding-assertions"))
   {
     options.set_option("unwinding-assertions", true);
