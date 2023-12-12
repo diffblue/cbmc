@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --verify
+--no-standard-checks --variable-sensitivity --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] .* assertion z == 0: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-pointers constants --verify
+--no-standard-checks --variable-sensitivity --vsd-pointers constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* assertion pa == &\(x\[0\].a\): SUCCESS

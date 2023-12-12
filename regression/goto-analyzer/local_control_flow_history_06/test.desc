@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --recursive-interprocedural --loop-unwind-and-branching 12 --constants --one-domain-per-history
+--no-standard-checks --verify --recursive-interprocedural --loop-unwind-and-branching 12 --constants --one-domain-per-history
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* assertion flotal == \(n \* \(n - 1\) / 2\): UNKNOWN$

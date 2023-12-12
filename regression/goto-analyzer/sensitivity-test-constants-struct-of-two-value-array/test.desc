@@ -1,6 +1,6 @@
 CORE
 sensitivity_test_constants_struct_of_two_value_array.c
---variable-sensitivity --vsd-structs every-field --verify
+--no-standard-checks --variable-sensitivity --vsd-structs every-field --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* x.a\[0\]==0: UNKNOWN$

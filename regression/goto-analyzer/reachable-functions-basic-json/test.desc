@@ -1,6 +1,6 @@
 CORE
 ../unreachable-instructions-basic-text/unreachable.c
---reachable-functions --json -
+--no-standard-checks --reachable-functions --json -
 "function": "main",$
 "function": "dead_inside",$
 "function": "obviously_dead",$

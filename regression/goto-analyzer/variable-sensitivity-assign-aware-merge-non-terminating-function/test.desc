@@ -1,6 +1,6 @@
 CORE
 main.c
---function test_non_terminating --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify
+--no-standard-checks --function test_non_terminating --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify
 ^EXIT=0$
 ^SIGNAL=0$
 \[test_non_terminating.assertion\.1\] line 23 one_val==5: SUCCESS

@@ -1,6 +1,6 @@
 CORE
 main.c
-file1.c file2.c --dependence-graph --show
+--no-standard-checks file1.c file2.c --dependence-graph --show
 ^EXIT=0$
 ^SIGNAL=0$
 --

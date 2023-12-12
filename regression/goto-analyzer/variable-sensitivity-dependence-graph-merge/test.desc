@@ -1,6 +1,6 @@
 CORE
 main.c
---dependence-graph-vs --vsd-structs every-field --vsd-arrays every-element --verify
+--no-standard-checks --dependence-graph-vs --vsd-structs every-field --vsd-arrays every-element --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line \d+ s_str.idx > 1: UNKNOWN$

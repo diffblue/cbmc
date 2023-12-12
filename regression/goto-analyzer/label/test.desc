@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --error-label ERROR
+--no-standard-checks --show-goto-functions --error-label ERROR
 Labels: ERROR$
 ASSIGN main#return_value := 1$
 ^EXIT=0$

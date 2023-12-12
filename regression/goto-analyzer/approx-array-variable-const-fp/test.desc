@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --pointer-check
+--no-standard-checks --show-goto-functions --pointer-check
 ^Removal of function pointers and virtual functions$
 ^\s*IF fp_tbl\[.*i.*\] = address_of\(f2\) THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[.*i.*\] = address_of\(f3\) THEN GOTO [0-9]$

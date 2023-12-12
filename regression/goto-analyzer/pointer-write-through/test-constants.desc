@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --variable-sensitivity --vsd-pointers constants
+--no-standard-checks --verify --variable-sensitivity --vsd-pointers constants
 ^\[main.assertion.1\] line 10 assertion a == 15: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$

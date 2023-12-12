@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-arrays every-element --vsd-values intervals --show
+--no-standard-checks --variable-sensitivity --vsd-arrays every-element --vsd-values intervals --show
 ^EXIT=0$
 ^SIGNAL=0$
 ^main::1::x .* TOP @ \[1\]

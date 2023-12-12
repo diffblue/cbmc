@@ -1,6 +1,6 @@
 CORE
 sensitivity_test_two_value_struct.c
---variable-sensitivity --verify
+--no-standard-checks --variable-sensitivity --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* x.a==0: UNKNOWN$

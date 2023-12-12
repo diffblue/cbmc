@@ -1,6 +1,6 @@
 CORE
 main.c
---dependence-graph-vs --show 
+--no-standard-checks --dependence-graph-vs --show 
 ^EXIT=0$
 ^SIGNAL=0$
 ^Data dependencies: 0 \[in\]$

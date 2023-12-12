@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --recursive-interprocedural --vsd --loop-unwind-and-branching 10 --one-domain-per-history --verbosity 9
+--no-standard-checks --verify --recursive-interprocedural --vsd --loop-unwind-and-branching 10 --one-domain-per-history --verbosity 9
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1] line \d+ assertion local == global: SUCCESS$

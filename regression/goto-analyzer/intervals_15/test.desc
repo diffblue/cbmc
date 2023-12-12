@@ -1,6 +1,6 @@
 CORE
 main.c
---intervals
+--no-standard-checks --intervals
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] .* j\s*<\s*52: UNKNOWN$

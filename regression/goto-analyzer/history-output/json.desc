@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --recursive-interprocedural --one-domain-per-history --vsd --branching 4 --json -
+--no-standard-checks --verify --recursive-interprocedural --one-domain-per-history --vsd --branching 4 --json -
 ^EXIT=0$
 ^SIGNAL=0$
 \"falseHistories\": \[ \"local_control_flow_history : location \d+ after \d+ not taken after \d+ taken\" \]

@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-values constants --show
+--no-standard-checks --variable-sensitivity --vsd-values constants --show
 ^EXIT=0$
 ^SIGNAL=0$
 ^main::1::1::i .* TOP @ \[3, 6\]

@@ -1,6 +1,6 @@
 CORE
 main.c
---intervals
+--no-standard-checks --intervals
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] line 5 x > -10 \&\& x < 100: SUCCESS$

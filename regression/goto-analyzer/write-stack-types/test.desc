@@ -1,6 +1,6 @@
 CORE
 write-stack-address-of.c
---variable-sensitivity --vsd-structs every-field --vsd-pointers constants --verify
+--no-standard-checks --variable-sensitivity --vsd-structs every-field --vsd-pointers constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[func1\.assertion\.1\] line \d+ func1.a == 0: UNKNOWN$

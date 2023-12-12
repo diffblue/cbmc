@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity  --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --unreachable-instructions
+--no-standard-checks --variable-sensitivity  --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --unreachable-instructions
 ^EXIT=0$
 ^SIGNAL=0$
 line 18 function func

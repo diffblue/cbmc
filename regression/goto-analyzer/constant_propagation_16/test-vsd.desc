@@ -1,6 +1,6 @@
 CORE
 main.c
---show --variable-sensitivity
+--no-standard-checks --show --variable-sensitivity
 ^EXIT=0$
 ^SIGNAL=0$
 --

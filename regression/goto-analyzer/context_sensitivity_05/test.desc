@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --recursive-interprocedural --call-stack 0 --constants --one-domain-per-history
+--no-standard-checks --verify --recursive-interprocedural --call-stack 0 --constants --one-domain-per-history
 ^\[f00.assertion.1\] .* assertion x < 0: SUCCESS \(unreachable\)$
 ^\[f00.assertion.2\] .* assertion 1: SUCCESS \(unreachable\)$
 ^\[f00.assertion.3\] .* assertion 0: SUCCESS \(unreachable\)$

@@ -1,6 +1,6 @@
 CORE
 main.c
---intervals --verify
+--no-standard-checks --intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 14 y <= 10: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main.c
---show --constants
+--no-standard-checks --show --constants
 ^EXIT=0$
 ^SIGNAL=0$
 --

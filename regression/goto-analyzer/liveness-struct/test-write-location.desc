@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-structs every-field --vsd-values intervals --show
+--no-standard-checks --variable-sensitivity --vsd-structs every-field --vsd-values intervals --show
 ^EXIT=0$
 ^SIGNAL=0$
 ^main::1::s .* \{\} @ \[1\]

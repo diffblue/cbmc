@@ -1,6 +1,6 @@
 CORE
 ../unreachable-instructions-basic-text/unreachable.c
---reachable-functions --constants
+--no-standard-checks --reachable-functions --constants
 ^EXIT=0$
 ^SIGNAL=0$
 unreachable.c main 35 42$

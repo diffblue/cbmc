@@ -1,6 +1,6 @@
 CORE
 sensitivity_dependency_variables.c
---variable-sensitivity  --vsd-arrays every-element --vsd-pointers constants --vsd-structs every-field --show
+--no-standard-checks --variable-sensitivity  --vsd-arrays every-element --vsd-pointers constants --vsd-structs every-field --show
 ^EXIT=0$
 ^SIGNAL=0$
 main#return_value \(\) -> TOP @ \[1\]

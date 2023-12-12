@@ -1,6 +1,6 @@
 CORE
 main.c
---function global_test --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify
+--no-standard-checks --function global_test --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[global_test\.assertion\.1\] line \d+ global==42: SUCCESS$

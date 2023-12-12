@@ -1,6 +1,6 @@
 CORE
 struct-initialization.c
---variable-sensitivity --vsd-structs every-field --verify
+--no-standard-checks --variable-sensitivity --vsd-structs every-field --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line \d+ los.a==0: SUCCESS$

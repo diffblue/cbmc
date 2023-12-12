@@ -1,6 +1,6 @@
 CORE
 main.c
---constants --verify
+--no-standard-checks --constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
 \[main.assertion.1\] line 18 assertion \(1.0f / 10.0f\) - f < -0.1f: FAILURE \(if reachable\)

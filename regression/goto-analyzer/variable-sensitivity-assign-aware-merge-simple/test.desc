@@ -1,6 +1,6 @@
 CORE
 main.c
---function pointer_test --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify --three-way-merge
+--no-standard-checks --function pointer_test --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify --three-way-merge
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[pointer_test.assertion\.1\] line \d+ j==1: SUCCESS$

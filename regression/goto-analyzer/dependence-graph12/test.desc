@@ -1,6 +1,6 @@
 CORE
 main.c
---dependence-graph --show
+--no-standard-checks --dependence-graph --show
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

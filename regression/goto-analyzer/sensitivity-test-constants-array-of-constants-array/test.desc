@@ -1,6 +1,6 @@
 CORE
 sensitivity_test_constants_array_of_constants_array.c
---variable-sensitivity --vsd-arrays every-element --verify --vsd-pointers constants
+--no-standard-checks --variable-sensitivity --vsd-arrays every-element --verify --vsd-pointers constants
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* a\[1\]\[2\]==0: SUCCESS$

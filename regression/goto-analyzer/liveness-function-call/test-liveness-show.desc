@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-liveness --show
+--no-standard-checks --variable-sensitivity --vsd-liveness --show
 ^EXIT=0$
 ^SIGNAL=0$
 globalX .* 0 @ \[15\]

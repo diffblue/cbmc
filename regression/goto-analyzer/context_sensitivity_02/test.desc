@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --recursive-interprocedural --call-stack 0 --constants --one-domain-per-history
+--no-standard-checks --verify --recursive-interprocedural --call-stack 0 --constants --one-domain-per-history
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* assertion x == nnx: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --variable-sensitivity --vsd-values intervals --vsd-pointers top-bottom
+--no-standard-checks --verify --variable-sensitivity --vsd-values intervals --vsd-pointers top-bottom
 ^\[main.assertion.1\] line 15 assertion q == a: UNKNOWN
 ^EXIT=0$
 ^SIGNAL=0$

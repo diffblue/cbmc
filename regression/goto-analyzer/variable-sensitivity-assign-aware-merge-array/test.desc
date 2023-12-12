@@ -1,6 +1,6 @@
 CORE
 main.c
---function pass_param --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify
+--no-standard-checks --function pass_param --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify
 ^EXIT=0$
 ^SIGNAL=0$
 \[pass_param\.assertion\.1\] line 13 b\[0\]==0: SUCCESS

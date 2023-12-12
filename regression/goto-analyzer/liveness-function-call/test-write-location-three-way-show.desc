@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --three-way-merge --show
+--no-standard-checks --variable-sensitivity --three-way-merge --show
 ^EXIT=0$
 ^SIGNAL=0$
 globalX .* 0 @ \[15\]

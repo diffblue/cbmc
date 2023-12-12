@@ -1,6 +1,6 @@
 CORE
 main.c
---verify --recursive-interprocedural --one-domain-per-history --vsd --branching 4 --xml -
+--no-standard-checks --verify --recursive-interprocedural --one-domain-per-history --vsd --branching 4 --xml -
 ^EXIT=0$
 ^SIGNAL=0$
 <history>local_control_flow_history : location \d+ after \d+ taken after \d+ taken<\/history>

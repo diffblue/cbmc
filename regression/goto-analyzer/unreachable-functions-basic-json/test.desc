@@ -1,6 +1,6 @@
 CORE
 ../unreachable-instructions-basic-text/unreachable.c
---unreachable-functions --json -
+--no-standard-checks --unreachable-functions --json -
 "file": ".*unreachable.c",
 "firstLine": 3,
 "function": "not_called",

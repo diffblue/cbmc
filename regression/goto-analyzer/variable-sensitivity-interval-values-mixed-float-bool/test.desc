@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-values intervals --verify
+--no-standard-checks --variable-sensitivity --vsd-values intervals --verify
 \[main\.assertion\.1\] line 10 x > y, z == 1: SUCCESS
 \[main\.assertion\.2\] line 17 x < y, z == 1: SUCCESS
 ^EXIT=0$

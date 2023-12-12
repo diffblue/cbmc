@@ -1,6 +1,6 @@
 CORE
 main.c
---show --variable-sensitivity --vsd-values set-of-constants --vsd-arrays every-element
+--no-standard-checks --show --variable-sensitivity --vsd-values set-of-constants --vsd-arrays every-element
 ^EXIT=0$
 ^SIGNAL=0$
 main::1::arr_0_after_write \(\) -> value-set-begin: 1 :value-set-end

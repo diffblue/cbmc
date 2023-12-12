@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify
+--no-standard-checks --variable-sensitivity --vsd-pointers constants --vsd-arrays every-element --vsd-structs every-field --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[bar\.assertion\.1\] line \d+ assertion other == 4: SUCCESS$

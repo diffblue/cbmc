@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-structs every-field --vsd-arrays every-element --vsd-pointers constants --show
+--no-standard-checks --variable-sensitivity --vsd-structs every-field --vsd-arrays every-element --vsd-pointers constants --show
 ^EXIT=0$
 ^SIGNAL=0$
 --

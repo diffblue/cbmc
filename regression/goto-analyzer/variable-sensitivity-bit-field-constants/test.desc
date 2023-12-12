@@ -1,6 +1,6 @@
 CORE
 main.c
---function main --variable-sensitivity --vsd-structs every-field --verify
+--no-standard-checks --function main --variable-sensitivity --vsd-structs every-field --verify
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line \d+ bs\.byte==10: SUCCESS

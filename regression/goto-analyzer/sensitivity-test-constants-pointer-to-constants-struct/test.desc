@@ -1,6 +1,6 @@
 CORE
 sensitivity_test_constants_pointer_to_constants_struct.c
---variable-sensitivity --vsd-pointers constants --vsd-structs every-field --verify
+--no-standard-checks --variable-sensitivity --vsd-pointers constants --vsd-structs every-field --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] .* \(\*p\).a==0: SUCCESS$
