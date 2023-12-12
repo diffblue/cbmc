@@ -58,14 +58,12 @@ $goto_harness "$input_goto_binary" "$harness_file" --harness-function-name $entr
 $cbmc --show-goto-functions "$harness_file"
 if [[ "${harness_file}" == "harness.gb" ]];then
   $cbmc --function $entry_point "$harness_file" \
-    --no-standard-checks `# deactivate default checks to make tests pass without significant adapting` \
     --pointer-check `# because we want to see out of bounds errors` \
     --unwind 11 `# with the way we set up arrays symex can't figure out loop bounds automatically` \
     --unwinding-assertions `# we want to make sure we don't accidentally pass tests because we didn't unwind enough` \
     # cbmc args end
 else
 $cbmc --function $entry_point "$input_c_file" "$harness_file" \
-  --no-standard-checks `# deactivate default checks to make tests pass without significant adapting` \
   --pointer-check `# because we want to see out of bounds errors` \
   --unwind 11 `# with the way we set up arrays symex can't figure out loop bounds automatically` \
   --unwinding-assertions `# we want to make sure we don't accidentally pass tests because we didn't unwind enough` \
