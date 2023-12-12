@@ -272,7 +272,7 @@ public:
     libt lib;
 
     bool string_abstraction;
-    bool malloc_may_fail = false;
+    bool malloc_may_fail = true;
 
     enum malloc_failure_modet
     {
@@ -281,7 +281,7 @@ public:
       malloc_failure_mode_assert_then_assume = 2
     };
 
-    malloc_failure_modet malloc_failure_mode = malloc_failure_mode_none;
+    malloc_failure_modet malloc_failure_mode = malloc_failure_mode_return_null;
 
     static const std::size_t default_object_bits = 8;
 
