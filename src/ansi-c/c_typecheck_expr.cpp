@@ -66,14 +66,14 @@ protected:
 
   /// This function determines what expressions are to be propagated as
   /// "constants"
-  bool is_constant(const exprt &e) const
+  virtual bool is_constant(const exprt &e) const
   {
     // non-standard numeric constant
     if(e.id() == ID_infinity)
       return true;
 
     // numeric, character, or pointer-typed constant
-    if(e.is_constant())
+    if(e.is_constant() || e.id() == ID_string_constant)
       return true;
 
     // possibly an address constant
@@ -135,6 +135,54 @@ protected:
       return true;
 
     return false;
+  }
+};
+
+/// Clang appears to have a somewhat different idea of what is/isn't to be
+/// considered a constant at compile time.
+class clang_is_constant_foldedt : public is_compile_time_constantt
+{
+public:
+  explicit clang_is_constant_foldedt(const namespacet &ns)
+    : is_compile_time_constantt(ns)
+  {
+  }
+
+protected:
+  /// This function determines what expressions are constant folded by clang
+  bool is_constant(const exprt &e) const override
+  {
+    // we need to adhere to short-circuit semantics for the following
+    if(e.id() == ID_if)
+    {
+      const if_exprt &if_expr = to_if_expr(e);
+      if(!is_constant(if_expr.cond()))
+        return false;
+      exprt const_cond = simplify_expr(if_expr.cond(), ns);
+      CHECK_RETURN(const_cond.is_constant());
+      if(const_cond.is_true())
+        return is_constant(if_expr.true_case());
+      else
+        return is_constant(if_expr.false_case());
+    }
+    else if(e.id() == ID_and || e.id() == ID_or)
+    {
+      for(const auto &op : e.operands())
+      {
+        if(!is_constant(op))
+          return false;
+        exprt const_cond = simplify_expr(op, ns);
+        CHECK_RETURN(const_cond.is_constant());
+        // stop when we hit false (for an and) or true (for an or)
+        if(const_cond == make_boolean_expr(e.id() == ID_or))
+          break;
+      }
+      return true;
+    }
+    else if(e.id() == ID_address_of)
+      return false;
+    else
+      return is_compile_time_constantt::is_constant(e);
   }
 };
 
@@ -3684,8 +3732,11 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier=="__builtin_constant_p")
   {
-    // this is a gcc extension to tell whether the argument
-    // is known to be a compile-time constant
+    // This is a gcc/clang extension to tell whether the argument
+    // is known to be a compile-time constant. The behavior of these two
+    // compiler families, however, is quite different, which we need to take
+    // care of in the below config-dependent branches.
+
     if(expr.arguments().size()!=1)
     {
       error().source_location = f_op.source_location();
@@ -3693,30 +3744,35 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    // do not typecheck the argument - it is never evaluated, and thus side
-    // effects must not show up either
-
-    // try to produce constant
-    exprt tmp1=expr.arguments().front();
-    simplify(tmp1, *this);
-
-    bool is_constant=false;
-
-    // Need to do some special treatment for string literals,
-    // which are (void *)&("lit"[0])
-    if(
-      tmp1.id() == ID_typecast &&
-      to_typecast_expr(tmp1).op().id() == ID_address_of &&
-      to_address_of_expr(to_typecast_expr(tmp1).op()).object().id() ==
-        ID_index &&
-      to_index_expr(to_address_of_expr(to_typecast_expr(tmp1).op()).object())
-          .array()
-          .id() == ID_string_constant)
+    bool is_constant = false;
+    if(config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
     {
-      is_constant=true;
+      is_constant = clang_is_constant_foldedt(*this)(expr.arguments().front());
     }
     else
-      is_constant=tmp1.is_constant();
+    {
+      // try to produce constant
+      exprt tmp1 = expr.arguments().front();
+      simplify(tmp1, *this);
+
+      // Need to do some special treatment for string literals,
+      // which are (void *)&("lit"[0])
+      if(
+        tmp1.id() == ID_typecast &&
+        to_typecast_expr(tmp1).op().id() == ID_address_of &&
+        to_address_of_expr(to_typecast_expr(tmp1).op()).object().id() ==
+          ID_index &&
+        to_index_expr(to_address_of_expr(to_typecast_expr(tmp1).op()).object())
+            .array()
+            .id() == ID_string_constant)
+      {
+        is_constant = true;
+      }
+      else if(tmp1.id() == ID_string_constant)
+        is_constant = true;
+      else
+        is_constant = tmp1.is_constant();
+    }
 
     exprt tmp2=from_integer(is_constant, expr.type());
     tmp2.add_source_location()=source_location;
