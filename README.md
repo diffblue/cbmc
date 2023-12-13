@@ -1,3 +1,6 @@
+
+[//]: # if CBMC has a logo, it should go here.
+
 CBMC is a Bounded Model Checker for C and C++ programs. It supports C89, C99,
 most of C11 and most compiler extensions provided by gcc and Visual Studio. It
 also supports SystemC using Scoot. It allows verifying array bounds (buffer
@@ -9,8 +12,11 @@ and passing the resulting equation to a decision procedure.
 [![Build Status][coverity_img]][coverity]
 [![Build Status][codecov_img]][codecov]
 
-Installing
-==========
+
+## Installing
+
+[//]: # The CBMC release page has the information about installation across all platforms.
+[//]: # We don't need to repeat this information here, we just need to redirect the user with a better introduction here.
 
 Get the [latest release](https://github.com/diffblue/cbmc/releases).
 * Releases are tested and for production use.
@@ -18,72 +24,24 @@ Get the [latest release](https://github.com/diffblue/cbmc/releases).
 Get the current *develop* version: `git clone https://github.com/diffblue/cbmc.git`.
 * Develop versions are not recommended for production use.
 
-### Windows
+## Documentation
+[//]: # Here is a small introduction about user and developer documentation. We should point the user to a different page, which in this case could be the starter-kit.
 
-For windows you can install cbmc binaries via the .msi's found on the
-[releases](https://github.com/diffblue/cbmc/releases) page.
+[//]: # Should we explain the difference between CPROVER and the other source of documentations here? I would prefer not. Just focusing on CBMC and the different tools it provides.
 
-Note that we depend on the Visual C++ redistributables. You likely
-already have these, if not please download and run vcredist.x64.exe from
-[Microsoft](https://support.microsoft.com/en-gb/help/2977003/the-latest-supported-visual-c-downloads) to install them prior to running
-cbmc.
+### Features
+[//]: # This is the section where we can guide the user on how they could use CBMC and the different tools it provides. I don't think we need to go over all of them, but it'd be nice to give the user a small example to help them understand what it is available.
 
-### Linux
-
-For different linux environments, you have these choices:
-
-1. Install CBMC through the distribution's repositories, with the downside
-   that this might install an older version of cbmc, depending on what the
-   package maintenance policy of the distribution is, or
-2. Install CBMC through the `.deb` package built by each release, available
-   on the [releases](https://github.com/diffblue/cbmc/releases) page. To
-   do that, download the `.deb` package and run `apt install cbmc-x.y.deb`
-   with `root` privileges, with `x.y` being substituted for the version
-   you are attempting to install.
-
-   *NOTE*: Because of libc/libc++ ABI compatibility and package
-   dependency names, if you follow this path make sure you install the
-   package appropriate for the version of operating system you are using.
-3. Compile from source using the instructions [here](COMPILING.md)
-
-### macOS
-
-For macOS there is a package available in [Homebrew/core](https://formulae.brew.sh/formula/cbmc).
-Assuming you have homebrew installed, you can run
-
-```sh
-$ brew install cbmc
-```
-
-to install CBMC, or if you already have it installed via homebrew
-
-```sh
-$ brew upgrade cbmc
-```
-
-to get an up-to-date version.
-
-Homebrew will always update formulas to their latest version available, so you may
-periodically see an upgraded version of CBMC being downloaded regardless of whether
-you explicitly requested that or not. If you would rather this didn't happen, you
-can pin the CBMC version with:
-
-```sh
-$ brew pin cbmc
-```
-
-If instead of the latest version, you would want to install a historic version, you
-can do so with a [homebrew tap](https://github.com/diffblue/homebrew-cbmc) that we
-maintain. Instructions for that are available in the [documentation](doc/ADR/homebrew_tap.md)
-
-Report bugs
+## Reporting bugs
 ===========
 
 If you encounter a problem please file a bug report:
 * Create an [issue](https://github.com/diffblue/cbmc/issues)
 
-Contributing to the code base
-=============================
+## Contributing to CBMC
+
+[//]: # We should replace this entire text here by a page about contributions.
+If you are interested in contributing to CBMC, please see our [development guide]().
 
 1. Fork the repository
 2. Clone the repository `git clone git@github.com:YOURNAME/cbmc.git`
@@ -96,8 +54,10 @@ New contributors can look through the [mini
 projects](https://github.com/diffblue/cbmc/blob/develop/FEATURE_IDEAS.md)
 page for small, focussed feature ideas.
 
-License
-=======
+## License
+
+[//]: # We need a link to the license file here. I'd keep this section.
+
 4-clause BSD license, see `LICENSE` file.
 
 
