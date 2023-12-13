@@ -1,5 +1,6 @@
 var NAVTREEINDEX111 =
 {
+"letify_8h_source.html":[9,0,2,28,8,1],
 "lexical__loops_8h.html":[9,0,2,0,50],
 "lexical__loops_8h.html#a85f1a3a07cfc64438de3339edc5c581d":[9,0,2,0,50,1],
 "lexical__loops_8h.html#aadb5d35f23c54e1f0c14cd90227d4c5a":[9,0,2,0,50,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX111 =
 "math_8c.html#a43418ed4932726a6070da8a9b55090cc":[9,0,2,1,1,17,95],
 "math_8c.html#a44f1309085cc0f577103681994bcda36":[9,0,2,1,1,17,55],
 "math_8c.html#a4618e032de8318b72df5cc71f15b5e45":[9,0,2,1,1,17,82],
-"math_8c.html#a465b763ca84f8fd2099493b3c4e5352c":[9,0,2,1,1,17,155],
-"math_8c.html#a48b07ac3e4fbcda2507c312d60e6eb72":[9,0,2,1,1,17,42]
+"math_8c.html#a465b763ca84f8fd2099493b3c4e5352c":[9,0,2,1,1,17,155]
 };

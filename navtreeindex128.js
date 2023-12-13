@@ -1,5 +1,6 @@
 var NAVTREEINDEX128 =
 {
+"string__builtin__function_8cpp.html#ae99fc6efbf0f938b46a07932821cd2e9":[9,0,2,28,10,6,1],
 "string__builtin__function_8cpp_source.html":[9,0,2,28,10,6],
 "string__builtin__function_8h.html":[9,0,2,28,10,7],
 "string__builtin__function_8h.html#a402b428cabe73b6f80a02d3c9f809b61":[9,0,2,28,10,7,10],
@@ -248,6 +249,5 @@ var NAVTREEINDEX128 =
 "string__refinement__util_8h.html#aeff5d5f482426d6d534a4297b544d418":[9,0,2,28,10,34,7],
 "string__refinement__util_8h_source.html":[9,0,2,28,10,34],
 "string__utils_8cpp.html":[9,0,2,31,228],
-"string__utils_8cpp.html#a198f5e81e9785b00fbee69a541ddcace":[9,0,2,31,228,3],
-"string__utils_8cpp.html#a4a862fd50d31fb2b660b683899596c36":[9,0,2,31,228,4]
+"string__utils_8cpp.html#a198f5e81e9785b00fbee69a541ddcace":[9,0,2,31,228,3]
 };
