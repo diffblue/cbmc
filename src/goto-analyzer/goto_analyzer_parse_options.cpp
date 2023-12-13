@@ -56,6 +56,23 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
 {
 }
 
+void goto_analyzer_parse_optionst::set_default_analysis_flags(
+  optionst &options,
+  const bool enabled)
+{
+  // Checks enabled by default in v6.0+.
+  options.set_option("bounds-check", enabled);
+  options.set_option("pointer-check", enabled);
+  options.set_option("pointer-primitive-check", enabled);
+  options.set_option("div-by-zero-check", enabled);
+  options.set_option("signed-overflow-check", enabled);
+  options.set_option("undefined-shift-check", enabled);
+
+  // This is in-line with the options we set for CBMC in cbmc_parse_optionst
+  // with the exception of unwinding-assertions, which don't make sense in
+  // the context of abstract interpretation.
+}
+
 void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
@@ -67,7 +84,10 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("function"))
     options.set_option("function", cmdline.get_value("function"));
 
-  // all checks supported by goto_check
+  goto_analyzer_parse_optionst::set_default_analysis_flags(
+    options, !cmdline.isset("no-standard-checks"));
+
+  // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // The user should either select:

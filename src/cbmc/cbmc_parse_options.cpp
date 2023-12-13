@@ -106,6 +106,23 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("depth", UINT32_MAX);
 }
 
+void cbmc_parse_optionst::set_default_analysis_flags(
+  optionst &options,
+  const bool enabled)
+{
+  // Checks enabled by default in v6.0+.
+  options.set_option("bounds-check", enabled);
+  options.set_option("pointer-check", enabled);
+  options.set_option("pointer-primitive-check", enabled);
+  options.set_option("div-by-zero-check", enabled);
+  options.set_option("signed-overflow-check", enabled);
+  options.set_option("undefined-shift-check", enabled);
+
+  // Unwinding assertions required in certain cases for sound verification
+  // results. See https://github.com/diffblue/cbmc/issues/6561 for elaboration.
+  options.set_option("unwinding-assertions", enabled);
+}
+
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
@@ -177,7 +194,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-vcc", true);
 
   if(cmdline.isset("cover"))
+  {
     parse_cover_options(cmdline, options);
+    // The default unwinding assertions option needs to be switched off when
+    // performing coverage checks because we intend to solve for coverage rather
+    // than assertions.
+    options.set_option("unwinding-assertions", false);
+  }
 
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
@@ -261,7 +284,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwind"))
   {
     options.set_option("unwind", cmdline.get_value("unwind"));
-    if(!cmdline.isset("unwinding-assertions"))
+    if(
+      !options.get_bool_option("unwinding-assertions") &&
+      !cmdline.isset("unwinding-assertions"))
     {
       log.warning() << "**** WARNING: Use --unwinding-assertions to obtain "
                        "sound verification results"
@@ -288,7 +313,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option(
       "unwindset", cmdline.get_comma_separated_values("unwindset"));
-    if(!cmdline.isset("unwinding-assertions"))
+    if(
+      !options.get_bool_option("unwinding-assertions") &&
+      !cmdline.isset("unwinding-assertions"))
     {
       log.warning() << "**** WARNING: Use --unwinding-assertions to obtain "
                        "sound verification results"
@@ -305,11 +332,18 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     "self-loops-to-assumptions",
     !cmdline.isset("no-self-loops-to-assumptions"));
 
-  // all checks supported by goto_check
+  // Enable flags that in combination provide analysis with no surprises
+  // (expected checks and no unsoundness by missing checks).
+  cbmc_parse_optionst::set_default_analysis_flags(
+    options, !cmdline.isset("no-standard-checks"));
+
+  // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // generate unwinding assertions
-  if(cmdline.isset("unwinding-assertions"))
+  if(
+    options.get_bool_option("unwinding-assertions") ||
+    cmdline.isset("unwinding-assertions"))
   {
     options.set_option("unwinding-assertions", true);
     options.set_option("paths-symex-explore-all", true);

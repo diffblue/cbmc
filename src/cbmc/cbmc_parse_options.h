@@ -34,6 +34,7 @@ class optionst;
 // clang-format off
 #define CBMC_OPTIONS \
   OPT_BMC \
+  "(no-standard-checks)" \
   "(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
   "(no-simplify)(full-slice)" \
@@ -91,6 +92,11 @@ public:
   /// default behaviour, for example unit tests.
   static void set_default_options(optionst &);
 
+  /// \brief Setup default analysis flags.
+  ///
+  /// This function sets up the default analysis checks as discussed
+  /// in RFC https://github.com/diffblue/cbmc/issues/7975.
+  static void set_default_analysis_flags(optionst &, const bool enabled);
   static bool process_goto_program(goto_modelt &, const optionst &, messaget &);
 
   static int get_goto_program(

@@ -109,7 +109,8 @@ class optionst;
   "(show)(verify)(simplify):" \
   "(show-on-source)" \
   "(unreachable-instructions)(unreachable-functions)" \
-  "(reachable-functions)"
+  "(reachable-functions)"           \
+  "(no-standard-checks)"
 
 #define GOTO_ANALYSER_OPTIONS_AI \
   "(recursive-interprocedural)" \
@@ -188,6 +189,9 @@ protected:
   virtual bool process_goto_program(const optionst &options);
 
   virtual int perform_analysis(const optionst &options);
+
+  // TODO: Add documentation
+  static void set_default_analysis_flags(optionst &options, const bool enabled);
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
