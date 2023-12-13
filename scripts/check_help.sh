@@ -83,10 +83,15 @@ for t in  \
         echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
       done
       ;;
+    # We also need ignore the negative default checks for goto-instrument given
+    # that it's not processing them (but still ends up importing them by using
+    # the macro PARSE_OPTIONS_GOTO_CHECK). The rationale for ignoring them is
+    # similar to the goto-diff entry below.
     goto-instrument)
       for undoc in \
         -document-claims-html -document-claims-latex -show-claims \
-        -no-simplify ; do
+        -no-simplify -no-pointer-check -no-bounds-check -no-undefined-shift-check \
+        -no-pointer-primitive-check -no-div-by-zero-check -no-signed-overflow-check ; do
         echo "$undoc" >> help_string
         echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
       done
