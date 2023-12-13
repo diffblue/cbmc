@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "c_types.h"
-#include "config.h"
 #include "expr_util.h"
 #include "namespace.h"
 #include "pointer_expr.h"
@@ -402,23 +401,6 @@ simplify_exprt::simplify_pointer_offset(const pointer_offset_exprt &expr)
     if(is_null_pointer(c_ptr))
     {
       return from_integer(0, expr.type());
-    }
-    else
-    {
-      // this is a pointer, we can't use to_integer
-      const auto width = to_pointer_type(ptr.type()).get_width();
-      mp_integer number = bvrep2integer(c_ptr.get_value(), width, false);
-      // a null pointer would have been caught above, return value 0
-      // will indicate that conversion failed
-      if(number==0)
-        return unchanged(expr);
-
-      // The constant address consists of OBJECT-ID || OFFSET.
-      mp_integer offset_bits =
-        *pointer_offset_bits(ptr.type(), ns) - config.bv_encoding.object_bits;
-      number%=power(2, offset_bits);
-
-      return from_integer(number, expr.type());
     }
   }
 

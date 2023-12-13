@@ -44,27 +44,6 @@ TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
   REQUIRE(offset_value==1);
 }
 
-TEST_CASE("Simplify const pointer offset", "[core][util]")
-{
-  config.set_arch("none");
-
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-
-  // build a numeric constant of some pointer type
-  constant_exprt number=from_integer(1234, size_type());
-  number.type()=pointer_type(char_type());
-
-  exprt p_o=pointer_offset(number);
-
-  exprt simp=simplify_expr(p_o, ns);
-
-  REQUIRE(simp.is_constant());
-  const mp_integer offset_value =
-    numeric_cast_v<mp_integer>(to_constant_expr(simp));
-  REQUIRE(offset_value==1234);
-}
-
 TEST_CASE("Simplify byte extract", "[core][util]")
 {
   // this test does require a proper architecture to be set so that byte extract
