@@ -1,11 +1,3 @@
-[![Build Status][coverity_img]][coverity]
-[![Build Status][codecov_img]][codecov]
-
-[CProver Documentation](https://diffblue.github.io/cbmc/)
-
-About
-=====
-
 CBMC is a Bounded Model Checker for C and C++ programs. It supports C89, C99,
 most of C11 and most compiler extensions provided by gcc and Visual Studio. It
 also supports SystemC using Scoot. It allows verifying array bounds (buffer
@@ -14,23 +6,17 @@ Furthermore, it can check C and C++ for consistency with other languages, such
 as Verilog. The verification is performed by unwinding the loops in the program
 and passing the resulting equation to a decision procedure.
 
-For full information see [cprover.org](http://www.cprover.org/cbmc).
-
-For an overview of the various tools that are part of CProver and
-how to use them see [TOOLS_OVERVIEW.md](TOOLS_OVERVIEW.md).
-
-
-Versions
-========
-
-Get the [latest release](https://github.com/diffblue/cbmc/releases)
-* Releases are tested and for production use.
-
-Get the current *develop* version: `git clone https://github.com/diffblue/cbmc.git`
-* Develop versions are not recommended for production use.
+[![Build Status][coverity_img]][coverity]
+[![Build Status][codecov_img]][codecov]
 
 Installing
 ==========
+
+Get the [latest release](https://github.com/diffblue/cbmc/releases).
+* Releases are tested and for production use.
+
+Get the current *develop* version: `git clone https://github.com/diffblue/cbmc.git`.
+* Develop versions are not recommended for production use.
 
 ### Windows
 
