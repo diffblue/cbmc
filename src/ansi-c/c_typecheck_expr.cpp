@@ -45,8 +45,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 /// Architecturally similar to \ref can_forward_propagatet, but specialized for
-/// what is a constexpr, i.e., an expression that can be fully evaluated at
-/// compile time.
+/// what is an expression that can be fully evaluated at compile time within
+/// the limits of what the C standard permits. See 6.6 Constant expressions in
+/// C11.
 class is_compile_time_constantt
 {
 public:
@@ -67,16 +68,21 @@ protected:
   /// "constants"
   bool is_constant(const exprt &e) const
   {
+    // non-standard numeric constant
     if(e.id() == ID_infinity)
       return true;
 
+    // numeric, character, or pointer-typed constant
     if(e.is_constant())
       return true;
 
+    // possibly an address constant
     if(e.id() == ID_address_of)
     {
       return is_constant_address_of(to_address_of_expr(e).object());
     }
+    // we choose to accept the following expressions (over constant operands) as
+    // constant expressions
     else if(
       e.id() == ID_typecast || e.id() == ID_array_of || e.id() == ID_plus ||
       e.id() == ID_mult || e.id() == ID_array || e.id() == ID_with ||
