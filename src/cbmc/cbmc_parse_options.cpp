@@ -118,12 +118,6 @@ void cbmc_parse_optionst::set_default_analysis_flags(
   options.set_option("signed-overflow-check", enabled);
   options.set_option("undefined-shift-check", enabled);
 
-  // Default malloc failure profile chosen to be returning null. These options
-  // are not strictly needed, but they are staying here as part of documentation
-  // of the default option set for the tool.
-  options.set_option("malloc-may-fail", enabled);
-  options.set_option("malloc-fail-null", enabled);
-
   // Unwinding assertions required in certain cases for sound verification
   // results. See https://github.com/diffblue/cbmc/issues/6561 for elaboration.
   options.set_option("unwinding-assertions", enabled);
@@ -342,20 +336,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // (expected checks and no unsoundness by missing checks).
   cbmc_parse_optionst::set_default_analysis_flags(
     options, !cmdline.isset("no-standard-checks"));
-
-  if(!cmdline.isset("no-standard-checks"))
-  {
-    // The malloc failure mode is by default handled by the `config.set` call
-    // which only looks at the `cmdline` flags. In the case of default checks,
-    // these haven't been set - we need to overwrite the config object to manually
-    // bootstrap the malloc-may-fail behaviour
-    if(!config.ansi_c.malloc_may_fail && options.is_set("malloc-may-fail"))
-    {
-      config.ansi_c.malloc_may_fail = true;
-      config.ansi_c.malloc_failure_mode =
-        configt::ansi_ct::malloc_failure_modet::malloc_failure_mode_return_null;
-    }
-  }
 
   // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);

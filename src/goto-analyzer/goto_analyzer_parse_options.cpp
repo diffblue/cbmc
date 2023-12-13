@@ -68,12 +68,6 @@ void goto_analyzer_parse_optionst::set_default_analysis_flags(
   options.set_option("signed-overflow-check", enabled);
   options.set_option("undefined-shift-check", enabled);
 
-  // Default malloc failure profile chosen to be returning null. These options
-  // are not strictly *needed*, but they are staying here as part of documentation
-  // of the default option set for the tool.
-  options.set_option("malloc-may-fail", enabled);
-  options.set_option("malloc-fail-null", enabled);
-
   // This is in-line with the options we set for CBMC in cbmc_parse_optionst
   // with the exception of unwinding-assertions, which don't make sense in
   // the context of abstract interpretation.
@@ -92,22 +86,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 
   goto_analyzer_parse_optionst::set_default_analysis_flags(
     options, !cmdline.isset("no-standard-checks"));
-
-  // Enable flags that in combination provide analysis with no surprises
-  // (expected checks and no unsoundness by missing checks).
-  if(!cmdline.isset("no-standard-checks"))
-  {
-    // The malloc failure mode is by default handled by the `config.set` call
-    // which only looks at the `cmdline` flags. In the case of default checks,
-    // these haven't been set - we need to overwrite the config object to manually
-    // bootstrap the malloc-may-fail behaviour
-    if(!config.ansi_c.malloc_may_fail && options.is_set("malloc-may-fail"))
-    {
-      config.ansi_c.malloc_may_fail = true;
-      config.ansi_c.malloc_failure_mode =
-        configt::ansi_ct::malloc_failure_modet::malloc_failure_mode_return_null;
-    }
-  }
 
   // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
