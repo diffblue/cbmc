@@ -4,6 +4,9 @@
 <p><strong>cbmc [--property <em>property-id</em><strong>]</strong> <em>file.c</em> ...</strong></p>
 <p><strong>cbmc [--show-properties] <em>file.c</em> ...</strong></p>
 <p><strong>cbmc [--all-properties] <em>file.c</em> ...</strong></p>
+<p><strong>cbmc [--no-standard-checks] <em>file.c</em> ...</strong></p>
+<p><strong>cbmc [--no-standard-checks] [--pointer-check] <em>file.c</em> ...</strong></p>
+<p><strong>cbmc [--no-bounds-check] <em>file.c</em> ...</strong></p>
 <p><strong>goto-cc [-I <em>include-path</em><strong>]</strong> [-c] <em>file.c</em> [-o <em>outfile.o</em><strong>]</strong></strong></p>
 <p><strong>goto-instrument <em>infile</em> <em>outfile</em></strong></p>
 <p>Only the most useful options are listed here; see below for the remainder.</p>
@@ -13,8 +16,73 @@
 <p><strong>goto-instrument</strong>(1) reads a GOTO binary, performs a given program transformation, and then writes the resulting program as GOTO binary on disc.</p>
 <p>The usual flow is to (1) translate source into a GOTO binary using goto-cc, then (2) perform instrumentation with goto-instrument, and finally (3) perform the analysis with cbmc.</p>
 <h1>OPTIONS</h1>
+<h2>Standard Checks</h2>
+<p>From version <strong>6.0</strong> onwards, <strong>cbmc</strong>, <strong>goto-analyzer</strong> and some other tools apply some checks to the program by default (called the "standard checks"), with the aim to provide a better user experience for a non-expert user of the tool. These checks are:</p>
+<dl>
+<dt><strong>--pointer-check</strong></dt>
+<dd><p>enable pointer checks</p>
+</dd>
+<dt><strong>--bounds-check</strong></dt>
+<dd><p>enable array bounds checks</p>
+</dd>
+<dt><strong>--undefined-shift-check</strong></dt>
+<dd><p>check shift greater than bit-width</p>
+</dd>
+<dt><strong>--div-by-zero-check</strong></dt>
+<dd><p>enable division by zero checks</p>
+</dd>
+<dt><strong>--pointer-primitive-check</strong></dt>
+<dd><p>checks that all pointers in pointer primitives are valid or null</p>
+</dd>
+<dt><strong>--signed-overflow-check</strong></dt>
+<dd><p>enable signed arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--malloc-may-fail</strong></dt>
+<dd><p>allow malloc calls to return a null pointer</p>
+</dd>
+<dt><strong>--malloc-fail-null</strong></dt>
+<dd><p>set malloc failure mode to return null</p>
+</dd>
+<dt><strong>--unwinding-assertions</strong> (<strong>cbmc</strong>-only)</dt>
+<dd><p>generate unwinding assertions (cannot be used with <strong>--cover</strong>)</p>
+</dd>
+</dl>
+<p>These checks can all be deactivated at once by using the <strong>--no-standard-checks</strong> flag like in the header example, or individually, by prepending a <strong>no-</strong> before the flag, like so:</p>
+<dl>
+<dt><strong>--no-pointer-check</strong></dt>
+<dd><p>disable pointer checks</p>
+</dd>
+<dt><strong>--no-bounds-check</strong></dt>
+<dd><p>disable array bounds checks</p>
+</dd>
+<dt><strong>--no-undefined-shift-check</strong></dt>
+<dd><p>do not perform check for shift greater than bit-width</p>
+</dd>
+<dt><strong>--no-div-by-zero-check</strong></dt>
+<dd><p>disable division by zero checks</p>
+</dd>
+<dt><strong>--no-pointer-primitive-check</strong></dt>
+<dd><p>do not check that all pointers in pointer primitives are valid or null</p>
+</dd>
+<dt><strong>--no-signed-overflow-check</strong></dt>
+<dd><p>disable signed arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--no-malloc-may-fail</strong></dt>
+<dd><p>do not allow malloc calls to fail by default</p>
+</dd>
+<dt><strong>--no-malloc-fail-null</strong></dt>
+<dd><p>do not set malloc failure mode to return null pointer</p>
+</dd>
+<dt><strong>--no-unwinding-assertions</strong> (<strong>cbmc</strong>-only)</dt>
+<dd><p>do not generate unwinding assertions (cannot be used with <strong>--cover</strong>)</p>
+</dd>
+</dl>
+<p>If an already set flag is re-set, like calling <strong>--pointer-check</strong> when default checks are already on, the flag is simply ignored.</p>
 <h2>Analysis options:</h2>
 <dl>
+<dt><strong>--no-standard-checks</strong></dt>
+<dd><p>disable the standard (default) checks applied to a C/GOTO program (see above for more information)</p>
+</dd>
 <dt><strong>--show-properties</strong></dt>
 <dd><p>show the properties, but don't run analysis</p>
 </dd>

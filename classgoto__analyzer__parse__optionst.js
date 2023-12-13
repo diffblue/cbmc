@@ -7,5 +7,6 @@ var classgoto__analyzer__parse__optionst =
     [ "perform_analysis", "classgoto__analyzer__parse__optionst.html#aa686c5efc6e94282f1a43989589e9e38", null ],
     [ "process_goto_program", "classgoto__analyzer__parse__optionst.html#a8b307f9b632d374c8b9f4fc717369dab", null ],
     [ "register_languages", "classgoto__analyzer__parse__optionst.html#aa0f9bcb0c4f40e5cf552b8f2124ca562", null ],
+    [ "set_default_analysis_flags", "classgoto__analyzer__parse__optionst.html#aa7143d2c36fd3e2569f71ce3139eea75", null ],
     [ "goto_model", "classgoto__analyzer__parse__optionst.html#a3b80741678a4d2c049306c38911b568e", null ]
 ];

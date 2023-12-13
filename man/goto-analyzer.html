@@ -4,6 +4,9 @@
 <p><strong>goto-analyzer [-?|-h|--help]</strong></p>
 <p><strong>goto-analyzer --version</strong></p>
 <p><strong>goto-analyzer [options] file.c|file.gb</strong></p>
+<p><strong>goto-analyzer [--no-standard-checks] <em>file.c</em> ...</strong></p>
+<p><strong>goto-analyzer [--no-standard-checks] [--pointer-check] <em>file.c</em> ...</strong></p>
+<p><strong>goto-analyzer [--no-bounds-check] <em>file.c</em> ...</strong></p>
 <h1>DESCRIPTION</h1>
 <p><strong>goto-analyzer</strong> is an abstract interpreter which uses the same front-end and GOTO binary representation as <strong>cbmc</strong>(1).</p>
 <p>The key difference is that <strong>cbmc</strong>(1) under-approximates the behavior of the program (execution traces that are too long or require too many loop unwindings are not considered) while <strong>goto-analyzer</strong> over-approximates the behavior of the program. <strong>cbmc</strong>(1) can determine if a property is A. true for a bounded number of iterations or B. false and giving an error trace. In contrast <strong>goto-analyzer</strong> can determine if a property is A. true for all iterations or B. possibly false. In this sense, each tool has its own strengths and weaknesses.</p>
@@ -262,6 +265,9 @@
 </dl>
 <h2>Program instrumentation options:</h2>
 <dl>
+<dt><strong>--no-standard-checks</strong></dt>
+<dd><p>disable the standard (default) checks applied to a C/GOTO program (see below for more information)</p>
+</dd>
 <dt><strong>--property</strong> id</dt>
 <dd><p>enable selected properties only</p>
 </dd>
@@ -338,6 +344,68 @@
 <dd><p>track C string lengths and zero-termination</p>
 </dd>
 </dl>
+<h2>Standard Checks</h2>
+<p>From version <strong>6.0</strong> onwards, <strong>cbmc</strong>, <strong>goto-analyzer</strong> and some other tools apply some checks to the program by default (called the "standard checks"), with the aim to provide a better user experience for a non-expert user of the tool. These checks are:</p>
+<dl>
+<dt><strong>--pointer-check</strong></dt>
+<dd><p>enable pointer checks</p>
+</dd>
+<dt><strong>--bounds-check</strong></dt>
+<dd><p>enable array bounds checks</p>
+</dd>
+<dt><strong>--undefined-shift-check</strong></dt>
+<dd><p>check shift greater than bit-width</p>
+</dd>
+<dt><strong>--div-by-zero-check</strong></dt>
+<dd><p>enable division by zero checks</p>
+</dd>
+<dt><strong>--pointer-primitive-check</strong></dt>
+<dd><p>checks that all pointers in pointer primitives are valid or null</p>
+</dd>
+<dt><strong>--signed-overflow-check</strong></dt>
+<dd><p>enable signed arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--malloc-may-fail</strong></dt>
+<dd><p>allow malloc calls to return a null pointer</p>
+</dd>
+<dt><strong>--malloc-fail-null</strong></dt>
+<dd><p>set malloc failure mode to return null</p>
+</dd>
+<dt><strong>--unwinding-assertions</strong> (<strong>cbmc</strong>-only)</dt>
+<dd><p>generate unwinding assertions (cannot be used with <strong>--cover</strong>)</p>
+</dd>
+</dl>
+<p>These checks can all be deactivated at once by using the <strong>--no-standard-checks</strong> flag like in the header example, or individually, by prepending a <strong>no-</strong> before the flag, like so:</p>
+<dl>
+<dt><strong>--no-pointer-check</strong></dt>
+<dd><p>disable pointer checks</p>
+</dd>
+<dt><strong>--no-bounds-check</strong></dt>
+<dd><p>disable array bounds checks</p>
+</dd>
+<dt><strong>--no-undefined-shift-check</strong></dt>
+<dd><p>do not perform check for shift greater than bit-width</p>
+</dd>
+<dt><strong>--no-div-by-zero-check</strong></dt>
+<dd><p>disable division by zero checks</p>
+</dd>
+<dt><strong>--no-pointer-primitive-check</strong></dt>
+<dd><p>do not check that all pointers in pointer primitives are valid or null</p>
+</dd>
+<dt><strong>--no-signed-overflow-check</strong></dt>
+<dd><p>disable signed arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--no-malloc-may-fail</strong></dt>
+<dd><p>do not allow malloc calls to fail by default</p>
+</dd>
+<dt><strong>--no-malloc-fail-null</strong></dt>
+<dd><p>do not set malloc failure mode to return null pointer</p>
+</dd>
+<dt><strong>--no-unwinding-assertions</strong> (<strong>cbmc</strong>-only)</dt>
+<dd><p>do not generate unwinding assertions (cannot be used with <strong>--cover</strong>)</p>
+</dd>
+</dl>
+<p>If an already set flag is re-set, like calling <strong>--pointer-check</strong> when default checks are already on, the flag is simply ignored.</p>
 <h2>Other options:</h2>
 <dl>
 <dt><strong>--validate-goto-model</strong></dt>
