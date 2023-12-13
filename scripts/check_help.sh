@@ -91,6 +91,21 @@ for t in  \
         echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
       done
       ;;
+    # goto-diff is a bit of a peculiar situation in that it initialises some
+    # of its options using the PARSE_OPTIONS_GOTO_CHECK macro which initialises
+    # the negative checks (being the mirror image of the default checks), which
+    # this tool doesn't make use of - but there's also no good way to remove
+    # given our current architecture. Thus, we just don't document them (and
+    # ignore them if someone falls on them by accident).
+    goto-diff)
+      for undoc in \
+        -no-pointer-check -no-bounds-check -no-undefined-shift-check \
+        -no-pointer-primitive-check -no-div-by-zero-check \
+        -no-signed-overflow-check ; do
+        echo "$undoc" >> help_string
+        echo "$undoc" | sed 's/^/\\fB/;s/-/\\-/g;s/$/\\fR/' >> man_page_opts
+      done
+      ;;
     janalyzer)
       # -jar, -gb are documented, but in a different format
       for undoc in -show-intervals -show-non-null -jar -gb ; do
