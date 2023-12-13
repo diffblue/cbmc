@@ -60,19 +60,26 @@ public:
     return is_constant(e);
   }
 
+  virtual ~is_compile_time_constantt() = default;
+
 protected:
   const namespacet &ns;
 
   /// This function determines what expressions are to be propagated as
   /// "constants"
-  bool is_constant(const exprt &e) const
+  virtual bool is_constant(const exprt &e) const
   {
     // non-standard numeric constant
     if(e.id() == ID_infinity)
       return true;
 
-    // numeric, character, or pointer-typed constant
-    if(e.is_constant())
+    // numeric, character, or pointer-typed constant.  A string literal is a
+    // legitimate (address) constant per C11 6.6, so -- unlike the arithmetic
+    // operators that are confined to clang_is_constant_foldedt below --
+    // accepting ID_string_constant here is intentional and shared with
+    // make_constant.  (Non-integer contexts such as `int a["abc"];` are still
+    // rejected, by the index-type conversion.)
+    if(e.is_constant() || e.id() == ID_string_constant)
       return true;
 
     // possibly an address constant
@@ -93,9 +100,9 @@ protected:
       e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector)
     {
       return std::all_of(
-        e.operands().begin(), e.operands().end(), [this](const exprt &op) {
-          return is_constant(op);
-        });
+        e.operands().begin(),
+        e.operands().end(),
+        [this](const exprt &op) { return is_constant(op); });
     }
 
     return false;
@@ -134,6 +141,83 @@ protected:
       return true;
 
     return false;
+  }
+};
+
+/// Whether a simplified, constant condition is "true".  The condition may be a
+/// numeric non-zero or a bool-typed "true" constant: implicit_typecast_bool
+/// rewrites e.g. 0 to 0!=0, which simplifies to a bool "false"/"true", and
+/// is_zero() does not handle ID_bool, so is_false() is also consulted.
+static bool is_constant_true(const exprt &cond)
+{
+  return !cond.is_zero() && !cond.is_false();
+}
+
+/// Clang appears to have a somewhat different idea of what is/isn't to be
+/// considered a constant at compile time.
+class clang_is_constant_foldedt : public is_compile_time_constantt
+{
+public:
+  explicit clang_is_constant_foldedt(const namespacet &ns)
+    : is_compile_time_constantt(ns)
+  {
+  }
+
+protected:
+  /// This function determines what expressions are constant folded by clang
+  bool is_constant(const exprt &e) const override
+  {
+    // we need to adhere to short-circuit semantics for the following
+    if(e.id() == ID_if)
+    {
+      const if_exprt &if_expr = to_if_expr(e);
+      if(!is_constant(if_expr.cond()))
+        return false;
+      exprt const_cond = simplify_expr(if_expr.cond(), ns);
+      // A constant accepted by is_constant (e.g. a string literal or an
+      // infinity) need not simplify to a constant_exprt; if it does not we
+      // cannot decide the branch at compile time, so it is not constant folded.
+      if(!const_cond.is_constant())
+        return false;
+      if(is_constant_true(const_cond))
+        return is_constant(if_expr.true_case());
+      else
+        return is_constant(if_expr.false_case());
+    }
+    else if(e.id() == ID_and || e.id() == ID_or)
+    {
+      for(const auto &op : e.operands())
+      {
+        if(!is_constant(op))
+          return false;
+        exprt const_cond = simplify_expr(op, ns);
+        if(!const_cond.is_constant())
+          return false;
+        // stop when we hit false (for an and) or true (for an or)
+        if(is_constant_true(const_cond) == (e.id() == ID_or))
+          break;
+      }
+      return true;
+    }
+    else if(e.id() == ID_address_of)
+      return false;
+    else if(
+      e.id() == ID_minus || e.id() == ID_unary_minus || e.id() == ID_div ||
+      e.id() == ID_mod || e.id() == ID_shl || e.id() == ID_lshr ||
+      e.id() == ID_ashr)
+    {
+      // In addition to the operators accepted by
+      // is_compile_time_constantt::is_constant, clang constant-folds these
+      // arithmetic operators.  They are kept out of the shared base predicate
+      // so that make_constant's behaviour is unchanged; the full set of
+      // clang-folded operators is the union of the two lists.
+      return std::all_of(
+        e.operands().begin(),
+        e.operands().end(),
+        [this](const exprt &op) { return is_constant(op); });
+    }
+    else
+      return is_compile_time_constantt::is_constant(e);
   }
 };
 
@@ -3842,8 +3926,11 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier=="__builtin_constant_p")
   {
-    // this is a gcc extension to tell whether the argument
-    // is known to be a compile-time constant
+    // This is a gcc/clang extension to tell whether the argument
+    // is known to be a compile-time constant. The behavior of these two
+    // compiler families, however, is quite different, which we need to take
+    // care of in the below config-dependent branches.
+
     if(expr.arguments().size()!=1)
     {
       error().source_location = f_op.source_location();
@@ -3851,30 +3938,35 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    // do not typecheck the argument - it is never evaluated, and thus side
-    // effects must not show up either
-
-    // try to produce constant
-    exprt tmp1=expr.arguments().front();
-    simplify(tmp1, *this);
-
-    bool is_constant=false;
-
-    // Need to do some special treatment for string literals,
-    // which are (void *)&("lit"[0])
-    if(
-      tmp1.id() == ID_typecast &&
-      to_typecast_expr(tmp1).op().id() == ID_address_of &&
-      to_address_of_expr(to_typecast_expr(tmp1).op()).object().id() ==
-        ID_index &&
-      to_index_expr(to_address_of_expr(to_typecast_expr(tmp1).op()).object())
-          .array()
-          .id() == ID_string_constant)
+    bool is_constant = false;
+    if(config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
     {
-      is_constant=true;
+      is_constant = clang_is_constant_foldedt(*this)(expr.arguments().front());
     }
     else
-      is_constant=tmp1.is_constant();
+    {
+      // try to produce constant
+      exprt tmp1 = expr.arguments().front();
+      simplify(tmp1, *this);
+
+      // Need to do some special treatment for string literals,
+      // which are (void *)&("lit"[0])
+      if(
+        tmp1.id() == ID_typecast &&
+        to_typecast_expr(tmp1).op().id() == ID_address_of &&
+        to_address_of_expr(to_typecast_expr(tmp1).op()).object().id() ==
+          ID_index &&
+        to_index_expr(to_address_of_expr(to_typecast_expr(tmp1).op()).object())
+            .array()
+            .id() == ID_string_constant)
+      {
+        is_constant = true;
+      }
+      else if(tmp1.id() == ID_string_constant)
+        is_constant = true;
+      else
+        is_constant = tmp1.is_constant();
+    }
 
     exprt tmp2=from_integer(is_constant, expr.type());
     tmp2.add_source_location()=source_location;

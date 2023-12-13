@@ -1,0 +1,15 @@
+CORE
+main.c
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+array size of static symbol 'a' is not constant$
+--
+^warning: ignoring
+--
+A division the simplifier cannot fold (1/0) is not a constant expression, so
+make_constant must reject it as a file-scope array size.  This pins down that
+the operators added for Clang __builtin_constant_p folding live only in
+clang_is_constant_foldedt, keeping the shared base predicate (and hence
+make_constant) unchanged.

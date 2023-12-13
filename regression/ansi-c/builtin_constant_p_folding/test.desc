@@ -1,0 +1,15 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+__builtin_constant_p must recognise integer constant arithmetic as constant for
+both GCC and Clang, irrespective of the operator (subtraction, division,
+modulo, shifts, ...). Run under the ansi-c-clang profile this exercises the
+Clang-specific constant-folding path, which previously only handled addition
+and multiplication and so wrongly reported e.g. __builtin_constant_p(1 - 1) as
+non-constant.
