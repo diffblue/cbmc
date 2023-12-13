@@ -242,31 +242,7 @@ TEST_CASE(
       REQUIRE(
         test.sent_commands ==
         std::vector<smt_commandt>{
-          smt_declare_function_commandt{nondet_int_a_term, {}},
-          smt_define_function_commandt{
-            "forty_two", {}, smt_bit_vector_constant_termt{42, 16}},
-          smt_define_function_commandt{
-            "first_comparison",
-            {},
-            smt_core_theoryt::equal(nondet_int_a_term, forty_two_term)},
-          smt_declare_function_commandt{nondet_int_b_term, {}},
-          smt_define_function_commandt{
-            "second_comparison",
-            {},
-            smt_core_theoryt::make_not(
-              smt_core_theoryt::equal(nondet_int_b_term, forty_two_term))},
-          smt_define_function_commandt{
-            "third_comparison",
-            {},
-            smt_core_theoryt::equal(nondet_int_a_term, nondet_int_b_term)},
-          smt_define_function_commandt{
-            "comparison_conjunction",
-            {},
-            smt_core_theoryt::make_and(
-              smt_core_theoryt::make_and(
-                smt_identifier_termt{"first_comparison", smt_bool_sortt{}},
-                smt_identifier_termt{"second_comparison", smt_bool_sortt{}}),
-              smt_identifier_termt{"third_comparison", smt_bool_sortt{}})},
+          smt_declare_function_commandt{comparison_conjunction_term, {}},
           smt_assert_commandt{comparison_conjunction_term}});
     }
     SECTION("Set with nondet_padding")
@@ -326,8 +302,8 @@ TEST_CASE(
       REQUIRE(
         test.sent_commands ==
         std::vector<smt_commandt>{
-          smt_define_function_commandt{
-            "bar", {}, smt_bit_vector_constant_termt{42, 8}},
+          smt_declare_function_commandt{
+            smt_identifier_termt{"bar", smt_bit_vector_sortt{8}}, {}},
           smt_define_function_commandt{
             "B0", {}, smt_identifier_termt{"bar", smt_bit_vector_sortt{8}}}});
     }
@@ -1210,19 +1186,9 @@ TEST_CASE(
   test.procedure.set_to(equal_expr, true);
 
   std::vector<smt_commandt> expected_commands{
-    smt_define_function_commandt(
-      inner_symbol_with_value.name,
-      {},
-      smt_bit_vector_theoryt::concat(
-        smt_bit_vector_constant_termt{10, 32},
-        smt_bit_vector_constant_termt{23, 16})),
-    smt_define_function_commandt(
-      symbol_with_value.name,
-      {},
-      smt_bit_vector_theoryt::concat(
-        smt_bit_vector_constant_termt{1, config.ansi_c.bool_width},
-        smt_identifier_termt{
-          inner_symbol_with_value.name, smt_bit_vector_sortt{48}})),
+    smt_declare_function_commandt{
+      smt_identifier_termt{symbol_with_value.name, smt_bit_vector_sortt{56}},
+      {}},
     smt_assert_commandt{smt_core_theoryt::equal(
       smt_identifier_termt{symbol_with_value.name, smt_bit_vector_sortt{56}},
       smt_identifier_termt{symbol_with_value.name, smt_bit_vector_sortt{56}})}};
