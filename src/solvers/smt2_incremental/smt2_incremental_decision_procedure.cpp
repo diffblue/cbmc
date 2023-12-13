@@ -5,12 +5,10 @@
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/namespace.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol.h>
 
 #include <solvers/smt2_incremental/ast/smt_commands.h>
 #include <solvers/smt2_incremental/ast/smt_responses.h>
@@ -210,28 +208,12 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
       continue;
     if(const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(current))
     {
-      const irep_idt &identifier = symbol_expr->get_identifier();
-      const symbolt *symbol = nullptr;
-      if(ns.lookup(identifier, symbol) || symbol->value.is_nil())
-      {
-        send_function_definition(
-          *symbol_expr,
-          symbol_expr->get_identifier(),
-          solver_process,
-          expression_identifiers,
-          identifier_table);
-      }
-      else
-      {
-        const exprt lowered = lower(symbol->value);
-        if(push_dependencies_needed(lowered))
-          continue;
-        const smt_define_function_commandt function{
-          symbol->name, {}, convert_expr_to_smt(lowered)};
-        expression_identifiers.emplace(*symbol_expr, function.identifier());
-        identifier_table.emplace(identifier, function.identifier());
-        solver_process->send(function);
-      }
+      send_function_definition(
+        *symbol_expr,
+        symbol_expr->get_identifier(),
+        solver_process,
+        expression_identifiers,
+        identifier_table);
     }
     else if(const auto array_expr = expr_try_dynamic_cast<array_exprt>(current))
       define_array_function(*array_expr);
