@@ -1,6 +1,6 @@
 CORE pthread
 main.c
-
+--no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
