@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_program2code.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/ieee_float.h>
@@ -1435,6 +1436,19 @@ void goto_program2codet::cleanup_code(
 
     if(code.op0().type().id()==ID_array)
       cleanup_expr(to_array_type(code.op0().type()).size(), true);
+    else if(code.op0().type().id() == ID_c_bit_field)
+    {
+      c_bit_field_typet original_type = to_c_bit_field_type(code.op0().type());
+      bitvector_typet bv_type =
+        to_bitvector_type(original_type.underlying_type());
+      code.op0().type() = bv_type;
+      if(code.operands().size() == 2)
+      {
+        exprt bit_mask =
+          from_integer(power(2, original_type.get_width()) - 1, bv_type);
+        code.op1() = bitand_exprt{code.op1(), bit_mask};
+      }
+    }
 
     add_local_types(code.op0().type());
 
