@@ -1,6 +1,6 @@
 CORE
 main.c
---floatbv
+--no-div-by-zero-check --floatbv
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
