@@ -1,6 +1,6 @@
 CORE
 assert_dynamic.c
---trace
+--no-malloc-may-fail --trace
 Passing problem to incremental SMT2 solving
 line 16 assertion __CPROVER_DYNAMIC_OBJECT\(pointer\)\: FAILURE
 make_dynamic\=FALSE
