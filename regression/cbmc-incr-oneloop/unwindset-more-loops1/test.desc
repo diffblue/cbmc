@@ -1,6 +1,6 @@
 CORE
 main.c
---incremental-loop main.3 --unwindset main.1:2,main.2:8
+--no-standard-checks --incremental-loop main.3 --unwindset main.1:2,main.2:8
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
