@@ -37,7 +37,8 @@ jobs:
         with:
           tag_name: cbmc-${{ env.CBMC_VERSION }}
           release_name: cbmc-${{ env.CBMC_VERSION }}
-          prerelease: true
+          draft: false
+          prerelease: false
           body: |
             This is CBMC version ${{ env.CBMC_VERSION }}.
 
@@ -95,8 +96,6 @@ jobs:
             That will initialise an execution of the container based on the image pushed
             as part of this release. The CProver tools are present in the `$PATH` of the
             container.
-          draft: false
-          prerelease: false
       - name: Slack notification of successful release
         uses: rtCamp/action-slack-notify@v2
         env:
