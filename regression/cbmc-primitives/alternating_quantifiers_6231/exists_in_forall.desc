@@ -1,6 +1,6 @@
 CORE no-new-smt
 exists_in_forall.c
---pointer-check
+--no-malloc-may-fail --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line \d* for all z, there exists a y so that y = z \+ 10 and y > 1: SUCCESS

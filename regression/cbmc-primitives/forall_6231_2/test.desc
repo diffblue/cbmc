@@ -1,6 +1,6 @@
-CORE
+CORE no-new-smt
 test.c
---pointer-check
+--no-malloc-may-fail --pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line \d+ assertion __CPROVER_forall \{ int i ; \(0 <= i && i < 1\) ==> \*\(a\+i\) == \*\(a\+i\) \}: SUCCESS

@@ -1,6 +1,6 @@
 CORE
 main.c
---no-simplify --no-propagation
+--no-malloc-may-fail --no-simplify --no-propagation
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
