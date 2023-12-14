@@ -21,7 +21,7 @@ else
 fi
 
 rm -f "${target}-mod.gb"
-$goto_instrument ${args} "${target}.gb" "${target}-mod.gb"
+$goto_instrument --no-malloc-fail ${args} "${target}.gb" "${target}-mod.gb"
 if [ ! -e "${target}-mod.gb" ] ; then
   cp "${target}.gb" "${target}-mod.gb"
 elif echo $args | grep -q -- "--dump-c-type-header" ; then
@@ -39,5 +39,5 @@ elif echo $args | grep -q -- "--dump-c" ; then
 
   rm "${target}-mod.c"
 fi
-$goto_instrument --show-goto-functions "${target}-mod.gb"
+$goto_instrument --no-malloc-fail --show-goto-functions "${target}-mod.gb"
 $cbmc --no-standard-checks "${target}-mod.gb"

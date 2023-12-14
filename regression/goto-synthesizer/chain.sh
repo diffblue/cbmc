@@ -37,7 +37,7 @@ fi
 rm -f "${name}-mod.gb"
 rm -f "${name}-mod-2.gb"
 echo "Running goto-instrument: "
-$goto_instrument ${args_inst} "${name}.gb" "${name}-mod.gb"
+$goto_instrument --no-malloc-fail ${args_inst} "${name}.gb" "${name}-mod.gb"
 if [ ! -e "${name}-mod.gb" ] ; then
   cp "$name.gb" "${name}-mod.gb"
 elif echo $args_inst | grep -q -- "--dump-c" ; then
@@ -53,9 +53,9 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
 fi
 echo "Running goto-synthesizer: "
 if echo $args_synthesizer | grep -q -- "--dump-loop-contracts" ; then
-  $goto_synthesizer ${args_synthesizer} "${name}-mod.gb"
+  $goto_synthesizer ${args_synthesizer} --no-malloc-fail "${name}-mod.gb"
 else
-  $goto_synthesizer ${args_synthesizer} "${name}-mod.gb" "${name}-mod-2.gb"
+  $goto_synthesizer ${args_synthesizer} --no-malloc-fail "${name}-mod.gb" "${name}-mod-2.gb"
   echo "Running CBMC: "
   $cbmc --no-standard-checks ${args_cbmc} "${name}-mod-2.gb"
 fi
