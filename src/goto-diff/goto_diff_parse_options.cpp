@@ -183,6 +183,14 @@ bool goto_diff_parse_optionst::process_goto_program(
                << messaget::eom;
   link_to_library(goto_model, ui_message_handler, cprover_cpp_library_factory);
   link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+  // library functions may introduce inline assembler
+  while(has_asm(goto_model))
+  {
+    remove_asm(goto_model);
+    link_to_library(
+      goto_model, ui_message_handler, cprover_cpp_library_factory);
+    link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
+  }
 
   // Common removal of types and complex constructs
   if(::process_goto_program(goto_model, options, log))

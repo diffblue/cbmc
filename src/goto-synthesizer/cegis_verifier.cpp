@@ -89,6 +89,15 @@ void cegis_verifiert::preprocess_goto_model()
     goto_model, log.get_message_handler(), cprover_cpp_library_factory);
   link_to_library(
     goto_model, log.get_message_handler(), cprover_c_library_factory);
+  // library functions may introduce inline assembler
+  while(has_asm(goto_model))
+  {
+    remove_asm(goto_model);
+    link_to_library(
+      goto_model, log.get_message_handler(), cprover_cpp_library_factory);
+    link_to_library(
+      goto_model, log.get_message_handler(), cprover_c_library_factory);
+  }
   process_goto_program(goto_model, options, log);
 
   add_failed_symbols(goto_model.symbol_table);
