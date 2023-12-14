@@ -8,10 +8,10 @@ ifeq ($(BUILD_ENV_),MSVC)
 endif
 
 test:
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --no-standard-checks --validate-goto-model --validate-ssa-equation" $(excluded_tests)
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests)
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --no-standard-checks --validate-goto-model --validate-ssa-equation" $(excluded_tests)
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests)
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
