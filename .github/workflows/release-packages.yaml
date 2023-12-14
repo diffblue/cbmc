@@ -70,7 +70,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         if: success() || failure()
         env:
-          SLACK_CHANNEL: team_open_source
+          SLACK_CHANNEL: aws-cbmc
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -143,7 +143,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         if: success() || failure()
         env:
-          SLACK_CHANNEL: team_open_source
+          SLACK_CHANNEL: aws-cbmc
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -172,7 +172,7 @@ jobs:
       - name: Slack notification of CI status
         if: success() || failure()
         env:
-          SLACK_CHANNEL: team_open_source
+          SLACK_CHANNEL: aws-cbmc
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -266,7 +266,7 @@ jobs:
       - name: Slack notification of CI status
         if: success() || failure()
         env:
-          SLACK_CHANNEL: team_open_source
+          SLACK_CHANNEL: aws-cbmc
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -299,7 +299,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         if: success() || failure()
         env:
-          SLACK_CHANNEL: team_open_source
+          SLACK_CHANNEL: aws-cbmc
           SLACK_COLOR: ${{ job.status }}
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
