@@ -108,7 +108,8 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
 
 void cbmc_parse_optionst::set_default_analysis_flags(
   optionst &options,
-  const bool enabled)
+  const bool enabled,
+  const messaget &log)
 {
   // Checks enabled by default in v6.0+.
   options.set_option("bounds-check", enabled);
@@ -121,6 +122,29 @@ void cbmc_parse_optionst::set_default_analysis_flags(
   // Unwinding assertions required in certain cases for sound verification
   // results. See https://github.com/diffblue/cbmc/issues/6561 for elaboration.
   options.set_option("unwinding-assertions", enabled);
+
+  if(enabled)
+  {
+    log.status() << "Running with --standard-checks on: "
+                 << "bounds-check, pointer-check, pointer-primitive-check, "
+                    "div-by-zero-check, "
+                 << "signed-overflow-check, undefined-shift-check and "
+                    "unwinding-assertions are"
+                 << "**on** by default for this analysis run.\n"
+                 << messaget::eom;
+    ;
+  }
+  else
+  { // enabled == false
+    log.status() << "Running with --no-standard-checks on: "
+                 << "bounds-check, pointer-check, pointer-primitive-check, "
+                    "div-by-zero-check, "
+                 << "signed-overflow-check, undefined-shift-check and "
+                    "unwinding-assertions are "
+                 << "**off** by default for this analysis run.\n"
+                 << messaget::eom;
+    ;
+  }
 }
 
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
@@ -335,7 +359,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // Enable flags that in combination provide analysis with no surprises
   // (expected checks and no unsoundness by missing checks).
   cbmc_parse_optionst::set_default_analysis_flags(
-    options, !cmdline.isset("no-standard-checks"));
+    options, !cmdline.isset("no-standard-checks"), log);
 
   // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
