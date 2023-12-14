@@ -60,6 +60,9 @@ csmith_test() {
   # Prepare the test CBMC by injecting the checksum as an assertion.
   gcc -E -I/usr/include/csmith -D__FRAMAC \
     -D'Frama_C_dump_assert_each()'="assert($check==(crc))" $f -o $bn.i
+  # We don't model argv here, so make sure we don't end up with a spurious
+  # null-pointer use.
+  sed -i 's/strcmp(argv\[1\], "1")/0/' $bn.i
   # Run the test using CBMC for up to 90 seconds, unwinding loops up to 257
   # times.
   ec=0
