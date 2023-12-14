@@ -1,6 +1,6 @@
 CORE
 main.c
---cover mcdc
+--no-standard-checks --cover mcdc
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1\] file main.c line 8 function main decision/condition 'x \* 123 > 100.* false: SATISFIED$

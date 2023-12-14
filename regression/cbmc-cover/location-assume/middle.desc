@@ -1,6 +1,6 @@
 CORE
 middle.c
---cover location
+--no-standard-checks --cover location
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1\] file middle.c line 5 function main block 1 \(lines middle\.c:main:5-8\): SATISFIED$
