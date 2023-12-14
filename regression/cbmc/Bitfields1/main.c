@@ -51,9 +51,13 @@ int main() {
   bf.d=2;
   assert(bf.d==1);
 
-  // assignments have the underlying type
+  // assignments have the underlying type, except for GCC
   assert(sizeof(bf.d=1)==sizeof(_Bool));
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
+  assert(sizeof(bf.a += 1) == 1);
+#else
   assert(sizeof(bf.a += 1) == sizeof(unsigned long));
+#endif
 
   bf.Type=IntelCacheTrace;
 
