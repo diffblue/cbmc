@@ -120,7 +120,12 @@ void cbmc_parse_optionst::set_default_analysis_flags(
 
   // Unwinding assertions required in certain cases for sound verification
   // results. See https://github.com/diffblue/cbmc/issues/6561 for elaboration.
-  options.set_option("unwinding-assertions", enabled);
+  // As the unwinding-assertions is processed earlier, we set it only if it has
+  // not been set yet.
+  if(!options.is_set("unwinding-assertions"))
+  {
+    options.set_option("unwinding-assertions", enabled);
+  }
 }
 
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
@@ -143,6 +148,35 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       << "--cover and --unwinding-assertions must not be given together"
       << messaget::eom;
     exit(CPROVER_EXIT_USAGE_ERROR);
+  }
+
+  // We want to warn the user that if we are using standard checks (that enables
+  // unwinding-assertions) and we did not disable them manually.
+  if(
+    cmdline.isset("cover") && !cmdline.isset("no-standard-checks") &&
+    !cmdline.isset("no-unwinding-assertions"))
+  {
+    log.warning() << "--cover is incompatible with --unwinding-assertions, so "
+                     "unwinding-assertions will be defaulted to false"
+                  << messaget::eom;
+  }
+
+  // We want to set the unwinding-assertions option as early as we can,
+  // otherwise we come across two issues: 1) there's no way to deactivate it
+  // with `--no-unwinding-assertions`, as the `--no-xxx` flags are set by
+  // `goto_check_c` which doesn't provide handling for the options, and 2) we
+  // handle it only when we use `--no-standard-checks`, but if we do so, we have
+  // already printed a couple times to the screen that `--unwinding-assertions`
+  // must be passed because of some activation/sensitive further down below.
+  if(cmdline.isset("unwinding-assertions"))
+  {
+    options.set_option("unwinding-assertions", true);
+    options.set_option("paths-symex-explore-all", true);
+  }
+  else if(cmdline.isset("no-unwinding-assertions"))
+  {
+    options.set_option("unwinding-assertions", false);
+    options.set_option("paths-symex-explore-all", false);
   }
 
   if(cmdline.isset("max-field-sensitivity-array-size"))
@@ -339,15 +373,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
-
-  // generate unwinding assertions
-  if(
-    options.get_bool_option("unwinding-assertions") ||
-    cmdline.isset("unwinding-assertions"))
-  {
-    options.set_option("unwinding-assertions", true);
-    options.set_option("paths-symex-explore-all", true);
-  }
 
   if(cmdline.isset("partial-loops"))
   {
