@@ -12,6 +12,6 @@ var classfull__slicert =
     [ "add_jumps", "classfull__slicert.html#af9499490e440dedfb40740429b4d363d", null ],
     [ "add_to_queue", "classfull__slicert.html#a258ca97296cefee7bd179f5110a41e51", null ],
     [ "fixedpoint", "classfull__slicert.html#a7d76d9f3c028c2bf9961c6895a4ad87c", null ],
-    [ "operator()", "classfull__slicert.html#a91789c5e57a78d3d08fbc99899ab022b", null ],
+    [ "operator()", "classfull__slicert.html#ad6c494cec583798c7fabbfae1cb634be", null ],
     [ "cfg", "classfull__slicert.html#aba9edfc81f8d0f8ce0d04b2040a42a79", null ]
 ];

@@ -5,7 +5,7 @@ var classrd__range__domaint =
     [ "rangest", "classrd__range__domaint.html#addc7f05775e71c373d3fbb44a3e655d4", null ],
     [ "values_innert", "classrd__range__domaint.html#afc0c4f3a498527fc4760b26db2d23dc2", null ],
     [ "valuest", "classrd__range__domaint.html#af141a4b2fbf34065eac1cad38bc4dfed", null ],
-    [ "rd_range_domaint", "classrd__range__domaint.html#aefec68ff7576aa514183b90eee2a738b", null ],
+    [ "rd_range_domaint", "classrd__range__domaint.html#ab419336bc4297eac1c57bb10b0b8d1a2", null ],
     [ "clear_cache", "classrd__range__domaint.html#a72fa050f81d5806962680240f7511e67", null ],
     [ "gen", "classrd__range__domaint.html#ae1869ff3d9a9840d391d04fcca08215e", null ],
     [ "get", "classrd__range__domaint.html#a692bb7c6ffae96cc1dd1ffdddef2c762", null ],
@@ -30,5 +30,6 @@ var classrd__range__domaint =
     [ "bv_container", "classrd__range__domaint.html#a8901ce7b3d3715a658b483f5887735fe", null ],
     [ "export_cache", "classrd__range__domaint.html#a1f1b1ad320189efde7184f0c93d6a142", null ],
     [ "has_values", "classrd__range__domaint.html#aeafe1f973a1d62d188eeeeb01948c59a", null ],
+    [ "message_handler", "classrd__range__domaint.html#afd5f6130ff6f3d281d46d81d12ae2ffe", null ],
     [ "values", "classrd__range__domaint.html#af2596491fff8311281ecb6da55cddd8d", null ]
 ];

@@ -11,7 +11,7 @@ var classchange__impactt =
       [ "NEW_CTRL_DEP", "classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cda283c2b58366af4ef8d39965cd0626fe3", null ],
       [ "DEL_CTRL_DEP", "classchange__impactt.html#a9f012be4c3cc2d33f9e0e1dfbcae48cdac2d9904db7047ca1991810a77b46dab9", null ]
     ] ],
-    [ "change_impactt", "classchange__impactt.html#a4bc9c6e464668c69613ff56e3ec80e67", null ],
+    [ "change_impactt", "classchange__impactt.html#a360b76951f62ffe09dfca66db41755b3", null ],
     [ "change_impact", "classchange__impactt.html#a28f53b69bb608679b02230add5c60372", null ],
     [ "change_impact", "classchange__impactt.html#aa49a80acab2f11fa764010bfd4857aa2", null ],
     [ "operator()", "classchange__impactt.html#a663b26cc748cc3b27af28a878a56b964", null ],

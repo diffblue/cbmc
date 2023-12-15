@@ -2,7 +2,7 @@ var classdep__graph__domaint =
 [
     [ "depst", "classdep__graph__domaint.html#a30d8ae729650aa385728c9b15dd6bc2b", null ],
     [ "node_indext", "classdep__graph__domaint.html#afb7d0e0b79ff87f9575e73fbf4382f8b", null ],
-    [ "dep_graph_domaint", "classdep__graph__domaint.html#acd8f5f2bdc79a883c226c8c6d9fabf1e", null ],
+    [ "dep_graph_domaint", "classdep__graph__domaint.html#a1f6e3bf5fc844d28958c317374145e76", null ],
     [ "control_dependencies", "classdep__graph__domaint.html#a2b10aa5456a0917f070d1221adb3edc4", null ],
     [ "data_dependencies", "classdep__graph__domaint.html#ad01ebb9e1cf1156d52e2828b94222244", null ],
     [ "get_node_id", "classdep__graph__domaint.html#a4b50d9b1499162cc7f649bee2632f675", null ],
@@ -23,5 +23,6 @@ var classdep__graph__domaint =
     [ "data_deps", "classdep__graph__domaint.html#a37ad880b17641bf997066e9c670686c8", null ],
     [ "has_changed", "classdep__graph__domaint.html#a831e2ddceacbe032814df256f21f83cc", null ],
     [ "has_values", "classdep__graph__domaint.html#a210c227c4e835fe86c29d2e4a77cca69", null ],
+    [ "message_handler", "classdep__graph__domaint.html#af17b1e35c1fd831efcf428cb85593455", null ],
     [ "node_id", "classdep__graph__domaint.html#a54e5a2b9d9eca5111b4e9de9c4d663a7", null ]
 ];

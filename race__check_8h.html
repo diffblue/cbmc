@@ -119,18 +119,18 @@ $(document).ready(function(){initNavTree('race__check_8h.html',''); initResizabl
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa5825176d795a7d3c3cc70105438492d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="race__check_8h.html#aa5825176d795a7d3c3cc70105438492d">race_check</a> (<a class="el" href="classvalue__setst.html">value_setst</a> &amp;, class <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
-<tr class="separator:aa5825176d795a7d3c3cc70105438492d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2840732231a7d0799c187230821517f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="race__check_8h.html#a2840732231a7d0799c187230821517f5">race_check</a> (<a class="el" href="classvalue__setst.html">value_setst</a> &amp;, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;)</td></tr>
-<tr class="separator:a2840732231a7d0799c187230821517f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad25a5c50fd5c396e60e9480b2acc0473"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="race__check_8h.html#ad25a5c50fd5c396e60e9480b2acc0473">race_check</a> (<a class="el" href="classvalue__setst.html">value_setst</a> &amp;, class <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)</td></tr>
+<tr class="separator:ad25a5c50fd5c396e60e9480b2acc0473"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a647cc74cf4e82553214591afb5dad24e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="race__check_8h.html#a647cc74cf4e82553214591afb5dad24e">race_check</a> (<a class="el" href="classvalue__setst.html">value_setst</a> &amp;, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)</td></tr>
+<tr class="separator:a647cc74cf4e82553214591afb5dad24e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Race Detection for Threaded Goto Programs. </p>
 
 <p class="definition">Definition in file <a class="el" href="race__check_8h_source.html">race_check.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aa5825176d795a7d3c3cc70105438492d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa5825176d795a7d3c3cc70105438492d">&#9670;&nbsp;</a></span>race_check() <span class="overload">[1/2]</span></h2>
+<a id="ad25a5c50fd5c396e60e9480b2acc0473"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad25a5c50fd5c396e60e9480b2acc0473">&#9670;&nbsp;</a></span>race_check() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -157,7 +157,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classgoto__programt.html">goto_programt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_program</em>&#160;</td>
+          <td class="paramname"><em>goto_program</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -167,12 +173,12 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="race__check_8cpp_source.html#l00265">265</a> of file <a class="el" href="race__check_8cpp_source.html">race_check.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="race__check_8cpp_source.html#l00270">270</a> of file <a class="el" href="race__check_8cpp_source.html">race_check.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a2840732231a7d0799c187230821517f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2840732231a7d0799c187230821517f5">&#9670;&nbsp;</a></span>race_check() <span class="overload">[2/2]</span></h2>
+<a id="a647cc74cf4e82553214591afb5dad24e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a647cc74cf4e82553214591afb5dad24e">&#9670;&nbsp;</a></span>race_check() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -187,7 +193,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
-          <td class="paramname"><em>goto_model</em>&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -197,7 +209,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="race__check_8cpp_source.html#l00287">287</a> of file <a class="el" href="race__check_8cpp_source.html">race_check.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="race__check_8cpp_source.html#l00294">294</a> of file <a class="el" href="race__check_8cpp_source.html">race_check.cpp</a>.</p>
 
 </div>
 </div>

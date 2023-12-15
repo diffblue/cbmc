@@ -147,7 +147,7 @@ $(document).ready(function(){initNavTree('interrupt_8cpp_source.html',''); initR
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="interrupt_8cpp.html#aa007ceb98b2b4b883267dbee4466c1b3">   58</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="interrupt_8cpp.html#aa007ceb98b2b4b883267dbee4466c1b3">interrupt</a>(</div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="interrupt_8cpp.html#a4bbfc3fac95d414f279bfd70f1de4c0e">   58</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="interrupt_8cpp.html#a4bbfc3fac95d414f279bfd70f1de4c0e">interrupt</a>(</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <a class="code" href="classvalue__setst.html">value_setst</a> &amp;value_sets,</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table,</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_id,</div>
@@ -156,27 +156,27 @@ $(document).ready(function(){initNavTree('interrupt_8cpp_source.html',''); initR
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;#endif</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program,</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> &amp;interrupt_handler,</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">const</span> <a class="code" href="classrw__set__baset.html">rw_set_baset</a> &amp;isr_rw_set)</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;{</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <a class="code" href="classnamespacet.html">namespacet</a> ns(symbol_table);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(i_it, goto_program)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;instruction=*i_it;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#ifdef LOCAL_MAY</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <a class="code" href="classlocal__may__aliast.html">local_may_aliast</a> local_may(goto_function);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <a class="code" href="classrw__set__loct.html">rw_set_loct</a> rw_set(</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    ns,</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    value_sets,</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    function_id,</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    i_it</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;#ifdef LOCAL_MAY</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    ,</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    local_may</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">const</span> <a class="code" href="classrw__set__baset.html">rw_set_baset</a> &amp;isr_rw_set,</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <a class="code" href="classnamespacet.html">namespacet</a> ns(symbol_table);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(i_it, goto_program)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;instruction=*i_it;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#ifdef LOCAL_MAY</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="classlocal__may__aliast.html">local_may_aliast</a> local_may(goto_function);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <a class="code" href="classrw__set__loct.html">rw_set_loct</a> rw_set(</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    ns,</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    value_sets,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    function_id,</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    i_it,</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;#ifdef LOCAL_MAY</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    local_may,</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;#endif</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  ); <span class="comment">// NOLINT(whitespace/parens)</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    message_handler); <span class="comment">// NOLINT(whitespace/parens)</span></div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="comment">// potential race?</span></div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordtype">bool</span> race_on_read=<a class="code" href="interrupt_8cpp.html#a0e63478608b92caf2321b5ea4a57c72a">potential_race_on_read</a>(rw_set, isr_rw_set);</div>
@@ -277,18 +277,18 @@ $(document).ready(function(){initNavTree('interrupt_8cpp_source.html',''); initR
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  <span class="keywordflow">return</span> isr;</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;}</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno"><a class="line" href="interrupt_8cpp.html#a1aa144cac98438f495483960bc0e303b">  188</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="interrupt_8cpp.html#aa007ceb98b2b4b883267dbee4466c1b3">interrupt</a>(</div>
+<div class="line"><a name="l00188"></a><span class="lineno"><a class="line" href="interrupt_8cpp.html#ad97bd0b910417f39752db06a8603fb1a">  188</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="interrupt_8cpp.html#a4bbfc3fac95d414f279bfd70f1de4c0e">interrupt</a>(</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <a class="code" href="classvalue__setst.html">value_setst</a> &amp;value_sets,</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;interrupt_handler)</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;{</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  <span class="comment">// look up the ISR</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> isr=</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <a class="code" href="interrupt_8cpp.html#ae6d287cf117f6c30687a5e5c4240e754">get_isr</a>(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, interrupt_handler);</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="comment">// we first figure out which objects are read/written by the ISR</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  <a class="code" href="classrw__set__functiont.html">rw_set_functiont</a> isr_rw_set(</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    value_sets, goto_model, isr);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;interrupt_handler,</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;{</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  <span class="comment">// look up the ISR</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> isr=</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <a class="code" href="interrupt_8cpp.html#ae6d287cf117f6c30687a5e5c4240e754">get_isr</a>(goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, interrupt_handler);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  <span class="comment">// we first figure out which objects are read/written by the ISR</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  <a class="code" href="classrw__set__functiont.html">rw_set_functiont</a> isr_rw_set(value_sets, goto_model, isr, message_handler);</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="comment">// now instrument</span></div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
@@ -299,7 +299,7 @@ $(document).ready(function(){initNavTree('interrupt_8cpp_source.html',''); initR
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      gf_entry.first != <a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>() &amp;&amp;</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      gf_entry.first != isr.<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>())</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    {</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <a class="code" href="interrupt_8cpp.html#aa007ceb98b2b4b883267dbee4466c1b3">interrupt</a>(</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <a class="code" href="interrupt_8cpp.html#a4bbfc3fac95d414f279bfd70f1de4c0e">interrupt</a>(</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        value_sets,</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>,</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        gf_entry.first,</div>
@@ -308,12 +308,13 @@ $(document).ready(function(){initNavTree('interrupt_8cpp_source.html',''); initR
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;#endif</div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        gf_entry.second.body,</div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        isr,</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        isr_rw_set);</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    }</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;}</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        isr_rw_set,</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        message_handler);</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    }</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#ab0e44849e3d2a7afe582edb65c726b7e">update</a>();</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;}</div>
 <div class="ttc" id="aclassbool__typet_html"><div class="ttname"><a href="classbool__typet.html">bool_typet</a></div><div class="ttdoc">The Boolean type.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00035">std_types.h:36</a></div></div>
 <div class="ttc" id="aclasscode__function__callt_html"><div class="ttname"><a href="classcode__function__callt.html">code_function_callt</a></div><div class="ttdoc">goto_instruction_codet representation of a function call statement.</div><div class="ttdef"><b>Definition:</b> <a href="goto__instruction__code_8h_source.html#l00270">goto_instruction_code.h:271</a></div></div>
 <div class="ttc" id="aclasscode__typet_html_aea0614e764b785c9a71b217eea487e4a"><div class="ttname"><a href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">code_typet::parameters</a></div><div class="ttdeci">const parameterst &amp; parameters() const</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00655">std_types.h:655</a></div></div>
@@ -335,14 +336,15 @@ $(document).ready(function(){initNavTree('interrupt_8cpp_source.html',''); initR
 <div class="ttc" id="aclassgoto__programt_html_a9b8a5b000ff480dcb197f52cee96bd8d"><div class="ttname"><a href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a></div><div class="ttdeci">static instructiont make_function_call(const code_function_callt &amp;_code, const source_locationt &amp;l=source_locationt::nil())</div><div class="ttdoc">Create a function call instruction.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01089">goto_program.h:1089</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_ae34f002c1001fe7430f617688016e473"><div class="ttname"><a href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a></div><div class="ttdeci">static instructiont make_goto(targett _target, const source_locationt &amp;l=source_locationt::nil())</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01038">goto_program.h:1038</a></div></div>
 <div class="ttc" id="aclasslocal__may__aliast_html"><div class="ttname"><a href="classlocal__may__aliast.html">local_may_aliast</a></div><div class="ttdef"><b>Definition:</b> <a href="local__may__alias_8h_source.html#l00024">local_may_alias.h:25</a></div></div>
+<div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:28</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00090">namespace.h:91</a></div></div>
-<div class="ttc" id="aclassrw__set__baset_html"><div class="ttname"><a href="classrw__set__baset.html">rw_set_baset</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00033">rw_set.h:34</a></div></div>
-<div class="ttc" id="aclassrw__set__baset_html_a1d82a9a4a49f6e57d36dc56a3578a73f"><div class="ttname"><a href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">rw_set_baset::r_entries</a></div><div class="ttdeci">entriest r_entries</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00059">rw_set.h:59</a></div></div>
-<div class="ttc" id="aclassrw__set__baset_html_a2d6fbb6c81f6c054a9b1efe6d3d50886"><div class="ttname"><a href="classrw__set__baset.html#a2d6fbb6c81f6c054a9b1efe6d3d50886">rw_set_baset::has_w_entry</a></div><div class="ttdeci">bool has_w_entry(irep_idt object) const</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00079">rw_set.h:79</a></div></div>
-<div class="ttc" id="aclassrw__set__baset_html_a312d58d6e58bc9b243809caed82dfcac"><div class="ttname"><a href="classrw__set__baset.html#a312d58d6e58bc9b243809caed82dfcac">rw_set_baset::has_r_entry</a></div><div class="ttdeci">bool has_r_entry(irep_idt object) const</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00084">rw_set.h:84</a></div></div>
-<div class="ttc" id="aclassrw__set__baset_html_abe17842d7b66dd8a8f614963a7eea222"><div class="ttname"><a href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">rw_set_baset::w_entries</a></div><div class="ttdeci">entriest w_entries</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00059">rw_set.h:59</a></div></div>
-<div class="ttc" id="aclassrw__set__functiont_html"><div class="ttname"><a href="classrw__set__functiont.html">rw_set_functiont</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00202">rw_set.h:203</a></div></div>
-<div class="ttc" id="aclassrw__set__loct_html"><div class="ttname"><a href="classrw__set__loct.html">rw_set_loct</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00176">rw_set.h:177</a></div></div>
+<div class="ttc" id="aclassrw__set__baset_html"><div class="ttname"><a href="classrw__set__baset.html">rw_set_baset</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00034">rw_set.h:35</a></div></div>
+<div class="ttc" id="aclassrw__set__baset_html_a1d82a9a4a49f6e57d36dc56a3578a73f"><div class="ttname"><a href="classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f">rw_set_baset::r_entries</a></div><div class="ttdeci">entriest r_entries</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00060">rw_set.h:60</a></div></div>
+<div class="ttc" id="aclassrw__set__baset_html_a2d6fbb6c81f6c054a9b1efe6d3d50886"><div class="ttname"><a href="classrw__set__baset.html#a2d6fbb6c81f6c054a9b1efe6d3d50886">rw_set_baset::has_w_entry</a></div><div class="ttdeci">bool has_w_entry(irep_idt object) const</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00080">rw_set.h:80</a></div></div>
+<div class="ttc" id="aclassrw__set__baset_html_a312d58d6e58bc9b243809caed82dfcac"><div class="ttname"><a href="classrw__set__baset.html#a312d58d6e58bc9b243809caed82dfcac">rw_set_baset::has_r_entry</a></div><div class="ttdeci">bool has_r_entry(irep_idt object) const</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00085">rw_set.h:85</a></div></div>
+<div class="ttc" id="aclassrw__set__baset_html_abe17842d7b66dd8a8f614963a7eea222"><div class="ttname"><a href="classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222">rw_set_baset::w_entries</a></div><div class="ttdeci">entriest w_entries</div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00060">rw_set.h:60</a></div></div>
+<div class="ttc" id="aclassrw__set__functiont_html"><div class="ttname"><a href="classrw__set__functiont.html">rw_set_functiont</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00214">rw_set.h:215</a></div></div>
+<div class="ttc" id="aclassrw__set__loct_html"><div class="ttname"><a href="classrw__set__loct.html">rw_set_loct</a></div><div class="ttdef"><b>Definition:</b> <a href="rw__set_8h_source.html#l00180">rw_set.h:181</a></div></div>
 <div class="ttc" id="aclassside__effect__expr__nondett_html"><div class="ttname"><a href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a></div><div class="ttdoc">A side_effect_exprt that returns a non-deterministically chosen value.</div><div class="ttdef"><b>Definition:</b> <a href="std__code_8h_source.html#l01519">std_code.h:1520</a></div></div>
 <div class="ttc" id="aclasssource__locationt_html"><div class="ttname"><a href="classsource__locationt.html">source_locationt</a></div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00019">source_location.h:20</a></div></div>
 <div class="ttc" id="aclasssymbol__exprt_html"><div class="ttname"><a href="classsymbol__exprt.html">symbol_exprt</a></div><div class="ttdoc">Expression to hold a symbol (variable)</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00112">std_expr.h:113</a></div></div>
@@ -354,7 +356,7 @@ $(document).ready(function(){initNavTree('interrupt_8cpp_source.html',''); initR
 <div class="ttc" id="agoto__program_8h_html_a70232dd124bfcc17855c337bac57477f"><div class="ttname"><a href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a></div><div class="ttdeci">#define Forall_goto_program_instructions(it, program)</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l01233">goto_program.h:1233</a></div></div>
 <div class="ttc" id="ainterrupt_8cpp_html_a0e63478608b92caf2321b5ea4a57c72a"><div class="ttname"><a href="interrupt_8cpp.html#a0e63478608b92caf2321b5ea4a57c72a">potential_race_on_read</a></div><div class="ttdeci">static bool potential_race_on_read(const rw_set_baset &amp;code_rw_set, const rw_set_baset &amp;isr_rw_set)</div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8cpp_source.html#l00027">interrupt.cpp:27</a></div></div>
 <div class="ttc" id="ainterrupt_8cpp_html_a4509e5d4fd04da42d07f98f8f598e5a8"><div class="ttname"><a href="interrupt_8cpp.html#a4509e5d4fd04da42d07f98f8f598e5a8">potential_race_on_write</a></div><div class="ttdeci">static bool potential_race_on_write(const rw_set_baset &amp;code_rw_set, const rw_set_baset &amp;isr_rw_set)</div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8cpp_source.html#l00041">interrupt.cpp:41</a></div></div>
-<div class="ttc" id="ainterrupt_8cpp_html_aa007ceb98b2b4b883267dbee4466c1b3"><div class="ttname"><a href="interrupt_8cpp.html#aa007ceb98b2b4b883267dbee4466c1b3">interrupt</a></div><div class="ttdeci">static void interrupt(value_setst &amp;value_sets, const symbol_tablet &amp;symbol_table, const irep_idt &amp;function_id, goto_programt &amp;goto_program, const symbol_exprt &amp;interrupt_handler, const rw_set_baset &amp;isr_rw_set)</div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8cpp_source.html#l00058">interrupt.cpp:58</a></div></div>
+<div class="ttc" id="ainterrupt_8cpp_html_a4bbfc3fac95d414f279bfd70f1de4c0e"><div class="ttname"><a href="interrupt_8cpp.html#a4bbfc3fac95d414f279bfd70f1de4c0e">interrupt</a></div><div class="ttdeci">static void interrupt(value_setst &amp;value_sets, const symbol_tablet &amp;symbol_table, const irep_idt &amp;function_id, goto_programt &amp;goto_program, const symbol_exprt &amp;interrupt_handler, const rw_set_baset &amp;isr_rw_set, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8cpp_source.html#l00058">interrupt.cpp:58</a></div></div>
 <div class="ttc" id="ainterrupt_8cpp_html_ae6d287cf117f6c30687a5e5c4240e754"><div class="ttname"><a href="interrupt_8cpp.html#ae6d287cf117f6c30687a5e5c4240e754">get_isr</a></div><div class="ttdeci">static symbol_exprt get_isr(const symbol_tablet &amp;symbol_table, const irep_idt &amp;interrupt_handler)</div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8cpp_source.html#l00154">interrupt.cpp:154</a></div></div>
 <div class="ttc" id="ainterrupt_8h_html"><div class="ttname"><a href="interrupt_8h.html">interrupt.h</a></div><div class="ttdoc">Interrupt Instrumentation for Goto Programs.</div></div>
 <div class="ttc" id="airep_8h_html_aec473a7cdee5da3223f587aa2c1c4132"><div class="ttname"><a href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00047">irep.h:47</a></div></div>

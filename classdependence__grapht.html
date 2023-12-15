@@ -152,8 +152,8 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7848c3c36e312ef2261883966b595e86"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdependence__grapht.html#a7848c3c36e312ef2261883966b595e86">dependence_grapht</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;_ns)</td></tr>
-<tr class="separator:a7848c3c36e312ef2261883966b595e86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c5b53544f8bc212a4db5adfb80754a7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdependence__grapht.html#a0c5b53544f8bc212a4db5adfb80754a7">dependence_grapht</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;_ns, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)</td></tr>
+<tr class="separator:a0c5b53544f8bc212a4db5adfb80754a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77a752ac9666258d580af40fcd0b1a95"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdependence__grapht.html#a77a752ac9666258d580af40fcd0b1a95">initialize</a> (const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</td></tr>
 <tr class="memdesc:a77a752ac9666258d580af40fcd0b1a95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize all the abstract states for a whole program.  <a href="classdependence__grapht.html#a77a752ac9666258d580af40fcd0b1a95">More...</a><br /></td></tr>
 <tr class="separator:a77a752ac9666258d580af40fcd0b1a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -440,7 +440,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00213">213</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00218">218</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a706cec4cecc6406d093ea3f186ebda7b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a706cec4cecc6406d093ea3f186ebda7b">&#9670;&nbsp;</a></span>post_dominators_mapt</h2>
@@ -454,36 +454,38 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00221">221</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00226">226</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a7848c3c36e312ef2261883966b595e86"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7848c3c36e312ef2261883966b595e86">&#9670;&nbsp;</a></span>dependence_grapht()</h2>
+<a id="a0c5b53544f8bc212a4db5adfb80754a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c5b53544f8bc212a4db5adfb80754a7">&#9670;&nbsp;</a></span>dependence_grapht()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">dependence_grapht::dependence_grapht </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
-          <td class="paramname"><em>_ns</em></td><td>)</td>
+          <td class="paramname"><em>_ns</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8cpp_source.html#l00362">362</a> of file <a class="el" href="dependence__graph_8cpp_source.html">dependence_graph.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8cpp_source.html#l00366">366</a> of file <a class="el" href="dependence__graph_8cpp_source.html">dependence_graph.cpp</a>.</p>
 
 </div>
 </div>
@@ -520,7 +522,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8cpp_source.html#l00369">369</a> of file <a class="el" href="dependence__graph_8cpp_source.html">dependence_graph.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8cpp_source.html#l00376">376</a> of file <a class="el" href="dependence__graph_8cpp_source.html">dependence_graph.cpp</a>.</p>
 
 </div>
 </div>
@@ -547,7 +549,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00274">274</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00279">279</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -578,7 +580,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classai__baset.html#af2c87f4066db93a82a3af6bb011eb053">ai_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00259">259</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00264">264</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -611,7 +613,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classai__baset.html#a41054b2dfaffab4e78cfe72902a5f261">ai_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00225">225</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00230">230</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -654,7 +656,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classai__baset.html#a7dc441fc77d3f580c311581242a97e3d">ai_baset</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00241">241</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00246">246</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -681,7 +683,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00279">279</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00284">284</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -706,7 +708,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00285">285</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00290">290</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -730,7 +732,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00286">286</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00291">291</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -754,7 +756,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00291">291</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00296">296</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -778,7 +780,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00287">287</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00292">292</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -802,7 +804,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00289">289</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00294">294</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>
@@ -826,7 +828,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00290">290</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dependence__graph_8h_source.html#l00295">295</a> of file <a class="el" href="dependence__graph_8h_source.html">dependence_graph.h</a>.</p>
 
 </div>
 </div>

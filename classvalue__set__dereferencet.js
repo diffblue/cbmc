@@ -1,7 +1,7 @@
 var classvalue__set__dereferencet =
 [
     [ "valuet", "classvalue__set__dereferencet_1_1valuet.html", "classvalue__set__dereferencet_1_1valuet" ],
-    [ "value_set_dereferencet", "classvalue__set__dereferencet.html#a20f2892cc0fb57ed54348a1375cc65a6", null ],
+    [ "value_set_dereferencet", "classvalue__set__dereferencet.html#a531bf86b47f4e6b706602e4d5fd5e8e4", null ],
     [ "~value_set_dereferencet", "classvalue__set__dereferencet.html#a619499924a8c883be8b02a7f9422997a", null ],
     [ "build_reference_to", "classvalue__set__dereferencet.html#ac3f674c9b87633b27f2d6388c6679f8f", null ],
     [ "dereference", "classvalue__set__dereferencet.html#aa1b74cf1877d611aac52a357afb881ca", null ],
@@ -14,7 +14,7 @@ var classvalue__set__dereferencet =
     [ "dereference_callback", "classvalue__set__dereferencet.html#a8a9f4d92aa0adac0fec7704d766b9d2f", null ],
     [ "exclude_null_derefs", "classvalue__set__dereferencet.html#a261f7ea0a71f3efbb3762fbb0f1b8b05", null ],
     [ "language_mode", "classvalue__set__dereferencet.html#aa9ac68328b327df86d02fcde8c901790", null ],
-    [ "log", "classvalue__set__dereferencet.html#a0df3d64b0b95eb9a60df27c937b19b18", null ],
+    [ "message_handler", "classvalue__set__dereferencet.html#a85d98f6c27b67491c0a731e204727d12", null ],
     [ "new_symbol_table", "classvalue__set__dereferencet.html#a399d7373670372bddac9395cf37e7d93", null ],
     [ "ns", "classvalue__set__dereferencet.html#af33894f1278dbb0a60a1d793bd01e832", null ]
 ];

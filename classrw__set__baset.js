@@ -2,7 +2,7 @@ var classrw__set__baset =
 [
     [ "entryt", "structrw__set__baset_1_1entryt.html", "structrw__set__baset_1_1entryt" ],
     [ "entriest", "classrw__set__baset.html#a96ca77aacd5e945e480586ef53eee3e7", null ],
-    [ "rw_set_baset", "classrw__set__baset.html#a8ff02b03363a9fac3469fa6e11cc9d50", null ],
+    [ "rw_set_baset", "classrw__set__baset.html#a9afbc19f6a41d00710fad47810d6fd5d", null ],
     [ "~rw_set_baset", "classrw__set__baset.html#af36e846fec3c381959f4df978922d7f6", null ],
     [ "empty", "classrw__set__baset.html#a414392c009609c9629cfcc29bf15d7c8", null ],
     [ "has_r_entry", "classrw__set__baset.html#a312d58d6e58bc9b243809caed82dfcac", null ],
@@ -13,6 +13,7 @@ var classrw__set__baset =
     [ "set_track_deref", "classrw__set__baset.html#aeb25279168a4141a24e4375d00133497", null ],
     [ "swap", "classrw__set__baset.html#aa961317e08be72b3c9167392a4cbc9b5", null ],
     [ "track_deref", "classrw__set__baset.html#a66cb22deed5dc725365900bcd8c4a4c1", null ],
+    [ "message_handler", "classrw__set__baset.html#aeef13106a0ab99d2f77b1825788a29e1", null ],
     [ "ns", "classrw__set__baset.html#ae8e787202c99eb6379469f3082dbecbd", null ],
     [ "r_entries", "classrw__set__baset.html#a1d82a9a4a49f6e57d36dc56a3578a73f", null ],
     [ "w_entries", "classrw__set__baset.html#abe17842d7b66dd8a8f614963a7eea222", null ]

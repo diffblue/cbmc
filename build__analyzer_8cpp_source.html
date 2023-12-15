@@ -215,7 +215,7 @@ $(document).ready(function(){initNavTree('build__analyzer_8cpp_source.html','');
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(options.<a class="code" href="classoptionst.html#a6fcce35026ee271847c3622218a3a2b1">get_bool_option</a>(<span class="stringliteral">&quot;dependence-graph&quot;</span>))</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    {</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="keywordflow">return</span> std::make_unique&lt;dependence_grapht&gt;(ns);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="keywordflow">return</span> std::make_unique&lt;dependence_grapht&gt;(ns, mh);</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(options.<a class="code" href="classoptionst.html#a6fcce35026ee271847c3622218a3a2b1">get_bool_option</a>(<span class="stringliteral">&quot;dependence-graph-vs&quot;</span>))</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    {</div>

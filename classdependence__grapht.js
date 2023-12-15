@@ -1,7 +1,7 @@
 var classdependence__grapht =
 [
     [ "post_dominators_mapt", "classdependence__grapht.html#a706cec4cecc6406d093ea3f186ebda7b", null ],
-    [ "dependence_grapht", "classdependence__grapht.html#a7848c3c36e312ef2261883966b595e86", null ],
+    [ "dependence_grapht", "classdependence__grapht.html#a0c5b53544f8bc212a4db5adfb80754a7", null ],
     [ "add_dep", "classdependence__grapht.html#a008b6240c071b4b8a734554370f81764", null ],
     [ "cfg_post_dominators", "classdependence__grapht.html#a4edca8a8034122d985e54ab13f606aae", null ],
     [ "finalize", "classdependence__grapht.html#a8232e49e9d7cea4de9f6d48e8a39017d", null ],

@@ -6,7 +6,7 @@ var classrw__range__sett =
       [ "READ", "classrw__range__sett.html#af5b2ab26cb3228b6ac30086cfea9866ba3466fab4975481651940ed328aa990e4", null ]
     ] ],
     [ "~rw_range_sett", "classrw__range__sett.html#a2bc02d75998a4d440dad775d25d24e1e", null ],
-    [ "rw_range_sett", "classrw__range__sett.html#a60aed5c31b4e588b86ff373ebc8d4eb2", null ],
+    [ "rw_range_sett", "classrw__range__sett.html#a884057483710fd14b00dca3adb677010", null ],
     [ "add", "classrw__range__sett.html#ae1b0741fd3cc43974b5b80332a43ee7c", null ],
     [ "get_array_objects", "classrw__range__sett.html#a8eef0150dfd36cb0746c0c0a9259d375", null ],
     [ "get_objects_address_of", "classrw__range__sett.html#a8601d1a34ff64748a557ce904f8d7b4b", null ],
@@ -30,6 +30,7 @@ var classrw__range__sett =
     [ "get_ranges", "classrw__range__sett.html#aa78b7d2a6f52ccc060df46b29c7a5d6f", null ],
     [ "get_w_set", "classrw__range__sett.html#adfebc2b8f8221b9c6354326a40d6730b", null ],
     [ "output", "classrw__range__sett.html#a02112b39145ba7a35d191f2495761337", null ],
+    [ "message_handler", "classrw__range__sett.html#a2a3efa69beb1ec4254e1e656d12f185b", null ],
     [ "ns", "classrw__range__sett.html#adeeb0f52b7a6f9674c010445d3bea094", null ],
     [ "r_range_set", "classrw__range__sett.html#a0458b4796a2a6f0d58cb56ec44457f73", null ],
     [ "w_range_set", "classrw__range__sett.html#a8cb6b40c47488bf8813efcfbb9ea09bf", null ]

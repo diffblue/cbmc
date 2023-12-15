@@ -109,18 +109,21 @@ $(document).ready(function(){initNavTree('interrupt_8h_source.html',''); initRes
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="irep_8h.html">util/irep.h</a>&gt;</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">class </span><a class="code" href="classgoto__modelt.html">goto_modelt</a>;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">class </span><a class="code" href="classvalue__setst.html">value_setst</a>;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keywordtype">void</span> <a class="code" href="interrupt_8h.html#aead3dc8717fce244e693544941f257f3">interrupt</a>(</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <a class="code" href="classvalue__setst.html">value_setst</a> &amp;,</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;,</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;interrupt_handler);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_INTERRUPT_H</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">class </span><a class="code" href="classmessage__handlert.html">message_handlert</a>;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">class </span><a class="code" href="classvalue__setst.html">value_setst</a>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keywordtype">void</span> <a class="code" href="interrupt_8h.html#a5f19824dbdf7d9238defa62db9aad044">interrupt</a>(</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="classvalue__setst.html">value_setst</a> &amp;,</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;,</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;interrupt_handler,</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_GOTO_INSTRUMENT_INTERRUPT_H</span></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>
+<div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:28</a></div></div>
 <div class="ttc" id="aclassvalue__setst_html"><div class="ttname"><a href="classvalue__setst.html">value_setst</a></div><div class="ttdef"><b>Definition:</b> <a href="value__sets_8h_source.html#l00021">value_sets.h:22</a></div></div>
-<div class="ttc" id="ainterrupt_8h_html_aead3dc8717fce244e693544941f257f3"><div class="ttname"><a href="interrupt_8h.html#aead3dc8717fce244e693544941f257f3">interrupt</a></div><div class="ttdeci">void interrupt(value_setst &amp;, goto_modelt &amp;, const irep_idt &amp;interrupt_handler)</div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8cpp_source.html#l00188">interrupt.cpp:188</a></div></div>
+<div class="ttc" id="ainterrupt_8h_html_a5f19824dbdf7d9238defa62db9aad044"><div class="ttname"><a href="interrupt_8h.html#a5f19824dbdf7d9238defa62db9aad044">interrupt</a></div><div class="ttdeci">void interrupt(value_setst &amp;, goto_modelt &amp;, const irep_idt &amp;interrupt_handler, message_handlert &amp;)</div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8cpp_source.html#l00188">interrupt.cpp:188</a></div></div>
 <div class="ttc" id="airep_8h_html"><div class="ttname"><a href="irep_8h.html">irep.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
