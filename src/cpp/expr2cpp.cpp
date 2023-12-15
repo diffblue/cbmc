@@ -96,7 +96,10 @@ std::string expr2cppt::convert_struct(
 
       dest+=sep;
       dest+='.';
-      dest += c.get_string(ID_pretty_name);
+      if(!c.get_pretty_name().empty())
+        dest += id2string(c.get_pretty_name());
+      else
+        dest += id2string(c.get_name());
       dest+='=';
       dest+=tmp;
     }
