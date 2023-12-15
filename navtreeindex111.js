@@ -1,6 +1,5 @@
 var NAVTREEINDEX111 =
 {
-"letify_8cpp.html":[9,0,2,28,8,0],
 "letify_8cpp_source.html":[9,0,2,28,8,0],
 "letify_8h.html":[9,0,2,28,8,1],
 "letify_8h_source.html":[9,0,2,28,8,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX111 =
 "math_8c.html#a40c164fa2b2bf09a2ec154c97be511cc":[9,0,2,1,1,17,3],
 "math_8c.html#a42a74194e2694f23ed669b77834c5bd4":[9,0,2,1,1,17,47],
 "math_8c.html#a42c2329ef247d4bc7a19ea7a72a7bc30":[9,0,2,1,1,17,25],
-"math_8c.html#a43418ed4932726a6070da8a9b55090cc":[9,0,2,1,1,17,95]
+"math_8c.html#a43418ed4932726a6070da8a9b55090cc":[9,0,2,1,1,17,95],
+"math_8c.html#a44f1309085cc0f577103681994bcda36":[9,0,2,1,1,17,55]
 };

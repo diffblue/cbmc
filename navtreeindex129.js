@@ -1,6 +1,5 @@
 var NAVTREEINDEX129 =
 {
-"string__refinement__util_8h_source.html":[9,0,2,28,10,34],
 "string__utils_8cpp.html":[9,0,2,31,228],
 "string__utils_8cpp.html#a198f5e81e9785b00fbee69a541ddcace":[9,0,2,31,228,3],
 "string__utils_8cpp.html#a4a862fd50d31fb2b660b683899596c36":[9,0,2,31,228,4],
@@ -249,5 +248,6 @@ var NAVTREEINDEX129 =
 "structbv__pointerst_1_1postponedt.html":[8,0,137,0],
 "structbv__pointerst_1_1postponedt.html#a19ebd650f5e5c0f25fab61e0ccb1afb7":[8,0,137,0,2],
 "structbv__pointerst_1_1postponedt.html#a7b2ac377a210b82af83ffa0671292699":[8,0,137,0,3],
-"structbv__pointerst_1_1postponedt.html#ac38d063c2c0604a24b14e8d2d7cf66e7":[8,0,137,0,1]
+"structbv__pointerst_1_1postponedt.html#ac38d063c2c0604a24b14e8d2d7cf66e7":[8,0,137,0,1],
+"structbv__pointerst_1_1postponedt.html#ae2ffeee7846753ed6b3a60fcb36001b4":[8,0,137,0,0]
 };

@@ -1,6 +1,5 @@
 var NAVTREEINDEX118 =
 {
-"polynomial_8h_source.html":[9,0,2,15,0,19],
 "polynomial__accelerator_8cpp.html":[9,0,2,15,0,20],
 "polynomial__accelerator_8cpp_source.html":[9,0,2,15,0,20],
 "polynomial__accelerator_8h.html":[9,0,2,15,0,21],
@@ -249,5 +248,6 @@ var NAVTREEINDEX118 =
 "rational_8h.html#ad4dcec4b2c62c5e6a59c5fa78583d59c":[9,0,2,31,170,7],
 "rational_8h.html#ae2844c83be4b2d6e6d81641cb3fba4f5":[9,0,2,31,170,4],
 "rational_8h_source.html":[9,0,2,31,170],
-"rational__tools_8cpp.html":[9,0,2,31,171]
+"rational__tools_8cpp.html":[9,0,2,31,171],
+"rational__tools_8cpp.html#a10b9600f02c74893475b545b67f403d6":[9,0,2,31,171,2]
 };
