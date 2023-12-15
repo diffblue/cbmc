@@ -104,13 +104,13 @@ $(document).ready(function(){initNavTree('parser_8h_source.html',''); initResiza
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#ifndef CPROVER_UTIL_PARSER_H</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#define CPROVER_UTIL_PARSER_H</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;iosfwd&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="expr_8h.html">expr.h</a>&quot;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="unit_2testing-utils_2message_8h.html">message.h</a>&quot;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="file__util_8h.html">file_util.h</a>&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="expr_8h.html">expr.h</a>&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="unit_2testing-utils_2message_8h.html">message.h</a>&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;filesystem&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;iosfwd&gt;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
 <div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classparsert.html">   23</a></span>&#160;<span class="keyword">class </span><a class="code" href="classparsert.html">parsert</a></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
@@ -178,7 +178,7 @@ $(document).ready(function(){initNavTree('parser_8h_source.html',''); initResiza
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  {</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="classparsert.html#a28bc578d212eb0c5adbb2e7b3887e1dd">source_location</a>.<a class="code" href="classsource__locationt.html#aeac5d6e9903cb150b7688a2ea5a84421">set_file</a>(file);</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="classparsert.html#a28bc578d212eb0c5adbb2e7b3887e1dd">source_location</a>.<a class="code" href="classsource__locationt.html#a374d0d358d77febcbd041fcbfdf35569">set_working_directory</a>(</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <a class="code" href="file__util_8cpp.html#a77ba97d34f2a175d3e0b3073c19f7ac9">get_current_working_directory</a>());</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      std::filesystem::current_path().<span class="keywordtype">string</span>());</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  }</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
 <div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="classparsert.html#ad173848c309df5e6d22325072f5ef3c0">   92</a></span>&#160;  <a class="code" href="classdstringt.html">irep_idt</a> <a class="code" href="classparsert.html#ad173848c309df5e6d22325072f5ef3c0">get_file</a>()<span class="keyword"> const</span></div>
@@ -311,8 +311,6 @@ $(document).ready(function(){initNavTree('parser_8h_source.html',''); initResiza
 <div class="ttc" id="aclasssource__locationt_html_aeb4caa8fd6855cfc473b4e9d01c0ea09"><div class="ttname"><a href="classsource__locationt.html#aeb4caa8fd6855cfc473b4e9d01c0ea09">source_locationt::set_line</a></div><div class="ttdeci">void set_line(const irep_idt &amp;line)</div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00109">source_location.h:109</a></div></div>
 <div class="ttc" id="aclasssource__locationt_html_affd0be5e28a571c5cbbd9d91ae4ba0eb"><div class="ttname"><a href="classsource__locationt.html#affd0be5e28a571c5cbbd9d91ae4ba0eb">source_locationt::set_function</a></div><div class="ttdeci">void set_function(const irep_idt &amp;function)</div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00130">source_location.h:130</a></div></div>
 <div class="ttc" id="aexpr_8h_html"><div class="ttname"><a href="expr_8h.html">expr.h</a></div></div>
-<div class="ttc" id="afile__util_8cpp_html_a77ba97d34f2a175d3e0b3073c19f7ac9"><div class="ttname"><a href="file__util_8cpp.html#a77ba97d34f2a175d3e0b3073c19f7ac9">get_current_working_directory</a></div><div class="ttdeci">std::string get_current_working_directory()</div><div class="ttdef"><b>Definition:</b> <a href="file__util_8cpp_source.html#l00051">file_util.cpp:51</a></div></div>
-<div class="ttc" id="afile__util_8h_html"><div class="ttname"><a href="file__util_8h.html">file_util.h</a></div></div>
 <div class="ttc" id="aparser_8h_html_a5bb666c6222814ac13c43acbf290380c"><div class="ttname"><a href="parser_8h.html#a5bb666c6222814ac13c43acbf290380c">_newstack</a></div><div class="ttdeci">exprt &amp; _newstack(parsert &amp;parser, unsigned &amp;x)</div><div class="ttdef"><b>Definition:</b> <a href="parser_8cpp_source.html#l00019">parser.cpp:19</a></div></div>
 <div class="ttc" id="aunit_2testing-utils_2message_8h_html"><div class="ttname"><a href="unit_2testing-utils_2message_8h.html">message.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->

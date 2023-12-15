@@ -87,8 +87,6 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
     [ "expr_iterator.h", "expr__iterator_8h.html", "expr__iterator_8h" ],
     [ "expr_util.cpp", "expr__util_8cpp.html", "expr__util_8cpp" ],
     [ "expr_util.h", "expr__util_8h.html", "expr__util_8h" ],
-    [ "file_util.cpp", "file__util_8cpp.html", "file__util_8cpp" ],
-    [ "file_util.h", "file__util_8h.html", "file__util_8h" ],
     [ "find_macros.cpp", "find__macros_8cpp.html", "find__macros_8cpp" ],
     [ "find_macros.h", "find__macros_8h.html", "find__macros_8h" ],
     [ "find_symbols.cpp", "find__symbols_8cpp.html", "find__symbols_8cpp" ],

@@ -113,16 +113,16 @@ $(document).ready(function(){initNavTree('as__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="cmdline_8h.html">util/cmdline.h</a>&gt;</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="config_8h.html">util/config.h</a>&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="file__util_8h.html">util/file_util.h</a>&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="get__base__name_8h.html">util/get_base_name.h</a>&gt;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="run_8h.html">util/run.h</a>&gt;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="tempdir_8h.html">util/tempdir.h</a>&gt;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="version_8h.html">util/version.h</a>&gt;</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="compile_8h.html">compile.h</a>&quot;</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__cc__cmdline_8h.html">goto_cc_cmdline.h</a>&quot;</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="hybrid__binary_8h.html">hybrid_binary.h</a>&quot;</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="get__base__name_8h.html">util/get_base_name.h</a>&gt;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="run_8h.html">util/run.h</a>&gt;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="tempdir_8h.html">util/tempdir.h</a>&gt;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="version_8h.html">util/version.h</a>&gt;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="compile_8h.html">compile.h</a>&quot;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__cc__cmdline_8h.html">goto_cc_cmdline.h</a>&quot;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="hybrid__binary_8h.html">hybrid_binary.h</a>&quot;</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;filesystem&gt;</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &lt;fstream&gt;</span> <span class="comment">// IWYU pragma: keep</span></div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
@@ -393,11 +393,11 @@ $(document).ready(function(){initNavTree('as__mode_8cpp_source.html',''); initRe
 <div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  std::string saved = output_file + <span class="stringliteral">&quot;.goto-cc-saved&quot;</span>;</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <span class="keywordflow">try</span></div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  {</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <a class="code" href="file__util_8cpp.html#ae98be146fa53a35c4c19fe72649806ae">file_rename</a>(output_file, saved);</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    std::filesystem::rename(output_file, saved);</div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classcprover__exception__baset.html">cprover_exception_baset</a> &amp;e)</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::filesystem::filesystem_error &amp;e)</div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  {</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; e.<a class="code" href="classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca">what</a>() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; e.what() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  }</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
@@ -448,8 +448,6 @@ $(document).ready(function(){initNavTree('as__mode_8cpp_source.html',''); initRe
 <div class="ttc" id="aclassconfigt_html_abf0ff23ebf6e57c98ba4e09841ca33ea"><div class="ttname"><a href="classconfigt.html#abf0ff23ebf6e57c98ba4e09841ca33ea">configt::this_architecture</a></div><div class="ttdeci">static irep_idt this_architecture()</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l01351">config.cpp:1351</a></div></div>
 <div class="ttc" id="aclassconfigt_html_af9a6fec588d1a19fe5e72a56fd2e77de"><div class="ttname"><a href="classconfigt.html#af9a6fec588d1a19fe5e72a56fd2e77de">configt::this_operating_system</a></div><div class="ttdeci">static irep_idt this_operating_system()</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l01451">config.cpp:1451</a></div></div>
 <div class="ttc" id="aclassconfigt_html_afea36d271997788d5fae9e5baefd358b"><div class="ttname"><a href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">configt::ansi_c</a></div><div class="ttdeci">struct configt::ansi_ct ansi_c</div></div>
-<div class="ttc" id="aclasscprover__exception__baset_html"><div class="ttname"><a href="classcprover__exception__baset.html">cprover_exception_baset</a></div><div class="ttdoc">Base class for exceptions thrown in the cprover project.</div><div class="ttdef"><b>Definition:</b> <a href="c__errors_8h_source.html#l00063">c_errors.h:64</a></div></div>
-<div class="ttc" id="aclasscprover__exception__baset_html_adfa34194a22e105cf3ee5af8340da3ca"><div class="ttname"><a href="classcprover__exception__baset.html#adfa34194a22e105cf3ee5af8340da3ca">cprover_exception_baset::what</a></div><div class="ttdeci">virtual std::string what() const</div><div class="ttdoc">A human readable description of what went wrong.</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8cpp_source.html#l00012">exception_utils.cpp:12</a></div></div>
 <div class="ttc" id="aclassgoto__cc__cmdlinet_html"><div class="ttname"><a href="classgoto__cc__cmdlinet.html">goto_cc_cmdlinet</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__cmdline_8h_source.html#l00019">goto_cc_cmdline.h:20</a></div></div>
 <div class="ttc" id="aclassgoto__cc__cmdlinet_html_a437638b99fbd23fb6a23d84dc561c20a"><div class="ttname"><a href="classgoto__cc__cmdlinet.html#a437638b99fbd23fb6a23d84dc561c20a">goto_cc_cmdlinet::parsed_argv</a></div><div class="ttdeci">parsed_argvt parsed_argv</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__cmdline_8h_source.html#l00064">goto_cc_cmdline.h:64</a></div></div>
 <div class="ttc" id="aclassgoto__cc__cmdlinet_html_a5d44a30bebc5fb0f94d726cceb8de7f1"><div class="ttname"><a href="classgoto__cc__cmdlinet.html#a5d44a30bebc5fb0f94d726cceb8de7f1">goto_cc_cmdlinet::stdin_file</a></div><div class="ttdeci">std::string stdin_file</div><div class="ttdef"><b>Definition:</b> <a href="goto__cc__cmdline_8h_source.html#l00068">goto_cc_cmdline.h:68</a></div></div>
@@ -466,8 +464,6 @@ $(document).ready(function(){initNavTree('as__mode_8cpp_source.html',''); initRe
 <div class="ttc" id="acmdline_8h_html"><div class="ttname"><a href="cmdline_8h.html">cmdline.h</a></div></div>
 <div class="ttc" id="acompile_8h_html"><div class="ttname"><a href="compile_8h.html">compile.h</a></div><div class="ttdoc">Compile and link source and object files.</div></div>
 <div class="ttc" id="aconfig_8h_html"><div class="ttname"><a href="config_8h.html">config.h</a></div></div>
-<div class="ttc" id="afile__util_8cpp_html_ae98be146fa53a35c4c19fe72649806ae"><div class="ttname"><a href="file__util_8cpp.html#ae98be146fa53a35c4c19fe72649806ae">file_rename</a></div><div class="ttdeci">void file_rename(const std::string &amp;old_path, const std::string &amp;new_path)</div><div class="ttdoc">Rename a file.</div><div class="ttdef"><b>Definition:</b> <a href="file__util_8cpp_source.html#l00240">file_util.cpp:240</a></div></div>
-<div class="ttc" id="afile__util_8h_html"><div class="ttname"><a href="file__util_8h.html">file_util.h</a></div></div>
 <div class="ttc" id="aget__base__name_8cpp_html_aa4748fd30b535821cd99aecf509a8f33"><div class="ttname"><a href="get__base__name_8cpp.html#aa4748fd30b535821cd99aecf509a8f33">get_base_name</a></div><div class="ttdeci">std::string get_base_name(const std::string &amp;in, bool strip_suffix)</div><div class="ttdoc">cleans a filename from path and extension</div><div class="ttdef"><b>Definition:</b> <a href="get__base__name_8cpp_source.html#l00016">get_base_name.cpp:16</a></div></div>
 <div class="ttc" id="aget__base__name_8h_html"><div class="ttname"><a href="get__base__name_8h.html">get_base_name.h</a></div></div>
 <div class="ttc" id="agoto__cc__cmdline_8h_html"><div class="ttname"><a href="goto__cc__cmdline_8h.html">goto_cc_cmdline.h</a></div><div class="ttdoc">Command line interpretation for goto-cc.</div></div>
