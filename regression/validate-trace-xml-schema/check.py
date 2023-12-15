@@ -133,7 +133,7 @@ class Validator:
                 self.check_trace(test_desc_path, trace_file)
 
     def read_trace_into(self, trace_file, args):
-        subprocess.run([CbmcPath, '--no-standard-checks', '--trace', '--xml-ui'] + args,
+        subprocess.run([CbmcPath, '--trace', '--xml-ui'] + args,
                        stdout=trace_file)
 
     def check_trace(self, test_desc_path, trace_file):
