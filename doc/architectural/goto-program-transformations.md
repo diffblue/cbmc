@@ -310,6 +310,7 @@ line options. The reachability slicer is enabled by the `--reachability-slice`
 command line option. The implementation of this pass is called via the \ref
 reachability_slicer(goto_modelt &, message_handlert &) function. The full slicer
 is enabled by the `--full-slice` command line option. The implementation of this
-pass is called via the \ref full_slicer(goto_modelt &) function.
+pass is called via the \ref full_slicer(goto_modelt &, message_handlert &)
+function.
 
 <em>Predecessor pass is \ref properties-transform .</em>

@@ -28,7 +28,8 @@ static void mmio(
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
-  goto_programt &goto_program)
+  goto_programt &goto_program,
+  message_handlert &message_handler)
 {
   namespacet ns(symbol_table);
 
@@ -46,12 +47,11 @@ static void mmio(
         ns,
         value_sets,
         function_id,
-        i_it
+        i_it,
 #ifdef LOCAL_MAY
-        ,
-        local_may
+        local_may,
 #endif
-      ); // NOLINT(whitespace/parens)
+        message_handler); // NOLINT(whitespace/parens)
 
       if(rw_set.empty())
         continue;
@@ -158,7 +158,8 @@ static void mmio(
 
 void mmio(
   value_setst &value_sets,
-  goto_modelt &goto_model)
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
   // now instrument
 
@@ -175,7 +176,8 @@ void mmio(
 #ifdef LOCAL_MAY
         gf_entry.second,
 #endif
-        gf_entry.second.body);
+        gf_entry.second.body,
+        message_handler);
     }
   }
 

@@ -41,7 +41,8 @@ public:
   void operator()(
     goto_functionst &goto_functions,
     const namespacet &ns,
-    const slicing_criteriont &criterion);
+    const slicing_criteriont &criterion,
+    message_handlert &message_handler);
 
 protected:
   struct cfg_nodet

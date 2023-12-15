@@ -329,7 +329,7 @@ void goto_symext::dereference_rec(
       symex_dereference_state,
       language_mode,
       expr_is_not_null,
-      log);
+      log.get_message_handler());
 
     // std::cout << "**** " << format(tmp1) << '\n';
     exprt tmp2 =

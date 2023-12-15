@@ -26,6 +26,7 @@ Date: February 2006
 #include <analyses/local_may_alias.h>
 #endif
 
+class message_handlert;
 class value_setst;
 
 // a container for read/write sets
@@ -33,8 +34,8 @@ class value_setst;
 class rw_set_baset
 {
 public:
-  explicit rw_set_baset(const namespacet &_ns)
-    :ns(_ns)
+  rw_set_baset(const namespacet &_ns, message_handlert &message_handler)
+    : ns(_ns), message_handler(message_handler)
   {
   }
 
@@ -97,6 +98,7 @@ protected:
   virtual void reset_track_deref() {}
 
   const namespacet &ns;
+  message_handlert &message_handler;
 };
 
 inline std::ostream &operator<<(
@@ -117,8 +119,9 @@ public:
     value_setst &_value_sets,
     const irep_idt &_function_id,
     goto_programt::const_targett _target,
-    local_may_aliast &may)
-    : rw_set_baset(_ns),
+    local_may_aliast &may,
+    message_handlert &message_handler)
+    : rw_set_baset(_ns, message_handler),
       value_sets(_value_sets),
       function_id(_function_id),
       target(_target),
@@ -128,8 +131,9 @@ public:
     const namespacet &_ns,
     value_setst &_value_sets,
     const irep_idt &_function_id,
-    goto_programt::const_targett _target)
-    : rw_set_baset(_ns),
+    goto_programt::const_targett _target,
+    message_handlert &message_handler)
+    : rw_set_baset(_ns, message_handler),
       value_sets(_value_sets),
       function_id(_function_id),
       target(_target)
@@ -182,15 +186,23 @@ public:
     value_setst &_value_sets,
     const irep_idt &_function_id,
     goto_programt::const_targett _target,
-    local_may_aliast &may)
-    : _rw_set_loct(_ns, _value_sets, _function_id, _target, may)
+    local_may_aliast &may,
+    message_handlert &message_handler)
+    : _rw_set_loct(
+        _ns,
+        _value_sets,
+        _function_id,
+        _target,
+        may,
+        message_handler)
 #else
   rw_set_loct(
     const namespacet &_ns,
     value_setst &_value_sets,
     const irep_idt &_function_id,
-    goto_programt::const_targett _target)
-    : _rw_set_loct(_ns, _value_sets, _function_id, _target)
+    goto_programt::const_targett _target,
+    message_handlert &message_handler)
+    : _rw_set_loct(_ns, _value_sets, _function_id, _target, message_handler)
 #endif
   {
     compute();
@@ -205,11 +217,12 @@ public:
   rw_set_functiont(
     value_setst &_value_sets,
     const goto_modelt &_goto_model,
-    const exprt &function):
-    rw_set_baset(ns),
-    ns(_goto_model.symbol_table),
-    value_sets(_value_sets),
-    goto_functions(_goto_model.goto_functions)
+    const exprt &function,
+    message_handlert &message_handler)
+    : rw_set_baset(ns, message_handler),
+      ns(_goto_model.symbol_table),
+      value_sets(_value_sets),
+      goto_functions(_goto_model.goto_functions)
   {
     compute_rec(function);
   }
@@ -243,16 +256,24 @@ public:
     value_setst &_value_sets,
     const irep_idt &_function_id,
     goto_programt::const_targett _target,
-    local_may_aliast &may)
-    : _rw_set_loct(_ns, _value_sets, _function_id, _target, may),
+    local_may_aliast &may,
+    message_handlert &message_handler)
+    : _rw_set_loct(
+        _ns,
+        _value_sets,
+        _function_id,
+        _target,
+        may,
+        message_handler),
       dereferencing(false)
 #else
   rw_set_with_trackt(
     const namespacet &_ns,
     value_setst &_value_sets,
     const irep_idt &_function_id,
-    goto_programt::const_targett _target)
-    : _rw_set_loct(_ns, _value_sets, _function_id, _target),
+    goto_programt::const_targett _target,
+    message_handlert &message_handler)
+    : _rw_set_loct(_ns, _value_sets, _function_id, _target, message_handler),
       dereferencing(false)
 #endif
   {

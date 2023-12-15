@@ -16,21 +16,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class goto_functionst;
 class goto_modelt;
+class message_handlert;
 
-void full_slicer(
-  goto_functionst &,
-  const namespacet &);
+void full_slicer(goto_functionst &, const namespacet &, message_handlert &);
 
-void full_slicer(goto_modelt &);
+void full_slicer(goto_modelt &, message_handlert &);
 
 void property_slicer(
   goto_functionst &,
   const namespacet &,
-  const std::list<std::string> &properties);
+  const std::list<std::string> &properties,
+  message_handlert &);
 
 void property_slicer(
   goto_modelt &,
-  const std::list<std::string> &properties);
+  const std::list<std::string> &properties,
+  message_handlert &);
 
 class slicing_criteriont
 {
@@ -44,6 +45,7 @@ public:
 void full_slicer(
   goto_functionst &goto_functions,
   const namespacet &ns,
-  const slicing_criteriont &criterion);
+  const slicing_criteriont &criterion,
+  message_handlert &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_FULL_SLICER_H

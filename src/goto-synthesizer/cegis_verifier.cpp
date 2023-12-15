@@ -178,7 +178,7 @@ std::list<loop_idt> cegis_verifiert::get_cause_loop_id(
   std::list<loop_idt> result;
 
   // build the dependence graph
-  dependence_grapht dependence_graph(ns);
+  dependence_grapht dependence_graph(ns, log.get_message_handler());
   dependence_graph(goto_model);
 
   // Checking if `to` is dependent on `from`.

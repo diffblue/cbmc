@@ -897,9 +897,10 @@ bool jbmc_parse_optionst::process_goto_functions(
                   << messaget::eom;
     log.status() << "Performing a full slice" << messaget::eom;
     if(cmdline.isset("property"))
-      property_slicer(goto_model, cmdline.get_values("property"));
+      property_slicer(
+        goto_model, cmdline.get_values("property"), ui_message_handler);
     else
-      full_slicer(goto_model);
+      full_slicer(goto_model, ui_message_handler);
   }
 
   // remove any skips introduced

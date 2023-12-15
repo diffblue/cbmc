@@ -282,6 +282,7 @@ exprt value_set_dereferencet::handle_dereference_base_case(
 
   if(display_points_to_sets)
   {
+    messaget log{message_handler};
     log.status() << value_set_dereference_stats_to_json(
       pointer, points_to_set, retained_values, result_value);
   }

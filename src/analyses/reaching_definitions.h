@@ -159,8 +159,12 @@ class rd_range_domaint:public ai_domain_baset
 {
 public:
   rd_range_domaint(
-    sparse_bitvector_analysist<reaching_definitiont> *_bv_container)
-    : ai_domain_baset(), has_values(false), bv_container(_bv_container)
+    sparse_bitvector_analysist<reaching_definitiont> *_bv_container,
+    message_handlert &message_handler)
+    : ai_domain_baset(),
+      has_values(false),
+      bv_container(_bv_container),
+      message_handler(message_handler)
   {
     PRECONDITION(bv_container != nullptr);
   }
@@ -346,6 +350,8 @@ private:
   bool merge_inner(
     values_innert &dest,
     const values_innert &other);
+
+  message_handlert &message_handler;
 };
 
 class reaching_definitions_analysist:
@@ -354,7 +360,7 @@ class reaching_definitions_analysist:
 {
 public:
   // constructor
-  explicit reaching_definitions_analysist(const namespacet &_ns);
+  reaching_definitions_analysist(const namespacet &_ns, message_handlert &);
 
   virtual ~reaching_definitions_analysist();
 

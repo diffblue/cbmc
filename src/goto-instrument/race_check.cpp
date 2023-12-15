@@ -164,7 +164,8 @@ static void race_check(
   const irep_idt &function_id,
   L_M_ARG(const goto_functionst::goto_functiont &goto_function)
   goto_programt &goto_program,
-  w_guardst &w_guards)
+  w_guardst &w_guards,
+  message_handlert &message_handler)
 // clang-format on
 {
   namespacet ns(symbol_table);
@@ -180,7 +181,11 @@ static void race_check(
     if(instruction.is_assign())
     {
       rw_set_loct rw_set(
-        ns, value_sets, function_id, i_it L_M_LAST_ARG(local_may));
+        ns,
+        value_sets,
+        function_id,
+        i_it L_M_LAST_ARG(local_may),
+        message_handler);
 
       if(!has_shared_entries(ns, rw_set))
         continue;
@@ -269,7 +274,8 @@ void race_check(
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
-  goto_programt &goto_program)
+  goto_programt &goto_program,
+  message_handlert &message_handler)
 {
   w_guardst w_guards(symbol_table);
 
@@ -278,7 +284,8 @@ void race_check(
     symbol_table,
     function_id,
     L_M_ARG(goto_function) goto_program,
-    w_guards);
+    w_guards,
+    message_handler);
 
   w_guards.add_initialization(goto_program);
   goto_program.update();
@@ -286,7 +293,8 @@ void race_check(
 
 void race_check(
   value_setst &value_sets,
-  goto_modelt &goto_model)
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
   w_guardst w_guards(goto_model.symbol_table);
 
@@ -301,7 +309,8 @@ void race_check(
         goto_model.symbol_table,
         gf_entry.first,
         L_M_ARG(gf_entry.second) gf_entry.second.body,
-        w_guards);
+        w_guards,
+        message_handler);
     }
   }
 

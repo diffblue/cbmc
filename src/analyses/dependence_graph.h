@@ -68,8 +68,11 @@ class dep_graph_domaint:public ai_domain_baset
 public:
   typedef grapht<dep_nodet>::node_indext node_indext;
 
-  explicit dep_graph_domaint(node_indext id)
-    : has_values(false), node_id(id), has_changed(false)
+  dep_graph_domaint(node_indext id, message_handlert &message_handler)
+    : has_values(false),
+      node_id(id),
+      has_changed(false),
+      message_handler(message_handler)
   {
   }
 
@@ -189,6 +192,8 @@ private:
   // location has a data dependency on
   depst data_deps;
 
+  message_handlert &message_handler;
+
   friend const depst &
     dependence_graph_test_get_control_deps(const dep_graph_domaint &);
   friend const depst &
@@ -220,7 +225,7 @@ public:
 
   typedef std::map<irep_idt, cfg_post_dominatorst> post_dominators_mapt;
 
-  explicit dependence_grapht(const namespacet &_ns);
+  dependence_grapht(const namespacet &_ns, message_handlert &);
 
   void initialize(const goto_functionst &goto_functions)
   {

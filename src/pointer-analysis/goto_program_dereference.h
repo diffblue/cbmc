@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H
 
-#include <util/message.h>
-
 #include "dereference_callback.h"
 #include "value_set_dereference.h"
 
@@ -35,24 +33,23 @@ public:
   // for the final argument to value_set_dereferencet.
   // This means that language-inappropriate values such as
   // (struct A*)some_integer_value in Java, may be returned.
-  // Note: value_set_dereferencet requires a messaget instance
-  // as on of its arguments to display the points-to set
+  // Note: value_set_dereferencet requires a message_handlert instance
+  // as one of its arguments to display the points-to set
   // during symex. Display is not done during goto-program
   // conversion. To ensure this the display_points_to_sets
   // parameter in value_set_dereferencet::dereference()
   // is set to false by default and is not changed by the
-  // goto program conversion modules. Similarly, here we set
-  // _log to be a default messaget instance.
+  // goto program conversion modules.
   goto_program_dereferencet(
     const namespacet &_ns,
     symbol_table_baset &_new_symbol_table,
     const optionst &_options,
     value_setst &_value_sets,
-    const messaget &_log = messaget())
+    message_handlert &message_handler)
     : options(_options),
       ns(_ns),
       value_sets(_value_sets),
-      dereference(_ns, _new_symbol_table, *this, ID_nil, false, _log)
+      dereference(_ns, _new_symbol_table, *this, ID_nil, false, message_handler)
   {
   }
 
@@ -101,11 +98,10 @@ void dereference(
   goto_programt::const_targett target,
   exprt &expr,
   const namespacet &,
-  value_setst &);
+  value_setst &,
+  message_handlert &);
 
-void remove_pointers(
-  goto_modelt &,
-  value_setst &);
+void remove_pointers(goto_modelt &, value_setst &, message_handlert &);
 
 #define OPT_REMOVE_POINTERS "(remove-pointers)"
 

@@ -131,7 +131,12 @@ void goto_symext::process_array_expr(statet &state, exprt &expr)
   symex_dereference_statet symex_dereference_state(state, ns);
 
   value_set_dereferencet dereference(
-    ns, state.symbol_table, symex_dereference_state, language_mode, false, log);
+    ns,
+    state.symbol_table,
+    symex_dereference_state,
+    language_mode,
+    false,
+    log.get_message_handler());
 
   expr = dereference.dereference(expr, symex_config.show_points_to_sets);
   lift_lets(state, expr);

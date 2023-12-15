@@ -14,11 +14,10 @@ Date: September 2011
 #ifndef CPROVER_GOTO_INSTRUMENT_MMIO_H
 #define CPROVER_GOTO_INSTRUMENT_MMIO_H
 
+class message_handlert;
 class value_setst;
 class goto_modelt;
 
-void mmio(
-  value_setst &,
-  goto_modelt &);
+void mmio(value_setst &, goto_modelt &, message_handlert &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_MMIO_H

@@ -155,7 +155,7 @@ void _rw_set_loct::read_write_rec(
       read_write_rec(*it, r, w, suffix, guard_conjuncts);
     }
     #else
-    dereference(function_id, target, tmp, ns, value_sets);
+    dereference(function_id, target, tmp, ns, value_sets, message_handler);
 
     read_write_rec(tmp, r, w, suffix, guard_conjuncts);
 #endif
@@ -219,12 +219,11 @@ void rw_set_functiont::compute_rec(const exprt &function)
           ns,
           value_sets,
           function_id,
-          i_it
+          i_it,
 #ifdef LOCAL_MAY
-          ,
-          local_may
+          local_may,
 #endif
-        ); // NOLINT(whitespace/parens)
+          message_handler); // NOLINT(whitespace/parens)
       }
     }
   }

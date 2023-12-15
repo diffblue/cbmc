@@ -87,7 +87,7 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
 
     WHEN("Constructing a dependence graph")
     {
-      dependence_grapht dep_graph(ns);
+      dependence_grapht dep_graph(ns, null_message_handler);
       dep_graph(goto_model.goto_functions, ns);
 
       THEN("The function call and assignment instructions "
