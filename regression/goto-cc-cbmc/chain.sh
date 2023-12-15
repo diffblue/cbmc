@@ -17,4 +17,4 @@ else
   "${goto_cc}" "${name}" -o "${base_name}.gb"
 fi
 
-"${cbmc}" --no-standard-checks "${base_name}.gb" ${options}
+"${cbmc}" "${base_name}.gb" ${options}

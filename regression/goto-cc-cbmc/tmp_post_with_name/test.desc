@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check
+--no-malloc-may-fail --pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.pointer_dereference\.5\] line 8 dereference failure: pointer outside object bounds in \*tmp_post_ptr: FAILURE
