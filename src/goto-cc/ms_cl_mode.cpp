@@ -19,15 +19,15 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
-#include <iostream>
-
 #include <util/config.h>
-#include <util/file_util.h>
 #include <util/get_base_name.h>
 #include <util/message.h>
 
 #include "compile.h"
 #include "ms_cl_version.h"
+
+#include <filesystem>
+#include <iostream>
 
 static bool has_directory_suffix(const std::string &path)
 {
@@ -128,7 +128,7 @@ int ms_cl_modet::doit()
     {
       compiler.output_directory_object = Fo_value;
 
-      if(!is_directory(Fo_value))
+      if(!std::filesystem::is_directory(Fo_value))
         log.warning() << "not a directory: " << Fo_value << messaget::eom;
     }
     else
@@ -154,7 +154,7 @@ int ms_cl_modet::doit()
       has_directory_suffix(compiler.output_file_executable) &&
       cmdline.args.size() >= 1)
     {
-      if(!is_directory(compiler.output_file_executable))
+      if(!std::filesystem::is_directory(compiler.output_file_executable))
       {
         log.warning() << "not a directory: " << compiler.output_file_executable
                       << messaget::eom;

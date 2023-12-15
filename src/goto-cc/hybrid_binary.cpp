@@ -11,12 +11,12 @@ Author: Michael Tautschnig, 2018
 
 #include "hybrid_binary.h"
 
-#include <util/file_util.h>
 #include <util/message.h>
 #include <util/run.h>
 #include <util/suffix.h>
 
 #include <cstring>
+#include <filesystem>
 
 #if defined(__APPLE__)
 #  include <sys/stat.h>
@@ -80,7 +80,7 @@ int hybrid_binary(
   }
 
   // delete the goto binary
-  bool remove_result = file_remove(goto_binary_file);
+  bool remove_result = std::filesystem::remove(goto_binary_file);
   if(!remove_result)
   {
     message.error() << "Remove failed: " << std::strerror(errno)
@@ -140,7 +140,7 @@ int hybrid_binary(
   }
 
   // delete the goto binary
-  bool remove_result = file_remove(goto_binary_file);
+  bool remove_result = std::filesystem::remove(goto_binary_file);
   if(!remove_result)
   {
     message.error() << "Remove failed: " << std::strerror(errno)

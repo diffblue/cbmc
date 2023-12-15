@@ -21,7 +21,6 @@ Author: CM Wintersteiger, 2006
 
 #include <util/cmdline.h>
 #include <util/config.h>
-#include <util/file_util.h>
 #include <util/get_base_name.h>
 #include <util/invariant.h>
 #include <util/prefix.h>
@@ -35,6 +34,7 @@ Author: CM Wintersteiger, 2006
 #include "hybrid_binary.h"
 #include "linker_script_merge.h"
 
+#include <filesystem>
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
 #include <numeric>
@@ -1006,9 +1006,9 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
 
     try
     {
-      file_rename(*it, bin_name);
+      std::filesystem::rename(*it, bin_name);
     }
-    catch(const cprover_exception_baset &e)
+    catch(const std::filesystem::filesystem_error &e)
     {
       log.error() << "Rename failed: " << e.what() << messaget::eom;
       return 1;

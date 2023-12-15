@@ -13,7 +13,6 @@ Date: April 2016
 
 #include "unreachable_instructions.h"
 
-#include <util/file_util.h>
 #include <util/json_irep.h>
 #include <util/options.h>
 #include <util/xml.h>
@@ -22,6 +21,8 @@ Date: April 2016
 
 #include <analyses/ai.h>
 #include <analyses/cfg_dominators.h>
+
+#include <filesystem>
 
 typedef std::map<unsigned, goto_programt::const_targett> dead_mapt;
 
@@ -106,9 +107,10 @@ file_name_string_opt(const source_locationt &source_location)
   if(source_location.get_file().empty())
     return {};
 
-  return concat_dir_file(
-    id2string(source_location.get_working_directory()),
-    id2string(source_location.get_file()));
+  return std::filesystem::path(
+           id2string(source_location.get_working_directory()))
+    .append(id2string(source_location.get_file()))
+    .string();
 }
 
 static void add_to_json(

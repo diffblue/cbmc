@@ -15,7 +15,6 @@ Date: June 2006
 
 #include <util/cmdline.h>
 #include <util/config.h>
-#include <util/file_util.h>
 #include <util/get_base_name.h>
 #include <util/prefix.h>
 #include <util/run.h>
@@ -39,6 +38,7 @@ Date: June 2006
 #include <linking/static_lifetime_init.h>
 
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -217,11 +217,14 @@ bool compilet::add_files_from_archive(
     tstr = get_temporary_directory("goto-cc.XXXXXX");
 
     tmp_dirs.push_back(tstr);
-    set_current_path(tmp_dirs.back());
+    std::filesystem::current_path(tmp_dirs.back());
 
     // unpack now
-    int ret =
-      run("ar", {"ar", "x", concat_dir_file(working_directory, file_name)});
+    int ret = run(
+      "ar",
+      {"ar",
+       "x",
+       std::filesystem::path(working_directory).append(file_name).string()});
     if(ret != 0)
     {
       log.error() << "Failed to extract archive " << file_name << messaget::eom;
@@ -233,7 +236,9 @@ bool compilet::add_files_from_archive(
   temporary_filet tmp_file_out("", "");
   int ret = run(
     "ar",
-    {"ar", "t", concat_dir_file(working_directory, file_name)},
+    {"ar",
+     "t",
+     std::filesystem::path(working_directory).append(file_name).string()},
     "",
     tmp_file_out(),
     "");
@@ -248,7 +253,7 @@ bool compilet::add_files_from_archive(
 
   while(!in.fail() && std::getline(in, line))
   {
-    std::string t = concat_dir_file(tstr, line);
+    std::string t = std::filesystem::path(tstr).append(line).string();
 
     if(is_goto_binary(t, log.get_message_handler()))
       object_files.push_back(t);
@@ -258,7 +263,7 @@ bool compilet::add_files_from_archive(
   }
 
   if(!thin_archive)
-    set_current_path(working_directory);
+    std::filesystem::current_path(working_directory);
 
   return false;
 }
@@ -272,7 +277,8 @@ bool compilet::find_library(const std::string &name)
 
   for(const auto &library_path : library_paths)
   {
-    library_file_name = concat_dir_file(library_path, "lib" + name + ".a");
+    library_file_name =
+      std::filesystem::path(library_path).append("lib" + name + ".a").string();
 
     std::ifstream in(library_file_name);
 
@@ -280,7 +286,9 @@ bool compilet::find_library(const std::string &name)
       return !add_input_file(library_file_name);
     else
     {
-      library_file_name = concat_dir_file(library_path, "lib" + name + ".so");
+      library_file_name = std::filesystem::path(library_path)
+                            .append("lib" + name + ".so")
+                            .string();
 
       switch(detect_file_type(library_file_name, log.get_message_handler()))
       {
@@ -409,7 +417,11 @@ std::optional<symbol_tablet> compilet::compile()
           get_base_name(file_name, true) + "." + object_file_extension;
 
         if(!output_directory_object.empty())
-          cfn = concat_dir_file(output_directory_object, file_name_with_obj_ext);
+        {
+          cfn = std::filesystem::path(output_directory_object)
+                  .append(file_name_with_obj_ext)
+                  .string();
+        }
         else
           cfn = file_name_with_obj_ext;
       }
@@ -647,7 +659,7 @@ compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
   wrote_object=false;
-  working_directory=get_current_working_directory();
+  working_directory = std::filesystem::current_path().string();
 
   if(cmdline.isset("export-function-local-symbols"))
   {
@@ -664,7 +676,7 @@ compilet::~compilet()
   // clean up temp dirs
 
   for(const auto &dir : tmp_dirs)
-    delete_directory(dir);
+    std::filesystem::remove_all(dir);
 }
 
 std::size_t compilet::function_body_count(const goto_functionst &functions)

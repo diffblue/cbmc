@@ -13,10 +13,6 @@ Date: December 2012
 
 #include "count_eloc.h"
 
-#include <iostream>
-#include <unordered_set>
-
-#include <util/file_util.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
@@ -25,6 +21,10 @@ Date: December 2012
 #include <goto-programs/goto_model.h>
 
 #include <linking/static_lifetime_init.h>
+
+#include <filesystem>
+#include <iostream>
+#include <unordered_set>
 
 typedef std::unordered_set<irep_idt> linest;
 typedef std::unordered_map<irep_idt, linest> filest;
@@ -75,7 +75,8 @@ void list_eloc(const goto_modelt &goto_model)
     {
       std::string file=id2string(lines.first);
       if(!files.first.empty())
-        file=concat_dir_file(id2string(files.first), file);
+        file =
+          std::filesystem::path(id2string(files.first)).append(file).string();
 
       for(const irep_idt &line : lines.second)
         std::cout << file << ':' << line << '\n';
