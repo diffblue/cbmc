@@ -192,7 +192,8 @@ static irep_idt get_function_name(const function_application_exprt &expr)
   return to_symbol_expr(name).get_identifier();
 }
 
-optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
+std::optional<exprt>
+string_constraint_generatort::make_array_pointer_association(
   const exprt &return_code,
   const function_application_exprt &expr)
 {

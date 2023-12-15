@@ -301,7 +301,7 @@ const symbolt &dfcc_utilst::clone_and_rename_function(
   goto_modelt &goto_model,
   const irep_idt &function_id,
   const irep_idt &new_function_id,
-  optionalt<typet> new_return_type = {})
+  std::optional<typet> new_return_type = {})
 {
   std::function<const irep_idt(const irep_idt &)> trans_fun =
     [&](const irep_idt &old_name) { return new_function_id; };

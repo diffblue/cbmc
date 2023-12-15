@@ -215,10 +215,10 @@ int cprover_parse_optionst::main()
       return CPROVER_EXIT_SUCCESS;
     }
 
-    // gcc produces a spurious warning for optionalt<irep_idt> if initialised
-    // with ternary operator. Initialising with an immediately invoked lamda
-    // avoids this.
-    const auto contract = [&]() -> optionalt<irep_idt> {
+    // gcc produces a spurious warning for std::optional<irep_idt> if
+    // initialised with ternary operator. Initialising with an immediately
+    // invoked lambda avoids this.
+    const auto contract = [&]() -> std::optional<irep_idt> {
       if(cmdline.isset("contract"))
         return {cmdline.get_value("contract")};
       else

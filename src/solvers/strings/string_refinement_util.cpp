@@ -154,7 +154,7 @@ interval_sparse_arrayt::interval_sparse_arrayt(
   }
 }
 
-optionalt<interval_sparse_arrayt>
+std::optional<interval_sparse_arrayt>
 interval_sparse_arrayt::of_expr(const exprt &expr, const exprt &extra_value)
 {
   if(const auto &array_expr = expr_try_dynamic_cast<array_exprt>(expr))

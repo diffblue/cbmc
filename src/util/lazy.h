@@ -10,7 +10,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_UTIL_LAZY_H
 
 #include <functional>
-#include <util/optional.h>
+#include <optional>
 
 template <typename valuet>
 class lazyt
@@ -34,7 +34,7 @@ public:
   }
 
 private:
-  optionalt<valuet> value;
+  std::optional<valuet> value;
   std::function<valuet()> evaluation_function;
 
   explicit lazyt(std::function<valuet()> fun)

@@ -465,7 +465,7 @@ gdb_apit::pointer_valuet gdb_apit::get_memory(const std::string &expr)
   if(!b)
     return pointer_valuet{};
 
-  optionalt<std::string> opt_string;
+  std::optional<std::string> opt_string;
   const std::string string = result[4];
 
   if(!string.empty())
@@ -494,7 +494,7 @@ gdb_apit::pointer_valuet gdb_apit::get_memory(const std::string &expr)
   return pointer_valuet(result[1], result[2], result[3], opt_string, true);
 }
 
-optionalt<std::string> gdb_apit::get_value(const std::string &expr)
+std::optional<std::string> gdb_apit::get_value(const std::string &expr)
 {
   PRECONDITION(gdb_state == gdb_statet::STOPPED);
 

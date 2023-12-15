@@ -40,7 +40,7 @@ static bool is_valid_string_constraint(
   const namespacet &ns,
   const string_constraintt &constraint);
 
-static optionalt<exprt> find_counter_example(
+static std::optional<exprt> find_counter_example(
   const namespacet &ns,
   const exprt &axiom,
   const symbol_exprt &var,
@@ -106,14 +106,14 @@ static std::vector<exprt> instantiate(
   const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &witnesses);
 
-static optionalt<exprt> get_array(
+static std::optional<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
   const array_string_exprt &arr,
   const array_poolt &array_pool);
 
-static optionalt<exprt> substitute_array_access(
+static std::optional<exprt> substitute_array_access(
   const index_exprt &index_expr,
   symbol_generatort &symbol_generator,
   const bool left_propagate);
@@ -686,7 +686,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     // in the graph.
     const exprt eq_with_char_array_replaced_with_representative_elements =
       replace_expr_copy(symbol_resolve, eq);
-    const optionalt<exprt> new_equation = add_node(
+    const std::optional<exprt> new_equation = add_node(
       dependencies,
       eq_with_char_array_replaced_with_representative_elements,
       generator.array_pool,
@@ -954,7 +954,7 @@ void string_refinementt::add_lemma(
 /// \param array_pool: pool of arrays representing strings
 /// \return an optional expression representing the size of the array that can
 ///         be cast to size_t
-static optionalt<exprt> get_valid_array_size(
+static std::optional<exprt> get_valid_array_size(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
@@ -998,7 +998,7 @@ static optionalt<exprt> get_valid_array_size(
 /// \param arr: expression of type array representing a string
 /// \param array_pool: pool of arrays representing strings
 /// \return an optional array expression or array_of_exprt
-static optionalt<exprt> get_array(
+static std::optional<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
@@ -1188,9 +1188,9 @@ static exprt substitute_array_access(
   exprt false_index = index_exprt(if_expr.false_case(), index);
 
   // Substitute recursively in branches of conditional expressions
-  optionalt<exprt> substituted_true_case =
+  std::optional<exprt> substituted_true_case =
     substitute_array_access(true_index, symbol_generator, left_propagate);
-  optionalt<exprt> substituted_false_case =
+  std::optional<exprt> substituted_false_case =
     substitute_array_access(false_index, symbol_generator, left_propagate);
 
   return if_exprt(
@@ -1199,7 +1199,7 @@ static exprt substitute_array_access(
     substituted_false_case ? *substituted_false_case : false_index);
 }
 
-static optionalt<exprt> substitute_array_access(
+static std::optional<exprt> substitute_array_access(
   const index_exprt &index_expr,
   symbol_generatort &symbol_generator,
   const bool left_propagate)
@@ -1238,7 +1238,7 @@ static void substitute_array_access_in_place(
   {
     if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(*it))
     {
-      optionalt<exprt> result =
+      std::optional<exprt> result =
         substitute_array_access(*index_expr, symbol_generator, left_propagate);
 
       // Only perform a write when we have something changed.
@@ -1904,7 +1904,7 @@ exprt string_refinementt::get(const exprt &expr) const
 /// \param message_handler: message handler
 /// \return the witness of the satisfying assignment if one
 ///   exists. If UNSAT, then behaviour is undefined.
-static optionalt<exprt> find_counter_example(
+static std::optional<exprt> find_counter_example(
   const namespacet &ns,
   const exprt &axiom,
   const symbol_exprt &var,

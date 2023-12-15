@@ -161,7 +161,7 @@ bv_pointers_widet::bv_pointers_widet(
 {
 }
 
-optionalt<bvt> bv_pointers_widet::convert_address_of_rec(const exprt &expr)
+std::optional<bvt> bv_pointers_widet::convert_address_of_rec(const exprt &expr)
 {
   if(expr.id() == ID_symbol)
   {

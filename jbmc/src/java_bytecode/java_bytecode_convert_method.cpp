@@ -228,7 +228,7 @@ exprt java_bytecode_convert_methodt::variable(
 /// \return the constructed member type
 java_method_typet member_type_lazy(
   const std::string &descriptor,
-  const optionalt<std::string> &signature,
+  const std::optional<std::string> &signature,
   const std::string &class_name,
   const std::string &method_name,
   message_handlert &message_handler)
@@ -534,7 +534,7 @@ void create_parameter_symbols(
 void java_bytecode_convert_methodt::convert(
   const symbolt &class_symbol,
   const methodt &m,
-  const optionalt<prefix_filtert> &method_context)
+  const std::optional<prefix_filtert> &method_context)
 {
   // Construct the fully qualified method name
   // (e.g. "my.package.ClassName.myMethodName:(II)I") and query the symbol table
@@ -1263,7 +1263,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
       }
     }
 
-    optionalt<codet> catch_instruction;
+    std::optional<codet> catch_instruction;
 
     if(catch_type!=typet())
     {
@@ -3083,7 +3083,7 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   return block;
 }
 
-optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
+std::optional<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
   const source_locationt &location,
   std::size_t instruction_address,
   const exprt &arg0,
@@ -3282,11 +3282,11 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   size_t max_array_length,
   bool throw_assertion_error,
-  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy,
   bool threading_support,
-  const optionalt<prefix_filtert> &method_context,
+  const std::optional<prefix_filtert> &method_context,
   bool assert_no_exceptions_thrown)
 
 {

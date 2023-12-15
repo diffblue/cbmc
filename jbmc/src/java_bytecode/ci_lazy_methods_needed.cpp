@@ -53,7 +53,7 @@ void ci_lazy_methods_neededt::add_cprover_nondet_initialize_if_it_exists(
   const irep_idt &class_id)
 {
   resolve_inherited_componentt resolve_inherited_component{symbol_table};
-  optionalt<resolve_inherited_componentt::inherited_componentt>
+  std::optional<resolve_inherited_componentt::inherited_componentt>
     cprover_nondet_initialize = resolve_inherited_component(
       class_id, "cproverNondetInitialize:()V", true);
 

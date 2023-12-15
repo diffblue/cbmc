@@ -158,7 +158,7 @@ void contracts_wranglert::mangle(
               << log.eom;
 
   // Extract the assigns from parse_tree.
-  optionalt<exprt> assigns_expr;
+  std::optional<exprt> assigns_expr;
   if(!loop_contracts.assigns.empty())
   {
     assigns_expr = static_cast<exprt &>(ansi_c_parser.parse_tree.items.front()

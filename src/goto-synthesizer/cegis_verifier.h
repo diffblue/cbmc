@@ -114,9 +114,9 @@ public:
   {
   }
 
-  /// Verify `goto_model`. Return an empty `optionalt if there is no violation.
-  /// Otherwise, return the formatted counterexample.
-  optionalt<cext> verify();
+  /// Verify `goto_model`. Return an empty `std::optional` if there is no
+  /// violation. Otherwise, return the formatted counterexample.
+  std::optional<cext> verify();
 
   /// Result counterexample.
   propertiest properties;

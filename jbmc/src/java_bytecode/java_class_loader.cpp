@@ -228,7 +228,7 @@ std::vector<irep_idt> java_class_loadert::load_entire_jar(
   return *classes;
 }
 
-optionalt<std::vector<irep_idt>> java_class_loadert::read_jar_file(
+std::optional<std::vector<irep_idt>> java_class_loadert::read_jar_file(
   const std::string &jar_path,
   message_handlert &message_handler)
 {

@@ -149,7 +149,7 @@ bool interval_uniont::is_empty() const
   return intervals.empty();
 }
 
-optionalt<mp_integer> interval_uniont::maximum() const
+std::optional<mp_integer> interval_uniont::maximum() const
 {
   if(intervals.empty())
     return {};
@@ -159,7 +159,7 @@ optionalt<mp_integer> interval_uniont::maximum() const
   return {};
 }
 
-optionalt<mp_integer> interval_uniont::minimum() const
+std::optional<mp_integer> interval_uniont::minimum() const
 {
   if(intervals.empty())
     return {};
@@ -213,7 +213,7 @@ interval_uniont::of_interval(interval_uniont::intervalt interval)
   return result;
 }
 
-optionalt<interval_uniont>
+std::optional<interval_uniont>
 interval_uniont::of_string(const std::string &to_parse)
 {
   const std::regex limits_regex("\\[(-\\d+|\\d*):(-\\d+|\\d*)\\]");
@@ -235,7 +235,7 @@ interval_uniont::of_string(const std::string &to_parse)
   return result;
 }
 
-optionalt<mp_integer> interval_uniont::as_singleton() const
+std::optional<mp_integer> interval_uniont::as_singleton() const
 {
   if(intervals.size() != 1)
     return {};

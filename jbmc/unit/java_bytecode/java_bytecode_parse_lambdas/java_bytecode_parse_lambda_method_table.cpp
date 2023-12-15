@@ -28,7 +28,7 @@ SCENARIO(
     GIVEN(
       "A class with a static lambda variables from " + compiler + " compiler.")
     {
-      optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
+      std::optional<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
         "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
           compiler + "_classes/StaticLambdas.class",
         "StaticLambdas",
@@ -351,11 +351,12 @@ SCENARIO(
     [](const std::string &compiler) { // NOLINT(whitespace/braces)
       GIVEN("A method with local lambdas from " + compiler + " compiler.")
       {
-        optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
-            compiler + "_classes/LocalLambdas.class",
-          "LocalLambdas",
-          null_message_handler);
+        std::optional<java_bytecode_parse_treet> parse_tree =
+          java_bytecode_parse(
+            "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+              compiler + "_classes/LocalLambdas.class",
+            "LocalLambdas",
+            null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);
@@ -672,11 +673,12 @@ SCENARIO(
         "A class that has lambdas as member variables from " + compiler +
         " compiler.")
       {
-        optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
-            compiler + "_classes/MemberLambdas.class",
-          "MemberLambdas",
-          null_message_handler);
+        std::optional<java_bytecode_parse_treet> parse_tree =
+          java_bytecode_parse(
+            "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+              compiler + "_classes/MemberLambdas.class",
+            "MemberLambdas",
+            null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);
@@ -1019,11 +1021,12 @@ SCENARIO(
         "variables from " +
         compiler + " compiler.")
       {
-        optionalt<java_bytecode_parse_treet> parse_tree = java_bytecode_parse(
-          "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
-            compiler + "_classes/OuterMemberLambdas$Inner.class",
-          "OuterMemberLambdas$Inner",
-          null_message_handler);
+        std::optional<java_bytecode_parse_treet> parse_tree =
+          java_bytecode_parse(
+            "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/" +
+              compiler + "_classes/OuterMemberLambdas$Inner.class",
+            "OuterMemberLambdas$Inner",
+            null_message_handler);
         WHEN("Parsing that class")
         {
           REQUIRE(parse_tree);

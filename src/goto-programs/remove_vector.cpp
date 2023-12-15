@@ -354,7 +354,7 @@ static void remove_vector(symbol_table_baset &symbol_table)
 void remove_vector(goto_functionst::goto_functiont &goto_function)
 {
   for(auto &i : goto_function.body.instructions)
-    i.transform([](exprt e) -> optionalt<exprt> {
+    i.transform([](exprt e) -> std::optional<exprt> {
       if(have_to_remove_vector(e))
       {
         remove_vector(e);

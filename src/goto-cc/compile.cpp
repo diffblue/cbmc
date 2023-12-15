@@ -307,7 +307,7 @@ bool compilet::find_library(const std::string &name)
 
 /// parses object files and links them
 /// \return true on error, false otherwise
-bool compilet::link(optionalt<symbol_tablet> &&symbol_table)
+bool compilet::link(std::optional<symbol_tablet> &&symbol_table)
 {
   // "compile" hitherto uncompiled functions
   log.statistics() << "Compiling functions" << messaget::eom;
@@ -361,7 +361,7 @@ bool compilet::link(optionalt<symbol_tablet> &&symbol_table)
 /// Parses source files and writes object files, or keeps the symbols in the
 /// symbol_table if not compiling/assembling only.
 /// \return Symbol table, if parsing and type checking succeeded, else empty
-optionalt<symbol_tablet> compilet::compile()
+std::optional<symbol_tablet> compilet::compile()
 {
   symbol_tablet symbol_table;
 
@@ -606,7 +606,8 @@ bool compilet::write_bin_object_file(
 
 /// Parses and type checks a source file located at \p file_name.
 /// \return A symbol table if, and only if, parsing and type checking succeeded.
-optionalt<symbol_tablet> compilet::parse_source(const std::string &file_name)
+std::optional<symbol_tablet>
+compilet::parse_source(const std::string &file_name)
 {
   language_filest language_files;
 

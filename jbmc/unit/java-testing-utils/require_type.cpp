@@ -17,7 +17,7 @@ Author: Diffblue Ltd.
 /// \return A cast to pointer_typet version of type
 pointer_typet require_type::require_pointer(
   const typet &type,
-  const optionalt<typet> &subtype)
+  const std::optional<typet> &subtype)
 {
   REQUIRE(type.id() == ID_pointer);
   const pointer_typet &pointer = to_pointer_type(type);
@@ -243,7 +243,7 @@ java_generic_parametert require_type::require_java_generic_parameter(
 /// \return The value passed in the first argument
 const typet &require_type::require_java_non_generic_type(
   const typet &type,
-  const optionalt<struct_tag_typet> &expect_subtype)
+  const std::optional<struct_tag_typet> &expect_subtype)
 {
   REQUIRE(!is_java_generic_parameter(type));
   REQUIRE(!is_java_generic_type(type));

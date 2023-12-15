@@ -775,7 +775,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
   }
 }
 
-optionalt<std::string>
+std::optional<std::string>
 c_typecastt::check_address_can_be_taken(const typet &type)
 {
   if(type.id() == ID_c_bit_field)

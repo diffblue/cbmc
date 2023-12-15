@@ -9,8 +9,9 @@ Author: Jeannie Moulton
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_TRACE_VALIDATION_H
 #define CPROVER_JAVA_BYTECODE_JAVA_TRACE_VALIDATION_H
 
-#include <util/optional.h>
 #include <util/validation_mode.h>
+
+#include <optional>
 
 class goto_tracet;
 class namespacet;
@@ -49,7 +50,7 @@ bool check_symbol_structure(const exprt &expr);
 
 /// Recursively extracts the first operand of an expression until it reaches a
 /// symbol and returns it, or returns an empty optional
-optionalt<symbol_exprt> get_inner_symbol_expr(exprt expr);
+std::optional<symbol_exprt> get_inner_symbol_expr(exprt expr);
 
 /// \return true iff the expression is a member expression (or nested member
 /// expression) of a valid symbol

@@ -323,7 +323,7 @@ static std::string resolve_pointer_name(
   const auto it = goto_model.goto_functions.function_map.find(function_id);
   if(it != goto_model.goto_functions.function_map.end())
   {
-    optionalt<source_locationt> location;
+    std::optional<source_locationt> location;
     for(const auto &instruction : it->second.body.instructions)
     {
       if(
@@ -421,7 +421,7 @@ function_pointer_restrictionst::parse_function_pointer_restriction(
   return std::make_pair(pointer_name, target_names);
 }
 
-optionalt<function_pointer_restrictionst::restrictiont>
+std::optional<function_pointer_restrictionst::restrictiont>
 function_pointer_restrictionst::get_by_name_restriction(
   const goto_functiont &goto_function,
   const function_pointer_restrictionst::restrictionst &by_name_restrictions,
@@ -457,7 +457,7 @@ function_pointer_restrictionst::get_by_name_restriction(
 
   if(restriction != by_name_restrictions.end())
   {
-    return optionalt<function_pointer_restrictionst::restrictiont>(
+    return std::optional<function_pointer_restrictionst::restrictiont>(
       std::make_pair(
         function_pointer_call_site.get_identifier(), restriction->second));
   }

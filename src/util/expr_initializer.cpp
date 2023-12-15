@@ -29,7 +29,7 @@ public:
   {
   }
 
-  optionalt<exprt> operator()(
+  std::optional<exprt> operator()(
     const typet &type,
     const source_locationt &source_location,
     const exprt &init_expr)
@@ -40,13 +40,13 @@ public:
 protected:
   const namespacet &ns;
 
-  optionalt<exprt> expr_initializer_rec(
+  std::optional<exprt> expr_initializer_rec(
     const typet &type,
     const source_locationt &source_location,
     const exprt &init_expr);
 };
 
-optionalt<exprt> expr_initializert::expr_initializer_rec(
+std::optional<exprt> expr_initializert::expr_initializer_rec(
   const typet &type,
   const source_locationt &source_location,
   const exprt &init_expr)
@@ -305,7 +305,7 @@ optionalt<exprt> expr_initializert::expr_initializer_rec(
 /// \param ns: Namespace to perform type symbol/tag lookups.
 /// \return An expression if a constant expression of the input type can be
 ///   built.
-optionalt<exprt> zero_initializer(
+std::optional<exprt> zero_initializer(
   const typet &type,
   const source_locationt &source_location,
   const namespacet &ns)
@@ -321,7 +321,7 @@ optionalt<exprt> zero_initializer(
 /// \param ns: Namespace to perform type symbol/tag lookups.
 /// \return An expression if a non-deterministic expression of the input type
 ///   can be built.
-optionalt<exprt> nondet_initializer(
+std::optional<exprt> nondet_initializer(
   const typet &type,
   const source_locationt &source_location,
   const namespacet &ns)
@@ -337,7 +337,7 @@ optionalt<exprt> nondet_initializer(
 /// \param init_byte_expr: Value to be used for initialization.
 /// \return An expression if a byte-initialized expression of the input type
 ///   can be built.
-optionalt<exprt> expr_initializer(
+std::optional<exprt> expr_initializer(
   const typet &type,
   const source_locationt &source_location,
   const namespacet &ns,

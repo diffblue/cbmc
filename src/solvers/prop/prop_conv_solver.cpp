@@ -74,7 +74,7 @@ literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
   return literal;
 }
 
-optionalt<bool> prop_conv_solvert::get_bool(const exprt &expr) const
+std::optional<bool> prop_conv_solvert::get_bool(const exprt &expr) const
 {
   // trivial cases
 

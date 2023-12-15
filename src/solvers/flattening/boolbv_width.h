@@ -28,7 +28,7 @@ public:
     return entry_opt->total_width;
   }
 
-  virtual optionalt<std::size_t> get_width_opt(const typet &type) const
+  virtual std::optional<std::size_t> get_width_opt(const typet &type) const
   {
     const auto &entry_opt = get_entry(type);
     if(!entry_opt.has_value())
@@ -56,7 +56,7 @@ protected:
     std::size_t total_width;
     std::vector<membert> members;
   };
-  using entryt = optionalt<defined_entryt>;
+  using entryt = std::optional<defined_entryt>;
 
   typedef std::unordered_map<typet, entryt, irep_hash> cachet;
 

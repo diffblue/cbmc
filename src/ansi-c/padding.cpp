@@ -101,7 +101,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   return result;
 }
 
-static optionalt<std::size_t>
+static std::optional<std::size_t>
 underlying_width(const c_bit_field_typet &type, const namespacet &ns)
 {
   const typet &underlying_type = type.underlying_type();

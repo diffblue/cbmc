@@ -490,7 +490,8 @@ static symbol_exprt typecheck_atomic_fetch_op(
   return result;
 }
 
-optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
+std::optional<symbol_exprt>
+c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
   const irep_idt &identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location)
@@ -1420,7 +1421,7 @@ exprt c_typecheck_baset::typecheck_shuffle_vector(
     const exprt &arg0 = arguments[0];
     const vector_typet &input_vec_type = to_vector_type(arg0.type());
 
-    optionalt<exprt> arg1;
+    std::optional<exprt> arg1;
     if(arguments.size() == 3)
     {
       if(arguments[1].type() != input_vec_type)

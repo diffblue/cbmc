@@ -23,7 +23,7 @@ namespace require_goto_statements
 {
 struct pointer_assignment_locationt
 {
-  optionalt<code_assignt> null_assignment;
+  std::optional<code_assignt> null_assignment;
   std::vector<code_assignt> non_null_assignments;
 };
 
@@ -47,7 +47,7 @@ private:
 pointer_assignment_locationt find_struct_component_assignments(
   const std::vector<codet> &statements,
   const irep_idt &structure_name,
-  const optionalt<irep_idt> &superclass_name,
+  const std::optional<irep_idt> &superclass_name,
   const irep_idt &component_name,
   const symbol_table_baset &symbol_table);
 
@@ -74,16 +74,16 @@ const code_declt &require_declaration_of_name(
 
 const irep_idt &require_struct_component_assignment(
   const irep_idt &structure_name,
-  const optionalt<irep_idt> &superclass_name,
+  const std::optional<irep_idt> &superclass_name,
   const irep_idt &component_name,
   const irep_idt &component_type_name,
-  const optionalt<irep_idt> &typecast_name,
+  const std::optional<irep_idt> &typecast_name,
   const std::vector<codet> &entry_point_instructions,
   const symbol_table_baset &symbol_table);
 
 const irep_idt &require_struct_array_component_assignment(
   const irep_idt &structure_name,
-  const optionalt<irep_idt> &superclass_name,
+  const std::optional<irep_idt> &superclass_name,
   const irep_idt &array_component_name,
   const irep_idt &array_type_name,
   const std::vector<codet> &entry_point_instructions,

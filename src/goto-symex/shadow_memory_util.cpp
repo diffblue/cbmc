@@ -1127,7 +1127,7 @@ get_shadow_memory_for_matched_object(
   return result;
 }
 
-optionalt<exprt> get_shadow_memory(
+std::optional<exprt> get_shadow_memory(
   const exprt &expr,
   const std::vector<exprt> &value_set,
   const std::vector<shadow_memory_statet::shadowed_addresst> &addresses,

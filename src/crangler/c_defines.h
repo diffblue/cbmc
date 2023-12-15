@@ -12,8 +12,7 @@ Author: Daniel Kroening, dkr@amazon.com
 #ifndef CPROVER_CRANGLER_C_DEFINES_H
 #define CPROVER_CRANGLER_C_DEFINES_H
 
-#include <util/optional.h>
-
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -25,7 +24,7 @@ class c_definest
 public:
   struct definet
   {
-    optionalt<std::vector<std::string>> parameters;
+    std::optional<std::vector<std::string>> parameters;
     std::string value;
   };
 

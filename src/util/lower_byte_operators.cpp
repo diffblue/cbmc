@@ -409,8 +409,8 @@ static exprt bv_to_expr(
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
-  const optionalt<mp_integer> &offset_bytes,
-  const optionalt<mp_integer> &max_bytes,
+  const std::optional<mp_integer> &offset_bytes,
+  const std::optional<mp_integer> &max_bytes,
   const std::size_t bits_per_byte,
   const namespacet &ns,
   bool unpack_byte_array = false);
@@ -537,11 +537,11 @@ static exprt unpack_array_vector_no_known_bounds(
 /// \return Array expression holding unpacked elements or array comprehension
 static exprt unpack_array_vector(
   const exprt &src,
-  const optionalt<mp_integer> &src_size,
+  const std::optional<mp_integer> &src_size,
   const mp_integer &element_bits,
   bool little_endian,
-  const optionalt<mp_integer> &offset_bytes,
-  const optionalt<mp_integer> &max_bytes,
+  const std::optional<mp_integer> &offset_bytes,
+  const std::optional<mp_integer> &max_bytes,
   const std::size_t bits_per_byte,
   const namespacet &ns)
 {
@@ -562,7 +562,7 @@ static exprt unpack_array_vector(
 
   // refine the number of elements to extract in case the element width is known
   // and a multiple of bytes; otherwise we will expand the entire array/vector
-  optionalt<mp_integer> num_elements = src_size;
+  std::optional<mp_integer> num_elements = src_size;
   if(element_bits > 0 && element_bits % bits_per_byte == 0)
   {
     if(!num_elements.has_value())
@@ -614,10 +614,10 @@ static exprt unpack_array_vector(
     // recursively unpack each element so that we eventually just have an array
     // of bytes left
 
-    const optionalt<mp_integer> element_max_bytes =
+    const std::optional<mp_integer> element_max_bytes =
       max_bytes
         ? std::min(mp_integer{el_bytes}, *max_bytes - byte_operands.size())
-        : optionalt<mp_integer>{};
+        : std::optional<mp_integer>{};
     const std::size_t element_max_bytes_int =
       element_max_bytes ? numeric_cast_v<std::size_t>(*element_max_bytes)
                         : el_bytes;
@@ -655,8 +655,8 @@ static void process_bit_fields(
   std::size_t total_bits,
   exprt::operandst &dest,
   bool little_endian,
-  const optionalt<mp_integer> &offset_bytes,
-  const optionalt<mp_integer> &max_bytes,
+  const std::optional<mp_integer> &offset_bytes,
+  const std::optional<mp_integer> &max_bytes,
   const std::size_t bits_per_byte,
   const namespacet &ns)
 {
@@ -691,17 +691,17 @@ static void process_bit_fields(
 static array_exprt unpack_struct(
   const exprt &src,
   bool little_endian,
-  const optionalt<mp_integer> &offset_bytes,
-  const optionalt<mp_integer> &max_bytes,
+  const std::optional<mp_integer> &offset_bytes,
+  const std::optional<mp_integer> &max_bytes,
   const std::size_t bits_per_byte,
   const namespacet &ns)
 {
   const struct_typet &struct_type = to_struct_type(ns.follow(src.type()));
   const struct_typet::componentst &components = struct_type.components();
 
-  optionalt<mp_integer> offset_in_member;
-  optionalt<mp_integer> max_bytes_left;
-  optionalt<std::pair<exprt::operandst, std::size_t>> bit_fields;
+  std::optional<mp_integer> offset_in_member;
+  std::optional<mp_integer> max_bytes_left;
+  std::optional<std::pair<exprt::operandst, std::size_t>> bit_fields;
 
   mp_integer member_offset_bits = 0;
   exprt::operandst byte_operands;
@@ -895,8 +895,8 @@ static array_exprt unpack_complex(
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
-  const optionalt<mp_integer> &offset_bytes,
-  const optionalt<mp_integer> &max_bytes,
+  const std::optional<mp_integer> &offset_bytes,
+  const std::optional<mp_integer> &max_bytes,
   const std::size_t bits_per_byte,
   const namespacet &ns,
   bool unpack_byte_array)
@@ -1102,7 +1102,7 @@ static exprt lower_byte_extract_array_vector(
   const mp_integer &element_bits,
   const namespacet &ns)
 {
-  optionalt<std::size_t> num_elements;
+  std::optional<std::size_t> num_elements;
   if(src.type().id() == ID_array)
     num_elements = numeric_cast<std::size_t>(to_array_type(src.type()).size());
   else
@@ -1176,7 +1176,7 @@ static exprt lower_byte_extract_array_vector(
 /// \param ns: Namespace
 /// \return An expression if the subtype size is known, else `nullopt` so that a
 /// fall-back to more generic code can be used.
-static optionalt<exprt> lower_byte_extract_complex(
+static std::optional<exprt> lower_byte_extract_complex(
   const byte_extract_exprt &src,
   const byte_extract_exprt &unpacked,
   const namespacet &ns)
@@ -1380,8 +1380,8 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   const exprt &root = unpacked.op();
   const exprt &offset = unpacked.offset();
 
-  optionalt<typet> subtype;
-  optionalt<typet> index_type;
+  std::optional<typet> subtype;
+  std::optional<typet> index_type;
   if(root.type().id() == ID_vector)
   {
     subtype = to_vector_type(root.type()).element_type();
@@ -1464,7 +1464,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 static exprt lower_byte_update(
   const byte_update_exprt &src,
   const exprt &value_as_byte_array,
-  const optionalt<exprt> &non_const_update_bound,
+  const std::optional<exprt> &non_const_update_bound,
   const namespacet &ns);
 
 /// Apply a byte update \p src to an array/vector of bytes using the byte-array
@@ -1549,7 +1549,7 @@ static exprt lower_byte_update_byte_array_vector(
   const byte_update_exprt &src,
   const typet &subtype,
   const array_exprt &value_as_byte_array,
-  const optionalt<exprt> &non_const_update_bound,
+  const std::optional<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
   PRECONDITION(
@@ -1765,7 +1765,7 @@ static exprt lower_byte_update_array_vector_non_const(
   const byte_update_exprt &src,
   const typet &subtype,
   const exprt &value_as_byte_array,
-  const optionalt<exprt> &non_const_update_bound,
+  const std::optional<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
   // do all arithmetic below using index/offset types - the array theory
@@ -1918,7 +1918,7 @@ static exprt lower_byte_update_single_element(
   const mp_integer &subtype_bits,
   const mp_integer &bits_already_set,
   const exprt &value_as_byte_array,
-  const optionalt<exprt> &non_const_update_bound,
+  const std::optional<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
   // We need to take one or more bytes from value_as_byte_array to modify the
@@ -2048,7 +2048,7 @@ static exprt lower_byte_update_single_element(
     new_value,
     src.get_bits_per_byte()};
 
-  optionalt<exprt> update_bound;
+  std::optional<exprt> update_bound;
   if(non_const_update_bound.has_value())
   {
     // The size of the update is not constant, and thus is to be symbolically
@@ -2091,9 +2091,9 @@ static exprt lower_byte_update_single_element(
 static exprt lower_byte_update_array_vector(
   const byte_update_exprt &src,
   const typet &subtype,
-  const optionalt<mp_integer> &subtype_bits,
+  const std::optional<mp_integer> &subtype_bits,
   const exprt &value_as_byte_array,
-  const optionalt<exprt> &non_const_update_bound,
+  const std::optional<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
   const bool is_array = src.type().id() == ID_array;
@@ -2176,7 +2176,7 @@ static exprt lower_byte_update_struct(
   const byte_update_exprt &src,
   const struct_typet &struct_type,
   const exprt &value_as_byte_array,
-  const optionalt<exprt> &non_const_update_bound,
+  const std::optional<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
   exprt::operandst elements;
@@ -2280,7 +2280,7 @@ static exprt lower_byte_update_union(
   const byte_update_exprt &src,
   const union_typet &union_type,
   const exprt &value_as_byte_array,
-  const optionalt<exprt> &non_const_update_bound,
+  const std::optional<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
   const auto widest_member = union_type.find_widest_union_component(ns);
@@ -2311,12 +2311,12 @@ static exprt lower_byte_update_union(
 static exprt lower_byte_update(
   const byte_update_exprt &src,
   const exprt &value_as_byte_array,
-  const optionalt<exprt> &non_const_update_bound,
+  const std::optional<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
   if(src.type().id() == ID_array || src.type().id() == ID_vector)
   {
-    optionalt<typet> subtype;
+    std::optional<typet> subtype;
     if(src.type().id() == ID_vector)
       subtype = to_vector_type(src.type()).element_type();
     else
@@ -2558,7 +2558,7 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
   // use a "with" expression to encode the update; else update the values in
   // place.
   // 4) Construct a new object.
-  optionalt<exprt> non_const_update_bound;
+  std::optional<exprt> non_const_update_bound;
   // update value, may require extension to full bytes
   exprt update_value = src.value();
   auto update_size_expr_opt = size_of_expr(update_value.type(), ns);

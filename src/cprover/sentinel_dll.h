@@ -101,10 +101,10 @@ inline state_is_sentinel_dll_exprt &to_state_is_sentinel_dll_expr(exprt &expr)
   return ret;
 }
 
-optionalt<exprt>
+std::optional<exprt>
 sentinel_dll_next(const exprt &state, const exprt &node, const namespacet &);
 
-optionalt<exprt>
+std::optional<exprt>
 sentinel_dll_prev(const exprt &state, const exprt &node, const namespacet &);
 
 #endif // CPROVER_CPROVER_SENTINEL_DLL_H

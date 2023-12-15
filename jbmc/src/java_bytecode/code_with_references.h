@@ -30,7 +30,7 @@ struct object_creation_referencet
   /// This should only be set once the actual elements of the array have been
   /// seen, not the first time an `@ref` have been seen, only when `@id` is
   /// seen.
-  optionalt<exprt> array_length;
+  std::optional<exprt> array_length;
 };
 
 /// Base class for code which can contain references which can get replaced

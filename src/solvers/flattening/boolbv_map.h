@@ -53,14 +53,15 @@ public:
     const irep_idt &identifier,
     const typet &type);
 
-  optionalt<std::reference_wrapper<const map_entryt>>
+  std::optional<std::reference_wrapper<const map_entryt>>
   get_map_entry(const irep_idt &identifier) const
   {
     const auto entry = mapping.find(identifier);
     if(entry == mapping.end())
       return {};
 
-    return optionalt<std::reference_wrapper<const map_entryt>>(entry->second);
+    return std::optional<std::reference_wrapper<const map_entryt>>(
+      entry->second);
   }
 
   const mappingt &get_mapping() const

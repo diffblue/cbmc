@@ -65,7 +65,7 @@ public:
   array_string_exprt result;
   /// Only set when the format string is a constant. In the other case, the
   /// result will be non-deterministic
-  optionalt<std::string> format_string;
+  std::optional<std::string> format_string;
   std::vector<array_string_exprt> inputs;
 
   /// Constructor from arguments of a function application.
@@ -78,7 +78,7 @@ public:
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool);
 
-  optionalt<array_string_exprt> string_result() const override
+  std::optional<array_string_exprt> string_result() const override
   {
     return result;
   }
@@ -88,7 +88,7 @@ public:
     return inputs;
   }
 
-  optionalt<exprt>
+  std::optional<exprt>
   eval(const std::function<exprt(const exprt &)> &get_value) const override;
 
   std::string name() const override

@@ -46,7 +46,7 @@ void goto_convertt::remove_assignment(
 {
   const irep_idt statement=expr.get_statement();
 
-  optionalt<exprt> replacement_expr_opt;
+  std::optional<exprt> replacement_expr_opt;
 
   if(statement==ID_assign)
   {

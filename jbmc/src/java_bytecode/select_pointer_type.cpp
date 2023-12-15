@@ -42,7 +42,7 @@ pointer_typet select_pointer_typet::specialize_generics(
       generic_parameter_specialization_map;
     while(true)
     {
-      const optionalt<reference_typet> specialization =
+      const std::optional<reference_typet> specialization =
         spec_map_copy.pop(parameter_name);
       if(!specialization)
       {

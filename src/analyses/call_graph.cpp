@@ -296,12 +296,12 @@ void call_grapht::output_xml(std::ostream &out) const
   }
 }
 
-optionalt<std::size_t> call_grapht::directed_grapht::get_node_index(
-  const irep_idt &function) const
+std::optional<std::size_t>
+call_grapht::directed_grapht::get_node_index(const irep_idt &function) const
 {
   auto findit=nodes_by_name.find(function);
   if(findit==nodes_by_name.end())
-    return optionalt<node_indext>();
+    return std::optional<node_indext>();
   else
     return findit->second;
 }

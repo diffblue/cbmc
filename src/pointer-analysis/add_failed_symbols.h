@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
 
 #include <util/expr.h>
-#include <util/optional.h>
 
 class symbol_table_baset;
 class symbolt;
@@ -32,7 +31,7 @@ irep_idt failed_symbol_id(const irep_idt &identifier);
 /// \param ns: global namespace
 /// \return symbol expression for the failed-dereference symbol, or an empty
 ///   optional if none exists.
-optionalt<symbol_exprt>
+std::optional<symbol_exprt>
 get_failed_symbol(const symbol_exprt &expr, const namespacet &ns);
 
 /// Return true if, and only if, \p expr is the result of failed dereferencing.

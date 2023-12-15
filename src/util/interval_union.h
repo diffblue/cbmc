@@ -14,7 +14,8 @@ Author: Diffblue Limited
 
 #include <util/interval_template.h>
 #include <util/mp_arith.h>
-#include <util/optional.h>
+
+#include <optional>
 #include <vector>
 
 class exprt;
@@ -54,11 +55,11 @@ public:
 
   /// empty optional means either unbounded on the right or empty,
   /// \ref is_empty has to be called to distinguish between the two
-  optionalt<mp_integer> maximum() const;
+  std::optional<mp_integer> maximum() const;
 
   /// empty optional means either unbounded on the left or empty,
   /// \ref is_empty has to be called to distinguish between the two
-  optionalt<mp_integer> minimum() const;
+  std::optional<mp_integer> minimum() const;
 
   /// Convert the set to a string representing a sequence of intervals, each
   /// interval being of the form "[lower:upper]", "[:upper]" if there is no
@@ -69,7 +70,7 @@ public:
   /// Parse a string which is a comma `,` separated list of intervals of the
   /// form "[lower1:upper1]", for example: "[-3:-2],[4:5]".
   /// Return an empty optional if the string doesn't match the format.
-  static optionalt<interval_uniont> of_string(const std::string &to_parse);
+  static std::optional<interval_uniont> of_string(const std::string &to_parse);
 
   /// Construct interval union from a single interval
   static interval_uniont of_interval(intervalt interval);
@@ -78,7 +79,7 @@ public:
   exprt make_contains_expr(const exprt &e) const;
 
   /// If the set contains only one element, return the value of this element.
-  optionalt<mp_integer> as_singleton() const;
+  std::optional<mp_integer> as_singleton() const;
 
 private:
   /// Non-overlapping intervals stored in order of their lower bound, so that

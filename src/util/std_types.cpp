@@ -100,7 +100,8 @@ void struct_typet::add_base(const struct_tag_typet &base)
   bases().push_back(baset(base));
 }
 
-optionalt<struct_typet::baset> struct_typet::get_base(const irep_idt &id) const
+std::optional<struct_typet::baset>
+struct_typet::get_base(const irep_idt &id) const
 {
   for(const auto &b : bases())
   {

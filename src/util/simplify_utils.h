@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_SIMPLIFY_UTILS_H
 
 #include "expr.h"
-#include "optional.h"
 
 #include <string>
 
@@ -25,13 +24,13 @@ bool join_operands(exprt &expr);
 bool sort_and_join(exprt &expr);
 
 // bit-level conversions
-optionalt<exprt> bits2expr(
+std::optional<exprt> bits2expr(
   const std::string &bits,
   const typet &type,
   bool little_endian,
   const namespacet &ns);
 
-optionalt<std::string>
+std::optional<std::string>
 expr2bits(const exprt &, bool little_endian, const namespacet &ns);
 
 /// Get char sequence from content field of a refined string expression
@@ -46,7 +45,7 @@ expr2bits(const exprt &, bool little_endian, const namespacet &ns);
 /// \return array expression representing the char sequence which forms the
 ///   content of the refined string expression, empty optional if the content
 ///   cannot be determined
-optionalt<std::reference_wrapper<const array_exprt>>
+std::optional<std::reference_wrapper<const array_exprt>>
 try_get_string_data_array(const exprt &content, const namespacet &ns);
 
 #endif // CPROVER_UTIL_SIMPLIFY_UTILS_H

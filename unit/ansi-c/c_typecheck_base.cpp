@@ -28,7 +28,7 @@ public:
   {
   }
 
-  optionalt<symbol_exprt> test_typecheck_shadow_memory_builtin(
+  std::optional<symbol_exprt> test_typecheck_shadow_memory_builtin(
     const side_effect_expr_function_callt &expr)
   {
     return typecheck_shadow_memory_builtin(expr);

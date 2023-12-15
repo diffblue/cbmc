@@ -16,9 +16,15 @@ Author: Daniel Poetzl
 #  include <iostream>
 #endif
 
+#include "as_const.h"
+#include "irep.h"
+#include "sharing_node.h"
+#include "threeval.h"
+
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
 #include <stack>
 #include <stdexcept>
@@ -26,12 +32,6 @@ Author: Daniel Poetzl
 #include <tuple>
 #include <type_traits>
 #include <vector>
-
-#include "as_const.h"
-#include "irep.h"
-#include "optional.h"
-#include "sharing_node.h"
-#include "threeval.h"
 
 #ifdef SM_INTERNAL_CHECKS
 #  define SM_ASSERT(b) INVARIANT(b, "Sharing map internal invariant")
@@ -332,8 +332,8 @@ public:
   /// - Best case: O(1)
   ///
   /// \param k: The key of the element to search
-  /// \return optionalt containing a const reference to the value if found
-  optionalt<std::reference_wrapper<const mapped_type>>
+  /// \return std::optional containing a const reference to the value if found
+  std::optional<std::reference_wrapper<const mapped_type>>
   find(const key_type &k) const;
 
   /// Swap with other map
@@ -1448,7 +1448,7 @@ SHARING_MAPT(void)
     "method to check if an update is needed beforehand");
 }
 
-SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
+SHARING_MAPT2(std::optional<std::reference_wrapper<const, mapped_type>>)::find(
   const key_type &k) const
 {
   const nodet *lp = get_leaf_node(k);
@@ -1456,7 +1456,8 @@ SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
   if(lp == nullptr)
     return std::nullopt;
 
-  return optionalt<std::reference_wrapper<const mapped_type>>(lp->get_value());
+  return std::optional<std::reference_wrapper<const mapped_type>>(
+    lp->get_value());
 }
 
 // static constants

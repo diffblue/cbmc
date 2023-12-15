@@ -17,7 +17,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/optional.h>
 #include <util/std_expr.h>
 
 #include "dfcc_contract_functions.h"
@@ -139,7 +138,7 @@ protected:
   const source_locationt wrapper_sl;
 
   /// Symbol for the return value of the wrapped function
-  optionalt<symbol_exprt> return_value_opt;
+  std::optional<symbol_exprt> return_value_opt;
 
   /// Symbol for the write set object derived from the contract
   const symbol_exprt contract_write_set;

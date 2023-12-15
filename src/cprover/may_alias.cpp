@@ -92,7 +92,7 @@ bool prefix_of(const typet &a, const typet &b, const namespacet &ns)
   return a_struct.is_prefix_of(b_struct) || b_struct.is_prefix_of(a_struct);
 }
 
-static optionalt<object_address_exprt> find_object(const exprt &expr)
+static std::optional<object_address_exprt> find_object(const exprt &expr)
 {
   if(expr.id() == ID_object_address)
     return to_object_address_expr(expr);
@@ -145,7 +145,7 @@ static exprt drop_pointer_typecasts(exprt src)
     return src;
 }
 
-optionalt<exprt>
+std::optional<exprt>
 same_address(const exprt &a, const exprt &b, const namespacet &ns)
 {
   static const auto true_expr = true_exprt();
@@ -219,7 +219,7 @@ same_address(const exprt &a, const exprt &b, const namespacet &ns)
   return {};
 }
 
-optionalt<exprt> may_alias(
+std::optional<exprt> may_alias(
   const exprt &a,
   const exprt &b,
   const std::unordered_set<symbol_exprt, irep_hash> &address_taken,

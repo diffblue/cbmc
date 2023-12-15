@@ -33,7 +33,7 @@ void unwindsett::parse_unwindset_one_loop(
   if(val.empty())
     return;
 
-  optionalt<unsigned> thread_nr;
+  std::optional<unsigned> thread_nr;
   if(isdigit(val[0]))
   {
     auto c_pos = val.find(':');
@@ -116,8 +116,8 @@ void unwindsett::parse_unwindset_one_loop(
       }
       else
       {
-        optionalt<unsigned> nr;
-        optionalt<source_locationt> location;
+        std::optional<unsigned> nr;
+        std::optional<source_locationt> location;
         for(const auto &instruction : goto_function.body.instructions)
         {
           if(
@@ -161,7 +161,7 @@ void unwindsett::parse_unwindset_one_loop(
     std::string uw_string = val.substr(last_c_pos + 1);
 
     // the below initialisation makes g++-5 happy
-    optionalt<unsigned> uw(0);
+    std::optional<unsigned> uw(0);
 
     if(uw_string.empty())
       uw = {};
@@ -187,7 +187,7 @@ void unwindsett::parse_unwindset(
     parse_unwindset_one_loop(element, message_handler);
 }
 
-optionalt<unsigned>
+std::optional<unsigned>
 unwindsett::get_limit(const irep_idt &loop_id, unsigned thread_nr) const
 {
   // We use the most specific limit we have

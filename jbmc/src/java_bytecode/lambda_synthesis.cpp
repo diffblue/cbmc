@@ -51,7 +51,7 @@ irep_idt lambda_synthetic_class_name(
 ///   methods) of the class where the lambda is called
 /// \param index: Index of the lambda method handle in the vector
 /// \return Symbol of the lambda method if the method handle has a known type
-static optionalt<java_class_typet::java_lambda_method_handlet>
+static std::optional<java_class_typet::java_lambda_method_handlet>
 get_lambda_method_handle(
   const symbol_table_baset &symbol_table,
   const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
@@ -73,7 +73,7 @@ get_lambda_method_handle(
   return {};
 }
 
-static optionalt<java_class_typet::java_lambda_method_handlet>
+static std::optional<java_class_typet::java_lambda_method_handlet>
 lambda_method_handle(
   const symbol_table_baset &symbol_table,
   const irep_idt &method_identifier,
@@ -605,7 +605,7 @@ static symbol_exprt instantiate_new_object(
 
 /// If \p maybe_boxed_type is a boxed primitive return its unboxing method;
 /// otherwise return empty.
-static optionalt<irep_idt>
+static std::optional<irep_idt>
 get_unboxing_method(const pointer_typet &maybe_boxed_type)
 {
   const irep_idt &boxed_type_id =
@@ -613,7 +613,7 @@ get_unboxing_method(const pointer_typet &maybe_boxed_type)
   const java_boxed_type_infot *boxed_type_info =
     get_boxed_type_info_by_name(boxed_type_id);
   return boxed_type_info ? boxed_type_info->unboxing_function_name
-                         : optionalt<irep_idt>{};
+                         : std::optional<irep_idt>{};
 }
 
 /// Produce a class_method_descriptor_exprt or symbol_exprt for

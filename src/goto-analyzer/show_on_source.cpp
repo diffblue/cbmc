@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// get the name of the file referred to at a location loc,
 /// if any
-static optionalt<std::string>
+static std::optional<std::string>
 show_location(const ai_baset &ai, ai_baset::locationt loc)
 {
   const auto abstract_state = ai.abstract_state_before(loc);

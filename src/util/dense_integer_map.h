@@ -17,7 +17,6 @@ Author: Diffblue Ltd
 #include <vector>
 
 #include <util/invariant.h>
-#include <util/optional.h>
 
 /// Identity functor. When we use C++20 this can be replaced with std::identity.
 class identity_functort
@@ -41,10 +40,11 @@ public:
 ///
 /// The type is optimised for fast lookups at the expense of flexibility.
 /// It makes one compromise on the iterface of std::map / unordered_map: the
-/// iterator refers to a pair<key, optionalt<value>>, where the value optional
-/// will always be defined. This is because the backing store uses optionalt
-/// this way and we don't want to impose the price of copying the key and value
-/// each time we move the iterator just so we have a <const K, V> & to give out.
+/// iterator refers to a pair<key, std::optional<value>>, where the value
+/// optional will always be defined. This is because the backing store uses
+/// std::optional this way and we don't want to impose the price of copying the
+/// key and value each time we move the iterator just so we have a
+/// <const K, V> & to give out.
 ///
 /// Undocumented functions with matching names have the same semantics as
 /// std::map equivalents (including perfect iterator stability, with ordering
@@ -71,8 +71,8 @@ private:
 
   // Indicates whether a given position in \ref map's value has been set, and
   // therefore whether our iterators should stop at a given location. We use
-  // this auxiliary structure rather than `pair<K, optionalt<V>>` in \ref map
-  // because this way we can more easily return a std::map-like
+  // this auxiliary structure rather than `pair<K, std::optional<V>>` in
+  // \ref map because this way we can more easily return a std::map-like
   // std::pair<const K, V> & from the iterator.
   std::vector<bool> value_set;
 

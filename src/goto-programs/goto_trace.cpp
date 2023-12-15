@@ -30,7 +30,7 @@ Author: Daniel Kroening
 
 #include <ostream>
 
-static optionalt<symbol_exprt> get_object_rec(const exprt &src)
+static std::optional<symbol_exprt> get_object_rec(const exprt &src)
 {
   if(src.id()==ID_symbol)
     return to_symbol_expr(src);
@@ -50,7 +50,7 @@ static optionalt<symbol_exprt> get_object_rec(const exprt &src)
     return {}; // give up
 }
 
-optionalt<symbol_exprt> goto_trace_stept::get_lhs_object() const
+std::optional<symbol_exprt> goto_trace_stept::get_lhs_object() const
 {
   return get_object_rec(full_lhs);
 }
@@ -292,7 +292,7 @@ std::string trace_numeric_value(
 static void trace_value(
   messaget::mstreamt &out,
   const namespacet &ns,
-  const optionalt<symbol_exprt> &lhs_object,
+  const std::optional<symbol_exprt> &lhs_object,
   const exprt &full_lhs,
   const exprt &value,
   const trace_optionst &options)

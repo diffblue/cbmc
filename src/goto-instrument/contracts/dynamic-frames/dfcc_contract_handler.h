@@ -17,7 +17,6 @@ Date: August 2022
 
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/optional.h>
 #include <util/std_expr.h>
 
 #include "dfcc_contract_functions.h"
@@ -111,7 +110,7 @@ public:
   /// PRECONDITION is triggered.
   const symbolt &get_pure_contract_symbol(
     const irep_idt &contract_id,
-    const optionalt<irep_idt> function_id_opt = {});
+    const std::optional<irep_idt> function_id_opt = {});
 
 protected:
   goto_modelt &goto_model;

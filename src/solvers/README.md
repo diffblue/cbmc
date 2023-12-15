@@ -181,7 +181,7 @@ Note: `bvt` mentioned below is an alias to a vector of literalt.
 Which takes an exprt then calls the associated transformation functions to
 generate the \ref literalt vector to then pass to the internal \ref propt instance.
 
-`const bvt & boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)`
+`const bvt & boolbvt::convert_bv(const exprt &expr, std::optional<std::size_t> expected_width)`
 
 Similar to convert_bitvector except it also provides basic caching and
 freezing results for incremental solving. It calls convert_bitvector

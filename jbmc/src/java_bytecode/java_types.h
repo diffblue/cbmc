@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/narrow.h>
-#include <util/optional.h>
 #include <util/std_expr.h>
 
 class java_annotationt : public irept
@@ -672,7 +671,7 @@ exprt get_array_dimension_field(const exprt &pointer);
 exprt get_array_element_type_field(const exprt &pointer);
 
 typet java_type_from_char(char t);
-optionalt<typet> java_type_from_string(
+std::optional<typet> java_type_from_string(
   const std::string &,
   const std::string &class_name_prefix = "");
 char java_char_from_type(const typet &type);
@@ -880,7 +879,7 @@ public:
     return (generic_typest &)(add(ID_generic_types).get_sub());
   }
 
-  optionalt<size_t>
+  std::optional<size_t>
   generic_type_index(const java_generic_parametert &type) const;
 };
 
@@ -1138,9 +1137,9 @@ public:
   }
 };
 
-inline optionalt<typet> java_type_from_string_with_exception(
+inline std::optional<typet> java_type_from_string_with_exception(
   const std::string &descriptor,
-  const optionalt<std::string> &signature,
+  const std::optional<std::string> &signature,
   const std::string &class_name)
 {
   try
@@ -1157,7 +1156,7 @@ inline optionalt<typet> java_type_from_string_with_exception(
 /// \param gen_types: The subtypes array.
 /// \param identifier: The string identifier of the type of the component.
 /// \return Optional with the size if the identifier was found.
-inline const optionalt<size_t> java_generics_get_index_for_subtype(
+inline const std::optional<size_t> java_generics_get_index_for_subtype(
   const std::vector<java_generic_parametert> &gen_types,
   const irep_idt &identifier)
 {

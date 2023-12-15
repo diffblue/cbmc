@@ -31,11 +31,11 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   size_t max_array_length,
   bool throw_assertion_error,
-  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess,
   const class_hierarchyt &class_hierarchy,
   bool threading_support,
-  const optionalt<prefix_filtert> &method_context,
+  const std::optional<prefix_filtert> &method_context,
   bool assert_no_exceptions_thrown);
 
 void create_method_stub_symbol(

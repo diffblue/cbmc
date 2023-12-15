@@ -229,7 +229,7 @@ struct java_bytecode_language_optionst
   /// JSON which contains initial values of static fields (right
   /// after the static initializer of the class was run). This is read from the
   /// file specified by the --static-values command-line option.
-  optionalt<json_objectt> static_values_json;
+  std::optional<json_objectt> static_values_json;
 
   /// List of classes to never load
   std::unordered_set<std::string> no_load_classes;
@@ -243,7 +243,7 @@ struct java_bytecode_language_optionst
   /// symbol (corresponding to the body of the method) will be replaced with the
   /// same kind of "return nondet null or instance of return type" body that we
   /// use for stubbed methods. The original method body will never be loaded.
-  optionalt<prefix_filtert> method_context;
+  std::optional<prefix_filtert> method_context;
 
   /// Should we lift clinit calls in function bodies to the top? For example,
   /// turning `if(x) A.clinit() else B.clinit()` into
@@ -251,7 +251,7 @@ struct java_bytecode_language_optionst
   bool should_lift_clinit_calls;
 
   /// If set then a JAR file has been given via the -jar option.
-  optionalt<std::string> main_jar;
+  std::optional<std::string> main_jar;
 };
 
 #define JAVA_CLASS_MODEL_SUFFIX "@class_model"
@@ -349,27 +349,27 @@ protected:
     convert_single_method(
       function_id,
       symbol_table,
-      optionalt<ci_lazy_methods_neededt>(),
+      std::optional<ci_lazy_methods_neededt>(),
       class_to_declared_symbols,
       message_handler);
   }
   bool convert_single_method(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table,
-    optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+    std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
     lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
     message_handlert &);
   bool convert_single_method_code(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table,
-    optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+    std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
     lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
     message_handlert &);
 
   bool do_ci_lazy_method_conversion(symbol_table_baset &, message_handlert &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
-  optionalt<java_bytecode_language_optionst> language_options;
+  std::optional<java_bytecode_language_optionst> language_options;
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
   java_class_loadert java_class_loader;

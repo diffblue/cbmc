@@ -48,7 +48,7 @@ public:
   }
 
   using mutator_functiont =
-    std::function<optionalt<renamedt>(const renamedt &)>;
+    std::function<std::optional<renamedt>(const renamedt &)>;
 
 private:
   underlyingt &value()
@@ -99,7 +99,7 @@ void selectively_mutate(
   for(auto it = renamed.depth_begin(), itend = renamed.depth_end(); it != itend;
       ++it)
   {
-    optionalt<renamedt<exprt, level>> replacement =
+    std::optional<renamedt<exprt, level>> replacement =
       get_mutated_expr(static_cast<const renamedt<exprt, level> &>(*it));
 
     if(replacement)

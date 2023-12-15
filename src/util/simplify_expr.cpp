@@ -1717,7 +1717,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 
   // try to simplify byte_extract(byte_update(...))
   auto const bu = expr_try_dynamic_cast<byte_update_exprt>(expr.op());
-  optionalt<mp_integer> update_offset;
+  std::optional<mp_integer> update_offset;
   if(bu)
     update_offset = numeric_cast<mp_integer>(bu->offset());
   if(bu && el_size.has_value() && update_offset.has_value())
@@ -2028,7 +2028,7 @@ simplify_exprt::simplify_byte_extract_preorder(const byte_extract_exprt &expr)
   }
   else
   {
-    optionalt<exprt::operandst> new_operands;
+    std::optional<exprt::operandst> new_operands;
 
     for(std::size_t i = 0; i < expr.operands().size(); ++i)
     {
@@ -2665,7 +2665,7 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
       {
         if(skip_typecast(sum->op0()) == tc_op1 && sum->operands().size() == 2)
         {
-          optionalt<exprt> offset;
+          std::optional<exprt> offset;
           if(sum->type().id() == ID_pointer)
           {
             offset = std::move(simplify_pointer_offset(
@@ -2711,7 +2711,7 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
       return unchanged(expr);
 
     // preserve the sizeof type annotation
-    optionalt<typet> c_sizeof_type;
+    std::optional<typet> c_sizeof_type;
     for(const auto &op : expr.operands())
     {
       const typet &sizeof_type =
@@ -2808,7 +2808,7 @@ simplify_exprt::simplify_node_preorder(const exprt &expr)
   }
   else if(expr.has_operands())
   {
-    optionalt<exprt::operandst> new_operands;
+    std::optional<exprt::operandst> new_operands;
 
     for(std::size_t i = 0; i < expr.operands().size(); ++i)
     {

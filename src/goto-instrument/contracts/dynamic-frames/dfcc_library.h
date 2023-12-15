@@ -14,7 +14,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <util/irep.h>
 #include <util/message.h>
-#include <util/optional.h>
 
 #include <goto-programs/goto_instruction_code.h>
 
@@ -223,7 +222,7 @@ public:
   void load(std::set<irep_idt> &to_instrument);
 
   /// Returns the dfcc_funt that corresponds to the given id if any.
-  optionalt<dfcc_funt> get_dfcc_fun(const irep_idt &id) const;
+  std::optional<dfcc_funt> get_dfcc_fun(const irep_idt &id) const;
 
   /// Returns the name of the given dfcc_funt.
   const irep_idt &get_dfcc_fun_name(dfcc_funt fun) const;
@@ -264,7 +263,7 @@ public:
   /// Returns the library instrumentation hook for the given built-in.
   /// function_id must be one of `__CPROVER_assignable`,
   /// `__CPROVER_object_whole`, `__CPROVER_object_from`, `__CPROVER_object_upto`
-  optionalt<dfcc_funt> get_havoc_hook(const irep_idt &function_id) const;
+  std::optional<dfcc_funt> get_havoc_hook(const irep_idt &function_id) const;
 
   /// \brief Returns the "__dfcc_instrumented_functions" symbol or creates it if
   /// it does not exist already.

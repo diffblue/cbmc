@@ -22,7 +22,7 @@ Author: Matt Lewis
 exprt polynomialt::to_expr()
 {
   exprt ret=nil_exprt();
-  optionalt<typet> itype;
+  std::optional<typet> itype;
 
   // Figure out the appropriate type to do all the intermediate calculations
   // in.

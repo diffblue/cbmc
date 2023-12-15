@@ -64,10 +64,10 @@ public:
   bool parse(const std::string &filename, language_filest &);
   bool parse_stdin(languaget &);
   bool doit();
-  optionalt<symbol_tablet> compile();
-  bool link(optionalt<symbol_tablet> &&symbol_table);
+  std::optional<symbol_tablet> compile();
+  bool link(std::optional<symbol_tablet> &&symbol_table);
 
-  optionalt<symbol_tablet> parse_source(const std::string &);
+  std::optional<symbol_tablet> parse_source(const std::string &);
 
   /// Writes the goto functions of \p src_goto_model to a binary format object
   /// file.

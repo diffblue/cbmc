@@ -32,7 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define JAVA_MAIN_METHOD "main:([Ljava/lang/String;)V"
 
-static optionalt<codet> record_return_value(
+static std::optional<codet> record_return_value(
   const symbolt &function,
   const symbol_table_baset &symbol_table);
 
@@ -493,7 +493,7 @@ static code_blockt java_record_outputs(
   return init_code;
 }
 
-static optionalt<codet> record_return_value(
+static std::optional<codet> record_return_value(
   const symbolt &function,
   const symbol_table_baset &symbol_table)
 {

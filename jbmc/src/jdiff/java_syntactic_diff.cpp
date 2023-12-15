@@ -36,7 +36,7 @@ bool java_syntactic_difft::operator()()
     CHECK_RETURN(fun1 != nullptr);
     const symbolt *fun2 = goto_model2.symbol_table.lookup(gf_entry.first);
     CHECK_RETURN(fun2 != nullptr);
-    const optionalt<irep_idt> class_name = declaring_class(*fun1);
+    const std::optional<irep_idt> class_name = declaring_class(*fun1);
     bool function_access_changed =
       fun1->type.get(ID_access) != fun2->type.get(ID_access);
     bool class_access_changed = false;

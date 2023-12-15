@@ -21,7 +21,7 @@ class namespacet;
 bool is_object_field_element(const exprt &);
 
 // check whether the given two addresses may be aliases
-optionalt<exprt> may_alias(
+std::optional<exprt> may_alias(
   const exprt &,
   const exprt &,
   const std::unordered_set<symbol_exprt, irep_hash> &address_taken,

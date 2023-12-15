@@ -742,11 +742,11 @@ protected:
     const array_exprt &new_char_array,
     const address_of_exprt &string_data);
 
-  optionalt<std::reference_wrapper<const array_exprt>>
+  std::optional<std::reference_wrapper<const array_exprt>>
   try_evaluate_constant_string(const statet &state, const exprt &content);
 
   // clang-format off
-  static optionalt<std::reference_wrapper<const constant_exprt>>
+  static std::optional<std::reference_wrapper<const constant_exprt>>
   try_evaluate_constant(
     const statet &state,
     const exprt &expr);

@@ -106,7 +106,7 @@ void dfcc(
   const optionst &options,
   goto_modelt &goto_model,
   const irep_idt &harness_id,
-  const optionalt<irep_idt> &to_check,
+  const std::optional<irep_idt> &to_check,
   const bool allow_recursive_calls,
   const std::set<irep_idt> &to_replace,
   const bool apply_loop_contracts,
@@ -139,7 +139,7 @@ void dfcc(
   const optionst &options,
   goto_modelt &goto_model,
   const irep_idt &harness_id,
-  const optionalt<std::pair<irep_idt, irep_idt>> &to_check,
+  const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
   const bool allow_recursive_calls,
   const std::map<irep_idt, irep_idt> &to_replace,
   const bool apply_loop_contracts,
@@ -167,7 +167,7 @@ public:
     const optionst &options,
     goto_modelt &goto_model,
     const irep_idt &harness_id,
-    const optionalt<std::pair<irep_idt, irep_idt>> &to_check,
+    const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
     const bool allow_recursive_calls,
     const std::map<irep_idt, irep_idt> &to_replace,
     const dfcc_loop_contract_modet loop_contract_mode,
@@ -204,7 +204,7 @@ protected:
   const optionst &options;
   goto_modelt &goto_model;
   const irep_idt &harness_id;
-  const optionalt<std::pair<irep_idt, irep_idt>> &to_check;
+  const std::optional<std::pair<irep_idt, irep_idt>> &to_check;
   const bool allow_recursive_calls;
   const std::map<irep_idt, irep_idt> &to_replace;
   const dfcc_loop_contract_modet loop_contract_mode;

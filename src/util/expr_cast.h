@@ -101,10 +101,10 @@ auto expr_try_dynamic_cast(TExpr &base)
 /// \tparam T: The type to cast the \p base param to.
 /// \tparam TType: The original type to cast from, must be a exprt rvalue.
 /// \param base: A generic \ref exprt rvalue.
-/// \return Cast value in an optionalt<T> or empty if \a base is not an instance
-///         of T.
+/// \return Cast value in an std::optional<T> or empty if \a base is not an
+///         instance of T.
 template <typename T, typename TExpr>
-optionalt<T> expr_try_dynamic_cast(TExpr &&base)
+std::optional<T> expr_try_dynamic_cast(TExpr &&base)
 {
   static_assert(
     std::is_rvalue_reference<decltype(base)>::value,
@@ -118,7 +118,7 @@ optionalt<T> expr_try_dynamic_cast(TExpr &&base)
   static_assert(!std::is_const<TExpr>::value, "Attempted to move from const.");
   if(!can_cast_expr<T>(base))
     return {};
-  optionalt<T> ret{static_cast<T &&>(base)};
+  std::optional<T> ret{static_cast<T &&>(base)};
   validate_expr(*ret);
   return ret;
 }
@@ -153,10 +153,10 @@ auto type_try_dynamic_cast(TType &base) ->
 /// \tparam T: The type to cast the \p base param to.
 /// \tparam TType: The original type to cast from, must be a typet rvalue.
 /// \param base: A generic \ref typet rvalue.
-/// \return Cast value in an optionalt<T> or empty if \a base is not an instance
-///         of T.
+/// \return Cast value in an std::optional<T> or empty if \a base is not an
+///         instance of T.
 template <typename T, typename TType>
-optionalt<T> type_try_dynamic_cast(TType &&base)
+std::optional<T> type_try_dynamic_cast(TType &&base)
 {
   static_assert(
     std::is_rvalue_reference<decltype(base)>::value,
@@ -171,7 +171,7 @@ optionalt<T> type_try_dynamic_cast(TType &&base)
   if(!can_cast_type<T>(base))
     return {};
   TType::check(base);
-  optionalt<T> ret{static_cast<T &&>(base)};
+  std::optional<T> ret{static_cast<T &&>(base)};
   return ret;
 }
 

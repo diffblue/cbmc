@@ -355,8 +355,8 @@ protected:
 
 private:
   const std::vector<irep_idt> globals_to_havoc;
-  optionalt<std::regex> parameters_to_havoc;
-  optionalt<std::vector<std::size_t>> param_numbers_to_havoc;
+  std::optional<std::regex> parameters_to_havoc;
+  std::optional<std::vector<std::size_t>> param_numbers_to_havoc;
   const c_object_factory_parameterst &object_factory_parameters;
   mutable messaget message;
 };

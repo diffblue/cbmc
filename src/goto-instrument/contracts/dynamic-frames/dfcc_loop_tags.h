@@ -24,7 +24,7 @@ bool dfcc_has_loop_id(
   const goto_programt::instructiont::const_targett &target,
   std::size_t loop_id);
 
-optionalt<std::size_t>
+std::optional<std::size_t>
 dfcc_get_loop_id(const goto_programt::instructiont::const_targett &target);
 
 void dfcc_set_loop_head(goto_programt::instructiont::targett &target);

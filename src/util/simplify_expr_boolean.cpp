@@ -235,7 +235,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 
     if(may_be_reducible_to_interval)
     {
-      optionalt<symbol_exprt> symbol_opt;
+      std::optional<symbol_exprt> symbol_opt;
       std::set<mp_integer> values;
       for(const exprt &op : new_operands)
       {

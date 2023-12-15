@@ -86,7 +86,7 @@ mp_integer gdb_value_extractort::get_malloc_size(irep_idt name)
     return scope_it->size();
 }
 
-optionalt<std::string> gdb_value_extractort::get_malloc_pointee(
+std::optional<std::string> gdb_value_extractort::get_malloc_pointee(
   const memory_addresst &point,
   mp_integer member_size)
 {

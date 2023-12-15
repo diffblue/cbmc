@@ -99,7 +99,7 @@ public:
   void add(const codet &destructor);
 
   /// Fetches the destructor value for the passed-in node index.
-  optionalt<codet> &get_destructor(node_indext index);
+  std::optional<codet> &get_destructor(node_indext index);
 
   /// Builds a vector of destructors that start from starting_index and ends
   /// at end_index.
@@ -110,8 +110,8 @@ public:
   /// \return collection of destructors that should be called for the
   ///     range supplied.
   const std::vector<destructor_and_idt> get_destructors(
-    optionalt<node_indext> end_index = {},
-    optionalt<node_indext> starting_index = {});
+    std::optional<node_indext> end_index = {},
+    std::optional<node_indext> starting_index = {});
 
   /// Finds the nearest common ancestor of two nodes and then returns it.
   /// This should be used when you want to find out what parts of the two
@@ -123,7 +123,7 @@ public:
   /// Sets the current node. Next time a node is added to the stack it will
   /// be added as a child of this node. If passed an empty index, no
   /// assignment will be done.
-  void set_current_node(optionalt<node_indext> val);
+  void set_current_node(std::optional<node_indext> val);
 
   /// Sets the current node. Next time a node is added to the stack it will
   /// be added as a child of this node.
@@ -145,7 +145,7 @@ private:
       : destructor_value(std::move(destructor))
     {
     }
-    optionalt<codet> destructor_value;
+    std::optional<codet> destructor_value;
   };
 
   grapht<destructor_nodet> destruction_graph;

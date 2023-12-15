@@ -18,7 +18,6 @@ Date: February 2023
 
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/optional.h>
 #include <util/std_expr.h>
 
 #include "dfcc_contract_mode.h"

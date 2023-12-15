@@ -13,7 +13,7 @@ Author: Peter Schrammel
 
 #include <util/message.h>
 
-optionalt<std::size_t> cover_basic_blockst::continuation_of_block(
+std::optional<std::size_t> cover_basic_blockst::continuation_of_block(
   const goto_programt::const_targett &instruction,
   cover_basic_blockst::block_mapt &block_map)
 {
@@ -103,7 +103,7 @@ std::size_t cover_basic_blockst::block_of(goto_programt::const_targett t) const
   return it->second;
 }
 
-optionalt<goto_programt::const_targett>
+std::optional<goto_programt::const_targett>
 cover_basic_blockst::instruction_of(const std::size_t block_nr) const
 {
   INVARIANT(block_nr < block_infos.size(), "block number out of range");
@@ -214,7 +214,7 @@ cover_basic_blocks_javat::block_of(goto_programt::const_targett t) const
   return it->second;
 }
 
-optionalt<goto_programt::const_targett>
+std::optional<goto_programt::const_targett>
 cover_basic_blocks_javat::instruction_of(const std::size_t block_nr) const
 {
   PRECONDITION(block_nr < block_infos.size());

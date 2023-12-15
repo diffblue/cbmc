@@ -110,7 +110,7 @@ void dfcc_contract_handlert::add_contract_instructions(
 
 const symbolt &dfcc_contract_handlert::get_pure_contract_symbol(
   const irep_idt &contract_id,
-  const optionalt<irep_idt> function_id_opt)
+  const std::optional<irep_idt> function_id_opt)
 {
   auto pure_contract_id = "contract::" + id2string(contract_id);
   const symbolt *pure_contract_symbol = nullptr;

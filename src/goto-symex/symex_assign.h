@@ -28,7 +28,7 @@ class symex_assignt
 {
 public:
   symex_assignt(
-    optionalt<shadow_memoryt> shadow_memory,
+    std::optional<shadow_memoryt> shadow_memory,
     goto_symex_statet &state,
     symex_targett::assignment_typet assignment_type,
     const namespacet &ns,
@@ -60,7 +60,7 @@ public:
     exprt::operandst &guard);
 
 private:
-  optionalt<shadow_memoryt> shadow_memory;
+  std::optional<shadow_memoryt> shadow_memory;
   goto_symex_statet &state;
   symex_targett::assignment_typet assignment_type;
   const namespacet &ns;

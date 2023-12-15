@@ -1116,7 +1116,7 @@ void state_encodingt::encode(
 void state_encoding(
   const goto_modelt &goto_model,
   bool program_is_inlined,
-  optionalt<irep_idt> contract,
+  std::optional<irep_idt> contract,
   encoding_targett &dest)
 {
   if(program_is_inlined)
@@ -1179,7 +1179,7 @@ void state_encoding(
   const goto_modelt &goto_model,
   state_encoding_formatt state_encoding_format,
   bool program_is_inlined,
-  optionalt<irep_idt> contract,
+  std::optional<irep_idt> contract,
   std::ostream &out)
 {
   switch(state_encoding_format)
@@ -1236,7 +1236,7 @@ void variable_encoding(
 solver_resultt state_encoding_solver(
   const goto_modelt &goto_model,
   bool program_is_inlined,
-  optionalt<irep_idt> contract,
+  std::optional<irep_idt> contract,
   const solver_optionst &solver_options)
 {
   const namespacet ns(goto_model.symbol_table);

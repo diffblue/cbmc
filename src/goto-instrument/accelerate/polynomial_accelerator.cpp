@@ -497,7 +497,7 @@ void polynomial_acceleratort::assert_for_values(
   overflow_instrumentert &overflow)
 {
   // First figure out what the appropriate type for this expression is.
-  optionalt<typet> expr_type;
+  std::optional<typet> expr_type;
 
   for(std::map<exprt, int>::iterator it=values.begin();
       it!=values.end();

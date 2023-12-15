@@ -4,12 +4,11 @@
 
 #include <testing-utils/use_catch.h>
 
-#include <util/optional.h>
-
+#include <optional>
 #include <string>
 #include <vector>
 
-optionalt<std::string>
+std::optional<std::string>
 prefix_in_list(const std::string &option, const std::vector<std::string> &list);
 
 static const std::vector<std::string> test_list{"spam", "eggs", "and", "ham"};

@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ssa_expr.h"
 #include "std_expr.h"
 
-optionalt<mp_integer> member_offset(
+std::optional<mp_integer> member_offset(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns)
@@ -63,7 +63,7 @@ optionalt<mp_integer> member_offset(
   return result;
 }
 
-optionalt<mp_integer> member_offset_bits(
+std::optional<mp_integer> member_offset_bits(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns)
@@ -87,7 +87,7 @@ optionalt<mp_integer> member_offset_bits(
 }
 
 /// Compute the size of a type in bytes, rounding up to full bytes
-optionalt<mp_integer>
+std::optional<mp_integer>
 pointer_offset_size(const typet &type, const namespacet &ns)
 {
   auto bits = pointer_offset_bits(type, ns);
@@ -98,7 +98,7 @@ pointer_offset_size(const typet &type, const namespacet &ns)
     return {};
 }
 
-optionalt<mp_integer>
+std::optional<mp_integer>
 pointer_offset_bits(const typet &type, const namespacet &ns)
 {
   if(type.id()==ID_array)
@@ -218,7 +218,7 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
     return {};
 }
 
-optionalt<exprt>
+std::optional<exprt>
 member_offset_expr(const member_exprt &member_expr, const namespacet &ns)
 {
   // need to distinguish structs and unions
@@ -232,7 +232,7 @@ member_offset_expr(const member_exprt &member_expr, const namespacet &ns)
     return {};
 }
 
-optionalt<exprt> member_offset_expr(
+std::optional<exprt> member_offset_expr(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns)
@@ -278,7 +278,7 @@ optionalt<exprt> member_offset_expr(
   return simplify_expr(std::move(result), ns);
 }
 
-optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
+std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
 {
   if(type.id()==ID_array)
   {
@@ -504,7 +504,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     return {};
 }
 
-optionalt<mp_integer>
+std::optional<mp_integer>
 compute_pointer_offset(const exprt &expr, const namespacet &ns)
 {
   if(expr.id()==ID_symbol)
@@ -566,7 +566,7 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
   return {}; // don't know
 }
 
-optionalt<exprt> get_subexpression_at_offset(
+std::optional<exprt> get_subexpression_at_offset(
   const exprt &expr,
   const mp_integer &offset_bytes,
   const typet &target_type_raw,
@@ -689,7 +689,7 @@ optionalt<exprt> get_subexpression_at_offset(
     expr, from_integer(offset_bytes, c_index_type()), target_type_raw);
 }
 
-optionalt<exprt> get_subexpression_at_offset(
+std::optional<exprt> get_subexpression_at_offset(
   const exprt &expr,
   const exprt &offset,
   const typet &target_type,

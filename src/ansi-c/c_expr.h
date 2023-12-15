@@ -21,7 +21,7 @@ class shuffle_vector_exprt : public multi_ary_exprt
 public:
   shuffle_vector_exprt(
     exprt vector1,
-    optionalt<exprt> vector2,
+    std::optional<exprt> vector2,
     exprt::operandst indices);
 
   const vector_typet &type() const

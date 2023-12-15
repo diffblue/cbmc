@@ -449,7 +449,7 @@ static std::string strip_first_field_from_suffix(
   return suffix.substr(field.length() + 1);
 }
 
-optionalt<irep_idt> value_sett::get_index_of_symbol(
+std::optional<irep_idt> value_sett::get_index_of_symbol(
   irep_idt identifier,
   const typet &type,
   const std::string &suffix,
@@ -698,10 +698,10 @@ void value_sett::get_value_set_rec(
       throw expr.id_string()+" expected to have at least two operands";
 
     object_mapt pointer_expr_set;
-    optionalt<mp_integer> i;
+    std::optional<mp_integer> i;
 
     // special case for plus/minus and exactly one pointer
-    optionalt<exprt> ptr_operand;
+    std::optional<exprt> ptr_operand;
     if(
       expr_type.id() == ID_pointer &&
       (expr.id() == ID_plus || expr.id() == ID_minus))

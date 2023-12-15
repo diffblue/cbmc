@@ -72,13 +72,13 @@ void goto_symext::apply_goto_condition(
 /// \param symbol_expr: The symbol expression in the condition
 /// \param other_operand: The other expression in the condition; we only support
 ///   an address of expression, a typecast of an address of expression or a
-///   null pointer, and return an empty optionalt in all other cases
+///   null pointer, and return an empty std::optional in all other cases
 /// \param value_set: The value-set for looking up what the symbol can point to
 /// \param language_mode: The language mode
 /// \param ns: A namespace
 /// \return If we were able to evaluate the condition as true or false then we
-///   return that, otherwise we return an empty optionalt
-static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
+///   return that, otherwise we return an empty std::optional
+static std::optional<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   const irep_idt &operation,
   const symbol_exprt &symbol_expr,
   const exprt &other_operand,
@@ -179,8 +179,8 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
 /// \param language_mode: The language mode
 /// \param ns: A namespace
 /// \return If we were able to evaluate the condition as true or false then we
-///   return that, otherwise we return an empty optionalt
-static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
+///   return that, otherwise we return an empty std::optional
+static std::optional<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   const renamedt<exprt, L2> &renamed_expr,
   const value_sett &value_set,
   const irep_idt &language_mode,

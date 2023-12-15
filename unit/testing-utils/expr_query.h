@@ -17,8 +17,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/expr_cast.h>
 
-/// Wrapper for optionalt<exprt> with useful method for queries to be used in
-/// unit tests.
+/// Wrapper for std::optional<exprt> with useful method for queries to be used
+/// in unit tests.
 template <typename T = exprt>
 class expr_queryt
 {

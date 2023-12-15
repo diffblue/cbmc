@@ -277,7 +277,7 @@ public:
   /// Return the base with the given name, if exists.
   /// \param id: The name of the base we are looking for.
   /// \return The base if exists.
-  optionalt<baset> get_base(const irep_idt &id) const;
+  std::optional<baset> get_base(const irep_idt &id) const;
 
   /// Test whether `id` is a base class/struct.
   /// \param id: symbol type name

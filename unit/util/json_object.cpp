@@ -9,7 +9,6 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <util/json.h>
-#include <util/optional.h>
 #include <util/optional_utils.h>
 #include <util/range.h>
 
@@ -38,13 +37,13 @@ SCENARIO(
           return make_pair(number, json_stringt{number});
         });
 
-      const optionalt<jsont> one = optional_lookup(object, "one");
+      const std::optional<jsont> one = optional_lookup(object, "one");
       REQUIRE(one);
       REQUIRE(one->value == "one");
-      const optionalt<jsont> two = optional_lookup(object, "two");
+      const std::optional<jsont> two = optional_lookup(object, "two");
       REQUIRE(two);
       REQUIRE(two->value == "two");
-      const optionalt<jsont> three = optional_lookup(object, "three");
+      const std::optional<jsont> three = optional_lookup(object, "three");
       REQUIRE(three);
       REQUIRE(three->value == "three");
     }

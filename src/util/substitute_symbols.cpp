@@ -13,7 +13,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "std_expr.h"
 
-static optionalt<exprt> substitute_symbols_rec(
+static std::optional<exprt> substitute_symbols_rec(
   const std::map<irep_idt, exprt> &substitutions,
   exprt src)
 {
@@ -107,7 +107,7 @@ static optionalt<exprt> substitute_symbols_rec(
     return {};
 }
 
-optionalt<exprt>
+std::optional<exprt>
 substitute_symbols(const std::map<irep_idt, exprt> &substitutions, exprt src)
 {
   return substitute_symbols_rec(substitutions, src);

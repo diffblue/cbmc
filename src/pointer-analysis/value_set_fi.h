@@ -57,7 +57,7 @@ public:
 
   /// Represents the offset into an object: either a unique integer offset,
   /// or an unknown value, represented by `!offset`.
-  typedef optionalt<mp_integer> offsett;
+  typedef std::optional<mp_integer> offsett;
   bool offset_is_zero(const offsett &offset) const
   {
     return offset && offset->is_zero();

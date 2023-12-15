@@ -286,7 +286,7 @@ static void remove_complex(
   goto_functionst::goto_functiont &goto_function)
 {
   for(auto &i : goto_function.body.instructions)
-    i.transform([](exprt e) -> optionalt<exprt> {
+    i.transform([](exprt e) -> std::optional<exprt> {
       if(have_to_remove_complex(e))
       {
         remove_complex(e);

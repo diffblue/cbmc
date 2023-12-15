@@ -100,7 +100,7 @@ code_with_references_listt assign_from_json(
   const jsont &json,
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
-  optionalt<ci_lazy_methods_neededt> &needed_lazy_methods,
+  std::optional<ci_lazy_methods_neededt> &needed_lazy_methods,
   size_t max_user_array_length,
   std::unordered_map<std::string, object_creation_referencet> &references);
 

@@ -1214,8 +1214,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       options,
       goto_model,
       harness_id,
-      to_enforce.empty() ? optionalt<irep_idt>{}
-                         : optionalt<irep_idt>{to_enforce.front()},
+      to_enforce.empty() ? std::optional<irep_idt>{}
+                         : std::optional<irep_idt>{to_enforce.front()},
       allow_recursive_calls,
       to_replace,
       cmdline.isset(FLAG_LOOP_CONTRACTS),

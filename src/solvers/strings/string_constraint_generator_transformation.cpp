@@ -269,7 +269,7 @@ string_constraint_generatort::add_axioms_for_trim(
 ///   not primitive chars.
 /// \param array_pool: pool of arrays representing strings
 /// \return Optional pair of two expressions
-static optionalt<std::pair<exprt, exprt>> to_char_pair(
+static std::optional<std::pair<exprt, exprt>> to_char_pair(
   exprt expr1,
   exprt expr2,
   std::function<array_string_exprt(const exprt &)> get_string_expr,

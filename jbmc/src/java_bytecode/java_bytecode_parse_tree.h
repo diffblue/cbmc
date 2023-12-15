@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <map>
 
-#include <util/optional.h>
 #include <util/std_types.h>
 
 #include "bytecode_info.h"
@@ -48,7 +47,7 @@ struct java_bytecode_parse_treet
 
   typedef std::vector<annotationt> annotationst;
 
-  static optionalt<annotationt> find_annotation(
+  static std::optional<annotationt> find_annotation(
     const annotationst &annotations,
     const irep_idt &annotation_type_name);
 
@@ -64,7 +63,7 @@ struct java_bytecode_parse_treet
   struct membert
   {
     std::string descriptor;
-    optionalt<std::string> signature;
+    std::optional<std::string> signature;
     irep_idt name;
     bool is_public, is_protected, is_private, is_static, is_final;
     annotationst annotations;
@@ -127,7 +126,7 @@ struct java_bytecode_parse_treet
     {
       irep_idt name;
       std::string descriptor;
-      optionalt<std::string> signature;
+      std::optional<std::string> signature;
       std::size_t index;
       std::size_t start_pc;
       std::size_t length;
@@ -228,7 +227,7 @@ struct java_bytecode_parse_treet
     struct lambda_method_handlet
     {
       java_class_typet::method_handle_kindt handle_type;
-      optionalt<class_method_descriptor_exprt> method_descriptor;
+      std::optional<class_method_descriptor_exprt> method_descriptor;
 
       /// Construct a lambda method handle with parameters \p params.
       lambda_method_handlet(
@@ -273,7 +272,7 @@ struct java_bytecode_parse_treet
 
     typedef std::list<irep_idt> implementst;
     implementst implements;
-    optionalt<std::string> signature;
+    std::optional<std::string> signature;
     typedef std::list<fieldt> fieldst;
     typedef std::list<methodt> methodst;
     fieldst fields;

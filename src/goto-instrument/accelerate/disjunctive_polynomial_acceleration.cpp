@@ -640,7 +640,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(
   exprt &target)
 {
   // First figure out what the appropriate type for this expression is.
-  optionalt<typet> expr_type;
+  std::optional<typet> expr_type;
 
   for(std::map<exprt, exprt>::iterator it=values.begin();
       it!=values.end();

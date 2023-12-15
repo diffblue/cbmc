@@ -170,7 +170,7 @@ propertyt::tracet counterexample(
   return trace;
 }
 
-optionalt<propertyt::tracet> counterexample_found(
+std::optional<propertyt::tracet> counterexample_found(
   const std::vector<framet> &frames,
   const workt &work,
   const std::unordered_set<symbol_exprt, irep_hash> &address_taken,

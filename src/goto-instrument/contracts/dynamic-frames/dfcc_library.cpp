@@ -203,7 +203,7 @@ dfcc_funt dfcc_libraryt::get_hook(const irep_idt &function_id) const
 }
 
 // Returns the havoc function to use for a given front-end function
-optionalt<dfcc_funt>
+std::optional<dfcc_funt>
 dfcc_libraryt::get_havoc_hook(const irep_idt &function_id) const
 {
   auto found = havoc_hook.find(function_id);
@@ -362,7 +362,7 @@ void dfcc_libraryt::load(std::set<irep_idt> &to_instrument)
     goto_model.goto_functions.function_map.at(it.second.name).make_hidden();
 }
 
-optionalt<dfcc_funt> dfcc_libraryt::get_dfcc_fun(const irep_idt &id) const
+std::optional<dfcc_funt> dfcc_libraryt::get_dfcc_fun(const irep_idt &id) const
 {
   auto found = dfcc_name_to_fun.find(id);
   if(found != dfcc_name_to_fun.end())

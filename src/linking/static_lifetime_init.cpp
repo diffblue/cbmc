@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-static optionalt<codet> static_lifetime_init(
+static std::optional<codet> static_lifetime_init(
   const irep_idt &identifier,
   symbol_table_baset &symbol_table)
 {

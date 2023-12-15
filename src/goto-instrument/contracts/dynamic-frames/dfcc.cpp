@@ -16,7 +16,6 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
-#include <util/optional.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
@@ -117,7 +116,7 @@ void dfcc(
   const optionst &options,
   goto_modelt &goto_model,
   const irep_idt &harness_id,
-  const optionalt<irep_idt> &to_check,
+  const std::optional<irep_idt> &to_check,
   const bool allow_recursive_calls,
   const std::set<irep_idt> &to_replace,
   const bool apply_loop_contracts,
@@ -134,7 +133,7 @@ void dfcc(
     goto_model,
     harness_id,
     to_check.has_value() ? parse_function_contract_pair(to_check.value())
-                         : optionalt<std::pair<irep_idt, irep_idt>>{},
+                         : std::optional<std::pair<irep_idt, irep_idt>>{},
     allow_recursive_calls,
     to_replace_map,
     apply_loop_contracts,
@@ -147,7 +146,7 @@ void dfcc(
   const optionst &options,
   goto_modelt &goto_model,
   const irep_idt &harness_id,
-  const optionalt<std::pair<irep_idt, irep_idt>> &to_check,
+  const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
   const bool allow_recursive_calls,
   const std::map<irep_idt, irep_idt> &to_replace,
   const bool apply_loop_contracts,
@@ -172,7 +171,7 @@ dfcct::dfcct(
   const optionst &options,
   goto_modelt &goto_model,
   const irep_idt &harness_id,
-  const optionalt<std::pair<irep_idt, irep_idt>> &to_check,
+  const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
   const bool allow_recursive_calls,
   const std::map<irep_idt, irep_idt> &to_replace,
   const dfcc_loop_contract_modet loop_contract_mode,

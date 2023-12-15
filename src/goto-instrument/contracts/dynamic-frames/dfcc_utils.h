@@ -104,7 +104,7 @@ struct dfcc_utilst
     goto_modelt &goto_model,
     const irep_idt &function_id,
     const irep_idt &new_function_id,
-    optionalt<typet> new_return_type);
+    std::optional<typet> new_return_type);
 
   /// Given a function to wrap `foo` and a new name `wrapped_foo`
   ///

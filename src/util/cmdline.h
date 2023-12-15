@@ -12,10 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <limits>
 #include <list>
+#include <optional>
 #include <string>
 #include <vector>
-
-#include "optional.h"
 
 class cmdlinet
 {
@@ -190,8 +189,8 @@ protected:
 
   std::vector<optiont> options;
 
-  optionalt<std::size_t> getoptnr(char option) const;
-  optionalt<std::size_t> getoptnr(const std::string &option) const;
+  std::optional<std::size_t> getoptnr(char option) const;
+  std::optional<std::size_t> getoptnr(const std::string &option) const;
 };
 
 #endif // CPROVER_UTIL_CMDLINE_H

@@ -107,7 +107,7 @@ protected:
   const goto_functionst &goto_functions;
 
   typedef std::unordered_map<irep_idt, mp_integer> memory_mapt;
-  using inverse_memory_mapt = std::map<mp_integer, optionalt<symbol_exprt>>;
+  using inverse_memory_mapt = std::map<mp_integer, std::optional<symbol_exprt>>;
   memory_mapt memory_map;
   inverse_memory_mapt inverse_memory_map;
 

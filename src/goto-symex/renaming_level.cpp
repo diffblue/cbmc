@@ -52,7 +52,8 @@ void symex_level1t::insert(
     ssa.get().get_identifier(), std::make_pair(ssa.get(), index));
 }
 
-optionalt<std::pair<ssa_exprt, std::size_t>> symex_level1t::insert_or_replace(
+std::optional<std::pair<ssa_exprt, std::size_t>>
+symex_level1t::insert_or_replace(
   const renamedt<ssa_exprt, L0> &ssa,
   std::size_t index)
 {

@@ -32,7 +32,7 @@ resolve_inherited_componentt::resolve_inherited_componentt(
 /// \param user_filter: Predicate that should return true for symbols that can
 ///   be returned. Those for which it returns false will be ignored.
 /// \return The concrete component that has been resolved
-optionalt<resolve_inherited_componentt::inherited_componentt>
+std::optional<resolve_inherited_componentt::inherited_componentt>
 resolve_inherited_componentt::operator()(
   const irep_idt &class_id,
   const irep_idt &component_name,
@@ -122,7 +122,7 @@ irep_idt resolve_inherited_componentt::inherited_componentt::
 ///   class specifier)
 /// \param symbol_table: Global symbol table
 /// \return The concrete component that has been resolved
-optionalt<resolve_inherited_componentt::inherited_componentt>
+std::optional<resolve_inherited_componentt::inherited_componentt>
 get_inherited_method_implementation(
   const irep_idt &call_basename,
   const irep_idt &classname,

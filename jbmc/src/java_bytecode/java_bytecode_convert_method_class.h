@@ -40,7 +40,7 @@ public:
     message_handlert &_message_handler,
     size_t _max_array_length,
     bool throw_assertion_error,
-    optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+    std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
     java_string_library_preprocesst &_string_preprocess,
     const class_hierarchyt &class_hierarchy,
     bool threading_support,
@@ -69,7 +69,7 @@ public:
   void operator()(
     const symbolt &class_symbol,
     const methodt &method,
-    const optionalt<prefix_filtert> &method_context)
+    const std::optional<prefix_filtert> &method_context)
   {
     convert(class_symbol, method, method_context);
   }
@@ -84,7 +84,7 @@ protected:
   const bool throw_assertion_error;
   const bool assert_no_exceptions_thrown;
   const bool threading_support;
-  optionalt<ci_lazy_methods_neededt> needed_lazy_methods;
+  std::optional<ci_lazy_methods_neededt> needed_lazy_methods;
 
   /// Fully qualified name of the method under translation.
   /// Initialized by `convert`.
@@ -319,7 +319,7 @@ protected:
   void convert(
     const symbolt &class_symbol,
     const methodt &,
-    const optionalt<prefix_filtert> &method_context);
+    const std::optional<prefix_filtert> &method_context);
 
   code_blockt convert_parameter_annotations(
     const methodt &method,
@@ -368,7 +368,7 @@ protected:
       std::vector<java_bytecode_parse_treet::instructiont>::const_iterator>
       &ret_instructions) const;
 
-  optionalt<exprt> convert_invoke_dynamic(
+  std::optional<exprt> convert_invoke_dynamic(
     const source_locationt &location,
     std::size_t instruction_address,
     const exprt &arg0,

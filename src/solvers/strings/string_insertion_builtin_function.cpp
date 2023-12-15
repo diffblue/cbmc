@@ -62,7 +62,7 @@ std::vector<mp_integer> string_insertion_builtin_functiont::eval(
   return eval_result;
 }
 
-optionalt<exprt> string_insertion_builtin_functiont::eval(
+std::optional<exprt> string_insertion_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
   const auto &input1_value = eval_string(input1, get_value);

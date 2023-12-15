@@ -23,7 +23,6 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/c_types.h>
-#include <util/optional.h>
 
 /// A very simple analysis that counts executed instructions along a particular
 /// path, taking the max at merge points and saturating at 100 instructions.
@@ -33,8 +32,7 @@ Author: Diffblue Ltd.
 class instruction_counter_domaint : public ai_domain_baset
 {
 public:
-
-  optionalt<unsigned> path_length;
+  std::optional<unsigned> path_length;
 
   void transform(
     const irep_idt &,

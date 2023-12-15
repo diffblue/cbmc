@@ -169,7 +169,7 @@ simplify_exprt::simplify_index(const index_exprt &expr)
 
     if(array.type().id() == ID_array || array.type().id() == ID_vector)
     {
-      optionalt<typet> subtype;
+      std::optional<typet> subtype;
       if(array.type().id() == ID_array)
         subtype = to_array_type(array.type()).element_type();
       else
@@ -215,7 +215,7 @@ simplify_exprt::simplify_index_preorder(const index_exprt &expr)
   }
   else
   {
-    optionalt<exprt::operandst> new_operands;
+    std::optional<exprt::operandst> new_operands;
 
     for(std::size_t i = 0; i < expr.operands().size(); ++i)
     {

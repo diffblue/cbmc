@@ -53,8 +53,8 @@ public:
   /// a given type parameter
   /// \param parameter_name: The name of the type parameter
   /// \returns: The specialization for the given type parameter, if there was
-  ///   one before the pop, or an empty optionalt if the stack was empty
-  optionalt<reference_typet> pop(const irep_idt &parameter_name);
+  ///   one before the pop, or an empty std::optional if the stack was empty
+  std::optional<reference_typet> pop(const irep_idt &parameter_name);
 
   /// A wrapper for a generic_parameter_specialization_mapt and a namespacet
   /// that can be output to a stream

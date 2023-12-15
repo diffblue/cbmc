@@ -42,7 +42,7 @@ public:
     const symbol_tablet &,
     goto_functionst &,
     bool show_full,
-    const optionalt<std::string> &json_file_name);
+    const std::optional<std::string> &json_file_name);
 
 protected:
   messaget log;
@@ -226,7 +226,7 @@ bool taint_analysist::operator()(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   bool show_full,
-  const optionalt<std::string> &json_file_name)
+  const std::optional<std::string> &json_file_name)
 {
   try
   {
@@ -421,7 +421,7 @@ bool taint_analysis(
   const std::string &taint_file_name,
   message_handlert &message_handler,
   bool show_full,
-  const optionalt<std::string> &json_file_name)
+  const std::optional<std::string> &json_file_name)
 {
   taint_analysist taint_analysis(message_handler);
   return taint_analysis(
