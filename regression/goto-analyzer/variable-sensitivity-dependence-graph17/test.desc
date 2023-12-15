@@ -1,6 +1,6 @@
 CORE
 main.c
---dependence-graph-vs --vsd-arrays every-element --show
+--no-standard-checks --dependence-graph-vs --vsd-arrays every-element --show
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 data-dependency-context.c
---variable-sensitivity --vsd-structs every-field --vsd-arrays every-element --vsd-data-dependencies --show
+--no-standard-checks --variable-sensitivity --vsd-structs every-field --vsd-arrays every-element --vsd-data-dependencies --show
 // Enable multi-line checking
 activate-multi-line-match
 ^EXIT=0$

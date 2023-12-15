@@ -1,6 +1,6 @@
 CORE
 main-always.c
---variable-sensitivity --vsd-values set-of-constants --show
+--no-standard-checks --variable-sensitivity --vsd-values set-of-constants --show
 ^EXIT=0$
 ^SIGNAL=0$
 ^main::1::i .* value-set-begin: 5 :value-set-end @ \[17\]
