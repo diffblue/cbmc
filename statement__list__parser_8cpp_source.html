@@ -144,7 +144,7 @@ $(document).ready(function(){initNavTree('statement__list__parser_8cpp_source.ht
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">if</span>(op.get(ID_statement_list_type) == ID_statement_list_version)</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    {</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstring__constantt.html">string_constantt</a> &amp;constant{<a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(op)};</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(constant.get_value());</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(constant.value());</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  }</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3af99897b60119951af8961dbd52dd3f">UNREACHABLE</a>; <span class="comment">// Root expression should always have a version</span></div>
@@ -314,10 +314,10 @@ $(document).ready(function(){initNavTree('statement__list__parser_8cpp_source.ht
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        code_token.<a class="code" href="classexprt.html#af3e85c53e888c1a6d58ce016ce6bccdd">add_to_operands</a>(*op_it);</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    }</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">if</span>(label.get_value() == ID_nil)</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">if</span>(label.value() == ID_nil)</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      instruction.<a class="code" href="structstatement__list__parse__treet_1_1instructiont.html#a569eabb2129d8de49bae1f2058856346">add_token</a>(code_token);</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      instruction.<a class="code" href="structstatement__list__parse__treet_1_1instructiont.html#a569eabb2129d8de49bae1f2058856346">add_token</a>(<a class="code" href="classcode__labelt.html">code_labelt</a>{label.get_value(), code_token});</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      instruction.<a class="code" href="structstatement__list__parse__treet_1_1instructiont.html#a569eabb2129d8de49bae1f2058856346">add_token</a>(<a class="code" href="classcode__labelt.html">code_labelt</a>{label.value(), code_token});</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    network.<a class="code" href="structstatement__list__parse__treet_1_1networkt.html#ac2944516ce10714c760ede7683e88008">add_instruction</a>(instruction);</div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  }</div>

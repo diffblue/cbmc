@@ -895,7 +895,7 @@ $(document).ready(function(){initNavTree('string__abstraction_8cpp_source.html',
 <div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;  <span class="keywordflow">if</span>(<span class="keywordtype">object</span>.<span class="keywordtype">id</span>()==ID_string_constant)</div>
 <div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;  {</div>
 <div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;    <span class="keyword">const</span> std::string &amp;str_value =</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;      <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(<span class="keywordtype">object</span>).get_value());</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;      <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<a class="code" href="string__constant_8h.html#a23c766e4d074e46ced9ce2e4c13e8a5a">to_string_constant</a>(<span class="keywordtype">object</span>).value());</div>
 <div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    <span class="comment">// make sure we handle the case of a string constant with string-terminating</span></div>
 <div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    <span class="comment">// \0 in it</span></div>
 <div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;    <span class="keyword">const</span> std::size_t str_len =</div>
