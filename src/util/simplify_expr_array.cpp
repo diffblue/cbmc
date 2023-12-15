@@ -128,7 +128,7 @@ simplify_exprt::simplify_index(const index_exprt &expr)
   {
     const auto i = numeric_cast<mp_integer>(index);
 
-    const std::string &value = id2string(to_string_constant(array).get_value());
+    const std::string &value = id2string(to_string_constant(array).value());
 
     if(!i.has_value())
     {

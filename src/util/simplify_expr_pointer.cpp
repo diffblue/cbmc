@@ -689,7 +689,7 @@ simplify_exprt::simplify_object_size(const object_size_exprt &expr)
     {
       typet type=expr.type();
       return from_integer(
-        to_string_constant(op_object).get_value().size() + 1, type);
+        to_string_constant(op_object).value().size() + 1, type);
     }
   }
 

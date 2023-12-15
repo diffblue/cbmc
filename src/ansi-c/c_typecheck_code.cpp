@@ -119,7 +119,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
       error().source_location = code.find_source_location();
       error() << "static assertion failed";
       if(code.op1().id() == ID_string_constant)
-        error() << ": " << to_string_constant(code.op1()).get_value();
+        error() << ": " << to_string_constant(code.op1()).value();
       error() << eom;
       throw 0;
     }

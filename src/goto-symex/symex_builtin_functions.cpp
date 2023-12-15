@@ -320,12 +320,12 @@ static irep_idt get_string_argument_rec(const exprt &src)
         index_expr.index().is_zero())
       {
         const exprt &fmt_str = index_expr.array();
-        return to_string_constant(fmt_str).get_value();
+        return to_string_constant(fmt_str).value();
       }
     }
     else if(object.id() == ID_string_constant)
     {
-      return to_string_constant(object).get_value();
+      return to_string_constant(object).value();
     }
   }
 

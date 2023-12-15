@@ -365,7 +365,7 @@ string_constraint_generatort::add_axioms_for_char_literal(
   {
     const string_constantt &s = to_string_constant(
       to_binary_expr(to_unary_expr(to_unary_expr(arg).op()).op()).op0());
-    const std::string &sval = id2string(s.get_value());
+    const std::string &sval = id2string(s.value());
     CHECK_RETURN(sval.size() == 1);
     return {from_integer(unsigned(sval[0]), arg.type()), {}};
   }
