@@ -9,7 +9,7 @@ var classvalue__set__fit =
     [ "gvs_recursion_sett", "classvalue__set__fit.html#ad76fce18b27962024c7403e4f7f2c61e", null ],
     [ "idt", "classvalue__set__fit.html#ad1fd57abccb2accb49c6acb34c41ee38", null ],
     [ "object_mapt", "classvalue__set__fit.html#a72a2cbe6470086787a9871b1aeec8c3f", null ],
-    [ "offsett", "classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2", null ],
+    [ "offsett", "classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52", null ],
     [ "recfind_recursion_sett", "classvalue__set__fit.html#a9c6ed3b22852dfada78337bfb64d498d", null ],
     [ "valuest", "classvalue__set__fit.html#add0eaab401e0e4df9118a4036bf25eda", null ],
     [ "value_set_fit", "classvalue__set__fit.html#a8308a0ec997c92fe1ca34ed321572024", null ],

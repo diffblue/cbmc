@@ -99,17 +99,17 @@ $(document).ready(function(){initNavTree('format__strings_8h.html',''); initResi
 
 <p>Format String <a class="el" href="class_parser.html">Parser</a>.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;string&gt;</code><br />
-<code>#include &lt;list&gt;</code><br />
-<code>#include &lt;<a class="el" href="irep_8h_source.html">util/irep.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="irep_8h_source.html">util/irep.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="mp__arith_8h_source.html">util/mp_arith.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="optional_8h_source.html">util/optional.h</a>&gt;</code><br />
+<code>#include &lt;list&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
+<code>#include &lt;string&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for format_strings.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="format__strings_8h__incl.svg" width="1639" height="515"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="format__strings_8h__incl.svg" width="1608" height="515"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -137,8 +137,8 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a256e2911df3b394de61aa43b133ced52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="format__strings_8h.html#ab232cba724f5764f9c8bcb0e0160b209">format_token_listt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="format__strings_8h.html#a256e2911df3b394de61aa43b133ced52">parse_format_string</a> (const std::string &amp;)</td></tr>
 <tr class="separator:a256e2911df3b394de61aa43b133ced52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc750f5ce665b9a5e1eb608faf27974b"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="format__strings_8h.html#afc750f5ce665b9a5e1eb608faf27974b">get_type</a> (const <a class="el" href="classformat__tokent.html">format_tokent</a> &amp;)</td></tr>
-<tr class="separator:afc750f5ce665b9a5e1eb608faf27974b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab427dcf5109b78471d894a1be4633773"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="format__strings_8h.html#ab427dcf5109b78471d894a1be4633773">get_type</a> (const <a class="el" href="classformat__tokent.html">format_tokent</a> &amp;)</td></tr>
+<tr class="separator:ab427dcf5109b78471d894a1be4633773"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Format String <a class="el" href="class_parser.html">Parser</a>. </p>
@@ -162,14 +162,14 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="afc750f5ce665b9a5e1eb608faf27974b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc750f5ce665b9a5e1eb608faf27974b">&#9670;&nbsp;</a></span>get_type()</h2>
+<a id="ab427dcf5109b78471d894a1be4633773"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab427dcf5109b78471d894a1be4633773">&#9670;&nbsp;</a></span>get_type()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;<a class="el" href="classtypet.html">typet</a>&gt; get_type </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classtypet.html">typet</a>&gt; get_type </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classformat__tokent.html">format_tokent</a> &amp;&#160;</td>
           <td class="paramname"><em>token</em></td><td>)</td>

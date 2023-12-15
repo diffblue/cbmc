@@ -23,7 +23,7 @@ var shadow__memory__util_8cpp =
     [ "get_matched_expr_cond", "shadow__memory__util_8cpp.html#a6ce5da54cee2d866ff75f6bbb3f3050b", null ],
     [ "get_shadow_dereference", "shadow__memory__util_8cpp.html#af3d80e2d0fb11aeb83361e3bcf824b7b", null ],
     [ "get_shadow_dereference_candidates", "shadow__memory__util_8cpp.html#a6a415504940fb0400e08c374448246fc", null ],
-    [ "get_shadow_memory", "shadow__memory__util_8cpp.html#a5cc17ee4223dddad60a4bed4dce65093", null ],
+    [ "get_shadow_memory", "shadow__memory__util_8cpp.html#af68945cc92887e29a0d6c6dd11a6f2e9", null ],
     [ "get_shadow_memory_for_matched_object", "shadow__memory__util_8cpp.html#a39e1731978175253e71fd534aa919af2", null ],
     [ "log_are_types_incompatible", "shadow__memory__util_8cpp.html#a749d29ca5d4b3775274a389a47e6f97e", null ],
     [ "log_shadow_memory_incompatible_types", "shadow__memory__util_8cpp.html#a7f6e875b11f5b09aa607741da65ab928", null ],

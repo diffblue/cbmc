@@ -122,9 +122,9 @@ Classes</h2></td></tr>
 Public Types</h2></td></tr>
 <tr class="memitem:ad1fd57abccb2accb49c6acb34c41ee38"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#ad1fd57abccb2accb49c6acb34c41ee38">idt</a></td></tr>
 <tr class="separator:ad1fd57abccb2accb49c6acb34c41ee38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1735004e0353e1b295d2a1b398b9e6a2"><td class="memItemLeft" align="right" valign="top">typedef optionalt&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">offsett</a></td></tr>
-<tr class="memdesc:a1735004e0353e1b295d2a1b398b9e6a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents the offset into an object: either a unique integer offset, or an unknown value, represented by <code>!offset</code>.  <a href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">More...</a><br /></td></tr>
-<tr class="separator:a1735004e0353e1b295d2a1b398b9e6a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f047eb720774f126c6c955d6c789e52"><td class="memItemLeft" align="right" valign="top">typedef std::optional&lt; <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">offsett</a></td></tr>
+<tr class="memdesc:a0f047eb720774f126c6c955d6c789e52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents the offset into an object: either a unique integer offset, or an unknown value, represented by <code>!offset</code>.  <a href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">More...</a><br /></td></tr>
+<tr class="separator:a0f047eb720774f126c6c955d6c789e52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72a2cbe6470086787a9871b1aeec8c3f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classreference__counting.html">reference_counting</a>&lt; <a class="el" href="classvalue__set__fit_1_1object__map__dt.html">object_map_dt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#a72a2cbe6470086787a9871b1aeec8c3f">object_mapt</a></td></tr>
 <tr class="separator:a72a2cbe6470086787a9871b1aeec8c3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1f18db30605befb3d2d5ded8fbe6f34"><td class="memItemLeft" align="right" valign="top">typedef std::unordered_set&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="structirep__hash.html">irep_hash</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#aa1f18db30605befb3d2d5ded8fbe6f34">expr_sett</a></td></tr>
@@ -150,7 +150,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5db4209c9e2ef1c36f2677b9678fbeea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f2f6947a9a276ea113d57d861d61777"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#a5f2f6947a9a276ea113d57d861d61777">set_to</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function, unsigned inx)</td></tr>
 <tr class="separator:a5f2f6947a9a276ea113d57d861d61777"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacc85d82e480f541b56c1a1fa26ee159"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#aacc85d82e480f541b56c1a1fa26ee159">offset_is_zero</a> (const <a class="el" href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">offsett</a> &amp;offset) const</td></tr>
+<tr class="memitem:aacc85d82e480f541b56c1a1fa26ee159"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#aacc85d82e480f541b56c1a1fa26ee159">offset_is_zero</a> (const <a class="el" href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">offsett</a> &amp;offset) const</td></tr>
 <tr class="separator:aacc85d82e480f541b56c1a1fa26ee159"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:addc8d37ed2eaef79a835068a92dca462"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#addc8d37ed2eaef79a835068a92dca462">to_expr</a> (const <a class="el" href="classvalue__set__fit_1_1object__map__dt.html#a327159eaf295a97423948c6f4c9e9b93">object_map_dt::value_type</a> &amp;it) const</td></tr>
 <tr class="separator:addc8d37ed2eaef79a835068a92dca462"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -162,9 +162,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aef1795b9824cfef52058d92fc813a363"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af32d831141d89748d52ffdab67046d22"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#af32d831141d89748d52ffdab67046d22">insert</a> (<a class="el" href="classvalue__set__fit.html#a72a2cbe6470086787a9871b1aeec8c3f">object_mapt</a> &amp;dest, const <a class="el" href="classexprt.html">exprt</a> &amp;src, const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;offset_value) const</td></tr>
 <tr class="separator:af32d831141d89748d52ffdab67046d22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb10942df0acb1371590cdff5a3fc5f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#adb10942df0acb1371590cdff5a3fc5f0">insert</a> (<a class="el" href="classvalue__set__fit.html#a72a2cbe6470086787a9871b1aeec8c3f">object_mapt</a> &amp;dest, <a class="el" href="classnumberingt.html#af240197202b283e569de8e906fe1996b">object_numberingt::number_type</a> n, const <a class="el" href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">offsett</a> &amp;offset) const</td></tr>
+<tr class="memitem:adb10942df0acb1371590cdff5a3fc5f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#adb10942df0acb1371590cdff5a3fc5f0">insert</a> (<a class="el" href="classvalue__set__fit.html#a72a2cbe6470086787a9871b1aeec8c3f">object_mapt</a> &amp;dest, <a class="el" href="classnumberingt.html#af240197202b283e569de8e906fe1996b">object_numberingt::number_type</a> n, const <a class="el" href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">offsett</a> &amp;offset) const</td></tr>
 <tr class="separator:adb10942df0acb1371590cdff5a3fc5f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05fac5fe9d4be24573adfb6b7726e0a0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#a05fac5fe9d4be24573adfb6b7726e0a0">insert</a> (<a class="el" href="classvalue__set__fit.html#a72a2cbe6470086787a9871b1aeec8c3f">object_mapt</a> &amp;dest, const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">offsett</a> &amp;offset) const</td></tr>
+<tr class="memitem:a05fac5fe9d4be24573adfb6b7726e0a0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#a05fac5fe9d4be24573adfb6b7726e0a0">insert</a> (<a class="el" href="classvalue__set__fit.html#a72a2cbe6470086787a9871b1aeec8c3f">object_mapt</a> &amp;dest, const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">offsett</a> &amp;offset) const</td></tr>
 <tr class="separator:a05fac5fe9d4be24573adfb6b7726e0a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b415d493a4915dedb6392b92093eaa4"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvalue__set__fit.html#a5b415d493a4915dedb6392b92093eaa4">get_value_set</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns) const</td></tr>
 <tr class="separator:a5b415d493a4915dedb6392b92093eaa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -360,14 +360,14 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a1735004e0353e1b295d2a1b398b9e6a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1735004e0353e1b295d2a1b398b9e6a2">&#9670;&nbsp;</a></span>offsett</h2>
+<a id="a0f047eb720774f126c6c955d6c789e52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f047eb720774f126c6c955d6c789e52">&#9670;&nbsp;</a></span>offsett</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef optionalt&lt;<a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&gt; <a class="el" href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">value_set_fit::offsett</a></td>
+          <td class="memname">typedef std::optional&lt;<a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&gt; <a class="el" href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">value_set_fit::offsett</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1287,7 +1287,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">offsett</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">offsett</a> &amp;&#160;</td>
           <td class="paramname"><em>offset</em>&#160;</td>
         </tr>
         <tr>
@@ -1451,7 +1451,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">offsett</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">offsett</a> &amp;&#160;</td>
           <td class="paramname"><em>offset</em>&#160;</td>
         </tr>
         <tr>
@@ -1561,7 +1561,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="memname">bool value_set_fit::offset_is_zero </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classvalue__set__fit.html#a1735004e0353e1b295d2a1b398b9e6a2">offsett</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classvalue__set__fit.html#a0f047eb720774f126c6c955d6c789e52">offsett</a> &amp;&#160;</td>
           <td class="paramname"><em>offset</em></td><td>)</td>
           <td> const</td>
         </tr>

@@ -1,14 +1,14 @@
 var java__utils_8cpp =
 [
     [ "checked_dereference", "java__utils_8cpp.html#aadaf5ff75e6d95a639ed6d4e6dc66159", null ],
-    [ "class_name_from_method_name", "java__utils_8cpp.html#a2e09e1fbfb5d08c9df24a0b6acce3c03", null ],
+    [ "class_name_from_method_name", "java__utils_8cpp.html#ae18a8f330d49fbe452689b4c9f95a344", null ],
     [ "declare_function", "java__utils_8cpp.html#a501a7723438188cb1973c7c2275f767c", null ],
-    [ "declaring_class", "java__utils_8cpp.html#a4ebae8caea79ca846955c4237d7f0915", null ],
+    [ "declaring_class", "java__utils_8cpp.html#a311344961a89d136fc69d8b53083e46c", null ],
     [ "find_closing_delimiter", "java__utils_8cpp.html#aa43306c4f90470803e34ff4019dfb2fc", null ],
     [ "fresh_java_symbol", "java__utils_8cpp.html#a49fc9008a1330e6329658847b547673b", null ],
     [ "generate_class_stub", "java__utils_8cpp.html#a7f10462c30b86c07802295b9b5c8ed20", null ],
     [ "get_boxed_type_info_by_name", "java__utils_8cpp.html#a1880b5369568361210b15af9229e1f6f", null ],
-    [ "get_inherited_component", "java__utils_8cpp.html#af8bcdd9e42842c100435d61466ec707f", null ],
+    [ "get_inherited_component", "java__utils_8cpp.html#ad0ced08e4ca4fadebe286001a191d03c", null ],
     [ "get_java_primitive_type_info", "java__utils_8cpp.html#a1680be1d39f1eba0f2f6efcfb9ee0d77", null ],
     [ "is_java_string_literal_id", "java__utils_8cpp.html#a08d6cb5375ab2c0670f299549a637fed", null ],
     [ "is_java_string_type", "java__utils_8cpp.html#a8768a3fe1b662f0925e9c1b5746a1e15", null ],

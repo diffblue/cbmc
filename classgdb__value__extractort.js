@@ -14,7 +14,7 @@ var classgdb__value__extractort =
     [ "get_char_pointer_value", "classgdb__value__extractort.html#a3a493c2d82bab7d58e77ed8f6a381963", null ],
     [ "get_expr_value", "classgdb__value__extractort.html#a88f948b4df34f42438ee2bc6b9620dca", null ],
     [ "get_gdb_value", "classgdb__value__extractort.html#a0013b2d8bfe60c68b5d2b7bb5da8ff62", null ],
-    [ "get_malloc_pointee", "classgdb__value__extractort.html#a1fbf4c70dfbedff231b2fb10be8fb0ac", null ],
+    [ "get_malloc_pointee", "classgdb__value__extractort.html#ac4cd74c162ac2a796180a5b1776073c7", null ],
     [ "get_malloc_size", "classgdb__value__extractort.html#ac4bd4bf3f10bdfa8b4556999f8276c40", null ],
     [ "get_non_char_pointer_value", "classgdb__value__extractort.html#af12fbbc5606e35abb44161a9e1dc9c95", null ],
     [ "get_pointer_to_function_value", "classgdb__value__extractort.html#a3fa86de9dff24df7c48332daa139bfcf", null ],

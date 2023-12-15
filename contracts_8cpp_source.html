@@ -713,7 +713,7 @@ $(document).ready(function(){initNavTree('contracts_8cpp_source.html',''); initR
 <div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;  <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> instantiation_values;</div>
 <div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160; </div>
 <div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;  <span class="comment">// keep track of the call&#39;s return expression to make it nondet later</span></div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;  optionalt&lt;exprt&gt; call_ret_opt = {};</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;  std::optional&lt;exprt&gt; call_ret_opt = {};</div>
 <div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160; </div>
 <div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  <span class="comment">// if true, the call return variable variable was created during replacement</span></div>
 <div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;  <span class="keywordtype">bool</span> call_ret_is_fresh_var = <span class="keyword">false</span>;</div>
@@ -1360,7 +1360,7 @@ $(document).ready(function(){initNavTree('contracts_8cpp_source.html',''); initR
 <div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;  source_location.<a class="code" href="classsource__locationt.html#affd0be5e28a571c5cbbd9d91ae4ba0eb">set_function</a>(wrapper_function);</div>
 <div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160; </div>
 <div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;  <span class="comment">// decl ret</span></div>
-<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;  optionalt&lt;code_returnt&gt; return_stmt;</div>
+<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;  std::optional&lt;code_returnt&gt; return_stmt;</div>
 <div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;  <span class="keywordflow">if</span>(code_type.return_type() != <a class="code" href="classempty__typet.html">empty_typet</a>())</div>
 <div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;  {</div>
 <div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;    <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> <a class="code" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a> = <a class="code" href="fresh__symbol_8cpp.html#a1baa36294c4d640a926d615062a20feb">get_fresh_aux_symbol</a>(</div>

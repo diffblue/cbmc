@@ -14,5 +14,5 @@ var classliveness__contextt =
     [ "set_location", "classliveness__contextt.html#a125b82451129bac9e31a354afa94593e", null ],
     [ "update_location_context_internal", "classliveness__contextt.html#a74e56af34be3a2fd5d3c2033e6799868", null ],
     [ "write", "classliveness__contextt.html#a8010820ecb022650ca47085cbe5273c9", null ],
-    [ "assign_location", "classliveness__contextt.html#a007f56d110ba5f6ce6b9202ce01b5a1d", null ]
+    [ "assign_location", "classliveness__contextt.html#a6f52bb59932892c77635a43368a87c39", null ]
 ];

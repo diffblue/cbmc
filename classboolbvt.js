@@ -30,7 +30,7 @@ var classboolbvt =
     [ "convert_bitvector", "classboolbvt.html#a34f4d4fcb281e7074cecb324d588ee58", null ],
     [ "convert_bitwise", "classboolbvt.html#ab24b7e51e98825a716d9d1a208049c1d", null ],
     [ "convert_bswap", "classboolbvt.html#a404e35864111f3f89746382a29fe7d7b", null ],
-    [ "convert_bv", "classboolbvt.html#a9defaf85fe63872f900b1abb38275de8", null ],
+    [ "convert_bv", "classboolbvt.html#a14d25478f6b405c78cbbf3574ab0b03e", null ],
     [ "convert_bv_reduction", "classboolbvt.html#abbe8d60e2854291b074fb40be5994819", null ],
     [ "convert_bv_rel", "classboolbvt.html#a0cdd46863d7d19812d72cc0203d87323", null ],
     [ "convert_bv_typecast", "classboolbvt.html#ae9254234f1bfefb4139204c689e407ee", null ],

@@ -6,5 +6,5 @@ var structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet =
     [ "get_unknown_handle", "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html#a5b32356b680ad4ec152154c25ba2c913", null ],
     [ "is_unknown_handle", "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html#ab6bd172f53999a8b281b6d52916e04a4", null ],
     [ "handle_type", "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html#aa9dab694847e7749bb05e40556ea102d", null ],
-    [ "method_descriptor", "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html#a21836e2d5e3d8c40a83d0bf2729b1c46", null ]
+    [ "method_descriptor", "structjava__bytecode__parse__treet_1_1classt_1_1lambda__method__handlet.html#a76dcf6cdb00607c3c1e4a6121c918f2d", null ]
 ];

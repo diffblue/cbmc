@@ -2,7 +2,7 @@ var structdfcc__utilst =
 [
     [ "add_parameter", "structdfcc__utilst.html#a2353b6c808af2af345009cbe366067df", null ],
     [ "add_parameter", "structdfcc__utilst.html#ab991d0556f4491f44d7f31245e4464f0", null ],
-    [ "clone_and_rename_function", "structdfcc__utilst.html#a979ea68b2c3f5409004ce46f339e4a0c", null ],
+    [ "clone_and_rename_function", "structdfcc__utilst.html#a9af0f91b12952afdb327f017bc7f977c", null ],
     [ "create_new_parameter_symbol", "structdfcc__utilst.html#a8c2295a0f7e8ed323952f9a12cf64061", null ],
     [ "create_static_symbol", "structdfcc__utilst.html#a97257d59bb1a5bb38881f20bbe5d6dc3", null ],
     [ "create_symbol", "structdfcc__utilst.html#abccf2341a66f1185db919141f8350cd7", null ],

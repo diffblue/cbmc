@@ -6,6 +6,6 @@ var classinterval__sparse__arrayt =
     [ "interval_sparse_arrayt", "classinterval__sparse__arrayt.html#a6e026ca8318f96b7c996dd88a16fbd74", null ],
     [ "at", "classinterval__sparse__arrayt.html#aec8b5c78390448ae3d9e99d0ebdf1724", null ],
     [ "concretize", "classinterval__sparse__arrayt.html#abfcda842454af2e011720fca6b85d94a", null ],
-    [ "of_expr", "classinterval__sparse__arrayt.html#a6596e9286ec8c768718889b829f7b9ff", null ],
+    [ "of_expr", "classinterval__sparse__arrayt.html#a37d42cac90f9229d0cb19b60c2105a2e", null ],
     [ "to_if_expression", "classinterval__sparse__arrayt.html#a326df8a7e4b802c8356e6fc537048081", null ]
 ];

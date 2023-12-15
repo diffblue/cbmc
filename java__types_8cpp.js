@@ -38,7 +38,7 @@ var java__types_8cpp =
     [ "java_reference_type", "java__types_8cpp.html#aabae6b4f303ef8342287be634079c353", null ],
     [ "java_short_type", "java__types_8cpp.html#a8ac87982a81ed914dcbbf9f9745c1b7c", null ],
     [ "java_type_from_char", "java__types_8cpp.html#a0f7b5b48c4fd294c62edbd8f670e7c63", null ],
-    [ "java_type_from_string", "java__types_8cpp.html#a2a448cb64d018f994b46985abc4aed10", null ],
+    [ "java_type_from_string", "java__types_8cpp.html#a8f08a14ec786874c12b14eee11bf96b4", null ],
     [ "java_void_type", "java__types_8cpp.html#a1a6afb379178555c3b579171a49e8278", null ],
     [ "parse_list_types", "java__types_8cpp.html#a8d423616ea88ba533a3707e9554b1d29", null ],
     [ "parse_raw_list_types", "java__types_8cpp.html#a35477394455114398a25e5e1aae2fde3", null ],

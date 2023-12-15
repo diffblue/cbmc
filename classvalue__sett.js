@@ -3,7 +3,7 @@ var classvalue__sett =
     [ "entryt", "structvalue__sett_1_1entryt.html", "structvalue__sett_1_1entryt" ],
     [ "object_map_dt", "classvalue__sett.html#af92a5fe9e1495ee3c3396b02e9b2ace6", null ],
     [ "object_mapt", "classvalue__sett.html#abb2dc066654abb235711fa84799fc148", null ],
-    [ "offsett", "classvalue__sett.html#ad3b85dba1375e7147229e07b3278f201", null ],
+    [ "offsett", "classvalue__sett.html#a9ae9143371cfcfd97a0cc265f80e5c09", null ],
     [ "valuest", "classvalue__sett.html#a0edf7b833a50b85f5edb037200ae5c8d", null ],
     [ "insert_actiont", "classvalue__sett.html#ad59a616b46a7d5e0bc3e188565392483", [
       [ "INSERT", "classvalue__sett.html#ad59a616b46a7d5e0bc3e188565392483a61ee777e7f71dc466c3b2c685d8d313b", null ],
@@ -31,7 +31,7 @@ var classvalue__sett =
     [ "eval_pointer_offset", "classvalue__sett.html#a29ea32746c4a0bb96e387a7df50605f6", null ],
     [ "field_sensitive", "classvalue__sett.html#acc951a819a4742483eb93f5e4eb51f3b", null ],
     [ "find_entry", "classvalue__sett.html#a2a120b3bf85a7c3fe706c7fcc49c5222", null ],
-    [ "get_index_of_symbol", "classvalue__sett.html#a21987b736c3a7f70c18a658c04360108", null ],
+    [ "get_index_of_symbol", "classvalue__sett.html#afde4ceef46f60afe4ce6330f13d4adf3", null ],
     [ "get_insert_action", "classvalue__sett.html#ac3b1493699387b4f358aa37c1fa8e8bc", null ],
     [ "get_reference_set", "classvalue__sett.html#aedb61eaca0ec7dfdecf8ea8fba610ba1", null ],
     [ "get_reference_set", "classvalue__sett.html#af246590f77a942fe9c79f6d1a9755ad3", null ],

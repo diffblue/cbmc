@@ -122,9 +122,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9fdfdf20a85c9109fbc89db67ce87756"><td class="memItemLeft" align="right" valign="top">const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__contract__handlert.html#a9fdfdf20a85c9109fbc89db67ce87756">get_assigns_clause_size</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;contract_id)</td></tr>
 <tr class="memdesc:a9fdfdf20a85c9109fbc89db67ce87756"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size assigns clause of the given contract in number of targets.  <a href="classdfcc__contract__handlert.html#a9fdfdf20a85c9109fbc89db67ce87756">More...</a><br /></td></tr>
 <tr class="separator:a9fdfdf20a85c9109fbc89db67ce87756"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0a170e962446de59d9db2dadc80af88"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__contract__handlert.html#aa0a170e962446de59d9db2dadc80af88">get_pure_contract_symbol</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;contract_id, const optionalt&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; function_id_opt={})</td></tr>
-<tr class="memdesc:aa0a170e962446de59d9db2dadc80af88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches for a symbol named "contract::contract_id" in the symbol table.  <a href="classdfcc__contract__handlert.html#aa0a170e962446de59d9db2dadc80af88">More...</a><br /></td></tr>
-<tr class="separator:aa0a170e962446de59d9db2dadc80af88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3deb1b75f27594deae072463e12d79d7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__contract__handlert.html#a3deb1b75f27594deae072463e12d79d7">get_pure_contract_symbol</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;contract_id, const std::optional&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; function_id_opt={})</td></tr>
+<tr class="memdesc:a3deb1b75f27594deae072463e12d79d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches for a symbol named "contract::contract_id" in the symbol table.  <a href="classdfcc__contract__handlert.html#a3deb1b75f27594deae072463e12d79d7">More...</a><br /></td></tr>
+<tr class="separator:a3deb1b75f27594deae072463e12d79d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -178,7 +178,7 @@ Static Protected Attributes</h2></td></tr>
 <p>Translation results are cached so it is safe to call <code>get_contract_functions</code> several times.</p>
 <p>This class also implements the <a class="el" href="classdfcc__contract__handlert.html">dfcc_contract_handlert</a> interface and allows to generate instructions modelling contract checking and contract replacement. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00065">65</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00064">64</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ae70b7ff858df53235463c1313d79d022"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae70b7ff858df53235463c1313d79d022">&#9670;&nbsp;</a></span>dfcc_contract_handlert()</h2>
@@ -428,8 +428,8 @@ Static Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa0a170e962446de59d9db2dadc80af88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0a170e962446de59d9db2dadc80af88">&#9670;&nbsp;</a></span>get_pure_contract_symbol()</h2>
+<a id="a3deb1b75f27594deae072463e12d79d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3deb1b75f27594deae072463e12d79d7">&#9670;&nbsp;</a></span>get_pure_contract_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -443,7 +443,7 @@ Static Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const optionalt&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td>
+          <td class="paramtype">const std::optional&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td>
           <td class="paramname"><em>function_id_opt</em> = <code>{}</code>&#160;</td>
         </tr>
         <tr>
@@ -482,7 +482,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00128">128</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00127">127</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -506,7 +506,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00124">124</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00123">123</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -530,7 +530,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00117">117</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00116">116</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -554,7 +554,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00121">121</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00120">120</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -578,7 +578,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00120">120</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00119">119</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -602,7 +602,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00119">119</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00118">118</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -626,7 +626,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00122">122</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00121">121</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -650,7 +650,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00118">118</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00117">117</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -674,7 +674,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00125">125</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00124">124</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>
@@ -698,7 +698,7 @@ Static Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00123">123</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__contract__handler_8h_source.html#l00122">122</a> of file <a class="el" href="dfcc__contract__handler_8h_source.html">dfcc_contract_handler.h</a>.</p>
 
 </div>
 </div>

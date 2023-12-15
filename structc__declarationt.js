@@ -1,7 +1,7 @@
 var structc__declarationt =
 [
     [ "tokenst", "structc__declarationt.html#afc77d24dfaa16dc7cae5a070a7f67578", null ],
-    [ "declared_identifier", "structc__declarationt.html#a993cdf74dc4d3739b4f74e75df25f3c2", null ],
+    [ "declared_identifier", "structc__declarationt.html#a4849f51ee8155d6edc6a91abdbd86062", null ],
     [ "has_body", "structc__declarationt.html#a2d05a35536882b0b4417e8bd0b1fb0cd", null ],
     [ "is_function", "structc__declarationt.html#a57fdaa1632dfbcd1bab32c038e0791cb", null ],
     [ "print", "structc__declarationt.html#a916c4a2d50f12d27df883db5d304fbff", null ],

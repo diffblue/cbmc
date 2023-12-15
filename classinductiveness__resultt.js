@@ -10,5 +10,5 @@ var classinductiveness__resultt =
     [ "inductive", "classinductiveness__resultt.html#a20c72db8f9331dbe8390d0615556e367", null ],
     [ "step_case_fail", "classinductiveness__resultt.html#a2d6342785155832c4e12b785bac996e9", null ],
     [ "outcome", "classinductiveness__resultt.html#abd26501e9772b16418bb854b69c540a2", null ],
-    [ "work", "classinductiveness__resultt.html#a5aff7425bad180e1d61f4f15bf408092", null ]
+    [ "work", "classinductiveness__resultt.html#a853c4941b38b029533ff742684f4cf48", null ]
 ];

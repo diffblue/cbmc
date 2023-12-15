@@ -59,7 +59,7 @@ var classexpr2ct =
     [ "convert_designated_initializer", "classexpr2ct.html#aaf75d6fdd18c002e38e5d6aca409e267", null ],
     [ "convert_extractbit", "classexpr2ct.html#ad8ad680eb0c3a029909d7f25aa1f7320", null ],
     [ "convert_extractbits", "classexpr2ct.html#a7e5cfeaefcb97b4160a899bb24675916", null ],
-    [ "convert_function", "classexpr2ct.html#a81f0c03e9977eaa2bb161626a44193dc", null ],
+    [ "convert_function", "classexpr2ct.html#a035e7026849f1ef0a67423f8dcac9b3b", null ],
     [ "convert_function", "classexpr2ct.html#aeca40e5076a30fc2a01cb1acd99632be", null ],
     [ "convert_function_application", "classexpr2ct.html#a32dec621ec733004a3155875e6f907ec", null ],
     [ "convert_Hoare", "classexpr2ct.html#a64e1453702df598d14d19fdcf72d8719", null ],

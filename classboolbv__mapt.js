@@ -5,7 +5,7 @@ var classboolbv__mapt =
     [ "boolbv_mapt", "classboolbv__mapt.html#ac01e8b096411895ac905632dadf3dd40", null ],
     [ "erase_literals", "classboolbv__mapt.html#a8084879d6019505537914effe871f67a", null ],
     [ "get_literals", "classboolbv__mapt.html#aaf6c62345eb09b73eb495c101cc7eb6b", null ],
-    [ "get_map_entry", "classboolbv__mapt.html#a5eebe4f3b24117d49921202b5cbca844", null ],
+    [ "get_map_entry", "classboolbv__mapt.html#ae85e84082b7f47eb5c0c6dd19eb6bcab", null ],
     [ "get_mapping", "classboolbv__mapt.html#a8787341e8ed18b99b1cf44fe0c97eeca", null ],
     [ "set_literals", "classboolbv__mapt.html#a8be7ca2e30e1784653df172d01a290e2", null ],
     [ "show", "classboolbv__mapt.html#aa1077bc956a649ace220d4e6417e9f20", null ],

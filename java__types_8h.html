@@ -101,14 +101,13 @@ $(document).ready(function(){initNavTree('java__types_8h.html',''); initResizabl
 <code>#include &lt;set&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="narrow_8h_source.html">util/narrow.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="optional_8h_source.html">util/optional.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for java_types.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__types_8h__incl.svg" width="1291" height="739"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__types_8h__incl.svg" width="1143" height="739"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -258,9 +257,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a0f7b5b48c4fd294c62edbd8f670e7c63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtypet.html">typet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a0f7b5b48c4fd294c62edbd8f670e7c63">java_type_from_char</a> (char t)</td></tr>
 <tr class="memdesc:a0f7b5b48c4fd294c62edbd8f670e7c63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a type indicated by the given character:  <a href="java__types_8h.html#a0f7b5b48c4fd294c62edbd8f670e7c63">More...</a><br /></td></tr>
 <tr class="separator:a0f7b5b48c4fd294c62edbd8f670e7c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36a4c8942455e10afad46d9ca3a82409"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a36a4c8942455e10afad46d9ca3a82409">java_type_from_string</a> (const std::string &amp;, const std::string &amp;class_name_prefix=&quot;&quot;)</td></tr>
-<tr class="memdesc:a36a4c8942455e10afad46d9ca3a82409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms a string representation of a Java type into an internal type representation thereof.  <a href="java__types_8h.html#a36a4c8942455e10afad46d9ca3a82409">More...</a><br /></td></tr>
-<tr class="separator:a36a4c8942455e10afad46d9ca3a82409"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92321a708d0c9ba676bb97cde902e0a3"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a92321a708d0c9ba676bb97cde902e0a3">java_type_from_string</a> (const std::string &amp;, const std::string &amp;class_name_prefix=&quot;&quot;)</td></tr>
+<tr class="memdesc:a92321a708d0c9ba676bb97cde902e0a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms a string representation of a Java type into an internal type representation thereof.  <a href="java__types_8h.html#a92321a708d0c9ba676bb97cde902e0a3">More...</a><br /></td></tr>
+<tr class="separator:a92321a708d0c9ba676bb97cde902e0a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a201a7ed851d71782c63d4b41736d14fb"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a201a7ed851d71782c63d4b41736d14fb">java_char_from_type</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="separator:a201a7ed851d71782c63d4b41736d14fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cc8fa319fee1cbad11c3ac9b80463c7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a0cc8fa319fee1cbad11c3ac9b80463c7">java_generic_type_from_string</a> (const std::string &amp;, const std::string &amp;)</td></tr>
@@ -343,11 +342,11 @@ Functions</h2></td></tr>
 <tr class="separator:ab75b1552a5d31a16083a175fa654fea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0dc7f4c7164e7f8de404ca4d974d9d2"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classjava__generic__parametert.html">java_generic_parametert</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#ab0dc7f4c7164e7f8de404ca4d974d9d2">get_all_generic_parameters</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="separator:ab0dc7f4c7164e7f8de404ca4d974d9d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fbec8075793ee0ab9e77c03125beaba"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a0fbec8075793ee0ab9e77c03125beaba">java_type_from_string_with_exception</a> (const std::string &amp;descriptor, const optionalt&lt; std::string &gt; &amp;signature, const std::string &amp;class_name)</td></tr>
-<tr class="separator:a0fbec8075793ee0ab9e77c03125beaba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e4bfb1a020eca2fe0785f2f5f4cf94c"><td class="memItemLeft" align="right" valign="top">const optionalt&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a4e4bfb1a020eca2fe0785f2f5f4cf94c">java_generics_get_index_for_subtype</a> (const std::vector&lt; <a class="el" href="classjava__generic__parametert.html">java_generic_parametert</a> &gt; &amp;gen_types, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier)</td></tr>
-<tr class="memdesc:a4e4bfb1a020eca2fe0785f2f5f4cf94c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index in the subtypes array for a given component.  <a href="java__types_8h.html#a4e4bfb1a020eca2fe0785f2f5f4cf94c">More...</a><br /></td></tr>
-<tr class="separator:a4e4bfb1a020eca2fe0785f2f5f4cf94c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99a1e6c3b8422389c54565cb8c195852"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a99a1e6c3b8422389c54565cb8c195852">java_type_from_string_with_exception</a> (const std::string &amp;descriptor, const std::optional&lt; std::string &gt; &amp;signature, const std::string &amp;class_name)</td></tr>
+<tr class="separator:a99a1e6c3b8422389c54565cb8c195852"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1a0b494190825423d08a74df20e82b0"><td class="memItemLeft" align="right" valign="top">const std::optional&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#ae1a0b494190825423d08a74df20e82b0">java_generics_get_index_for_subtype</a> (const std::vector&lt; <a class="el" href="classjava__generic__parametert.html">java_generic_parametert</a> &gt; &amp;gen_types, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier)</td></tr>
+<tr class="memdesc:ae1a0b494190825423d08a74df20e82b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index in the subtypes array for a given component.  <a href="java__types_8h.html#ae1a0b494190825423d08a74df20e82b0">More...</a><br /></td></tr>
+<tr class="separator:ae1a0b494190825423d08a74df20e82b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6968d988b85b648b3e23bbb597ec8eaa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__types_8h.html#a6968d988b85b648b3e23bbb597ec8eaa">get_dependencies_from_generic_parameters</a> (const std::string &amp;, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;)</td></tr>
 <tr class="memdesc:a6968d988b85b648b3e23bbb597ec8eaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collect information about generic type parameters from a given signature.  <a href="java__types_8h.html#a6968d988b85b648b3e23bbb597ec8eaa">More...</a><br /></td></tr>
 <tr class="separator:a6968d988b85b648b3e23bbb597ec8eaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -378,7 +377,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00669">669</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00668">668</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -394,7 +393,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00671">671</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00670">670</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -410,7 +409,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00656">656</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00655">655</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -441,7 +440,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00095">95</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00094">94</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -471,7 +470,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00595">595</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00594">594</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -510,7 +509,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a generic Java parameter type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00810">810</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00809">809</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -540,7 +539,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00939">939</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00938">938</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -570,7 +569,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00179">179</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00178">178</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -600,7 +599,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00624">624</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00623">623</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -992,7 +991,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if type is a java class type with generics </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00995">995</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00994">994</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1029,7 +1028,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if type is a generic Java parameter type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00820">820</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00819">819</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1066,7 +1065,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if type is a generic Java parameter tag type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00751">751</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00750">750</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1101,7 +1100,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the type is a symbol type with generics </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00889">889</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00888">888</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1136,7 +1135,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if type is java type containing with generics, e.g., List&lt;T&gt; </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00947">947</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00946">946</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1171,7 +1170,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if type is a implicitly generic java class type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01100">1100</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01099">1099</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1561,7 +1560,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the type of the bound of the type variable </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01051">1051</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01050">1050</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1609,7 +1608,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the name of the generic type variable of t at the given index </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01037">1037</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01036">1036</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1657,7 +1656,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the type variable of t at the given index </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01022">1022</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01021">1021</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1697,8 +1696,8 @@ template&lt;&gt; </div>
 
 </div>
 </div>
-<a id="a4e4bfb1a020eca2fe0785f2f5f4cf94c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4e4bfb1a020eca2fe0785f2f5f4cf94c">&#9670;&nbsp;</a></span>java_generics_get_index_for_subtype()</h2>
+<a id="ae1a0b494190825423d08a74df20e82b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1a0b494190825423d08a74df20e82b0">&#9670;&nbsp;</a></span>java_generics_get_index_for_subtype()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1707,7 +1706,7 @@ template&lt;&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const optionalt&lt;size_t&gt; java_generics_get_index_for_subtype </td>
+          <td class="memname">const std::optional&lt;size_t&gt; java_generics_get_index_for_subtype </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; <a class="el" href="classjava__generic__parametert.html">java_generic_parametert</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>gen_types</em>, </td>
@@ -1741,7 +1740,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Optional with the size if the identifier was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01160">1160</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01159">1159</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -1914,14 +1913,14 @@ template&lt;&gt; </div>
 
 </div>
 </div>
-<a id="a36a4c8942455e10afad46d9ca3a82409"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36a4c8942455e10afad46d9ca3a82409">&#9670;&nbsp;</a></span>java_type_from_string()</h2>
+<a id="a92321a708d0c9ba676bb97cde902e0a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92321a708d0c9ba676bb97cde902e0a3">&#9670;&nbsp;</a></span>java_type_from_string()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;<a class="el" href="classtypet.html">typet</a>&gt; java_type_from_string </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classtypet.html">typet</a>&gt; java_type_from_string </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>src</em>, </td>
@@ -1955,8 +1954,8 @@ template&lt;&gt; </div>
 
 </div>
 </div>
-<a id="a0fbec8075793ee0ab9e77c03125beaba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0fbec8075793ee0ab9e77c03125beaba">&#9670;&nbsp;</a></span>java_type_from_string_with_exception()</h2>
+<a id="a99a1e6c3b8422389c54565cb8c195852"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99a1e6c3b8422389c54565cb8c195852">&#9670;&nbsp;</a></span>java_type_from_string_with_exception()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1965,7 +1964,7 @@ template&lt;&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;<a class="el" href="classtypet.html">typet</a>&gt; java_type_from_string_with_exception </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classtypet.html">typet</a>&gt; java_type_from_string_with_exception </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>descriptor</em>, </td>
@@ -1973,7 +1972,7 @@ template&lt;&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const optionalt&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::optional&lt; std::string &gt; &amp;&#160;</td>
           <td class="paramname"><em>signature</em>, </td>
         </tr>
         <tr>
@@ -1995,7 +1994,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01141">1141</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01140">1140</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2129,7 +2128,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00084">84</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00083">83</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2157,7 +2156,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00089">89</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00088">88</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2185,7 +2184,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00582">582</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00581">581</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2213,7 +2212,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00588">588</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00587">587</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2248,7 +2247,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type to java_generics_class_typet </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01003">1003</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01002">1002</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2283,7 +2282,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type into a java class type with generics </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01012">1012</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01011">1011</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2318,7 +2317,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type into a <a class="el" href="classjava__generic__parametert.html" title="Reference that points to a java_generic_parameter_tagt.">java_generic_parametert</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00827">827</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00826">826</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2353,7 +2352,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type into a java_generic_parameter </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00836">836</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00835">835</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2388,7 +2387,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type into a <a class="el" href="classjava__generic__parametert.html" title="Reference that points to a java_generic_parameter_tagt.">java_generic_parametert</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00759">759</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00758">758</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2423,7 +2422,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type into a java_generic_parameter_tag </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00767">767</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00766">766</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2458,7 +2457,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the converted type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00897">897</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00896">896</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2493,7 +2492,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the converted type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00906">906</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00905">905</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2528,7 +2527,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type into java type with generics </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00954">954</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00953">953</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2563,7 +2562,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type into java type with generics </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00963">963</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00962">962</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2598,7 +2597,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type to java_generics_class_typet </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01108">1108</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01107">1107</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2633,7 +2632,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cast of type into a java class type with generics </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01117">1117</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l01116">1116</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2661,7 +2660,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00184">184</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00183">183</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2689,7 +2688,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00190">190</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00189">189</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2717,7 +2716,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00630">630</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00629">629</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>
@@ -2745,7 +2744,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00636">636</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__types_8h_source.html#l00635">635</a> of file <a class="el" href="java__types_8h_source.html">java_types.h</a>.</p>
 
 </div>
 </div>

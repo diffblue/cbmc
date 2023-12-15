@@ -202,10 +202,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a94de8e43c334d50ff1c81ec4993b135f inherit pro_methods_classcmdlinet"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#a94de8e43c334d50ff1c81ec4993b135f">parse_arguments</a> (int argc, const char **argv)</td></tr>
 <tr class="memdesc:a94de8e43c334d50ff1c81ec4993b135f inherit pro_methods_classcmdlinet"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a commandline according to a previously parsed optstring and writes the result to <a class="el" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">cmdlinet::options</a>.  <a href="classcmdlinet.html#a94de8e43c334d50ff1c81ec4993b135f">More...</a><br /></td></tr>
 <tr class="separator:a94de8e43c334d50ff1c81ec4993b135f inherit pro_methods_classcmdlinet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a75ea8787c8f405d0487313ad487502 inherit pro_methods_classcmdlinet"><td class="memItemLeft" align="right" valign="top">optionalt&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#a7a75ea8787c8f405d0487313ad487502">getoptnr</a> (char option) const</td></tr>
-<tr class="separator:a7a75ea8787c8f405d0487313ad487502 inherit pro_methods_classcmdlinet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a379b2a7d6dd10ba89a5558b39c894ba8 inherit pro_methods_classcmdlinet"><td class="memItemLeft" align="right" valign="top">optionalt&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#a379b2a7d6dd10ba89a5558b39c894ba8">getoptnr</a> (const std::string &amp;option) const</td></tr>
-<tr class="separator:a379b2a7d6dd10ba89a5558b39c894ba8 inherit pro_methods_classcmdlinet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53eef7daf5598627503a5dd91d79ed7c inherit pro_methods_classcmdlinet"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#a53eef7daf5598627503a5dd91d79ed7c">getoptnr</a> (char option) const</td></tr>
+<tr class="separator:a53eef7daf5598627503a5dd91d79ed7c inherit pro_methods_classcmdlinet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf8d906ed38cc6f7f14ae5488df55030 inherit pro_methods_classcmdlinet"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#abf8d906ed38cc6f7f14ae5488df55030">getoptnr</a> (const std::string &amp;option) const</td></tr>
+<tr class="separator:abf8d906ed38cc6f7f14ae5488df55030 inherit pro_methods_classcmdlinet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -322,7 +322,7 @@ Additional Inherited Members</h2></td></tr>
 <p>here the argument to option "f" would be "Filename", "trace" is a long option with no argument, and "some-other-option" and "G" are both allowed options that don’t appear on the commandline (with and without argument respectively).</p>
 <dl class="section return"><dt>Returns</dt><dd>true if there was an error while parsing argv, false otherwise. If this failed due to an unknown option name being in argv, the public variable <a class="el" href="classcmdlinet.html#a268e7cb6f9cd518573ebe467bbf8742f">cmdlinet::unknown_arg</a> will be non-empty and contain the name of that option. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cmdline_8cpp_source.html#l00075">75</a> of file <a class="el" href="cmdline_8cpp_source.html">cmdline.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cmdline_8cpp_source.html#l00074">74</a> of file <a class="el" href="cmdline_8cpp_source.html">cmdline.cpp</a>.</p>
 
 </div>
 </div>

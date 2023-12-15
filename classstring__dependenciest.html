@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('classstring__dependenciest.html',''); 
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classstring__dependenciest__coll__graph.svg" width="2014" height="512"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classstring__dependenciest__coll__graph.svg" width="2087" height="418"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -144,9 +144,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa15250d0ca1916edefc58f30891d755b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c11ff33797367acc7ffce28016584d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#a4c11ff33797367acc7ffce28016584d3">for_each_dependency</a> (const <a class="el" href="classstring__dependenciest_1_1builtin__function__nodet.html">builtin_function_nodet</a> &amp;node, const std::function&lt; void(const <a class="el" href="classstring__dependenciest_1_1string__nodet.html">string_nodet</a> &amp;)&gt; &amp;f) const</td></tr>
 <tr class="separator:a4c11ff33797367acc7ffce28016584d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afedc2575cb326daa2bb32ee27b1a0734"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#afedc2575cb326daa2bb32ee27b1a0734">eval</a> (const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;s, const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;get_value) const</td></tr>
-<tr class="memdesc:afedc2575cb326daa2bb32ee27b1a0734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to evaluate the given string from the dependencies and valuation of strings on which it depends Warning: eval uses a cache which must be cleaned everytime the valuations given by get_value can change.  <a href="classstring__dependenciest.html#afedc2575cb326daa2bb32ee27b1a0734">More...</a><br /></td></tr>
-<tr class="separator:afedc2575cb326daa2bb32ee27b1a0734"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a382e264b62495ff5097fbc07433c562f"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#a382e264b62495ff5097fbc07433c562f">eval</a> (const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;s, const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;get_value) const</td></tr>
+<tr class="memdesc:a382e264b62495ff5097fbc07433c562f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempt to evaluate the given string from the dependencies and valuation of strings on which it depends Warning: eval uses a cache which must be cleaned everytime the valuations given by get_value can change.  <a href="classstring__dependenciest.html#a382e264b62495ff5097fbc07433c562f">More...</a><br /></td></tr>
+<tr class="separator:a382e264b62495ff5097fbc07433c562f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a263895fc2995bd34d8cabc0f691a0c90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#a263895fc2995bd34d8cabc0f691a0c90">clean_cache</a> ()</td></tr>
 <tr class="memdesc:a263895fc2995bd34d8cabc0f691a0c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean the cache used by <code>eval</code>  <a href="classstring__dependenciest.html#a263895fc2995bd34d8cabc0f691a0c90">More...</a><br /></td></tr>
 <tr class="separator:a263895fc2995bd34d8cabc0f691a0c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,8 +179,8 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a85eadafceae7d84e6977a2bb01fd2b65"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="classarray__string__exprt.html">array_string_exprt</a>, std::size_t, <a class="el" href="structirep__hash.html">irep_hash</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#a85eadafceae7d84e6977a2bb01fd2b65">node_index_pool</a></td></tr>
 <tr class="memdesc:a85eadafceae7d84e6977a2bb01fd2b65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nodes describing dependencies of a string: values of the map correspond to indexes in the vector <code>string_nodes</code>.  <a href="classstring__dependenciest.html#a85eadafceae7d84e6977a2bb01fd2b65">More...</a><br /></td></tr>
 <tr class="separator:a85eadafceae7d84e6977a2bb01fd2b65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab92dac4be71622cfe71bb98ec2613084"><td class="memItemLeft" align="right" valign="top">std::vector&lt; optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#ab92dac4be71622cfe71bb98ec2613084">eval_string_cache</a></td></tr>
-<tr class="separator:ab92dac4be71622cfe71bb98ec2613084"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f544106be5a5dd398a28ebe3aa913ac"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::optional&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__dependenciest.html#a0f544106be5a5dd398a28ebe3aa913ac">eval_string_cache</a></td></tr>
+<tr class="separator:a0f544106be5a5dd398a28ebe3aa913ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Keep track of dependencies between strings. </p>
@@ -297,14 +297,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="afedc2575cb326daa2bb32ee27b1a0734"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afedc2575cb326daa2bb32ee27b1a0734">&#9670;&nbsp;</a></span>eval()</h2>
+<a id="a382e264b62495ff5097fbc07433c562f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a382e264b62495ff5097fbc07433c562f">&#9670;&nbsp;</a></span>eval()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt; string_dependenciest::eval </td>
+          <td class="memname">std::optional&lt; <a class="el" href="classexprt.html">exprt</a> &gt; string_dependenciest::eval </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -588,8 +588,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab92dac4be71622cfe71bb98ec2613084"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab92dac4be71622cfe71bb98ec2613084">&#9670;&nbsp;</a></span>eval_string_cache</h2>
+<a id="a0f544106be5a5dd398a28ebe3aa913ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f544106be5a5dd398a28ebe3aa913ac">&#9670;&nbsp;</a></span>eval_string_cache</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -598,7 +598,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;optionalt&lt;<a class="el" href="classexprt.html">exprt</a>&gt; &gt; string_dependenciest::eval_string_cache</td>
+          <td class="memname">std::vector&lt;std::optional&lt;<a class="el" href="classexprt.html">exprt</a>&gt; &gt; string_dependenciest::eval_string_cache</td>
         </tr>
       </table>
   </td>

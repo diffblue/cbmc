@@ -169,9 +169,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ad8b0155f36e0b852fc4216300e05c1e6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#ad8b0155f36e0b852fc4216300e05c1e6">create_stub_global_symbols</a> (const <a class="el" href="structjava__bytecode__parse__treet.html">java_bytecode_parse_treet</a> &amp;parse_tree, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classclass__hierarchyt.html">class_hierarchyt</a> &amp;class_hierarchy, <a class="el" href="classmessaget.html">messaget</a> &amp;<a class="el" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>)</td></tr>
 <tr class="memdesc:ad8b0155f36e0b852fc4216300e05c1e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Search for getstatic and putstatic instructions in a class' bytecode and create stub symbols for any static fields that aren't already in the symbol table.  <a href="java__bytecode__language_8cpp.html#ad8b0155f36e0b852fc4216300e05c1e6">More...</a><br /></td></tr>
 <tr class="separator:ad8b0155f36e0b852fc4216300e05c1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2192a29bbbea377ec53440f3a5e131d5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#a2192a29bbbea377ec53440f3a5e131d5">notify_static_method_calls</a> (const <a class="el" href="classcodet.html">codet</a> &amp;function_body, optionalt&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt; needed_lazy_methods)</td></tr>
-<tr class="memdesc:a2192a29bbbea377ec53440f3a5e131d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notify ci_lazy_methods, if present, of any static function calls made by the given function body.  <a href="java__bytecode__language_8cpp.html#a2192a29bbbea377ec53440f3a5e131d5">More...</a><br /></td></tr>
-<tr class="separator:a2192a29bbbea377ec53440f3a5e131d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef1df774ac0641c50bc6c7e758076c47"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#aef1df774ac0641c50bc6c7e758076c47">notify_static_method_calls</a> (const <a class="el" href="classcodet.html">codet</a> &amp;function_body, std::optional&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt; needed_lazy_methods)</td></tr>
+<tr class="memdesc:aef1df774ac0641c50bc6c7e758076c47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notify ci_lazy_methods, if present, of any static function calls made by the given function body.  <a href="java__bytecode__language_8cpp.html#aef1df774ac0641c50bc6c7e758076c47">More...</a><br /></td></tr>
+<tr class="separator:aef1df774ac0641c50bc6c7e758076c47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af98a1368e0fcaacd9dde2619df3d6ee8"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classlanguaget.html">languaget</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__bytecode__language_8cpp.html#af98a1368e0fcaacd9dde2619df3d6ee8">new_java_bytecode_language</a> ()</td></tr>
 <tr class="separator:af98a1368e0fcaacd9dde2619df3d6ee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -610,8 +610,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2192a29bbbea377ec53440f3a5e131d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2192a29bbbea377ec53440f3a5e131d5">&#9670;&nbsp;</a></span>notify_static_method_calls()</h2>
+<a id="aef1df774ac0641c50bc6c7e758076c47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef1df774ac0641c50bc6c7e758076c47">&#9670;&nbsp;</a></span>notify_static_method_calls()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -628,7 +628,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">optionalt&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt;&#160;</td>
+          <td class="paramtype">std::optional&lt; <a class="el" href="classci__lazy__methods__neededt.html">ci_lazy_methods_neededt</a> &gt;&#160;</td>
           <td class="paramname"><em>needed_lazy_methods</em>&#160;</td>
         </tr>
         <tr>

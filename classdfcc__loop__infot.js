@@ -1,8 +1,8 @@
 var classdfcc__loop__infot =
 [
     [ "dfcc_loop_infot", "classdfcc__loop__infot.html#a77e91aa579706d1e573f32d47853d9cd", null ],
-    [ "find_head", "classdfcc__loop__infot.html#a0f053e86a0e2257600a52246f06cef31", null ],
-    [ "find_latch", "classdfcc__loop__infot.html#ab8ffca7fa2edd09f31ab06c0383ecd19", null ],
+    [ "find_head", "classdfcc__loop__infot.html#aa33706ca5140110a67ef728b64907b99", null ],
+    [ "find_latch", "classdfcc__loop__infot.html#a6087f22d5994fb83a905b860253ff870", null ],
     [ "output", "classdfcc__loop__infot.html#a183d55c46c459226212129b0465bf926", null ],
     [ "addr_of_write_set_var", "classdfcc__loop__infot.html#a011243024aae667b906f6eb28852a1f6", null ],
     [ "assigns", "classdfcc__loop__infot.html#a48beca6693eaca29f718a5257bb3e3cd", null ],

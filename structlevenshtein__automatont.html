@@ -117,8 +117,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a14a1f7ade33a02bf7e11ce2b404f0aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79a77a3a2dbda6ab5dadff8a95637033"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlevenshtein__automatont.html#a79a77a3a2dbda6ab5dadff8a95637033">matches</a> (const std::string &amp;string) const</td></tr>
 <tr class="separator:a79a77a3a2dbda6ab5dadff8a95637033"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34b174492a1a57c43e31b13f344710da"><td class="memItemLeft" align="right" valign="top">optionalt&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlevenshtein__automatont.html#a34b174492a1a57c43e31b13f344710da">get_edit_distance</a> (const std::string &amp;string) const</td></tr>
-<tr class="separator:a34b174492a1a57c43e31b13f344710da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72c0ac6b9cb9e6c5cd5e85919b4be486"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlevenshtein__automatont.html#a72c0ac6b9cb9e6c5cd5e85919b4be486">get_edit_distance</a> (const std::string &amp;string) const</td></tr>
+<tr class="separator:a72c0ac6b9cb9e6c5cd5e85919b4be486"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76e89c8b969088e90d7df4393c65ef32"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlevenshtein__automatont.html#a76e89c8b969088e90d7df4393c65ef32">dump_automaton_dot_to</a> (std::ostream &amp;out)</td></tr>
 <tr class="separator:a76e89c8b969088e90d7df4393c65ef32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -138,7 +138,7 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p>Simple automaton that can detect whether a string can be transformed into another with a limited number of deletions, insertions or substitutions. </p>
 <p>Not a very fast implementation, but should be good enough for small strings. </p>
 
-<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00025">25</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00024">24</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a21b9fe937c616c76cf810639a94e17e7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a21b9fe937c616c76cf810639a94e17e7">&#9670;&nbsp;</a></span>state_labelt</h2>
@@ -160,7 +160,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00029">29</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00028">28</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
 
 </div>
 </div>
@@ -220,18 +220,18 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00040">40</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00039">39</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
 
 </div>
 </div>
-<a id="a34b174492a1a57c43e31b13f344710da"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a34b174492a1a57c43e31b13f344710da">&#9670;&nbsp;</a></span>get_edit_distance()</h2>
+<a id="a72c0ac6b9cb9e6c5cd5e85919b4be486"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72c0ac6b9cb9e6c5cd5e85919b4be486">&#9670;&nbsp;</a></span>get_edit_distance()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt; std::size_t &gt; levenshtein_automatont::get_edit_distance </td>
+          <td class="memname">std::optional&lt; std::size_t &gt; levenshtein_automatont::get_edit_distance </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>string</em></td><td>)</td>
@@ -285,7 +285,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00030">30</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00029">29</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
 
 </div>
 </div>
@@ -309,7 +309,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00028">28</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="edit__distance_8h_source.html#l00027">27</a> of file <a class="el" href="edit__distance_8h_source.html">edit_distance.h</a>.</p>
 
 </div>
 </div>

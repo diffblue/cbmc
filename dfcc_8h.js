@@ -7,6 +7,6 @@ var dfcc_8h =
     [ "HELP_ENFORCE_CONTRACT_REC", "dfcc_8h.html#ad2b98b6423d6a0a9dbb0e8ad2f725ab5", null ],
     [ "OPT_DFCC", "dfcc_8h.html#aa6a0fc16690fa9f922015ae82dc74649", null ],
     [ "OPT_ENFORCE_CONTRACT_REC", "dfcc_8h.html#a78f3db2c11d700ff93ab83d84204b16c", null ],
-    [ "dfcc", "group__dfcc-module.html#ga643c9eb853f28143d9a4a975844d99c4", null ],
-    [ "dfcc", "group__dfcc-module.html#ga46a51b92364a93b0f1975238bb5d0994", null ]
+    [ "dfcc", "group__dfcc-module.html#gaa8df472ec760037b14a556ce1eb6212f", null ],
+    [ "dfcc", "group__dfcc-module.html#gaa27d3a3ed2b347c9699a30bb3ef13fd6", null ]
 ];

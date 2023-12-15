@@ -98,13 +98,12 @@ $(document).ready(function(){initNavTree('add__failed__symbols_8h.html',''); ini
 <p>Pointer Dereferencing.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="expr_8h_source.html">util/expr.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="optional_8h_source.html">util/optional.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for add_failed_symbols.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="add__failed__symbols_8h__incl.svg" width="1359" height="814"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="add__failed__symbols_8h__incl.svg" width="1372" height="814"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -129,9 +128,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a92eeb8d0e818309bfc26407477b4d162"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="add__failed__symbols_8h.html#a92eeb8d0e818309bfc26407477b4d162">failed_symbol_id</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier)</td></tr>
 <tr class="memdesc:a92eeb8d0e818309bfc26407477b4d162"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the special symbol used to denote an unknown referee pointed to by a given pointer-typed symbol.  <a href="add__failed__symbols_8h.html#a92eeb8d0e818309bfc26407477b4d162">More...</a><br /></td></tr>
 <tr class="separator:a92eeb8d0e818309bfc26407477b4d162"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93835ea243767ea3c065b1e84d2fc76a"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="add__failed__symbols_8h.html#a93835ea243767ea3c065b1e84d2fc76a">get_failed_symbol</a> (const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:a93835ea243767ea3c065b1e84d2fc76a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the failed-dereference symbol for the given symbol.  <a href="add__failed__symbols_8h.html#a93835ea243767ea3c065b1e84d2fc76a">More...</a><br /></td></tr>
-<tr class="separator:a93835ea243767ea3c065b1e84d2fc76a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab98e18a04e5f42f073776ae7d53223ad"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="add__failed__symbols_8h.html#ab98e18a04e5f42f073776ae7d53223ad">get_failed_symbol</a> (const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:ab98e18a04e5f42f073776ae7d53223ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the failed-dereference symbol for the given symbol.  <a href="add__failed__symbols_8h.html#ab98e18a04e5f42f073776ae7d53223ad">More...</a><br /></td></tr>
+<tr class="separator:ab98e18a04e5f42f073776ae7d53223ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bd4f4ceb5033135d8dafa0066da0bae"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="add__failed__symbols_8h.html#a7bd4f4ceb5033135d8dafa0066da0bae">is_failed_symbol</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a7bd4f4ceb5033135d8dafa0066da0bae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if, and only if, <code>expr</code> is the result of failed dereferencing.  <a href="add__failed__symbols_8h.html#a7bd4f4ceb5033135d8dafa0066da0bae">More...</a><br /></td></tr>
 <tr class="separator:a7bd4f4ceb5033135d8dafa0066da0bae"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -237,14 +236,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a93835ea243767ea3c065b1e84d2fc76a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a93835ea243767ea3c065b1e84d2fc76a">&#9670;&nbsp;</a></span>get_failed_symbol()</h2>
+<a id="ab98e18a04e5f42f073776ae7d53223ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab98e18a04e5f42f073776ae7d53223ad">&#9670;&nbsp;</a></span>get_failed_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;<a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&gt; get_failed_symbol </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&gt; get_failed_symbol </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>expr</em>, </td>
@@ -303,7 +302,7 @@ Functions</h2></td></tr>
 
 <p>Return true if, and only if, <code>expr</code> is the result of failed dereferencing. </p>
 
-<p class="definition">Definition at line <a class="el" href="add__failed__symbols_8h_source.html#l00039">39</a> of file <a class="el" href="add__failed__symbols_8h_source.html">add_failed_symbols.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="add__failed__symbols_8h_source.html#l00038">38</a> of file <a class="el" href="add__failed__symbols_8h_source.html">add_failed_symbols.h</a>.</p>
 
 </div>
 </div>

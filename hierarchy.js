@@ -2058,6 +2058,10 @@ var hierarchy =
       [ "symex_target_equationt", "classsymex__target__equationt.html", null ]
     ] ],
     [ "system_library_symbolst", "classsystem__library__symbolst.html", null ],
+    [ "T", null, [
+      [ "cfg_base_nodet< T, I >", "structcfg__base__nodet.html", null ],
+      [ "reference_counting< T, empty >::dt", "classreference__counting_1_1dt.html", null ]
+    ] ],
     [ "taint_analysist", "classtaint__analysist.html", null ],
     [ "taint_parse_treet", "classtaint__parse__treet.html", null ],
     [ "take_time_resourcet", "classtake__time__resourcet.html", null ],
@@ -2186,9 +2190,5 @@ var hierarchy =
     [ "smt_bit_vector_theoryt::xort", "structsmt__bit__vector__theoryt_1_1xort.html", null ],
     [ "smt_core_theoryt::xort", "structsmt__core__theoryt_1_1xort.html", null ],
     [ "smt_bit_vector_theoryt::zero_extendt", "structsmt__bit__vector__theoryt_1_1zero__extendt.html", null ],
-    [ "zip_iteratort< first_iteratort, second_iteratort, same_size >", "structzip__iteratort.html", null ],
-    [ "T", null, [
-      [ "cfg_base_nodet< T, I >", "structcfg__base__nodet.html", null ],
-      [ "reference_counting< T, empty >::dt", "classreference__counting_1_1dt.html", null ]
-    ] ]
+    [ "zip_iteratort< first_iteratort, second_iteratort, same_size >", "structzip__iteratort.html", null ]
 ];

@@ -95,14 +95,14 @@ $(document).ready(function(){initNavTree('java__trace__validation_8h.html',''); 
 <div class="title">java_trace_validation.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="optional_8h_source.html">util/optional.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="validation__mode_8h_source.html">util/validation_mode.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="validation__mode_8h_source.html">util/validation_mode.h</a>&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for java_trace_validation.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__trace__validation_8h__incl.svg" width="363" height="216"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__trace__validation_8h__incl.svg" width="278" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -130,9 +130,9 @@ Functions</h2></td></tr>
 <tr class="separator:a7c42b8bd008f03ba967065117064b137"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ad54430d25f5769a8f46f62fea499f3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__trace__validation_8h.html#a8ad54430d25f5769a8f46f62fea499f3">check_symbol_structure</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="separator:a8ad54430d25f5769a8f46f62fea499f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a125250aa9c701f9a125e403e5591d999"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__trace__validation_8h.html#a125250aa9c701f9a125e403e5591d999">get_inner_symbol_expr</a> (<a class="el" href="classexprt.html">exprt</a> expr)</td></tr>
-<tr class="memdesc:a125250aa9c701f9a125e403e5591d999"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recursively extracts the first operand of an expression until it reaches a symbol and returns it, or returns an empty optional.  <a href="java__trace__validation_8h.html#a125250aa9c701f9a125e403e5591d999">More...</a><br /></td></tr>
-<tr class="separator:a125250aa9c701f9a125e403e5591d999"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad22ed4a1327828147960a107a14e4707"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__trace__validation_8h.html#ad22ed4a1327828147960a107a14e4707">get_inner_symbol_expr</a> (<a class="el" href="classexprt.html">exprt</a> expr)</td></tr>
+<tr class="memdesc:ad22ed4a1327828147960a107a14e4707"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recursively extracts the first operand of an expression until it reaches a symbol and returns it, or returns an empty optional.  <a href="java__trace__validation_8h.html#ad22ed4a1327828147960a107a14e4707">More...</a><br /></td></tr>
+<tr class="separator:ad22ed4a1327828147960a107a14e4707"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4478425c587f7a3536d03973a97ef0f5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__trace__validation_8h.html#a4478425c587f7a3536d03973a97ef0f5">check_member_structure</a> (const <a class="el" href="classmember__exprt.html">member_exprt</a> &amp;expr)</td></tr>
 <tr class="separator:a4478425c587f7a3536d03973a97ef0f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a037defe0df925a6e865b1d8c062d4980"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__trace__validation_8h.html#a037defe0df925a6e865b1d8c062d4980">valid_lhs_expr_high_level</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs)</td></tr>
@@ -167,7 +167,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot; counterexample trace does not match certain assumptions (experimental,&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot; currently java only)\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__trace__validation_8h_source.html#l00029">29</a> of file <a class="el" href="java__trace__validation_8h_source.html">java_trace_validation.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__trace__validation_8h_source.html#l00030">30</a> of file <a class="el" href="java__trace__validation_8h_source.html">java_trace_validation.h</a>.</p>
 
 </div>
 </div>
@@ -185,7 +185,7 @@ Functions</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">  <span class="comment">/*NOLINT*/</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(validate-trace)&quot;</span> \</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="java__trace__validation_8h_source.html#l00026">26</a> of file <a class="el" href="java__trace__validation_8h_source.html">java_trace_validation.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__trace__validation_8h_source.html#l00027">27</a> of file <a class="el" href="java__trace__validation_8h_source.html">java_trace_validation.h</a>.</p>
 
 </div>
 </div>
@@ -388,14 +388,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a125250aa9c701f9a125e403e5591d999"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a125250aa9c701f9a125e403e5591d999">&#9670;&nbsp;</a></span>get_inner_symbol_expr()</h2>
+<a id="ad22ed4a1327828147960a107a14e4707"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad22ed4a1327828147960a107a14e4707">&#9670;&nbsp;</a></span>get_inner_symbol_expr()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;<a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&gt; get_inner_symbol_expr </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&gt; get_inner_symbol_expr </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classexprt.html">exprt</a>&#160;</td>
           <td class="paramname"><em>expr</em></td><td>)</td>

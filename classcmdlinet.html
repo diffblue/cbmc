@@ -187,10 +187,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a94de8e43c334d50ff1c81ec4993b135f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#a94de8e43c334d50ff1c81ec4993b135f">parse_arguments</a> (int argc, const char **argv)</td></tr>
 <tr class="memdesc:a94de8e43c334d50ff1c81ec4993b135f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a commandline according to a previously parsed optstring and writes the result to <a class="el" href="classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37">cmdlinet::options</a>.  <a href="classcmdlinet.html#a94de8e43c334d50ff1c81ec4993b135f">More...</a><br /></td></tr>
 <tr class="separator:a94de8e43c334d50ff1c81ec4993b135f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a75ea8787c8f405d0487313ad487502"><td class="memItemLeft" align="right" valign="top">optionalt&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#a7a75ea8787c8f405d0487313ad487502">getoptnr</a> (char option) const</td></tr>
-<tr class="separator:a7a75ea8787c8f405d0487313ad487502"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a379b2a7d6dd10ba89a5558b39c894ba8"><td class="memItemLeft" align="right" valign="top">optionalt&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#a379b2a7d6dd10ba89a5558b39c894ba8">getoptnr</a> (const std::string &amp;option) const</td></tr>
-<tr class="separator:a379b2a7d6dd10ba89a5558b39c894ba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53eef7daf5598627503a5dd91d79ed7c"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#a53eef7daf5598627503a5dd91d79ed7c">getoptnr</a> (char option) const</td></tr>
+<tr class="separator:a53eef7daf5598627503a5dd91d79ed7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf8d906ed38cc6f7f14ae5488df55030"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcmdlinet.html#abf8d906ed38cc6f7f14ae5488df55030">getoptnr</a> (const std::string &amp;option) const</td></tr>
+<tr class="separator:abf8d906ed38cc6f7f14ae5488df55030"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -199,7 +199,7 @@ Protected Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00020">20</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00019">19</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="addddf7a1694e1e21f41fdea9cdffc072"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#addddf7a1694e1e21f41fdea9cdffc072">&#9670;&nbsp;</a></span>argst</h2>
@@ -213,7 +213,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00151">151</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00150">150</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
 
 </div>
 </div>
@@ -415,8 +415,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a7a75ea8787c8f405d0487313ad487502"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a75ea8787c8f405d0487313ad487502">&#9670;&nbsp;</a></span>getoptnr() <span class="overload">[1/2]</span></h2>
+<a id="a53eef7daf5598627503a5dd91d79ed7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53eef7daf5598627503a5dd91d79ed7c">&#9670;&nbsp;</a></span>getoptnr() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -425,7 +425,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt; std::size_t &gt; cmdlinet::getoptnr </td>
+          <td class="memname">std::optional&lt; std::size_t &gt; cmdlinet::getoptnr </td>
           <td>(</td>
           <td class="paramtype">char&#160;</td>
           <td class="paramname"><em>option</em></td><td>)</td>
@@ -443,8 +443,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a379b2a7d6dd10ba89a5558b39c894ba8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a379b2a7d6dd10ba89a5558b39c894ba8">&#9670;&nbsp;</a></span>getoptnr() <span class="overload">[2/2]</span></h2>
+<a id="abf8d906ed38cc6f7f14ae5488df55030"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf8d906ed38cc6f7f14ae5488df55030">&#9670;&nbsp;</a></span>getoptnr() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -453,7 +453,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt; std::size_t &gt; cmdlinet::getoptnr </td>
+          <td class="memname">std::optional&lt; std::size_t &gt; cmdlinet::getoptnr </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>option</em></td><td>)</td>
@@ -495,7 +495,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00099">99</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00098">98</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
 
 </div>
 </div>
@@ -788,7 +788,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classgoto__cc__cmdlinet.html#a054bdc02e35b5bbd7e9ffe771c28856a">goto_cc_cmdlinet</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00092">92</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00091">91</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
 
 </div>
 </div>
@@ -845,7 +845,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00152">152</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00151">151</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
 
 </div>
 </div>
@@ -869,7 +869,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00191">191</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00190">190</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
 
 </div>
 </div>
@@ -885,7 +885,7 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00153">153</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cmdline_8h_source.html#l00152">152</a> of file <a class="el" href="cmdline_8h_source.html">cmdline.h</a>.</p>
 
 </div>
 </div>

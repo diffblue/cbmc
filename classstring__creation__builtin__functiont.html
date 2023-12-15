@@ -123,8 +123,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aec46ab4664be09b0ed73e0dae265ac20"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__creation__builtin__functiont.html#aec46ab4664be09b0ed73e0dae265ac20">string_creation_builtin_functiont</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;<a class="el" href="classstring__builtin__functiont.html#a35edd5aa80a9de0b7f71e6f20b059969">return_code</a>, const std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt; &amp;fun_args, <a class="el" href="classarray__poolt.html">array_poolt</a> &amp;<a class="el" href="classstring__builtin__functiont.html#a95b7ed614059ec9dbfefb12b926fc105">array_pool</a>)</td></tr>
 <tr class="memdesc:aec46ab4664be09b0ed73e0dae265ac20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor from arguments of a function application.  <a href="classstring__creation__builtin__functiont.html#aec46ab4664be09b0ed73e0dae265ac20">More...</a><br /></td></tr>
 <tr class="separator:aec46ab4664be09b0ed73e0dae265ac20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2267cbc0a90e6dfcfba4efc97b9b08c6"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__creation__builtin__functiont.html#a2267cbc0a90e6dfcfba4efc97b9b08c6">string_result</a> () const override</td></tr>
-<tr class="separator:a2267cbc0a90e6dfcfba4efc97b9b08c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26b1e64a2f42ff4262b1db05751bf821"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__creation__builtin__functiont.html#a26b1e64a2f42ff4262b1db05751bf821">string_result</a> () const override</td></tr>
+<tr class="separator:a26b1e64a2f42ff4262b1db05751bf821"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99e682a4a09f7e956e766e7e0dc64b6e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__creation__builtin__functiont.html#a99e682a4a09f7e956e766e7e0dc64b6e">maybe_testing_function</a> () const override</td></tr>
 <tr class="memdesc:a99e682a4a09f7e956e766e7e0dc64b6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tells whether the builtin function can be a testing function, that is a function that does not return a string, for instance like <code>equals</code>, <code>indexOf</code> or <code>compare</code>.  <a href="classstring__creation__builtin__functiont.html#a99e682a4a09f7e956e766e7e0dc64b6e">More...</a><br /></td></tr>
 <tr class="separator:a99e682a4a09f7e956e766e7e0dc64b6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,9 +137,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aaad510986ddf8173e25631cf47abf6e4 inherit pub_methods_classstring__builtin__functiont"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19b0a861b05819c12ad2e680db0a1096 inherit pub_methods_classstring__builtin__functiont"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#a19b0a861b05819c12ad2e680db0a1096">string_arguments</a> () const</td></tr>
 <tr class="separator:a19b0a861b05819c12ad2e680db0a1096 inherit pub_methods_classstring__builtin__functiont"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a158e7cfb0df08193d80c1ae9378f09a5 inherit pub_methods_classstring__builtin__functiont"><td class="memItemLeft" align="right" valign="top">virtual optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#a158e7cfb0df08193d80c1ae9378f09a5">eval</a> (const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;get_value) const =0</td></tr>
-<tr class="memdesc:a158e7cfb0df08193d80c1ae9378f09a5 inherit pub_methods_classstring__builtin__functiont"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a function <code>get_value</code> which gives a valuation to expressions, attempt to find the result of the builtin function.  <a href="classstring__builtin__functiont.html#a158e7cfb0df08193d80c1ae9378f09a5">More...</a><br /></td></tr>
-<tr class="separator:a158e7cfb0df08193d80c1ae9378f09a5 inherit pub_methods_classstring__builtin__functiont"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecba40aeb090fe8f506514c6a7513c1d inherit pub_methods_classstring__builtin__functiont"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#aecba40aeb090fe8f506514c6a7513c1d">eval</a> (const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;get_value) const =0</td></tr>
+<tr class="memdesc:aecba40aeb090fe8f506514c6a7513c1d inherit pub_methods_classstring__builtin__functiont"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a function <code>get_value</code> which gives a valuation to expressions, attempt to find the result of the builtin function.  <a href="classstring__builtin__functiont.html#aecba40aeb090fe8f506514c6a7513c1d">More...</a><br /></td></tr>
+<tr class="separator:aecba40aeb090fe8f506514c6a7513c1d inherit pub_methods_classstring__builtin__functiont"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebe151eddcf376e42bd849dfea76c303 inherit pub_methods_classstring__builtin__functiont"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#aebe151eddcf376e42bd849dfea76c303">name</a> () const =0</td></tr>
 <tr class="separator:aebe151eddcf376e42bd849dfea76c303 inherit pub_methods_classstring__builtin__functiont"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84e7087e66cb60eb3a3fefe15ee17824 inherit pub_methods_classstring__builtin__functiont"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structstring__constraintst.html">string_constraintst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#a84e7087e66cb60eb3a3fefe15ee17824">constraints</a> (<a class="el" href="classstring__constraint__generatort.html">string_constraint_generatort</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;) const =0</td></tr>
@@ -244,8 +244,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a2267cbc0a90e6dfcfba4efc97b9b08c6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2267cbc0a90e6dfcfba4efc97b9b08c6">&#9670;&nbsp;</a></span>string_result()</h2>
+<a id="a26b1e64a2f42ff4262b1db05751bf821"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26b1e64a2f42ff4262b1db05751bf821">&#9670;&nbsp;</a></span>string_result()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -254,7 +254,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;<a class="el" href="classarray__string__exprt.html">array_string_exprt</a>&gt; string_creation_builtin_functiont::string_result </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classarray__string__exprt.html">array_string_exprt</a>&gt; string_creation_builtin_functiont::string_result </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -267,7 +267,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented from <a class="el" href="classstring__builtin__functiont.html#aeb50da96c914cdd93633433b606a82f4">string_builtin_functiont</a>.</p>
+<p>Reimplemented from <a class="el" href="classstring__builtin__functiont.html#a84204dd44726fc389f91723fea3dc594">string_builtin_functiont</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="string__builtin__function_8h_source.html#l00351">351</a> of file <a class="el" href="string__builtin__function_8h_source.html">string_builtin_function.h</a>.</p>
 

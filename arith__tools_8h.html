@@ -97,7 +97,6 @@ $(document).ready(function(){initNavTree('arith__tools_8h.html',''); initResizab
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="optional_8h_source.html">optional.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="std__expr_8h_source.html">std_expr.h</a>&quot;</code><br />
 <code>#include &lt;limits&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -105,7 +104,7 @@ $(document).ready(function(){initNavTree('arith__tools_8h.html',''); initResizab
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="arith__tools_8h__incl.svg" width="1380" height="874"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="arith__tools_8h__incl.svg" width="1262" height="874"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -128,10 +127,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a921fb92421ece03cfac32ce34e24e100"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a921fb92421ece03cfac32ce34e24e100">to_integer</a> (const <a class="el" href="classconstant__exprt.html">constant_exprt</a> &amp;expr, <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;int_value)</td></tr>
 <tr class="memdesc:a921fb92421ece03cfac32ce34e24e100"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a constant expression <code>expr</code> to an arbitrary-precision integer.  <a href="arith__tools_8h.html#a921fb92421ece03cfac32ce34e24e100">More...</a><br /></td></tr>
 <tr class="separator:a921fb92421ece03cfac32ce34e24e100"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a894532a7fe0995362d0163b9439a7b79"><td class="memTemplParams" colspan="2">template&lt;typename Target &gt; </td></tr>
-<tr class="memitem:a894532a7fe0995362d0163b9439a7b79"><td class="memTemplItemLeft" align="right" valign="top">optionalt&lt; Target &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a894532a7fe0995362d0163b9439a7b79">numeric_cast</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;arg)</td></tr>
-<tr class="memdesc:a894532a7fe0995362d0163b9439a7b79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an expression to any integral type.  <a href="arith__tools_8h.html#a894532a7fe0995362d0163b9439a7b79">More...</a><br /></td></tr>
-<tr class="separator:a894532a7fe0995362d0163b9439a7b79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad22b621aedad8a0058a13803be9f9e49"><td class="memTemplParams" colspan="2">template&lt;typename Target &gt; </td></tr>
+<tr class="memitem:ad22b621aedad8a0058a13803be9f9e49"><td class="memTemplItemLeft" align="right" valign="top">std::optional&lt; Target &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#ad22b621aedad8a0058a13803be9f9e49">numeric_cast</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;arg)</td></tr>
+<tr class="memdesc:ad22b621aedad8a0058a13803be9f9e49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an expression to any integral type.  <a href="arith__tools_8h.html#ad22b621aedad8a0058a13803be9f9e49">More...</a><br /></td></tr>
+<tr class="separator:ad22b621aedad8a0058a13803be9f9e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e191e6b9b8b495a97b0e3f78b4fc7ed"><td class="memTemplParams" colspan="2">template&lt;typename Target &gt; </td></tr>
 <tr class="memitem:a8e191e6b9b8b495a97b0e3f78b4fc7ed"><td class="memTemplItemLeft" align="right" valign="top">Target&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a8e191e6b9b8b495a97b0e3f78b4fc7ed">numeric_cast_v</a> (const <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;arg)</td></tr>
 <tr class="memdesc:a8e191e6b9b8b495a97b0e3f78b4fc7ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an mp_integer to integral type Target An invariant will fail if the conversion is not possible.  <a href="arith__tools_8h.html#a8e191e6b9b8b495a97b0e3f78b4fc7ed">More...</a><br /></td></tr>
@@ -435,8 +434,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a894532a7fe0995362d0163b9439a7b79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a894532a7fe0995362d0163b9439a7b79">&#9670;&nbsp;</a></span>numeric_cast()</h2>
+<a id="ad22b621aedad8a0058a13803be9f9e49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad22b621aedad8a0058a13803be9f9e49">&#9670;&nbsp;</a></span>numeric_cast()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -444,7 +443,7 @@ Functions</h2></td></tr>
 template&lt;typename Target &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;Target&gt; numeric_cast </td>
+          <td class="memname">std::optional&lt;Target&gt; numeric_cast </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>arg</em></td><td>)</td>
@@ -468,7 +467,7 @@ template&lt;typename Target &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>optional integer of type Target if conversion is possible, empty optional otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00125">125</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00124">124</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
 
 </div>
 </div>
@@ -505,7 +504,7 @@ template&lt;typename Target &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>value of type Target </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00149">149</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00148">148</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
 
 </div>
 </div>
@@ -542,7 +541,7 @@ template&lt;typename Target &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>value of type Target </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00136">136</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8h_source.html#l00135">135</a> of file <a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>.</p>
 
 </div>
 </div>

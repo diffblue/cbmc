@@ -4,7 +4,7 @@ var classdfcc__cfg__infot =
     [ "get_local_set", "classdfcc__cfg__infot.html#ab07f49a217532b1c767348c0d45b47f2", null ],
     [ "get_loop_info", "classdfcc__cfg__infot.html#a563f1c474d385eb43343bf34f5ed740c", null ],
     [ "get_loops_toposorted", "classdfcc__cfg__infot.html#a1f181c03819a3b9cb3de5b39b222d021", null ],
-    [ "get_outer_loop_identifier", "classdfcc__cfg__infot.html#a79ca1e4fadee086cf1df8d282f12e76b", null ],
+    [ "get_outer_loop_identifier", "classdfcc__cfg__infot.html#a1c7075c4d098296983bb7fd0e65abfba", null ],
     [ "get_outer_write_set", "classdfcc__cfg__infot.html#abc6b5481e5f664eb063a9a001b8a0df6", null ],
     [ "get_top_level_tracked", "classdfcc__cfg__infot.html#a250c7a87b86ef219653e97c56b543ffa", null ],
     [ "get_top_level_write_set", "classdfcc__cfg__infot.html#ad724020422e40bc1487ba7408ea41beb", null ],

@@ -149,9 +149,9 @@ Protected Types</h2></td></tr>
 <tr class="separator:a847b75506326b6162d3f7d3679fbe570"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab1a0d628701a45e9f8249f062ff4955"><td class="memItemLeft" align="right" valign="top">typedef std::list&lt; <a class="el" href="classgoto__check__ct.html#a847b75506326b6162d3f7d3679fbe570">allocationt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#aab1a0d628701a45e9f8249f062ff4955">allocationst</a></td></tr>
 <tr class="separator:aab1a0d628701a45e9f8249f062ff4955"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbd4955bb97545b17277938b4d4dcee8"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#abbd4955bb97545b17277938b4d4dcee8">named_check_statust</a> = optionalt&lt; std::pair&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129">check_statust</a> &gt; &gt;</td></tr>
-<tr class="memdesc:abbd4955bb97545b17277938b4d4dcee8"><td class="mdescLeft">&#160;</td><td class="mdescRight">optional (named-check, status) pair  <a href="classgoto__check__ct.html#abbd4955bb97545b17277938b4d4dcee8">More...</a><br /></td></tr>
-<tr class="separator:abbd4955bb97545b17277938b4d4dcee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0559a53f204fa7c9b1432d4b1a95af15"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a0559a53f204fa7c9b1432d4b1a95af15">named_check_statust</a> = std::optional&lt; std::pair&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129">check_statust</a> &gt; &gt;</td></tr>
+<tr class="memdesc:a0559a53f204fa7c9b1432d4b1a95af15"><td class="mdescLeft">&#160;</td><td class="mdescRight">optional (named-check, status) pair  <a href="classgoto__check__ct.html#a0559a53f204fa7c9b1432d4b1a95af15">More...</a><br /></td></tr>
+<tr class="separator:a0559a53f204fa7c9b1432d4b1a95af15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -213,8 +213,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a56ac5872139c119a106592e3676e2cb3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a56ac5872139c119a106592e3676e2cb3">requires_pointer_primitive_check</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a56ac5872139c119a106592e3676e2cb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the given expression is a pointer primitive that requires validation of the operand to guard against misuse.  <a href="classgoto__check__ct.html#a56ac5872139c119a106592e3676e2cb3">More...</a><br /></td></tr>
 <tr class="separator:a56ac5872139c119a106592e3676e2cb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7872959dc723f85a109c9c0204738e20"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="structgoto__check__ct_1_1conditiont.html">goto_check_ct::conditiont</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a7872959dc723f85a109c9c0204738e20">get_pointer_is_null_condition</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;address, const <a class="el" href="classexprt.html">exprt</a> &amp;size)</td></tr>
-<tr class="separator:a7872959dc723f85a109c9c0204738e20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45dd24368df3deba2ae7cd52250cd6d9"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structgoto__check__ct_1_1conditiont.html">goto_check_ct::conditiont</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a45dd24368df3deba2ae7cd52250cd6d9">get_pointer_is_null_condition</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;address, const <a class="el" href="classexprt.html">exprt</a> &amp;size)</td></tr>
+<tr class="separator:a45dd24368df3deba2ae7cd52250cd6d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad40a2fb1d192823780d609c1567fcb4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__check__ct.html#a5cfcc8a8140a1771d5daaddccab70a61">conditionst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ad40a2fb1d192823780d609c1567fcb4a">get_pointer_points_to_valid_memory_conditions</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;address, const <a class="el" href="classexprt.html">exprt</a> &amp;size)</td></tr>
 <tr class="separator:ad40a2fb1d192823780d609c1567fcb4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40ebc0d15342f3b8b65b68564d3ca0f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a40ebc0d15342f3b8b65b68564d3ca0f0">is_in_bounds_of_some_explicit_allocation</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;pointer, const <a class="el" href="classexprt.html">exprt</a> &amp;size)</td></tr>
@@ -243,7 +243,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ab82c7ee9b4b5d275830acdc41322d1c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#ab82c7ee9b4b5d275830acdc41322d1c3">add_all_checked_named_check_pragmas</a> (<a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location) const</td></tr>
 <tr class="memdesc:ab82c7ee9b4b5d275830acdc41322d1c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds "checked" pragmas for all named checks on the given source location (prevents any the instanciation of any ulterior check).  <a href="classgoto__check__ct.html#ab82c7ee9b4b5d275830acdc41322d1c3">More...</a><br /></td></tr>
 <tr class="separator:ab82c7ee9b4b5d275830acdc41322d1c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05a462d9a079d7ad6c891fc25437fe25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__check__ct.html#abbd4955bb97545b17277938b4d4dcee8">named_check_statust</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a05a462d9a079d7ad6c891fc25437fe25">match_named_check</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;named_check) const</td></tr>
+<tr class="memitem:a05a462d9a079d7ad6c891fc25437fe25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__check__ct.html#a0559a53f204fa7c9b1432d4b1a95af15">named_check_statust</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__check__ct.html#a05a462d9a079d7ad6c891fc25437fe25">match_named_check</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;named_check) const</td></tr>
 <tr class="memdesc:a05a462d9a079d7ad6c891fc25437fe25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matches a named-check string of the form.  <a href="classgoto__check__ct.html#a05a462d9a079d7ad6c891fc25437fe25">More...</a><br /></td></tr>
 <tr class="separator:a05a462d9a079d7ad6c891fc25437fe25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -471,8 +471,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="abbd4955bb97545b17277938b4d4dcee8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbd4955bb97545b17277938b4d4dcee8">&#9670;&nbsp;</a></span>named_check_statust</h2>
+<a id="a0559a53f204fa7c9b1432d4b1a95af15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0559a53f204fa7c9b1432d4b1a95af15">&#9670;&nbsp;</a></span>named_check_statust</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -481,7 +481,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="classgoto__check__ct.html#abbd4955bb97545b17277938b4d4dcee8">goto_check_ct::named_check_statust</a> =  optionalt&lt;std::pair&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129">check_statust</a>&gt; &gt;</td>
+          <td class="memname">using <a class="el" href="classgoto__check__ct.html#a0559a53f204fa7c9b1432d4b1a95af15">goto_check_ct::named_check_statust</a> =  std::optional&lt;std::pair&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129">check_statust</a>&gt; &gt;</td>
         </tr>
       </table>
   </td>
@@ -1469,8 +1469,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a7872959dc723f85a109c9c0204738e20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7872959dc723f85a109c9c0204738e20">&#9670;&nbsp;</a></span>get_pointer_is_null_condition()</h2>
+<a id="a45dd24368df3deba2ae7cd52250cd6d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45dd24368df3deba2ae7cd52250cd6d9">&#9670;&nbsp;</a></span>get_pointer_is_null_condition()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1479,7 +1479,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt; <a class="el" href="structgoto__check__ct_1_1conditiont.html">goto_check_ct::conditiont</a> &gt; goto_check_ct::get_pointer_is_null_condition </td>
+          <td class="memname">std::optional&lt; <a class="el" href="structgoto__check__ct_1_1conditiont.html">goto_check_ct::conditiont</a> &gt; goto_check_ct::get_pointer_is_null_condition </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>address</em>, </td>
@@ -1697,7 +1697,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classgoto__check__ct.html#abbd4955bb97545b17277938b4d4dcee8">goto_check_ct::named_check_statust</a> goto_check_ct::match_named_check </td>
+          <td class="memname"><a class="el" href="classgoto__check__ct.html#a0559a53f204fa7c9b1432d4b1a95af15">goto_check_ct::named_check_statust</a> goto_check_ct::match_named_check </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>named_check</em></td><td>)</td>

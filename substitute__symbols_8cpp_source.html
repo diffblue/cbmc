@@ -105,7 +105,7 @@ $(document).ready(function(){initNavTree('substitute__symbols_8cpp_source.html',
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="std__expr_8h.html">std_expr.h</a>&quot;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">   16</a></span>&#160;<span class="keyword">static</span> optionalt&lt;exprt&gt; <a class="code" href="substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">substitute_symbols_rec</a>(</div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="substitute__symbols_8cpp.html#a61184c867ea83a9e9041e8cd00be83de">   16</a></span>&#160;<span class="keyword">static</span> std::optional&lt;exprt&gt; <a class="code" href="substitute__symbols_8cpp.html#a61184c867ea83a9e9041e8cd00be83de">substitute_symbols_rec</a>(</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">const</span> std::map&lt;irep_idt, exprt&gt; &amp;substitutions,</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <a class="code" href="classexprt.html">exprt</a> src)</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
@@ -129,7 +129,7 @@ $(document).ready(function(){initNavTree('substitute__symbols_8cpp_source.html',
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      new_substitutions.erase(variable.get_identifier());</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">auto</span> op_result =</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <a class="code" href="substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">substitute_symbols_rec</a>(new_substitutions, binding_expr.where());</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <a class="code" href="substitute__symbols_8cpp.html#a61184c867ea83a9e9041e8cd00be83de">substitute_symbols_rec</a>(new_substitutions, binding_expr.where());</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">if</span>(op_result.has_value())</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    {</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keyword">auto</span> new_binding_expr = binding_expr; <span class="comment">// copy</span></div>
@@ -154,7 +154,7 @@ $(document).ready(function(){initNavTree('substitute__symbols_8cpp_source.html',
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;op : new_let_expr.values())</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keyword">auto</span> op_result = <a class="code" href="substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">substitute_symbols_rec</a>(new_substitutions, op);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keyword">auto</span> op_result = <a class="code" href="substitute__symbols_8cpp.html#a61184c867ea83a9e9041e8cd00be83de">substitute_symbols_rec</a>(new_substitutions, op);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <span class="keywordflow">if</span>(op_result.has_value())</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      {</div>
@@ -164,7 +164,7 @@ $(document).ready(function(){initNavTree('substitute__symbols_8cpp_source.html',
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    }</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keyword">auto</span> op_result =</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <a class="code" href="substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">substitute_symbols_rec</a>(new_substitutions, binding_expr.where());</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <a class="code" href="substitute__symbols_8cpp.html#a61184c867ea83a9e9041e8cd00be83de">substitute_symbols_rec</a>(new_substitutions, binding_expr.where());</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">if</span>(op_result.has_value())</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    {</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      new_let_expr.where() = op_result.value();</div>
@@ -184,7 +184,7 @@ $(document).ready(function(){initNavTree('substitute__symbols_8cpp_source.html',
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;op : src.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keyword">auto</span> op_result = <a class="code" href="substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">substitute_symbols_rec</a>(substitutions, op);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keyword">auto</span> op_result = <a class="code" href="substitute__symbols_8cpp.html#a61184c867ea83a9e9041e8cd00be83de">substitute_symbols_rec</a>(substitutions, op);</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordflow">if</span>(op_result.has_value())</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    {</div>
@@ -199,10 +199,10 @@ $(document).ready(function(){initNavTree('substitute__symbols_8cpp_source.html',
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">return</span> {};</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;}</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;optionalt&lt;exprt&gt;</div>
-<div class="line"><a name="l00111"></a><span class="lineno"><a class="line" href="substitute__symbols_8cpp.html#a20706d3b67c90093ece45847ce84eb52">  111</a></span>&#160;<a class="code" href="substitute__symbols_8cpp.html#a20706d3b67c90093ece45847ce84eb52">substitute_symbols</a>(<span class="keyword">const</span> std::map&lt;irep_idt, exprt&gt; &amp;substitutions, <a class="code" href="classexprt.html">exprt</a> src)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;std::optional&lt;exprt&gt;</div>
+<div class="line"><a name="l00111"></a><span class="lineno"><a class="line" href="substitute__symbols_8cpp.html#ab4592d5b07744ae92bc862a296b189a9">  111</a></span>&#160;<a class="code" href="substitute__symbols_8cpp.html#ab4592d5b07744ae92bc862a296b189a9">substitute_symbols</a>(<span class="keyword">const</span> std::map&lt;irep_idt, exprt&gt; &amp;substitutions, <a class="code" href="classexprt.html">exprt</a> src)</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;{</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">substitute_symbols_rec</a>(substitutions, src);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="substitute__symbols_8cpp.html#a61184c867ea83a9e9041e8cd00be83de">substitute_symbols_rec</a>(substitutions, src);</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;}</div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
 <div class="ttc" id="aclassexprt_html_a2c2a5f68a2d7b7766245ea4dde682293"><div class="ttname"><a href="classexprt.html#a2c2a5f68a2d7b7766245ea4dde682293">exprt::has_operands</a></div><div class="ttdeci">bool has_operands() const</div><div class="ttdoc">Return true if there is at least one operand.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00091">expr.h:91</a></div></div>
@@ -213,8 +213,8 @@ $(document).ready(function(){initNavTree('substitute__symbols_8cpp_source.html',
 <div class="ttc" id="astd__expr_8h_html_a1d1b623baac544cc3321b43480038b54"><div class="ttname"><a href="std__expr_8h.html#a1d1b623baac544cc3321b43480038b54">to_let_expr</a></div><div class="ttdeci">const let_exprt &amp; to_let_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a let_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03273">std_expr.h:3273</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_a25f1967a7eef63b269c6ed43faee88ab"><div class="ttname"><a href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a></div><div class="ttdeci">const symbol_exprt &amp; to_symbol_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a symbol_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00222">std_expr.h:222</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_ad3296993d9e039b3fd7a474e937405a7"><div class="ttname"><a href="std__expr_8h.html#ad3296993d9e039b3fd7a474e937405a7">to_binding_expr</a></div><div class="ttdeci">const binding_exprt &amp; to_binding_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a binding_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03121">std_expr.h:3121</a></div></div>
-<div class="ttc" id="asubstitute__symbols_8cpp_html_a20706d3b67c90093ece45847ce84eb52"><div class="ttname"><a href="substitute__symbols_8cpp.html#a20706d3b67c90093ece45847ce84eb52">substitute_symbols</a></div><div class="ttdeci">optionalt&lt; exprt &gt; substitute_symbols(const std::map&lt; irep_idt, exprt &gt; &amp;substitutions, exprt src)</div><div class="ttdoc">Substitute free occurrences of the variables given by their identifiers in the keys of the map in the...</div><div class="ttdef"><b>Definition:</b> <a href="substitute__symbols_8cpp_source.html#l00111">substitute_symbols.cpp:111</a></div></div>
-<div class="ttc" id="asubstitute__symbols_8cpp_html_a82f0607e90cd70e4a6166f7815a61da3"><div class="ttname"><a href="substitute__symbols_8cpp.html#a82f0607e90cd70e4a6166f7815a61da3">substitute_symbols_rec</a></div><div class="ttdeci">static optionalt&lt; exprt &gt; substitute_symbols_rec(const std::map&lt; irep_idt, exprt &gt; &amp;substitutions, exprt src)</div><div class="ttdef"><b>Definition:</b> <a href="substitute__symbols_8cpp_source.html#l00016">substitute_symbols.cpp:16</a></div></div>
+<div class="ttc" id="asubstitute__symbols_8cpp_html_a61184c867ea83a9e9041e8cd00be83de"><div class="ttname"><a href="substitute__symbols_8cpp.html#a61184c867ea83a9e9041e8cd00be83de">substitute_symbols_rec</a></div><div class="ttdeci">static std::optional&lt; exprt &gt; substitute_symbols_rec(const std::map&lt; irep_idt, exprt &gt; &amp;substitutions, exprt src)</div><div class="ttdef"><b>Definition:</b> <a href="substitute__symbols_8cpp_source.html#l00016">substitute_symbols.cpp:16</a></div></div>
+<div class="ttc" id="asubstitute__symbols_8cpp_html_ab4592d5b07744ae92bc862a296b189a9"><div class="ttname"><a href="substitute__symbols_8cpp.html#ab4592d5b07744ae92bc862a296b189a9">substitute_symbols</a></div><div class="ttdeci">std::optional&lt; exprt &gt; substitute_symbols(const std::map&lt; irep_idt, exprt &gt; &amp;substitutions, exprt src)</div><div class="ttdoc">Substitute free occurrences of the variables given by their identifiers in the keys of the map in the...</div><div class="ttdef"><b>Definition:</b> <a href="substitute__symbols_8cpp_source.html#l00111">substitute_symbols.cpp:111</a></div></div>
 <div class="ttc" id="asubstitute__symbols_8h_html"><div class="ttname"><a href="substitute__symbols_8h.html">substitute_symbols.h</a></div><div class="ttdoc">Symbol Substitution.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

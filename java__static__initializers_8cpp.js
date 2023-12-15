@@ -25,7 +25,7 @@ var java__static__initializers_8cpp =
     [ "gen_clinit_eqexpr", "java__static__initializers_8cpp.html#a6f81355cc788f0e2e88da40d7aedb55a", null ],
     [ "get_clinit_wrapper_body", "java__static__initializers_8cpp.html#a60ea6ee3867e0aab4042a9b2ea9a5d06", null ],
     [ "get_thread_safe_clinit_wrapper_body", "java__static__initializers_8cpp.html#ac16046ef29399f7db303a040d4bb9f30", null ],
-    [ "get_user_specified_clinit_body", "java__static__initializers_8cpp.html#a86cb5921f55f61e624979c79e8309df8", null ],
+    [ "get_user_specified_clinit_body", "java__static__initializers_8cpp.html#a19c1dd708dabcfca05f2de819c0a397c", null ],
     [ "is_clinit_function", "java__static__initializers_8cpp.html#ae11e338daee487348e9d94cddfe35969", null ],
     [ "is_clinit_wrapper_function", "java__static__initializers_8cpp.html#ac7532b44d1a71f44fb902c74b9f92d80", null ],
     [ "is_user_specified_clinit_function", "java__static__initializers_8cpp.html#a9a7b05b5bd7b1597a086aeca9008da97", null ],

@@ -39,6 +39,6 @@ var structjava__bytecode__parse__treet_1_1classt =
     [ "methods", "structjava__bytecode__parse__treet_1_1classt.html#a4aeed54bc93cf5d23d6891c46ade90a9", null ],
     [ "name", "structjava__bytecode__parse__treet_1_1classt.html#aa1d46f125a0e0e00534e9207397c720d", null ],
     [ "outer_class", "structjava__bytecode__parse__treet_1_1classt.html#a59d86eee29f01aa91d18833682756809", null ],
-    [ "signature", "structjava__bytecode__parse__treet_1_1classt.html#a1d7624a98713ccd1ef7e4bf68697a187", null ],
+    [ "signature", "structjava__bytecode__parse__treet_1_1classt.html#a74040e30bf01335dceeb2d53748b1f27", null ],
     [ "super_class", "structjava__bytecode__parse__treet_1_1classt.html#ac846bf7d998d07c8f9ef52c204e0a4dc", null ]
 ];

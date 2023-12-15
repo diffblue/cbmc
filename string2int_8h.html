@@ -95,7 +95,7 @@ $(document).ready(function(){initNavTree('string2int_8h.html',''); initResizable
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="narrow_8h_source.html">narrow.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="optional_8h_source.html">optional.h</a>&quot;</code><br />
+<code>#include &lt;optional&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;type_traits&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -103,7 +103,7 @@ $(document).ready(function(){initNavTree('string2int_8h.html',''); initResizable
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="string2int_8h__incl.svg" width="511" height="276"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="string2int_8h__incl.svg" width="388" height="276"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -133,27 +133,27 @@ Functions</h2></td></tr>
 <tr class="separator:a1114ac3b0c943e45af7348b45aa98699"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c425a891b4d941d793640a6ff5f9197"><td class="memItemLeft" align="right" valign="top">long long unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a5c425a891b4d941d793640a6ff5f9197">unsafe_string2unsignedlonglong</a> (const std::string &amp;str, int base=10)</td></tr>
 <tr class="separator:a5c425a891b4d941d793640a6ff5f9197"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a258c12ff3d8c7e161562cd76012cfde7"><td class="memItemLeft" align="right" valign="top">optionalt&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a258c12ff3d8c7e161562cd76012cfde7">string2optional_int</a> (const std::string &amp;, int base=10)</td></tr>
-<tr class="memdesc:a258c12ff3d8c7e161562cd76012cfde7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert string to integer as per stoi, but return nullopt when stoi would throw.  <a href="string2int_8h.html#a258c12ff3d8c7e161562cd76012cfde7">More...</a><br /></td></tr>
-<tr class="separator:a258c12ff3d8c7e161562cd76012cfde7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a451e62cefa43d686ecc3354eccb541bc"><td class="memItemLeft" align="right" valign="top">optionalt&lt; unsigned &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a451e62cefa43d686ecc3354eccb541bc">string2optional_unsigned</a> (const std::string &amp;, int base=10)</td></tr>
-<tr class="memdesc:a451e62cefa43d686ecc3354eccb541bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert string to unsigned similar to the stoul or stoull functions, return nullopt when the conversion fails.  <a href="string2int_8h.html#a451e62cefa43d686ecc3354eccb541bc">More...</a><br /></td></tr>
-<tr class="separator:a451e62cefa43d686ecc3354eccb541bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afae254ed72eb6725bf76189d4c2d304c"><td class="memItemLeft" align="right" valign="top">optionalt&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string2int_8h.html#afae254ed72eb6725bf76189d4c2d304c">string2optional_size_t</a> (const std::string &amp;, int base=10)</td></tr>
-<tr class="memdesc:afae254ed72eb6725bf76189d4c2d304c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert string to size_t similar to the stoul or stoull functions, return nullopt when the conversion fails.  <a href="string2int_8h.html#afae254ed72eb6725bf76189d4c2d304c">More...</a><br /></td></tr>
-<tr class="separator:afae254ed72eb6725bf76189d4c2d304c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dbcdf40d84c1c866cb516cb3324bcc7"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a5dbcdf40d84c1c866cb516cb3324bcc7">string2optional_int</a> (const std::string &amp;, int base=10)</td></tr>
+<tr class="memdesc:a5dbcdf40d84c1c866cb516cb3324bcc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert string to integer as per stoi, but return nullopt when stoi would throw.  <a href="string2int_8h.html#a5dbcdf40d84c1c866cb516cb3324bcc7">More...</a><br /></td></tr>
+<tr class="separator:a5dbcdf40d84c1c866cb516cb3324bcc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08899fb041857aa3848410177fd81ebe"><td class="memItemLeft" align="right" valign="top">std::optional&lt; unsigned &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a08899fb041857aa3848410177fd81ebe">string2optional_unsigned</a> (const std::string &amp;, int base=10)</td></tr>
+<tr class="memdesc:a08899fb041857aa3848410177fd81ebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert string to unsigned similar to the stoul or stoull functions, return nullopt when the conversion fails.  <a href="string2int_8h.html#a08899fb041857aa3848410177fd81ebe">More...</a><br /></td></tr>
+<tr class="separator:a08899fb041857aa3848410177fd81ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3573071a0c91e43104e7193270ea6c6"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string2int_8h.html#aa3573071a0c91e43104e7193270ea6c6">string2optional_size_t</a> (const std::string &amp;, int base=10)</td></tr>
+<tr class="memdesc:aa3573071a0c91e43104e7193270ea6c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert string to size_t similar to the stoul or stoull functions, return nullopt when the conversion fails.  <a href="string2int_8h.html#aa3573071a0c91e43104e7193270ea6c6">More...</a><br /></td></tr>
+<tr class="separator:aa3573071a0c91e43104e7193270ea6c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46b7a0f7bfdb99c23ef7be6a3eda6da7"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a46b7a0f7bfdb99c23ef7be6a3eda6da7"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a46b7a0f7bfdb99c23ef7be6a3eda6da7">string2optional_base</a> (const std::string &amp;str, int base) -&gt; typename std::enable_if&lt; <a class="el" href="util_8cpp.html#a64961c7c96a166ee16517f63747c3496">std::is_signed</a>&lt; T &gt;::value, long long &gt;::type</td></tr>
 <tr class="memdesc:a46b7a0f7bfdb99c23ef7be6a3eda6da7"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert string to signed long long if T is signed  <a href="string2int_8h.html#a46b7a0f7bfdb99c23ef7be6a3eda6da7">More...</a><br /></td></tr>
 <tr class="separator:a46b7a0f7bfdb99c23ef7be6a3eda6da7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77f910a51caef2cb2c528bc27ea09c5b"><td class="memTemplParams" colspan="2">template&lt;typename do_conversiont &gt; </td></tr>
-<tr class="memitem:a77f910a51caef2cb2c528bc27ea09c5b"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a77f910a51caef2cb2c528bc27ea09c5b">wrap_string_conversion</a> (do_conversiont do_conversion) -&gt; optionalt&lt; decltype(do_conversion())&gt;</td></tr>
-<tr class="memdesc:a77f910a51caef2cb2c528bc27ea09c5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">attempt a given conversion, return nullopt if the conversion fails with out_of_range or invalid_argument  <a href="string2int_8h.html#a77f910a51caef2cb2c528bc27ea09c5b">More...</a><br /></td></tr>
-<tr class="separator:a77f910a51caef2cb2c528bc27ea09c5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7f9666499126ee87a01965ba0d4e1c0"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:af7f9666499126ee87a01965ba0d4e1c0"><td class="memTemplItemLeft" align="right" valign="top">optionalt&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="string2int_8h.html#af7f9666499126ee87a01965ba0d4e1c0">string2optional</a> (const std::string &amp;str, int base=10)</td></tr>
-<tr class="memdesc:af7f9666499126ee87a01965ba0d4e1c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert a string to an integer, given the base of the representation works with signed and unsigned integer types smaller than (unsigned) long long does not accept negative inputs when the result type is unsigned  <a href="string2int_8h.html#af7f9666499126ee87a01965ba0d4e1c0">More...</a><br /></td></tr>
-<tr class="separator:af7f9666499126ee87a01965ba0d4e1c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfde0989df473fafe7d329a9667ce09e"><td class="memTemplParams" colspan="2">template&lt;typename do_conversiont &gt; </td></tr>
+<tr class="memitem:adfde0989df473fafe7d329a9667ce09e"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="string2int_8h.html#adfde0989df473fafe7d329a9667ce09e">wrap_string_conversion</a> (do_conversiont do_conversion) -&gt; std::optional&lt; decltype(do_conversion())&gt;</td></tr>
+<tr class="memdesc:adfde0989df473fafe7d329a9667ce09e"><td class="mdescLeft">&#160;</td><td class="mdescRight">attempt a given conversion, return nullopt if the conversion fails with out_of_range or invalid_argument  <a href="string2int_8h.html#adfde0989df473fafe7d329a9667ce09e">More...</a><br /></td></tr>
+<tr class="separator:adfde0989df473fafe7d329a9667ce09e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf569f6e3049b8f497d2fd36ebc2f375"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aaf569f6e3049b8f497d2fd36ebc2f375"><td class="memTemplItemLeft" align="right" valign="top">std::optional&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="string2int_8h.html#aaf569f6e3049b8f497d2fd36ebc2f375">string2optional</a> (const std::string &amp;str, int base=10)</td></tr>
+<tr class="memdesc:aaf569f6e3049b8f497d2fd36ebc2f375"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert a string to an integer, given the base of the representation works with signed and unsigned integer types smaller than (unsigned) long long does not accept negative inputs when the result type is unsigned  <a href="string2int_8h.html#aaf569f6e3049b8f497d2fd36ebc2f375">More...</a><br /></td></tr>
+<tr class="separator:aaf569f6e3049b8f497d2fd36ebc2f375"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a920b58bcf5302aa781cd69be1e077459"></a>
@@ -216,8 +216,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="af7f9666499126ee87a01965ba0d4e1c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7f9666499126ee87a01965ba0d4e1c0">&#9670;&nbsp;</a></span>string2optional()</h2>
+<a id="aaf569f6e3049b8f497d2fd36ebc2f375"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf569f6e3049b8f497d2fd36ebc2f375">&#9670;&nbsp;</a></span>string2optional()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -225,7 +225,7 @@ Functions</h2></td></tr>
 template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;T&gt; string2optional </td>
+          <td class="memname">std::optional&lt;T&gt; string2optional </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>str</em>, </td>
@@ -246,7 +246,7 @@ template&lt;typename T &gt; </div>
 
 <p>convert a string to an integer, given the base of the representation works with signed and unsigned integer types smaller than (unsigned) long long does not accept negative inputs when the result type is unsigned </p>
 
-<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00110">110</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00111">111</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
 
 </div>
 </div>
@@ -282,18 +282,18 @@ template&lt;typename T &gt; </div>
 <p>convert string to signed long long if T is signed </p>
 <p>convert string to unsigned long long if T is unsigned </p>
 
-<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00057">57</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00058">58</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
 
 </div>
 </div>
-<a id="a258c12ff3d8c7e161562cd76012cfde7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a258c12ff3d8c7e161562cd76012cfde7">&#9670;&nbsp;</a></span>string2optional_int()</h2>
+<a id="a5dbcdf40d84c1c866cb516cb3324bcc7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dbcdf40d84c1c866cb516cb3324bcc7">&#9670;&nbsp;</a></span>string2optional_int()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;int&gt; string2optional_int </td>
+          <td class="memname">std::optional&lt;int&gt; string2optional_int </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>str</em>, </td>
@@ -318,14 +318,14 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="afae254ed72eb6725bf76189d4c2d304c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afae254ed72eb6725bf76189d4c2d304c">&#9670;&nbsp;</a></span>string2optional_size_t()</h2>
+<a id="aa3573071a0c91e43104e7193270ea6c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3573071a0c91e43104e7193270ea6c6">&#9670;&nbsp;</a></span>string2optional_size_t()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;std::size_t&gt; string2optional_size_t </td>
+          <td class="memname">std::optional&lt;std::size_t&gt; string2optional_size_t </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>str</em>, </td>
@@ -347,18 +347,18 @@ template&lt;typename T &gt; </div>
 <p>Convert string to size_t similar to the stoul or stoull functions, return nullopt when the conversion fails. </p>
 <p>Note: Unlike stoul or stoull negative inputs are disallowed </p>
 
-<p class="definition">Definition at line <a class="el" href="string2int_8cpp_source.html#l00069">69</a> of file <a class="el" href="string2int_8cpp_source.html">string2int.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string2int_8cpp_source.html#l00071">71</a> of file <a class="el" href="string2int_8cpp_source.html">string2int.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a451e62cefa43d686ecc3354eccb541bc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a451e62cefa43d686ecc3354eccb541bc">&#9670;&nbsp;</a></span>string2optional_unsigned()</h2>
+<a id="a08899fb041857aa3848410177fd81ebe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08899fb041857aa3848410177fd81ebe">&#9670;&nbsp;</a></span>string2optional_unsigned()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;unsigned&gt; string2optional_unsigned </td>
+          <td class="memname">std::optional&lt;unsigned&gt; string2optional_unsigned </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>str</em>, </td>
@@ -380,7 +380,7 @@ template&lt;typename T &gt; </div>
 <p>Convert string to unsigned similar to the stoul or stoull functions, return nullopt when the conversion fails. </p>
 <p>Note: Unlike stoul or stoull negative inputs are disallowed </p>
 
-<p class="definition">Definition at line <a class="el" href="string2int_8cpp_source.html#l00064">64</a> of file <a class="el" href="string2int_8cpp_source.html">string2int.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string2int_8cpp_source.html#l00065">65</a> of file <a class="el" href="string2int_8cpp_source.html">string2int.cpp</a>.</p>
 
 </div>
 </div>
@@ -534,8 +534,8 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="a77f910a51caef2cb2c528bc27ea09c5b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a77f910a51caef2cb2c528bc27ea09c5b">&#9670;&nbsp;</a></span>wrap_string_conversion()</h2>
+<a id="adfde0989df473fafe7d329a9667ce09e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfde0989df473fafe7d329a9667ce09e">&#9670;&nbsp;</a></span>wrap_string_conversion()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -547,7 +547,7 @@ template&lt;typename do_conversiont &gt; </div>
           <td>(</td>
           <td class="paramtype">do_conversiont&#160;</td>
           <td class="paramname"><em>do_conversion</em></td><td>)</td>
-          <td> -&gt; optionalt&lt;decltype(do_conversion())&gt;
+          <td> -&gt; std::optional&lt;decltype(do_conversion())&gt;
 </td>
         </tr>
       </table>
@@ -555,7 +555,7 @@ template&lt;typename do_conversiont &gt; </div>
 
 <p>attempt a given conversion, return nullopt if the conversion fails with out_of_range or invalid_argument </p>
 
-<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00088">88</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00089">89</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
 
 </div>
 </div>

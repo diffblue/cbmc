@@ -438,7 +438,7 @@ $(document).ready(function(){initNavTree('string__constraint__generator__valueof
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="comment">// a digit, which is `max_string_length - 2` because of the space left for</span></div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="comment">// a minus sign. That assumes that we were able to identify the radix. If we</span></div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <span class="comment">// weren&#39;t then we check for overflow on every index.</span></div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    optionalt&lt;exprt&gt; no_overflow;</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    std::optional&lt;exprt&gt; no_overflow;</div>
 <div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <span class="keywordflow">if</span>(size - 1 &gt;= max_string_length - 2 || radix_ul == 0)</div>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    {</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;      no_overflow = <a class="code" href="classand__exprt.html">and_exprt</a>{<a class="code" href="classequal__exprt.html">equal_exprt</a>(sum, <a class="code" href="classdiv__exprt.html">div_exprt</a>(radix_sum, radix)),</div>

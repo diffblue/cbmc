@@ -120,9 +120,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a70c342c8834e76fee4707c91fd81d23e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classarray__poolt.html#a70c342c8834e76fee4707c91fd81d23e">get_or_create_length</a> (const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;s)</td></tr>
 <tr class="memdesc:a70c342c8834e76fee4707c91fd81d23e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of an <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> from the array_pool.  <a href="classarray__poolt.html#a70c342c8834e76fee4707c91fd81d23e">More...</a><br /></td></tr>
 <tr class="separator:a70c342c8834e76fee4707c91fd81d23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebe03c778a2591d74b4c647c17b7d31a"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classarray__poolt.html#aebe03c778a2591d74b4c647c17b7d31a">get_length_if_exists</a> (const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;s) const</td></tr>
-<tr class="memdesc:aebe03c778a2591d74b4c647c17b7d31a"><td class="mdescLeft">&#160;</td><td class="mdescRight">As opposed to <a class="el" href="java__string__library__preprocess_8cpp.html#a6dd4959b3c706c55a780396434485270" title="access length member">get_length()</a>, do not create a new symbol if the length of the <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> does not have one in the array_pool, but instead return an empty optional.  <a href="classarray__poolt.html#aebe03c778a2591d74b4c647c17b7d31a">More...</a><br /></td></tr>
-<tr class="separator:aebe03c778a2591d74b4c647c17b7d31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a599a5de25f963f91dc97a4cf0010fc4e"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classarray__poolt.html#a599a5de25f963f91dc97a4cf0010fc4e">get_length_if_exists</a> (const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;s) const</td></tr>
+<tr class="memdesc:a599a5de25f963f91dc97a4cf0010fc4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">As opposed to <a class="el" href="java__string__library__preprocess_8cpp.html#a6dd4959b3c706c55a780396434485270" title="access length member">get_length()</a>, do not create a new symbol if the length of the <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> does not have one in the array_pool, but instead return an empty optional.  <a href="classarray__poolt.html#a599a5de25f963f91dc97a4cf0010fc4e">More...</a><br /></td></tr>
+<tr class="separator:a599a5de25f963f91dc97a4cf0010fc4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a993fe9bbf405bdf90814e9b5f5960886"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classarray__poolt.html#a993fe9bbf405bdf90814e9b5f5960886">insert</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;pointer_expr, const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;array)</td></tr>
 <tr class="separator:a993fe9bbf405bdf90814e9b5f5960886"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0240cbd1849d8ee26de0e6d4d5bb4f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classarray__string__exprt.html">array_string_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classarray__poolt.html#af0240cbd1849d8ee26de0e6d4d5bb4f7">find</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;pointer, const <a class="el" href="classexprt.html">exprt</a> &amp;length)</td></tr>
@@ -307,14 +307,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aebe03c778a2591d74b4c647c17b7d31a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebe03c778a2591d74b4c647c17b7d31a">&#9670;&nbsp;</a></span>get_length_if_exists()</h2>
+<a id="a599a5de25f963f91dc97a4cf0010fc4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a599a5de25f963f91dc97a4cf0010fc4e">&#9670;&nbsp;</a></span>get_length_if_exists()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt; array_poolt::get_length_if_exists </td>
+          <td class="memname">std::optional&lt; <a class="el" href="classexprt.html">exprt</a> &gt; array_poolt::get_length_if_exists </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>

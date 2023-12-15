@@ -99,13 +99,13 @@ $(document).ready(function(){initNavTree('show__properties_8h.html',''); initRes
 <p>Show the properties.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="irep_8h_source.html">util/irep.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="optional_8h_source.html">util/optional.h</a>&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for show_properties.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="show__properties_8h__incl.svg" width="1418" height="515"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="show__properties_8h__incl.svg" width="1072" height="515"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -132,9 +132,9 @@ Functions</h2></td></tr>
 <tr class="separator:abd896216ff160a10bc6f15c3adaa68b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a791d8d89f524cc595ae1a27489cfc13a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="show__properties_8h.html#a791d8d89f524cc595ae1a27489cfc13a">show_properties</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classui__message__handlert.html">ui_message_handlert</a> &amp;ui_message_handler, const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</td></tr>
 <tr class="separator:a791d8d89f524cc595ae1a27489cfc13a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7ba60f0b466cc30e7f898aef2b441b4"><td class="memItemLeft" align="right" valign="top">optionalt&lt; <a class="el" href="classsource__locationt.html">source_locationt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="show__properties_8h.html#ad7ba60f0b466cc30e7f898aef2b441b4">find_property</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;property, const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</td></tr>
-<tr class="memdesc:ad7ba60f0b466cc30e7f898aef2b441b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <a class="el" href="classsource__locationt.html">source_locationt</a> that corresponds to the property given by an irep_idt.  <a href="show__properties_8h.html#ad7ba60f0b466cc30e7f898aef2b441b4">More...</a><br /></td></tr>
-<tr class="separator:ad7ba60f0b466cc30e7f898aef2b441b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1f185633acc61853b16f6b5bccee8eb"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classsource__locationt.html">source_locationt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="show__properties_8h.html#ac1f185633acc61853b16f6b5bccee8eb">find_property</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;property, const <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</td></tr>
+<tr class="memdesc:ac1f185633acc61853b16f6b5bccee8eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <a class="el" href="classsource__locationt.html">source_locationt</a> that corresponds to the property given by an irep_idt.  <a href="show__properties_8h.html#ac1f185633acc61853b16f6b5bccee8eb">More...</a><br /></td></tr>
+<tr class="separator:ac1f185633acc61853b16f6b5bccee8eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4df16cdd0bc55aa630915455b5986a2a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="show__properties_8h.html#a4df16cdd0bc55aa630915455b5986a2a">convert_properties_json</a> (<a class="el" href="classjson__arrayt.html">json_arrayt</a> &amp;json_properties, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;identifier, const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="memdesc:a4df16cdd0bc55aa630915455b5986a2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collects the properties in the goto program into a <code><a class="el" href="classjson__arrayt.html">json_arrayt</a></code>  <a href="show__properties_8h.html#a4df16cdd0bc55aa630915455b5986a2a">More...</a><br /></td></tr>
 <tr class="separator:a4df16cdd0bc55aa630915455b5986a2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -156,7 +156,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="show__properties_8h_source.html#l00029">29</a> of file <a class="el" href="show__properties_8h_source.html">show_properties.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__properties_8h_source.html#l00030">30</a> of file <a class="el" href="show__properties_8h_source.html">show_properties.h</a>.</p>
 
 </div>
 </div>
@@ -172,7 +172,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="show__properties_8h_source.html#l00026">26</a> of file <a class="el" href="show__properties_8h_source.html">show_properties.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__properties_8h_source.html#l00027">27</a> of file <a class="el" href="show__properties_8h_source.html">show_properties.h</a>.</p>
 
 </div>
 </div>
@@ -226,18 +226,18 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="show__properties_8cpp_source.html#l00127">127</a> of file <a class="el" href="show__properties_8cpp_source.html">show_properties.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__properties_8cpp_source.html#l00126">126</a> of file <a class="el" href="show__properties_8cpp_source.html">show_properties.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ad7ba60f0b466cc30e7f898aef2b441b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad7ba60f0b466cc30e7f898aef2b441b4">&#9670;&nbsp;</a></span>find_property()</h2>
+<a id="ac1f185633acc61853b16f6b5bccee8eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1f185633acc61853b16f6b5bccee8eb">&#9670;&nbsp;</a></span>find_property()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;<a class="el" href="classsource__locationt.html">source_locationt</a>&gt; find_property </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classsource__locationt.html">source_locationt</a>&gt; find_property </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>property</em>, </td>
@@ -266,7 +266,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>optional&lt;source_locationt&gt; the location of the property, if found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="show__properties_8cpp_source.html#l00022">22</a> of file <a class="el" href="show__properties_8cpp_source.html">show_properties.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__properties_8cpp_source.html#l00023">23</a> of file <a class="el" href="show__properties_8cpp_source.html">show_properties.cpp</a>.</p>
 
 </div>
 </div>
@@ -296,7 +296,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="show__properties_8cpp_source.html#l00204">204</a> of file <a class="el" href="show__properties_8cpp_source.html">show_properties.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__properties_8cpp_source.html#l00203">203</a> of file <a class="el" href="show__properties_8cpp_source.html">show_properties.cpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +332,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="show__properties_8cpp_source.html#l00191">191</a> of file <a class="el" href="show__properties_8cpp_source.html">show_properties.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__properties_8cpp_source.html#l00190">190</a> of file <a class="el" href="show__properties_8cpp_source.html">show_properties.cpp</a>.</p>
 
 </div>
 </div>

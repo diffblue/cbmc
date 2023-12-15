@@ -1,6 +1,6 @@
 var classrenamedt =
 [
-    [ "mutator_functiont", "classrenamedt.html#a47c73dfd3fa399b9e2a52e724b66495c", null ],
+    [ "mutator_functiont", "classrenamedt.html#a8da2a6ff89a91288cd8d06c67e48853c", null ],
     [ "renamedt", "classrenamedt.html#a132a196256dca2493ef436147f194054", null ],
     [ "get", "classrenamedt.html#a07c057d71303a7e73255cf3cdc6805e8", null ],
     [ "simplify", "classrenamedt.html#a4cf2705d5a39f456ba7d128460b9e176", null ],

@@ -10,5 +10,5 @@ var structjava__bytecode__parse__treet_1_1membert =
     [ "is_public", "structjava__bytecode__parse__treet_1_1membert.html#a86d6a1030c682101049b2a46e884519e", null ],
     [ "is_static", "structjava__bytecode__parse__treet_1_1membert.html#a6bb75893fc5232ca8d44b81803cb3935", null ],
     [ "name", "structjava__bytecode__parse__treet_1_1membert.html#a6d27546b1a29225b11e4d20e8b20021f", null ],
-    [ "signature", "structjava__bytecode__parse__treet_1_1membert.html#a5a94d093dca4d559df7983740a336682", null ]
+    [ "signature", "structjava__bytecode__parse__treet_1_1membert.html#a41cac4bf96247430eb574806bb534883", null ]
 ];

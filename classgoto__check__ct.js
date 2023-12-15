@@ -8,7 +8,7 @@ var classgoto__check__ct =
     [ "error_labelst", "classgoto__check__ct.html#abbe2c76790bac3bae54a55601d7b2e9e", null ],
     [ "goto_functiont", "classgoto__check__ct.html#a7a99c5bc30d2ec542054b17b3b39a55d", null ],
     [ "guardt", "classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2", null ],
-    [ "named_check_statust", "classgoto__check__ct.html#abbd4955bb97545b17277938b4d4dcee8", null ],
+    [ "named_check_statust", "classgoto__check__ct.html#a0559a53f204fa7c9b1432d4b1a95af15", null ],
     [ "check_statust", "classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129", [
       [ "ENABLE", "classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129a11f997ce70c0345214ac5eef4548e4de", null ],
       [ "DISABLE", "classgoto__check__ct.html#a4a98afeb77e36684a7d5b2353980e129a2c8076edcbfd0e2b63d54ab5b60342e3", null ],
@@ -37,7 +37,7 @@ var classgoto__check__ct =
     [ "enum_range_check", "classgoto__check__ct.html#a465329dae8d97a6de4a64c25f7250051", null ],
     [ "float_overflow_check", "classgoto__check__ct.html#a4af35b3ac886381587b270f4352cd165", null ],
     [ "get_pointer_dereferenceable_conditions", "classgoto__check__ct.html#a6c52773e455b83cdda895615dda1a248", null ],
-    [ "get_pointer_is_null_condition", "classgoto__check__ct.html#a7872959dc723f85a109c9c0204738e20", null ],
+    [ "get_pointer_is_null_condition", "classgoto__check__ct.html#a45dd24368df3deba2ae7cd52250cd6d9", null ],
     [ "get_pointer_points_to_valid_memory_conditions", "classgoto__check__ct.html#ad40a2fb1d192823780d609c1567fcb4a", null ],
     [ "goto_check", "classgoto__check__ct.html#a101c0a8c307448ffb3b8d53513906c0c", null ],
     [ "integer_overflow_check", "classgoto__check__ct.html#a9c5091e0f06db37c0d0ae705c54abb55", null ],

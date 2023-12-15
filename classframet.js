@@ -32,7 +32,7 @@ var classframet =
     [ "old_level1", "classframet.html#aabcf1a6853ff6399f474808c8a896e68", null ],
     [ "parameter_names", "classframet.html#a8d3c142e5ee072aed5a9aaf3120c1431", null ],
     [ "ref", "classframet.html#a545bbf1db1226a4c5efa98f121a05b75", null ],
-    [ "return_value_symbol", "classframet.html#abe40347e6aae08ee7c632008ef82fb8e", null ],
+    [ "return_value_symbol", "classframet.html#a22792e5fcab1ee072a8609a4c94b67c5", null ],
     [ "source_location", "classframet.html#aa49a437f4873597b8c7f2270fc2e9ae7", null ],
     [ "symbol", "classframet.html#a9901f3c34f0d0fd81fbdef99668b5761", null ]
 ];

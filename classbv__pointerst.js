@@ -6,7 +6,7 @@ var classbv__pointerst =
     [ "bv_pointerst", "classbv__pointerst.html#acd0a6a2fc0bf2ad1b16b421c12b1ef99", null ],
     [ "add_addr", "classbv__pointerst.html#a6272fe1bd5184a772fff5135b35fea4b", null ],
     [ "bv_get_rec", "classbv__pointerst.html#a7a973c3210c60ae62a431a5c7a965a5c", null ],
-    [ "convert_address_of_rec", "classbv__pointerst.html#a27da48889926f73cc911bdad349de51c", null ],
+    [ "convert_address_of_rec", "classbv__pointerst.html#add294d3445f902d1da3cffebb54d72cb", null ],
     [ "convert_bitvector", "classbv__pointerst.html#ad5b614797a4c4511cde33d807806a7ba", null ],
     [ "convert_pointer_type", "classbv__pointerst.html#af7a0d2775487740c970ef0bbacc68e7a", null ],
     [ "convert_rest", "classbv__pointerst.html#aca26f834139587796aefdead1aa57635", null ],

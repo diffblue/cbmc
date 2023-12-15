@@ -44,7 +44,7 @@ var classdfcc__wrapper__programt =
     [ "preamble", "classdfcc__wrapper__programt.html#a17be45696c707c99abf84fa1bb60662f", null ],
     [ "preconditions", "classdfcc__wrapper__programt.html#acf0528b042b611be5c10f6b817a398c7", null ],
     [ "requires_write_set", "classdfcc__wrapper__programt.html#a45b67328c06bbd488c21aede19989e3d", null ],
-    [ "return_value_opt", "classdfcc__wrapper__programt.html#aeff0151610e3aae6e8bd5dafeef1c33d", null ],
+    [ "return_value_opt", "classdfcc__wrapper__programt.html#ada273f1fc5d79dbc00df66ba2c6f0ad6", null ],
     [ "wrapped_symbol", "classdfcc__wrapper__programt.html#aca0f6b1f0b78d69605892d6ee7668a0e", null ],
     [ "wrapper_sl", "classdfcc__wrapper__programt.html#a0279c8a89d9cc41bf3f1f95e0eab231d", null ],
     [ "wrapper_symbol", "classdfcc__wrapper__programt.html#a9a583e65042ceb6e4b164d980b32e4f4", null ],

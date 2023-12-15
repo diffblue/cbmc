@@ -68,6 +68,6 @@ var java__bytecode__parser_8cpp =
     [ "VTYPE_INFO_UNINIT", "java__bytecode__parser_8cpp.html#abc36a5ecb760e3420aabc6e643fe9cbe", null ],
     [ "VTYPE_INFO_UNINIT_THIS", "java__bytecode__parser_8cpp.html#acd6b42bd5b92a9dd7342ac87bc542a5a", null ],
     [ "get_method_handle_type", "java__bytecode__parser_8cpp.html#aa8c68c31c66f6b7e611d45748aa158a1", null ],
-    [ "java_bytecode_parse", "java__bytecode__parser_8cpp.html#a32f43875ee90f8490035294f5eb64a24", null ],
-    [ "java_bytecode_parse", "java__bytecode__parser_8cpp.html#a8e90b9c97d78d600675c1b91cad63916", null ]
+    [ "java_bytecode_parse", "java__bytecode__parser_8cpp.html#a6c29e7f5d958a0c9754010c906851264", null ],
+    [ "java_bytecode_parse", "java__bytecode__parser_8cpp.html#ad1dba088bdf071dddf6eac5c75c39213", null ]
 ];

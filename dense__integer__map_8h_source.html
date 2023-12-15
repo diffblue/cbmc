@@ -109,18 +109,17 @@ $(document).ready(function(){initNavTree('dense__integer__map_8h_source.html',''
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="src_2util_2invariant_8h.html">util/invariant.h</a>&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="optional_8h.html">util/optional.h</a>&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classidentity__functort.html">   23</a></span>&#160;<span class="keyword">class </span><a class="code" href="classidentity__functort.html">identity_functort</a></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classidentity__functort.html#a536188d1ba55f5f39beb13fb6e68c6ef">   27</a></span>&#160;  constexpr T &amp;&amp;<a class="code" href="classidentity__functort.html#a536188d1ba55f5f39beb13fb6e68c6ef">operator()</a>(T &amp;&amp;t)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">  </span>{</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordflow">return</span> std::forward&lt;T&gt;(t);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  }</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;};</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="classidentity__functort.html">   22</a></span>&#160;<span class="keyword">class </span><a class="code" href="classidentity__functort.html">identity_functort</a></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classidentity__functort.html#a536188d1ba55f5f39beb13fb6e68c6ef">   26</a></span>&#160;  constexpr T &amp;&amp;<a class="code" href="classidentity__functort.html#a536188d1ba55f5f39beb13fb6e68c6ef">operator()</a>(T &amp;&amp;t)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">  </span>{</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">return</span> std::forward&lt;T&gt;(t);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  }</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;};</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> K, <span class="keyword">class</span> V, <span class="keyword">class</span> KeyToDenseInteger = <span class="keywordtype">id</span>entity_functort&gt;</div>
 <div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classdense__integer__mapt.html">   53</a></span>&#160;<span class="keyword">class </span><a class="code" href="classdense__integer__mapt.html">dense_integer_mapt</a></div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{</div>
@@ -142,8 +141,8 @@ $(document).ready(function(){initNavTree('dense__integer__map_8h_source.html',''
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="comment">// Indicates whether a given position in \ref map&#39;s value has been set, and</span></div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="comment">// therefore whether our iterators should stop at a given location. We use</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// this auxiliary structure rather than `pair&lt;K, optionalt&lt;V&gt;&gt;` in \ref map</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="comment">// because this way we can more easily return a std::map-like</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="comment">// this auxiliary structure rather than `pair&lt;K, std::optional&lt;V&gt;&gt;` in</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="comment">// \ref map because this way we can more easily return a std::map-like</span></div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="comment">// std::pair&lt;const K, V&gt; &amp; from the iterator.</span></div>
 <div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="classdense__integer__mapt.html#af422f4ac8c7020fc8144a660e0a8f1e5">   77</a></span>&#160;  std::vector&lt;bool&gt; <a class="code" href="classdense__integer__mapt.html#af422f4ac8c7020fc8144a660e0a8f1e5">value_set</a>;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
@@ -459,9 +458,8 @@ $(document).ready(function(){initNavTree('dense__integer__map_8h_source.html',''
 <div class="ttc" id="aclassdense__integer__mapt_html_ae5102096e7f89ac5c0fd18c512b40d43"><div class="ttname"><a href="classdense__integer__mapt.html#ae5102096e7f89ac5c0fd18c512b40d43">dense_integer_mapt::at</a></div><div class="ttdeci">const V &amp; at(const K &amp;key) const</div><div class="ttdef"><b>Definition:</b> <a href="dense__integer__map_8h_source.html#l00273">dense_integer_map.h:273</a></div></div>
 <div class="ttc" id="aclassdense__integer__mapt_html_ae8b390589fca66a35120f72a5a504675"><div class="ttname"><a href="classdense__integer__mapt.html#ae8b390589fca66a35120f72a5a504675">dense_integer_mapt::begin</a></div><div class="ttdeci">const_iterator begin() const</div><div class="ttdef"><b>Definition:</b> <a href="dense__integer__map_8h_source.html#l00335">dense_integer_map.h:335</a></div></div>
 <div class="ttc" id="aclassdense__integer__mapt_html_af422f4ac8c7020fc8144a660e0a8f1e5"><div class="ttname"><a href="classdense__integer__mapt.html#af422f4ac8c7020fc8144a660e0a8f1e5">dense_integer_mapt::value_set</a></div><div class="ttdeci">std::vector&lt; bool &gt; value_set</div><div class="ttdef"><b>Definition:</b> <a href="dense__integer__map_8h_source.html#l00077">dense_integer_map.h:77</a></div></div>
-<div class="ttc" id="aclassidentity__functort_html"><div class="ttname"><a href="classidentity__functort.html">identity_functort</a></div><div class="ttdoc">Identity functor. When we use C++20 this can be replaced with std::identity.</div><div class="ttdef"><b>Definition:</b> <a href="dense__integer__map_8h_source.html#l00023">dense_integer_map.h:24</a></div></div>
-<div class="ttc" id="aclassidentity__functort_html_a536188d1ba55f5f39beb13fb6e68c6ef"><div class="ttname"><a href="classidentity__functort.html#a536188d1ba55f5f39beb13fb6e68c6ef">identity_functort::operator()</a></div><div class="ttdeci">constexpr T &amp;&amp; operator()(T &amp;&amp;t) const</div><div class="ttdef"><b>Definition:</b> <a href="dense__integer__map_8h_source.html#l00027">dense_integer_map.h:27</a></div></div>
-<div class="ttc" id="aoptional_8h_html"><div class="ttname"><a href="optional_8h.html">optional.h</a></div></div>
+<div class="ttc" id="aclassidentity__functort_html"><div class="ttname"><a href="classidentity__functort.html">identity_functort</a></div><div class="ttdoc">Identity functor. When we use C++20 this can be replaced with std::identity.</div><div class="ttdef"><b>Definition:</b> <a href="dense__integer__map_8h_source.html#l00022">dense_integer_map.h:23</a></div></div>
+<div class="ttc" id="aclassidentity__functort_html_a536188d1ba55f5f39beb13fb6e68c6ef"><div class="ttname"><a href="classidentity__functort.html#a536188d1ba55f5f39beb13fb6e68c6ef">identity_functort::operator()</a></div><div class="ttdeci">constexpr T &amp;&amp; operator()(T &amp;&amp;t) const</div><div class="ttdef"><b>Definition:</b> <a href="dense__integer__map_8h_source.html#l00026">dense_integer_map.h:26</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html"><div class="ttname"><a href="src_2util_2invariant_8h.html">invariant.h</a></div></div>
 <div class="ttc" id="avalidation__mode_8h_html_a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc"><div class="ttname"><a href="validation__mode_8h.html#a5b0354803e00f78ad34e28f69aff6ea9abdbe9b3e99678fa8369d445ccf769ccc">validation_modet::INVARIANT</a></div><div class="ttdeci">@ INVARIANT</div></div>
 </div><!-- fragment --></div><!-- contents -->

@@ -7,7 +7,7 @@ var java__static__initializers_8h =
     [ "create_stub_global_initializers", "java__static__initializers_8h.html#a4084279b6ae824db7261cbff37e48cea", null ],
     [ "get_clinit_wrapper_body", "java__static__initializers_8h.html#a60ea6ee3867e0aab4042a9b2ea9a5d06", null ],
     [ "get_thread_safe_clinit_wrapper_body", "java__static__initializers_8h.html#ac16046ef29399f7db303a040d4bb9f30", null ],
-    [ "get_user_specified_clinit_body", "java__static__initializers_8h.html#a86cb5921f55f61e624979c79e8309df8", null ],
+    [ "get_user_specified_clinit_body", "java__static__initializers_8h.html#a19c1dd708dabcfca05f2de819c0a397c", null ],
     [ "is_clinit_function", "java__static__initializers_8h.html#ae11e338daee487348e9d94cddfe35969", null ],
     [ "is_clinit_wrapper_function", "java__static__initializers_8h.html#ac7532b44d1a71f44fb902c74b9f92d80", null ],
     [ "is_user_specified_clinit_function", "java__static__initializers_8h.html#a9a7b05b5bd7b1597a086aeca9008da97", null ],

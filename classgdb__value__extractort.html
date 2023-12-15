@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('classgdb__value__extractort.html','');
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classgdb__value__extractort__coll__graph.svg" width="2767" height="1387"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classgdb__value__extractort__coll__graph.svg" width="2767" height="1406"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -158,9 +158,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:ac4bd4bf3f10bdfa8b4556999f8276c40"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#ac4bd4bf3f10bdfa8b4556999f8276c40">get_malloc_size</a> (<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> name)</td></tr>
 <tr class="memdesc:ac4bd4bf3f10bdfa8b4556999f8276c40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Search for the size of the allocated memory for <code>name</code>.  <a href="classgdb__value__extractort.html#ac4bd4bf3f10bdfa8b4556999f8276c40">More...</a><br /></td></tr>
 <tr class="separator:ac4bd4bf3f10bdfa8b4556999f8276c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fbf4c70dfbedff231b2fb10be8fb0ac"><td class="memItemLeft" align="right" valign="top">optionalt&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#a1fbf4c70dfbedff231b2fb10be8fb0ac">get_malloc_pointee</a> (const <a class="el" href="classgdb__value__extractort.html#af41e9adfdea2de85acd48aef7873117b">memory_addresst</a> &amp;point, <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> member_size)</td></tr>
-<tr class="memdesc:a1fbf4c70dfbedff231b2fb10be8fb0ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the pointee string for address <code>point</code> assuming it points to a dynamic allocation of &lsquo;n&rsquo; elements each of size <code>member_size</code>.  <a href="classgdb__value__extractort.html#a1fbf4c70dfbedff231b2fb10be8fb0ac">More...</a><br /></td></tr>
-<tr class="separator:a1fbf4c70dfbedff231b2fb10be8fb0ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4cd74c162ac2a796180a5b1776073c7"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#ac4cd74c162ac2a796180a5b1776073c7">get_malloc_pointee</a> (const <a class="el" href="classgdb__value__extractort.html#af41e9adfdea2de85acd48aef7873117b">memory_addresst</a> &amp;point, <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> member_size)</td></tr>
+<tr class="memdesc:ac4cd74c162ac2a796180a5b1776073c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the pointee string for address <code>point</code> assuming it points to a dynamic allocation of &lsquo;n&rsquo; elements each of size <code>member_size</code>.  <a href="classgdb__value__extractort.html#ac4cd74c162ac2a796180a5b1776073c7">More...</a><br /></td></tr>
+<tr class="separator:ac4cd74c162ac2a796180a5b1776073c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93d148fb41275a27304caefd537301b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#a93d148fb41275a27304caefd537301b8">get_type_size</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type) const</td></tr>
 <tr class="memdesc:a93d148fb41275a27304caefd537301b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper for call get_offset_pointer_bits.  <a href="classgdb__value__extractort.html#a93d148fb41275a27304caefd537301b8">More...</a><br /></td></tr>
 <tr class="separator:a93d148fb41275a27304caefd537301b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,7 +174,7 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:a412e2c1f5d92918948eb317e5c1898f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate over <code>array</code> and fill its operands with the results of calling <a class="el" href="classgdb__value__extractort.html#a88f948b4df34f42438ee2bc6b9620dca">get_expr_value</a> on index expressions into <code>expr</code>.  <a href="classgdb__value__extractort.html#a412e2c1f5d92918948eb317e5c1898f0">More...</a><br /></td></tr>
 <tr class="separator:a412e2c1f5d92918948eb317e5c1898f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88f948b4df34f42438ee2bc6b9620dca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#a88f948b4df34f42438ee2bc6b9620dca">get_expr_value</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classexprt.html">exprt</a> &amp;zero_expr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location)</td></tr>
-<tr class="memdesc:a88f948b4df34f42438ee2bc6b9620dca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Case analysis on the <a class="el" href="classtypet.html">typet</a> of <code>expr</code> 1) For integers, booleans, and enums: call <a class="el" href="classgdb__apit.html#ad928c87caea2de74546e75920d7dec7b">gdb_apit::get_value</a> directly 2) For chars: return the <code>zero_expr</code> 3) For structs, arrays, and pointers: call their dedicated functions.  <a href="classgdb__value__extractort.html#a88f948b4df34f42438ee2bc6b9620dca">More...</a><br /></td></tr>
+<tr class="memdesc:a88f948b4df34f42438ee2bc6b9620dca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Case analysis on the <a class="el" href="classtypet.html">typet</a> of <code>expr</code> 1) For integers, booleans, and enums: call <a class="el" href="classgdb__apit.html#a6dcde5c1ee73f23b79b88b8f92a42c34">gdb_apit::get_value</a> directly 2) For chars: return the <code>zero_expr</code> 3) For structs, arrays, and pointers: call their dedicated functions.  <a href="classgdb__value__extractort.html#a88f948b4df34f42438ee2bc6b9620dca">More...</a><br /></td></tr>
 <tr class="separator:a88f948b4df34f42438ee2bc6b9620dca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb782299c591b07977dff3883a503993"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#adb782299c591b07977dff3883a503993">get_struct_value</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classexprt.html">exprt</a> &amp;zero_expr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location)</td></tr>
 <tr class="memdesc:adb782299c591b07977dff3883a503993"><td class="mdescLeft">&#160;</td><td class="mdescRight">For each of the members of the struct: call <a class="el" href="classgdb__value__extractort.html#a88f948b4df34f42438ee2bc6b9620dca">get_expr_value</a>.  <a href="classgdb__value__extractort.html#adb782299c591b07977dff3883a503993">More...</a><br /></td></tr>
@@ -186,7 +186,7 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:ad6215dc4d52d0f00b25b063c1fbd9a89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="classgdb__apit.html#adce3627fd3d799ce4747b5c666599fcf">gdb_apit::get_memory</a> on <code>expr</code> then split based on the points-to type being <code>char</code> type or not.  <a href="classgdb__value__extractort.html#ad6215dc4d52d0f00b25b063c1fbd9a89">More...</a><br /></td></tr>
 <tr class="separator:ad6215dc4d52d0f00b25b063c1fbd9a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02c3c8709f3cef042b1524dac6c763cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#a02c3c8709f3cef042b1524dac6c763cc">get_pointer_to_member_value</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgdb__value__extractort.html#a2fbe5196d17c8df3edef4671cdee1069">pointer_valuet</a> &amp;pointer_value, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location)</td></tr>
-<tr class="memdesc:a02c3c8709f3cef042b1524dac6c763cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="pointer__offset__size_8h.html#aaf2a909ee70f5905dac9c79fbf6b115c">get_subexpression_at_offset</a> to get the correct member expression.  <a href="classgdb__value__extractort.html#a02c3c8709f3cef042b1524dac6c763cc">More...</a><br /></td></tr>
+<tr class="memdesc:a02c3c8709f3cef042b1524dac6c763cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="pointer__offset__size_8h.html#acbc36bf5285e1134ef2675e42df8b5dd">get_subexpression_at_offset</a> to get the correct member expression.  <a href="classgdb__value__extractort.html#a02c3c8709f3cef042b1524dac6c763cc">More...</a><br /></td></tr>
 <tr class="separator:a02c3c8709f3cef042b1524dac6c763cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af12fbbc5606e35abb44161a9e1dc9c95"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#af12fbbc5606e35abb44161a9e1dc9c95">get_non_char_pointer_value</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classgdb__value__extractort.html#a2fbe5196d17c8df3edef4671cdee1069">pointer_valuet</a> &amp;value, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location)</td></tr>
 <tr class="memdesc:af12fbbc5606e35abb44161a9e1dc9c95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Similar to <a class="el" href="classgdb__value__extractort.html#a3a493c2d82bab7d58e77ed8f6a381963">get_char_pointer_value</a>.  <a href="classgdb__value__extractort.html#af12fbbc5606e35abb44161a9e1dc9c95">More...</a><br /></td></tr>
@@ -212,7 +212,7 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a141fa68d8745d890005feec5e7204303"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgdb__apit.html">gdb_apit</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#a141fa68d8745d890005feec5e7204303">gdb_api</a></td></tr>
 <tr class="separator:a141fa68d8745d890005feec5e7204303"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7c913ec9666d67a77753e6331a3098d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsymbol__tablet.html">symbol_tablet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#ad7c913ec9666d67a77753e6331a3098d">symbol_table</a></td></tr>
-<tr class="memdesc:ad7c913ec9666d67a77753e6331a3098d"><td class="mdescLeft">&#160;</td><td class="mdescRight">External symbol table &ndash; extracted from <a class="el" href="read__goto__binary_8h.html#a1176b2f0d40bcfc89ce8d86f7bb1e04a">read_goto_binary</a> We only expect to analyse symbols located there.  <a href="classgdb__value__extractort.html#ad7c913ec9666d67a77753e6331a3098d">More...</a><br /></td></tr>
+<tr class="memdesc:ad7c913ec9666d67a77753e6331a3098d"><td class="mdescLeft">&#160;</td><td class="mdescRight">External symbol table &ndash; extracted from <a class="el" href="read__goto__binary_8h.html#aa4635d556c219e940a39affbc9c1048c">read_goto_binary</a> We only expect to analyse symbols located there.  <a href="classgdb__value__extractort.html#ad7c913ec9666d67a77753e6331a3098d">More...</a><br /></td></tr>
 <tr class="separator:ad7c913ec9666d67a77753e6331a3098d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe1f6041a3da6a39481d19a73831b04b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classnamespacet.html">namespacet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__value__extractort.html#afe1f6041a3da6a39481d19a73831b04b">ns</a></td></tr>
 <tr class="separator:afe1f6041a3da6a39481d19a73831b04b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -666,7 +666,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Case analysis on the <a class="el" href="classtypet.html">typet</a> of <code>expr</code> 1) For integers, booleans, and enums: call <a class="el" href="classgdb__apit.html#ad928c87caea2de74546e75920d7dec7b">gdb_apit::get_value</a> directly 2) For chars: return the <code>zero_expr</code> 3) For structs, arrays, and pointers: call their dedicated functions. </p>
+<p>Case analysis on the <a class="el" href="classtypet.html">typet</a> of <code>expr</code> 1) For integers, booleans, and enums: call <a class="el" href="classgdb__apit.html#a6dcde5c1ee73f23b79b88b8f92a42c34">gdb_apit::get_value</a> directly 2) For chars: return the <code>zero_expr</code> 3) For structs, arrays, and pointers: call their dedicated functions. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">expr</td><td>the expression to be analysed </td></tr>
@@ -718,8 +718,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a1fbf4c70dfbedff231b2fb10be8fb0ac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1fbf4c70dfbedff231b2fb10be8fb0ac">&#9670;&nbsp;</a></span>get_malloc_pointee()</h2>
+<a id="ac4cd74c162ac2a796180a5b1776073c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4cd74c162ac2a796180a5b1776073c7">&#9670;&nbsp;</a></span>get_malloc_pointee()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -728,7 +728,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt; std::string &gt; gdb_value_extractort::get_malloc_pointee </td>
+          <td class="memname">std::optional&lt; std::string &gt; gdb_value_extractort::get_malloc_pointee </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classgdb__value__extractort.html#af41e9adfdea2de85acd48aef7873117b">memory_addresst</a> &amp;&#160;</td>
           <td class="paramname"><em>point</em>, </td>
@@ -956,7 +956,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Call <a class="el" href="pointer__offset__size_8h.html#aaf2a909ee70f5905dac9c79fbf6b115c">get_subexpression_at_offset</a> to get the correct member expression. </p>
+<p>Call <a class="el" href="pointer__offset__size_8h.html#acbc36bf5285e1134ef2675e42df8b5dd">get_subexpression_at_offset</a> to get the correct member expression. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">expr</td><td>the input pointer expression (needed to get the right type) </td></tr>
@@ -1600,7 +1600,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>External symbol table &ndash; extracted from <a class="el" href="read__goto__binary_8h.html#a1176b2f0d40bcfc89ce8d86f7bb1e04a">read_goto_binary</a> We only expect to analyse symbols located there. </p>
+<p>External symbol table &ndash; extracted from <a class="el" href="read__goto__binary_8h.html#aa4635d556c219e940a39affbc9c1048c">read_goto_binary</a> We only expect to analyse symbols located there. </p>
 
 <p class="definition">Definition at line <a class="el" href="analyze__symbol_8h_source.html#l00078">78</a> of file <a class="el" href="analyze__symbol_8h_source.html">analyze_symbol.h</a>.</p>
 

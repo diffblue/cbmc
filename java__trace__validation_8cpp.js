@@ -12,7 +12,7 @@ var java__trace__validation_8cpp =
     [ "check_struct_structure", "java__trace__validation_8cpp.html#aefc6393c55d6c30ae7c3bafbb2ff7886", null ],
     [ "check_symbol_structure", "java__trace__validation_8cpp.html#a8ad54430d25f5769a8f46f62fea499f3", null ],
     [ "check_trace_assumptions", "java__trace__validation_8cpp.html#aa4fa24109beb7b98bc226a70d0e80777", null ],
-    [ "get_inner_symbol_expr", "java__trace__validation_8cpp.html#a125250aa9c701f9a125e403e5591d999", null ],
+    [ "get_inner_symbol_expr", "java__trace__validation_8cpp.html#ad22ed4a1327828147960a107a14e4707", null ],
     [ "may_be_lvalue", "java__trace__validation_8cpp.html#a9fcb1380756adfef35b49b4c870e8cdb", null ],
     [ "valid_lhs_expr_high_level", "java__trace__validation_8cpp.html#a037defe0df925a6e865b1d8c062d4980", null ],
     [ "valid_rhs_expr_high_level", "java__trace__validation_8cpp.html#a2c5148ceed007953b69deadde5d3d241", null ]

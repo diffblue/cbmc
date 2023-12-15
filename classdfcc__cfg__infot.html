@@ -134,9 +134,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:abc6b5481e5f664eb063a9a001b8a0df6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f181c03819a3b9cb3de5b39b222d021"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::size_t &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#a1f181c03819a3b9cb3de5b39b222d021">get_loops_toposorted</a> () const</td></tr>
 <tr class="separator:a1f181c03819a3b9cb3de5b39b222d021"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79ca1e4fadee086cf1df8d282f12e76b"><td class="memItemLeft" align="right" valign="top">const optionalt&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#a79ca1e4fadee086cf1df8d282f12e76b">get_outer_loop_identifier</a> (const std::size_t loop_id) const</td></tr>
-<tr class="memdesc:a79ca1e4fadee086cf1df8d282f12e76b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the DFCC id of the loop that contains the given loop, returns nullopt when the loop has no outer loop.  <a href="classdfcc__cfg__infot.html#a79ca1e4fadee086cf1df8d282f12e76b">More...</a><br /></td></tr>
-<tr class="separator:a79ca1e4fadee086cf1df8d282f12e76b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c7075c4d098296983bb7fd0e65abfba"><td class="memItemLeft" align="right" valign="top">const std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#a1c7075c4d098296983bb7fd0e65abfba">get_outer_loop_identifier</a> (const std::size_t loop_id) const</td></tr>
+<tr class="memdesc:a1c7075c4d098296983bb7fd0e65abfba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the DFCC id of the loop that contains the given loop, returns nullopt when the loop has no outer loop.  <a href="classdfcc__cfg__infot.html#a1c7075c4d098296983bb7fd0e65abfba">More...</a><br /></td></tr>
+<tr class="separator:a1c7075c4d098296983bb7fd0e65abfba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb1b8ba063004f8f2be8457fdd71ba51"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#adb1b8ba063004f8f2be8457fdd71ba51">must_track_decl_or_dead</a> (<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> target) const</td></tr>
 <tr class="memdesc:adb1b8ba063004f8f2be8457fdd71ba51"><td class="mdescLeft">&#160;</td><td class="mdescRight">True iff a DECL ident must be tracked in the write set of the loop that contains the DECL.  <a href="classdfcc__cfg__infot.html#adb1b8ba063004f8f2be8457fdd71ba51">More...</a><br /></td></tr>
 <tr class="separator:adb1b8ba063004f8f2be8457fdd71ba51"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -387,14 +387,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a79ca1e4fadee086cf1df8d282f12e76b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79ca1e4fadee086cf1df8d282f12e76b">&#9670;&nbsp;</a></span>get_outer_loop_identifier()</h2>
+<a id="a1c7075c4d098296983bb7fd0e65abfba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c7075c4d098296983bb7fd0e65abfba">&#9670;&nbsp;</a></span>get_outer_loop_identifier()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const optionalt&lt; std::size_t &gt; dfcc_cfg_infot::get_outer_loop_identifier </td>
+          <td class="memname">const std::optional&lt; std::size_t &gt; dfcc_cfg_infot::get_outer_loop_identifier </td>
           <td>(</td>
           <td class="paramtype">const std::size_t&#160;</td>
           <td class="paramname"><em>loop_id</em></td><td>)</td>

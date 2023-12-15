@@ -296,7 +296,7 @@ $(document).ready(function(){initNavTree('adjust__float__expressions_8cpp_source
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;{</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : goto_function.body.instructions)</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    i.transform([&amp;ns](<a class="code" href="classexprt.html">exprt</a> expr) -&gt; optionalt&lt;exprt&gt; {</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    i.transform([&amp;ns](<a class="code" href="classexprt.html">exprt</a> expr) -&gt; std::optional&lt;exprt&gt; {</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="adjust__float__expressions_8cpp.html#a15e1de56638055049175985ce0bfbef3">have_to_adjust_float_expressions</a>(expr))</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      {</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <a class="code" href="adjust__float__expressions_8cpp.html#a77a0bb95074a10043426432f76f9820a">adjust_float_expressions</a>(expr, ns);</div>

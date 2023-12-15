@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('symex__main_8cpp.html',''); initResiza
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="symex__main_8cpp__incl.svg" width="2860" height="1335"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="symex__main_8cpp__incl.svg" width="2948" height="1335"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -133,17 +133,17 @@ Functions</h2></td></tr>
 <tr class="separator:a7feaf83267ed3a5fd4edff5e2b3a374a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6028fb6e116ce44a5fa97d277f9d6a41"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="symex__main_8cpp.html#a6028fb6e116ce44a5fa97d277f9d6a41">switch_to_thread</a> (<a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, const unsigned int thread_nb)</td></tr>
 <tr class="separator:a6028fb6e116ce44a5fa97d277f9d6a41"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac33877fd3e38991826c4fc1d27667a5a"><td class="memItemLeft" align="right" valign="top">static optionalt&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="symex__main_8cpp.html#ac33877fd3e38991826c4fc1d27667a5a">find_unique_pointer_typed_symbol</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
-<tr class="memdesc:ac33877fd3e38991826c4fc1d27667a5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if an expression only contains one unique symbol (possibly repeated multiple times)  <a href="symex__main_8cpp.html#ac33877fd3e38991826c4fc1d27667a5a">More...</a><br /></td></tr>
-<tr class="separator:ac33877fd3e38991826c4fc1d27667a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef5b250683187eeb28dce12d27eefa6"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="symex__main_8cpp.html#afef5b250683187eeb28dce12d27eefa6">find_unique_pointer_typed_symbol</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:afef5b250683187eeb28dce12d27eefa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if an expression only contains one unique symbol (possibly repeated multiple times)  <a href="symex__main_8cpp.html#afef5b250683187eeb28dce12d27eefa6">More...</a><br /></td></tr>
+<tr class="separator:afef5b250683187eeb28dce12d27eefa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Symbolic Execution. </p>
 
 <p class="definition">Definition in file <a class="el" href="symex__main_8cpp_source.html">symex_main.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ac33877fd3e38991826c4fc1d27667a5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac33877fd3e38991826c4fc1d27667a5a">&#9670;&nbsp;</a></span>find_unique_pointer_typed_symbol()</h2>
+<a id="afef5b250683187eeb28dce12d27eefa6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afef5b250683187eeb28dce12d27eefa6">&#9670;&nbsp;</a></span>find_unique_pointer_typed_symbol()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -152,7 +152,7 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static optionalt&lt;<a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&gt; find_unique_pointer_typed_symbol </td>
+          <td class="memname">static std::optional&lt;<a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&gt; find_unique_pointer_typed_symbol </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>expr</em></td><td>)</td>
@@ -173,7 +173,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>If only one unique symbol occurs in <code>expr</code> then return it; otherwise return an empty optionalt </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>If only one unique symbol occurs in <code>expr</code> then return it; otherwise return an empty std::optional </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="symex__main_8cpp_source.html#l00759">759</a> of file <a class="el" href="symex__main_8cpp_source.html">symex_main.cpp</a>.</p>
 

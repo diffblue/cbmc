@@ -15,6 +15,6 @@ var java__entry__point_8cpp =
     [ "java_static_lifetime_init", "java__entry__point_8cpp.html#abd65be2aac4b3f8df061f9cda7fe4fbc", null ],
     [ "record_exception", "java__entry__point_8cpp.html#aa780e1e054f3aa32b38432730cf80eac", null ],
     [ "record_pointer_parameters", "java__entry__point_8cpp.html#ad27776b73b61cb3f9830d5423d478046", null ],
-    [ "record_return_value", "java__entry__point_8cpp.html#a0a4171ad8014e2842a7bc30bd09b7827", null ],
+    [ "record_return_value", "java__entry__point_8cpp.html#a5b101253499bfbff74ad1f0085b1189f", null ],
     [ "should_init_symbol", "java__entry__point_8cpp.html#a916f96ba59da8b6b5ff1e6a54ff70f1a", null ]
 ];

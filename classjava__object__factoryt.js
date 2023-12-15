@@ -5,7 +5,7 @@ var classjava__object__factoryt =
     [ "assign_element", "classjava__object__factoryt.html#afa8e79e437d0cfcfca1b0b2ad83da520", null ],
     [ "declare_created_symbols", "classjava__object__factoryt.html#aa8060c2a9214bbb00578746ed256008d", null ],
     [ "gen_nondet_enum_init", "classjava__object__factoryt.html#ac0b19550a16446566b9175a5777cfa88", null ],
-    [ "gen_nondet_init", "classjava__object__factoryt.html#abdf4855176779cd562219ef351546f15", null ],
+    [ "gen_nondet_init", "classjava__object__factoryt.html#a0046389973615d821131b76916b60351", null ],
     [ "gen_nondet_pointer_init", "classjava__object__factoryt.html#af2dc4bb8607876217b64d828ddce1841", null ],
     [ "gen_nondet_struct_init", "classjava__object__factoryt.html#adcef7dd2536e9d18ef131890e0ace9f0", null ],
     [ "gen_nondet_subtype_pointer_init", "classjava__object__factoryt.html#aa6cd7a0756a9308b5c6e5fae3f2ad86f", null ],

@@ -13,7 +13,7 @@ var classpiped__processt =
     [ "piped_processt", "classpiped__processt.html#a624665bda0ceb606b02f2b4d45c08df9", null ],
     [ "~piped_processt", "classpiped__processt.html#a16ec95f7537d00dc002697855cb185fa", null ],
     [ "can_receive", "classpiped__processt.html#a22880bf94089d7b9668f27a01c17f670", null ],
-    [ "can_receive", "classpiped__processt.html#ae78f83d2157f2c9075cad3958d1a17af", null ],
+    [ "can_receive", "classpiped__processt.html#ae03cfd02d20fb6a7c411bb8e198d14c8", null ],
     [ "get_status", "classpiped__processt.html#af5e4d702df4db69b7ff4b3f56d78cfb2", null ],
     [ "operator=", "classpiped__processt.html#a126214734eadf4eb3cb20bd30ed52f5c", null ],
     [ "receive", "classpiped__processt.html#a7219fa7d278e86c9e230ed58b8621ebc", null ],

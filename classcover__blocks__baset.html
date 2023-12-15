@@ -112,8 +112,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5869f2722db00ee0a1a51fdd3a3a64f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af15de656dde1799ba565094d33b7cca4"><td class="memItemLeft" align="right" valign="top">virtual std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__blocks__baset.html#af15de656dde1799ba565094d33b7cca4">block_of</a> (<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> t) const =0</td></tr>
 <tr class="separator:af15de656dde1799ba565094d33b7cca4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac6a7f8161dd595251047590b2173325"><td class="memItemLeft" align="right" valign="top">virtual optionalt&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__blocks__baset.html#aac6a7f8161dd595251047590b2173325">instruction_of</a> (std::size_t block_nr) const =0</td></tr>
-<tr class="separator:aac6a7f8161dd595251047590b2173325"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad570332110d727e3a4ae8fa6109d23cc"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__blocks__baset.html#ad570332110d727e3a4ae8fa6109d23cc">instruction_of</a> (std::size_t block_nr) const =0</td></tr>
+<tr class="separator:ad570332110d727e3a4ae8fa6109d23cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab49ccf6391fa9b889eb707c0b5c9a1fb"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__blocks__baset.html#ab49ccf6391fa9b889eb707c0b5c9a1fb">source_location_of</a> (std::size_t block_nr) const =0</td></tr>
 <tr class="separator:ab49ccf6391fa9b889eb707c0b5c9a1fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6cf674bb2cdf18d75d5044a77da63d67"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classsource__linest.html">source_linest</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcover__blocks__baset.html#a6cf674bb2cdf18d75d5044a77da63d67">source_lines_of</a> (std::size_t block_nr) const =0</td></tr>
@@ -127,7 +127,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00023">23</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00021">21</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a5869f2722db00ee0a1a51fdd3a3a64f9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5869f2722db00ee0a1a51fdd3a3a64f9">&#9670;&nbsp;</a></span>~cover_blocks_baset()</h2>
@@ -190,8 +190,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aac6a7f8161dd595251047590b2173325"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac6a7f8161dd595251047590b2173325">&#9670;&nbsp;</a></span>instruction_of()</h2>
+<a id="ad570332110d727e3a4ae8fa6109d23cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad570332110d727e3a4ae8fa6109d23cc">&#9670;&nbsp;</a></span>instruction_of()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -200,7 +200,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual optionalt&lt;<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&gt; cover_blocks_baset::instruction_of </td>
+          <td class="memname">virtual std::optional&lt;<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a>&gt; cover_blocks_baset::instruction_of </td>
           <td>(</td>
           <td class="paramtype">std::size_t&#160;</td>
           <td class="paramname"><em>block_nr</em></td><td>)</td>
@@ -221,7 +221,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the instruction selected for instrumentation representative of the given block </dd></dl>
 
-<p>Implemented in <a class="el" href="classcover__basic__blocks__javat.html#aa50d739975140bc096263aca7e3c2310">cover_basic_blocks_javat</a>, and <a class="el" href="classcover__basic__blockst.html#aac046ab760726dac417d22797d241f68">cover_basic_blockst</a>.</p>
+<p>Implemented in <a class="el" href="classcover__basic__blocks__javat.html#ac8367e15f7c0868f7f47ca0c739e22e3">cover_basic_blocks_javat</a>, and <a class="el" href="classcover__basic__blockst.html#a8a558093787a8bb695583928a2832f4b">cover_basic_blockst</a>.</p>
 
 </div>
 </div>
@@ -307,7 +307,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classcover__basic__blockst.html#ad0c6337b3bd18e02173c7ca8fd6208bb">cover_basic_blockst</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00055">55</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cover__basic__blocks_8h_source.html#l00053">53</a> of file <a class="el" href="cover__basic__blocks_8h_source.html">cover_basic_blocks.h</a>.</p>
 
 </div>
 </div>

@@ -7,7 +7,7 @@ var classstruct__typet =
     [ "add_base", "classstruct__typet.html#aafb500ce01c9fd5e423558efabf14a10", null ],
     [ "bases", "classstruct__typet.html#a46ab3b6887d17d87f84152c846c3b75b", null ],
     [ "bases", "classstruct__typet.html#acc5067802c63bc76dbf03e73146e9004", null ],
-    [ "get_base", "classstruct__typet.html#ad5da0c85ebc4848a5c010c096d318bc0", null ],
+    [ "get_base", "classstruct__typet.html#a41ee3803fe8c208a7471b5629bb26bc3", null ],
     [ "has_base", "classstruct__typet.html#a58d432601bb69003ea30c449f788ac1c", null ],
     [ "is_class", "classstruct__typet.html#a76e2c3e6c23b4085aedb770b1d23b0d3", null ],
     [ "is_prefix_of", "classstruct__typet.html#aad8554467dd9272ff4c2bf0b95bb7f0b", null ]

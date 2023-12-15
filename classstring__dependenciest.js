@@ -8,7 +8,7 @@ var classstring__dependenciest =
     [ "add_dependency", "classstring__dependenciest.html#acbd54ac246232c022a1b18b3f0ab35b2", null ],
     [ "clean_cache", "classstring__dependenciest.html#a263895fc2995bd34d8cabc0f691a0c90", null ],
     [ "clear", "classstring__dependenciest.html#a3d11e818d426009bd1cc6d7db85a695c", null ],
-    [ "eval", "classstring__dependenciest.html#afedc2575cb326daa2bb32ee27b1a0734", null ],
+    [ "eval", "classstring__dependenciest.html#a382e264b62495ff5097fbc07433c562f", null ],
     [ "for_each_dependency", "classstring__dependenciest.html#a4c11ff33797367acc7ffce28016584d3", null ],
     [ "for_each_dependency", "classstring__dependenciest.html#aa15250d0ca1916edefc58f30891d755b", null ],
     [ "for_each_node", "classstring__dependenciest.html#a15cfa18c0a35dc33379b5379b54e43a2", null ],
@@ -19,7 +19,7 @@ var classstring__dependenciest =
     [ "node_at", "classstring__dependenciest.html#a056164e2995c54af7819f023cdb34b46", null ],
     [ "output_dot", "classstring__dependenciest.html#a2150330f3fe0d4bacc3a3aac0754b5a2", null ],
     [ "builtin_function_nodes", "classstring__dependenciest.html#a32f114534e88b2bca02922d38c7680d6", null ],
-    [ "eval_string_cache", "classstring__dependenciest.html#ab92dac4be71622cfe71bb98ec2613084", null ],
+    [ "eval_string_cache", "classstring__dependenciest.html#a0f544106be5a5dd398a28ebe3aa913ac", null ],
     [ "node_index_pool", "classstring__dependenciest.html#a85eadafceae7d84e6977a2bb01fd2b65", null ],
     [ "string_nodes", "classstring__dependenciest.html#a9e693e5bfeafd8a90000cf421d54b81c", null ]
 ];

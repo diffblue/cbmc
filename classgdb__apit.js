@@ -19,7 +19,7 @@ var classgdb__apit =
     [ "get_memory", "classgdb__apit.html#adce3627fd3d799ce4747b5c666599fcf", null ],
     [ "get_most_recent_record", "classgdb__apit.html#ab786d7ff1bf359134ddbe6a5d5677549", null ],
     [ "get_register_value", "classgdb__apit.html#ab301fa051903c287718e455a0cf636e7", null ],
-    [ "get_value", "classgdb__apit.html#ad928c87caea2de74546e75920d7dec7b", null ],
+    [ "get_value", "classgdb__apit.html#a6dcde5c1ee73f23b79b88b8f92a42c34", null ],
     [ "get_value_from_record", "classgdb__apit.html#abdeb680e1e75da85d35b1bb41b358b79", null ],
     [ "hit_malloc_breakpoint", "classgdb__apit.html#afd63d3726fa6368712971d5ad8017d61", null ],
     [ "most_recent_line_has_tag", "classgdb__apit.html#ae936c49ec415224e4ada5088e338b0c2", null ],

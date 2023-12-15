@@ -18,7 +18,7 @@ var classjava__bytecode__parsert =
     [ "get_relement_value", "classjava__bytecode__parsert.html#a205c05fce28f76bd0e3703245243160e", null ],
     [ "parse", "classjava__bytecode__parsert.html#a922bc2377c9d5b9dd028b14a5df37d57", null ],
     [ "parse_local_variable_type_table", "classjava__bytecode__parsert.html#abcfbe4551a9439040868f0b98c11d6be", null ],
-    [ "parse_method_handle", "classjava__bytecode__parsert.html#a4c7028847b6b46594bcf722e9c41d10d", null ],
+    [ "parse_method_handle", "classjava__bytecode__parsert.html#ad3ca5181b9ce2656025cb4ea813d68e9", null ],
     [ "pool_entry", "classjava__bytecode__parsert.html#aa78a6b5c854c24a233380dbd004f084f", null ],
     [ "rbytecode", "classjava__bytecode__parsert.html#a5208a9021f9e0ba483a39bf67ce45199", null ],
     [ "rclass_attribute", "classjava__bytecode__parsert.html#a160f5594f249b2cccb9856fe1dbc2cb7", null ],

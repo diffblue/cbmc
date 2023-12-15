@@ -66,7 +66,7 @@ var classgoto__programt_1_1instructiont =
     [ "source_location_nonconst", "classgoto__programt_1_1instructiont.html#a9118e36fc2348146a1f7ab1e18653a26", null ],
     [ "swap", "classgoto__programt_1_1instructiont.html#ae009e280a082420fde2932e0bc1442a4", null ],
     [ "to_string", "classgoto__programt_1_1instructiont.html#a97474ee91129443853cee1419cdefe7f", null ],
-    [ "transform", "classgoto__programt_1_1instructiont.html#a0bca8c04c16a17441f2de172aa10ee6c", null ],
+    [ "transform", "classgoto__programt_1_1instructiont.html#a8e387ea1547f4e9e2101b074fc8dc4c6", null ],
     [ "turn_into_assume", "classgoto__programt_1_1instructiont.html#a759ec4a5b8eb9c1ff16534b05b08a0d7", null ],
     [ "turn_into_skip", "classgoto__programt_1_1instructiont.html#a0e265a43cf50fc9fcbaccc66d9748740", null ],
     [ "type", "classgoto__programt_1_1instructiont.html#af88611294c2cd4f7bae41fb1260874fb", null ],

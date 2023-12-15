@@ -14,7 +14,7 @@ var classnumberingt =
     [ "clear", "classnumberingt.html#abfd7f7f480442ec044278eeb045024b9", null ],
     [ "end", "classnumberingt.html#adc688963902e0ba0b557b0e27630224a", null ],
     [ "end", "classnumberingt.html#ad703e040efb27673577bb3a136bb7fd9", null ],
-    [ "get_number", "classnumberingt.html#a7a8413c83099852ac6bfd160004c6db3", null ],
+    [ "get_number", "classnumberingt.html#a4628ce3decd573cf230975b3a6311367", null ],
     [ "number", "classnumberingt.html#a0e1fb469b2514c49951812546c14d386", null ],
     [ "operator[]", "classnumberingt.html#a72ee1f388d78418e650ffad88b9f40e3", null ],
     [ "operator[]", "classnumberingt.html#a228805d3c059210a5c3f82dbf1a303cf", null ],

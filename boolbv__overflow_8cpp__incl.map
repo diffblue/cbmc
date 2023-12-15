@@ -1,61 +1,60 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/flattening/boolbv_overflow.cpp" name="/home/runner/work/cbmc/cbmc/src/solvers/flattening/boolbv_overflow.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="259,5,461,61"/>
-<area shape="rect" id="node2" href="$arith__tools_8h.html" title=" " alt="" coords="180,259,308,285"/>
-<area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="471,587,563,613"/>
-<area shape="rect" id="node29" href="$bitvector__expr_8h.html" title="API to expression classes for bitvectors." alt="" coords="284,109,436,136"/>
-<area shape="rect" id="node30" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="501,109,661,136"/>
-<area shape="rect" id="node31" href="$boolbv_8h.html" title=" " alt="" coords="1125,109,1203,136"/>
-<area shape="rect" id="node8" href="$mp__arith_8h.html" title=" " alt="" coords="2249,505,2341,531"/>
-<area shape="rect" id="node11" href="$optional_8h.html" title=" " alt="" coords="818,811,905,837"/>
-<area shape="rect" id="node14" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="327,341,417,367"/>
-<area shape="rect" id="node28" title=" " alt="" coords="148,341,207,367"/>
-<area shape="rect" id="node4" title=" " alt="" coords="485,661,550,688"/>
-<area shape="rect" id="node5" title=" " alt="" coords="1027,661,1101,688"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1856,811,1915,837"/>
-<area shape="rect" id="node7" title=" " alt="" coords="213,811,305,837"/>
-<area shape="rect" id="node9" title=" " alt="" coords="2008,587,2072,613"/>
-<area shape="rect" id="node10" title=" " alt="" coords="2096,587,2221,613"/>
-<area shape="rect" id="node12" href="$deprecate_8h.html" title=" " alt="" coords="1036,885,1135,912"/>
-<area shape="rect" id="node13" title=" " alt="" coords="824,885,899,912"/>
-<area shape="rect" id="node15" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="398,505,495,531"/>
-<area shape="rect" id="node26" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="574,423,671,449"/>
-<area shape="rect" id="node16" title=" " alt="" coords="371,587,447,613"/>
-<area shape="rect" id="node17" title=" " alt="" coords="1539,661,1626,688"/>
-<area shape="rect" id="node18" href="$expr_8h.html" title=" " alt="" coords="1078,587,1141,613"/>
-<area shape="rect" id="node19" href="$as__const_8h.html" title=" " alt="" coords="1323,661,1413,688"/>
-<area shape="rect" id="node20" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="787,661,850,688"/>
-<area shape="rect" id="node23" href="$validation__mode_8h.html" title=" " alt="" coords="350,811,493,837"/>
-<area shape="rect" id="node24" href="$validate__types_8h.html" title=" " alt="" coords="804,736,935,763"/>
-<area shape="rect" id="node25" href="$validate__expressions_8h.html" title=" " alt="" coords="1126,661,1298,688"/>
-<area shape="rect" id="node21" href="$source__location_8h.html" title=" " alt="" coords="1017,736,1153,763"/>
-<area shape="rect" id="node22" href="$validate_8h.html" title=" " alt="" coords="297,736,383,763"/>
-<area shape="rect" id="node27" title=" " alt="" coords="587,587,711,613"/>
-<area shape="rect" id="node32" href="$endianness__map_8h.html" title=" " alt="" coords="902,505,1071,531"/>
-<area shape="rect" id="node34" href="$functions_8h.html" title="Uninterpreted Functions." alt="" coords="897,184,1103,211"/>
-<area shape="rect" id="node39" href="$arrays_8h.html" title="Theory of Arrays with Extensionality." alt="" coords="1127,184,1201,211"/>
-<area shape="rect" id="node57" href="$boolbv__map_8h.html" title=" " alt="" coords="1903,423,2017,449"/>
-<area shape="rect" id="node58" href="$boolbv__width_8h.html" title=" " alt="" coords="431,184,553,211"/>
-<area shape="rect" id="node59" href="$bv__utils_8h.html" title=" " alt="" coords="2152,341,2237,367"/>
-<area shape="rect" id="node33" title=" " alt="" coords="955,587,1018,613"/>
-<area shape="rect" id="node35" title=" " alt="" coords="897,423,948,449"/>
-<area shape="rect" id="node36" title=" " alt="" coords="948,259,991,285"/>
-<area shape="rect" id="node37" href="$mathematical__expr_8h.html" title="API to expression classes for &#39;mathematical&#39; expressions." alt="" coords="398,259,583,285"/>
-<area shape="rect" id="node38" href="$mathematical__types_8h.html" title="Mathematical types." alt="" coords="331,423,499,449"/>
-<area shape="rect" id="node40" title=" " alt="" coords="1065,259,1108,285"/>
-<area shape="rect" id="node41" title=" " alt="" coords="1132,259,1247,285"/>
-<area shape="rect" id="node42" href="$union__find_8h.html" title=" " alt="" coords="695,423,822,449"/>
-<area shape="rect" id="node44" href="$equality_8h.html" title=" " alt="" coords="1271,259,1356,285"/>
-<area shape="rect" id="node43" href="$numbering_8h.html" title=" " alt="" coords="672,505,776,531"/>
-<area shape="rect" id="node45" href="$prop__conv__solver_8h.html" title=" " alt="" coords="1432,333,1605,375"/>
-<area shape="rect" id="node46" href="$src_2util_2message_8h.html" title=" " alt="" coords="1826,505,1945,531"/>
-<area shape="rect" id="node47" href="$conflict__provider_8h.html" title="Capability to check whether an expression is a reason for the solver returning UNSAT." alt="" coords="1148,423,1340,449"/>
-<area shape="rect" id="node48" href="$hardness__collector_8h.html" title="Capability to collect the statistics of the complexity of individual solver queries." alt="" coords="1621,423,1827,449"/>
-<area shape="rect" id="node51" href="$prop_8h.html" title=" " alt="" coords="2093,423,2155,449"/>
-<area shape="rect" id="node54" href="$prop__conv_8h.html" title=" " alt="" coords="1023,423,1123,449"/>
-<area shape="rect" id="node56" href="$solver__resource__limits_8h.html" title="Solver capability to set resource limits." alt="" coords="1364,423,1545,449"/>
-<area shape="rect" id="node49" href="$literal_8h.html" title=" " alt="" coords="1646,505,1802,531"/>
-<area shape="rect" id="node50" title=" " alt="" coords="1392,505,1469,531"/>
-<area shape="rect" id="node52" href="$threeval_8h.html" title=" " alt="" coords="2111,505,2225,531"/>
-<area shape="rect" id="node53" title=" " alt="" coords="2020,505,2087,531"/>
-<area shape="rect" id="node55" href="$stack__decision__procedure_8h.html" title="Decision procedure with incremental solving with contexts and assumptions." alt="" coords="1147,497,1317,539"/>
+<area shape="rect" id="node1" title=" " alt="" coords="119,5,321,61"/>
+<area shape="rect" id="node2" href="$arith__tools_8h.html" title=" " alt="" coords="43,259,171,285"/>
+<area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="350,587,442,613"/>
+<area shape="rect" id="node28" href="$bitvector__expr_8h.html" title="API to expression classes for bitvectors." alt="" coords="144,109,296,136"/>
+<area shape="rect" id="node29" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="355,109,515,136"/>
+<area shape="rect" id="node30" href="$boolbv_8h.html" title=" " alt="" coords="937,109,1015,136"/>
+<area shape="rect" id="node8" href="$mp__arith_8h.html" title=" " alt="" coords="1161,505,1253,531"/>
+<area shape="rect" id="node11" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="211,341,301,367"/>
+<area shape="rect" id="node27" title=" " alt="" coords="128,341,187,367"/>
+<area shape="rect" id="node4" title=" " alt="" coords="281,661,346,688"/>
+<area shape="rect" id="node5" title=" " alt="" coords="1363,661,1437,688"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1296,811,1355,837"/>
+<area shape="rect" id="node7" title=" " alt="" coords="121,811,213,837"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1864,587,1928,613"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1163,587,1288,613"/>
+<area shape="rect" id="node12" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="301,505,398,531"/>
+<area shape="rect" id="node25" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="422,423,519,449"/>
+<area shape="rect" id="node13" title=" " alt="" coords="250,587,326,613"/>
+<area shape="rect" id="node14" title=" " alt="" coords="1462,661,1549,688"/>
+<area shape="rect" id="node15" href="$expr_8h.html" title=" " alt="" coords="633,587,695,613"/>
+<area shape="rect" id="node16" href="$as__const_8h.html" title=" " alt="" coords="619,661,709,688"/>
+<area shape="rect" id="node17" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="455,661,518,688"/>
+<area shape="rect" id="node22" href="$validation__mode_8h.html" title=" " alt="" coords="262,811,405,837"/>
+<area shape="rect" id="node23" href="$validate__types_8h.html" title=" " alt="" coords="421,736,552,763"/>
+<area shape="rect" id="node24" href="$validate__expressions_8h.html" title=" " alt="" coords="734,661,906,688"/>
+<area shape="rect" id="node18" href="$source__location_8h.html" title=" " alt="" coords="1675,736,1811,763"/>
+<area shape="rect" id="node21" href="$validate_8h.html" title=" " alt="" coords="207,736,294,763"/>
+<area shape="rect" id="node19" href="$deprecate_8h.html" title=" " alt="" coords="2020,811,2119,837"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1652,811,1727,837"/>
+<area shape="rect" id="node26" title=" " alt="" coords="830,587,954,613"/>
+<area shape="rect" id="node31" href="$endianness__map_8h.html" title=" " alt="" coords="1625,505,1794,531"/>
+<area shape="rect" id="node33" href="$functions_8h.html" title="Uninterpreted Functions." alt="" coords="704,184,909,211"/>
+<area shape="rect" id="node38" href="$arrays_8h.html" title="Theory of Arrays with Extensionality." alt="" coords="939,184,1013,211"/>
+<area shape="rect" id="node56" href="$boolbv__map_8h.html" title=" " alt="" coords="2005,423,2120,449"/>
+<area shape="rect" id="node57" href="$boolbv__width_8h.html" title=" " alt="" coords="507,184,629,211"/>
+<area shape="rect" id="node58" href="$bv__utils_8h.html" title=" " alt="" coords="1643,341,1728,367"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1382,587,1445,613"/>
+<area shape="rect" id="node34" title=" " alt="" coords="747,423,797,449"/>
+<area shape="rect" id="node35" title=" " alt="" coords="785,259,828,285"/>
+<area shape="rect" id="node36" href="$mathematical__expr_8h.html" title="API to expression classes for &#39;mathematical&#39; expressions." alt="" coords="246,259,431,285"/>
+<area shape="rect" id="node37" href="$mathematical__types_8h.html" title="Mathematical types." alt="" coords="179,423,347,449"/>
+<area shape="rect" id="node39" title=" " alt="" coords="852,259,895,285"/>
+<area shape="rect" id="node40" title=" " alt="" coords="919,259,1033,285"/>
+<area shape="rect" id="node41" href="$union__find_8h.html" title=" " alt="" coords="1345,423,1471,449"/>
+<area shape="rect" id="node43" href="$equality_8h.html" title=" " alt="" coords="1057,259,1143,285"/>
+<area shape="rect" id="node42" href="$numbering_8h.html" title=" " alt="" coords="1032,505,1136,531"/>
+<area shape="rect" id="node44" href="$prop__conv__solver_8h.html" title=" " alt="" coords="1079,333,1252,375"/>
+<area shape="rect" id="node45" href="$src_2util_2message_8h.html" title=" " alt="" coords="2151,505,2270,531"/>
+<area shape="rect" id="node46" href="$conflict__provider_8h.html" title="Capability to check whether an expression is a reason for the solver returning UNSAT." alt="" coords="872,423,1064,449"/>
+<area shape="rect" id="node47" href="$hardness__collector_8h.html" title="Capability to collect the statistics of the complexity of individual solver queries." alt="" coords="1723,423,1930,449"/>
+<area shape="rect" id="node50" href="$prop_8h.html" title=" " alt="" coords="2195,423,2258,449"/>
+<area shape="rect" id="node53" href="$prop__conv_8h.html" title=" " alt="" coords="1547,423,1647,449"/>
+<area shape="rect" id="node55" href="$solver__resource__limits_8h.html" title="Solver capability to set resource limits." alt="" coords="1139,423,1320,449"/>
+<area shape="rect" id="node48" href="$literal_8h.html" title=" " alt="" coords="1818,505,1974,531"/>
+<area shape="rect" id="node49" title=" " alt="" coords="1523,505,1600,531"/>
+<area shape="rect" id="node51" href="$threeval_8h.html" title=" " alt="" coords="2386,505,2499,531"/>
+<area shape="rect" id="node52" title=" " alt="" coords="2295,505,2361,531"/>
+<area shape="rect" id="node54" href="$stack__decision__procedure_8h.html" title="Decision procedure with incremental solving with contexts and assumptions." alt="" coords="1329,497,1498,539"/>
 </map>

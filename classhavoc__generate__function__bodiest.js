@@ -8,6 +8,6 @@ var classhavoc__generate__function__bodiest =
     [ "globals_to_havoc", "classhavoc__generate__function__bodiest.html#a74fffb805e5228d9b746e8348cc8ee34", null ],
     [ "message", "classhavoc__generate__function__bodiest.html#a5c61a28849923b437880ae6a5ad9a1b6", null ],
     [ "object_factory_parameters", "classhavoc__generate__function__bodiest.html#ae3da00243bf90a179620dec27ba2fa85", null ],
-    [ "param_numbers_to_havoc", "classhavoc__generate__function__bodiest.html#abb0b5ebf68d76b39c6c34896670db6d7", null ],
-    [ "parameters_to_havoc", "classhavoc__generate__function__bodiest.html#acdbc3514782b19f660ab7a3ea1cc764d", null ]
+    [ "param_numbers_to_havoc", "classhavoc__generate__function__bodiest.html#a3c9015c03faab950a59092c684ababce", null ],
+    [ "parameters_to_havoc", "classhavoc__generate__function__bodiest.html#aae3433a44841a3b9ab1c8de8d56b6a57", null ]
 ];

@@ -18,7 +18,7 @@ var classunion__find =
     [ "find_number", "classunion__find.html#a606769383e6cb0c8ca386ad9b9045c21", null ],
     [ "find_number", "classunion__find.html#a9b52f160a057cde837a8ecfcce15b989", null ],
     [ "find_number", "classunion__find.html#a8af0d979ce37c3a70a82d8b1d1fe7641", null ],
-    [ "get_number", "classunion__find.html#a1a123e4668edacafc4358d45d29279bf", null ],
+    [ "get_number", "classunion__find.html#a32e8165b98739a1b5195e05a8a596324", null ],
     [ "is_root", "classunion__find.html#ac1407b0e5e25c457f7c2f49121da4c81", null ],
     [ "is_root", "classunion__find.html#aed1f8046631c3c76d758929d0cb2368e", null ],
     [ "is_root_number", "classunion__find.html#ad613e8e7e77dd029239c27ff1424fa2a", null ],

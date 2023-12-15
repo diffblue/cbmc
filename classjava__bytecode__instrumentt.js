@@ -8,7 +8,7 @@ var classjava__bytecode__instrumentt =
     [ "check_class_cast", "classjava__bytecode__instrumentt.html#aca0970c414ae79b7e14b2f9af9732615", null ],
     [ "check_null_dereference", "classjava__bytecode__instrumentt.html#ae5bc53d605e31642276b94d1b86255e7", null ],
     [ "instrument_code", "classjava__bytecode__instrumentt.html#a74d81c8b67d73b92e140e0300fb0ab76", null ],
-    [ "instrument_expr", "classjava__bytecode__instrumentt.html#af56c8a904a95fb345f5cb14d6a9d1226", null ],
+    [ "instrument_expr", "classjava__bytecode__instrumentt.html#a10f2163c36cf074574b77a64c34f8b2b", null ],
     [ "operator()", "classjava__bytecode__instrumentt.html#a1ae589afb778e263d9b9caa8d5615fc8", null ],
     [ "prepend_instrumentation", "classjava__bytecode__instrumentt.html#a2d12795a82444b935a85f758cfdab6aa", null ],
     [ "throw_exception", "classjava__bytecode__instrumentt.html#a8fd958417ba2c50ca774003bb9083faf", null ],

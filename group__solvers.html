@@ -132,7 +132,7 @@ Flattening</h1>
 <p>Note: <code>bvt</code> mentioned below is an alias to a vector of literalt.</p>
 <p><code>bvt <a class="el" href="classboolbvt.html#a34f4d4fcb281e7074cecb324d588ee58" title="Converts an expression into its gate-level representation and returns a vector of literals correspond...">boolbvt::convert_bitvector(const exprt &amp;expr)</a></code></p>
 <p>Which takes an exprt then calls the associated transformation functions to generate the <a class="el" href="classliteralt.html">literalt</a> vector to then pass to the internal <a class="el" href="classpropt.html">propt</a> instance.</p>
-<p><code>const bvt &amp; <a class="el" href="classboolbvt.html#a9defaf85fe63872f900b1abb38275de8" title="Convert expression to vector of literalts, using an internal cache to speed up conversion if availabl...">boolbvt::convert_bv</a>(const exprt &amp;expr, optionalt&lt;std::size_t&gt; expected_width)</code></p>
+<p><code>const bvt &amp; <a class="el" href="classboolbvt.html#a14d25478f6b405c78cbbf3574ab0b03e" title="Convert expression to vector of literalts, using an internal cache to speed up conversion if availabl...">boolbvt::convert_bv</a>(const exprt &amp;expr, std::optional&lt;std::size_t&gt; expected_width)</code></p>
 <p>Similar to convert_bitvector except it also provides basic caching and freezing results for incremental solving. It calls convert_bitvector internally.</p>
 <p><code>literalt <a class="el" href="classboolbvt.html#af78c5a7a2e0aca78bf5d099e095e6143">boolbvt::convert_rest(const exprt &amp;expr)</a></code></p>
 <p>(Note: I'm not sure why this is split from the normal convert_bitvector, but it's probably worth mentioning)</p>

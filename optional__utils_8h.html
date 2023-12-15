@@ -94,13 +94,13 @@ $(document).ready(function(){initNavTree('optional__utils_8h.html',''); initResi
 <div class="title">optional_utils.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="optional_8h_source.html">optional.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &lt;optional&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for optional_utils.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="optional__utils_8h__incl.svg" width="208" height="216"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="optional__utils_8h__incl.svg" width="195" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -116,14 +116,14 @@ $(document).ready(function(){initNavTree('optional__utils_8h.html',''); initResi
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:af55c415ccf535a2d3b6e21e0ba71725a"><td class="memTemplParams" colspan="2">template&lt;typename map_like_collectiont , typename keyt &gt; </td></tr>
-<tr class="memitem:af55c415ccf535a2d3b6e21e0ba71725a"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="optional__utils_8h.html#af55c415ccf535a2d3b6e21e0ba71725a">optional_lookup</a> (const map_like_collectiont &amp;map, const keyt &amp;key) -&gt; optionalt&lt; decltype(map.find(key) -&gt;second)&gt;</td></tr>
-<tr class="memdesc:af55c415ccf535a2d3b6e21e0ba71725a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lookup a key in a map, if found return the associated value, nullopt otherwise.  <a href="optional__utils_8h.html#af55c415ccf535a2d3b6e21e0ba71725a">More...</a><br /></td></tr>
-<tr class="separator:af55c415ccf535a2d3b6e21e0ba71725a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c888e6525a02b65b3d43edea87d1b03"><td class="memTemplParams" colspan="2">template&lt;typename map_like_collectiont , typename keyt &gt; </td></tr>
+<tr class="memitem:a3c888e6525a02b65b3d43edea87d1b03"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="optional__utils_8h.html#a3c888e6525a02b65b3d43edea87d1b03">optional_lookup</a> (const map_like_collectiont &amp;map, const keyt &amp;key) -&gt; std::optional&lt; decltype(map.find(key) -&gt;second)&gt;</td></tr>
+<tr class="memdesc:a3c888e6525a02b65b3d43edea87d1b03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lookup a key in a map, if found return the associated value, nullopt otherwise.  <a href="optional__utils_8h.html#a3c888e6525a02b65b3d43edea87d1b03">More...</a><br /></td></tr>
+<tr class="separator:a3c888e6525a02b65b3d43edea87d1b03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="af55c415ccf535a2d3b6e21e0ba71725a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af55c415ccf535a2d3b6e21e0ba71725a">&#9670;&nbsp;</a></span>optional_lookup()</h2>
+<a id="a3c888e6525a02b65b3d43edea87d1b03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c888e6525a02b65b3d43edea87d1b03">&#9670;&nbsp;</a></span>optional_lookup()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -145,7 +145,7 @@ template&lt;typename map_like_collectiont , typename keyt &gt; </div>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td> -&gt; optionalt&lt;decltype(map.find(key)-&gt;second)&gt;
+          <td></td><td> -&gt; std::optional&lt;decltype(map.find(key)-&gt;second)&gt;
 </td>
         </tr>
       </table>

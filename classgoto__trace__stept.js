@@ -27,7 +27,7 @@ var classgoto__trace__stept =
       [ "ATOMIC_END", "classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebca4b79dc4675c4a6d6a9631357cf09f934", null ]
     ] ],
     [ "goto_trace_stept", "classgoto__trace__stept.html#ac0b7a5252a32f2249220cb95cadd4648", null ],
-    [ "get_lhs_object", "classgoto__trace__stept.html#a26a9560710883d1a5d64c1da1a932021", null ],
+    [ "get_lhs_object", "classgoto__trace__stept.html#ab346c903085ce2c99d3b083747da52f3", null ],
     [ "is_assert", "classgoto__trace__stept.html#a9d823a0f75f88e4748519045db2d71e2", null ],
     [ "is_assignment", "classgoto__trace__stept.html#a43d13feae1087b98f07f0cc1b604fab1", null ],
     [ "is_assume", "classgoto__trace__stept.html#a925d7a71b0d7d970fffb1d55d431038f", null ],

@@ -7,7 +7,7 @@ var classbv__pointers__widet =
     [ "add_addr", "classbv__pointers__widet.html#aebef4f135a761a9d051889997bacfb9c", null ],
     [ "boolbv_width", "classbv__pointers__widet.html#aff75c13a322f61570fc36b0d1b4de0ee", null ],
     [ "bv_get_rec", "classbv__pointers__widet.html#ae6d2d419500116ae7fbfdca8cb96af74", null ],
-    [ "convert_address_of_rec", "classbv__pointers__widet.html#a65b8b3902c723f86931611a3774a55ba", null ],
+    [ "convert_address_of_rec", "classbv__pointers__widet.html#aba10c9fab5feca11b7377ed7160acc8e", null ],
     [ "convert_bitvector", "classbv__pointers__widet.html#a4215f5a755d224d92d89eaf215345983", null ],
     [ "convert_pointer_type", "classbv__pointers__widet.html#a201791de3eabba312c28fbeeeadfa0f9", null ],
     [ "convert_rest", "classbv__pointers__widet.html#a2ed2b694f2443c332efb9e05e556a1b7", null ],

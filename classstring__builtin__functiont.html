@@ -128,13 +128,13 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3f84e884cf9210f06b9738c8ff803fa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaad510986ddf8173e25631cf47abf6e4"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#aaad510986ddf8173e25631cf47abf6e4">~string_builtin_functiont</a> ()=default</td></tr>
 <tr class="separator:aaad510986ddf8173e25631cf47abf6e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb50da96c914cdd93633433b606a82f4"><td class="memItemLeft" align="right" valign="top">virtual optionalt&lt; <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#aeb50da96c914cdd93633433b606a82f4">string_result</a> () const</td></tr>
-<tr class="separator:aeb50da96c914cdd93633433b606a82f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84204dd44726fc389f91723fea3dc594"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#a84204dd44726fc389f91723fea3dc594">string_result</a> () const</td></tr>
+<tr class="separator:a84204dd44726fc389f91723fea3dc594"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19b0a861b05819c12ad2e680db0a1096"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="classarray__string__exprt.html">array_string_exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#a19b0a861b05819c12ad2e680db0a1096">string_arguments</a> () const</td></tr>
 <tr class="separator:a19b0a861b05819c12ad2e680db0a1096"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a158e7cfb0df08193d80c1ae9378f09a5"><td class="memItemLeft" align="right" valign="top">virtual optionalt&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#a158e7cfb0df08193d80c1ae9378f09a5">eval</a> (const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;get_value) const =0</td></tr>
-<tr class="memdesc:a158e7cfb0df08193d80c1ae9378f09a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a function <code>get_value</code> which gives a valuation to expressions, attempt to find the result of the builtin function.  <a href="classstring__builtin__functiont.html#a158e7cfb0df08193d80c1ae9378f09a5">More...</a><br /></td></tr>
-<tr class="separator:a158e7cfb0df08193d80c1ae9378f09a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecba40aeb090fe8f506514c6a7513c1d"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#aecba40aeb090fe8f506514c6a7513c1d">eval</a> (const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;get_value) const =0</td></tr>
+<tr class="memdesc:aecba40aeb090fe8f506514c6a7513c1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a function <code>get_value</code> which gives a valuation to expressions, attempt to find the result of the builtin function.  <a href="classstring__builtin__functiont.html#aecba40aeb090fe8f506514c6a7513c1d">More...</a><br /></td></tr>
+<tr class="separator:aecba40aeb090fe8f506514c6a7513c1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebe151eddcf376e42bd849dfea76c303"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#aebe151eddcf376e42bd849dfea76c303">name</a> () const =0</td></tr>
 <tr class="separator:aebe151eddcf376e42bd849dfea76c303"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84e7087e66cb60eb3a3fefe15ee17824"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structstring__constraintst.html">string_constraintst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__builtin__functiont.html#a84e7087e66cb60eb3a3fefe15ee17824">constraints</a> (<a class="el" href="classstring__constraint__generatort.html">string_constraint_generatort</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;) const =0</td></tr>
@@ -166,7 +166,7 @@ Protected Attributes</h2></td></tr>
 <div class="textblock"><p>Base class for string functions that are built in the solver. </p>
 <p>The <a class="el" href="classstring__dependenciest.html">string_dependenciest</a> framework handles string operations by either:</p><ol type="1">
 <li>generating constraints for the solver, which is done by the <code><a class="el" href="classstring__builtin__functiont.html#a84e7087e66cb60eb3a3fefe15ee17824" title="Add constraints ensuring that the value of result expression of the builtin function corresponds to t...">constraints()</a></code> function,</li>
-<li>evaluating constant operations from the solver model, which is done by the <code><a class="el" href="classstring__builtin__functiont.html#a158e7cfb0df08193d80c1ae9378f09a5" title="Given a function get_value which gives a valuation to expressions, attempt to find the result of the ...">eval()</a></code> function.</li>
+<li>evaluating constant operations from the solver model, which is done by the <code><a class="el" href="classstring__builtin__functiont.html#aecba40aeb090fe8f506514c6a7513c1d" title="Given a function get_value which gives a valuation to expressions, attempt to find the result of the ...">eval()</a></code> function.</li>
 </ol>
 <p>Only the content of the strings are managed in that way. The constraints for the lengths are always added, see <a class="el" href="classstring__builtin__functiont.html#aba539f24b082994d14fb207201ad1095">length_constraint()</a>.</p>
 <p>Concretely, if a built-in function supports <b>constraint generation</b>, it means that the result of the operation can be tested. For instance in this Java example: </p><div class="fragment"><div class="line">String s = <span class="stringliteral">&quot;foo&quot;</span> + <span class="stringliteral">&quot;bar&quot;</span>;</div>
@@ -345,8 +345,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a158e7cfb0df08193d80c1ae9378f09a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a158e7cfb0df08193d80c1ae9378f09a5">&#9670;&nbsp;</a></span>eval()</h2>
+<a id="aecba40aeb090fe8f506514c6a7513c1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecba40aeb090fe8f506514c6a7513c1d">&#9670;&nbsp;</a></span>eval()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -355,7 +355,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual optionalt&lt;<a class="el" href="classexprt.html">exprt</a>&gt; string_builtin_functiont::eval </td>
+          <td class="memname">virtual std::optional&lt;<a class="el" href="classexprt.html">exprt</a>&gt; string_builtin_functiont::eval </td>
           <td>(</td>
           <td class="paramtype">const std::function&lt; <a class="el" href="classexprt.html">exprt</a>(const <a class="el" href="classexprt.html">exprt</a> &amp;)&gt; &amp;&#160;</td>
           <td class="paramname"><em>get_value</em></td><td>)</td>
@@ -372,7 +372,7 @@ Protected Attributes</h2></td></tr>
 <p>Given a function <code>get_value</code> which gives a valuation to expressions, attempt to find the result of the builtin function. </p>
 <p>If not enough information can be gathered from <code>get_value</code>, return an empty optional. </p>
 
-<p>Implemented in <a class="el" href="classstring__insertion__builtin__functiont.html#aeb83e4fff732f215f5e94a550be603f0">string_insertion_builtin_functiont</a>, <a class="el" href="classstring__format__builtin__functiont.html#ae3d67035b24c292b45ef7c6c38cd6e39">string_format_builtin_functiont</a>, <a class="el" href="classstring__of__int__builtin__functiont.html#a33f123069f9ca6ffb21ac0a9b1c687e0">string_of_int_builtin_functiont</a>, <a class="el" href="classstring__to__upper__case__builtin__functiont.html#a60c02222d51dee80163cb19a9d575a83">string_to_upper_case_builtin_functiont</a>, <a class="el" href="classstring__to__lower__case__builtin__functiont.html#a06367e6facaf7e32fd9db1379f3dc78c">string_to_lower_case_builtin_functiont</a>, <a class="el" href="classstring__set__char__builtin__functiont.html#aade253ca597dea1dbd425d3c01436970">string_set_char_builtin_functiont</a>, <a class="el" href="classstring__concat__char__builtin__functiont.html#a1ab641a41936179e1e3620e964143fa6">string_concat_char_builtin_functiont</a>, and <a class="el" href="classstring__builtin__function__with__no__evalt.html#a4f14c9f1dbfdb3705b09c57025d2e5c9">string_builtin_function_with_no_evalt</a>.</p>
+<p>Implemented in <a class="el" href="classstring__insertion__builtin__functiont.html#afdaf705e1301952dd93129b0321b1bcc">string_insertion_builtin_functiont</a>, <a class="el" href="classstring__format__builtin__functiont.html#afe87bdffb38be45edbc90ee450de9714">string_format_builtin_functiont</a>, <a class="el" href="classstring__of__int__builtin__functiont.html#aaec83a4f292cfc09555e45ffff2bbbcc">string_of_int_builtin_functiont</a>, <a class="el" href="classstring__to__upper__case__builtin__functiont.html#a5d6e216cf6cec8e42ccf82ec2cc679c2">string_to_upper_case_builtin_functiont</a>, <a class="el" href="classstring__to__lower__case__builtin__functiont.html#afde37fd2ad1fc157fd451702b28d56d1">string_to_lower_case_builtin_functiont</a>, <a class="el" href="classstring__set__char__builtin__functiont.html#acf14f1cb0122e8d5102d98e5a544396d">string_set_char_builtin_functiont</a>, <a class="el" href="classstring__concat__char__builtin__functiont.html#a9dac887a3c0b98a77080b582affba6e4">string_concat_char_builtin_functiont</a>, and <a class="el" href="classstring__builtin__function__with__no__evalt.html#a23b0ef6f2a8330157f949fa1107f51f0">string_builtin_function_with_no_evalt</a>.</p>
 
 </div>
 </div>
@@ -492,8 +492,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aeb50da96c914cdd93633433b606a82f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb50da96c914cdd93633433b606a82f4">&#9670;&nbsp;</a></span>string_result()</h2>
+<a id="a84204dd44726fc389f91723fea3dc594"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84204dd44726fc389f91723fea3dc594">&#9670;&nbsp;</a></span>string_result()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -502,7 +502,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual optionalt&lt;<a class="el" href="classarray__string__exprt.html">array_string_exprt</a>&gt; string_builtin_functiont::string_result </td>
+          <td class="memname">virtual std::optional&lt;<a class="el" href="classarray__string__exprt.html">array_string_exprt</a>&gt; string_builtin_functiont::string_result </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -515,7 +515,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classstring__insertion__builtin__functiont.html#a066af6732f590fac1f52c2bdbbff17a7">string_insertion_builtin_functiont</a>, <a class="el" href="classstring__format__builtin__functiont.html#a83254aaedc4d040428b348c8a8885a0c">string_format_builtin_functiont</a>, <a class="el" href="classstring__builtin__function__with__no__evalt.html#a724b688922f1f94b672e16878e820fd9">string_builtin_function_with_no_evalt</a>, <a class="el" href="classstring__creation__builtin__functiont.html#a2267cbc0a90e6dfcfba4efc97b9b08c6">string_creation_builtin_functiont</a>, and <a class="el" href="classstring__transformation__builtin__functiont.html#a5d90855142b38312b9e731254e797427">string_transformation_builtin_functiont</a>.</p>
+<p>Reimplemented in <a class="el" href="classstring__insertion__builtin__functiont.html#a819bcd6babf13d4e39a7d258bdd699c4">string_insertion_builtin_functiont</a>, <a class="el" href="classstring__format__builtin__functiont.html#ae01e893fa8ee5c1615be50f08e3bfd2b">string_format_builtin_functiont</a>, <a class="el" href="classstring__builtin__function__with__no__evalt.html#ac4bff47ecfc6e1aeb7b4aa34307da4a3">string_builtin_function_with_no_evalt</a>, <a class="el" href="classstring__creation__builtin__functiont.html#a26b1e64a2f42ff4262b1db05751bf821">string_creation_builtin_functiont</a>, and <a class="el" href="classstring__transformation__builtin__functiont.html#a57d60e636bfa5d3de576112e49e992de">string_transformation_builtin_functiont</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="string__builtin__function_8h_source.html#l00078">78</a> of file <a class="el" href="string__builtin__function_8h_source.html">string_builtin_function.h</a>.</p>
 

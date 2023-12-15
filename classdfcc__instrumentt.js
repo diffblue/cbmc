@@ -23,7 +23,7 @@ var classdfcc__instrumentt =
     [ "instrument_lhs", "classdfcc__instrumentt.html#a1e9b5f35225684a7040e6300f326f20c", null ],
     [ "instrument_other", "classdfcc__instrumentt.html#a2531d6c563767a2656e49e213fb3e455", null ],
     [ "instrument_wrapped_function", "classdfcc__instrumentt.html#a7ead72aab863c4f9dc2b9f9e56a2be37", null ],
-    [ "is_dead_object_update", "classdfcc__instrumentt.html#ad021542da17241ed9c9bd924d0dff581", null ],
+    [ "is_dead_object_update", "classdfcc__instrumentt.html#a64fcc243380b71ed02a069078744ff31", null ],
     [ "is_internal_symbol", "classdfcc__instrumentt.html#ad2be95dcf14f5470f447e968de7c32e5", null ],
     [ "contract_clauses_codegen", "classdfcc__instrumentt.html#a0fff429deefb41fa8c9d9f1b2744b44a", null ],
     [ "function_cache", "classdfcc__instrumentt.html#a4d7c4a63de14346d987dfb7366529d40", null ],

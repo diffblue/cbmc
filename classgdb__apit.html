@@ -149,9 +149,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5f5e34066c99752e5cc8720b08e9a853"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__apit.html#a5f5e34066c99752e5cc8720b08e9a853">run_gdb_from_core</a> (const std::string &amp;corefile)</td></tr>
 <tr class="memdesc:a5f5e34066c99752e5cc8720b08e9a853"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run gdb with the given core file.  <a href="classgdb__apit.html#a5f5e34066c99752e5cc8720b08e9a853">More...</a><br /></td></tr>
 <tr class="separator:a5f5e34066c99752e5cc8720b08e9a853"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad928c87caea2de74546e75920d7dec7b"><td class="memItemLeft" align="right" valign="top">optionalt&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__apit.html#ad928c87caea2de74546e75920d7dec7b">get_value</a> (const std::string &amp;expr)</td></tr>
-<tr class="memdesc:ad928c87caea2de74546e75920d7dec7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the memory address pointed to by the given pointer expression.  <a href="classgdb__apit.html#ad928c87caea2de74546e75920d7dec7b">More...</a><br /></td></tr>
-<tr class="separator:ad928c87caea2de74546e75920d7dec7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dcde5c1ee73f23b79b88b8f92a42c34"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__apit.html#a6dcde5c1ee73f23b79b88b8f92a42c34">get_value</a> (const std::string &amp;expr)</td></tr>
+<tr class="memdesc:a6dcde5c1ee73f23b79b88b8f92a42c34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the memory address pointed to by the given pointer expression.  <a href="classgdb__apit.html#a6dcde5c1ee73f23b79b88b8f92a42c34">More...</a><br /></td></tr>
+<tr class="separator:a6dcde5c1ee73f23b79b88b8f92a42c34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adce3627fd3d799ce4747b5c666599fcf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgdb__apit_1_1pointer__valuet.html">pointer_valuet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdb__apit.html#adce3627fd3d799ce4747b5c666599fcf">get_memory</a> (const std::string &amp;expr)</td></tr>
 <tr class="memdesc:adce3627fd3d799ce4747b5c666599fcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of a pointer associated with <code>expr</code>.  <a href="classgdb__apit.html#adce3627fd3d799ce4747b5c666599fcf">More...</a><br /></td></tr>
 <tr class="separator:adce3627fd3d799ce4747b5c666599fcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -607,14 +607,14 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad928c87caea2de74546e75920d7dec7b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad928c87caea2de74546e75920d7dec7b">&#9670;&nbsp;</a></span>get_value()</h2>
+<a id="a6dcde5c1ee73f23b79b88b8f92a42c34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dcde5c1ee73f23b79b88b8f92a42c34">&#9670;&nbsp;</a></span>get_value()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">optionalt&lt;std::string&gt; gdb_apit::get_value </td>
+          <td class="memname">std::optional&lt;std::string&gt; gdb_apit::get_value </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>expr</em></td><td>)</td>

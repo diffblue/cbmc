@@ -373,7 +373,7 @@ $(document).ready(function(){initNavTree('remove__complex_8cpp_source.html','');
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  <a class="code" href="classgoto__functionst.html#a75fd5a161012d70279ba54f9bac5bda2">goto_functionst::goto_functiont</a> &amp;goto_function)</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;{</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;i : goto_function.body.instructions)</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    i.transform([](<a class="code" href="classexprt.html">exprt</a> e) -&gt; optionalt&lt;exprt&gt; {</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    i.transform([](<a class="code" href="classexprt.html">exprt</a> e) -&gt; std::optional&lt;exprt&gt; {</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="remove__complex_8cpp.html#a4bca81ebf7f342e5ee2151129d589ff6">have_to_remove_complex</a>(e))</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;      {</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        <a class="code" href="remove__complex_8cpp.html#a47e111380fe8e91a296edc0c92f6e91b">remove_complex</a>(e);</div>

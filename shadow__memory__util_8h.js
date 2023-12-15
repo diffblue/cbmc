@@ -11,7 +11,7 @@ var shadow__memory__util_8h =
     [ "get_field_init_expr", "shadow__memory__util_8h.html#a58bb583f5280212d2b263f81562d8ef6", null ],
     [ "get_field_init_type", "shadow__memory__util_8h.html#a57e8b1a2da1ba74762afdf1ccca49240", null ],
     [ "get_shadow_dereference_candidates", "shadow__memory__util_8h.html#a6a415504940fb0400e08c374448246fc", null ],
-    [ "get_shadow_memory", "shadow__memory__util_8h.html#a5cc17ee4223dddad60a4bed4dce65093", null ],
+    [ "get_shadow_memory", "shadow__memory__util_8h.html#af68945cc92887e29a0d6c6dd11a6f2e9", null ],
     [ "replace_invalid_object_by_null", "shadow__memory__util_8h.html#a0986423d84e9da56454bc5ab418f68f7", null ],
     [ "shadow_memory_log_get_field", "shadow__memory__util_8h.html#aac732ffbd42af05c02f61327e535aab7", null ],
     [ "shadow_memory_log_set_field", "shadow__memory__util_8h.html#a56b93d779889bb43515cb5687f0f34cd", null ],

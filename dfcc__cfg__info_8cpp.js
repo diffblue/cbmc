@@ -1,8 +1,8 @@
 var dfcc__cfg__info_8cpp =
 [
     [ "contract_clausest", "structcontract__clausest.html", "structcontract__clausest" ],
-    [ "check_has_contract_rec", "dfcc__cfg__info_8cpp.html#a21be3293f2f519520b2e153bb28a4cc4", null ],
-    [ "check_inner_loops_have_contracts", "dfcc__cfg__info_8cpp.html#af7d314eeb5508a065d4ea17b6d566d7d", null ],
+    [ "check_has_contract_rec", "dfcc__cfg__info_8cpp.html#a1d7279622d3d52dfd420623999f5c0c0", null ],
+    [ "check_inner_loops_have_contracts", "dfcc__cfg__info_8cpp.html#ab7903d310b5aa6d8e98b0c1abda3db00", null ],
     [ "default_loop_contract_clauses", "dfcc__cfg__info_8cpp.html#a99f012848c7a4db34c05b81f82c3b0b2", null ],
     [ "gen_dfcc_loop_info", "dfcc__cfg__info_8cpp.html#acc4c87431dbc60f5c0ccbf621a5b537d", null ],
     [ "gen_loop_locals_set", "dfcc__cfg__info_8cpp.html#af945bfed67dca5baaea0c57d76cb4bc0", null ],

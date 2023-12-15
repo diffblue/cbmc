@@ -13,7 +13,7 @@ var classprop__conv__solvert =
     [ "decision_procedure_text", "classprop__conv__solvert.html#a6b57d7a7755ab2a2448bdca33d5f187e", null ],
     [ "finish_eager_conversion", "classprop__conv__solvert.html#a49cea6450ecfb82bfab5d7076f562500", null ],
     [ "get", "classprop__conv__solvert.html#aae8a23983e11023e492e3fc79c0fec5e", null ],
-    [ "get_bool", "classprop__conv__solvert.html#a42ebf45b2df3a0e7787f70af9d818021", null ],
+    [ "get_bool", "classprop__conv__solvert.html#aa3528a92ee922171d17491e18cb26864", null ],
     [ "get_cache", "classprop__conv__solvert.html#a7c85f02522ad39772365177cc1d18fed", null ],
     [ "get_hardness_collector", "classprop__conv__solvert.html#a6b2434c10c46b91aea8b3961666a7d27", null ],
     [ "get_literal", "classprop__conv__solvert.html#a55858b24735138f169bdac4b11d1ec84", null ],
