@@ -1,6 +1,5 @@
 var NAVTREEINDEX71 =
 {
-"classwall__clock__timestampert.html#a9cfec92a458ebc86abbcc85274de27d7":[8,0,1358,0],
 "classwidened__ranget.html":[8,0,1359],
 "classwidened__ranget.html#a0547440f127210cb7dd4e32f09da0622":[8,0,1359,0],
 "classwidened__ranget.html#a1c1a5f66b0345551276d7858d9c7c70f":[8,0,1359,8],
@@ -249,5 +248,6 @@ var NAVTREEINDEX71 =
 "config_8cpp.html#ad2957e882e3568503e4f786a480f2bfe":[9,0,2,31,21,3],
 "config_8cpp.html#ad2d049566f83776f4e37defd54fc28b4":[9,0,2,31,21,1],
 "config_8cpp_source.html":[9,0,2,31,21],
-"config_8h.html":[9,0,2,31,22]
+"config_8h.html":[9,0,2,31,22],
+"config_8h.html#a2e0780facc146351b9e53c153b0cd5e9":[9,0,2,31,22,8]
 };
