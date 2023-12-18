@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/janalyzer/janalyzer_parse_options.cpp" name="/home/runner/work/cbmc/cbmc/jbmc/src/janalyzer/janalyzer_parse_options.cpp">
-<area shape="rect" id="node1" title="JANALYZER Command Line Option Processing." alt="" coords="1835,5,2045,61"/>
-<area shape="rect" id="node2" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="492,117,684,143"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1391,370,1468,397"/>
-<area shape="rect" id="node7" href="$language_8h.html" title="Abstract interface to support a programming language." alt="" coords="1204,288,1351,315"/>
-<area shape="rect" id="node11" href="$show__properties_8h.html" title="Show the properties." alt="" coords="278,199,434,240"/>
-<area shape="rect" id="node13" href="$java__bytecode__language_8h.html" title=" " alt="" coords="965,199,1133,240"/>
-<area shape="rect" id="node14" href="$config_8h.html" title=" " alt="" coords="741,206,840,233"/>
-<area shape="rect" id="node17" href="$exit__codes_8h.html" title="Document and give macros for the exit codes of CPROVER binaries." alt="" coords="915,117,1045,143"/>
-<area shape="rect" id="node18" href="$help__formatter_8h.html" title="Help Formatter." alt="" coords="1851,370,2005,397"/>
-<area shape="rect" id="node19" href="$options_8h.html" title="Options." alt="" coords="1669,206,1776,233"/>
-<area shape="rect" id="node21" href="$version_8h.html" title=" " alt="" coords="1211,117,1317,143"/>
-<area shape="rect" id="node22" href="$goto__check_8h.html" title="Checks for Errors in C and Java Programs." alt="" coords="1342,109,1493,151"/>
-<area shape="rect" id="node23" href="$remove__returns_8h.html" title="Replace function returns by assignments to global variables." alt="" coords="1851,199,2023,240"/>
-<area shape="rect" id="node26" href="$remove__skip_8h.html" title="Program Transformation." alt="" coords="2047,199,2219,240"/>
-<area shape="rect" id="node27" href="$remove__virtual__functions_8h.html" title="Functions for replacing virtual function call with a static function calls in functions,..." alt="" coords="2555,199,2727,240"/>
-<area shape="rect" id="node29" href="$set__properties_8h.html" title="Set the properties to check." alt="" coords="1157,206,1384,233"/>
-<area shape="rect" id="node30" href="$show__symbol__table_8h.html" title="Show the symbol table." alt="" coords="1721,109,1877,151"/>
-<area shape="rect" id="node31" href="$constant__propagator_8h.html" title="Constant propagation." alt="" coords="3048,206,3277,233"/>
-<area shape="rect" id="node36" href="$dependence__graph_8h.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="3027,109,3189,151"/>
-<area shape="rect" id="node42" href="$interval__domain_8h.html" title="Interval Domain." alt="" coords="3261,117,3464,143"/>
-<area shape="rect" id="node45" href="$local__may__alias_8h.html" title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis." alt="" coords="2873,199,3023,240"/>
-<area shape="rect" id="node47" href="$ansi__c__language_8h.html" title=" " alt="" coords="1409,206,1594,233"/>
-<area shape="rect" id="node48" href="$static__show__domain_8h.html" title=" " alt="" coords="3689,363,3841,404"/>
-<area shape="rect" id="node49" href="$static__simplifier_8h.html" title=" " alt="" coords="3865,363,4017,404"/>
-<area shape="rect" id="node50" href="$static__verifier_8h.html" title=" " alt="" coords="2200,363,2352,404"/>
-<area shape="rect" id="node51" href="$taint__analysis_8h.html" title="Taint Analysis." alt="" coords="5,199,152,240"/>
-<area shape="rect" id="node52" href="$unreachable__instructions_8h.html" title="List all unreachable instructions." alt="" coords="2377,363,2573,404"/>
-<area shape="rect" id="node53" href="$lazy__goto__model_8h.html" title="Author: Diffblue Ltd." alt="" coords="3489,109,3637,151"/>
-<area shape="rect" id="node54" href="$remove__exceptions_8h.html" title="Remove function exceptional returns." alt="" coords="199,109,369,151"/>
-<area shape="rect" id="node55" href="$remove__instanceof_8h.html" title="Remove Instance&#45;of Operators." alt="" coords="3736,109,3907,151"/>
-<area shape="rect" id="node56" href="$mode_8h.html" title=" " alt="" coords="916,288,1039,315"/>
-<area shape="rect" id="node57" href="$static__lifetime__init_8h.html" title=" " alt="" coords="3982,109,4146,151"/>
-<area shape="rect" id="node58" title=" " alt="" coords="4170,117,4235,143"/>
-<area shape="rect" id="node59" title=" " alt="" coords="4259,117,4333,143"/>
-<area shape="rect" id="node60" title=" " alt="" coords="4357,117,4437,143"/>
-<area shape="rect" id="node3" href="$parse__options_8h.html" title=" " alt="" coords="519,370,670,397"/>
-<area shape="rect" id="node5" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="1063,288,1180,315"/>
-<area shape="rect" id="node10" href="$show__goto__functions_8h.html" title="Show the goto functions." alt="" coords="510,199,666,240"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1176,452,1235,479"/>
-<area shape="rect" id="node8" href="$irep_8h.html" title=" " alt="" coords="899,370,957,397"/>
-<area shape="rect" id="node9" title=" " alt="" coords="2639,452,2703,479"/>
-<area shape="rect" id="node12" title=" " alt="" coords="393,288,468,315"/>
-<area shape="rect" id="node15" href="$ieee__float_8h.html" title=" " alt="" coords="1977,288,2076,315"/>
-<area shape="rect" id="node16" title=" " alt="" coords="1632,288,1675,315"/>
-<area shape="rect" id="node20" title=" " alt="" coords="2451,288,2501,315"/>
-<area shape="rect" id="node24" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="2100,288,2225,315"/>
-<area shape="rect" id="node25" title=" " alt="" coords="2526,288,2613,315"/>
-<area shape="rect" id="node28" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="2875,370,2965,397"/>
-<area shape="rect" id="node32" href="$replace__symbol_8h.html" title=" " alt="" coords="3111,288,3273,315"/>
-<area shape="rect" id="node33" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="3349,288,3395,315"/>
-<area shape="rect" id="node35" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="3023,288,3086,315"/>
-<area shape="rect" id="node34" href="$ai__domain_8h.html" title="Abstract Interpretation Domain." alt="" coords="3399,370,3502,397"/>
-<area shape="rect" id="node37" href="$graph_8h.html" title="A Template Class for Graphs." alt="" coords="2752,206,2848,233"/>
-<area shape="rect" id="node39" href="$threeval_8h.html" title=" " alt="" coords="3527,370,3615,397"/>
-<area shape="rect" id="node40" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="2397,206,2531,233"/>
-<area shape="rect" id="node41" href="$reaching__definitions_8h.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="3352,206,3517,233"/>
-<area shape="rect" id="node38" title=" " alt="" coords="2739,288,2797,315"/>
-<area shape="rect" id="node43" href="$integer__interval_8h.html" title=" " alt="" coords="3643,206,3805,233"/>
-<area shape="rect" id="node44" href="$interval__template_8h.html" title=" " alt="" coords="3615,288,3790,315"/>
-<area shape="rect" id="node46" href="$union__find_8h.html" title=" " alt="" coords="2873,288,2999,315"/>
+<area shape="rect" id="node1" title="JANALYZER Command Line Option Processing." alt="" coords="2461,5,2672,61"/>
+<area shape="rect" id="node2" href="$janalyzer__parse__options_8h.html" title="JANALYZER Command Line Option Processing." alt="" coords="264,117,456,143"/>
+<area shape="rect" id="node6" title=" " alt="" coords="948,370,1025,397"/>
+<area shape="rect" id="node7" href="$language_8h.html" title="Abstract interface to support a programming language." alt="" coords="607,288,753,315"/>
+<area shape="rect" id="node11" href="$show__properties_8h.html" title="Show the properties." alt="" coords="398,199,554,240"/>
+<area shape="rect" id="node13" href="$java__bytecode__language_8h.html" title=" " alt="" coords="629,199,797,240"/>
+<area shape="rect" id="node14" href="$config_8h.html" title=" " alt="" coords="1253,206,1352,233"/>
+<area shape="rect" id="node17" href="$exit__codes_8h.html" title="Document and give macros for the exit codes of CPROVER binaries." alt="" coords="3562,117,3691,143"/>
+<area shape="rect" id="node18" href="$help__formatter_8h.html" title="Help Formatter." alt="" coords="1612,370,1767,397"/>
+<area shape="rect" id="node19" href="$options_8h.html" title="Options." alt="" coords="1921,206,2028,233"/>
+<area shape="rect" id="node21" href="$version_8h.html" title=" " alt="" coords="3716,117,3823,143"/>
+<area shape="rect" id="node22" href="$goto__check_8h.html" title="Checks for Errors in C and Java Programs." alt="" coords="3847,109,3998,151"/>
+<area shape="rect" id="node23" href="$remove__returns_8h.html" title="Replace function returns by assignments to global variables." alt="" coords="1529,199,1701,240"/>
+<area shape="rect" id="node26" href="$remove__skip_8h.html" title="Program Transformation." alt="" coords="1725,199,1897,240"/>
+<area shape="rect" id="node27" href="$remove__virtual__functions_8h.html" title="Functions for replacing virtual function call with a static function calls in functions,..." alt="" coords="2211,199,2383,240"/>
+<area shape="rect" id="node29" href="$set__properties_8h.html" title="Set the properties to check." alt="" coords="1327,288,1553,315"/>
+<area shape="rect" id="node30" href="$show__symbol__table_8h.html" title="Show the symbol table." alt="" coords="4022,109,4178,151"/>
+<area shape="rect" id="node31" href="$constant__propagator_8h.html" title="Constant propagation." alt="" coords="2805,206,3035,233"/>
+<area shape="rect" id="node36" href="$dependence__graph_8h.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="2919,109,3081,151"/>
+<area shape="rect" id="node42" href="$interval__domain_8h.html" title="Interval Domain." alt="" coords="3183,117,3385,143"/>
+<area shape="rect" id="node45" href="$local__may__alias_8h.html" title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis." alt="" coords="2630,199,2781,240"/>
+<area shape="rect" id="node47" href="$ansi__c__language_8h.html" title=" " alt="" coords="873,206,1058,233"/>
+<area shape="rect" id="node48" href="$static__show__domain_8h.html" title=" " alt="" coords="3432,363,3584,404"/>
+<area shape="rect" id="node49" href="$static__simplifier_8h.html" title=" " alt="" coords="3608,363,3760,404"/>
+<area shape="rect" id="node50" href="$static__verifier_8h.html" title=" " alt="" coords="3784,363,3936,404"/>
+<area shape="rect" id="node51" href="$taint__analysis_8h.html" title="Taint Analysis." alt="" coords="1083,199,1229,240"/>
+<area shape="rect" id="node52" href="$unreachable__instructions_8h.html" title="List all unreachable instructions." alt="" coords="2447,363,2643,404"/>
+<area shape="rect" id="node53" href="$lazy__goto__model_8h.html" title="Author: Diffblue Ltd." alt="" coords="4202,109,4350,151"/>
+<area shape="rect" id="node54" href="$remove__exceptions_8h.html" title="Remove function exceptional returns." alt="" coords="5,109,176,151"/>
+<area shape="rect" id="node55" href="$remove__instanceof_8h.html" title="Remove Instance&#45;of Operators." alt="" coords="4375,109,4545,151"/>
+<area shape="rect" id="node56" href="$mode_8h.html" title=" " alt="" coords="828,288,951,315"/>
+<area shape="rect" id="node57" href="$static__lifetime__init_8h.html" title=" " alt="" coords="4570,109,4734,151"/>
+<area shape="rect" id="node58" title=" " alt="" coords="4758,117,4823,143"/>
+<area shape="rect" id="node59" title=" " alt="" coords="4847,117,4921,143"/>
+<area shape="rect" id="node60" title=" " alt="" coords="4945,117,5025,143"/>
+<area shape="rect" id="node3" href="$parse__options_8h.html" title=" " alt="" coords="221,370,371,397"/>
+<area shape="rect" id="node5" href="$timestamper_8h.html" title="Emit timestamps." alt="" coords="415,288,532,315"/>
+<area shape="rect" id="node10" href="$show__goto__functions_8h.html" title="Show the goto functions." alt="" coords="166,199,322,240"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1039,452,1097,479"/>
+<area shape="rect" id="node8" href="$irep_8h.html" title=" " alt="" coords="863,370,921,397"/>
+<area shape="rect" id="node9" title=" " alt="" coords="2863,452,2927,479"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1025,288,1100,315"/>
+<area shape="rect" id="node15" href="$ieee__float_8h.html" title=" " alt="" coords="2387,288,2485,315"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1892,370,1935,397"/>
+<area shape="rect" id="node20" title=" " alt="" coords="2160,288,2211,315"/>
+<area shape="rect" id="node24" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1747,288,1872,315"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1998,288,2085,315"/>
+<area shape="rect" id="node28" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="2803,370,2893,397"/>
+<area shape="rect" id="node32" href="$replace__symbol_8h.html" title=" " alt="" coords="2932,288,3095,315"/>
+<area shape="rect" id="node33" href="$ai_8h.html" title="Abstract Interpretation." alt="" coords="3170,288,3217,315"/>
+<area shape="rect" id="node35" href="$dirty_8h.html" title="Variables whose address is taken." alt="" coords="2845,288,2907,315"/>
+<area shape="rect" id="node34" href="$ai__domain_8h.html" title="Abstract Interpretation Domain." alt="" coords="3142,370,3245,397"/>
+<area shape="rect" id="node37" href="$graph_8h.html" title="A Template Class for Graphs." alt="" coords="2408,206,2504,233"/>
+<area shape="rect" id="node39" href="$threeval_8h.html" title=" " alt="" coords="3269,370,3357,397"/>
+<area shape="rect" id="node40" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="2053,206,2187,233"/>
+<area shape="rect" id="node41" href="$reaching__definitions_8h.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="3109,206,3275,233"/>
+<area shape="rect" id="node38" title=" " alt="" coords="2561,288,2618,315"/>
+<area shape="rect" id="node43" href="$integer__interval_8h.html" title=" " alt="" coords="3451,206,3613,233"/>
+<area shape="rect" id="node44" href="$interval__template_8h.html" title=" " alt="" coords="3401,288,3575,315"/>
+<area shape="rect" id="node46" href="$union__find_8h.html" title=" " alt="" coords="2694,288,2821,315"/>
 </map>
