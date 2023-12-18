@@ -8,6 +8,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/magic.h>
 #include <util/namespace.h>
 #include <util/options.h>
 #include <util/symbol_table.h>

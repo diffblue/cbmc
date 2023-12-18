@@ -24,7 +24,7 @@
 #include <testing-utils/use_catch.h>
 
 exprt binary_expression(
-  dstringt const &exprId,
+  const irep_idt &exprId,
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
@@ -83,7 +83,7 @@ public:
   }
 
   void test_fn(
-    dstringt const &exprId,
+    const irep_idt &exprId,
     bool is_true,
     std::string const &test,
     std::string const &delimiter)

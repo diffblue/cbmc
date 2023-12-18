@@ -20,6 +20,9 @@ Author: Daniel Kroening
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
+#ifndef USE_DSTRING
+#  include <util/string_container.h>
+#endif
 #include <util/symbol.h>
 
 #include <ansi-c/expr2c.h>

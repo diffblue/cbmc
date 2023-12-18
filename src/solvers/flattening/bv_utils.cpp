@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_utils.h"
 
+#include <list>
 #include <utility>
 
 bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)

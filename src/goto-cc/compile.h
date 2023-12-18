@@ -18,6 +18,7 @@ Date: June 2006
 #include <util/std_types.h>
 #include <util/symbol.h>
 
+#include <list>
 #include <map>
 
 class cmdlinet;

@@ -15,6 +15,8 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/std_code_base.h>
 #include <util/std_expr.h>
 
+#include <list>
+
 /// Intermediate representation of a parsed Statement List file before
 /// converting it into a goto program. Contains all data structures that are
 /// necessary for describing Statement List functions and function blocks.

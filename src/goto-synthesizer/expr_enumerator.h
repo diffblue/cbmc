@@ -11,6 +11,7 @@ Author: Qinheping Hu
 
 #include <util/expr.h>
 
+#include <list>
 #include <map>
 #include <set>
 

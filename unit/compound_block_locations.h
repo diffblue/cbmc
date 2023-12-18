@@ -7,6 +7,7 @@
 
 #include <util/irep.h>
 
+#include <list>
 #include <string>
 
 class exprt;

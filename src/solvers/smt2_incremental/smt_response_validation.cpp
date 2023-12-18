@@ -139,14 +139,14 @@ valid_smt_error_response(const irept &parse_tree)
   // unexpected in the parse tree is now considered to be an invalid response.
   if(parse_tree.get_sub().size() == 1)
   {
-    return {response_or_errort<smt_responset>{
-      "Error response is missing the error message."}};
+    return {response_or_errort<smt_responset>{std::vector<std::string>{
+      {"Error response is missing the error message."}}}};
   }
   if(parse_tree.get_sub().size() > 2)
   {
-    return {response_or_errort<smt_responset>{
-      "Error response has multiple error messages - \"" +
-      print_parse_tree(parse_tree) + "\"."}};
+    return {response_or_errort<smt_responset>{std::vector<std::string>{
+      {"Error response has multiple error messages - \"" +
+       print_parse_tree(parse_tree) + "\"."}}}};
   }
   return validation_propagating<smt_error_responset, smt_responset>(
     validate_string_literal(parse_tree.get_sub()[1]));
@@ -250,10 +250,10 @@ static std::optional<response_or_errort<smt_termt>> try_select_validation(
     return {};
   if(parse_tree.get_sub().size() != 3)
   {
-    return response_or_errort<smt_termt>{
-      "\"select\" is expected to have 2 arguments, but " +
-      std::to_string(parse_tree.get_sub().size()) +
-      " arguments were found - \"" + print_parse_tree(parse_tree) + "\"."};
+    return response_or_errort<smt_termt>{std::vector<std::string>{
+      {"\"select\" is expected to have 2 arguments, but " +
+       std::to_string(parse_tree.get_sub().size()) +
+       " arguments were found - \"" + print_parse_tree(parse_tree) + "\"."}}};
   }
   const auto array = validate_term(parse_tree.get_sub()[1], identifier_table);
   const auto index = validate_term(parse_tree.get_sub()[2], identifier_table);
@@ -281,8 +281,8 @@ static response_or_errort<smt_termt> validate_term(
   {
     return *select_validation;
   }
-  return response_or_errort<smt_termt>{"Unrecognised SMT term - \"" +
-                                       print_parse_tree(parse_tree) + "\"."};
+  return response_or_errort<smt_termt>{std::vector<std::string>{
+    {"Unrecognised SMT term - \"" + print_parse_tree(parse_tree) + "\"."}}};
 }
 
 static response_or_errort<smt_get_value_responset::valuation_pairt>
@@ -305,10 +305,10 @@ validate_valuation_pair(
   if(valid_descriptor.get_sort() != valid_value.get_sort())
   {
     return resultt{
-      "Mismatched descriptor and value sorts in - " +
-      print_parse_tree(pair_parse_tree) + "\nDescriptor has sort " +
-      smt_to_smt2_string(valid_descriptor.get_sort()) + "\nValue has sort " +
-      smt_to_smt2_string(valid_value.get_sort())};
+      {"Mismatched descriptor and value sorts in - " +
+       print_parse_tree(pair_parse_tree) + "\nDescriptor has sort " +
+       smt_to_smt2_string(valid_descriptor.get_sort()) + "\nValue has sort " +
+       smt_to_smt2_string(valid_value.get_sort())}};
   }
   // see https://github.com/diffblue/cbmc/issues/7464 for why we explicitly name
   // the valuation_pairt type here:
@@ -378,6 +378,6 @@ response_or_errort<smt_responset> validate_smt_response(
   {
     return *get_value_response;
   }
-  return response_or_errort<smt_responset>{"Invalid SMT response \"" +
-                                           id2string(parse_tree.id()) + "\""};
+  return response_or_errort<smt_responset>{std::vector<std::string>{
+    {"Invalid SMT response \"" + id2string(parse_tree.id()) + "\""}}};
 }

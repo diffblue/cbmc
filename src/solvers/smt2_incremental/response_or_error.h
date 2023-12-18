@@ -20,11 +20,6 @@ public:
   {
   }
 
-  explicit response_or_errort(std::string message)
-    : smt_or_messages{std::vector<std::string>{std::move(message)}}
-  {
-  }
-
   explicit response_or_errort(std::vector<std::string> messages)
     : smt_or_messages{std::move(messages)}
   {

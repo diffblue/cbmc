@@ -6,14 +6,15 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/magic.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
 
 #include <analyses/dirty.h>
 #include <goto-symex/goto_symex_state.h>
-#include <util/arith_tools.h>
-#include <util/c_types.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
+#include <testing-utils/use_catch.h>
 
 static void add_to_symbol_table(
   symbol_tablet &symbol_table,

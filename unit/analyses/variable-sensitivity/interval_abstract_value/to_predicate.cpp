@@ -35,7 +35,7 @@ SCENARIO(
   const exprt val1 = from_integer(1, type);
   const exprt val2 = from_integer(2, type);
 
-  const exprt x_name = symbol_exprt(dstringt("x"), type);
+  const exprt x_name = symbol_exprt("x", type);
 
   auto config = vsd_configt::constant_domain();
   config.context_tracking.data_dependency_context = false;

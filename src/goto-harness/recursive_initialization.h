@@ -9,14 +9,15 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H
 #define CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H
 
-#include <map>
-#include <set>
-#include <unordered_set>
-
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
+
+#include <list>
+#include <map>
+#include <set>
+#include <unordered_set>
 
 class code_blockt;
 class goto_modelt;

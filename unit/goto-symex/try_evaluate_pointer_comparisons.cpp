@@ -6,11 +6,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
+#include <util/c_types.h>
+#include <util/magic.h>
 
 #include <goto-symex/goto_symex.h>
-
-#include <util/c_types.h>
+#include <testing-utils/use_catch.h>
 
 static void add_to_symbol_table(
   symbol_tablet &symbol_table,

@@ -590,7 +590,7 @@ std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
 
 void THEN_PREDICATE(const abstract_object_pointert &obj, const std::string &out)
 {
-  const auto x_name = symbol_exprt(dstringt("x"), obj->type());
+  const auto x_name = symbol_exprt("x", obj->type());
   auto pred = obj->to_predicate(x_name);
   THEN("predicate is " + out)
   {
