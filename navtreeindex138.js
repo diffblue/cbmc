@@ -1,6 +1,5 @@
 var NAVTREEINDEX138 =
 {
-"structtdefl__sym__freq.html#ab3e92f7d87da65857f18f8b8fb0a6ecb":[8,0,1262,0],
 "structtemplate__parameter__symbol__typet.html":[8,0,1265],
 "structtemplate__parameter__symbol__typet.html#a1c8faef0cf9bb8a040a3f2b716c7d4e5":[8,0,1265,0],
 "structtemplate__parameter__symbol__typet.html#aa2a19e831e9760c6b72a0943df36bb5e":[8,0,1265,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX138 =
 "symex__dead_8cpp.html":[9,0,2,17,62],
 "symex__dead_8cpp.html#a6f137469bd054654d606305836732f85":[9,0,2,17,62,0],
 "symex__dead_8cpp_source.html":[9,0,2,17,62],
-"symex__decl_8cpp.html":[9,0,2,17,63]
+"symex__decl_8cpp.html":[9,0,2,17,63],
+"symex__decl_8cpp_source.html":[9,0,2,17,63]
 };
