@@ -12,7 +12,7 @@ jobs:
   check-ubuntu-20_04-make-gcc:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -95,7 +95,7 @@ jobs:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -167,7 +167,7 @@ jobs:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -205,7 +205,7 @@ jobs:
   check-ubuntu-20_04-cmake-gcc:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -274,7 +274,7 @@ jobs:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -341,7 +341,7 @@ jobs:
   check-ubuntu-22_04-cmake-gcc:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -394,7 +394,7 @@ jobs:
   check-ubuntu-22_04-cmake-gcc-13:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -446,7 +446,7 @@ jobs:
   check-ubuntu-22_04-cmake-gcc-32bit:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -492,7 +492,7 @@ jobs:
   check-ubuntu-20_04-cmake-gcc-KNOWNBUG:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -538,7 +538,7 @@ jobs:
   check-ubuntu-20_04-cmake-gcc-THOROUGH:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -576,7 +576,7 @@ jobs:
   check-macos-11-make-clang:
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -627,7 +627,7 @@ jobs:
   check-macos-12-cmake-clang:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -672,7 +672,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Setup Visual Studio environment
@@ -727,7 +727,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Setup MSBuild
@@ -795,7 +795,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Setup Visual Studio environment
@@ -844,7 +844,7 @@ jobs:
   check-string-table:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check for unused irep ids
         run: ./scripts/string_table_check.sh
 
@@ -852,7 +852,7 @@ jobs:
   check-docker-image:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Download test dependencies
@@ -876,7 +876,7 @@ jobs:
   include-what-you-use:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -902,7 +902,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Remove unnecessary software to free up disk space

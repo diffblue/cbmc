@@ -11,7 +11,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -81,7 +81,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -168,7 +168,7 @@ jobs:
   #         HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
   #     - name: Checkout CBMC project source code to obtain access to scripts
   #       if: always()
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
   #     - name: Slack notification of CI status
   #       if: success() || failure()
   #       env:
@@ -184,7 +184,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Setup Visual Studio environment
@@ -277,7 +277,7 @@ jobs:
   #   runs-on: ubuntu-20.04
   #   steps:
   #     - name: Checkout CBMC source
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
   #       with:
   #         submodules: recursive
   #     - name: Set Image Tag

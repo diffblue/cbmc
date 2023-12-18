@@ -8,7 +8,7 @@ jobs:
   check-clang-format:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
@@ -30,7 +30,7 @@ jobs:
   check-cpplint:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout CBMC repository 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install latest stable Rust toolchain
         run: |
           rustup toolchain install stable --profile minimal --no-self-update -c clippy -c rustfmt

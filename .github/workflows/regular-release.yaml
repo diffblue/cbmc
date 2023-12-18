@@ -28,7 +28,7 @@ jobs:
     needs: get-version-information
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Create release
         uses: actions/create-release@v1
         env:
