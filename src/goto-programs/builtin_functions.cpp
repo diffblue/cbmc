@@ -1221,9 +1221,13 @@ void goto_convertt::do_function_call_symbol(
     dest.add(goto_programt::make_assertion(false_exprt(), annotated_location));
     // we ignore any LHS
   }
-  else if(identifier=="__assert_func")
+  else if(
+    identifier == "__assert_func" || identifier == "__assert2" ||
+    identifier == "__assert13")
   {
     // __assert_func is newlib (used by, e.g., cygwin)
+    // __assert2 is OpenBSD
+    // __assert13 is NetBSD
     // These take four arguments:
     // "file.c", line, __func__, "expression"
     if(arguments.size()!=4)
