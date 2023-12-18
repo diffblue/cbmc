@@ -143,14 +143,15 @@ $(document).ready(function(){initNavTree('allocainc_8h_source.html',''); initRes
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor"># define alloca(X) __builtin_alloca(X)</span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#elif defined __FreeBSD__ || defined __FreeBSD_kernel__ || defined __OpenBSD__</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor"># include &lt;stdlib.h&gt;</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#elif defined __FreeBSD__ || defined __FreeBSD_kernel__ ||                     \</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">  defined __OpenBSD__ || defined __NetBSD__</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#  include &lt;stdlib.h&gt;</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_BIG_INT_ALLOCAINC_H</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_BIG_INT_ALLOCAINC_H</span></div>
 <div class="ttc" id="astdlib_8c_html_a70cbb86944e9c1828b6b43af21679032"><div class="ttname"><a href="stdlib_8c.html#a70cbb86944e9c1828b6b43af21679032">alloca</a></div><div class="ttdeci">void * alloca(__CPROVER_size_t alloca_size)</div><div class="ttdef"><b>Definition:</b> <a href="stdlib_8c_source.html#l00297">stdlib.c:297</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

@@ -1309,286 +1309,290 @@ $(document).ready(function(){initNavTree('builtin__functions_8cpp_source.html','
 <div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>(), annotated_location));</div>
 <div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;    <span class="comment">// we ignore any LHS</span></div>
 <div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;  }</div>
-<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__assert_func&quot;</span>)</div>
-<div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;  {</div>
-<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;    <span class="comment">// __assert_func is newlib (used by, e.g., cygwin)</span></div>
-<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;    <span class="comment">// These take four arguments:</span></div>
-<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;    <span class="comment">// &quot;file.c&quot;, line, __func__, &quot;expression&quot;</span></div>
-<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=4)</div>
-<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;    {</div>
-<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
-<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have four arguments&quot;</span></div>
-<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;    }</div>
-<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160; </div>
-<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> description;</div>
-<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;    {</div>
-<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;      description=<span class="stringliteral">&quot;assertion &quot;</span>+<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">get_string_constant</a>(arguments[3]));</div>
-<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;    }</div>
-<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;    <span class="keywordflow">catch</span>(<span class="keywordtype">int</span>)</div>
+<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;    identifier == <span class="stringliteral">&quot;__assert_func&quot;</span> || identifier == <span class="stringliteral">&quot;__assert2&quot;</span> ||</div>
+<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;    identifier == <span class="stringliteral">&quot;__assert13&quot;</span>)</div>
+<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;  {</div>
+<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;    <span class="comment">// __assert_func is newlib (used by, e.g., cygwin)</span></div>
+<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;    <span class="comment">// __assert2 is OpenBSD</span></div>
+<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;    <span class="comment">// __assert13 is NetBSD</span></div>
+<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;    <span class="comment">// These take four arguments:</span></div>
+<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;    <span class="comment">// &quot;file.c&quot;, line, __func__, &quot;expression&quot;</span></div>
+<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=4)</div>
+<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;    {</div>
+<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
+<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have four arguments&quot;</span></div>
+<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;    }</div>
+<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160; </div>
+<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;    <a class="code" href="classdstringt.html">irep_idt</a> description;</div>
+<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;    <span class="keywordflow">try</span></div>
 <div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;    {</div>
-<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;      <span class="comment">// we might be building newlib, where __assert_func is passed</span></div>
-<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;      <span class="comment">// a pointer-typed symbol; the warning will still have been</span></div>
-<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;      <span class="comment">// printed</span></div>
-<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;      description=<span class="stringliteral">&quot;assertion&quot;</span>;</div>
-<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;    }</div>
-<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160; </div>
-<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;    <a class="code" href="classsource__locationt.html">source_locationt</a> annotated_location = <span class="keyword">function</span>.source_location();</div>
-<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;    annotated_location.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(<span class="stringliteral">&quot;user-provided&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;    annotated_location.<a class="code" href="classsource__locationt.html#a5f616b9345f345e4792ae6de077e33cd">set_property_class</a>(ID_assertion);</div>
-<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;    annotated_location.<a class="code" href="classsource__locationt.html#a1a5acc8bc6f3d2e68cf03fb5f0e494c6">set_comment</a>(description);</div>
-<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>(), annotated_location));</div>
-<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;    <span class="comment">// we ignore any LHS</span></div>
-<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;  }</div>
-<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;fence&quot;</span>)</div>
-<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;  {</div>
-<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;    <span class="keywordflow">if</span>(arguments.empty())</div>
-<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;    {</div>
-<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
-<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have at least one argument&quot;</span></div>
-<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;    }</div>
-<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160; </div>
-<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;    <a class="code" href="classcodet.html">codet</a> fence(ID_fence);</div>
-<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160; </div>
-<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;argument : arguments)</div>
-<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;      fence.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(<a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">get_string_constant</a>(argument), <span class="keyword">true</span>);</div>
-<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160; </div>
-<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a9de378241c7afc32a97e113b8337b376">goto_programt::make_other</a>(fence, <span class="keyword">function</span>.source_location()));</div>
-<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;  }</div>
-<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__builtin_prefetch&quot;</span>)</div>
-<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;  {</div>
-<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;    <span class="comment">// does nothing</span></div>
+<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;      description=<span class="stringliteral">&quot;assertion &quot;</span>+<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">get_string_constant</a>(arguments[3]));</div>
+<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;    }</div>
+<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;    <span class="keywordflow">catch</span>(<span class="keywordtype">int</span>)</div>
+<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;    {</div>
+<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;      <span class="comment">// we might be building newlib, where __assert_func is passed</span></div>
+<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;      <span class="comment">// a pointer-typed symbol; the warning will still have been</span></div>
+<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;      <span class="comment">// printed</span></div>
+<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;      description=<span class="stringliteral">&quot;assertion&quot;</span>;</div>
+<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;    }</div>
+<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160; </div>
+<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;    <a class="code" href="classsource__locationt.html">source_locationt</a> annotated_location = <span class="keyword">function</span>.source_location();</div>
+<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;    annotated_location.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(<span class="stringliteral">&quot;user-provided&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;    annotated_location.<a class="code" href="classsource__locationt.html#a5f616b9345f345e4792ae6de077e33cd">set_property_class</a>(ID_assertion);</div>
+<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;    annotated_location.<a class="code" href="classsource__locationt.html#a1a5acc8bc6f3d2e68cf03fb5f0e494c6">set_comment</a>(description);</div>
+<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(<a class="code" href="classfalse__exprt.html">false_exprt</a>(), annotated_location));</div>
+<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;    <span class="comment">// we ignore any LHS</span></div>
+<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;  }</div>
+<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;fence&quot;</span>)</div>
+<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;  {</div>
+<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;    <span class="keywordflow">if</span>(arguments.empty())</div>
+<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;    {</div>
+<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
+<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have at least one argument&quot;</span></div>
+<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;    }</div>
+<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160; </div>
+<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;    <a class="code" href="classcodet.html">codet</a> fence(ID_fence);</div>
+<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160; </div>
+<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;argument : arguments)</div>
+<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;      fence.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(<a class="code" href="classgoto__convertt.html#a20327f38bb9df4112418dbd3b0e8da76">get_string_constant</a>(argument), <span class="keyword">true</span>);</div>
+<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160; </div>
+<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a9de378241c7afc32a97e113b8337b376">goto_programt::make_other</a>(fence, <span class="keyword">function</span>.source_location()));</div>
 <div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;  }</div>
-<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__builtin_unreachable&quot;</span>)</div>
+<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__builtin_prefetch&quot;</span>)</div>
 <div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;  {</div>
-<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;    <span class="comment">// says something like UNREACHABLE;</span></div>
+<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;    <span class="comment">// does nothing</span></div>
 <div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;  }</div>
-<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==ID_gcc_builtin_va_arg)</div>
+<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__builtin_unreachable&quot;</span>)</div>
 <div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;  {</div>
-<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;    <span class="comment">// This does two things.</span></div>
-<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;    <span class="comment">// 1) Return value of argument.</span></div>
-<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;    <span class="comment">//    This is just dereferencing.</span></div>
-<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;    <span class="comment">// 2) Move list pointer to next argument.</span></div>
-<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;    <span class="comment">//    This is just an increment.</span></div>
-<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160; </div>
-<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=1)</div>
-<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;    {</div>
-<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
-<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have one argument&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;    }</div>
-<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160; </div>
-<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;    <a class="code" href="classexprt.html">exprt</a> list_arg=<a class="code" href="builtin__functions_8cpp.html#a2022aff829048eabd91dfc835d8907a3">make_va_list</a>(arguments[0]);</div>
-<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160; </div>
-<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;    <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>())</div>
-<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;    {</div>
-<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;      <a class="code" href="classexprt.html">exprt</a> list_arg_cast = list_arg;</div>
-<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;      <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;        list_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer &amp;&amp;</div>
-<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;        <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(list_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">base_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty)</div>
-<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;      {</div>
-<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;        list_arg_cast =</div>
-<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;          <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{list_arg, <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="classempty__typet.html">empty_typet</a>{}))};</div>
-<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;      }</div>
-<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160; </div>
-<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;      <a class="code" href="classtypet.html">typet</a> t=<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;      <a class="code" href="classdereference__exprt.html">dereference_exprt</a> rhs{</div>
-<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;        <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{<a class="code" href="classdereference__exprt.html">dereference_exprt</a>{std::move(list_arg_cast)}, t}};</div>
-<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;      rhs.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=<span class="keyword">function</span>.source_location();</div>
-<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;      dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(</div>
-<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;        <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(lhs, rhs, <span class="keyword">function</span>.source_location()));</div>
-<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;    }</div>
-<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160; </div>
-<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;    <a class="code" href="classcode__assignt.html">code_assignt</a> assign{</div>
-<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;      list_arg, <a class="code" href="classplus__exprt.html">plus_exprt</a>{list_arg, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(1, <a class="code" href="c__types_8cpp.html#a8c181bb981a94aa3dbae1fd975a3e418">pointer_diff_type</a>())}};</div>
-<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;    assign.rhs().<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(</div>
-<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;      ID_C_va_arg_type, <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(<span class="keyword">function</span>.type()).return_type());</div>
-<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
-<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;      std::move(assign), <span class="keyword">function</span>.source_location()));</div>
-<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;  }</div>
-<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__builtin_va_copy&quot;</span>)</div>
-<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;  {</div>
-<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=2)</div>
-<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;    {</div>
-<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
-<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have two arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;    }</div>
-<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160; </div>
-<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;    <a class="code" href="classexprt.html">exprt</a> dest_expr=<a class="code" href="builtin__functions_8cpp.html#a2022aff829048eabd91dfc835d8907a3">make_va_list</a>(arguments[0]);</div>
-<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypecast__exprt.html">typecast_exprt</a> src_expr(arguments[1], dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
-<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160; </div>
-<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="expr__util_8cpp.html#a9097a97c0262699752775011d66beff6">is_assignable</a>(dest_expr))</div>
-<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;    {</div>
-<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=dest_expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>();</div>
-<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;va_copy argument expected to be lvalue&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;    }</div>
-<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160; </div>
-<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
-<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;      dest_expr, src_expr, <span class="keyword">function</span>.source_location()));</div>
-<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;  }</div>
-<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier == <span class="stringliteral">&quot;__builtin_va_start&quot;</span> || identifier == <span class="stringliteral">&quot;__va_start&quot;</span>)</div>
-<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;  {</div>
-<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;    <span class="comment">// Set the list argument to be the address of the</span></div>
-<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;    <span class="comment">// parameter argument.</span></div>
-<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=2)</div>
-<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;    {</div>
-<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
-<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have two arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;    }</div>
-<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160; </div>
-<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;    <a class="code" href="classexprt.html">exprt</a> dest_expr=<a class="code" href="builtin__functions_8cpp.html#a2022aff829048eabd91dfc835d8907a3">make_va_list</a>(arguments[0]);</div>
-<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160; </div>
-<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="expr__util_8cpp.html#a9097a97c0262699752775011d66beff6">is_assignable</a>(dest_expr))</div>
-<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160;    {</div>
-<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=dest_expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>();</div>
-<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;va_start argument expected to be lvalue&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;    }</div>
-<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160; </div>
-<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;      dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer &amp;&amp;</div>
-<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;      <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">base_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty)</div>
-<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;    {</div>
-<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;      dest_expr =</div>
-<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;        <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{dest_expr, <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="classempty__typet.html">empty_typet</a>{}))};</div>
-<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;    }</div>
-<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160; </div>
-<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;    <a class="code" href="classside__effect__exprt.html">side_effect_exprt</a> rhs{</div>
-<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;      ID_va_start, dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), <span class="keyword">function</span>.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>()};</div>
-<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;    rhs.add_to_operands(</div>
-<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;      <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{<a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>{arguments[1]}, dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()});</div>
-<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160; </div>
-<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
-<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;      std::move(dest_expr), std::move(rhs), <span class="keyword">function</span>.source_location()));</div>
-<div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;  }</div>
-<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__builtin_va_end&quot;</span>)</div>
-<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;  {</div>
-<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;    <span class="comment">// Invalidates the argument. We do so by setting it to NULL.</span></div>
-<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=1)</div>
-<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;    {</div>
-<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
-<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have one argument&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;    }</div>
-<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160; </div>
-<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;    <a class="code" href="classexprt.html">exprt</a> dest_expr=<a class="code" href="builtin__functions_8cpp.html#a2022aff829048eabd91dfc835d8907a3">make_va_list</a>(arguments[0]);</div>
-<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160; </div>
-<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="expr__util_8cpp.html#a9097a97c0262699752775011d66beff6">is_assignable</a>(dest_expr))</div>
-<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;    {</div>
-<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=dest_expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>();</div>
-<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;va_end argument expected to be lvalue&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;    }</div>
-<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160; </div>
-<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;    <span class="comment">// our __builtin_va_list is a pointer</span></div>
-<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;    <span class="keywordflow">if</span>(dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer)</div>
-<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;    {</div>
-<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> zero =</div>
-<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;        <a class="code" href="expr__initializer_8cpp.html#a9c5a4817b13eabc6e77994168801d2a6">zero_initializer</a>(dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), <span class="keyword">function</span>.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>(), <a class="code" href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">ns</a>);</div>
-<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(zero.has_value());</div>
-<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;      dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
-<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;        dest_expr, *zero, <span class="keyword">function</span>.source_location()));</div>
-<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;    }</div>
-<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;  }</div>
-<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_isgreater&quot;</span> ||</div>
-<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_isgreaterequal&quot;</span> ||</div>
-<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_isless&quot;</span> || identifier == <span class="stringliteral">&quot;__builtin_islessequal&quot;</span> ||</div>
-<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_islessgreater&quot;</span> ||</div>
-<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_isunordered&quot;</span>)</div>
-<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;  {</div>
-<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;    <span class="comment">// these support two double or two float arguments; we call the</span></div>
-<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;    <span class="comment">// appropriate internal version</span></div>
-<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=2 ||</div>
-<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;       (arguments[0].type()!=<a class="code" href="c__types_8cpp.html#ac819b7bc6104e71d66797d4eed870fb9">double_type</a>() &amp;&amp;</div>
-<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;        arguments[0].type()!=<a class="code" href="c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46">float_type</a>()) ||</div>
-<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;       (arguments[1].type()!=<a class="code" href="c__types_8cpp.html#ac819b7bc6104e71d66797d4eed870fb9">double_type</a>() &amp;&amp;</div>
-<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;        arguments[1].type()!=<a class="code" href="c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46">float_type</a>()))</div>
-<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;    {</div>
-<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
-<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier</div>
-<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;              &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have two float/double arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
-<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
-<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;    }</div>
-<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160; </div>
-<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> new_arguments=arguments;</div>
-<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160; </div>
-<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;    <span class="keywordtype">bool</span> use_double=arguments[0].type()==<a class="code" href="c__types_8cpp.html#ac819b7bc6104e71d66797d4eed870fb9">double_type</a>();</div>
-<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;    <span class="keywordflow">if</span>(arguments[0].type()!=arguments[1].type())</div>
-<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;    {</div>
-<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;      <span class="keywordflow">if</span>(use_double)</div>
-<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;      {</div>
-<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;        new_arguments[1] =</div>
-<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160;          <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>(new_arguments[1], arguments[0].type());</div>
-<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;      }</div>
-<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160;      {</div>
-<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160;        new_arguments[0] =</div>
-<div class="line"><a name="l01446"></a><span class="lineno"> 1446</span>&#160;          <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>(new_arguments[0], arguments[1].type());</div>
-<div class="line"><a name="l01447"></a><span class="lineno"> 1447</span>&#160;        use_double=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l01448"></a><span class="lineno"> 1448</span>&#160;      }</div>
-<div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160;    }</div>
-<div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160; </div>
-<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;    <a class="code" href="classcode__typet.html">code_typet</a> f_type=<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(<span class="keyword">function</span>.type());</div>
-<div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160;    f_type.<a class="code" href="classcode__typet.html#ad25976e783c95670030bd73e3211c170">remove_ellipsis</a>();</div>
-<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;a_t=new_arguments[0].type();</div>
-<div class="line"><a name="l01454"></a><span class="lineno"> 1454</span>&#160;    f_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>()=</div>
-<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160;      <a class="code" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a>(2, <a class="code" href="classcode__typet_1_1parametert.html">code_typet::parametert</a>(a_t));</div>
-<div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160; </div>
-<div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160;    <span class="comment">// replace __builtin_ by CPROVER_PREFIX</span></div>
-<div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160;    std::string name=<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a>+<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(identifier).substr(10);</div>
-<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;    <span class="comment">// append d or f for double/float</span></div>
-<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;    name+=use_double?<span class="charliteral">&#39;d&#39;</span>:<span class="charliteral">&#39;f&#39;</span>;</div>
-<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160; </div>
-<div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;      <a class="code" href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">ns</a>.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(name).type == f_type,</div>
-<div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;      <span class="stringliteral">&quot;builtin declaration should match constructed type&quot;</span>);</div>
+<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;    <span class="comment">// says something like UNREACHABLE;</span></div>
+<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;  }</div>
+<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==ID_gcc_builtin_va_arg)</div>
+<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;  {</div>
+<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;    <span class="comment">// This does two things.</span></div>
+<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;    <span class="comment">// 1) Return value of argument.</span></div>
+<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;    <span class="comment">//    This is just dereferencing.</span></div>
+<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;    <span class="comment">// 2) Move list pointer to next argument.</span></div>
+<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;    <span class="comment">//    This is just an increment.</span></div>
+<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160; </div>
+<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=1)</div>
+<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;    {</div>
+<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
+<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have one argument&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;    }</div>
+<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160; </div>
+<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;    <a class="code" href="classexprt.html">exprt</a> list_arg=<a class="code" href="builtin__functions_8cpp.html#a2022aff829048eabd91dfc835d8907a3">make_va_list</a>(arguments[0]);</div>
+<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160; </div>
+<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;    <span class="keywordflow">if</span>(lhs.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>())</div>
+<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;    {</div>
+<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;      <a class="code" href="classexprt.html">exprt</a> list_arg_cast = list_arg;</div>
+<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;      <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;        list_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer &amp;&amp;</div>
+<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;        <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(list_arg.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">base_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty)</div>
+<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;      {</div>
+<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;        list_arg_cast =</div>
+<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;          <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{list_arg, <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="classempty__typet.html">empty_typet</a>{}))};</div>
+<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;      }</div>
+<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160; </div>
+<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;      <a class="code" href="classtypet.html">typet</a> t=<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(lhs.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;      <a class="code" href="classdereference__exprt.html">dereference_exprt</a> rhs{</div>
+<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;        <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{<a class="code" href="classdereference__exprt.html">dereference_exprt</a>{std::move(list_arg_cast)}, t}};</div>
+<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;      rhs.<a class="code" href="classtypet.html#aed4c5b73812f8da4e8374f6345cf4c2b">add_source_location</a>()=<span class="keyword">function</span>.source_location();</div>
+<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;      dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(</div>
+<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;        <a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(lhs, rhs, <span class="keyword">function</span>.source_location()));</div>
+<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;    }</div>
+<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160; </div>
+<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;    <a class="code" href="classcode__assignt.html">code_assignt</a> assign{</div>
+<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;      list_arg, <a class="code" href="classplus__exprt.html">plus_exprt</a>{list_arg, <a class="code" href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a>(1, <a class="code" href="c__types_8cpp.html#a8c181bb981a94aa3dbae1fd975a3e418">pointer_diff_type</a>())}};</div>
+<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;    assign.rhs().<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(</div>
+<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;      ID_C_va_arg_type, <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(<span class="keyword">function</span>.type()).return_type());</div>
+<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
+<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;      std::move(assign), <span class="keyword">function</span>.source_location()));</div>
+<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;  }</div>
+<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__builtin_va_copy&quot;</span>)</div>
+<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;  {</div>
+<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=2)</div>
+<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;    {</div>
+<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
+<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have two arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;    }</div>
+<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160; </div>
+<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;    <a class="code" href="classexprt.html">exprt</a> dest_expr=<a class="code" href="builtin__functions_8cpp.html#a2022aff829048eabd91dfc835d8907a3">make_va_list</a>(arguments[0]);</div>
+<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypecast__exprt.html">typecast_exprt</a> src_expr(arguments[1], dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>());</div>
+<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160; </div>
+<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="expr__util_8cpp.html#a9097a97c0262699752775011d66beff6">is_assignable</a>(dest_expr))</div>
+<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;    {</div>
+<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=dest_expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>();</div>
+<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;va_copy argument expected to be lvalue&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;    }</div>
+<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160; </div>
+<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
+<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;      dest_expr, src_expr, <span class="keyword">function</span>.source_location()));</div>
+<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;  }</div>
+<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier == <span class="stringliteral">&quot;__builtin_va_start&quot;</span> || identifier == <span class="stringliteral">&quot;__va_start&quot;</span>)</div>
+<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;  {</div>
+<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;    <span class="comment">// Set the list argument to be the address of the</span></div>
+<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;    <span class="comment">// parameter argument.</span></div>
+<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=2)</div>
+<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;    {</div>
+<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
+<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have two arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;    }</div>
+<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160; </div>
+<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;    <a class="code" href="classexprt.html">exprt</a> dest_expr=<a class="code" href="builtin__functions_8cpp.html#a2022aff829048eabd91dfc835d8907a3">make_va_list</a>(arguments[0]);</div>
+<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160; </div>
+<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="expr__util_8cpp.html#a9097a97c0262699752775011d66beff6">is_assignable</a>(dest_expr))</div>
+<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;    {</div>
+<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=dest_expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>();</div>
+<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;va_start argument expected to be lvalue&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;    }</div>
+<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160; </div>
+<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;      dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer &amp;&amp;</div>
+<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;      <a class="code" href="pointer__expr_8h.html#a803796648f3f21fa7835f4509b7ea0a2">to_pointer_type</a>(dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()).<a class="code" href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">base_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty)</div>
+<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160;    {</div>
+<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;      dest_expr =</div>
+<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;        <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{dest_expr, <a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code" href="classempty__typet.html">empty_typet</a>{}))};</div>
+<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;    }</div>
+<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160; </div>
+<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;    <a class="code" href="classside__effect__exprt.html">side_effect_exprt</a> rhs{</div>
+<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;      ID_va_start, dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), <span class="keyword">function</span>.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>()};</div>
+<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;    rhs.add_to_operands(</div>
+<div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;      <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>{<a class="code" href="classaddress__of__exprt.html">address_of_exprt</a>{arguments[1]}, dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()});</div>
+<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160; </div>
+<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;    dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
+<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;      std::move(dest_expr), std::move(rhs), <span class="keyword">function</span>.source_location()));</div>
+<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;  }</div>
+<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier==<span class="stringliteral">&quot;__builtin_va_end&quot;</span>)</div>
+<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;  {</div>
+<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;    <span class="comment">// Invalidates the argument. We do so by setting it to NULL.</span></div>
+<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=1)</div>
+<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;    {</div>
+<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
+<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have one argument&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;    }</div>
+<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160; </div>
+<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;    <a class="code" href="classexprt.html">exprt</a> dest_expr=<a class="code" href="builtin__functions_8cpp.html#a2022aff829048eabd91dfc835d8907a3">make_va_list</a>(arguments[0]);</div>
+<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160; </div>
+<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="expr__util_8cpp.html#a9097a97c0262699752775011d66beff6">is_assignable</a>(dest_expr))</div>
+<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;    {</div>
+<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=dest_expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>();</div>
+<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;va_end argument expected to be lvalue&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;    }</div>
+<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160; </div>
+<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;    <span class="comment">// our __builtin_va_list is a pointer</span></div>
+<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;    <span class="keywordflow">if</span>(dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_pointer)</div>
+<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;    {</div>
+<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> zero =</div>
+<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;        <a class="code" href="expr__initializer_8cpp.html#a9c5a4817b13eabc6e77994168801d2a6">zero_initializer</a>(dest_expr.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>(), <span class="keyword">function</span>.<a class="code" href="classtypet.html#a1096f778c7c3461521c759187a4ab6b0">source_location</a>(), <a class="code" href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">ns</a>);</div>
+<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;      <a class="code" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(zero.has_value());</div>
+<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;      dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a726515a927b1fb7c550044370b5825d1">goto_programt::make_assignment</a>(</div>
+<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;        dest_expr, *zero, <span class="keyword">function</span>.source_location()));</div>
+<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;    }</div>
+<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;  }</div>
+<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_isgreater&quot;</span> ||</div>
+<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_isgreaterequal&quot;</span> ||</div>
+<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_isless&quot;</span> || identifier == <span class="stringliteral">&quot;__builtin_islessequal&quot;</span> ||</div>
+<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_islessgreater&quot;</span> ||</div>
+<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;    identifier == <span class="stringliteral">&quot;__builtin_isunordered&quot;</span>)</div>
+<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;  {</div>
+<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;    <span class="comment">// these support two double or two float arguments; we call the</span></div>
+<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;    <span class="comment">// appropriate internal version</span></div>
+<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;    <span class="keywordflow">if</span>(arguments.size()!=2 ||</div>
+<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;       (arguments[0].type()!=<a class="code" href="c__types_8cpp.html#ac819b7bc6104e71d66797d4eed870fb9">double_type</a>() &amp;&amp;</div>
+<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;        arguments[0].type()!=<a class="code" href="c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46">float_type</a>()) ||</div>
+<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;       (arguments[1].type()!=<a class="code" href="c__types_8cpp.html#ac819b7bc6104e71d66797d4eed870fb9">double_type</a>() &amp;&amp;</div>
+<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;        arguments[1].type()!=<a class="code" href="c__types_8cpp.html#a089edcb2f3bb86d72d53a3bf5d79ef46">float_type</a>()))</div>
+<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160;    {</div>
+<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>().<a class="code" href="classmessaget_1_1mstreamt.html#ae35463c8d5f00a49e034580d11845daa">source_location</a>=<span class="keyword">function</span>.find_source_location();</div>
+<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160;      <a class="code" href="classmessaget.html#a108043e0a9925dcebbb8a793611428b6">error</a>() &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; identifier</div>
+<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;              &lt;&lt; <span class="stringliteral">&quot;&#39; expected to have two float/double arguments&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">eom</a>;</div>
+<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;      <span class="keywordflow">throw</span> 0;</div>
+<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;    }</div>
+<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160; </div>
+<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;    <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> new_arguments=arguments;</div>
+<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160; </div>
+<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;    <span class="keywordtype">bool</span> use_double=arguments[0].type()==<a class="code" href="c__types_8cpp.html#ac819b7bc6104e71d66797d4eed870fb9">double_type</a>();</div>
+<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;    <span class="keywordflow">if</span>(arguments[0].type()!=arguments[1].type())</div>
+<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160;    {</div>
+<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;      <span class="keywordflow">if</span>(use_double)</div>
+<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160;      {</div>
+<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160;        new_arguments[1] =</div>
+<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160;          <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>(new_arguments[1], arguments[0].type());</div>
+<div class="line"><a name="l01446"></a><span class="lineno"> 1446</span>&#160;      }</div>
+<div class="line"><a name="l01447"></a><span class="lineno"> 1447</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01448"></a><span class="lineno"> 1448</span>&#160;      {</div>
+<div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160;        new_arguments[0] =</div>
+<div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160;          <a class="code" href="classtypecast__exprt.html">typecast_exprt</a>(new_arguments[0], arguments[1].type());</div>
+<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;        use_double=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160;      }</div>
+<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160;    }</div>
+<div class="line"><a name="l01454"></a><span class="lineno"> 1454</span>&#160; </div>
+<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160;    <a class="code" href="classcode__typet.html">code_typet</a> f_type=<a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(<span class="keyword">function</span>.type());</div>
+<div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160;    f_type.<a class="code" href="classcode__typet.html#ad25976e783c95670030bd73e3211c170">remove_ellipsis</a>();</div>
+<div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160;    <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;a_t=new_arguments[0].type();</div>
+<div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160;    f_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>()=</div>
+<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;      <a class="code" href="classcode__typet.html#a1dbdc4c360c98cf99fc147d904ca223d">code_typet::parameterst</a>(2, <a class="code" href="classcode__typet_1_1parametert.html">code_typet::parametert</a>(a_t));</div>
+<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160; </div>
+<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;    <span class="comment">// replace __builtin_ by CPROVER_PREFIX</span></div>
+<div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;    std::string name=<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a>+<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(identifier).substr(10);</div>
+<div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;    <span class="comment">// append d or f for double/float</span></div>
+<div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;    name+=use_double?<span class="charliteral">&#39;d&#39;</span>:<span class="charliteral">&#39;f&#39;</span>;</div>
 <div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160; </div>
-<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;    <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> new_function=<span class="keyword">function</span>;</div>
-<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;    new_function.<a class="code" href="classsymbol__exprt.html#a09983568780d97b1c33420c5efa1b7df">set_identifier</a>(name);</div>
-<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;    new_function.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()=f_type;</div>
+<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;    <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
+<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;      <a class="code" href="classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6">ns</a>.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(name).type == f_type,</div>
+<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;      <span class="stringliteral">&quot;builtin declaration should match constructed type&quot;</span>);</div>
 <div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160; </div>
-<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;    <a class="code" href="classcode__function__callt.html">code_function_callt</a> function_call(lhs, new_function, new_arguments);</div>
-<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160;    function_call.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=<span class="keyword">function</span>.source_location();</div>
-<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160; </div>
-<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;    <a class="code" href="classgoto__convertt.html#a2298f86b3243068d233b7d8b4c327cc0">copy</a>(function_call, <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba026071c79ad175ff5edb80a307ed2e1d">FUNCTION_CALL</a>, dest);</div>
-<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;  }</div>
-<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier == <span class="stringliteral">&quot;alloca&quot;</span> || identifier == <span class="stringliteral">&quot;__builtin_alloca&quot;</span>)</div>
-<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;  {</div>
-<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;    <a class="code" href="classgoto__convertt.html#abbc0deeb9cb9b4badf671bc16cc594cb">do_alloca</a>(lhs, <span class="keyword">function</span>, arguments, dest, mode);</div>
+<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;    <a class="code" href="classsymbol__exprt.html">symbol_exprt</a> new_function=<span class="keyword">function</span>;</div>
+<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160;    new_function.<a class="code" href="classsymbol__exprt.html#a09983568780d97b1c33420c5efa1b7df">set_identifier</a>(name);</div>
+<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160;    new_function.<a class="code" href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">type</a>()=f_type;</div>
+<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160; </div>
+<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;    <a class="code" href="classcode__function__callt.html">code_function_callt</a> function_call(lhs, new_function, new_arguments);</div>
+<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160;    function_call.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=<span class="keyword">function</span>.source_location();</div>
+<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160; </div>
+<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;    <a class="code" href="classgoto__convertt.html#a2298f86b3243068d233b7d8b4c327cc0">copy</a>(function_call, <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba026071c79ad175ff5edb80a307ed2e1d">FUNCTION_CALL</a>, dest);</div>
 <div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;  }</div>
-<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(identifier == <span class="stringliteral">&quot;alloca&quot;</span> || identifier == <span class="stringliteral">&quot;__builtin_alloca&quot;</span>)</div>
 <div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;  {</div>
-<div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160;    <a class="code" href="classgoto__convertt.html#a734c3e7a0c005e53166fe98fa2b08add">do_function_call_symbol</a>(*symbol);</div>
-<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160; </div>
-<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;    <span class="comment">// insert function call</span></div>
-<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;    <span class="comment">// use symbol-&gt;symbol_expr() to ensure we use the type from the symbol table</span></div>
-<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;    <a class="code" href="classcode__function__callt.html">code_function_callt</a> function_call(</div>
-<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;      lhs,</div>
-<div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160;      symbol-&gt;<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>().<a class="code" href="classexprt.html#ae36ac8125b3a1bf9bbb50d1e5616337c">with_source_location</a>&lt;<a class="code" href="classsymbol__exprt.html">symbol_exprt</a>&gt;(<span class="keyword">function</span>),</div>
-<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;      arguments);</div>
-<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;    function_call.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=<span class="keyword">function</span>.source_location();</div>
-<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160; </div>
-<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;    <span class="comment">// remove void-typed assignments, which may have been created when the</span></div>
-<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;    <span class="comment">// front-end was unable to detect them in type checking for a lack of</span></div>
-<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160;    <span class="comment">// available declarations</span></div>
-<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;      lhs.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>() &amp;&amp;</div>
-<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;      <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(symbol-&gt;<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>).<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty)</div>
-<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160;    {</div>
-<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;      function_call.<a class="code" href="classcode__function__callt.html#a1113eda711f50e3859031d8ba3f9da98">lhs</a>().<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
-<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;    }</div>
-<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160; </div>
-<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    <a class="code" href="classgoto__convertt.html#a2298f86b3243068d233b7d8b4c327cc0">copy</a>(function_call, <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba026071c79ad175ff5edb80a307ed2e1d">FUNCTION_CALL</a>, dest);</div>
-<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;  }</div>
-<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;}</div>
+<div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160;    <a class="code" href="classgoto__convertt.html#abbc0deeb9cb9b4badf671bc16cc594cb">do_alloca</a>(lhs, <span class="keyword">function</span>, arguments, dest, mode);</div>
+<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;  }</div>
+<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;  {</div>
+<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;    <a class="code" href="classgoto__convertt.html#a734c3e7a0c005e53166fe98fa2b08add">do_function_call_symbol</a>(*symbol);</div>
+<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160; </div>
+<div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160;    <span class="comment">// insert function call</span></div>
+<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;    <span class="comment">// use symbol-&gt;symbol_expr() to ensure we use the type from the symbol table</span></div>
+<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;    <a class="code" href="classcode__function__callt.html">code_function_callt</a> function_call(</div>
+<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;      lhs,</div>
+<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;      symbol-&gt;<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>().<a class="code" href="classexprt.html#ae36ac8125b3a1bf9bbb50d1e5616337c">with_source_location</a>&lt;<a class="code" href="classsymbol__exprt.html">symbol_exprt</a>&gt;(<span class="keyword">function</span>),</div>
+<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;      arguments);</div>
+<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160;    function_call.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=<span class="keyword">function</span>.source_location();</div>
+<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160; </div>
+<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;    <span class="comment">// remove void-typed assignments, which may have been created when the</span></div>
+<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;    <span class="comment">// front-end was unable to detect them in type checking for a lack of</span></div>
+<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160;    <span class="comment">// available declarations</span></div>
+<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;      lhs.<a class="code" href="classirept.html#a70e48f2856c19edbcb43777235a18cf3">is_not_nil</a>() &amp;&amp;</div>
+<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;      <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(symbol-&gt;<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>).<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_empty)</div>
+<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    {</div>
+<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;      function_call.<a class="code" href="classcode__function__callt.html#a1113eda711f50e3859031d8ba3f9da98">lhs</a>().<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
+<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;    }</div>
+<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160; </div>
+<div class="line"><a name="l01505"></a><span class="lineno"> 1505</span>&#160;    <a class="code" href="classgoto__convertt.html#a2298f86b3243068d233b7d8b4c327cc0">copy</a>(function_call, <a class="code" href="goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296beba026071c79ad175ff5edb80a307ed2e1d">FUNCTION_CALL</a>, dest);</div>
+<div class="line"><a name="l01506"></a><span class="lineno"> 1506</span>&#160;  }</div>
+<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8cpp_html_a31f0721a9ec3035332ed9ede9732fc9b"><div class="ttname"><a href="arith__tools_8cpp.html#a31f0721a9ec3035332ed9ede9732fc9b">from_integer</a></div><div class="ttdeci">constant_exprt from_integer(const mp_integer &amp;int_value, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00100">arith_tools.cpp:100</a></div></div>
 <div class="ttc" id="aarith__tools_8cpp_html_a921fb92421ece03cfac32ce34e24e100"><div class="ttname"><a href="arith__tools_8cpp.html#a921fb92421ece03cfac32ce34e24e100">to_integer</a></div><div class="ttdeci">bool to_integer(const constant_exprt &amp;expr, mp_integer &amp;int_value)</div><div class="ttdoc">Convert a constant expression expr to an arbitrary-precision integer.</div><div class="ttdef"><b>Definition:</b> <a href="arith__tools_8cpp_source.html#l00020">arith_tools.cpp:20</a></div></div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>

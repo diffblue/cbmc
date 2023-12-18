@@ -1738,6 +1738,54 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;}</div>
 <div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160; </div>
 <div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160; </div>
+<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;<span class="comment">/* FUNCTION: __srget */</span></div>
+<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160; </div>
+<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;<span class="preprocessor">#ifdef __FreeBSD__</span></div>
+<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160; </div>
+<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160; </div>
+<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;<span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160; </div>
+<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;<span class="keywordtype">int</span> __srget(FILE *stream)</div>
+<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;{</div>
+<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160;  (void)*stream;</div>
+<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160; </div>
+<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;  <span class="comment">// FreeBSD&#39;s implementation returns a character or EOF; __VERIFIER_nondet_int</span></div>
+<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;  <span class="comment">// will capture all these options</span></div>
+<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="stdio_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
+<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;}</div>
+<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160; </div>
+<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160; </div>
+<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;<span class="comment">/* FUNCTION: __swbuf */</span></div>
+<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160; </div>
+<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;<span class="preprocessor">#ifdef __FreeBSD__</span></div>
+<div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160; </div>
+<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160; </div>
+<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;__CPROVER_bool <a class="code" href="stdio_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160; </div>
+<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;<span class="keywordtype">int</span> __swbuf(<span class="keywordtype">int</span> c, FILE *stream)</div>
+<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;{</div>
+<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;  (void)c;</div>
+<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160;  (void)*stream;</div>
+<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160; </div>
+<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;  <span class="comment">// FreeBSD&#39;s implementation returns `c` or or EOF in case writing failed; we</span></div>
+<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;  <span class="comment">// just non-deterministically choose between these</span></div>
+<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="stdio_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>())</div>
+<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;    <span class="keywordflow">return</span> EOF;</div>
+<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;    <span class="keywordflow">return</span> c;</div>
+<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;}</div>
+<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160; </div>
+<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a4f7c59e6fd6639afe168f4e28eef54f6"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a4f7c59e6fd6639afe168f4e28eef54f6">__CPROVER_w_ok</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_w_ok(const void *,...)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a00109de552d5ffc4e206a729dffb2b58"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a00109de552d5ffc4e206a729dffb2b58">__CPROVER_buffer_size</a></div><div class="ttdeci">__CPROVER_size_t __CPROVER_buffer_size(const void *)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a0dba738e1f9b5a1842df1e2a5e853ffc"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a0dba738e1f9b5a1842df1e2a5e853ffc">__CPROVER_printf</a></div><div class="ttdeci">void __CPROVER_printf(const char *format,...)</div></div>
