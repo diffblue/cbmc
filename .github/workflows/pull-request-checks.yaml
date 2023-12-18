@@ -59,7 +59,7 @@ jobs:
       - name: Print ccache stats
         run: ccache -s
       - name: Checking completeness of help output
-        run: scripts/check_help.sh
+        run: scripts/check_help.sh g++
       - name: Run unit tests
         run: |
           make -C unit test IPASIR=$PWD/riss.git/riss
@@ -247,7 +247,7 @@ jobs:
       - name: Print ccache stats
         run: ccache -s
       - name: Checking completeness of help output
-        run: scripts/check_help.sh build/bin
+        run: scripts/check_help.sh /usr/bin/g++ build/bin
       - name: Check if package building works
         run: |
           cd build

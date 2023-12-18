@@ -934,13 +934,13 @@ bool configt::set(const cmdlinet &cmdline)
       #ifdef _WIN32
       ansi_c.preprocessor=ansi_ct::preprocessort::VISUAL_STUDIO;
       ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
-      #elif __FreeBSD__
+#elif defined(__FreeBSD__) || defined(__OpenBSD__)
       ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
       ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
-      #else
+#else
       ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
       ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
-      #endif
+#endif
 
       cpp.cpp_standard = cppt::cpp_standardt::CPP14;
     }
@@ -952,14 +952,14 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode = ansi_ct::flavourt::CLANG;
     ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
   }
-  else if(os=="linux" || os=="solaris")
+  else if(os == "linux" || os == "solaris" || os == "netbsd")
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
     ansi_c.mode=ansi_ct::flavourt::GCC;
     ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
   }
-  else if(os=="freebsd")
+  else if(os == "freebsd" || os == "openbsd")
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
@@ -1458,13 +1458,17 @@ irep_idt configt::this_operating_system()
   this_os="macos";
   #elif __FreeBSD__
   this_os="freebsd";
-  #elif __linux__
+#elif __OpenBSD__
+  this_os = "openbsd";
+#elif __NetBSD__
+  this_os = "netbsd";
+#elif __linux__
   this_os="linux";
-  #elif __SVR4
+#elif __SVR4
   this_os="solaris";
-  #else
+#else
   this_os="unknown";
-  #endif
+#endif
 
   return this_os;
 }

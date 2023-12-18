@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Runs scripts/cpplint.py on the modified files
 # Based on https://github.com/s0enke/git-hooks/
 #

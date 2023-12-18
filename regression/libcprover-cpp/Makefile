@@ -1,6 +1,6 @@
 default: tests.log
 
-SRC = call_bmc.cpp $(wildcard ../../src/libcprover-cpp/*.cpp)
+SRC = call_bmc.cpp
 
 OBJ += ../../src/libcprover-cpp/libcprover-cpp$(LIBEXT)
 

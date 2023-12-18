@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 umask u=rwx,g=rx,o=rx
 
 VERSION=`./cbmc --version`

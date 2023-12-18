@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 svn export http://svn.cprover.org/svn/cbmc
 mv cbmc cbmc-3.9

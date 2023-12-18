@@ -188,6 +188,15 @@ bool api_sessiont::preprocess_model() const
     *implementation->model,
     *implementation->message_handler,
     cprover_c_library_factory);
+  // library functions may introduce inline assembler
+  while(has_asm(*implementation->model))
+  {
+    remove_asm(*implementation->model);
+    link_to_library(
+      *implementation->model,
+      *implementation->message_handler,
+      cprover_c_library_factory);
+  }
 
   // Common removal of types and complex constructs
   if(::process_goto_program(

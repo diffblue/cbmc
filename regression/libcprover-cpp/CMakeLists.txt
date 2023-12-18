@@ -1,7 +1,5 @@
-file(GLOB_RECURSE api_sources "../src/libcprover-cpp/*.cpp" "../src/libcprover-cpp/*.h")
-
 # This step builds a binary driving the API (to be used for testing)
-add_executable(api-binary-driver call_bmc.cpp ${api_sources})
+add_executable(api-binary-driver call_bmc.cpp)
 cprover_default_properties(api-binary-driver)
 target_include_directories(api-binary-driver
     PUBLIC

@@ -195,7 +195,7 @@ cadical-download:
 	@rm -Rf ../cadical
 	@mv cadical-$(cadical_release) ../cadical
 	@(cd ../cadical; patch -p1 < ../scripts/cadical-1.7.2-patch)
-	@(cd ../cadical && ./configure)
+	@(cd ../cadical && ./configure CXX="$(CXX)")
 	# Need to rename VERSION so that it isn't picked up by `#include<version>` on
 	# macOS which is case insensitive
 	@(cd ../cadical && mv VERSION VERSION.txt)

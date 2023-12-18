@@ -59,7 +59,7 @@ endif()
 # bash completion
 if(NOT WIN32)
   add_custom_command(OUTPUT "${CBMC_ROOT_DIR}/scripts/bash-autocomplete/cbmc.sh"
-    COMMAND "${CBMC_ROOT_DIR}/scripts/bash-autocomplete/extract_switches.sh"
+    COMMAND "${CBMC_ROOT_DIR}/scripts/bash-autocomplete/extract_switches.sh" "${CMAKE_CXX_COMPILER}"
     DEPENDS $<TARGET_FILE:cbmc>
   )
   add_custom_target(cbmc.sh ALL

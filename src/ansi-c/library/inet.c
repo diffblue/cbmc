@@ -1,4 +1,4 @@
-/* FUNCTION: inet_addr */
+/* FUNCTION: __inet_addr */
 
 #ifndef _WIN32
 
@@ -9,7 +9,7 @@
 
 in_addr_t __VERIFIER_nondet_in_addr_t(void);
 
-in_addr_t inet_addr(const char *cp)
+in_addr_t __inet_addr(const char *cp)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -24,7 +24,28 @@ in_addr_t inet_addr(const char *cp)
 
 #endif
 
-/* FUNCTION: inet_aton */
+/* FUNCTION: inet_addr */
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_INET_H_INCLUDED
+#    include <arpa/inet.h>
+#    define __CPROVER_INET_H_INCLUDED
+#  endif
+
+#  undef inet_addr
+
+in_addr_t __inet_addr(const char *cp);
+
+in_addr_t inet_addr(const char *cp)
+{
+__CPROVER_HIDE:;
+  return __inet_addr(cp);
+}
+
+#endif
+
+/* FUNCTION: __inet_aton */
 
 #ifndef _WIN32
 
@@ -35,7 +56,7 @@ in_addr_t inet_addr(const char *cp)
 
 int __VERIFIER_nondet_int(void);
 
-int inet_aton(const char *cp, struct in_addr *pin)
+int __inet_aton(const char *cp, struct in_addr *pin)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -51,7 +72,28 @@ int inet_aton(const char *cp, struct in_addr *pin)
 
 #endif
 
-/* FUNCTION: inet_ntoa */
+/* FUNCTION: inet_aton */
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_INET_H_INCLUDED
+#    include <arpa/inet.h>
+#    define __CPROVER_INET_H_INCLUDED
+#  endif
+
+#  undef inet_aton
+
+int __inet_aton(const char *cp, struct in_addr *pin);
+
+int inet_aton(const char *cp, struct in_addr *pin)
+{
+__CPROVER_HIDE:;
+  return __inet_aton(cp, pin);
+}
+
+#endif
+
+/* FUNCTION: __inet_ntoa */
 
 #ifndef _WIN32
 
@@ -62,7 +104,7 @@ int inet_aton(const char *cp, struct in_addr *pin)
 
 char __inet_ntoa_buffer[16];
 
-char *inet_ntoa(struct in_addr in)
+char *__inet_ntoa(struct in_addr in)
 {
 __CPROVER_HIDE:;
   (void)in;
@@ -73,7 +115,28 @@ __CPROVER_HIDE:;
 
 #endif
 
-/* FUNCTION: inet_network */
+/* FUNCTION: inet_ntoa */
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_INET_H_INCLUDED
+#    include <arpa/inet.h>
+#    define __CPROVER_INET_H_INCLUDED
+#  endif
+
+#  undef inet_ntoa
+
+char *__inet_ntoa(struct in_addr in);
+
+char *inet_ntoa(struct in_addr in)
+{
+__CPROVER_HIDE:;
+  return __inet_ntoa(in);
+}
+
+#endif
+
+/* FUNCTION: __inet_network */
 
 #ifndef _WIN32
 
@@ -84,7 +147,7 @@ __CPROVER_HIDE:;
 
 in_addr_t __VERIFIER_nondet_in_addr_t(void);
 
-in_addr_t inet_network(const char *cp)
+in_addr_t __inet_network(const char *cp)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -95,6 +158,27 @@ in_addr_t inet_network(const char *cp)
 
   in_addr_t result=__VERIFIER_nondet_in_addr_t();
   return result;
+}
+
+#endif
+
+/* FUNCTION: inet_network */
+
+#ifndef _WIN32
+
+#  ifndef __CPROVER_INET_H_INCLUDED
+#    include <arpa/inet.h>
+#    define __CPROVER_INET_H_INCLUDED
+#  endif
+
+#  undef inet_network
+
+in_addr_t __inet_network(const char *cp);
+
+in_addr_t inet_network(const char *cp)
+{
+__CPROVER_HIDE:;
+  return __inet_network(cp);
 }
 
 #endif

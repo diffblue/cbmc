@@ -59,7 +59,7 @@ static std::string compiler_name(
      base_name=="goto-gcc" ||
      base_name=="goto-ld")
   {
-    #ifdef __FreeBSD__
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
     return "clang";
     #else
     return "gcc";

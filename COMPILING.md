@@ -16,7 +16,7 @@ The environments below have been used successfully in the
 past, but are not actively tested:
 
 - Solaris 11
-- FreeBSD 11
+- FreeBSD 13
 
 # Building using CMake
 
@@ -246,11 +246,11 @@ Maven 3 manually.
 
 1. As root, get the necessary tools:
    ```
-   pkg install bash gmake git www/p5-libwww patch flex bison
+   pkg install bash gmake git www/p5-libwww python python3 patch flex bison cvc5 z3
    ```
    To compile JBMC, additionally install
    ```
-   pkg install openjdk8 wget maven3
+   pkg install openjdk8 wget maven
    ```
 2. As a user, get the CBMC source via
    ```

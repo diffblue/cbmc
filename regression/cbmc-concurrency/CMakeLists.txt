@@ -1,4 +1,4 @@
-if((NOT WIN32) AND (NOT APPLE))
+if((NOT WIN32) AND (NOT APPLE) AND (NOT (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")))
 add_test_pl_tests(
     "$<TARGET_FILE:cbmc> --no-standard-checks --validate-goto-model --validate-ssa-equation"
 )

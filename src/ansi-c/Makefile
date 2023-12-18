@@ -106,8 +106,10 @@ library/converter$(EXEEXT): library/converter.cpp
 file_converter$(EXEEXT): file_converter.cpp
 	$(LINKNATIVE)
 
-ifeq ($(BUILD_ENV),MinGW)
+ifeq ($(BUILD_ENV_),MinGW)
   platform_unavail = library/java.io.c library/err.c library/threads.c
+else ifeq ($(BUILD_ENV_),FreeBSD)
+  platform_unavail = library/fenv.c library/java.io.c library/threads.c
 else
   platform_unavail = library/java.io.c library/threads.c
 endif
