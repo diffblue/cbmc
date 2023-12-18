@@ -48,7 +48,7 @@ jobs:
       - name: Run (Docker Based) Linux Build test
         run: integration/linux/compile_linux.sh
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: CPROVER-faultyInput
           path: CPROVER/faultyInput/*
