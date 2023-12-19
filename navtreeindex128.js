@@ -1,6 +1,5 @@
 var NAVTREEINDEX128 =
 {
-"string__concatenation__builtin__function_8cpp.html#a4f7210e3c4f0f5f6876b0d7df475deeb":[9,0,2,28,10,8,2],
 "string__concatenation__builtin__function_8cpp_source.html":[9,0,2,28,10,8],
 "string__concatenation__builtin__function_8h.html":[9,0,2,28,10,9],
 "string__concatenation__builtin__function_8h_source.html":[9,0,2,28,10,9],
@@ -249,5 +248,6 @@ var NAVTREEINDEX128 =
 "string__utils_8cpp.html#ab616e469cc350c81586756a6532d6a3d":[9,0,2,31,225,8],
 "string__utils_8cpp.html#aedf7437a6cb42083fa91ef582fe323a2":[9,0,2,31,225,0],
 "string__utils_8cpp.html#afce6134dd08dfcfdb989a42e11b3efca":[9,0,2,31,225,9],
-"string__utils_8cpp_source.html":[9,0,2,31,225]
+"string__utils_8cpp_source.html":[9,0,2,31,225],
+"string__utils_8h.html":[9,0,2,31,226]
 };
