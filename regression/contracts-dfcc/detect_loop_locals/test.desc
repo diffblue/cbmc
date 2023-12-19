@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --apply-loop-contracts
+--dfcc main --apply-loop-contracts _ --no-standard-checks
 ^\[main.assigns.\d+\].*line 10 Check that i is assignable: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$

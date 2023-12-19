@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --replace-call-with-contract foo
+--no-malloc-may-fail --dfcc main --replace-call-with-contract foo _ --no-standard-checks
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

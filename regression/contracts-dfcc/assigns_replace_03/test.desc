@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract bar _ --pointer-primitive-check
+--no-malloc-may-fail --dfcc main --replace-call-with-contract bar _ --pointer-primitive-check --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

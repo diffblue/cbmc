@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract f
+--no-malloc-may-fail --dfcc main --enforce-contract f _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[f\.assigns.\d+\] line \d+ Check that \*a is assignable: SUCCESS

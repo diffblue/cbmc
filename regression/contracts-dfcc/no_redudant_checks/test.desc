@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --pointer-overflow-check _ --pointer-overflow-check --unsigned-overflow-check
+--no-malloc-may-fail --dfcc main --pointer-overflow-check _ --pointer-overflow-check --unsigned-overflow-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.overflow.1\].*: SUCCESS

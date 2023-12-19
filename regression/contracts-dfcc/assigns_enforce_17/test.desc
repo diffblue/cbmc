@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract pure
+--dfcc main --enforce-contract pure _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.\d+\] line \d+ assertion x \=\= 0: SUCCESS$

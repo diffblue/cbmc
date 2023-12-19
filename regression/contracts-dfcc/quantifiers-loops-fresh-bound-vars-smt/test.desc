@@ -1,6 +1,6 @@
 CORE dfcc-only smt-backend broken-cprover-smt-backend
 main.c
---dfcc main --apply-loop-contracts --enforce-contract foo --malloc-may-fail --malloc-fail-null _ --z3 --slice-formula
+--dfcc main --apply-loop-contracts --enforce-contract foo --malloc-may-fail --malloc-fail-null _ --z3 --slice-formula --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
