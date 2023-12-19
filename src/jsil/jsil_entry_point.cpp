@@ -154,8 +154,7 @@ bool jsil_entry_point(
 
   if(!symbol_table.insert(std::move(new_symbol)).second)
   {
-    messaget message;
-    message.set_message_handler(message_handler);
+    messaget message{message_handler};
     message.error() << "failed to move main symbol" << messaget::eom;
     return true;
   }
