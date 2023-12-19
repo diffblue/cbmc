@@ -9,7 +9,7 @@ var classprop__conv__solvert =
     [ "convert", "classprop__conv__solvert.html#aa7c020022f38d6901df99ce3e1eff5dc", null ],
     [ "convert_bool", "classprop__conv__solvert.html#a0e425a3d546b908a4cb09a911a945592", null ],
     [ "convert_rest", "classprop__conv__solvert.html#ab4c30a4d86aa49d42759ce1ff3282ec3", null ],
-    [ "dec_solve", "classprop__conv__solvert.html#a029ed127957ee654ef77f25a3e996a45", null ],
+    [ "dec_solve", "classprop__conv__solvert.html#a1188d736892917776f0075fbf29c8f1d", null ],
     [ "decision_procedure_text", "classprop__conv__solvert.html#a6b57d7a7755ab2a2448bdca33d5f187e", null ],
     [ "finish_eager_conversion", "classprop__conv__solvert.html#a49cea6450ecfb82bfab5d7076f562500", null ],
     [ "get", "classprop__conv__solvert.html#aae8a23983e11023e492e3fc79c0fec5e", null ],

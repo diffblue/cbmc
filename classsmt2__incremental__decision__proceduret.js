@@ -3,7 +3,7 @@ var classsmt2__incremental__decision__proceduret =
     [ "sequencet", "classsmt2__incremental__decision__proceduret_1_1sequencet.html", "classsmt2__incremental__decision__proceduret_1_1sequencet" ],
     [ "smt2_incremental_decision_proceduret", "classsmt2__incremental__decision__proceduret.html#aec972f4876400d7e66df41791269834b", null ],
     [ "convert_expr_to_smt", "classsmt2__incremental__decision__proceduret.html#acfad41046b599b1e47a9515e37ec426f", null ],
-    [ "dec_solve", "classsmt2__incremental__decision__proceduret.html#a347531f89639e9656b9327a20dab5c42", null ],
+    [ "dec_solve", "classsmt2__incremental__decision__proceduret.html#a6459b1065afdb21b5090cefb94b2c948", null ],
     [ "decision_procedure_text", "classsmt2__incremental__decision__proceduret.html#a4d0a2b50444bef7fa612f1326bc1684b", null ],
     [ "define_array_function", "classsmt2__incremental__decision__proceduret.html#af6a5a0ff0fd7a03fcfeae7e1bb225c2a", null ],
     [ "define_dependent_functions", "classsmt2__incremental__decision__proceduret.html#a58e33e70ccca4c6de0f2fa4e4ec0db46", null ],

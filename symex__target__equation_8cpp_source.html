@@ -458,7 +458,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;        mstream &lt;&lt; messaget::eom;</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;      });</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160; </div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(step.cond_expr);</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">set_to_true</a>(step.cond_expr);</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      step.converted = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
@@ -477,8 +477,8 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    {</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;      <span class="comment">// The result is not used, these have no impact on</span></div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      <span class="comment">// the satisfiability of the formula.</span></div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.cond_expr);</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">handle</a>(step.cond_expr);</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">handle</a>(</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;        <a class="code" href="classequal__exprt.html">equal_exprt</a>{step.ssa_full_lhs, step.ssa_full_lhs});</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      step.converted = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
@@ -503,7 +503,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        mstream &lt;&lt; messaget::eom;</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;      });</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160; </div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;      step.guard_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.guard);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;      step.guard_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">handle</a>(step.guard);</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        decision_procedure, [step_index, &amp;step](<a class="code" href="structsolver__hardnesst.html">solver_hardnesst</a> &amp;hardness) {</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;          hardness.<a class="code" href="structsolver__hardnesst.html#a8332a986a6574646362f4b2f43937f9e">register_ssa</a>(step_index, step.guard, step.source.pc);</div>
@@ -531,7 +531,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;            mstream &lt;&lt; messaget::eom;</div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;          });</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.cond_expr);</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">handle</a>(step.cond_expr);</div>
 <div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160; </div>
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
@@ -559,7 +559,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;            mstream &lt;&lt; messaget::eom;</div>
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;          });</div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160; </div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;        step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(step.cond_expr);</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;        step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">handle</a>(step.cond_expr);</div>
 <div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
 <div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
 <div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;      }</div>
@@ -581,7 +581,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;        mstream &lt;&lt; messaget::eom;</div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;      });</div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160; </div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(step.cond_expr);</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;      decision_procedure.<a class="code" href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">set_to_true</a>(step.cond_expr);</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;      step.converted = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160; </div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
@@ -615,7 +615,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;      <span class="keywordflow">if</span>(step.is_assert() &amp;&amp; !step.ignore &amp;&amp; !step.converted)</div>
 <div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;      {</div>
 <div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;        step.converted = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;        decision_procedure.<a class="code" href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">set_to_false</a>(step.cond_expr);</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;        decision_procedure.<a class="code" href="classdecision__proceduret.html#a217959fca4f90a8eaf872a8037cfc04c">set_to_false</a>(step.cond_expr);</div>
 <div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;        step.cond_handle = <a class="code" href="classfalse__exprt.html">false_exprt</a>();</div>
 <div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160; </div>
 <div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
@@ -624,7 +624,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;      }</div>
 <div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(step.is_assume())</div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;      {</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;        decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(step.cond_expr);</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;        decision_procedure.<a class="code" href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">set_to_true</a>(step.cond_expr);</div>
 <div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160; </div>
 <div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;        <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
 <div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;          decision_procedure, <a class="code" href="symex__target__equation_8cpp.html#a05de0ca5461191c049cf1be1ef445b62">hardness_register_ssa</a>(step_index, step));</div>
@@ -664,7 +664,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;        step.cond_expr);</div>
 <div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160; </div>
 <div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;      <span class="comment">// do the conversion</span></div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;      step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a>(<a class="code" href="goto__check__c_8cpp.html#a5ce29488705971f68782d8dec4e5e8fe">implication</a>);</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;      step.cond_handle = decision_procedure.<a class="code" href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">handle</a>(<a class="code" href="goto__check__c_8cpp.html#a5ce29488705971f68782d8dec4e5e8fe">implication</a>);</div>
 <div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160; </div>
 <div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;      <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
 <div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        decision_procedure,</div>
@@ -694,7 +694,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160; </div>
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> assertion_disjunction = <a class="code" href="std__expr_8cpp.html#a4d859ac2f51f3b898154a185ddd2daa2">disjunction</a>(disjuncts);</div>
 <div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;  <span class="comment">// the below is &#39;true&#39; if there are no assertions</span></div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  decision_procedure.<a class="code" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a>(assertion_disjunction);</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  decision_procedure.<a class="code" href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">set_to_true</a>(assertion_disjunction);</div>
 <div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160; </div>
 <div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;  <a class="code" href="solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa">with_solver_hardness</a>(</div>
 <div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    decision_procedure,</div>
@@ -727,7 +727,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;          <a class="code" href="classequal__exprt.html">equal_exprt</a> eq(arg, symbol);</div>
 <div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(eq);</div>
 <div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160; </div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a>(eq, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#aeb884d7769ebcd1efffcf72768f726c9">set_to</a>(eq, <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;          conjuncts.push_back(eq);</div>
 <div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;          step.converted_function_arguments.push_back(symbol);</div>
 <div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        }</div>
@@ -765,7 +765,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;          <a class="code" href="classequal__exprt.html">equal_exprt</a> eq(arg, symbol);</div>
 <div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;          <a class="code" href="classsymex__target__equationt.html#ab99495a691c992776d679fd3a320c4f0">merge_irep</a>(eq);</div>
 <div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160; </div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a>(eq, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;          decision_procedure.<a class="code" href="classdecision__proceduret.html#aeb884d7769ebcd1efffcf72768f726c9">set_to</a>(eq, <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;          conjuncts.push_back(eq);</div>
 <div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;          step.converted_io_args.push_back(symbol);</div>
 <div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;        }</div>
@@ -830,11 +830,11 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="ttc" id="aclass_s_s_a__stept_html_adfa356e14cb0e8e934d32a35bfbc7848"><div class="ttname"><a href="class_s_s_a__stept.html#adfa356e14cb0e8e934d32a35bfbc7848">SSA_stept::io_args</a></div><div class="ttdeci">std::list&lt; exprt &gt; io_args</div><div class="ttdef"><b>Definition:</b> <a href="ssa__step_8h_source.html#l00159">ssa_step.h:159</a></div></div>
 <div class="ttc" id="aclass_s_s_a__stept_html_afcbcb34e32a8a04fcab0cef96bc3d7b8"><div class="ttname"><a href="class_s_s_a__stept.html#afcbcb34e32a8a04fcab0cef96bc3d7b8">SSA_stept::ssa_lhs</a></div><div class="ttdeci">ssa_exprt ssa_lhs</div><div class="ttdef"><b>Definition:</b> <a href="ssa__step_8h_source.html#l00139">ssa_step.h:139</a></div></div>
 <div class="ttc" id="aclassand__exprt_html"><div class="ttname"><a href="classand__exprt.html">and_exprt</a></div><div class="ttdoc">Boolean AND.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02070">std_expr.h:2071</a></div></div>
-<div class="ttc" id="aclassdecision__proceduret_html"><div class="ttname"><a href="classdecision__proceduret.html">decision_proceduret</a></div><div class="ttdef"><b>Definition:</b> <a href="decision__procedure_8h_source.html#l00020">decision_procedure.h:21</a></div></div>
-<div class="ttc" id="aclassdecision__proceduret_html_ab923ff426a9db983d0b14376e2c3d7b9"><div class="ttname"><a href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">decision_proceduret::handle</a></div><div class="ttdeci">virtual exprt handle(const exprt &amp;expr)=0</div><div class="ttdoc">Generate a handle, which is an expression that has the same value as the argument in any model that i...</div></div>
-<div class="ttc" id="aclassdecision__proceduret_html_ac3cc8472e48642a0eb7b126abca0f59e"><div class="ttname"><a href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">decision_proceduret::set_to_false</a></div><div class="ttdeci">void set_to_false(const exprt &amp;expr)</div><div class="ttdoc">For a Boolean expression expr, add the constraint 'not expr'.</div><div class="ttdef"><b>Definition:</b> <a href="decision__procedure_8cpp_source.html#l00028">decision_procedure.cpp:28</a></div></div>
-<div class="ttc" id="aclassdecision__proceduret_html_aca2d8474f443affc3c0f6ad94eecb4e1"><div class="ttname"><a href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">decision_proceduret::set_to_true</a></div><div class="ttdeci">void set_to_true(const exprt &amp;expr)</div><div class="ttdoc">For a Boolean expression expr, add the constraint 'expr'.</div><div class="ttdef"><b>Definition:</b> <a href="decision__procedure_8cpp_source.html#l00023">decision_procedure.cpp:23</a></div></div>
-<div class="ttc" id="aclassdecision__proceduret_html_ad47239d18113c5683fa9d1d3755e863f"><div class="ttname"><a href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">decision_proceduret::set_to</a></div><div class="ttdeci">virtual void set_to(const exprt &amp;expr, bool value)=0</div><div class="ttdoc">For a Boolean expression expr, add the constraint 'expr' if value is true, otherwise add 'not expr'.</div></div>
+<div class="ttc" id="aclassdecision__proceduret_html"><div class="ttname"><a href="classdecision__proceduret.html">decision_proceduret</a></div><div class="ttdoc">An interface for a decision procedure for satisfiability problems.</div><div class="ttdef"><b>Definition:</b> <a href="decision__procedure_8h_source.html#l00021">decision_procedure.h:22</a></div></div>
+<div class="ttc" id="aclassdecision__proceduret_html_a217959fca4f90a8eaf872a8037cfc04c"><div class="ttname"><a href="classdecision__proceduret.html#a217959fca4f90a8eaf872a8037cfc04c">decision_proceduret::set_to_false</a></div><div class="ttdeci">void set_to_false(const exprt &amp;)</div><div class="ttdoc">For a Boolean expression expr, add the constraint 'not expr'.</div><div class="ttdef"><b>Definition:</b> <a href="decision__procedure_8cpp_source.html#l00036">decision_procedure.cpp:36</a></div></div>
+<div class="ttc" id="aclassdecision__proceduret_html_a5bb1ade1291b0a0674eb38d040a1d669"><div class="ttname"><a href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">decision_proceduret::handle</a></div><div class="ttdeci">virtual exprt handle(const exprt &amp;)=0</div><div class="ttdoc">Generate a handle, which is an expression that has the same value as the argument in any model that i...</div></div>
+<div class="ttc" id="aclassdecision__proceduret_html_a87da70755012fe67f010f0b32e12ea81"><div class="ttname"><a href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">decision_proceduret::set_to_true</a></div><div class="ttdeci">void set_to_true(const exprt &amp;)</div><div class="ttdoc">For a Boolean expression expr, add the constraint 'expr'.</div><div class="ttdef"><b>Definition:</b> <a href="decision__procedure_8cpp_source.html#l00031">decision_procedure.cpp:31</a></div></div>
+<div class="ttc" id="aclassdecision__proceduret_html_aeb884d7769ebcd1efffcf72768f726c9"><div class="ttname"><a href="classdecision__proceduret.html#aeb884d7769ebcd1efffcf72768f726c9">decision_proceduret::set_to</a></div><div class="ttdeci">virtual void set_to(const exprt &amp;, bool value)=0</div><div class="ttdoc">For a Boolean expression expr, add the constraint 'expr' if value is true, otherwise add 'not expr'.</div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00038">dstring.h:39</a></div></div>
 <div class="ttc" id="aclassequal__exprt_html"><div class="ttname"><a href="classequal__exprt.html">equal_exprt</a></div><div class="ttdoc">Equality.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l01305">std_expr.h:1306</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>

@@ -6,7 +6,7 @@ var classstring__refinementt =
     [ "string_refinementt", "classstring__refinementt.html#a7f7a012df0bf6e01870c3bde64dda218", null ],
     [ "string_refinementt", "classstring__refinementt.html#a99f32c14734ed9ca305b0d3ce6489c5d", null ],
     [ "add_lemma", "classstring__refinementt.html#af301515460e1aad79df7279760115443", null ],
-    [ "dec_solve", "classstring__refinementt.html#a8a2ac48211dc5f85be38bfa80338f2db", null ],
+    [ "dec_solve", "classstring__refinementt.html#a62e604a1865aa7853799bc24c1ad3fcd", null ],
     [ "decision_procedure_text", "classstring__refinementt.html#a083a457556ee99b0ce241a5c2a3db2a8", null ],
     [ "get", "classstring__refinementt.html#ac5296b634b2451a0a9859f62a2dddca6", null ],
     [ "set_to", "classstring__refinementt.html#aab339349e5c6a8cb3c8f61010f04b5ca", null ],

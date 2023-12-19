@@ -123,9 +123,6 @@ $(document).ready(function(){initNavTree('classsmt2__dect.html',''); initResizab
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a1583400ed6e3c83a140b092e39132461"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__dect.html#a1583400ed6e3c83a140b092e39132461">smt2_dect</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;_ns, const std::string &amp;_benchmark, const std::string &amp;_notes, const std::string &amp;_logic, <a class="el" href="classsmt2__convt.html#aebe67bd484621bca28e896863885f4ac">solvert</a> _solver, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;_message_handler)</td></tr>
 <tr class="separator:a1583400ed6e3c83a140b092e39132461"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac70d51230c675381a2c3e4e02c3d471"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__dect.html#aac70d51230c675381a2c3e4e02c3d471">dec_solve</a> () override</td></tr>
-<tr class="memdesc:aac70d51230c675381a2c3e4e02c3d471"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem.  <a href="classsmt2__dect.html#aac70d51230c675381a2c3e4e02c3d471">More...</a><br /></td></tr>
-<tr class="separator:aac70d51230c675381a2c3e4e02c3d471"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c3188640326faa66df2f6d571696af2"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__dect.html#a2c3188640326faa66df2f6d571696af2">decision_procedure_text</a> () const override</td></tr>
 <tr class="memdesc:a2c3188640326faa66df2f6d571696af2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a textual description of the decision procedure.  <a href="classsmt2__dect.html#a2c3188640326faa66df2f6d571696af2">More...</a><br /></td></tr>
 <tr class="separator:a2c3188640326faa66df2f6d571696af2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,20 +161,26 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae5824edb3d4ffd415800a7d4f144ff64 inherit pub_methods_classstack__decision__proceduret"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstack__decision__proceduret.html#ae5824edb3d4ffd415800a7d4f144ff64">~stack_decision_proceduret</a> ()=default</td></tr>
 <tr class="separator:ae5824edb3d4ffd415800a7d4f144ff64 inherit pub_methods_classstack__decision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classdecision__proceduret"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classdecision__proceduret')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classdecision__proceduret.html">decision_proceduret</a></td></tr>
-<tr class="memitem:aca2d8474f443affc3c0f6ad94eecb4e1 inherit pub_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
-<tr class="memdesc:aca2d8474f443affc3c0f6ad94eecb4e1 inherit pub_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'expr'.  <a href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">More...</a><br /></td></tr>
-<tr class="separator:aca2d8474f443affc3c0f6ad94eecb4e1 inherit pub_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3cc8472e48642a0eb7b126abca0f59e inherit pub_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">set_to_false</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
-<tr class="memdesc:ac3cc8472e48642a0eb7b126abca0f59e inherit pub_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'not expr'.  <a href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">More...</a><br /></td></tr>
-<tr class="separator:ac3cc8472e48642a0eb7b126abca0f59e inherit pub_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87da70755012fe67f010f0b32e12ea81 inherit pub_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">set_to_true</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
+<tr class="memdesc:a87da70755012fe67f010f0b32e12ea81 inherit pub_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'expr'.  <a href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">More...</a><br /></td></tr>
+<tr class="separator:a87da70755012fe67f010f0b32e12ea81 inherit pub_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a217959fca4f90a8eaf872a8037cfc04c inherit pub_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a217959fca4f90a8eaf872a8037cfc04c">set_to_false</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
+<tr class="memdesc:a217959fca4f90a8eaf872a8037cfc04c inherit pub_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'not expr'.  <a href="classdecision__proceduret.html#a217959fca4f90a8eaf872a8037cfc04c">More...</a><br /></td></tr>
+<tr class="separator:a217959fca4f90a8eaf872a8037cfc04c inherit pub_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a148cc01334739a153de7a0ff54836a3f inherit pub_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">operator()</a> ()</td></tr>
-<tr class="memdesc:a148cc01334739a153de7a0ff54836a3f inherit pub_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem.  <a href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">More...</a><br /></td></tr>
+<tr class="memdesc:a148cc01334739a153de7a0ff54836a3f inherit pub_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem This corresponds to SMT-LIB's check-sat.  <a href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">More...</a><br /></td></tr>
 <tr class="separator:a148cc01334739a153de7a0ff54836a3f inherit pub_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5c8b47ef5a36f399a14b42bd5c7027c inherit pub_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#aa5c8b47ef5a36f399a14b42bd5c7027c">operator()</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;assumption)</td></tr>
+<tr class="memdesc:aa5c8b47ef5a36f399a14b42bd5c7027c inherit pub_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem under the given assumption.  <a href="classdecision__proceduret.html#aa5c8b47ef5a36f399a14b42bd5c7027c">More...</a><br /></td></tr>
+<tr class="separator:aa5c8b47ef5a36f399a14b42bd5c7027c inherit pub_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab283ba06663672fc7433e0bb933b1aca inherit pub_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#ab283ba06663672fc7433e0bb933b1aca">~decision_proceduret</a> ()</td></tr>
 <tr class="separator:ab283ba06663672fc7433e0bb933b1aca inherit pub_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
+<tr class="memitem:a59a3b753948ddb672a68a0b59ba97598"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__dect.html#a59a3b753948ddb672a68a0b59ba97598">dec_solve</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;) override</td></tr>
+<tr class="memdesc:a59a3b753948ddb672a68a0b59ba97598"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the decision procedure.  <a href="classsmt2__dect.html#a59a3b753948ddb672a68a0b59ba97598">More...</a><br /></td></tr>
+<tr class="separator:a59a3b753948ddb672a68a0b59ba97598"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9c841fcf12f1a6e6315faa652d7c5ea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__dect.html#ab9c841fcf12f1a6e6315faa652d7c5ea">read_result</a> (std::istream &amp;in)</td></tr>
 <tr class="separator:ab9c841fcf12f1a6e6315faa652d7c5ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classsmt2__convt"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classsmt2__convt')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classsmt2__convt.html">smt2_convt</a></td></tr>
@@ -325,15 +328,18 @@ Protected Member Functions</h2></td></tr>
 <tr class="inherit_header pro_methods_classstack__decision__proceduret"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classstack__decision__proceduret')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classstack__decision__proceduret.html">stack_decision_proceduret</a></td></tr>
 <tr class="memitem:ae5824edb3d4ffd415800a7d4f144ff64 inherit pro_methods_classstack__decision__proceduret"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstack__decision__proceduret.html#ae5824edb3d4ffd415800a7d4f144ff64">~stack_decision_proceduret</a> ()=default</td></tr>
 <tr class="separator:ae5824edb3d4ffd415800a7d4f144ff64 inherit pro_methods_classstack__decision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca2d8474f443affc3c0f6ad94eecb4e1 inherit pro_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
-<tr class="memdesc:aca2d8474f443affc3c0f6ad94eecb4e1 inherit pro_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'expr'.  <a href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">More...</a><br /></td></tr>
-<tr class="separator:aca2d8474f443affc3c0f6ad94eecb4e1 inherit pro_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3cc8472e48642a0eb7b126abca0f59e inherit pro_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">set_to_false</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
-<tr class="memdesc:ac3cc8472e48642a0eb7b126abca0f59e inherit pro_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'not expr'.  <a href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">More...</a><br /></td></tr>
-<tr class="separator:ac3cc8472e48642a0eb7b126abca0f59e inherit pro_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87da70755012fe67f010f0b32e12ea81 inherit pro_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">set_to_true</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
+<tr class="memdesc:a87da70755012fe67f010f0b32e12ea81 inherit pro_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'expr'.  <a href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">More...</a><br /></td></tr>
+<tr class="separator:a87da70755012fe67f010f0b32e12ea81 inherit pro_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a217959fca4f90a8eaf872a8037cfc04c inherit pro_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a217959fca4f90a8eaf872a8037cfc04c">set_to_false</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
+<tr class="memdesc:a217959fca4f90a8eaf872a8037cfc04c inherit pro_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'not expr'.  <a href="classdecision__proceduret.html#a217959fca4f90a8eaf872a8037cfc04c">More...</a><br /></td></tr>
+<tr class="separator:a217959fca4f90a8eaf872a8037cfc04c inherit pro_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a148cc01334739a153de7a0ff54836a3f inherit pro_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">operator()</a> ()</td></tr>
-<tr class="memdesc:a148cc01334739a153de7a0ff54836a3f inherit pro_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem.  <a href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">More...</a><br /></td></tr>
+<tr class="memdesc:a148cc01334739a153de7a0ff54836a3f inherit pro_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem This corresponds to SMT-LIB's check-sat.  <a href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">More...</a><br /></td></tr>
 <tr class="separator:a148cc01334739a153de7a0ff54836a3f inherit pro_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5c8b47ef5a36f399a14b42bd5c7027c inherit pro_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#aa5c8b47ef5a36f399a14b42bd5c7027c">operator()</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;assumption)</td></tr>
+<tr class="memdesc:aa5c8b47ef5a36f399a14b42bd5c7027c inherit pro_methods_classdecision__proceduret"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem under the given assumption.  <a href="classdecision__proceduret.html#aa5c8b47ef5a36f399a14b42bd5c7027c">More...</a><br /></td></tr>
+<tr class="separator:aa5c8b47ef5a36f399a14b42bd5c7027c inherit pro_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab283ba06663672fc7433e0bb933b1aca inherit pro_methods_classdecision__proceduret"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#ab283ba06663672fc7433e0bb933b1aca">~decision_proceduret</a> ()</td></tr>
 <tr class="separator:ab283ba06663672fc7433e0bb933b1aca inherit pro_methods_classdecision__proceduret"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -564,8 +570,8 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aac70d51230c675381a2c3e4e02c3d471"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac70d51230c675381a2c3e4e02c3d471">&#9670;&nbsp;</a></span>dec_solve()</h2>
+<a id="a59a3b753948ddb672a68a0b59ba97598"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59a3b753948ddb672a68a0b59ba97598">&#9670;&nbsp;</a></span>dec_solve()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -576,20 +582,21 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">decision_proceduret::resultt</a> smt2_dect::dec_solve </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assumption</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Run the decision procedure to solve the problem. </p>
+<p>Implementation of the decision procedure. </p>
 
-<p>Reimplemented from <a class="el" href="classsmt2__convt.html#af81dcacd07c53ec16bd4101640c3d75e">smt2_convt</a>.</p>
+<p>Reimplemented from <a class="el" href="classsmt2__convt.html#a29223dc8875131d6b5cf1202a9ef7764">smt2_convt</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="smt2__dec_8cpp_source.html#l00036">36</a> of file <a class="el" href="smt2__dec_8cpp_source.html">smt2_dec.cpp</a>.</p>
 
@@ -701,7 +708,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__dec_8h_source.html#l00046">46</a> of file <a class="el" href="smt2__dec_8h_source.html">smt2_dec.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__dec_8h_source.html#l00045">45</a> of file <a class="el" href="smt2__dec_8h_source.html">smt2_dec.h</a>.</p>
 
 </div>
 </div>

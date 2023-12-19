@@ -98,6 +98,9 @@ $(document).ready(function(){initNavTree('classdecision__proceduret.html',''); i
 </div><!--header-->
 <div class="contents">
 
+<p>An interface for a decision procedure for satisfiability problems.  
+ <a href="classdecision__proceduret.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="decision__procedure_8h_source.html">decision_procedure.h</a>&gt;</code></p>
 <div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Inheritance diagram for decision_proceduret:</div>
@@ -119,24 +122,27 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad47239d18113c5683fa9d1d3755e863f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr, bool value)=0</td></tr>
-<tr class="memdesc:ad47239d18113c5683fa9d1d3755e863f"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'expr' if <code>value</code> is <code>true</code>, otherwise add 'not expr'.  <a href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">More...</a><br /></td></tr>
-<tr class="separator:ad47239d18113c5683fa9d1d3755e863f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca2d8474f443affc3c0f6ad94eecb4e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">set_to_true</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
-<tr class="memdesc:aca2d8474f443affc3c0f6ad94eecb4e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'expr'.  <a href="classdecision__proceduret.html#aca2d8474f443affc3c0f6ad94eecb4e1">More...</a><br /></td></tr>
-<tr class="separator:aca2d8474f443affc3c0f6ad94eecb4e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3cc8472e48642a0eb7b126abca0f59e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">set_to_false</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
-<tr class="memdesc:ac3cc8472e48642a0eb7b126abca0f59e"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'not expr'.  <a href="classdecision__proceduret.html#ac3cc8472e48642a0eb7b126abca0f59e">More...</a><br /></td></tr>
-<tr class="separator:ac3cc8472e48642a0eb7b126abca0f59e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab923ff426a9db983d0b14376e2c3d7b9"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">handle</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)=0</td></tr>
-<tr class="memdesc:ab923ff426a9db983d0b14376e2c3d7b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a handle, which is an expression that has the same value as the argument in any model that is generated; this offers an efficient way to refer to the expression in subsequent calls to <a class="el" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a> or <a class="el" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a>.  <a href="classdecision__proceduret.html#ab923ff426a9db983d0b14376e2c3d7b9">More...</a><br /></td></tr>
-<tr class="separator:ab923ff426a9db983d0b14376e2c3d7b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb884d7769ebcd1efffcf72768f726c9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#aeb884d7769ebcd1efffcf72768f726c9">set_to</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;, bool value)=0</td></tr>
+<tr class="memdesc:aeb884d7769ebcd1efffcf72768f726c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'expr' if <code>value</code> is <code>true</code>, otherwise add 'not expr'.  <a href="classdecision__proceduret.html#aeb884d7769ebcd1efffcf72768f726c9">More...</a><br /></td></tr>
+<tr class="separator:aeb884d7769ebcd1efffcf72768f726c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87da70755012fe67f010f0b32e12ea81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">set_to_true</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
+<tr class="memdesc:a87da70755012fe67f010f0b32e12ea81"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'expr'.  <a href="classdecision__proceduret.html#a87da70755012fe67f010f0b32e12ea81">More...</a><br /></td></tr>
+<tr class="separator:a87da70755012fe67f010f0b32e12ea81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a217959fca4f90a8eaf872a8037cfc04c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a217959fca4f90a8eaf872a8037cfc04c">set_to_false</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)</td></tr>
+<tr class="memdesc:a217959fca4f90a8eaf872a8037cfc04c"><td class="mdescLeft">&#160;</td><td class="mdescRight">For a Boolean expression <code>expr</code>, add the constraint 'not expr'.  <a href="classdecision__proceduret.html#a217959fca4f90a8eaf872a8037cfc04c">More...</a><br /></td></tr>
+<tr class="separator:a217959fca4f90a8eaf872a8037cfc04c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bb1ade1291b0a0674eb38d040a1d669"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">handle</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;)=0</td></tr>
+<tr class="memdesc:a5bb1ade1291b0a0674eb38d040a1d669"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a handle, which is an expression that has the same value as the argument in any model that is generated; this offers an efficient way to refer to the expression in subsequent calls to <a class="el" href="classdecision__proceduret.html#a097d7025160196820511a7e35c94d0c8">get</a> or <a class="el" href="classdecision__proceduret.html#aeb884d7769ebcd1efffcf72768f726c9">set_to</a>.  <a href="classdecision__proceduret.html#a5bb1ade1291b0a0674eb38d040a1d669">More...</a><br /></td></tr>
+<tr class="separator:a5bb1ade1291b0a0674eb38d040a1d669"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a148cc01334739a153de7a0ff54836a3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">operator()</a> ()</td></tr>
-<tr class="memdesc:a148cc01334739a153de7a0ff54836a3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem.  <a href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">More...</a><br /></td></tr>
+<tr class="memdesc:a148cc01334739a153de7a0ff54836a3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem This corresponds to SMT-LIB's check-sat.  <a href="classdecision__proceduret.html#a148cc01334739a153de7a0ff54836a3f">More...</a><br /></td></tr>
 <tr class="separator:a148cc01334739a153de7a0ff54836a3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a728b2bdb614c52b357bf83859ede0566"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr) const =0</td></tr>
-<tr class="memdesc:a728b2bdb614c52b357bf83859ede0566"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <code>expr</code> with variables replaced by values from satisfying assignment if available.  <a href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">More...</a><br /></td></tr>
-<tr class="separator:a728b2bdb614c52b357bf83859ede0566"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5c8b47ef5a36f399a14b42bd5c7027c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#aa5c8b47ef5a36f399a14b42bd5c7027c">operator()</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;assumption)</td></tr>
+<tr class="memdesc:aa5c8b47ef5a36f399a14b42bd5c7027c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem under the given assumption.  <a href="classdecision__proceduret.html#aa5c8b47ef5a36f399a14b42bd5c7027c">More...</a><br /></td></tr>
+<tr class="separator:aa5c8b47ef5a36f399a14b42bd5c7027c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a097d7025160196820511a7e35c94d0c8"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a097d7025160196820511a7e35c94d0c8">get</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;) const =0</td></tr>
+<tr class="memdesc:a097d7025160196820511a7e35c94d0c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <code>expr</code> with variables replaced by values from satisfying assignment if available.  <a href="classdecision__proceduret.html#a097d7025160196820511a7e35c94d0c8">More...</a><br /></td></tr>
+<tr class="separator:a097d7025160196820511a7e35c94d0c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47ccd3af6e542ec29afbbcb2867b78bb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a47ccd3af6e542ec29afbbcb2867b78bb">print_assignment</a> (std::ostream &amp;out) const =0</td></tr>
 <tr class="memdesc:a47ccd3af6e542ec29afbbcb2867b78bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print satisfying assignment to <code>out</code>.  <a href="classdecision__proceduret.html#a47ccd3af6e542ec29afbbcb2867b78bb">More...</a><br /></td></tr>
 <tr class="separator:a47ccd3af6e542ec29afbbcb2867b78bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,13 +157,14 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:ae23dc8c07522b9d77f76d52ac1a600e1"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#ae23dc8c07522b9d77f76d52ac1a600e1">dec_solve</a> ()=0</td></tr>
-<tr class="memdesc:ae23dc8c07522b9d77f76d52ac1a600e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the decision procedure to solve the problem.  <a href="classdecision__proceduret.html#ae23dc8c07522b9d77f76d52ac1a600e1">More...</a><br /></td></tr>
-<tr class="separator:ae23dc8c07522b9d77f76d52ac1a600e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ddb4e45627c55986be93d6b9dbf7f35"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdecision__proceduret.html#a2ddb4e45627c55986be93d6b9dbf7f35">dec_solve</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;assumption)=0</td></tr>
+<tr class="memdesc:a2ddb4e45627c55986be93d6b9dbf7f35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the decision procedure.  <a href="classdecision__proceduret.html#a2ddb4e45627c55986be93d6b9dbf7f35">More...</a><br /></td></tr>
+<tr class="separator:a2ddb4e45627c55986be93d6b9dbf7f35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="decision__procedure_8h_source.html#l00020">20</a> of file <a class="el" href="decision__procedure_8h_source.html">decision_procedure.h</a>.</p>
+<div class="textblock"><p>An interface for a decision procedure for satisfiability problems. </p>
+
+<p class="definition">Definition at line <a class="el" href="decision__procedure_8h_source.html#l00021">21</a> of file <a class="el" href="decision__procedure_8h_source.html">decision_procedure.h</a>.</p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
 <a id="a2ed50735d8bf495b7be832fb80b9c8a0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2ed50735d8bf495b7be832fb80b9c8a0">&#9670;&nbsp;</a></span>resultt</h2>
@@ -186,7 +193,7 @@ Protected Member Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a2ed50735d8bf495b7be832fb80b9c8a0a53a299451b07d786124b2dd6f6ece682"></a>D_ERROR&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="decision__procedure_8h_source.html#l00043">43</a> of file <a class="el" href="decision__procedure_8h_source.html">decision_procedure.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="decision__procedure_8h_source.html#l00044">44</a> of file <a class="el" href="decision__procedure_8h_source.html">decision_procedure.h</a>.</p>
 
 </div>
 </div>
@@ -214,13 +221,13 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00014">14</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00016">16</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae23dc8c07522b9d77f76d52ac1a600e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae23dc8c07522b9d77f76d52ac1a600e1">&#9670;&nbsp;</a></span>dec_solve()</h2>
+<a id="a2ddb4e45627c55986be93d6b9dbf7f35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ddb4e45627c55986be93d6b9dbf7f35">&#9670;&nbsp;</a></span>dec_solve()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -231,7 +238,8 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual <a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">resultt</a> decision_proceduret::dec_solve </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assumption</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -242,9 +250,9 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Run the decision procedure to solve the problem. </p>
+<p>Implementation of the decision procedure. </p>
 
-<p>Implemented in <a class="el" href="classstring__refinementt.html#a8a2ac48211dc5f85be38bfa80338f2db">string_refinementt</a>, <a class="el" href="classsmt2__incremental__decision__proceduret.html#a347531f89639e9656b9327a20dab5c42">smt2_incremental_decision_proceduret</a>, <a class="el" href="classsmt2__dect.html#aac70d51230c675381a2c3e4e02c3d471">smt2_dect</a>, <a class="el" href="classsmt2__convt.html#af81dcacd07c53ec16bd4101640c3d75e">smt2_convt</a>, <a class="el" href="classbv__refinementt.html#a53f0c1cde2baa0398e3520423ba22cb0">bv_refinementt</a>, and <a class="el" href="classprop__conv__solvert.html#a029ed127957ee654ef77f25a3e996a45">prop_conv_solvert</a>.</p>
+<p>Implemented in <a class="el" href="classstring__refinementt.html#a62e604a1865aa7853799bc24c1ad3fcd">string_refinementt</a>, <a class="el" href="classsmt2__incremental__decision__proceduret.html#a6459b1065afdb21b5090cefb94b2c948">smt2_incremental_decision_proceduret</a>, <a class="el" href="classsmt2__dect.html#a59a3b753948ddb672a68a0b59ba97598">smt2_dect</a>, <a class="el" href="classsmt2__convt.html#a29223dc8875131d6b5cf1202a9ef7764">smt2_convt</a>, <a class="el" href="classbv__refinementt.html#a105b3f33cd07b51e125d7e0ad629da06">bv_refinementt</a>, and <a class="el" href="classprop__conv__solvert.html#a1188d736892917776f0075fbf29c8f1d">prop_conv_solvert</a>.</p>
 
 </div>
 </div>
@@ -277,8 +285,8 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a728b2bdb614c52b357bf83859ede0566"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a728b2bdb614c52b357bf83859ede0566">&#9670;&nbsp;</a></span>get()</h2>
+<a id="a097d7025160196820511a7e35c94d0c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a097d7025160196820511a7e35c94d0c8">&#9670;&nbsp;</a></span>get()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -290,7 +298,7 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">virtual <a class="el" href="classexprt.html">exprt</a> decision_proceduret::get </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -337,8 +345,8 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ab923ff426a9db983d0b14376e2c3d7b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab923ff426a9db983d0b14376e2c3d7b9">&#9670;&nbsp;</a></span>handle()</h2>
+<a id="a5bb1ade1291b0a0674eb38d040a1d669"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bb1ade1291b0a0674eb38d040a1d669">&#9670;&nbsp;</a></span>handle()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -350,7 +358,7 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">virtual <a class="el" href="classexprt.html">exprt</a> decision_proceduret::handle </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -361,7 +369,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Generate a handle, which is an expression that has the same value as the argument in any model that is generated; this offers an efficient way to refer to the expression in subsequent calls to <a class="el" href="classdecision__proceduret.html#a728b2bdb614c52b357bf83859ede0566">get</a> or <a class="el" href="classdecision__proceduret.html#ad47239d18113c5683fa9d1d3755e863f">set_to</a>. </p>
+<p>Generate a handle, which is an expression that has the same value as the argument in any model that is generated; this offers an efficient way to refer to the expression in subsequent calls to <a class="el" href="classdecision__proceduret.html#a097d7025160196820511a7e35c94d0c8">get</a> or <a class="el" href="classdecision__proceduret.html#aeb884d7769ebcd1efffcf72768f726c9">set_to</a>. </p>
 <p>The returned expression may be the expression itself or a more compact but solver-specific representation. </p>
 
 <p>Implemented in <a class="el" href="classsmt2__incremental__decision__proceduret.html#a1d1569125e1afdee07d0b312d3b7d650">smt2_incremental_decision_proceduret</a>, <a class="el" href="classsmt2__convt.html#a95f78822452b7c4715bb5d1f548bbf36">smt2_convt</a>, and <a class="el" href="classprop__conv__solvert.html#ad7c377a467d7d5654ee1159b1d934fef">prop_conv_solvert</a>.</p>
@@ -369,7 +377,7 @@ Protected Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a148cc01334739a153de7a0ff54836a3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a148cc01334739a153de7a0ff54836a3f">&#9670;&nbsp;</a></span>operator()()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a148cc01334739a153de7a0ff54836a3f">&#9670;&nbsp;</a></span>operator()() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -384,9 +392,32 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Run the decision procedure to solve the problem. </p>
+<p>Run the decision procedure to solve the problem This corresponds to SMT-LIB's check-sat. </p>
 
-<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00018">18</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00020">20</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa5c8b47ef5a36f399a14b42bd5c7027c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5c8b47ef5a36f399a14b42bd5c7027c">&#9670;&nbsp;</a></span>operator()() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classdecision__proceduret.html#a2ed50735d8bf495b7be832fb80b9c8a0">decision_proceduret::resultt</a> decision_proceduret::operator() </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>assumption</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Run the decision procedure to solve the problem under the given assumption. </p>
+<p>This corresponds to SMT-LIB's check-sat-assuming. </p>
+
+<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00026">26</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
@@ -420,8 +451,8 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad47239d18113c5683fa9d1d3755e863f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad47239d18113c5683fa9d1d3755e863f">&#9670;&nbsp;</a></span>set_to()</h2>
+<a id="aeb884d7769ebcd1efffcf72768f726c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb884d7769ebcd1efffcf72768f726c9">&#9670;&nbsp;</a></span>set_to()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -433,7 +464,7 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">virtual void decision_proceduret::set_to </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>expr</em>, </td>
+          <td class="paramname">, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -460,8 +491,8 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ac3cc8472e48642a0eb7b126abca0f59e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3cc8472e48642a0eb7b126abca0f59e">&#9670;&nbsp;</a></span>set_to_false()</h2>
+<a id="a217959fca4f90a8eaf872a8037cfc04c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a217959fca4f90a8eaf872a8037cfc04c">&#9670;&nbsp;</a></span>set_to_false()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -478,12 +509,12 @@ Protected Member Functions</h2></td></tr>
 
 <p>For a Boolean expression <code>expr</code>, add the constraint 'not expr'. </p>
 
-<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00028">28</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00036">36</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aca2d8474f443affc3c0f6ad94eecb4e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca2d8474f443affc3c0f6ad94eecb4e1">&#9670;&nbsp;</a></span>set_to_true()</h2>
+<a id="a87da70755012fe67f010f0b32e12ea81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87da70755012fe67f010f0b32e12ea81">&#9670;&nbsp;</a></span>set_to_true()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -500,7 +531,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>For a Boolean expression <code>expr</code>, add the constraint 'expr'. </p>
 
-<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00023">23</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="decision__procedure_8cpp_source.html#l00031">31</a> of file <a class="el" href="decision__procedure_8cpp_source.html">decision_procedure.cpp</a>.</p>
 
 </div>
 </div>

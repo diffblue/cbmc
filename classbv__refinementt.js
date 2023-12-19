@@ -15,7 +15,7 @@ var classbv__refinementt =
     [ "convert_floatbv_op", "classbv__refinementt.html#ad54274fbbf212afa47b698d4fad01fa8", null ],
     [ "convert_mod", "classbv__refinementt.html#ad05f65fafaeaf1a893dbb66c2700b8db", null ],
     [ "convert_mult", "classbv__refinementt.html#a04644ff79d5e61f4e6eeff9549438904", null ],
-    [ "dec_solve", "classbv__refinementt.html#a53f0c1cde2baa0398e3520423ba22cb0", null ],
+    [ "dec_solve", "classbv__refinementt.html#a105b3f33cd07b51e125d7e0ad629da06", null ],
     [ "decision_procedure_text", "classbv__refinementt.html#a38b43be4f39f28b21510efa2e474d12a", null ],
     [ "finish_eager_conversion_arrays", "classbv__refinementt.html#ac1b255ff1c88bcfdbf2660d850b26488", null ],
     [ "freeze_lazy_constraints", "classbv__refinementt.html#aa36e2982948497d41c5e9933591d2344", null ],

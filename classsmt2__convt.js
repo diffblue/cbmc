@@ -56,7 +56,7 @@ var classsmt2__convt =
     [ "convert_union", "classsmt2__convt.html#aaa662dfaa8d9773763b20c91a6db2561", null ],
     [ "convert_update", "classsmt2__convt.html#ad6b16cc8510e3e4bf5b77647822bb6e0", null ],
     [ "convert_with", "classsmt2__convt.html#aaff22045e19cd027407a320a893c90b0", null ],
-    [ "dec_solve", "classsmt2__convt.html#af81dcacd07c53ec16bd4101640c3d75e", null ],
+    [ "dec_solve", "classsmt2__convt.html#a29223dc8875131d6b5cf1202a9ef7764", null ],
     [ "decision_procedure_text", "classsmt2__convt.html#a7d693c703cc7921c1a885e538f809ac3", null ],
     [ "define_object_size", "classsmt2__convt.html#a83458c9188b4d6e02d32dd33ad12cbb4", null ],
     [ "find_symbols", "classsmt2__convt.html#a093ab95cde0c0f3179edddba8ff1a149", null ],
