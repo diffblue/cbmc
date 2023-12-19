@@ -89,6 +89,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 #define CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 
+#include <util/config.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
@@ -152,6 +153,7 @@ class optionst;
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
   OPT_GOTO_CHECK \
+  OPT_CONFIG_LIBRARY \
   "(show-symbol-table)(show-parse-tree)" \
   "(property):" \
   "(verbosity):(version)" \
