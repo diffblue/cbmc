@@ -42,4 +42,4 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
   rm "${name}-mod.c"
 fi
 $goto_instrument --show-goto-functions "${name}-mod.gb"
-$cbmc --no-standard-checks "${name}-mod.gb" ${args_cbmc}
+$cbmc "${name}-mod.gb" ${args_cbmc}
