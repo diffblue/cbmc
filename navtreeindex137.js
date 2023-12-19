@@ -1,6 +1,5 @@
 var NAVTREEINDEX137 =
 {
-"structsolver__hardnesst.html#a99da81aaf61f883d2d2353635f3e717a":[8,0,1156,21],
 "structsolver__hardnesst.html#aa48796f202a3fd4597959b79422cded4":[8,0,1156,11],
 "structsolver__hardnesst.html#ab8d5c8b2bdb3dc9c4be0129babc03225":[8,0,1156,19],
 "structsolver__hardnesst.html#ab8ef13570d1820dae01892f61820e0d4":[8,0,1156,20],
@@ -249,5 +248,6 @@ var NAVTREEINDEX137 =
 "structtdefl__compressor.html#afd5820d45d173546cc6b996fdca53689":[8,0,1260,31],
 "structtdefl__output__buffer.html":[8,0,1261],
 "structtdefl__output__buffer.html#a26e5da3f933edc1a218afbe7838e9d22":[8,0,1261,1],
-"structtdefl__output__buffer.html#a60119e1ddcb4fb92149189bed7cb8250":[8,0,1261,2]
+"structtdefl__output__buffer.html#a60119e1ddcb4fb92149189bed7cb8250":[8,0,1261,2],
+"structtdefl__output__buffer.html#ab0705ebff551ebede28640ada5a9d2ab":[8,0,1261,0]
 };

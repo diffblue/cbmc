@@ -1,5 +1,6 @@
 var NAVTREEINDEX12 =
 {
+"classbdd__nodet.html#ae6e3bd59583fbbff3e48b0ca3bcb70c5":[8,0,111,7],
 "classbddt.html":[8,0,112],
 "classbddt.html#a09bd505bd242852d7f920c94ee369948":[8,0,112,15],
 "classbddt.html#a09bd505bd242852d7f920c94ee369948":[8,0,112,14],
@@ -237,17 +238,16 @@ var NAVTREEINDEX12 =
 "classbswap__exprt.html#affebc305264ae4fa27fc3d396e06e24a":[8,0,130,3],
 "classbv__arithmetict.html":[8,0,131],
 "classbv__arithmetict.html#a0305b483a36ae59681f044940dd0624e":[8,0,131,0],
-"classbv__pointers__widet.html#a201791de3eabba312c28fbeeeadfa0f9":[8,0,136,9],
-"classbv__pointers__widet.html#a218b027b1e74b594e95a32bb38a7eab2":[8,0,136,17],
-"classbv__pointers__widet.html#a2ed2b694f2443c332efb9e05e556a1b7":[8,0,136,10],
-"classbv__pointers__widet.html#a4215f5a755d224d92d89eaf215345983":[8,0,136,8],
-"classbv__pointers__widet.html#a56c564def3b38193bf44e58bd5d57bce":[8,0,136,15],
-"classbv__pointers__widet.html#a5ac573319ead10c6804a506906020b76":[8,0,136,18],
-"classbv__pointers__widet.html#a67d9c04a0cfcf4696ae132c9d4f562b4":[8,0,136,12],
-"classbv__pointers__widet.html#a6abaa2402153d31dcfd959e2d7926f3a":[8,0,136,20],
-"classbv__pointers__widet.html#a72a22930fe0546d798302ec37f268d91":[8,0,136,23],
-"classbv__pointers__widet.html#a76d4d48a9be759325d1de167d598a87f":[8,0,136,24],
-"classbv__pointers__widet.html#a9f5887fab61082cede81e12837f8c5a1":[8,0,136,21],
-"classbv__pointers__widet.html#aad87961e55a98e2655b3ddbb6da19f71":[8,0,136,25],
-"classbv__pointers__widet.html#ab883d587a6000827beccaba698f58fde":[8,0,136,19]
+"classbv__arithmetict.html#a031053207f45a45264d1198f85e0f9dd":[8,0,131,28],
+"classbv__arithmetict.html#a03dd921bafa400156863684113a7b97e":[8,0,131,20],
+"classbv__arithmetict.html#a0bfd09cdd94e28c324e89e97842bac65":[8,0,131,23],
+"classbv__arithmetict.html#a0dea026209fe2486fa6785ecb23d36b7":[8,0,131,31],
+"classbv__arithmetict.html#a18b5bbfeb8a58a2faa42add668b854af":[8,0,131,1],
+"classbv__arithmetict.html#a19e8e20e301d032d2ebb713f2e14ac39":[8,0,131,17],
+"classbv__arithmetict.html#a3a33195cc0e2598ea362beaa8b919294":[8,0,131,4],
+"classbv__arithmetict.html#a3b823bb7b8894e57a4bdda76e25677f2":[8,0,131,29],
+"classbv__arithmetict.html#a408dc71b708eb717b707d76dee8c4f7f":[8,0,131,27],
+"classbv__arithmetict.html#a45a70df978a2f46977736a7857fe6867":[8,0,131,7],
+"classbv__arithmetict.html#a4cf27661ecf3a11b40e2dbea19d8fc15":[8,0,131,13],
+"classbv__arithmetict.html#a548497335d6a71f777ec750922b1487b":[8,0,131,30]
 };
