@@ -71,10 +71,12 @@ class symbol_table_baset;
 
 #define OPT_CONFIG_LIBRARY                                                     \
   "(malloc-fail-assert)(malloc-fail-null)(malloc-may-fail)"                    \
+  "(no-malloc-may-fail)"                                                       \
   "(string-abstraction)"
 
 #define HELP_CONFIG_LIBRARY                                                    \
   " {y--malloc-may-fail} \t allow malloc calls to return a null pointer\n"     \
+  " {y--no-malloc-may-fail} \t disable potential malloc failure\n"             \
   " {y--malloc-fail-assert} \t "                                               \
   "set malloc failure mode to assert-then-assume\n"                            \
   " {y--malloc-fail-null} \t set malloc failure mode to return null\n"         \
@@ -272,7 +274,7 @@ public:
     libt lib;
 
     bool string_abstraction;
-    bool malloc_may_fail = false;
+    bool malloc_may_fail = true;
 
     enum malloc_failure_modet
     {
@@ -281,7 +283,7 @@ public:
       malloc_failure_mode_assert_then_assume = 2
     };
 
-    malloc_failure_modet malloc_failure_mode = malloc_failure_mode_none;
+    malloc_failure_modet malloc_failure_mode = malloc_failure_mode_return_null;
 
     static const std::size_t default_object_bits = 8;
 

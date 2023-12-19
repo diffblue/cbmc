@@ -126,10 +126,28 @@ void cbmc_parse_optionst::set_default_analysis_flags(
   {
     options.set_option("unwinding-assertions", enabled);
   }
+
+  if(enabled)
+  {
+    config.ansi_c.malloc_may_fail = true;
+    config.ansi_c.malloc_failure_mode =
+      configt::ansi_ct::malloc_failure_modet::malloc_failure_mode_return_null;
+  }
+  else
+  {
+    config.ansi_c.malloc_may_fail = false;
+    config.ansi_c.malloc_failure_mode =
+      configt::ansi_ct::malloc_failure_modet::malloc_failure_mode_none;
+  }
 }
 
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
 {
+  // Enable flags that in combination provide analysis with no surprises
+  // (expected checks and no unsoundness by missing checks).
+  cbmc_parse_optionst::set_default_analysis_flags(
+    options, !cmdline.isset("no-standard-checks"));
+
   if(config.set(cmdline))
   {
     usage_error();
@@ -365,11 +383,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   options.set_option(
     "self-loops-to-assumptions",
     !cmdline.isset("no-self-loops-to-assumptions"));
-
-  // Enable flags that in combination provide analysis with no surprises
-  // (expected checks and no unsoundness by missing checks).
-  cbmc_parse_optionst::set_default_analysis_flags(
-    options, !cmdline.isset("no-standard-checks"));
 
   // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
