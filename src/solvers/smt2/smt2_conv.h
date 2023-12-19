@@ -102,7 +102,7 @@ protected:
     unordered_map<irep_idt, std::function<void(const exprt &)>, irep_id_hash>;
   converterst converters;
 
-  std::vector<exprt> assumptions;
+  std::vector<literalt> assumptions;
   boolbv_widtht boolbv_width;
 
   std::size_t number_of_solver_calls = 0;

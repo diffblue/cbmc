@@ -42,12 +42,21 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
     temp_file_stderr("smt2_dec_stderr_", "");
 
   const auto write_problem_to_file = [&](std::ofstream problem_out) {
+    if(assumption.is_not_nil())
+      assumptions.push_back(convert(assumption));
+
     cached_output << stringstream.str();
     stringstream.str(std::string{});
+
     write_footer();
+
+    if(assumption.is_not_nil())
+      assumptions.pop_back();
+
     problem_out << cached_output.str() << stringstream.str();
     stringstream.str(std::string{});
   };
+
   write_problem_to_file(std::ofstream(
     temp_file_problem(), std::ios_base::out | std::ios_base::trunc));
 
