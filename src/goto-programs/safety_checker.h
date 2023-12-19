@@ -24,12 +24,7 @@ class goto_functionst;
 class safety_checkert:public messaget
 {
 public:
-  explicit safety_checkert(
-    const namespacet &_ns);
-
-  explicit safety_checkert(
-    const namespacet &_ns,
-    message_handlert &_message_handler);
+  safety_checkert(const namespacet &_ns, message_handlert &_message_handler);
 
   enum class resultt
   {
