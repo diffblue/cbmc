@@ -63,4 +63,4 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
   rm "${name}${dfcc_suffix}-mod.c"
 fi
 $goto_instrument --show-goto-functions "${name}${dfcc_suffix}-mod.gb"
-$cbmc --no-standard-checks "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}
+$cbmc "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}
