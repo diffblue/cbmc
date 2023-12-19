@@ -51,7 +51,6 @@ public:
 protected:
   dfcc_libraryt &library;
   message_handlert &message_handler;
-  messaget log;
 };
 
 #endif
