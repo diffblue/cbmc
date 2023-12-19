@@ -1,11 +1,5 @@
 var NAVTREEINDEX130 =
 {
-"structbv__refinementt_1_1approximationt.html#ab7f74f8ba20c7636dab7913900aaede2":[8,0,138,0,1],
-"structbv__refinementt_1_1approximationt.html#ac15ee02667959f755bc10be3d2e528a8":[8,0,138,0,17],
-"structbv__refinementt_1_1approximationt.html#aca902cc90c30456c04eba07437bd8aa9":[8,0,138,0,9],
-"structbv__refinementt_1_1approximationt.html#ae75be3510735ce7ed83c2eb2bd2cb1e4":[8,0,138,0,14],
-"structbv__refinementt_1_1approximationt.html#aefc4529da28e9925114aadf51aace5cd":[8,0,138,0,8],
-"structbv__refinementt_1_1approximationt.html#af06567bf6c2cd3b2d342ff173ac3001d":[8,0,138,0,0],
 "structbv__refinementt_1_1approximationt.html#af64f49811038d39aec99c38ba2fdc7a6":[8,0,138,0,6],
 "structbv__refinementt_1_1approximationt.html#afd67fd10df3f84ae3504c2155bd26c34":[8,0,138,0,10],
 "structbv__refinementt_1_1configt.html":[8,0,138,1],
@@ -249,5 +243,11 @@ var NAVTREEINDEX130 =
 "structconfigt_1_1ansi__ct.html#ad5f38da55f83dd34bb403dff3cba4bf6":[8,0,256,0,54],
 "structconfigt_1_1ansi__ct.html#ada723b2cb1666be3ff494b27df4758bd":[8,0,256,0,21],
 "structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591e":[8,0,256,0,6],
-"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea32d8b233e3c58a262a0b75872297d8d5":[8,0,256,0,6,1]
+"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea32d8b233e3c58a262a0b75872297d8d5":[8,0,256,0,6,1],
+"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea47f45e65244c17ec9fa8771a5c6d60e1":[8,0,256,0,6,5],
+"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea4e039bbec176af81eb7f5ac299517216":[8,0,256,0,6,3],
+"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea5481bd2e9b6a066bd69eec52fff9dff8":[8,0,256,0,6,2],
+"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea571e24dc3d8793b5c5d3eb370c2aede9":[8,0,256,0,6,4],
+"structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591eab50339a10e1de285ac99d4c3990b8693":[8,0,256,0,6,0],
+"structconfigt_1_1ansi__ct.html#adc1cba4fe2b1f6716d17f49eda886ec7":[8,0,256,0,60]
 };
