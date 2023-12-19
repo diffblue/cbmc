@@ -19,7 +19,7 @@ jobs:
       CC: "ccache /usr/bin/clang-13"
       CXX: "ccache /usr/bin/clang++-13"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -71,7 +71,7 @@ jobs:
   check-macos-13-cmake-clang-rust:
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Fetch dependencies

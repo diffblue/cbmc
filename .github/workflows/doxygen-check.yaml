@@ -10,7 +10,7 @@ jobs:
     # sync with the `publish` job.
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Fetch dependencies
       env:
         # This is needed in addition to -yq to prevent apt-get from asking for
