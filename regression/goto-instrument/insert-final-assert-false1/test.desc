@@ -1,6 +1,6 @@
 CORE
 main.c
---insert-final-assert-false main
+--insert-final-assert-false main _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 insert-final-assert-false \(should fail\) : SUCCESS

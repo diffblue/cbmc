@@ -1,6 +1,6 @@
 CORE
 test.c
---function-pointer-restrictions-file restrictions.json
+--function-pointer-restrictions-file restrictions.json _ --no-standard-checks
 \[use_f\.pointer_dereference\.1\] line \d+ dereferenced function pointer must be one of \[(f|g), (f|g)\]: FAILURE
 ^EXIT=10$
 ^SIGNAL=0$

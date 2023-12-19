@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
---full-slice --add-library
+--full-slice --add-library --no-malloc-may-fail _ --no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

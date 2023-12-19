@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 2 --full-slice --add-library
+--no-malloc-may-fail --unwind 2 --full-slice --add-library _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

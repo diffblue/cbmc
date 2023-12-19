@@ -1,6 +1,6 @@
 CORE
 main.c
---add-library --generate-function-body-options assert-false --generate-function-body '([^_]*)'
+--add-library --generate-function-body-options assert-false --generate-function-body '([^_]*)' _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL
