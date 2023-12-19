@@ -463,7 +463,7 @@ prop_conv_solvert::dec_solve(const exprt &assumption)
   if(assumption.is_nil())
     push();
   else
-    push({literal_exprt(convert(assumption))});
+    push({assumption});
 
   auto prop_result = prop.prop_solve(assumption_stack);
 
@@ -539,7 +539,12 @@ void prop_conv_solvert::push(const std::vector<exprt> &assumptions)
   // We push the given assumptions as a single context onto the stack.
   assumption_stack.reserve(assumption_stack.size() + assumptions.size());
   for(const auto &assumption : assumptions)
-    assumption_stack.push_back(to_literal_expr(assumption).get_literal());
+  {
+    auto literal = convert(assumption);
+    if(!literal.is_constant())
+      set_frozen(literal);
+    assumption_stack.push_back(literal);
+  }
   context_size_stack.push_back(assumptions.size());
 }
 

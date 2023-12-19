@@ -95,7 +95,7 @@ bool goto_symex_fault_localizert::check(
   }
 
   // lock the failed assertion
-  assumptions.push_back(solver.handle(not_exprt(failed_step.cond_handle)));
+  assumptions.push_back(not_exprt(failed_step.cond_handle));
 
   solver.push(assumptions);
 
