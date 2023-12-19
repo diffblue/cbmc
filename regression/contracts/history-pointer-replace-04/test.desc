@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-call-with-contract foo
+--replace-call-with-contract foo _ --no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[foo.precondition.\d+\] line \d+ Check requires clause of foo in main: SUCCESS$

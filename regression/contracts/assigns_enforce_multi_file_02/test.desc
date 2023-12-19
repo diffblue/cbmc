@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f1
+--enforce-contract f1 _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[f1.assigns.\d+\] line \d+ Check that \*a is valid: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main_enforce.c
---enforce-contract resize_vec _ --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check
+--enforce-contract resize_vec _ --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check --no-standard-checks
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

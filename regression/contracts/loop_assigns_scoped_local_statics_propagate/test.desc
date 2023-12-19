@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-call-with-contract bar --apply-loop-contracts
+--replace-call-with-contract bar --apply-loop-contracts _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assigns.\d+\] line \d+ Check that j \(assigned by the contract of bar\) is assignable: SUCCESS$

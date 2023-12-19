@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract foo _ --pointer-primitive-check
+--enforce-contract foo _ --pointer-primitive-check --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[foo.assigns.\d+\] line \d+ Check that x is valid: SUCCESS$
