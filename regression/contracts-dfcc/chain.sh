@@ -44,7 +44,7 @@ else
 fi
 
 if [[ "${args_inst}" != *"malloc"* ]]; then
-  args_inst="--no-malloc-fail $args_inst"
+  args_inst="--no-malloc-may-fail $args_inst"
 fi
 
 rm -f "${name}${dfcc_suffix}-mod.gb"
