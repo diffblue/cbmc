@@ -106,7 +106,7 @@ protected:
 
   std::size_t number_of_solver_calls = 0;
 
-  resultt dec_solve() override;
+  resultt dec_solve(const exprt &) override;
 
   void write_header();
   /// Writes the end of the SMT file to the `smt_convt::out` stream. These parts

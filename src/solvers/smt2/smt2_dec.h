@@ -39,11 +39,11 @@ public:
   {
   }
 
-  resultt dec_solve() override;
   std::string decision_procedure_text() const override;
 
 protected:
   message_handlert &message_handler;
+  resultt dec_solve(const exprt &) override;
 
   /// Everything except the footer is cached, so that output files can be
   /// rewritten with varying footers.

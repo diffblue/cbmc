@@ -39,7 +39,7 @@ public:
 
   explicit bv_refinementt(const infot &info);
 
-  decision_proceduret::resultt dec_solve() override;
+  decision_proceduret::resultt dec_solve(const exprt &) override;
 
   std::string decision_procedure_text() const override
   {

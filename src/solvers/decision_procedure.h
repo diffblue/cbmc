@@ -17,18 +17,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class exprt;
 
+/// An interface for a decision procedure for satisfiability problems.
 class decision_proceduret
 {
 public:
   /// For a Boolean expression \p expr, add the constraint 'expr' if \p value
   /// is `true`, otherwise add 'not expr'
-  virtual void set_to(const exprt &expr, bool value) = 0;
+  virtual void set_to(const exprt &, bool value) = 0;
 
   /// For a Boolean expression \p expr, add the constraint 'expr'
-  void set_to_true(const exprt &expr);
+  void set_to_true(const exprt &);
 
   /// For a Boolean expression \p expr, add the constraint 'not expr'
-  void set_to_false(const exprt &expr);
+  void set_to_false(const exprt &);
 
   /// Generate a handle, which is an expression that
   /// has the same value as the argument in any model
@@ -37,7 +38,7 @@ public:
   /// \ref set_to.
   /// The returned expression may be the expression itself or a more compact
   /// but solver-specific representation.
-  virtual exprt handle(const exprt &expr) = 0;
+  virtual exprt handle(const exprt &) = 0;
 
   /// Result of running the decision procedure
   enum class resultt
@@ -48,12 +49,18 @@ public:
   };
 
   /// Run the decision procedure to solve the problem
+  /// This corresponds to SMT-LIB's check-sat.
   resultt operator()();
+
+  /// Run the decision procedure to solve the problem under
+  /// the given assumption.
+  /// This corresponds to SMT-LIB's check-sat-assuming.
+  resultt operator()(const exprt &assumption);
 
   /// Return \p expr with variables replaced by values from satisfying
   /// assignment if available.
   /// Return `nil` if not available
-  virtual exprt get(const exprt &expr) const = 0;
+  virtual exprt get(const exprt &) const = 0;
 
   /// Print satisfying assignment to \p out
   virtual void print_assignment(std::ostream &out) const = 0;
@@ -67,8 +74,8 @@ public:
   virtual ~decision_proceduret();
 
 protected:
-  /// Run the decision procedure to solve the problem
-  virtual resultt dec_solve() = 0;
+  /// Implementation of the decision procedure.
+  virtual resultt dec_solve(const exprt &assumption) = 0;
 };
 
 /// Add Boolean constraint \p src to decision procedure \p dest

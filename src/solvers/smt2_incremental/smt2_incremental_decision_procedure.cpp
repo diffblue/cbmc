@@ -687,7 +687,8 @@ exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
   return lowered;
 }
 
-decision_proceduret::resultt smt2_incremental_decision_proceduret::dec_solve()
+decision_proceduret::resultt
+smt2_incremental_decision_proceduret::dec_solve(const exprt &assumption)
 {
   ++number_of_solver_calls;
   define_object_properties();

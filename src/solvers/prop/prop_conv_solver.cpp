@@ -439,7 +439,8 @@ void prop_conv_solvert::finish_eager_conversion()
 {
 }
 
-decision_proceduret::resultt prop_conv_solvert::dec_solve()
+decision_proceduret::resultt
+prop_conv_solvert::dec_solve(const exprt &assumption)
 {
   // post-processing isn't incremental yet
   if(!post_processing_done)
@@ -459,7 +460,16 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   log.statistics() << "Solving with " << prop.solver_text() << messaget::eom;
 
-  switch(prop.prop_solve(assumption_stack))
+  if(assumption.is_nil())
+    push();
+  else
+    push({literal_exprt(convert(assumption))});
+
+  auto prop_result = prop.prop_solve(assumption_stack);
+
+  pop();
+
+  switch(prop_result)
   {
   case propt::resultt::P_SATISFIABLE:
     return resultt::D_SATISFIABLE;

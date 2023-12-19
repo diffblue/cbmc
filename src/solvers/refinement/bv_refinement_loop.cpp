@@ -21,7 +21,7 @@ bv_refinementt::bv_refinementt(const infot &info)
   PRECONDITION(prop.has_is_in_conflict());
 }
 
-decision_proceduret::resultt bv_refinementt::dec_solve()
+decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
 {
   // do the usual post-processing
   log.status() << "BV-Refinement: post-processing" << messaget::eom;

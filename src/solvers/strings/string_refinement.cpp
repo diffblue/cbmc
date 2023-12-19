@@ -603,7 +603,8 @@ output_equations(std::ostream &output, const std::vector<exprt> &equations)
 /// \return `resultt::D_SATISFIABLE` if the constraints are satisfiable,
 ///   `resultt::D_UNSATISFIABLE` if they are unsatisfiable,
 ///   `resultt::D_ERROR` if the limit of iteration was reached.
-decision_proceduret::resultt string_refinementt::dec_solve()
+decision_proceduret::resultt
+string_refinementt::dec_solve(const exprt &assumption)
 {
 #ifdef DEBUG
   log.debug() << "dec_solve: Initial set of equations" << messaget::eom;
@@ -781,7 +782,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
   dependencies.clean_cache();
-  const decision_proceduret::resultt initial_result = supert::dec_solve();
+  const decision_proceduret::resultt initial_result =
+    supert::dec_solve(nil_exprt());
   if(initial_result == resultt::D_SATISFIABLE)
   {
     bool satisfied;
@@ -822,7 +824,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   while((loop_bound_--) > 0)
   {
     dependencies.clean_cache();
-    const decision_proceduret::resultt refined_result = supert::dec_solve();
+    const decision_proceduret::resultt refined_result =
+      supert::dec_solve(nil_exprt());
 
     if(refined_result == resultt::D_SATISFIABLE)
     {

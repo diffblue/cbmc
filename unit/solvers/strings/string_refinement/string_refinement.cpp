@@ -100,7 +100,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
       solver.set_to(
         equal_exprt{return_length, from_integer(15, int_type)}, true);
 
-      auto result = solver.dec_solve();
+      auto result = solver();
       THEN("The formula is satisfiable")
       {
         REQUIRE(result == decision_proceduret::resultt::D_SATISFIABLE);
@@ -136,7 +136,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
         "The formula is satisfiable and the model of the array should have"
         "length 10 and end with 'b'")
       {
-        auto result = solver.dec_solve();
+        auto result = solver();
         REQUIRE(result == decision_proceduret::resultt::D_SATISFIABLE);
         const exprt array_model = solver.get(array1);
         REQUIRE(can_cast_expr<array_exprt>(array_model));
@@ -183,7 +183,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
         "The model for array1 has length 10 and contains 'c' at "
         " position 3 and b at position 9")
       {
-        auto result = solver.dec_solve();
+        auto result = solver();
         REQUIRE(result == decision_proceduret::resultt::D_SATISFIABLE);
         const exprt array_model = solver.get(array1);
         REQUIRE(can_cast_expr<array_exprt>(array_model));
@@ -230,7 +230,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
         true);
       THEN("The model for array1 has length 10 and contains 'c' at position 9")
       {
-        auto result = solver.dec_solve();
+        auto result = solver();
         REQUIRE(result == decision_proceduret::resultt::D_SATISFIABLE);
         const exprt array_model = solver.get(array1);
         REQUIRE(can_cast_expr<array_exprt>(array_model));
