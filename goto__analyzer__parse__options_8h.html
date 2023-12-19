@@ -98,7 +98,8 @@ $(document).ready(function(){initNavTree('goto__analyzer__parse__options_8h.html
 
 <p>Goto-Analyser Command Line Option Processing.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="parse__options_8h_source.html">util/parse_options.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="config_8h_source.html">util/config.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="parse__options_8h_source.html">util/parse_options.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="timestamper_8h_source.html">util/timestamper.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="ui__message_8h_source.html">util/ui_message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="validation__interface_8h_source.html">util/validation_interface.h</a>&gt;</code><br />
@@ -113,7 +114,7 @@ $(document).ready(function(){initNavTree('goto__analyzer__parse__options_8h.html
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="goto__analyzer__parse__options_8h__incl.svg" width="2934" height="887"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="goto__analyzer__parse__options_8h__incl.svg" width="3070" height="723"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -200,6 +201,7 @@ Output</h2>
 <div class="line">  OPT_SHOW_GOTO_FUNCTIONS \</div>
 <div class="line">  OPT_SHOW_PROPERTIES \</div>
 <div class="line">  OPT_GOTO_CHECK \</div>
+<div class="line">  OPT_CONFIG_LIBRARY \</div>
 <div class="line">  <span class="stringliteral">&quot;(show-symbol-table)(show-parse-tree)&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(property):&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(verbosity):(version)&quot;</span> \</div>
@@ -218,7 +220,7 @@ Output</h2>
 <div class="line">  GOTO_ANALYSER_OPTIONS_OUTPUT \</div>
 <div class="line">  GOTO_ANALYSER_OPTIONS_SPECIFIC_ANALYSES \</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00148">148</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00149">149</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
 
 </div>
 </div>
@@ -238,7 +240,7 @@ Output</h2>
 <div class="line">  <span class="stringliteral">&quot;(legacy-ait)&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(legacy-concurrent)&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00115">115</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00116">116</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
 
 </div>
 </div>
@@ -260,7 +262,7 @@ Output</h2>
 <div class="line">  <span class="stringliteral">&quot;(vsd)(variable-sensitivity)&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(dependence-graph-vs)&quot;</span> \</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00128">128</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00129">129</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
 
 </div>
 </div>
@@ -281,7 +283,7 @@ Output</h2>
 <div class="line">  <span class="stringliteral">&quot;(branching):&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(loop-unwind-and-branching):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00121">121</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00122">122</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
 
 </div>
 </div>
@@ -299,7 +301,7 @@ Output</h2>
 <b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(json):(xml):&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(text):(dot):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00140">140</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00141">141</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
 
 </div>
 </div>
@@ -317,7 +319,7 @@ Output</h2>
 <b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(taint):(show-taint)&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(show-local-may-alias)&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00144">144</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00145">145</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
 
 </div>
 </div>
@@ -335,7 +337,7 @@ Output</h2>
 <b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot;(one-domain-per-history)&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(one-domain-per-location)&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00136">136</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00137">137</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
 
 </div>
 </div>
@@ -356,7 +358,7 @@ Output</h2>
 <div class="line">  <span class="stringliteral">&quot;(reachable-functions)&quot;</span>           \</div>
 <div class="line">  <span class="stringliteral">&quot;(no-standard-checks)&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00108">108</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__analyzer__parse__options_8h_source.html#l00109">109</a> of file <a class="el" href="goto__analyzer__parse__options_8h_source.html">goto_analyzer_parse_options.h</a>.</p>
 
 </div>
 </div>
