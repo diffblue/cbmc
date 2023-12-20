@@ -27,8 +27,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_parsert final : public parsert
 {
 public:
-  explicit java_bytecode_parsert(bool skip_instructions)
-    : skip_instructions(skip_instructions)
+  java_bytecode_parsert(
+    bool skip_instructions,
+    message_handlert &message_handler)
+    : parsert(message_handler), skip_instructions(skip_instructions)
   {
   }
 
@@ -1809,9 +1811,9 @@ std::optional<java_bytecode_parse_treet> java_bytecode_parse(
   message_handlert &message_handler,
   bool skip_instructions)
 {
-  java_bytecode_parsert java_bytecode_parser(skip_instructions);
+  java_bytecode_parsert java_bytecode_parser(
+    skip_instructions, message_handler);
   java_bytecode_parser.in=&istream;
-  java_bytecode_parser.log.set_message_handler(message_handler);
 
   bool parser_result=java_bytecode_parser.parse();
 
