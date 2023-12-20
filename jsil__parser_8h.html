@@ -90,8 +90,7 @@ $(document).ready(function(){initNavTree('jsil__parser_8h.html',''); initResizab
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">jsil_parser.h File Reference</div>  </div>
 </div><!--header-->
@@ -127,25 +126,18 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a9c6c4a93fa01f18cf2e8779c4821c3dd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jsil__parser_8h.html#a9c6c4a93fa01f18cf2e8779c4821c3dd">yyjsilparse</a> ()</td></tr>
-<tr class="separator:a9c6c4a93fa01f18cf2e8779c4821c3dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe854d80cabd6380ab7f932de4df5d5a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jsil__parser_8h.html#abe854d80cabd6380ab7f932de4df5d5a">yyjsilerror</a> (const std::string &amp;error)</td></tr>
-<tr class="separator:abe854d80cabd6380ab7f932de4df5d5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad79917e6dc81de832b201615e3c37ec2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jsil__parser_8h.html#ad79917e6dc81de832b201615e3c37ec2">jsil_scanner_init</a> ()</td></tr>
-<tr class="separator:ad79917e6dc81de832b201615e3c37ec2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:abb103aa9db12e65e954f9094a3ff21d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classjsil__parsert.html">jsil_parsert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jsil__parser_8h.html#abb103aa9db12e65e954f9094a3ff21d5">jsil_parser</a></td></tr>
-<tr class="separator:abb103aa9db12e65e954f9094a3ff21d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a992d5f5aba3fc5e942529d7efc5f5a79"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jsil__parser_8h.html#a992d5f5aba3fc5e942529d7efc5f5a79">yyjsilparse</a> (<a class="el" href="classjsil__parsert.html">jsil_parsert</a> &amp;)</td></tr>
+<tr class="separator:a992d5f5aba3fc5e942529d7efc5f5a79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea744103a58a0245dd8ed52f843a6860"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jsil__parser_8h.html#aea744103a58a0245dd8ed52f843a6860">jsil_scanner_init</a> (<a class="el" href="classjsil__parsert.html">jsil_parsert</a> &amp;)</td></tr>
+<tr class="separator:aea744103a58a0245dd8ed52f843a6860"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Jsil Language. </p>
 
 <p class="definition">Definition in file <a class="el" href="jsil__parser_8h_source.html">jsil_parser.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ad79917e6dc81de832b201615e3c37ec2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad79917e6dc81de832b201615e3c37ec2">&#9670;&nbsp;</a></span>jsil_scanner_init()</h2>
+<a id="aea744103a58a0245dd8ed52f843a6860"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea744103a58a0245dd8ed52f843a6860">&#9670;&nbsp;</a></span>jsil_scanner_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -153,6 +145,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void jsil_scanner_init </td>
           <td>(</td>
+          <td class="paramtype"><a class="el" href="classjsil__parsert.html">jsil_parsert</a> &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -161,28 +154,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="abe854d80cabd6380ab7f932de4df5d5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe854d80cabd6380ab7f932de4df5d5a">&#9670;&nbsp;</a></span>yyjsilerror()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int yyjsilerror </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>error</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="jsil__parser_8cpp_source.html#l00018">18</a> of file <a class="el" href="jsil__parser_8cpp_source.html">jsil_parser.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a9c6c4a93fa01f18cf2e8779c4821c3dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c6c4a93fa01f18cf2e8779c4821c3dd">&#9670;&nbsp;</a></span>yyjsilparse()</h2>
+<a id="a992d5f5aba3fc5e942529d7efc5f5a79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a992d5f5aba3fc5e942529d7efc5f5a79">&#9670;&nbsp;</a></span>yyjsilparse()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -190,36 +163,12 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">int yyjsilparse </td>
           <td>(</td>
+          <td class="paramtype"><a class="el" href="classjsil__parsert.html">jsil_parsert</a> &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="abb103aa9db12e65e954f9094a3ff21d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb103aa9db12e65e954f9094a3ff21d5">&#9670;&nbsp;</a></span>jsil_parser</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classjsil__parsert.html">jsil_parsert</a> jsil_parser</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="jsil__parser_8cpp_source.html#l00014">14</a> of file <a class="el" href="jsil__parser_8cpp_source.html">jsil_parser.cpp</a>.</p>
 
 </div>
 </div>
