@@ -3,10 +3,10 @@
 
 #include "xml_parser.h"
 
-int yyxmllex();
+int yyxmllex(xml_parsert &xml_parser);
 extern char *yyxmltext;
 
-int yyxmlerror(const std::string &error)
+int yyxmlerror(xml_parsert &xml_parser, const std::string &error)
 {
   xml_parser.parse_error(error, yyxmltext);
   return 0;
@@ -25,6 +25,9 @@ int yyxmlerror(const std::string &error)
 #pragma warning(disable:4702)
 #endif
 %}
+
+%parse-param {xml_parsert &xml_parser}
+%lex-param {xml_parsert &xml_parser}
 
 %union {char *s;}
 
