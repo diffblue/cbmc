@@ -17,6 +17,7 @@ class symbol_table_baset;
 //! \return 'true' in case of error
 bool builtin_factory(
   const irep_idt &identifier,
+  bool support_ts_18661_3_Floatn_types,
   symbol_table_baset &,
   message_handlert &);
 

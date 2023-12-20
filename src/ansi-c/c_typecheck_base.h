@@ -250,6 +250,8 @@ protected:
 
   virtual bool gcc_types_compatible_p(const typet &, const typet &);
 
+  virtual bool builtin_factory(const irep_idt &);
+
   // types
   virtual void typecheck_type(typet &type);
   virtual void typecheck_compound_type(struct_union_typet &type);
