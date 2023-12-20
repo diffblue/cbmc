@@ -38,7 +38,7 @@ static int isatty(int) { return 0; }
 #include "literals/convert_string_literal.h"
 #include "literals/unescape_string.h"
 
-#define PARSER ansi_c_parser
+#define PARSER (*ansi_c_parser)
 #define YYSTYPE unsigned
 #undef  ECHO
 #define ECHO
@@ -48,6 +48,19 @@ static int isatty(int) { return 0; }
 #ifdef ANSI_C_DEBUG
 extern int yyansi_cdebug;
 #endif
+
+static ansi_c_parsert *ansi_c_parser;
+void ansi_c_scanner_init(ansi_c_parsert &_ansi_c_parser)
+{
+#ifdef ANSI_C_DEBUG
+  yyansi_cdebug=1;
+#endif
+  ansi_c_parser = &_ansi_c_parser;
+  YY_FLUSH_BUFFER;
+  BEGIN(0);
+}
+
+int yyansi_cerror(const std::string &error);
 
 #define loc() \
   { newstack(yyansi_clval); PARSER.set_source_location(parser_stack(yyansi_clval)); }
@@ -263,17 +276,6 @@ enable_or_disable ("enable"|"disable")
 %x CPROVER_ID
 %x CPROVER_PRAGMA
 %x OTHER_PRAGMA
-
-%{
-void ansi_c_scanner_init()
-{
-#ifdef ANSI_C_DEBUG
-  yyansi_cdebug=1;
-#endif
-  YY_FLUSH_BUFFER;
-  BEGIN(0);
-}
-%}
 
 %%
 

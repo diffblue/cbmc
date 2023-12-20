@@ -18,15 +18,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_parse_tree.h"
 #include "ansi_c_scope.h"
 
-int yyansi_cparse();
+class ansi_c_parsert;
+int yyansi_cparse(ansi_c_parsert &);
 
 class ansi_c_parsert:public parsert
 {
 public:
   ansi_c_parse_treet parse_tree;
 
-  ansi_c_parsert()
-    : tag_following(false),
+  explicit ansi_c_parsert(message_handlert &message_handler)
+    : parsert(message_handler),
+      tag_following(false),
       asm_block_following(false),
       parenthesis_counter(0),
       mode(modet::NONE),
@@ -35,11 +37,14 @@ public:
       for_has_scope(false),
       ts_18661_3_Floatn_types(false)
   {
+    // set up global scope
+    scopes.clear();
+    scopes.push_back(scopet());
   }
 
   virtual bool parse() override
   {
-    return yyansi_cparse()!=0;
+    return yyansi_cparse(*this) != 0;
   }
 
   virtual void clear() override
@@ -166,9 +171,6 @@ private:
   std::list<std::map<const irep_idt, bool>> pragma_cprover_stack;
 };
 
-extern ansi_c_parsert ansi_c_parser;
-
-int yyansi_cerror(const std::string &error);
-void ansi_c_scanner_init();
+void ansi_c_scanner_init(ansi_c_parsert &);
 
 #endif // CPROVER_ANSI_C_ANSI_C_PARSER_H

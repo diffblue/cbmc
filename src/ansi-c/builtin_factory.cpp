@@ -47,16 +47,15 @@ static bool convert(
 {
   std::istringstream in(s.str());
 
-  ansi_c_parser.clear();
+  ansi_c_parsert ansi_c_parser{message_handler};
   ansi_c_parser.set_file(ID_built_in);
   ansi_c_parser.in=&in;
-  ansi_c_parser.log.set_message_handler(message_handler);
   ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
   ansi_c_parser.cpp98=false; // it's not C++
   ansi_c_parser.cpp11=false; // it's not C++
   ansi_c_parser.mode=config.ansi_c.mode;
 
-  ansi_c_scanner_init();
+  ansi_c_scanner_init(ansi_c_parser);
 
   if(ansi_c_parser.parse())
     return true;
