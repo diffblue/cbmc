@@ -20,7 +20,7 @@
 
 #include <util/unicode.h>
 
-int yyjsonlex();
+int yyjsonlex(json_parsert &json_parser);
 extern char *yyjsontext;
 extern int yyjsonleng; // really an int, not a size_t
 
@@ -75,13 +75,16 @@ static std::string convert_TOK_NUMBER()
   return yyjsontext;
 }
 
-int yyjsonerror(const std::string &error)
+int yyjsonerror(json_parsert &json_parser, const std::string &error)
 {
   json_parser.parse_error(error, yyjsontext);
   return 0;
 }
 
 %}
+
+%parse-param {json_parsert &json_parser}
+%lex-param {json_parsert &json_parser}
 
 %token TOK_STRING
 %token TOK_NUMBER

@@ -24,7 +24,7 @@
 #pragma warning(disable:4005)
 #endif
 
-#define PARSER json_parser
+#define PARSER (*json_parser)
 
 #include "json_parser.h"
 #include "json_y.tab.h"
@@ -33,6 +33,19 @@
 #include <util/pragma_wnull_conversion.def> // IWYU pragma: keep
 #include <util/pragma_wdeprecated_register.def> // IWYU pragma: keep
 
+static json_parsert *json_parser;
+
+int yyjsonlex(void);
+
+int yyjsonlex(json_parsert &_json_parser)
+{
+  // our scanner is not reentrant
+  PRECONDITION(!json_parser);
+  json_parser = &_json_parser;
+  int result = yyjsonlex();
+  json_parser = nullptr;
+  return result;
+}
 %}
 
 string  \"\"|\"{chars}\"

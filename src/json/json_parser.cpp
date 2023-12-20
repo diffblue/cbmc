@@ -10,7 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-json_parsert json_parser;
+int yyjsonparse(json_parsert &);
+
+bool json_parsert::parse()
+{
+  return yyjsonparse(*this) != 0;
+}
 
 // 'do it all' function
 bool parse_json(
@@ -19,10 +24,10 @@ bool parse_json(
   message_handlert &message_handler,
   jsont &dest)
 {
-  json_parser.clear();
+  json_parsert json_parser{message_handler};
+
   json_parser.set_file(filename);
   json_parser.in=&in;
-  json_parser.log.set_message_handler(message_handler);
 
   bool result=json_parser.parse();
 
