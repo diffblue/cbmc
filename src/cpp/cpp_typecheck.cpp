@@ -325,7 +325,8 @@ void cpp_typecheckt::clean_up()
 
 bool cpp_typecheckt::builtin_factory(const irep_idt &identifier)
 {
-  return ::builtin_factory(identifier, symbol_table, get_message_handler());
+  return ::builtin_factory(
+    identifier, false, symbol_table, get_message_handler());
 }
 
 bool cpp_typecheckt::contains_cpp_name(const exprt &expr)

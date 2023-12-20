@@ -68,7 +68,7 @@ bool ansi_c_languaget::parse(
   // parsing
 
   std::string code;
-  ansi_c_internal_additions(code);
+  ansi_c_internal_additions(code, config.ansi_c.ts_18661_3_Floatn_types);
   std::istringstream codestr(code);
 
   ansi_c_parser.clear();

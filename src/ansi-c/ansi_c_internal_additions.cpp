@@ -158,7 +158,9 @@ max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
   return ((mp_integer)1) << (mp_integer)bits_for_positive_offset;
 }
 
-void ansi_c_internal_additions(std::string &code)
+void ansi_c_internal_additions(
+  std::string &code,
+  bool support_ts_18661_3_Floatn_types)
 {
   // clang-format off
   // do the built-in types and variables
@@ -247,9 +249,7 @@ void ansi_c_internal_additions(std::string &code)
     config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_types;
-    // check the parser and not config.ansi_c.ts_18661_3_Floatn_types to adjust
-    // behaviour depending on C or C++ context
-    if(ansi_c_parser.ts_18661_3_Floatn_types)
+    if(support_ts_18661_3_Floatn_types)
       code += gcc_builtin_headers_types_gcc7plus;
 
     // there are many more, e.g., look at
