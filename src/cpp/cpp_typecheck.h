@@ -343,7 +343,7 @@ protected:
 
   void add_method_body(symbolt *_method_symbol);
 
-  bool builtin_factory(const irep_idt &);
+  bool builtin_factory(const irep_idt &) override;
 
   // types
 
