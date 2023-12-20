@@ -178,7 +178,7 @@ bool api_sessiont::is_goto_binary(std::string &file) const
 bool api_sessiont::preprocess_model() const
 {
   // Remove inline assembler; this needs to happen before adding the library.
-  remove_asm(*implementation->model);
+  remove_asm(*implementation->model, *implementation->message_handler);
 
   // add the library
   messaget log{*implementation->message_handler};
@@ -191,7 +191,7 @@ bool api_sessiont::preprocess_model() const
   // library functions may introduce inline assembler
   while(has_asm(*implementation->model))
   {
-    remove_asm(*implementation->model);
+    remove_asm(*implementation->model, *implementation->message_handler);
     link_to_library(
       *implementation->model,
       *implementation->message_handler,

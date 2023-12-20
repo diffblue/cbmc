@@ -273,7 +273,7 @@ public:
   /// \todo This function is underspecified, we do not compute the exact value
   /// but over approximate it.
   /// \deprecated This is Java specific and should be implemented in Java.
-  DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
+  // DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
   std::pair<exprt, string_constraintst>
   add_axioms_for_code_point_count(const function_application_exprt &f);
 
@@ -283,7 +283,7 @@ public:
   /// argument code points and we approximate this by saying the result is
   /// between index + offset and index + 2 * offset.
   /// \deprecated This is Java specific and should be implemented in Java.
-  DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
+  // DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
   std::pair<exprt, string_constraintst>
   add_axioms_for_offset_by_code_point(const function_application_exprt &f);
 

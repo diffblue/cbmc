@@ -13,12 +13,26 @@
 #ifdef ANSI_C_DEBUG
 #define YYDEBUG 1
 #endif
-#define PARSER ansi_c_parser
+#define PARSER (*ansi_c_parser)
 
 #include "ansi_c_parser.h"
 
 int yyansi_clex();
 extern char *yyansi_ctext;
+
+static ansi_c_parsert *ansi_c_parser;
+int yyansi_cparse(void);
+int yyansi_cparse(ansi_c_parsert &_ansi_c_parser)
+{
+  ansi_c_parser = &_ansi_c_parser;
+  return yyansi_cparse();
+}
+
+int yyansi_cerror(const std::string &error)
+{
+  ansi_c_parser->parse_error(error, yyansi_ctext);
+  return 0;
+}
 
 #include "parser_static.inc"
 

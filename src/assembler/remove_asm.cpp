@@ -30,8 +30,13 @@ Date:   December 2014
 class remove_asmt
 {
 public:
-  remove_asmt(symbol_tablet &_symbol_table, goto_functionst &_goto_functions)
-    : symbol_table(_symbol_table), goto_functions(_goto_functions)
+  remove_asmt(
+    symbol_tablet &_symbol_table,
+    goto_functionst &_goto_functions,
+    message_handlert &message_handler)
+    : symbol_table(_symbol_table),
+      goto_functions(_goto_functions),
+      message_handler(message_handler)
   {
   }
 
@@ -44,6 +49,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
+  message_handlert &message_handler;
 
   void process_function(const irep_idt &, goto_functionst::goto_functiont &);
 
@@ -228,7 +234,7 @@ void remove_asmt::process_instruction_gcc(
   const irep_idt &i_str = to_string_constant(code.asm_text()).value();
 
   std::istringstream str(id2string(i_str));
-  assembler_parser.clear();
+  assembler_parsert assembler_parser{message_handler};
   assembler_parser.in = &str;
   assembler_parser.parse();
 
@@ -399,7 +405,7 @@ void remove_asmt::process_instruction_msc(
   const irep_idt &i_str = to_string_constant(code.op0()).value();
 
   std::istringstream str(id2string(i_str));
-  assembler_parser.clear();
+  assembler_parsert assembler_parser{message_handler};
   assembler_parser.in = &str;
   assembler_parser.parse();
 
@@ -544,13 +550,17 @@ void remove_asmt::process_function(
     remove_skip(goto_function.body);
 }
 
-/// \copybrief remove_asm(goto_modelt &)
+/// \copybrief remove_asm(goto_modelt &, message_handlert &)
 ///
 /// \param goto_functions: The goto functions
 /// \param symbol_table: The symbol table
-void remove_asm(goto_functionst &goto_functions, symbol_tablet &symbol_table)
+/// \param message_handler: Message handler
+void remove_asm(
+  goto_functionst &goto_functions,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
 {
-  remove_asmt rem(symbol_table, goto_functions);
+  remove_asmt rem(symbol_table, goto_functions, message_handler);
   rem();
 }
 
@@ -561,9 +571,11 @@ void remove_asm(goto_functionst &goto_functions, symbol_tablet &symbol_table)
 /// Unrecognised assembly instructions are ignored.
 ///
 /// \param goto_model: The goto model
-void remove_asm(goto_modelt &goto_model)
+/// \param message_handler: Message handler
+void remove_asm(goto_modelt &goto_model, message_handlert &message_handler)
 {
-  remove_asm(goto_model.goto_functions, goto_model.symbol_table);
+  remove_asm(
+    goto_model.goto_functions, goto_model.symbol_table, message_handler);
 }
 
 bool has_asm(const goto_functionst &goto_functions)

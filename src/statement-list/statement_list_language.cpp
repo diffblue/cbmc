@@ -60,12 +60,11 @@ bool statement_list_languaget::parse(
   const std::string &path,
   message_handlert &message_handler)
 {
-  statement_list_parser.clear();
+  statement_list_parsert statement_list_parser{message_handler};
   parse_path = path;
   statement_list_parser.set_line_no(0);
   statement_list_parser.set_file(path);
   statement_list_parser.in = &instream;
-  statement_list_scanner_init();
   bool result = statement_list_parser.parse();
 
   // store result

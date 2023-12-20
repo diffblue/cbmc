@@ -195,10 +195,15 @@ void new_scopet::print_rec(std::ostream &out, unsigned indent) const
 class Parser // NOLINT(readability/identifiers)
 {
 public:
-  explicit Parser(cpp_parsert &_cpp_parser):
-    lex(_cpp_parser.token_buffer),
-    parser(_cpp_parser),
-    max_errors(10)
+  Parser(cpp_parsert &_cpp_parser, message_handlert &message_handler)
+    : lex(_cpp_parser.token_buffer),
+      parse_tree(_cpp_parser.parse_tree),
+      message_handler(message_handler),
+      max_errors(10),
+      cpp11(
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17)
   {
     root_scope.kind=new_scopet::kindt::NAMESPACE;
     current_scope=&root_scope;
@@ -208,7 +213,8 @@ public:
 
 protected:
   cpp_token_buffert &lex;
-  cpp_parsert &parser;
+  cpp_parse_treet &parse_tree;
+  message_handlert &message_handler;
 
   // scopes
   new_scopet root_scope;
@@ -408,6 +414,7 @@ protected:
   }
 
   unsigned int max_errors;
+  const bool cpp11;
 };
 
 static bool is_identifier(int token)
@@ -512,8 +519,9 @@ bool Parser::SyntaxError()
 
     message+="'";
 
-    parser.log.error().source_location = source_location;
-    parser.log.error() << message << messaget::eom;
+    messaget log{message_handler};
+    log.error().source_location = source_location;
+    log.error() << message << messaget::eom;
   }
 
   return ++number_of_errors < max_errors;
@@ -1986,13 +1994,10 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 {
   int t=lex.LookAhead(0);
 
-  if(t==TOK_STATIC ||
-     t==TOK_EXTERN ||
-     (t == TOK_AUTO && !ansi_c_parser.cpp11) ||
-     t==TOK_REGISTER ||
-     t==TOK_MUTABLE ||
-     t==TOK_GCC_ASM ||
-     t==TOK_THREAD_LOCAL)
+  if(
+    t == TOK_STATIC || t == TOK_EXTERN || (t == TOK_AUTO && !cpp11) ||
+    t == TOK_REGISTER || t == TOK_MUTABLE || t == TOK_GCC_ASM ||
+    t == TOK_THREAD_LOCAL)
   {
     cpp_tokent tk;
     lex.get_token(tk);
@@ -2730,7 +2735,7 @@ bool Parser::rConstructorDecl(
 
     case TOK_DEFAULT: // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!cpp11)
         {
           SyntaxError();
           return false;
@@ -2743,7 +2748,7 @@ bool Parser::rConstructorDecl(
 
     case TOK_DELETE: // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!cpp11)
         {
           SyntaxError();
           return false;
@@ -2907,7 +2912,7 @@ bool Parser::rDeclaratorWithInit(
 
       if(lex.LookAhead(0)==TOK_DEFAULT) // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!cpp11)
         {
           SyntaxError();
           return false;
@@ -2919,7 +2924,7 @@ bool Parser::rDeclaratorWithInit(
       }
       else if(lex.LookAhead(0)==TOK_DELETE) // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!cpp11)
         {
           SyntaxError();
           return false;
@@ -8379,7 +8384,7 @@ bool Parser::operator()()
 
   while(rProgram(item))
   {
-    parser.parse_tree.items.push_back(item);
+    parse_tree.items.push_back(item);
     item.clear();
   }
 
@@ -8390,8 +8395,8 @@ bool Parser::operator()()
   return number_of_errors!=0;
 }
 
-bool cpp_parse()
+bool cpp_parse(cpp_parsert &cpp_parser, message_handlert &message_handler)
 {
-  Parser parser(cpp_parser);
+  Parser parser(cpp_parser, message_handler);
   return parser();
 }

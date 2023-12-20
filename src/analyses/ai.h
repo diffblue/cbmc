@@ -589,7 +589,7 @@ public:
   // Not recommended as it will throw an exception if a location has not
   // been reached in an analysis and there is no (other) way of telling
   // if a location has been reached.
-  DEPRECATED(SINCE(2019, 08, 01, "use abstract_state_{before,after} instead"))
+  // DEPRECATED(SINCE(2019, 08, 01, "use abstract_state_{before,after} instead"))
   const domainT &operator[](locationt l) const
   {
     auto p = storage->abstract_state_before(l, *domain_factory);
@@ -607,7 +607,7 @@ protected:
   // Support the legacy get_state interface which is needed for a few domains
   // This is one of the few users of the legacy get_state(locationt) method
   // in location_sensitive_storaget.
-  DEPRECATED(SINCE(2019, 08, 01, "use get_state(trace_ptrt p) instead"))
+  // DEPRECATED(SINCE(2019, 08, 01, "use get_state(trace_ptrt p) instead"))
   virtual statet &get_state(locationt l)
   {
     auto &s = dynamic_cast<location_sensitive_storaget &>(*storage);

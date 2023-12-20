@@ -10,7 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-xml_parsert xml_parser;
+int yyxmlparse(xml_parsert &);
+
+bool xml_parsert::parse()
+{
+  return yyxmlparse(*this) != 0;
+}
 
 // 'do it all' function
 bool parse_xml(
@@ -19,12 +24,12 @@ bool parse_xml(
   message_handlert &message_handler,
   xmlt &dest)
 {
-  xml_parser.clear();
+  xml_parsert xml_parser{message_handler};
+
   xml_parser.set_file(filename);
   xml_parser.in=&in;
-  xml_parser.log.set_message_handler(message_handler);
 
-  bool result=yyxmlparse()!=0;
+  bool result = xml_parser.parse();
 
   // save result
   xml_parser.parse_tree.element.swap(dest);

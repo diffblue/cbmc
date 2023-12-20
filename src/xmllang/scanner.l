@@ -19,7 +19,7 @@
 #include "xml_parser.h"
 #include "xml_y.tab.h"
 
-#define PARSER xml_parser
+#define PARSER (*xml_parser)
 
 //static int keep;  /* To store start condition */
 
@@ -65,6 +65,22 @@ string     \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 %s PI
 %s DTD
 
+%{
+static xml_parsert *xml_parser;
+
+int yyxmllex(void);
+
+int yyxmllex(xml_parsert &_xml_parser)
+{
+  // our scanner is not reentrant
+  PRECONDITION(!xml_parser);
+  xml_parser = &_xml_parser;
+  int result = yyxmllex();
+  xml_parser = nullptr;
+  return result;
+}
+%}
+
 %%
 
 <INITIAL,PI>{ws}  {/* skip */}
@@ -87,7 +103,7 @@ string     \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 <DTD>.            {/* skip */}
 <DTD>\]{close}    {BEGIN(INITIAL); /* skip */}
 
-.                 { yyxmlerror("unexpected character"); }
+.                 { yyxmlerror(*xml_parser, "unexpected character"); }
 {nl}              {/* skip, must be an extra one at EOF */;}
 
 %%

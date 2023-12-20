@@ -139,11 +139,11 @@ void contracts_wranglert::mangle(
 
   // Parse the fake function.
   std::istringstream is(pr.str());
-  ansi_c_parser.clear();
+  ansi_c_parsert ansi_c_parser{message_handler};
   ansi_c_parser.set_line_no(0);
   ansi_c_parser.set_file("<predicate>");
   ansi_c_parser.in = &is;
-  ansi_c_scanner_init();
+  ansi_c_scanner_init(ansi_c_parser);
   ansi_c_parser.parse();
 
   // Extract the invariants from prase_tree.

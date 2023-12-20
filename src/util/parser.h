@@ -39,7 +39,11 @@ public:
     last_line.clear();
   }
 
-  parsert():in(nullptr) { clear(); }
+  explicit parsert(message_handlert &message_handler)
+    : in(nullptr), log(message_handler)
+  {
+    clear();
+  }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner
@@ -131,11 +135,8 @@ public:
     column+=token_width;
   }
 
-  // should be protected or even just be a reference to a message handler, but
-  // for now enables a step-by-step transition
-  messaget log;
-
 protected:
+  messaget log;
   source_locationt source_location;
   unsigned line_no, previous_line_no;
   unsigned column;

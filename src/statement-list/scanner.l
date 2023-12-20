@@ -41,7 +41,7 @@ static int isatty(int) { return 0; }
 #endif
 
 // Value inside of statement_list_parser.h.
-#define PARSER statement_list_parser
+#define PARSER (*statement_list_parser)
 
 // Sets the type of yystatement_listlval so that it can be used as the stack 
 // index.
@@ -62,11 +62,13 @@ static int isatty(int) { return 0; }
 #ifdef STATEMENT_LIST_DEBUG
 extern int yystatement_listdebug;
 #endif
-void statement_list_scanner_init()
+static statement_list_parsert *statement_list_parser;
+void statement_list_scanner_init(statement_list_parsert &_statement_list_parser)
 {
 #ifdef STATEMENT_LIST_DEBUG
   yystatement_listdebug=1;
 #endif
+  statement_list_parser = &_statement_list_parser;
   YY_FLUSH_BUFFER;
   BEGIN(0);
 }

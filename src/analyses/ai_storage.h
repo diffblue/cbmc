@@ -200,7 +200,7 @@ public:
   // Care should be exercised in using this.  It is possible to create domains
   // without any corresponding history object(s).  This can lead to somewhat
   // unexpected behaviour depending on which APIs you use.
-  DEPRECATED(SINCE(2019, 08, 01, "use get_state(trace_ptrt p) instead"))
+  // DEPRECATED(SINCE(2019, 08, 01, "use get_state(trace_ptrt p) instead"))
   statet &get_state(locationt l, const ai_domain_factory_baset &fac)
   {
     typename state_mapt::const_iterator it = state_map.find(l);
