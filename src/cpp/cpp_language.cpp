@@ -102,11 +102,9 @@ bool cpp_languaget::parse(
   std::istringstream i_preprocessed(o_preprocessed.str());
 
   // parsing
-
-  cpp_parser.clear();
+  cpp_parsert cpp_parser{message_handler};
   cpp_parser.set_file(path);
   cpp_parser.in=&i_preprocessed;
-  cpp_parser.log.set_message_handler(message_handler);
   cpp_parser.mode=config.ansi_c.mode;
 
   bool result=cpp_parser.parse();
@@ -245,11 +243,9 @@ bool cpp_languaget::to_expr(
   std::istringstream i_preprocessed(code);
 
   // parsing
-
-  cpp_parser.clear();
+  cpp_parsert cpp_parser{message_handler};
   cpp_parser.set_file(irep_idt());
   cpp_parser.in=&i_preprocessed;
-  cpp_parser.log.set_message_handler(message_handler);
 
   bool result=cpp_parser.parse();
 
