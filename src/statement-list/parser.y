@@ -12,7 +12,7 @@
 #ifdef STATEMENT_LIST_DEBUG
 #define YYDEBUG 1
 #endif
-#define PARSER statement_list_parser
+#define PARSER (*statement_list_parser)
 
 #include "statement_list_parser.h"
 #include "converters/convert_string_value.h"
@@ -25,6 +25,20 @@
 
 int yystatement_listlex();
 extern char *yystatement_listtext;
+
+static statement_list_parsert *statement_list_parser;
+int yystatement_listparse(void);
+int yystatement_listparse(statement_list_parsert &_statement_list_parser)
+{
+  statement_list_parser = &_statement_list_parser;
+  return yystatement_listparse();
+}
+
+int yystatement_listerror(const std::string &error)
+{
+  statement_list_parser->parse_error(error, yystatement_listtext);
+  return 0;
+}
 
 #define YYSTYPE unsigned
 #define YYSTYPE_IS_TRIVIAL 1

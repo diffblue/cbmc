@@ -21,10 +21,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <iostream>
 #include <iterator>
 
-statement_list_parsert statement_list_parser;
-
-extern char *yystatement_listtext;
-
 /// Searches for the name of the TIA module inside of its root
 /// expression.
 /// \param root: Expression that includes the element's name as a
@@ -337,13 +333,8 @@ void statement_list_parsert::add_function(const exprt &function)
 
 bool statement_list_parsert::parse()
 {
-  return yystatement_listparse() != 0;
-}
-
-int yystatement_listerror(const std::string &error)
-{
-  statement_list_parser.parse_error(error, yystatement_listtext);
-  return 0;
+  statement_list_scanner_init(*this);
+  return yystatement_listparse(*this) != 0;
 }
 
 void statement_list_parsert::clear()
