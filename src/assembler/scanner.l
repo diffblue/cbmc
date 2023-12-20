@@ -13,7 +13,7 @@
 #pragma warning(disable:4005)
 #endif
 
-#define PARSER assembler_parser
+#define PARSER (*assembler_parser)
 #define YYSTYPE unsigned
 #undef  ECHO
 #define ECHO
@@ -61,10 +61,18 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x LINE_COMMENT
 
 %{
-void assemlber_scanner_init()
+static assembler_parsert *assembler_parser;
+
+int yyassemblerlex(void);
+
+int yyassemblerlex(assembler_parsert &_assembler_parser)
 {
-  YY_FLUSH_BUFFER;
-  BEGIN(0);
+  // our scanner is not reentrant
+  PRECONDITION(!assembler_parser);
+  assembler_parser = &_assembler_parser;
+  int result = yyassemblerlex();
+  assembler_parser = nullptr;
+  return result;
 }
 %}
 

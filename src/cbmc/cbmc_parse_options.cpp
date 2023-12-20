@@ -882,7 +882,7 @@ bool cbmc_parse_optionst::process_goto_program(
 {
   // Remove inline assembler; this needs to happen before
   // adding the library.
-  remove_asm(goto_model);
+  remove_asm(goto_model, log.get_message_handler());
 
   // add the library
   log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
@@ -894,7 +894,7 @@ bool cbmc_parse_optionst::process_goto_program(
   // library functions may introduce inline assembler
   while(has_asm(goto_model))
   {
-    remove_asm(goto_model);
+    remove_asm(goto_model, log.get_message_handler());
     link_to_library(
       goto_model, log.get_message_handler(), cprover_cpp_library_factory);
     link_to_library(

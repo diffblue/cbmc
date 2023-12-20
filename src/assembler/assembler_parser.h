@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-int yyassemblerlex();
-int yyassemblererror(const std::string &error);
-void assembler_scanner_init();
+class assembler_parsert;
+int yyassemblerlex(assembler_parsert &);
+int yyassemblererror(assembler_parsert &, const std::string &error);
 
 class assembler_parsert:public parsert
 {
@@ -37,13 +37,14 @@ public:
     instructions.push_back(instructiont());
   }
 
-  assembler_parsert()
+  explicit assembler_parsert(message_handlert &message_handler)
+    : parsert(message_handler)
   {
   }
 
   virtual bool parse()
   {
-    yyassemblerlex();
+    yyassemblerlex(*this);
     return false;
   }
 
@@ -51,10 +52,7 @@ public:
   {
     parsert::clear();
     instructions.clear();
-    // assembler_scanner_init();
   }
 };
-
-extern assembler_parsert assembler_parser;
 
 #endif // CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H
