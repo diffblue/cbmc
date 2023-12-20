@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_PARSER_H
 #define CPROVER_UTIL_PARSER_H
 
+#include "deprecate.h"
 #include "expr.h"
 #include "message.h"
 
@@ -39,7 +40,13 @@ public:
     last_line.clear();
   }
 
+  DEPRECATED(SINCE(2023, 12, 20, "use parsert(message_handler) instead"))
   parsert():in(nullptr) { clear(); }
+  explicit parsert(message_handlert &message_handler)
+    : in(nullptr), log(message_handler)
+  {
+    clear();
+  }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner
