@@ -2,6 +2,9 @@
 %option noinput
 %option nounistd
 %option never-interactive
+%option noyywrap
+%option reentrant
+%option extra-type="assembler_parsert *"
 
 %{
 
@@ -13,7 +16,7 @@
 #pragma warning(disable:4005)
 #endif
 
-#define PARSER assembler_parser
+#define PARSER (*yyextra)
 #define YYSTYPE unsigned
 #undef  ECHO
 #define ECHO
@@ -60,14 +63,6 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x GRAMMAR
 %x LINE_COMMENT
 
-%{
-void assemlber_scanner_init()
-{
-  YY_FLUSH_BUFFER;
-  BEGIN(0);
-}
-%}
-
 %%
 
 <INITIAL>.|\n   { BEGIN(GRAMMAR);
@@ -109,7 +104,3 @@ void assemlber_scanner_init()
 }
 
 <<EOF>>         { yyterminate(); /* done! */ }
-
-%%
-
-int yywrap() { return 1; }

@@ -949,7 +949,7 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
   log.status() << "Virtual function removal" << messaget::eom;
   remove_virtual_functions(goto_model);
   log.status() << "Cleaning inline assembler statements" << messaget::eom;
-  remove_asm(goto_model);
+  remove_asm(goto_model, log.get_message_handler());
 }
 
 /// Remove function pointers that can be resolved by analysing const variables
@@ -1065,7 +1065,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     // remove inline assembler as that may yield further library function calls
     // that need to be resolved
-    remove_asm(goto_model);
+    remove_asm(goto_model, ui_message_handler);
 
     // add the library
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
@@ -1076,7 +1076,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     // library functions may introduce inline assembler
     while(has_asm(goto_model))
     {
-      remove_asm(goto_model);
+      remove_asm(goto_model, ui_message_handler);
       link_to_library(
         goto_model, ui_message_handler, cprover_cpp_library_factory);
       link_to_library(
