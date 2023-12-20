@@ -10,7 +10,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-xml_parsert xml_parser;
+int xml_parsert::instance_count = 0;
+
+int yyxmllex_init_extra(xml_parsert *, void **);
+int yyxmllex_destroy(void *);
+int yyxmlparse(xml_parsert &, void *);
+
+bool xml_parsert::parse()
+{
+  void *scanner;
+  yyxmllex_init_extra(this, &scanner);
+  bool parse_fail = yyxmlparse(*this, scanner) != 0;
+  yyxmllex_destroy(scanner);
+  return parse_fail;
+}
 
 // 'do it all' function
 bool parse_xml(
@@ -19,18 +32,15 @@ bool parse_xml(
   message_handlert &message_handler,
   xmlt &dest)
 {
-  xml_parser.clear();
+  xml_parsert xml_parser{message_handler};
+
   xml_parser.set_file(filename);
   xml_parser.in=&in;
-  xml_parser.log.set_message_handler(message_handler);
 
-  bool result=yyxmlparse()!=0;
+  bool result = xml_parser.parse();
 
   // save result
   xml_parser.parse_tree.element.swap(dest);
-
-  // save some memory
-  xml_parser.clear();
 
   return result;
 }

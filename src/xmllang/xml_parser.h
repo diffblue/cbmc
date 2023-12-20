@@ -14,11 +14,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_parse_tree.h"
 
-int yyxmlparse();
-
 class xml_parsert:public parsert
 {
 public:
+  explicit xml_parsert(message_handlert &message_handler)
+    : parsert(message_handler)
+  {
+    // Simplistic check that we don't attempt to do reentrant parsing as the
+    // Bison-generated parser has global state.
+    PRECONDITION(++instance_count == 1);
+    stack.push_back(&parse_tree.element);
+  }
+
+  xml_parsert(const xml_parsert &) = delete;
+
+  ~xml_parsert() override
+  {
+    --instance_count;
+  }
+
   xml_parse_treet parse_tree;
 
   std::list<xmlt *> stack;
@@ -28,10 +42,7 @@ public:
     return *stack.back();
   }
 
-  virtual bool parse()
-  {
-    return yyxmlparse()!=0;
-  }
+  bool parse() override;
 
   void new_level()
   {
@@ -39,18 +50,22 @@ public:
     stack.push_back(&current().elements.back());
   }
 
-  virtual void clear()
+  /// Clears the parser state. May be removed in future as there should not be a
+  /// need to re-use an existing parser object.
+  void clear() override
   {
     parse_tree.clear();
     // set up stack
     stack.clear();
     stack.push_back(&parse_tree.element);
+    parsert::clear();
   }
+
+protected:
+  static int instance_count;
 };
 
-extern xml_parsert xml_parser;
-
-int yyxmlerror(const std::string &error);
+int yyxmlerror(xml_parsert &, void *, const std::string &);
 
 // 'do it all' functions
 bool parse_xml(
