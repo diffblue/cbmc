@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_PARSER_H
 #define CPROVER_UTIL_PARSER_H
 
-#include "deprecate.h"
 #include "expr.h"
 #include "message.h"
 
@@ -29,11 +28,6 @@ public:
   std::string this_line, last_line;
 
   std::vector<exprt> stack;
-
-  DEPRECATED(SINCE(2023, 12, 20, "use parsert(message_handler) instead"))
-  parsert() : in(nullptr), line_no(0), previous_line_no(0), column(1)
-  {
-  }
 
   explicit parsert(message_handlert &message_handler)
     : in(nullptr),
@@ -135,11 +129,8 @@ public:
     column+=token_width;
   }
 
-  // should be protected or even just be a reference to a message handler, but
-  // for now enables a step-by-step transition
-  messaget log;
-
 protected:
+  messaget log;
   source_locationt source_location;
   unsigned line_no, previous_line_no;
   unsigned column;
