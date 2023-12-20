@@ -17,12 +17,22 @@
 #include <ansi-c/literals/convert_float_literal.h>
 #include <ansi-c/literals/convert_string_literal.h>
 
-#define PARSER jsil_parser
+#define PARSER (*jsil_parser)
 #define YYSTYPE unsigned
 
 #include "jsil_parser.h"
 #include "jsil_y.tab.h"
 // extern int yyjsildebug;
+
+static jsil_parsert *jsil_parser;
+void jsil_scanner_init(jsil_parsert &_jsil_parser)
+{
+  jsil_parser = &_jsil_parser;
+  YY_FLUSH_BUFFER;
+  BEGIN(0);
+}
+
+int yyjsilerror(const std::string &error);
 
 #define loc() \
   { newstack(yyjsillval); PARSER.set_source_location(parser_stack(yyjsillval)); }
@@ -71,14 +81,6 @@ string_lit      ["]{s_char}*["]
 %x STRING_LITERAL_COMMENT
 %x STATEMENTS
 
-%{
-void jsil_scanner_init()
-{
-  // yyjsildebug=1;
-  YY_FLUSH_BUFFER;
-  BEGIN(0);
-}
-%}
  /* %option debug */
 
 %%
