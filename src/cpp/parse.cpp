@@ -195,10 +195,14 @@ void new_scopet::print_rec(std::ostream &out, unsigned indent) const
 class Parser // NOLINT(readability/identifiers)
 {
 public:
-  explicit Parser(cpp_parsert &_cpp_parser):
-    lex(_cpp_parser.token_buffer),
-    parser(_cpp_parser),
-    max_errors(10)
+  explicit Parser(cpp_parsert &_cpp_parser)
+    : lex(_cpp_parser.token_buffer),
+      parser(_cpp_parser),
+      max_errors(10),
+      cpp11(
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17)
   {
     root_scope.kind=new_scopet::kindt::NAMESPACE;
     current_scope=&root_scope;
@@ -408,6 +412,7 @@ protected:
   }
 
   unsigned int max_errors;
+  const bool cpp11;
 };
 
 static bool is_identifier(int token)
@@ -1986,13 +1991,10 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 {
   int t=lex.LookAhead(0);
 
-  if(t==TOK_STATIC ||
-     t==TOK_EXTERN ||
-     (t == TOK_AUTO && !ansi_c_parser.cpp11) ||
-     t==TOK_REGISTER ||
-     t==TOK_MUTABLE ||
-     t==TOK_GCC_ASM ||
-     t==TOK_THREAD_LOCAL)
+  if(
+    t == TOK_STATIC || t == TOK_EXTERN || (t == TOK_AUTO && !cpp11) ||
+    t == TOK_REGISTER || t == TOK_MUTABLE || t == TOK_GCC_ASM ||
+    t == TOK_THREAD_LOCAL)
   {
     cpp_tokent tk;
     lex.get_token(tk);
@@ -2730,7 +2732,7 @@ bool Parser::rConstructorDecl(
 
     case TOK_DEFAULT: // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!cpp11)
         {
           SyntaxError();
           return false;
@@ -2743,7 +2745,7 @@ bool Parser::rConstructorDecl(
 
     case TOK_DELETE: // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!cpp11)
         {
           SyntaxError();
           return false;
@@ -2907,7 +2909,7 @@ bool Parser::rDeclaratorWithInit(
 
       if(lex.LookAhead(0)==TOK_DEFAULT) // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!cpp11)
         {
           SyntaxError();
           return false;
@@ -2919,7 +2921,7 @@ bool Parser::rDeclaratorWithInit(
       }
       else if(lex.LookAhead(0)==TOK_DELETE) // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!cpp11)
         {
           SyntaxError();
           return false;
