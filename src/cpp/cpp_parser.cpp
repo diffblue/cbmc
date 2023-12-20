@@ -15,9 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/gcc_version.h>
 
-cpp_parsert cpp_parser;
-
-bool cpp_parse();
+bool cpp_parse(cpp_parsert &, message_handlert &);
 
 bool cpp_parsert::parse()
 {
@@ -35,18 +33,18 @@ bool cpp_parsert::parse()
   }
 
   // We use the ANSI-C scanner
-  ansi_c_parser.cpp98=true;
-  ansi_c_parser.cpp11 =
+  token_buffer.ansi_c_parser.cpp98 = true;
+  token_buffer.ansi_c_parser.cpp11 =
     config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
     config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
     config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17;
-  ansi_c_parser.ts_18661_3_Floatn_types = false; // these are still typedefs
-  ansi_c_parser.float16_type = *support_float16;
-  ansi_c_parser.bf16_type = *support_float16;
-  ansi_c_parser.in=in;
-  ansi_c_parser.mode=mode;
-  ansi_c_parser.set_file(get_file());
-  ansi_c_parser.log.set_message_handler(log.get_message_handler());
+  token_buffer.ansi_c_parser.ts_18661_3_Floatn_types =
+    false; // these are still typedefs
+  token_buffer.ansi_c_parser.float16_type = *support_float16;
+  token_buffer.ansi_c_parser.bf16_type = *support_float16;
+  token_buffer.ansi_c_parser.in = in;
+  token_buffer.ansi_c_parser.mode = mode;
+  token_buffer.ansi_c_parser.set_file(get_file());
 
-  return cpp_parse();
+  return cpp_parse(*this, log.get_message_handler());
 }

@@ -36,9 +36,11 @@ public:
     asm_block_following=false;
   }
 
-  cpp_parsert()
-    : mode(configt::ansi_ct::flavourt::ANSI),
+  explicit cpp_parsert(message_handlert &message_handler)
+    : parsert(message_handler),
+      mode(configt::ansi_ct::flavourt::ANSI),
       recognize_wchar_t(true),
+      token_buffer(message_handler),
       asm_block_following(false),
       support_float16(std::nullopt)
   {
@@ -72,7 +74,5 @@ public:
 protected:
   std::optional<bool> support_float16;
 };
-
-extern cpp_parsert cpp_parser;
 
 #endif // CPROVER_CPP_CPP_PARSER_H
