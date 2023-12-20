@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_token_buffer.h"
 
-#include <ansi-c/ansi_c_parser.h>
-
 int cpp_token_buffert::LookAhead(unsigned offset)
 {
   PRECONDITION(current_pos <= token_vector.size());
