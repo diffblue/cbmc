@@ -99,7 +99,6 @@ ifeq ($(origin LEX),default)
   LEX    = flex
 endif
 
-
 else ifeq ($(BUILD_ENV_),Cygwin)
   # use these for Cygwin:
   LIBEXT = .a
