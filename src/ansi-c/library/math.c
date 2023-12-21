@@ -317,6 +317,13 @@ long double __builtin_huge_vall(void)
 #pragma CPROVER check pop
 }
 
+/* FUNCTION: __builtin_ffs */
+
+//int __builtin_ffs(float f)
+//{
+//  return simplify_exprt::simplify_ffs(f);
+//}
+
 /* FUNCTION: _dsign */
 
 int _dsign(double d)
