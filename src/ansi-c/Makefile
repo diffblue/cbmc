@@ -86,6 +86,9 @@ all: ansi-c$(LIBEXT)
 
 ansi_c_y.tab.cpp: parser.y
 	$(YACC) $(YFLAGS) -pyyansi_c parser.y --defines=ansi_c_y.tab.h -o $@
+	$(SED) -e's,enum yytokentype,enum yytokentype_ansi,' \
+	  <ansi_c_y.tab.h >ansi_c_y.tab.h.tmp && \
+	  mv ansi_c_y.tab.h.tmp ansi_c_y.tab.h
 
 ansi_c_y.tab.h: ansi_c_y.tab.cpp
 

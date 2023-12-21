@@ -41,10 +41,15 @@ macro(generic_bison name)
         COMPILE_FLAGS "${bison_warnings_as_errors} -pyy${name}"
     )
     set(renamed_parser_header "${CMAKE_CURRENT_BINARY_DIR}/${bison_header}")
-    add_custom_command(OUTPUT "${renamed_parser_header}"
-        COMMAND "${CMAKE_COMMAND}" -E copy "${BISON_parser_OUTPUT_HEADER}" "${renamed_parser_header}"
-        MAIN_DEPENDENCY "${BISON_parser_OUTPUT_HEADER}"
-    )
+    if(${SED} STREQUAL "SED-NOTFOUND")
+      add_custom_command(OUTPUT "${renamed_parser_header}"
+          COMMAND "${CMAKE_COMMAND}" -E copy "${BISON_parser_OUTPUT_HEADER}" "${renamed_parser_header}"
+          MAIN_DEPENDENCY "${BISON_parser_OUTPUT_HEADER}")
+    else()
+      add_custom_command(OUTPUT "${renamed_parser_header}"
+          COMMAND ${SED} -e "s,enum yytokentype,enum yytokentype_${name}," <${BISON_parser_OUTPUT_HEADER} >${renamed_parser_header}
+          MAIN_DEPENDENCY "${BISON_parser_OUTPUT_HEADER}")
+    endif()
     list(REMOVE_ITEM BISON_parser_OUTPUTS "${BISON_parser_OUTPUT_HEADER}")
     list(APPEND BISON_parser_OUTPUTS "${renamed_parser_header}")
 endmacro(generic_bison)

@@ -98,6 +98,9 @@ endif
 ifeq ($(origin LEX),default)
   LEX    = flex
 endif
+ifeq ($(origin SED),default)
+  SED   = sed
+endif
 
 else ifeq ($(BUILD_ENV_),Cygwin)
   # use these for Cygwin:
@@ -130,6 +133,9 @@ endif
 ifeq ($(origin LEX),default)
   LEX    = flex
 endif
+ifeq ($(origin SED),default)
+  SED   = sed
+endif
 
 
 else ifeq ($(BUILD_ENV_),MSVC)
@@ -157,6 +163,10 @@ endif
   YFLAGS ?= -v -Werror
 ifeq ($(origin LEX),default)
   LEX    = win_flex
+endif
+ifeq ($(origin SED),default)
+  # on MSVC there is no lto
+  SED   = rem
 endif
 
 
