@@ -31,11 +31,15 @@ all: statement-list$(LIBEXT)
 
 statement_list_y.tab.cpp: parser.y
 	$(YACC) $(YFLAGS) -pyystatement_list parser.y --defines=statement_list_y.tab.h -o $@
+	$(SED) -e's,enum yytokentype,enum yytokentype_stmt,' \
+	  <statement_list_y.tab.h >statement_list_y.tab.h.tmp && \
+	  mv statement_list_y.tab.h.tmp statement_list_y.tab.h
 
 statement_list_y.tab.h: statement_list_y.tab.cpp
 
 statement_list_lex.yy.cpp: scanner.l
 	$(LEX) -Pyystatement_list -o$@ scanner.l
+	$(SED) -e's,struct yyguts_t,struct yystmtguts_t,g' <$@ >$@.tmp && mv $@.tmp $@
 
 # extra dependencies
 statement_list_y.tab$(OBJEXT): statement_list_y.tab.cpp \

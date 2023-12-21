@@ -247,6 +247,8 @@ else()
   message(STATUS "IPO / LTO not supported: <${error}>")
 endif()
 
+find_program(SED sed gsed)
+
 add_subdirectory(src)
 add_subdirectory(regression)
 add_subdirectory(unit)

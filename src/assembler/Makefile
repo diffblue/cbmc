@@ -16,6 +16,7 @@ all: assembler$(LIBEXT)
 
 assembler_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyassembler -o$@ scanner.l
+	$(SED) -e's,struct yyguts_t,struct yyasmguts_t,' <$@ >$@.tmp && mv $@.tmp $@
 
 generated_files: assembler_lex.yy.cpp
 

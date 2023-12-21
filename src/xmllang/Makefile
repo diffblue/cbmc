@@ -27,6 +27,7 @@ xml_y.tab.h: xml_y.tab.cpp
 
 xml_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyxml -o$@ scanner.l
+	$(SED) -e's,struct yyguts_t,struct yyxmlguts_t,g' <$@ >$@.tmp && mv $@.tmp $@
 
 generated_files: xml_lex.yy.cpp xml_y.tab.cpp xml_y.tab.h
 
