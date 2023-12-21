@@ -55,11 +55,11 @@ e       e|e\+|e-|E|E\+|E-
 
 %%
 
-{string}        { return TOK_STRING; }
-{number}        { return TOK_NUMBER; }
-"true"          { return TOK_TRUE; }
-"false"         { return TOK_FALSE; }
-"null"          { return TOK_NULL; }
+{string}        { return JTOK_STRING; }
+{number}        { return JTOK_NUMBER; }
+"true"          { return JTOK_TRUE; }
+"false"         { return JTOK_FALSE; }
+"null"          { return JTOK_NULL; }
 
 [" "\r\n\t]     { /* eat */ }
 .               { return yytext[0]; }

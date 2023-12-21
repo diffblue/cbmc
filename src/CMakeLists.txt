@@ -24,7 +24,7 @@ macro(generic_bison name)
 
     set(bison_source "${name}_y.tab.cpp")
     set_source_files_properties(${bison_source} PROPERTIES
-      COMPILE_FLAGS "-Dyyalloc=${name}_yyalloc -Dyysymbol_kind_t=${name}_yysymbol_kind_t")
+      COMPILE_FLAGS "-Dyyalloc=${name}_yyalloc -Dyysymbol_kind_t=${name}_yysymbol_kind_t -Dyytokentype=${name}_yytokentype")
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${bison_source}")
         message(FATAL_ERROR "Generated file ${bison_source} found in source tree. If you previously built with `make`, run `make clean` and try again")
     endif()
