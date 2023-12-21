@@ -22,7 +22,7 @@ for f in "$@"; do
     [ "${ec}" -eq 0 ] || exit "${ec}"
 done
 
-# Make sure all internal library functions have tests exercising them:
+echo Make sure all internal library functions have tests exercising them
 grep '^/\* FUNCTION:' ../*/library/* | cut -f3 -d" " | sort -u > __functions
 
 # Some functions are not expected to have tests:
@@ -81,7 +81,7 @@ perl -p -i -e 's/^__vfprintf_chk\n//' __functions # vfprintf-01/__vfprintf_chk.d
 
 # Some functions are covered by tests in other folders:
 perl -p -i -e 's/^__spawned_thread\n//' __functions # any pthread_create tests
-perl -p -i -e 's/^__builtin_ffsl?l?\n//' __functions # cbmc/__builtin_ffs-01
+#perl -p -i -e 's/^__builtin_ffsl?l?\n//' __functions # cbmc/__builtin_ffs-01
 perl -p -i -e 's/^__builtin_[su]addl?l?_overflow\n//' __functions # cbmc/gcc_builtin_add_overflow
 perl -p -i -e 's/^__builtin_[su]mull?l?_overflow\n//' __functions # cbmc/gcc_builtin_mul_overflow
 perl -p -i -e 's/^__builtin_[su]subl?l?_overflow\n//' __functions # cbmc/gcc_builtin_sub_overflow
@@ -101,13 +101,14 @@ perl -p -i -e 's/^_mm_setr_epi(16|32)\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_setr_pi16\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_subs_ep[iu]16\n//' __functions # cbmc/SIMD1
 
-ls ../../regression/cbmc-library/ | grep -- - | cut -f1 -d- | sort -u > __tests
+ls ../../regression/cbmc-library/ | grep -- -0 | cut -f1 -d- | sort -u > __tests
 diff -u __tests __functions
 ec="${?}"
-rm __functions __tests
 if [ $ec != 0 ]; then
   echo "Tests and library functions don't match."
   echo "Lines prefixed with - are tests not matching any library function."
   echo "Lines prefixed with + are functions lacking a test."
+else
+  rm __functions __tests
 fi
 exit "${ec}"
