@@ -1,6 +1,6 @@
 CORE
 main.c
---harness-type call-function --function test --associated-array-size array:size
+--harness-type call-function --function test --associated-array-size array:size _ --no-standard-checks
 VERIFICATION SUCCESSFUL
 ^EXIT=0$
 ^SIGNAL=0$

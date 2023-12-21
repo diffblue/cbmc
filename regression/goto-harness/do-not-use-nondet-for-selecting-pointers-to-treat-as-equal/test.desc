@@ -1,6 +1,6 @@
 CORE
 test.c
---function test --harness-type call-function --treat-pointers-equal x,y --treat-pointers-equal-maybe
+--function test --harness-type call-function --treat-pointers-equal x,y --treat-pointers-equal-maybe _ --no-standard-checks
 should_make_equal
 \[test.assertion.1\] line 3 assertion x: SUCCESS
 \[test.assertion.2\] line 4 assertion y: SUCCESS

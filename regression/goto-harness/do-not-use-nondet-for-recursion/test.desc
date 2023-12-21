@@ -1,6 +1,6 @@
 CORE
 test.c
---function test --harness-type call-function
+--function test --harness-type call-function _ --no-standard-checks
 \[test.assertion.1\] line \d+ assertion list: SUCCESS
 \[test.assertion.2\] line \d+ assertion list->next: FAILURE
 \[test.assertion.3\] line \d+ assertion !\(list->next != \(\(struct linked_list \*\).*\)\): FAILURE

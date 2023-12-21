@@ -1,6 +1,6 @@
 CORE
 main.c
---function func --min-null-tree-depth 10 --max-nondet-tree-depth 3 --harness-type call-function --treat-pointers-equal 'p,q;r,s,t'
+--function func --min-null-tree-depth 10 --max-nondet-tree-depth 3 --harness-type call-function --treat-pointers-equal 'p,q;r,s,t' _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL

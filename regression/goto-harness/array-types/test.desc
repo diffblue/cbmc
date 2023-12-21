@@ -1,6 +1,6 @@
 CORE
 example.c
---harness-type call-function --function test --treat-pointer-as-array arr
+--harness-type call-function --function test --treat-pointer-as-array arr _ --no-standard-checks
 VERIFICATION SUCCESSFUL
 ^EXIT=0$
 ^SIGNAL=0$
