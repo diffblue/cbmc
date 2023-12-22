@@ -1,28 +1,40 @@
 /*******************************************************************\
 
- Module: Destructor Tree
+ Module: Scope Tree
 
  Author: John Dumbell, john.dumbell@diffblue.com
 
 \*******************************************************************/
 
-#include "destructor_tree.h"
+#include "scope_tree.h"
 
-void destructor_treet::add(const codet &destructor)
+void scope_treet::add(
+  const codet &destructor,
+  std::optional<goto_programt::targett> declaration)
 {
   auto previous_node = get_current_node();
-  auto new_node = destruction_graph.add_node(destructor);
-  destruction_graph.add_edge(previous_node, new_node);
+  using declaration_optt = std::optional<declaration_statet>;
+  auto declaration_opt =
+    declaration ? declaration_optt{{*declaration}} : declaration_optt{};
+  auto new_node = scope_graph.add_node(destructor, std::move(declaration_opt));
+  scope_graph.add_edge(previous_node, new_node);
   current_node = new_node;
 }
 
-std::optional<codet> &destructor_treet::get_destructor(node_indext index)
+std::optional<codet> &scope_treet::get_destructor(node_indext index)
 {
-  PRECONDITION(index < destruction_graph.size());
-  return destruction_graph[index].destructor_value;
+  PRECONDITION(index < scope_graph.size());
+  return scope_graph[index].destructor_value;
 }
 
-const ancestry_resultt destructor_treet::get_nearest_common_ancestor_info(
+std::optional<scope_treet::declaration_statet> &
+scope_treet::get_declaration(node_indext index)
+{
+  PRECONDITION(index < scope_graph.size());
+  return scope_graph[index].declaration;
+}
+
+const ancestry_resultt scope_treet::get_nearest_common_ancestor_info(
   node_indext left_index,
   node_indext right_index)
 {
@@ -31,7 +43,7 @@ const ancestry_resultt destructor_treet::get_nearest_common_ancestor_info(
   {
     if(right_index > left_index)
     {
-      auto edge_map = destruction_graph[right_index].in;
+      auto edge_map = scope_graph[right_index].in;
       INVARIANT(
         !edge_map.empty(),
         "Node at index " + std::to_string(right_index) +
@@ -40,7 +52,7 @@ const ancestry_resultt destructor_treet::get_nearest_common_ancestor_info(
     }
     else
     {
-      auto edge_map = destruction_graph[left_index].in;
+      auto edge_map = scope_graph[left_index].in;
       INVARIANT(
         !edge_map.empty(),
         "Node at index " + std::to_string(left_index) +
@@ -53,7 +65,7 @@ const ancestry_resultt destructor_treet::get_nearest_common_ancestor_info(
   return {right_index, left_unique_count, right_unique_count};
 }
 
-const std::vector<destructor_and_idt> destructor_treet::get_destructors(
+const std::vector<destructor_and_idt> scope_treet::get_destructors(
   std::optional<node_indext> end_index,
   std::optional<node_indext> starting_index)
 {
@@ -63,7 +75,7 @@ const std::vector<destructor_and_idt> destructor_treet::get_destructors(
   std::vector<destructor_and_idt> codes;
   while(next_id > end_id)
   {
-    auto node = destruction_graph[next_id];
+    auto node = scope_graph[next_id];
     auto &destructor = node.destructor_value;
     if(destructor)
       codes.emplace_back(destructor_and_idt(*destructor, next_id));
@@ -74,27 +86,34 @@ const std::vector<destructor_and_idt> destructor_treet::get_destructors(
   return codes;
 }
 
-void destructor_treet::set_current_node(std::optional<node_indext> val)
+void scope_treet::set_current_node(std::optional<node_indext> val)
 {
   if(val)
     set_current_node(*val);
 }
 
-void destructor_treet::set_current_node(node_indext val)
+void scope_treet::set_current_node(node_indext val)
 {
   current_node = val;
 }
 
-void destructor_treet::descend_tree()
+void scope_treet::descend_tree()
 {
   node_indext current_node = get_current_node();
   if(current_node != 0)
   {
-    set_current_node(destruction_graph[current_node].in.begin()->first);
+    set_current_node(scope_graph[current_node].in.begin()->first);
   }
 }
 
-node_indext destructor_treet::get_current_node() const
+node_indext scope_treet::get_current_node() const
 {
   return current_node;
+}
+
+scope_treet::scope_nodet::scope_nodet(
+  codet destructor,
+  std::optional<declaration_statet> declaration)
+  : destructor_value(std::move(destructor)), declaration(std::move(declaration))
+{
 }

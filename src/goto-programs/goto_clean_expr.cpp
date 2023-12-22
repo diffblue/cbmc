@@ -53,7 +53,7 @@ symbol_exprt goto_convertt::make_compound_literal(
   if(!new_symbol.is_static_lifetime)
   {
     code_deadt code_dead(result);
-    targets.destructor_stack.add(std::move(code_dead));
+    targets.scope_stack.add(std::move(code_dead), {});
   }
 
   return result;

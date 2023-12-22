@@ -1,0 +1,13 @@
+CORE
+re-enter_scope.c
+
+\[main\.assertion\.1\] line 13 assertion i \=\= 42\: FAILURE
+\[main\.assertion\.2\] line 17 assertion j \=\= 3\: SUCCESS
+\[main\.assertion\.3\] line 20 assertion j \=\= 3\: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Test that if execution re-enters a scope via a goto the pre-existing variable
+becomes non-det.

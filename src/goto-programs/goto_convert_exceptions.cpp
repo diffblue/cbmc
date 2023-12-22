@@ -33,14 +33,14 @@ void goto_convertt::convert_msc_try_finally(
     targets.set_leave(tmp.instructions.begin());
 
     // first put 'finally' code onto destructor stack
-    node_indext old_stack_top = targets.destructor_stack.get_current_node();
-    targets.destructor_stack.add(to_code(code.op1()));
+    node_indext old_stack_top = targets.scope_stack.get_current_node();
+    targets.scope_stack.add(to_code(code.op1()), {});
 
     // do 'try' code
     convert(to_code(code.op0()), dest, mode);
 
     // pop 'finally' from destructor stack
-    targets.destructor_stack.set_current_node(old_stack_top);
+    targets.scope_stack.set_current_node(old_stack_top);
 
     // 'leave' target gets restored here
   }
@@ -165,14 +165,14 @@ void goto_convertt::convert_CPROVER_try_catch(
   catch_code.add_source_location()=code.source_location();
 
   // Store the point before the temp catch code.
-  node_indext old_stack_top = targets.destructor_stack.get_current_node();
-  targets.destructor_stack.add(catch_code);
+  node_indext old_stack_top = targets.scope_stack.get_current_node();
+  targets.scope_stack.add(catch_code, {});
 
   // now convert 'try' code
   convert(to_code(code.op0()), dest, mode);
 
   // pop 'catch' code off stack
-  targets.destructor_stack.set_current_node(old_stack_top);
+  targets.scope_stack.set_current_node(old_stack_top);
 
   // add 'throw' target
   dest.destructive_append(tmp);
@@ -220,14 +220,14 @@ void goto_convertt::convert_CPROVER_try_finally(
     code.find_source_location());
 
   // first put 'finally' code onto destructor stack
-  node_indext old_stack_top = targets.destructor_stack.get_current_node();
-  targets.destructor_stack.add(to_code(code.op1()));
+  node_indext old_stack_top = targets.scope_stack.get_current_node();
+  targets.scope_stack.add(to_code(code.op1()), {});
 
   // do 'try' code
   convert(to_code(code.op0()), dest, mode);
 
   // pop 'finally' from destructor stack
-  targets.destructor_stack.set_current_node(old_stack_top);
+  targets.scope_stack.set_current_node(old_stack_top);
 
   // now add 'finally' code
   convert(to_code(code.op1()), dest, mode);
@@ -284,7 +284,7 @@ void goto_convertt::unwind_destructor_stack(
   std::optional<node_indext> end_index,
   std::optional<node_indext> starting_index)
 {
-  // As we go we'll keep targets.destructor_stack.current_node pointing at the
+  // As we go we'll keep targets.scope_stack.current_node pointing at the
   // next node we intend to destroy, so that if our convert(...) call for each
   // destructor returns, throws or otherwise unwinds then it will carry on from
   // the correct point in the stack of variables we intend to destroy, and if it
@@ -295,22 +295,22 @@ void goto_convertt::unwind_destructor_stack(
   // side-effect is only noticed by that convert(...) call.
 
   node_indext start_id =
-    starting_index.value_or(targets.destructor_stack.get_current_node());
+    starting_index.value_or(targets.scope_stack.get_current_node());
 
-  targets.destructor_stack.set_current_node(start_id);
+  targets.scope_stack.set_current_node(start_id);
 
   node_indext end_id = end_index.value_or(0);
 
-  while(targets.destructor_stack.get_current_node() > end_id)
+  while(targets.scope_stack.get_current_node() > end_id)
   {
-    node_indext current_node = targets.destructor_stack.get_current_node();
+    node_indext current_node = targets.scope_stack.get_current_node();
 
     std::optional<codet> &destructor =
-      targets.destructor_stack.get_destructor(current_node);
+      targets.scope_stack.get_destructor(current_node);
 
     // Descend the tree before unwinding so we don't re-do the current node
     // in event that convert(...) recurses into this function:
-    targets.destructor_stack.descend_tree();
+    targets.scope_stack.descend_tree();
     if(destructor)
     {
       // Copy, assign source location then convert.
@@ -321,5 +321,5 @@ void goto_convertt::unwind_destructor_stack(
   }
 
   // Restore the working destructor stack to how it was before we began:
-  targets.destructor_stack.set_current_node(start_id);
+  targets.scope_stack.set_current_node(start_id);
 }
