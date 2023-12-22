@@ -1,6 +1,6 @@
 CORE
 ../unreachable-instructions-basic-text/unreachable.c
---unreachable-instructions --constants
+--no-standard-checks --unreachable-instructions --constants
 ^EXIT=0$
 ^SIGNAL=0$
 not_called

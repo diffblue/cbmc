@@ -1,6 +1,6 @@
 CORE
 main.c
---replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo
+--replace-call-with-contract bar --replace-call-with-contract baz --enforce-contract foo _ --no-standard-checks
 ^\[bar.precondition.\d+\] line \d+ Check requires clause of bar in foo: SUCCESS$
 ^\[baz.precondition.\d+\] line \d+ Check requires clause of baz in foo: SUCCESS$
 ^EXIT=0$

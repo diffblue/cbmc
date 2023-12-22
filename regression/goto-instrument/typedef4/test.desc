@@ -1,6 +1,6 @@
 CORE
 main.c
---dump-c
+--dump-c _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 --

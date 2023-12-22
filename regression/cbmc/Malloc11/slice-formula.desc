@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check --slice-formula
+--no-malloc-may-fail --slice-formula
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

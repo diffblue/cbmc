@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --enforce-contract foo
+--no-malloc-may-fail --dfcc main --enforce-contract foo _ --no-standard-checks
 ^\[foo.assigns.\d+\].* Check that \*loc1 is assignable: SUCCESS$
 ^\[foo.assigns.\d+\].* Check that \*loc2 is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$

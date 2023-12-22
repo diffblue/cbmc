@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---dfcc main --enforce-contract foo8 _ --pointer-primitive-check
+--no-malloc-may-fail --dfcc main --enforce-contract foo8 _ --pointer-primitive-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[foo8.assigns.\d+\] line \d+ Check that array\[(\(.* int\))?0\] is assignable: SUCCESS$

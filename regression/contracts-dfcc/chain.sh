@@ -43,10 +43,6 @@ else
   $goto_cc -o "${name}${dfcc_suffix}.gb" "${name}.c"
 fi
 
-if [[ "${args_inst}" != *"malloc"* ]]; then
-  args_inst="--no-malloc-may-fail $args_inst"
-fi
-
 rm -f "${name}${dfcc_suffix}-mod.gb"
 $goto_instrument ${args_inst} "${name}${dfcc_suffix}.gb" "${name}${dfcc_suffix}-mod.gb"
 if [ ! -e "${name}${dfcc_suffix}-mod.gb" ] ; then
@@ -63,4 +59,4 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
   rm "${name}${dfcc_suffix}-mod.c"
 fi
 $goto_instrument --show-goto-functions "${name}${dfcc_suffix}-mod.gb"
-$cbmc --no-standard-checks "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}
+$cbmc "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}

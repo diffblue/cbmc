@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check _ --arrays-uf-always _ --arrays-uf-always
+--pointer-check _ --no-malloc-may-fail --arrays-uf-always _ --arrays-uf-always
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

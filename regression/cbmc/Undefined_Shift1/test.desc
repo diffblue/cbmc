@@ -1,6 +1,6 @@
 CORE
 main.c
---undefined-shift-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*\] line 4 shift operand is negative in .*: SUCCESS$
@@ -9,7 +9,7 @@ main.c
 ^\[.*\] line 15 shift distance is negative in .*: FAILURE$
 ^\[.*\] line 15 shift distance too large in .*: SUCCESS$
 ^\[.*\] line 20 shift operand is negative in .*: FAILURE$
-^\*\* 3 of 6 failed
+^\*\* 4 of 9 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

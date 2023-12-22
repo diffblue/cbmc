@@ -1,6 +1,6 @@
 CORE smt-backend broken-cprover-smt-backend thorough-smt-backend
 main.c
---apply-loop-contracts _ --z3
+--apply-loop-contracts _ --z3 --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.\d+\] line .* Check loop invariant before entry: SUCCESS$

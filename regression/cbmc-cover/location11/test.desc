@@ -1,6 +1,6 @@
 CORE
 main.c
---cover location
+--no-standard-checks --cover location
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1\] file main.c line 9 function main block 1.*: SATISFIED$

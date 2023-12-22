@@ -1,6 +1,6 @@
 CORE
 main.c
---function func --min-null-tree-depth 2 --max-nondet-tree-depth 10 --cover branch
+--no-standard-checks --function func --min-null-tree-depth 2 --max-nondet-tree-depth 10 --cover branch
 ^EXIT=0$
 ^SIGNAL=0$
 \[func.coverage.2\] file main.c line .* function func block 1 branch false: SATISFIED

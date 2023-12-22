@@ -1,6 +1,6 @@
 CORE
 main.c
---harness-type call-function --function calling_func --treat-pointer-as-cstring s --associated-array-size s:length
+--harness-type call-function --function calling_func --treat-pointer-as-cstring s --associated-array-size s:length _ --no-standard-checks
 \[calling_func.assertion.\d+\] line \d+ assertion stringlength\(s\) \+ 1 == length: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

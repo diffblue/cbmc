@@ -1,3 +1,3 @@
 add_test_pl_tests(
-    "$<TARGET_FILE:cbmc> --no-standard-checks"
+    "$<TARGET_FILE:cbmc>"
 )

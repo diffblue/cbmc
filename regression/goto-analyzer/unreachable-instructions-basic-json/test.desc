@@ -1,6 +1,6 @@
 CORE
 ../unreachable-instructions-basic-text/unreachable.c
---unreachable-instructions --json -
+--no-standard-checks --unreachable-instructions --json -
 "function": "not_called",
 "unreachableInstructions":
 "sourceLocation":

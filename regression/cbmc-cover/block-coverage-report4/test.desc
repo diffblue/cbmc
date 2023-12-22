@@ -1,6 +1,6 @@
 CORE
 main.c
---cover location --unwind 4
+--no-standard-checks --cover location --unwind 4
 block 1 \(lines main.c:main:3\): SATISFIED
 block 2 \(lines main.c:main:4\): SATISFIED
 block 3 \(lines main.c:main:4,6\): SATISFIED

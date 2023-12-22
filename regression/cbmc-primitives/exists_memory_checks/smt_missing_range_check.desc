@@ -1,6 +1,6 @@
 CORE smt-backend no-new-smt
 smt_missing_range_check.c
---pointer-check -z3
+--no-malloc-may-fail --pointer-check -z3
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

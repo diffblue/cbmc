@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract foo
+--no-malloc-may-fail --dfcc main --replace-call-with-contract foo _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[foo.precondition.\d+\] line \d+ Check requires clause of (contract contract::foo for function foo|foo in main): SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 short-circuit-memory-checks.c
---pointer-check
+
 ^EXIT=10$
 ^SIGNAL=0$
 line 11 dereference failure: pointer NULL in \*c: SUCCESS

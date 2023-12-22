@@ -1,6 +1,6 @@
 CORE dfcc-only
 main.c
---loop-contracts-file test.json --dfcc main --apply-loop-contracts
+--loop-contracts-file test.json --dfcc main --apply-loop-contracts _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

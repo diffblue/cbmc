@@ -1,6 +1,6 @@
 CORE
 test.c
---restrict-function-pointer-by-name main::1::fp/f
+--restrict-function-pointer-by-name main::1::fp/f _ --no-standard-checks
 \[main\.pointer_dereference\.1\] line \d+ dereferenced function pointer must be f: SUCCESS
 \[main\.assertion\.1\] line \d+ assertion fp\(\) == 1: SUCCESS
 f\(\)

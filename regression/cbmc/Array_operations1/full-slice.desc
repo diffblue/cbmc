@@ -10,9 +10,9 @@ main.c
 ^\[test_unequal\.assertion\.4\] .* expected to fail: FAILURE
 ^\[test_unequal\.assertion\.5\] .* expected to fail: FAILURE
 ^\[test_unequal\.assertion\.6\] .* expected to fail: FAILURE
-^\*\* 5 of 15 failed
+^\*\* 5 of 19 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
 --
-Verify the properties of various cprover array primitves
+Verify the properties of various CPROVER array primitives.

@@ -1,6 +1,6 @@
 CORE
 test.c
---value-set-fi-fp-removal
+--value-set-fi-fp-removal _ --no-standard-checks
 ^EXIT=10$
 ^SIGNAL=0$
 ^file test.c line 20 function main: replacing function pointer by 2 possible targets$

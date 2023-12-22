@@ -1,6 +1,6 @@
 CORE
 test.c
---harness-type call-function --function test --treat-pointer-as-array arr
+--harness-type call-function --function test --treat-pointer-as-array arr _ --no-standard-checks
 \[test.pointer_dereference.\d+\] line \d+ dereference failure: pointer outside object bounds in arr\[(\(signed( long)* int\))?0\]: SUCCESS
 \[test.pointer_dereference.\d+\] line \d+ dereference failure: pointer outside object bounds in arr\[(\(signed( long)* int\))?10\]: FAILURE
 ^EXIT=10$

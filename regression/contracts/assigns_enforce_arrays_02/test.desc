@@ -1,6 +1,6 @@
 CORE
 main.c
---enforce-contract f1 --enforce-contract f2
+--enforce-contract f1 --enforce-contract f2 _ --no-standard-checks
 ^\[f1.assigns.\d+\] line 6 Check that \*a is valid: SUCCESS$
 ^\[f1.assigns.\d+\] line 8 Check that a\[.*0\] is assignable: SUCCESS$
 ^\[f1.assigns.\d+\] line 9 Check that a\[.*5\] is assignable: FAILURE$

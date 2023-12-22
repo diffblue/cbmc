@@ -1,6 +1,6 @@
 CORE
 main.c
---little-endian --pointer-check
+--little-endian
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

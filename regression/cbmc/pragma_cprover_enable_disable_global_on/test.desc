@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-primitive-check
+
 ^main.c function main$
 ^\[main.pointer_primitives.\d+\] line 8 pointer invalid in R_OK\(p, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main.pointer_primitives.\d+\] line 8 pointer outside object bounds in R_OK\(p, \(unsigned (long (long )?)?int\)1\): FAILURE$

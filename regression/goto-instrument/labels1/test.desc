@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--malloc-may-fail _ --no-standard-checks
 Labels: label_zero$
 Labels: label_one$
 Labels: label_two$

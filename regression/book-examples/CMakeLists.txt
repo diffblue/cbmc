@@ -13,19 +13,19 @@ else()
 endif()
 
 add_test_pl_tests(
-    "$<TARGET_FILE:cbmc> --no-standard-checks --validate-goto-model --validate-ssa-equation" -X smt-backend ${gcc_only} ${exclude_win_broken_tests}
+    "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation" -X smt-backend ${gcc_only} ${exclude_win_broken_tests}
 )
 
 add_test_pl_profile(
     "book-examples-paths-lifo"
-    "$<TARGET_FILE:cbmc> --no-standard-checks --paths lifo"
+    "$<TARGET_FILE:cbmc> --paths lifo"
     "-C;-X;thorough-paths;-X;smt-backend;-X;paths-lifo-expected-failure;${gcc_only_string}-s;paths-lifo;${exclude_win_broken_tests_string}"
     "CORE"
 )
 
 add_test_pl_profile(
     "book-examples-cprover-smt2"
-    "$<TARGET_FILE:cbmc> --no-standard-checks --cprover-smt2"
+    "$<TARGET_FILE:cbmc> --cprover-smt2"
     "-C;-X;broken-smt-backend;-X;thorough-smt-backend;-X;broken-cprover-smt-backend;-X;thorough-cprover-smt-backend;${gcc_only_string}-s;cprover-smt2;${exclude_win_broken_tests_string}"
     "CORE"
 )
@@ -33,7 +33,7 @@ add_test_pl_profile(
 # If `-X` (exclude flag) is passed, test.pl will exclude the tests matching the label following it.
 add_test_pl_profile(
   "book-examples-new-smt-backend"
-  "$<TARGET_FILE:cbmc> --no-standard-checks --incremental-smt2-solver 'z3 --smt2 -in'"
+  "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'z3 --smt2 -in'"
   "${gcc_only_string}-X;no-new-smt;-s;new-smt-backend"
   "CORE"
 )

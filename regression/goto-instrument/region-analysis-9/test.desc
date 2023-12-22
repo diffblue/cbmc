@@ -1,6 +1,6 @@
 CORE
 test.c
---show-sese-regions
+--show-sese-regions _ --no-standard-checks
 ^Function contains 2 single-entry, single-exit regions:$
 ^Region starting at \(2, [0-9]+\) .*::x := 0 ends at \(21, [0-9]+\) 6: ASSIGN main::argc := main::argc \+ 1$
 ^Region starting at \(0, [0-9]+\) IF .*5.* THEN GOTO 7 ends at \(24, [0-9]+\) 8: SKIP$

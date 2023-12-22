@@ -1,6 +1,6 @@
 CORE
 signed_addition_overflow3.c
---signed-overflow-check --conversion-check
+--conversion-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*\] .* arithmetic overflow on signed \+ in .*: SUCCESS

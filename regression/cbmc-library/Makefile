@@ -9,10 +9,10 @@ ifeq ($(BUILD_ENV_),MSVC)
 endif
 
 test:
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --no-standard-checks" $(unix_only) $(gcc_only)
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(unix_only) $(gcc_only)
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --no-standard-checks" $(unix_only) $(gcc_only)
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(unix_only) $(gcc_only)
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;

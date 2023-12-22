@@ -1,6 +1,6 @@
 CORE
 b.c
-a.c --pointer-check
+--no-malloc-may-fail a.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

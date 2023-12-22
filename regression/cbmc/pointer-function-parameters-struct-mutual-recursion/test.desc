@@ -1,6 +1,6 @@
 CORE
 main.c
---function func --min-null-tree-depth 10 --max-nondet-tree-depth 3 --pointer-check
+--function func --min-null-tree-depth 10 --max-nondet-tree-depth 3
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL

@@ -1,6 +1,6 @@
 CORE
 main.c
---variable-sensitivity --vsd-values constants --loop-unwind 10 --three-way-merge --show
+--no-standard-checks --variable-sensitivity --vsd-values constants --loop-unwind 10 --three-way-merge --show
 ^EXIT=0$
 ^SIGNAL=0$
 ^main::1::1::i .* 5 @ \[6\]

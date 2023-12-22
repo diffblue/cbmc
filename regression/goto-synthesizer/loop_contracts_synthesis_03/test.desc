@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check
+--pointer-check _ --no-malloc-may-fail _ --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.pointer\_dereference.\d+\] .* SUCCESS$

@@ -1,6 +1,6 @@
 CORE broken-cprover-smt-backend thorough-paths no-new-smt
 main.c
---floatbv --no-simplify
+--floatbv --no-simplify --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

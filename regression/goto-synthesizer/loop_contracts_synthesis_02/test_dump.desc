@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check _ --dump-loop-contracts
+--pointer-check _ --dump-loop-contracts --no-malloc-may-fail
 ^EXIT=0$
 ^SIGNAL=0$
 \"sources"\: \[ \"main\.c\" \]

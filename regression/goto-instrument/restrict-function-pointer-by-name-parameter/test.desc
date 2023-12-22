@@ -1,6 +1,6 @@
 CORE
 test.c
---restrict-function-pointer-by-name use_fp::fp/f
+--restrict-function-pointer-by-name use_fp::fp/f _ --no-standard-checks
 \[use_fp\.pointer_dereference\.1\] line \d+ dereferenced function pointer must be f: SUCCESS
 \[use_fp\.assertion\.1\] line \d+ assertion fp\(\) == 1: SUCCESS
 f\(\)

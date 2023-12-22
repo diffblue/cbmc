@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
---object-bits 8 --bounds-check --pointer-check --pointer-primitive-check --div-by-zero-check --enum-range-check --unsigned-overflow-check --signed-overflow-check --pointer-overflow-check --float-overflow-check --conversion-check --undefined-shift-check --nan-check --pointer-primitive-check
+--object-bits 8 --enum-range-check --unsigned-overflow-check --pointer-overflow-check --float-overflow-check --conversion-check --nan-check
 ^\[main\.pointer_primitives\.\d+\] line 77 pointer invalid in R_OK\(q, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main\.pointer_primitives\.\d+\] line 77 pointer outside object bounds in R_OK\(q, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main\.pointer_arithmetic\.\d+\] line 78 pointer arithmetic: pointer outside object bounds in p \+ (\(signed int\))?2000000000000(l|ll): FAILURE

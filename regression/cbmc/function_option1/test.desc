@@ -1,6 +1,6 @@
 CORE
 main.c
- --function f
+--function f --no-standard-checks
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

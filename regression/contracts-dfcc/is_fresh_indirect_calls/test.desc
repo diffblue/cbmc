@@ -1,6 +1,6 @@
 CORE
 main.c
---dfcc main --replace-call-with-contract foo
+--no-malloc-may-fail --dfcc main --replace-call-with-contract foo _ --no-standard-checks
 ^\[main.assertion.\d+\].*c is rw_ok: SUCCESS$
 ^\[main.assertion.\d+\].*c and a are distinct: SUCCESS$
 ^\[main.assertion.\d+\].*c and b are distinct: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 main.c
---graphml-witness - --unwindset main.0:1 --unwinding-assertions --stack-trace
+--no-standard-checks --graphml-witness - --unwindset main.0:1 --unwinding-assertions --stack-trace
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

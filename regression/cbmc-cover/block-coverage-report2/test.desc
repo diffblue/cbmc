@@ -1,6 +1,6 @@
 CORE
 main.c
---cover location
+--no-standard-checks --cover location
 block 1 \(lines main.c:main:13,14\): SATISFIED
 block 2 \(lines main.c:main:15\): SATISFIED
 block 3 \(lines main.c:main:17,18\): SATISFIED

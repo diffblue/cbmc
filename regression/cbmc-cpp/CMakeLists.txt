@@ -5,5 +5,5 @@ else()
 endif()
 
 add_test_pl_tests(
-    "$<TARGET_FILE:cbmc> --no-standard-checks --validate-goto-model --validate-ssa-equation" ${gcc_only}
+    "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation" ${gcc_only}
 )

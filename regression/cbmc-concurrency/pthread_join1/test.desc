@@ -1,6 +1,6 @@
 CORE pthread
 main.c
---all-properties
+--no-standard-checks --all-properties
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line 21 assertion i==1: FAILURE$

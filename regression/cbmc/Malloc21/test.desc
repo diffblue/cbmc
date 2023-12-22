@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-pointer-check --no-malloc-may-fail
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

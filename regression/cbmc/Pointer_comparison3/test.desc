@@ -1,9 +1,9 @@
 CORE no-new-smt
 main.c
-
+--no-malloc-may-fail
 ^\[main.assertion.3\] line 21 always false for different objects: FAILURE$
 ^\[main.assertion.4\] line 23 always false for different objects: FAILURE$
-^\*\* 2 of 7 failed
+^\*\* 11 of 59 failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

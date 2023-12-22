@@ -1,6 +1,6 @@
 CORE
 main.c
---string-abstraction --unwind 5 --pointer-check --bounds-check
+--string-abstraction --unwind 5
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

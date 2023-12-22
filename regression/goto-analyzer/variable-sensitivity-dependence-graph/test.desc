@@ -1,6 +1,6 @@
 CORE
 main.c
-file1.c file2.c --dependence-graph-vs --vsd-structs every-field --vsd-arrays every-element --show
+--no-standard-checks file1.c file2.c --dependence-graph-vs --vsd-structs every-field --vsd-arrays every-element --show
 ^EXIT=0$
 ^SIGNAL=0$
 ^Data dependencies: 48 \[st.a\]$

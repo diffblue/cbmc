@@ -1,6 +1,6 @@
 CORE
 main.c
---pointer-check
+--no-malloc-may-fail
 ^EXIT=10$
 ^SIGNAL=0$
 pointer outside object bounds in \*p: FAILURE
