@@ -93,7 +93,7 @@ public:
   }
 
   /// equivalent of as_string().starts_with(s)
-  bool starts_with(const char *s)
+  bool starts_with(const char *s) const
   {
     for(const char *t = c_str(); *s != 0; s++, t++)
       if(*t != *s)
@@ -103,7 +103,7 @@ public:
   }
 
   /// equivalent of as_string().starts_with(s)
-  bool starts_with(const std::string &prefix)
+  bool starts_with(const std::string &prefix) const
   {
     return as_string().compare(0, prefix.size(), prefix) == 0;
   }
