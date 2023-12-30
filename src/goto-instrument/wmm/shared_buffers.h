@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cprover_prefix.h>
 #include <util/namespace.h>
-#include <util/prefix.h>
 #include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_program.h>
@@ -154,7 +153,7 @@ public:
     const symbolt &symbol=ns.lookup(id);
     if(symbol.is_thread_local)
       return false;
-    if(has_prefix(id2string(id), CPROVER_PREFIX))
+    if(id.starts_with(CPROVER_PREFIX))
       return false;
 
     return true;

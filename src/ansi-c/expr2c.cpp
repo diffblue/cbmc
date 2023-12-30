@@ -1650,7 +1650,7 @@ std::string expr2ct::convert_symbol(const exprt &src)
     dest=id2string(entry->second);
 
     #if 0
-    if(has_prefix(id2string(id), SYMEX_DYNAMIC_PREFIX "::dynamic_object"))
+    if(id.starts_with(SYMEX_DYNAMIC_PREFIX "::dynamic_object"))
     {
       if(sizeof_nesting++ == 0)
         dest+=" /*"+convert(src.type());
@@ -1992,7 +1992,7 @@ std::string expr2ct::convert_constant(
         dest="(("+convert(type)+")"+dest+")";
     }
     else if(
-      value == "INVALID" || has_prefix(id2string(value), "INVALID-") ||
+      value == "INVALID" || value.starts_with("INVALID-") ||
       value == "NULL+offset")
     {
       dest = id2string(value);
@@ -3729,10 +3729,10 @@ std::string expr2ct::convert_with_precedence(
       "__builtin_bswap" + integer2string(*pointer_offset_bits(
                             to_unary_expr(src).op().type(), ns)));
 
-  else if(has_prefix(src.id_string(), "byte_extract"))
+  else if(src.id().starts_with("byte_extract"))
     return convert_byte_extract(to_byte_extract_expr(src), precedence = 16);
 
-  else if(has_prefix(src.id_string(), "byte_update"))
+  else if(src.id().starts_with("byte_update"))
     return convert_byte_update(to_byte_update_expr(src), precedence = 16);
 
   else if(src.id()==ID_address_of)

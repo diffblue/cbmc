@@ -11,13 +11,12 @@ Author: Thomas Kiley
 
 #include "show_goto_functions_json.h"
 
-#include <iostream>
-
-#include <util/json_irep.h>
 #include <util/cprover_prefix.h>
-#include <util/prefix.h>
+#include <util/json_irep.h>
 
 #include "goto_functions.h"
+
+#include <iostream>
 
 /// For outputting the GOTO program in a readable JSON format.
 /// \param _list_only: output only list of functions, but not their bodies
@@ -46,11 +45,10 @@ json_objectt show_goto_functions_jsont::convert(
     json_function["name"] = json_stringt(function_name);
     json_function["isBodyAvailable"]=
       jsont::json_boolean(function.body_available());
-    bool is_internal=
-      has_prefix(id2string(function_name), CPROVER_PREFIX) ||
-      has_prefix(id2string(function_name), "java::array[") ||
-      has_prefix(id2string(function_name), "java::org.cprover") ||
-      has_prefix(id2string(function_name), "java::java");
+    bool is_internal = function_name.starts_with(CPROVER_PREFIX) ||
+                       function_name.starts_with("java::array[") ||
+                       function_name.starts_with("java::org.cprover") ||
+                       function_name.starts_with("java::java");
     json_function["isInternal"]=jsont::json_boolean(is_internal);
 
     if(list_only)

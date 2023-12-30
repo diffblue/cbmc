@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
-#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
@@ -84,7 +83,7 @@ void goto_symext::trigger_auto_object(const exprt &expr, statet &state)
       {
         const symbolt &symbol = ns.lookup(obj_identifier);
 
-        if(has_prefix(id2string(symbol.base_name), "symex::auto_object"))
+        if(symbol.base_name.starts_with("symex::auto_object"))
         {
           // done already?
           if(!state.get_level2().current_names.has_key(

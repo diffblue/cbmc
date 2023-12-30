@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Program Transformation
 
 #include "goto_convert.h"
+#include "goto_convert_class.h"
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -18,13 +19,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
-#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
 #include <util/symbol_table_builder.h>
 
-#include "goto_convert_class.h"
 #include "destructor.h"
 #include "remove_skip.h"
 
@@ -462,7 +461,7 @@ void goto_convertt::convert_label(
   // magic thread creation label.
   // The "__CPROVER_ASYNC_" signals the start of a sequence of instructions
   // that can be executed in parallel, i.e, a new thread.
-  if(has_prefix(id2string(label), CPROVER_PREFIX "ASYNC_"))
+  if(label.starts_with(CPROVER_PREFIX "ASYNC_"))
   {
     // the body of the thread is expected to be
     // in the operand.

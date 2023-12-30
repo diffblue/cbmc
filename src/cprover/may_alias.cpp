@@ -14,7 +14,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
@@ -115,15 +114,15 @@ bool stack_and_not_dirty(
   {
     auto symbol_expr = object->object_expr();
     auto identifier = symbol_expr.get_identifier();
-    if(has_prefix(id2string(identifier), "va_arg::"))
+    if(identifier.starts_with("va_arg::"))
       return true; // on the stack, and might alias
-    else if(has_prefix(id2string(identifier), "var_args::"))
+    else if(identifier.starts_with("var_args::"))
       return false; // on the stack -- can take address?
-    else if(has_prefix(id2string(identifier), "va_args::"))
+    else if(identifier.starts_with("va_args::"))
       return false; // on the stack -- can take address?
-    else if(has_prefix(id2string(identifier), "va_arg_array::"))
+    else if(identifier.starts_with("va_arg_array::"))
       return false; // on the stack -- can take address?
-    else if(has_prefix(id2string(identifier), "old::"))
+    else if(identifier.starts_with("old::"))
       return true; // on the stack, but can't take address
     else if(identifier == "return_value")
       return true; // on the stack, but can't take address

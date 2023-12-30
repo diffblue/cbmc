@@ -28,7 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -1443,7 +1442,7 @@ void goto_check_ct::pointer_primitive_check(
   {
     const auto &symbol_expr = to_symbol_expr(pointer);
 
-    if(has_prefix(id2string(symbol_expr.get_identifier()), CPROVER_PREFIX))
+    if(symbol_expr.get_identifier().starts_with(CPROVER_PREFIX))
       return;
   }
 

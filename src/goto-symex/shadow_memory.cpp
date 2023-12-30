@@ -17,7 +17,6 @@ Author: Peter Schrammel
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
-#include <util/prefix.h>
 #include <util/string_constant.h>
 
 #include <langapi/language_util.h>
@@ -352,8 +351,8 @@ void shadow_memoryt::symex_field_static_init(
     return;
 
   if(
-    has_prefix(id2string(identifier), CPROVER_PREFIX) &&
-    !has_prefix(id2string(identifier), CPROVER_PREFIX "errno"))
+    identifier.starts_with(CPROVER_PREFIX) &&
+    !identifier.starts_with(CPROVER_PREFIX "errno"))
   {
     return;
   }
@@ -383,9 +382,9 @@ void shadow_memoryt::symex_field_static_init_string_constant(
 {
   if(
     expr.get_original_expr().id() == ID_symbol &&
-    has_prefix(
-      id2string(to_symbol_expr(expr.get_original_expr()).get_identifier()),
-      CPROVER_PREFIX))
+    to_symbol_expr(expr.get_original_expr())
+      .get_identifier()
+      .starts_with(CPROVER_PREFIX))
   {
     return;
   }

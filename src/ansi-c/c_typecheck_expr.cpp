@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
@@ -870,7 +869,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     // preserve location
     expr.add_source_location()=source_location;
   }
-  else if(has_prefix(id2string(identifier), CPROVER_PREFIX "constant_infinity"))
+  else if(identifier.starts_with(CPROVER_PREFIX "constant_infinity"))
   {
     expr=infinity_exprt(symbol.type);
 
@@ -1934,7 +1933,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       throw 0;
     }
   }
-  else if(has_prefix(id2string(statement), "assign"))
+  else if(statement.starts_with("assign"))
     typecheck_side_effect_assignment(expr);
   else if(statement==ID_function_call)
     typecheck_side_effect_function_call(
@@ -3456,9 +3455,8 @@ exprt c_typecheck_baset::do_special_functions(
 
     typecheck_function_call_arguments(expr);
 
-    count_leading_zeros_exprt clz{expr.arguments().front(),
-                                  has_prefix(id2string(identifier), "__lzcnt"),
-                                  expr.type()};
+    count_leading_zeros_exprt clz{
+      expr.arguments().front(), identifier.starts_with("__lzcnt"), expr.type()};
     clz.add_source_location() = source_location;
 
     return std::move(clz);

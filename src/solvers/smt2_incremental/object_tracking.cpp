@@ -6,7 +6,6 @@
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -93,8 +92,7 @@ static bool is_dynamic(const exprt &object)
     return true;
   const auto symbol = expr_try_dynamic_cast<symbol_exprt>(object);
   bool symbol_is_dynamic =
-    symbol &&
-    has_prefix(id2string(symbol->get_identifier()), SYMEX_DYNAMIC_PREFIX);
+    symbol && symbol->get_identifier().starts_with(SYMEX_DYNAMIC_PREFIX);
   return symbol_is_dynamic;
 }
 

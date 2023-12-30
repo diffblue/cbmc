@@ -11,13 +11,12 @@ Author: Thomas Kiley
 
 #include "show_goto_functions_xml.h"
 
-#include <iostream>
-
 #include <util/cprover_prefix.h>
-#include <util/prefix.h>
 #include <util/xml_irep.h>
 
 #include "goto_functions.h"
+
+#include <iostream>
 
 /// For outputting the GOTO program in a readable xml format.
 /// \param _list_only: output only list of functions, but not their bodies
@@ -50,11 +49,10 @@ xmlt show_goto_functions_xmlt::convert(
     xml_function.set_attribute("name", id2string(function_name));
     xml_function.set_attribute_bool(
       "is_body_available", function.body_available());
-    bool is_internal=
-      has_prefix(id2string(function_name), CPROVER_PREFIX) ||
-      has_prefix(id2string(function_name), "java::array[") ||
-      has_prefix(id2string(function_name), "java::org.cprover") ||
-      has_prefix(id2string(function_name), "java::java");
+    bool is_internal = function_name.starts_with(CPROVER_PREFIX) ||
+                       function_name.starts_with("java::array[") ||
+                       function_name.starts_with("java::org.cprover") ||
+                       function_name.starts_with("java::java");
     xml_function.set_attribute_bool("is_internal", is_internal);
 
     if(list_only)

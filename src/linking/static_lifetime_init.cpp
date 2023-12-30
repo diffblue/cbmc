@@ -44,7 +44,7 @@ static std::optional<codet> static_lifetime_init(
     return {};
 
   // just for linking
-  if(has_prefix(id2string(identifier), CPROVER_PREFIX "architecture_"))
+  if(identifier.starts_with(CPROVER_PREFIX "architecture_"))
     return {};
 
   const typet &type = ns.follow(symbol.type);

@@ -268,8 +268,8 @@ void goto_program2codet::convert_labels(
       ++it)
   {
     if(
-      has_prefix(id2string(*it), CPROVER_PREFIX "ASYNC_") ||
-      has_prefix(id2string(*it), CPROVER_PREFIX "DUMP_L"))
+      it->starts_with(CPROVER_PREFIX "ASYNC_") ||
+      it->starts_with(CPROVER_PREFIX "DUMP_L"))
     {
       continue;
     }
@@ -1205,8 +1205,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
       ++it)
   {
     if(
-      has_prefix(id2string(*it), CPROVER_PREFIX "ASYNC_") ||
-      has_prefix(id2string(*it), CPROVER_PREFIX "DUMP_L"))
+      it->starts_with(CPROVER_PREFIX "ASYNC_") ||
+      it->starts_with(CPROVER_PREFIX "DUMP_L"))
     {
       continue;
     }
@@ -1270,7 +1270,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
         it=target->labels.begin();
         it!=target->labels.end();
         ++it)
-      if(has_prefix(id2string(*it), CPROVER_PREFIX "ASYNC_"))
+      if(it->starts_with(CPROVER_PREFIX "ASYNC_"))
       {
         labels_in_use.insert(*it);
 
@@ -1343,7 +1343,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       it=target->labels.begin();
       it!=target->labels.end();
       ++it)
-    if(has_prefix(id2string(*it), CPROVER_PREFIX "ASYNC_"))
+    if(it->starts_with(CPROVER_PREFIX "ASYNC_"))
     {
       labels_in_use.insert(*it);
 
@@ -1862,7 +1862,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       {
         if(it->second.type.id()!=ID_code)
           continue;
-        if(!has_prefix(id2string(it->second.base_name), "nondet_"))
+        if(!it->second.base_name.starts_with("nondet_"))
           continue;
         const code_typet &code_type=to_code_type(it->second.type);
         if(code_type.return_type() != expr.type())

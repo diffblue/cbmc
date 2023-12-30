@@ -206,7 +206,7 @@ void merge_source_location_rec(
 
 bool is_java_string_literal_id(const irep_idt &id)
 {
-  return has_prefix(id2string(id), JAVA_STRING_LITERAL_PREFIX);
+  return id.starts_with(JAVA_STRING_LITERAL_PREFIX);
 }
 
 irep_idt resolve_friendly_method_name(
@@ -221,8 +221,7 @@ irep_idt resolve_friendly_method_name(
     std::set<irep_idt> matches;
 
     for(const auto &s : symbol_table.symbols)
-      if(has_prefix(id2string(s.first), prefix) &&
-         s.second.type.id()==ID_code)
+      if(s.first.starts_with(prefix) && s.second.type.id() == ID_code)
         matches.insert(s.first);
 
     if(matches.empty())

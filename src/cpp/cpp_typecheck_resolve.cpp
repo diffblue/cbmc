@@ -15,12 +15,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
-#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -33,6 +30,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
+
+#include <algorithm>
 
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck):
   cpp_typecheck(_cpp_typecheck),
@@ -814,7 +813,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
 
     dest=type_exprt(typet(base_name));
   }
-  else if(has_prefix(id2string(base_name), "constant_infinity"))
+  else if(base_name.starts_with("constant_infinity"))
   {
     // ok, but type missing
     dest=exprt(ID_infinity, size_type());

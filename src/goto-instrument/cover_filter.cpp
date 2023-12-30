@@ -34,7 +34,7 @@ bool internal_functions_filtert::operator()(
     return false;
 
   // ignore Java built-ins (synthetic functions)
-  if(has_prefix(id2string(function.name), "java::array["))
+  if(function.name.starts_with("java::array["))
     return false;
 
   // ignore if built-in library

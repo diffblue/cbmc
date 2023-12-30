@@ -13,12 +13,11 @@ Date: February 2006
 
 #include "race_check.h"
 
-#include <util/prefix.h>
+#include <util/pointer_predicates.h>
 
 #include <goto-programs/remove_skip.h>
 
 #include <linking/static_lifetime_init.h>
-#include <util/pointer_predicates.h>
 
 #include "rw_set.h"
 
@@ -128,8 +127,8 @@ static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
     identifier == CPROVER_PREFIX "alloc_size" || identifier == "stdin" ||
     identifier == "stdout" || identifier == "stderr" ||
     identifier == "sys_nerr" ||
-    has_prefix(id2string(identifier), "symex::invalid_object") ||
-    has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "::dynamic_object"))
+    identifier.starts_with("symex::invalid_object") ||
+    identifier.starts_with(SYMEX_DYNAMIC_PREFIX "::dynamic_object"))
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);

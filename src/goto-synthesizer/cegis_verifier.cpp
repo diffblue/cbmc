@@ -16,7 +16,6 @@ Author: Qinheping Hu
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/prefix.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/link_to_library.h>
@@ -45,7 +44,7 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
   {
     if(
       it->id() == ID_symbol &&
-      has_prefix(id2string(to_symbol_expr(*it).get_identifier()), prefix))
+      to_symbol_expr(*it).get_identifier().starts_with(prefix))
     {
       return true;
     }

@@ -16,7 +16,6 @@ Date: June 2006
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/get_base_name.h>
-#include <util/prefix.h>
 #include <util/run.h>
 #include <util/symbol_table_builder.h>
 #include <util/tempdir.h>
@@ -744,10 +743,10 @@ bool compilet::add_written_cprover_symbols(const symbol_tablet &symbol_table)
   {
     const irep_idt &name=pair.second.name;
     const typet &new_type=pair.second.type;
-    if(!(has_prefix(id2string(name), CPROVER_PREFIX) && new_type.id()==ID_code))
+    if(!(name.starts_with(CPROVER_PREFIX) && new_type.id() == ID_code))
       continue;
 
-    if(has_prefix(id2string(name), FILE_LOCAL_PREFIX))
+    if(name.starts_with(FILE_LOCAL_PREFIX))
       continue;
 
     bool inserted;
