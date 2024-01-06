@@ -23,28 +23,27 @@ bool constant_exprt::value_is_zero_string() const
 
 void constant_exprt::check(const exprt &expr, const validation_modet vm)
 {
-  DATA_CHECK(
-    vm, !expr.has_operands(), "constant expression must not have operands");
+  nullary_exprt::check(expr, vm);
+
+  const auto value = expr.get(ID_value);
 
   DATA_CHECK(
     vm,
-    !can_cast_type<bitvector_typet>(expr.type()) ||
-      !id2string(to_constant_expr(expr).get_value()).empty(),
+    !can_cast_type<bitvector_typet>(expr.type()) || !value.empty(),
     "bitvector constant must have a non-empty value");
 
   DATA_CHECK(
     vm,
     !can_cast_type<bitvector_typet>(expr.type()) ||
       can_cast_type<pointer_typet>(expr.type()) ||
-      id2string(to_constant_expr(expr).get_value())
-          .find_first_not_of("0123456789ABCDEF") == std::string::npos,
+      id2string(value).find_first_not_of("0123456789ABCDEF") ==
+        std::string::npos,
     "negative bitvector constant must use two's complement");
 
   DATA_CHECK(
     vm,
-    !can_cast_type<bitvector_typet>(expr.type()) ||
-      to_constant_expr(expr).get_value() == ID_0 ||
-      id2string(to_constant_expr(expr).get_value())[0] != '0',
+    !can_cast_type<bitvector_typet>(expr.type()) || value == ID_0 ||
+      id2string(value)[0] != '0',
     "bitvector constant must not have leading zeros");
 }
 

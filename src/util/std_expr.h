@@ -26,6 +26,24 @@ public:
   {
   }
 
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 0,
+      "nullary expression must not have operands");
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+
   /// remove all operand methods
   operandst &operands() = delete;
   const operandst &operands() const = delete;
@@ -293,19 +311,16 @@ inline void validate_expr(const nondet_symbol_exprt &value)
 inline const nondet_symbol_exprt &to_nondet_symbol_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_nondet_symbol);
-  const nondet_symbol_exprt &ret =
-    static_cast<const nondet_symbol_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  nondet_symbol_exprt::check(expr);
+  return static_cast<const nondet_symbol_exprt &>(expr);
 }
 
 /// \copydoc to_nondet_symbol_expr(const exprt &)
 inline nondet_symbol_exprt &to_nondet_symbol_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_symbol);
-  nondet_symbol_exprt &ret = static_cast<nondet_symbol_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  nondet_symbol_exprt::check(expr);
+  return static_cast<nondet_symbol_exprt &>(expr);
 }
 
 
@@ -1804,18 +1819,16 @@ inline void validate_expr(const empty_union_exprt &value)
 inline const empty_union_exprt &to_empty_union_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_empty_union);
-  const empty_union_exprt &ret = static_cast<const empty_union_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  empty_union_exprt::check(expr);
+  return static_cast<const empty_union_exprt &>(expr);
 }
 
 /// \copydoc to_empty_union_expr(const exprt &)
 inline empty_union_exprt &to_empty_union_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_empty_union);
-  empty_union_exprt &ret = static_cast<empty_union_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  empty_union_exprt::check(expr);
+  return static_cast<empty_union_exprt &>(expr);
 }
 
 /// \brief Struct constructor from list of elements
@@ -2921,16 +2934,16 @@ inline bool can_cast_expr<type_exprt>(const exprt &base)
 inline const type_exprt &to_type_expr(const exprt &expr)
 {
   PRECONDITION(can_cast_expr<type_exprt>(expr));
-  const type_exprt &ret = static_cast<const type_exprt &>(expr);
-  return ret;
+  type_exprt::check(expr);
+  return static_cast<const type_exprt &>(expr);
 }
 
 /// \copydoc to_type_expr(const exprt &)
 inline type_exprt &to_type_expr(exprt &expr)
 {
   PRECONDITION(can_cast_expr<type_exprt>(expr));
-  type_exprt &ret = static_cast<type_exprt &>(expr);
-  return ret;
+  type_exprt::check(expr);
+  return static_cast<type_exprt &>(expr);
 }
 
 /// \brief A constant literal expression
@@ -2988,6 +3001,7 @@ inline void validate_expr(const constant_exprt &value)
 inline const constant_exprt &to_constant_expr(const exprt &expr)
 {
   PRECONDITION(expr.is_constant());
+  constant_exprt::check(expr);
   return static_cast<const constant_exprt &>(expr);
 }
 
@@ -2995,6 +3009,7 @@ inline const constant_exprt &to_constant_expr(const exprt &expr)
 inline constant_exprt &to_constant_expr(exprt &expr)
 {
   PRECONDITION(expr.is_constant());
+  constant_exprt::check(expr);
   return static_cast<constant_exprt &>(expr);
 }
 
@@ -3534,10 +3549,8 @@ inline const class_method_descriptor_exprt &
 to_class_method_descriptor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_virtual_function);
-  const class_method_descriptor_exprt &ret =
-    static_cast<const class_method_descriptor_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  class_method_descriptor_exprt::check(expr);
+  return static_cast<const class_method_descriptor_exprt &>(expr);
 }
 
 template <>
