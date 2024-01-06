@@ -323,6 +323,24 @@ public:
   {
   }
 
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 1,
+      "unary expression must have one operand");
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+  }
+
   const exprt &op() const
   {
     return op0();
@@ -349,7 +367,7 @@ inline bool can_cast_expr<unary_exprt>(const exprt &base)
 
 inline void validate_expr(const unary_exprt &value)
 {
-  validate_operands(value, 1, "Unary expressions must have one operand");
+  unary_exprt::check(value);
 }
 
 /// \brief Cast an exprt to a \ref unary_exprt
@@ -360,17 +378,15 @@ inline void validate_expr(const unary_exprt &value)
 /// \return Object of type \ref unary_exprt
 inline const unary_exprt &to_unary_expr(const exprt &expr)
 {
-  const unary_exprt &ret = static_cast<const unary_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  unary_exprt::check(expr);
+  return static_cast<const unary_exprt &>(expr);
 }
 
 /// \copydoc to_unary_expr(const exprt &)
 inline unary_exprt &to_unary_expr(exprt &expr)
 {
-  unary_exprt &ret = static_cast<unary_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  unary_exprt::check(expr);
+  return static_cast<unary_exprt &>(expr);
 }
 
 
@@ -403,18 +419,16 @@ inline void validate_expr(const abs_exprt &value)
 inline const abs_exprt &to_abs_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_abs);
-  const abs_exprt &ret = static_cast<const abs_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  abs_exprt::check(expr);
+  return static_cast<const abs_exprt &>(expr);
 }
 
 /// \copydoc to_abs_expr(const exprt &)
 inline abs_exprt &to_abs_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_abs);
-  abs_exprt &ret = static_cast<abs_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  abs_exprt::check(expr);
+  return static_cast<abs_exprt &>(expr);
 }
 
 
@@ -453,18 +467,16 @@ inline void validate_expr(const unary_minus_exprt &value)
 inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_unary_minus);
-  const unary_minus_exprt &ret = static_cast<const unary_minus_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  unary_minus_exprt::check(expr);
+  return static_cast<const unary_minus_exprt &>(expr);
 }
 
 /// \copydoc to_unary_minus_expr(const exprt &)
 inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_unary_minus);
-  unary_minus_exprt &ret = static_cast<unary_minus_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  unary_minus_exprt::check(expr);
+  return static_cast<unary_minus_exprt &>(expr);
 }
 
 /// \brief The unary plus expression
@@ -497,18 +509,16 @@ inline void validate_expr(const unary_plus_exprt &value)
 inline const unary_plus_exprt &to_unary_plus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_unary_plus);
-  const unary_plus_exprt &ret = static_cast<const unary_plus_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  unary_plus_exprt::check(expr);
+  return static_cast<const unary_plus_exprt &>(expr);
 }
 
 /// \copydoc to_unary_minus_expr(const exprt &)
 inline unary_plus_exprt &to_unary_plus_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_unary_plus);
-  unary_plus_exprt &ret = static_cast<unary_plus_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  unary_plus_exprt::check(expr);
+  return static_cast<unary_plus_exprt &>(expr);
 }
 
 /// \brief A base class for expressions that are predicates,
@@ -564,18 +574,16 @@ inline void validate_expr(const sign_exprt &expr)
 inline const sign_exprt &to_sign_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_sign);
-  const sign_exprt &ret = static_cast<const sign_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  sign_exprt::check(expr);
+  return static_cast<const sign_exprt &>(expr);
 }
 
 /// \copydoc to_sign_expr(const exprt &)
 inline sign_exprt &to_sign_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_sign);
-  sign_exprt &ret = static_cast<sign_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  sign_exprt::check(expr);
+  return static_cast<sign_exprt &>(expr);
 }
 
 /// \brief A base class for binary expressions
@@ -1543,18 +1551,16 @@ inline void validate_expr(const array_of_exprt &value)
 inline const array_of_exprt &to_array_of_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_of);
-  const array_of_exprt &ret = static_cast<const array_of_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  array_of_exprt::check(expr);
+  return static_cast<const array_of_exprt &>(expr);
 }
 
 /// \copydoc to_array_of_expr(const exprt &)
 inline array_of_exprt &to_array_of_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array_of);
-  array_of_exprt &ret = static_cast<array_of_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  array_of_exprt::check(expr);
+  return static_cast<array_of_exprt &>(expr);
 }
 
 
@@ -1754,18 +1760,16 @@ inline void validate_expr(const union_exprt &value)
 inline const union_exprt &to_union_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_union);
-  const union_exprt &ret = static_cast<const union_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  union_exprt::check(expr);
+  return static_cast<const union_exprt &>(expr);
 }
 
 /// \copydoc to_union_expr(const exprt &)
 inline union_exprt &to_union_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_union);
-  union_exprt &ret = static_cast<union_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  union_exprt::check(expr);
+  return static_cast<union_exprt &>(expr);
 }
 
 /// \brief Union constructor to support unions without any member (a GCC/Clang
@@ -1952,18 +1956,16 @@ inline void validate_expr(const complex_real_exprt &expr)
 inline const complex_real_exprt &to_complex_real_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_complex_real);
-  const complex_real_exprt &ret = static_cast<const complex_real_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  complex_real_exprt::check(expr);
+  return static_cast<const complex_real_exprt &>(expr);
 }
 
 /// \copydoc to_complex_real_expr(const exprt &)
 inline complex_real_exprt &to_complex_real_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_complex_real);
-  complex_real_exprt &ret = static_cast<complex_real_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  complex_real_exprt::check(expr);
+  return static_cast<complex_real_exprt &>(expr);
 }
 
 /// \brief Imaginary part of the expression describing a complex number.
@@ -2051,18 +2053,16 @@ inline void validate_expr(const typecast_exprt &value)
 inline const typecast_exprt &to_typecast_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_typecast);
-  const typecast_exprt &ret = static_cast<const typecast_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  typecast_exprt::check(expr);
+  return static_cast<const typecast_exprt &>(expr);
 }
 
 /// \copydoc to_typecast_expr(const exprt &)
 inline typecast_exprt &to_typecast_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_typecast);
-  typecast_exprt &ret = static_cast<typecast_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  typecast_exprt::check(expr);
+  return static_cast<typecast_exprt &>(expr);
 }
 
 
@@ -2303,18 +2303,16 @@ inline void validate_expr(const not_exprt &value)
 inline const not_exprt &to_not_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_not);
-  const not_exprt &ret = static_cast<const not_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  not_exprt::check(expr);
+  return static_cast<const not_exprt &>(expr);
 }
 
 /// \copydoc to_not_expr(const exprt &)
 inline not_exprt &to_not_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_not);
-  not_exprt &ret = static_cast<not_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  not_exprt::check(expr);
+  return static_cast<not_exprt &>(expr);
 }
 
 
@@ -2886,18 +2884,16 @@ inline void validate_expr(const member_exprt &value)
 inline const member_exprt &to_member_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member);
-  const member_exprt &ret = static_cast<const member_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  member_exprt::check(expr);
+  return static_cast<const member_exprt &>(expr);
 }
 
 /// \copydoc to_member_expr(const exprt &)
 inline member_exprt &to_member_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member);
-  member_exprt &ret = static_cast<member_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  member_exprt::check(expr);
+  return static_cast<member_exprt &>(expr);
 }
 
 
