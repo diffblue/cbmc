@@ -414,7 +414,7 @@ TEST_CASE("decoding into struct expressions.", "[core][smt2_incremental]")
      from_integer(2, unsignedbv_typet{16}),
      from_integer(1, signedbv_typet{24})},
     struct_tag};
-  const exprt encoded = constant_exprt{"000000030002000001", bv_typet{72}};
+  const exprt encoded = constant_exprt{"30002000001", bv_typet{72}};
   REQUIRE(test.struct_encoding.decode(encoded, struct_tag) == expected);
 }
 
