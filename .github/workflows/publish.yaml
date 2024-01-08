@@ -20,7 +20,14 @@ jobs:
         run: sudo python3 -m pip install gitpython pandocfilters
 
       - name: Install mermaid diagram filter
-        run: sudo npm install --global mermaid-filter
+        run: |
+          git clone https://github.com/raghur/mermaid-filter/
+          cd mermaid-filter
+          sed -i '1s/{/{ "overrides": { "puppeteer": "^21" },/' package.json
+          sed -i '1s/^\/\/ //' index.js
+          npm install --loglevel verbose
+          sudo npm link --loglevel verbose
+          cd ..
 
       - name: Build documentation
         run: cd doc/doxygen-root && make && touch html/.nojekyll
