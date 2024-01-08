@@ -12,12 +12,12 @@ jobs:
     outputs:
       version: ${{ steps.split-version.outputs._1 }}
     steps:
-      - uses: jungwinter/split@v1
+      - uses: jungwinter/split@v2
         id: split
         with:
           msg: ${{ github.ref }}
           seperator: '/'
-      - uses: jungwinter/split@v1
+      - uses: jungwinter/split@v2
         id: split-version
         with:
           msg: ${{ steps.split.outputs._2 }}
