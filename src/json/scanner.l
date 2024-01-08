@@ -11,8 +11,9 @@
 %option noinput
 %option nounistd
 %option never-interactive
-
 %option noyywrap
+%option reentrant
+%option extra-type="json_parsert *"
 
 %{
 
@@ -24,7 +25,7 @@
 #pragma warning(disable:4005)
 #endif
 
-#define PARSER json_parser
+#define PARSER (*yyextra)
 
 #include "json_parser.h"
 #include "json_y.tab.h"

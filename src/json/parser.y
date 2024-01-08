@@ -20,11 +20,13 @@
 
 #include <util/unicode.h>
 
-int yyjsonlex();
-extern char *yyjsontext;
-extern int yyjsonleng; // really an int, not a size_t
+int yyjsonlex(void *);
+char *yyjsonget_text(void *);
+#define yyjsontext yyjsonget_text(scanner)
+int yyjsonget_leng(void *); // really an int, not a size_t
+#define yyjsonleng yyjsonget_leng(scanner)
 
-static std::string convert_TOK_STRING()
+static std::string convert_TOK_STRING(void *scanner)
 {
   PRECONDITION(yyjsontext[0]=='"');
   std::size_t len=yyjsonleng;
@@ -70,18 +72,22 @@ static std::string convert_TOK_STRING()
   return result;
 }
 
-static std::string convert_TOK_NUMBER()
+static std::string convert_TOK_NUMBER(void *scanner)
 {
   return yyjsontext;
 }
 
-int yyjsonerror(const std::string &error)
+int yyjsonerror(json_parsert &json_parser, void *scanner, const std::string &error)
 {
   json_parser.parse_error(error, yyjsontext);
   return 0;
 }
 
 %}
+
+%parse-param {json_parsert &json_parser}
+%parse-param {void *scanner}
+%lex-param {void *scanner}
 
 %token TOK_STRING
 %token TOK_NUMBER
@@ -109,7 +115,7 @@ key_value_pair:
           TOK_STRING
         {
           // we abuse the 'value' to temporarily store the key
-          json_parser.top().value=convert_TOK_STRING();
+          json_parser.top().value=convert_TOK_STRING(scanner);
         }
           ':' value
         {
@@ -139,9 +145,9 @@ array_value:
         ;
 
 value   : TOK_STRING
-        { json_parser.push(json_stringt(convert_TOK_STRING())); }
+        { json_parser.push(json_stringt(convert_TOK_STRING(scanner))); }
         | TOK_NUMBER
-        { json_parser.push(json_numbert(convert_TOK_NUMBER())); }
+        { json_parser.push(json_numbert(convert_TOK_NUMBER(scanner))); }
         | object
         | array
         | TOK_TRUE
