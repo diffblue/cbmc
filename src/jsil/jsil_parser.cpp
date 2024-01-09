@@ -10,3 +10,5 @@ Author: Michael Tautschnig, tautschn@amazon.com
 /// Jsil Language
 
 #include "jsil_parser.h"
+
+int jsil_parsert::instance_count = 0;
