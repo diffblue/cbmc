@@ -194,6 +194,7 @@ var hierarchy =
     [ "boundst", "structboundst.html", null ],
     [ "goto_convertt::break_continue_targetst", "structgoto__convertt_1_1break__continue__targetst.html", null ],
     [ "goto_convertt::break_switch_targetst", "structgoto__convertt_1_1break__switch__targetst.html", null ],
+    [ "build_declaration_hops_inputst", "structbuild__declaration__hops__inputst.html", null ],
     [ "string_dependenciest::builtin_function_nodet", "classstring__dependenciest_1_1builtin__function__nodet.html", null ],
     [ "bv_arithmetict", "classbv__arithmetict.html", null ],
     [ "configt::bv_encodingt", "structconfigt_1_1bv__encodingt.html", null ],
@@ -406,6 +407,7 @@ var hierarchy =
         [ "smt2_incremental_decision_proceduret", "classsmt2__incremental__decision__proceduret.html", null ]
       ] ]
     ] ],
+    [ "scope_treet::declaration_statet", "structscope__treet_1_1declaration__statet.html", null ],
     [ "default_trace_stept", "structdefault__trace__stept.html", null ],
     [ "boolbv_widtht::defined_entryt", "structboolbv__widtht_1_1defined__entryt.html", null ],
     [ "c_definest::definet", "structc__definest_1_1definet.html", null ],
@@ -432,7 +434,6 @@ var hierarchy =
     ] ],
     [ "designatort", "classdesignatort.html", null ],
     [ "destructor_and_idt", "classdestructor__and__idt.html", null ],
-    [ "destructor_treet", "classdestructor__treet.html", null ],
     [ "destructt< I, pointee_baset, Ts >", "structdestructt.html", null ],
     [ "destructt< 0, pointee_baset, Ts... >", "structdestructt_3_010_00_01pointee__baset_00_01_ts_8_8_8_01_4.html", null ],
     [ "dfcc_cfg_infot", "classdfcc__cfg__infot.html", null ],
@@ -779,8 +780,8 @@ var hierarchy =
       [ "abstract_eventt", "classabstract__eventt.html", null ],
       [ "cfg_base_nodet< T, I >", "structcfg__base__nodet.html", null ],
       [ "class_hierarchy_graph_nodet", "classclass__hierarchy__graph__nodet.html", null ],
-      [ "destructor_treet::destructor_nodet", "classdestructor__treet_1_1destructor__nodet.html", null ],
-      [ "dfcc_loop_nesting_graph_nodet", "structdfcc__loop__nesting__graph__nodet.html", null ]
+      [ "dfcc_loop_nesting_graph_nodet", "structdfcc__loop__nesting__graph__nodet.html", null ],
+      [ "scope_treet::scope_nodet", "classscope__treet_1_1scope__nodet.html", null ]
     ] ],
     [ "graph_nodet< vs_dep_edget >", "classgraph__nodet.html", [
       [ "vs_dep_nodet", "structvs__dep__nodet.html", null ]
@@ -825,10 +826,10 @@ var hierarchy =
     [ "grapht< dep_nodet >", "classgrapht.html", [
       [ "dependence_grapht", "classdependence__grapht.html", null ]
     ] ],
-    [ "grapht< destructor_treet::destructor_nodet >", "classgrapht.html", null ],
     [ "grapht< function_nodet >", "classgrapht.html", [
       [ "call_grapht::directed_grapht", "classcall__grapht_1_1directed__grapht.html", null ]
     ] ],
+    [ "grapht< scope_treet::scope_nodet >", "classgrapht.html", null ],
     [ "grapht< vs_dep_nodet >", "classgrapht.html", [
       [ "variable_sensitivity_dependence_grapht", "classvariable__sensitivity__dependence__grapht.html", null ]
     ] ],
@@ -1415,6 +1416,7 @@ var hierarchy =
     [ "saj_tablet", "structsaj__tablet.html", null ],
     [ "solver_hardnesst::sat_hardnesst", "structsolver__hardnesst_1_1sat__hardnesst.html", null ],
     [ "save_scopet", "classsave__scopet.html", null ],
+    [ "scope_treet", "classscope__treet.html", null ],
     [ "reachability_slicert::search_stack_entryt", "structreachability__slicert_1_1search__stack__entryt.html", null ],
     [ "osx_mach_o_readert::sectiont", "structosx__mach__o__readert_1_1sectiont.html", null ],
     [ "select_pointer_typet", "classselect__pointer__typet.html", null ],

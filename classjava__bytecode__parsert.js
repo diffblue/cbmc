@@ -9,7 +9,7 @@ var classjava__bytecode__parsert =
     [ "lambda_method_handlet", "classjava__bytecode__parsert.html#aed56f2da7da503d383cfa4d9f0db3299", null ],
     [ "method_handle_typet", "classjava__bytecode__parsert.html#a630ea2feb3eb4c89ffa19128179a835c", null ],
     [ "methodt", "classjava__bytecode__parsert.html#a41002c091e079d5768dacfd26db245a0", null ],
-    [ "java_bytecode_parsert", "classjava__bytecode__parsert.html#a0dcf3e3abd8116fb3590943b4849a722", null ],
+    [ "java_bytecode_parsert", "classjava__bytecode__parsert.html#a9b872e3d62d5d2374d906072d9c8e85a", null ],
     [ "constant", "classjava__bytecode__parsert.html#a41c7987006050944e8fa867495fe049e", null ],
     [ "get_annotation_class_refs", "classjava__bytecode__parsert.html#a0626d399b3d651af8892a0d8364f31c8", null ],
     [ "get_annotation_value_class_refs", "classjava__bytecode__parsert.html#a9464ebce62faa93b4d004e6b237134c1", null ],

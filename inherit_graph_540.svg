@@ -197,48 +197,48 @@
 <path fill="none" stroke="midnightblue" d="M409.53,-40.44C426.72,-38.42 444.95,-36.26 460.91,-34.38"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="409.08,-36.97 399.56,-41.62 409.9,-43.92 409.08,-36.97"/>
 </g>
-<!-- Node953 -->
+<!-- Node954 -->
 <g id="node14" class="node">
-<title>Node953</title>
+<title>Node954</title>
 <g id="a_node14"><a xlink:href="classnamespace__baset.html" target="_top" xlink:title="Basic interface for a namespace.">
 <polygon fill="none" stroke="black" points="0,-19.5 0,-38.5 105,-38.5 105,-19.5 0,-19.5"/>
 <text text-anchor="middle" x="52.5" y="-26.5" font-family="Helvetica,sans-Serif" font-size="10.00">namespace_baset</text>
 </a>
 </g>
 </g>
-<!-- Node954 -->
+<!-- Node955 -->
 <g id="node15" class="node">
-<title>Node954</title>
+<title>Node955</title>
 <g id="a_node15"><a xlink:href="classnamespacet.html" target="_top" xlink:title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...">
 <polygon fill="none" stroke="black" points="149.5,-19.5 149.5,-38.5 226.5,-38.5 226.5,-19.5 149.5,-19.5"/>
 <text text-anchor="middle" x="188" y="-26.5" font-family="Helvetica,sans-Serif" font-size="10.00">namespacet</text>
 </a>
 </g>
 </g>
-<!-- Node953&#45;&gt;Node954 -->
+<!-- Node954&#45;&gt;Node955 -->
 <g id="edge13" class="edge">
-<title>Node953&#45;&gt;Node954</title>
+<title>Node954&#45;&gt;Node955</title>
 <path fill="none" stroke="midnightblue" d="M115.21,-29C126.8,-29 138.6,-29 149.18,-29"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="115.11,-25.5 105.11,-29 115.11,-32.5 115.11,-25.5"/>
 </g>
-<!-- Node954&#45;&gt;Node7 -->
+<!-- Node955&#45;&gt;Node7 -->
 <g id="edge14" class="edge">
-<title>Node954&#45;&gt;Node7</title>
+<title>Node955&#45;&gt;Node7</title>
 <path fill="none" stroke="midnightblue" d="M236.86,-34.89C253.52,-36.94 272.33,-39.25 289.46,-41.35"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="237.15,-31.39 226.79,-33.65 236.29,-38.34 237.15,-31.39"/>
 </g>
-<!-- Node955 -->
+<!-- Node956 -->
 <g id="node16" class="node">
-<title>Node955</title>
+<title>Node956</title>
 <g id="a_node16"><a xlink:href="classmulti__namespacet.html" target="_top" xlink:title="A multi namespace is essentially a namespace, with a list of namespaces.">
 <polygon fill="none" stroke="black" points="291,-0.5 291,-19.5 398,-19.5 398,-0.5 291,-0.5"/>
 <text text-anchor="middle" x="344.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">multi_namespacet</text>
 </a>
 </g>
 </g>
-<!-- Node954&#45;&gt;Node955 -->
+<!-- Node955&#45;&gt;Node956 -->
 <g id="edge15" class="edge">
-<title>Node954&#45;&gt;Node955</title>
+<title>Node955&#45;&gt;Node956</title>
 <path fill="none" stroke="midnightblue" d="M237.11,-23.08C254.19,-20.98 273.5,-18.61 290.93,-16.46"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="236.29,-19.66 226.79,-24.35 237.15,-26.61 236.29,-19.66"/>
 </g>

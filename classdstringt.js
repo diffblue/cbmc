@@ -32,8 +32,8 @@ var classdstringt =
     [ "operator>=", "classdstringt.html#adfc25440194b30c046c3dad7fa8665ee", null ],
     [ "operator[]", "classdstringt.html#ad351c090775c994bcff2dd9e6beae487", null ],
     [ "size", "classdstringt.html#aa1ffdeb71a3035dc8cd289066bc634bc", null ],
-    [ "starts_with", "classdstringt.html#a3c82fcfee058182e87516de833486051", null ],
-    [ "starts_with", "classdstringt.html#a864430bc915edcf9616f468941697f9d", null ],
+    [ "starts_with", "classdstringt.html#a1d8ed5d7f9cb92e42fdfa6ef7cdac022", null ],
+    [ "starts_with", "classdstringt.html#a27628fcb2a03f87ff068d9fe4f20b67b", null ],
     [ "swap", "classdstringt.html#a1969094925dd74c39194226419055dfd", null ],
     [ "no", "classdstringt.html#ae4fb067f04c5f3fa31dcebe08a649db8", null ]
 ];

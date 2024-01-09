@@ -210,11 +210,11 @@
 <!-- Node118 -->
 <g id="node54" class="node">
 <title>Node118</title>
-<g id="a_node54"><a xlink:href="destructor__tree_8h.html" target="_top" xlink:title=" ">
+<g id="a_node54"><a xlink:href="scope__tree_8h.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="3033,-351 3033,-392 3171,-392 3171,-351 3033,-351"/>
 <text text-anchor="start" x="3041" y="-380" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3041" y="-369" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text text-anchor="middle" x="3102" y="-358" font-family="Helvetica,sans-Serif" font-size="10.00">/destructor_tree.h</text>
+<text text-anchor="middle" x="3102" y="-358" font-family="Helvetica,sans-Serif" font-size="10.00">/scope_tree.h</text>
 </a>
 </g>
 </g>
@@ -1056,11 +1056,11 @@
 <!-- Node119 -->
 <g id="node55" class="node">
 <title>Node119</title>
-<g id="a_node55"><a xlink:href="destructor__tree_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="3126,-262 3126,-303 3264,-303 3264,-262 3126,-262"/>
+<g id="a_node55"><a xlink:href="goto__convert__class_8h.html" target="_top" xlink:title="Program Transformation.">
+<polygon fill="none" stroke="red" points="3126,-262 3126,-303 3264,-303 3264,-262 3126,-262"/>
 <text text-anchor="start" x="3134" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3134" y="-280" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text text-anchor="middle" x="3195" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">/destructor_tree.cpp</text>
+<text text-anchor="middle" x="3195" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">/goto_convert_class.h</text>
 </a>
 </g>
 </g>
@@ -1070,20 +1070,20 @@
 <path fill="none" stroke="midnightblue" d="M3130.58,-343.76C3144.59,-330.66 3161.15,-315.16 3173.98,-303.16"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3128.01,-341.37 3123.1,-350.76 3132.8,-346.48 3128.01,-341.37"/>
 </g>
-<!-- Node120 -->
+<!-- Node170 -->
 <g id="node56" class="node">
-<title>Node120</title>
-<g id="a_node56"><a xlink:href="goto__convert__class_8h.html" target="_top" xlink:title="Program Transformation.">
-<polygon fill="none" stroke="red" points="3282,-262 3282,-303 3420,-303 3420,-262 3282,-262"/>
+<title>Node170</title>
+<g id="a_node56"><a xlink:href="scope__tree_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="3282,-262 3282,-303 3420,-303 3420,-262 3282,-262"/>
 <text text-anchor="start" x="3290" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="3290" y="-280" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/goto&#45;programs</text>
-<text text-anchor="middle" x="3351" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">/goto_convert_class.h</text>
+<text text-anchor="middle" x="3351" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">/scope_tree.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node118&#45;&gt;Node120 -->
+<!-- Node118&#45;&gt;Node170 -->
 <g id="edge71" class="edge">
-<title>Node118&#45;&gt;Node120</title>
+<title>Node118&#45;&gt;Node170</title>
 <path fill="none" stroke="midnightblue" d="M3167.46,-347.63C3207.07,-333.79 3257.07,-316.32 3294.88,-303.11"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3166.17,-344.37 3157.88,-350.98 3168.48,-350.98 3166.17,-344.37"/>
 </g>
