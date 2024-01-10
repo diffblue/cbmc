@@ -17,6 +17,7 @@ jobs:
         # user input
         DEBIAN_FRONTEND: noninteractive
       run: |
+        sudo apt-get update
         sudo apt-get install --no-install-recommends -yq doxygen graphviz
     - name: Run Doxygen
       run: ./scripts/run_doxygen.sh
