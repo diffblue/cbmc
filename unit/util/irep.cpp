@@ -22,13 +22,8 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       const std::size_t ref_count_size = 0;
 #endif
 
-#ifdef USE_DSTRING
       const std::size_t data_size = sizeof(dstringt);
       REQUIRE(sizeof(dstringt) == sizeof(unsigned));
-#else
-      const std::size_t data_size = sizeof(std::string);
-      REQUIRE(sizeof(std::string) == sizeof(void *));
-#endif
 
       const std::size_t sub_size = sizeof(std::vector<int>);
 #ifndef _GLIBCXX_DEBUG

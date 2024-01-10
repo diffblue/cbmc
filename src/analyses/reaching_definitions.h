@@ -274,11 +274,7 @@ private:
   sparse_bitvector_analysist<reaching_definitiont> *const bv_container;
 
   typedef std::set<std::size_t> values_innert;
-  #ifdef USE_DSTRING
   typedef std::map<irep_idt, values_innert> valuest;
-  #else
-  typedef std::unordered_map<irep_idt, values_innert> valuest;
-  #endif
   /// It is an ordered map from program variable names to `ID`s of
   /// `reaching_definitiont` instances stored in map pointed to by
   /// `bv_container`. The map is not empty only if `has_value` is `UNKNOWN`.
@@ -286,11 +282,7 @@ private:
   /// instruction.
   valuest values;
 
-  #ifdef USE_DSTRING
   typedef std::map<irep_idt, ranges_at_loct> export_cachet;
-  #else
-  typedef std::unordered_map<irep_idt, ranges_at_loct> export_cachet;
-  #endif
   /// It is a helper data structure. It consists of data already stored in
   /// `values` and `bv_container`. It is basically (an ordered) map from (a
   /// subset of) variables in `values` to iterators to GOTO instructions where
