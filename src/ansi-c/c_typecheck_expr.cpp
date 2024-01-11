@@ -3512,11 +3512,15 @@ exprt c_typecheck_baset::do_special_functions(
 
     return typecast_exprt(expr.arguments()[0], expr.type());
   }
-  else if(identifier=="__builtin_object_size")
+  else if(
+    identifier == "__builtin_object_size" ||
+    identifier == "__builtin_dynamic_object_size")
   {
-    // this is a gcc extension to provide information about
+    // These are gcc extensions to provide information about
     // object sizes at compile time
     // http://gcc.gnu.org/onlinedocs/gcc/Object-Size-Checking.html
+    // Our behavior is as if it was never possible to determine the object that
+    // the pointer pointed to.
 
     if(expr.arguments().size()!=2)
     {
