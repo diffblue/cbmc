@@ -139,6 +139,7 @@ var class_parser =
     [ "set_location", "class_parser.html#ae6d386fd82dd4e38be715aaf2f50c998", null ],
     [ "SkipTo", "class_parser.html#a25508e644a2f51d503e0d1fb2b7fa62b", null ],
     [ "SyntaxError", "class_parser.html#aa229c3d51f198cebb66f101a5ac9272c", null ],
+    [ "cpp11", "class_parser.html#aea9235def4572edb268ba3872a44d0ae", null ],
     [ "current_function", "class_parser.html#aab3b10903bf34196b6c8fcf87c655b96", null ],
     [ "current_scope", "class_parser.html#aad1a7f8a14617955335cdb7bd7ffba2c", null ],
     [ "lex", "class_parser.html#a5f60b827c61c71f01df042a656d310a1", null ],
