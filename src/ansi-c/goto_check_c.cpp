@@ -796,7 +796,7 @@ void goto_check_ct::conversion_check(const exprt &expr, const guardt &guard)
       {
         // Note that the fractional part is truncated!
         ieee_floatt upper(to_floatbv_type(old_type));
-        upper.from_integer(power(2, new_width) - 1);
+        upper.from_integer(power(2, new_width));
         const binary_relation_exprt no_overflow_upper(
           op, ID_lt, upper.to_expr());
 
