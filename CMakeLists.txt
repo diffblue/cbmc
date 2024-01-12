@@ -256,7 +256,6 @@ cprover_default_properties(
     goto-symex
     goto-synthesizer
     goto-synthesizer-lib
-    jsil
     json
     json-symtab-language
     langapi

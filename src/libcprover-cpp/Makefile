@@ -28,7 +28,6 @@ OBJ += \
   ../goto-instrument/unwindset$(OBJEXT) \
   ../goto-programs/goto-programs$(LIBEXT) \
   ../goto-symex/goto-symex$(LIBEXT) \
-  ../jsil/jsil$(LIBEXT) \
   ../json-symtab-language/json-symtab-language$(LIBEXT) \
   ../json/json$(LIBEXT) \
   ../langapi/langapi$(LIBEXT) \

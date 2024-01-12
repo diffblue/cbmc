@@ -36,11 +36,6 @@ CLEANFILES = goto-analyzer$(EXEEXT)
 
 all: goto-analyzer$(EXEEXT)
 
-ifneq ($(wildcard ../jsil/Makefile),)
-  OBJ += ../jsil/jsil$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JSIL
-endif
-
 ###############################################################################
 
 goto-analyzer$(EXEEXT): $(OBJ)

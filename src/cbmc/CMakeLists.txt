@@ -29,7 +29,6 @@ target_link_libraries(cbmc-lib
 )
 
 add_if_library(cbmc-lib bv_refinement)
-add_if_library(cbmc-lib jsil)
 
 # Executable
 add_executable(cbmc cbmc_main.cpp)
