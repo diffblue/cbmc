@@ -1,30 +1,30 @@
 <map id="typet" name="typet">
-<area shape="rect" id="node1" title="The type of an expression, extends irept." alt="" coords="748,803,804,829"/>
+<area shape="rect" id="node1" title="The type of an expression, extends irept." alt="" coords="748,744,804,771"/>
 <area shape="rect" id="node5" href="$classannotated__typet.html" title=" " alt="" coords="867,157,997,184"/>
 <area shape="rect" id="node6" href="$classbitvector__typet.html" title="Base class of fixed&#45;width bit&#45;vector types." alt="" coords="871,208,993,235"/>
-<area shape="rect" id="node19" href="$classbool__typet.html" title="The Boolean type." alt="" coords="887,347,977,373"/>
-<area shape="rect" id="node20" href="$classcode__typet.html" title="Base type of functions." alt="" coords="885,397,979,424"/>
-<area shape="rect" id="node25" href="$classcpp__enum__typet.html" title=" " alt="" coords="867,448,997,475"/>
-<area shape="rect" id="node26" href="$classempty__typet.html" title="The empty type." alt="" coords="879,499,985,525"/>
-<area shape="rect" id="node27" href="$classenumeration__typet.html" title="An enumeration type, i.e., a type with elements (not to be confused with C enums)" alt="" coords="859,549,1005,576"/>
-<area shape="rect" id="node28" href="$classinteger__typet.html" title="Unbounded, signed integers (mathematical integers, not bitvectors)" alt="" coords="877,600,987,627"/>
-<area shape="rect" id="node29" href="$classnatural__typet.html" title="Natural numbers including zero (mathematical integers, not bitvectors)" alt="" coords="877,651,987,677"/>
-<area shape="rect" id="node30" href="$classrange__typet.html" title="A type for subranges of integers." alt="" coords="882,701,982,728"/>
-<area shape="rect" id="node31" href="$classrational__typet.html" title="Unbounded, signed rational numbers." alt="" coords="875,752,989,779"/>
-<area shape="rect" id="node32" href="$classreal__typet.html" title="Unbounded, signed real numbers." alt="" coords="888,803,976,829"/>
-<area shape="rect" id="node33" href="$classstate__typet.html" title=" " alt="" coords="884,853,980,880"/>
-<area shape="rect" id="node34" href="$classstring__typet.html" title="String type." alt="" coords="882,904,982,931"/>
-<area shape="rect" id="node35" href="$classstruct__union__typet.html" title="Base type for structs and unions." alt="" coords="861,955,1003,981"/>
-<area shape="rect" id="node41" href="$classtag__typet.html" title="A tag&#45;based type, i.e., typet with an identifier." alt="" coords="890,1005,974,1032"/>
-<area shape="rect" id="node47" href="$structtemplate__parameter__symbol__typet.html" title="a template parameter symbol that is a type" alt="" coords="854,1057,1010,1098"/>
-<area shape="rect" id="node48" href="$classtemplate__typet.html" title=" " alt="" coords="871,1123,993,1149"/>
-<area shape="rect" id="node49" href="$classtype__with__subtypest.html" title="Type with multiple subtypes." alt="" coords="853,1173,1011,1200"/>
-<area shape="rect" id="node52" href="$classtype__with__subtypet.html" title="Type with a single subtype." alt="" coords="857,1261,1007,1288"/>
-<area shape="rect" id="node58" href="$classtypedef__typet.html" title="A typedef." alt="" coords="875,1312,989,1339"/>
-<area shape="rect" id="node59" href="$classuninitialized__typet.html" title=" " alt="" coords="861,1363,1003,1389"/>
-<area shape="rect" id="node2" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,803,699,829"/>
-<area shape="rect" id="node3" href="$classsharing__treet.html" title=" " alt="" coords="431,788,597,844"/>
-<area shape="rect" id="node4" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,795,187,837"/>
+<area shape="rect" id="node20" href="$classbool__typet.html" title="The Boolean type." alt="" coords="887,288,977,315"/>
+<area shape="rect" id="node21" href="$classcode__typet.html" title="Base type of functions." alt="" coords="885,339,979,365"/>
+<area shape="rect" id="node24" href="$classcpp__enum__typet.html" title=" " alt="" coords="867,389,997,416"/>
+<area shape="rect" id="node25" href="$classempty__typet.html" title="The empty type." alt="" coords="879,440,985,467"/>
+<area shape="rect" id="node26" href="$classenumeration__typet.html" title="An enumeration type, i.e., a type with elements (not to be confused with C enums)" alt="" coords="859,491,1005,517"/>
+<area shape="rect" id="node27" href="$classinteger__typet.html" title="Unbounded, signed integers (mathematical integers, not bitvectors)" alt="" coords="877,541,987,568"/>
+<area shape="rect" id="node28" href="$classnatural__typet.html" title="Natural numbers including zero (mathematical integers, not bitvectors)" alt="" coords="877,592,987,619"/>
+<area shape="rect" id="node29" href="$classrange__typet.html" title="A type for subranges of integers." alt="" coords="882,643,982,669"/>
+<area shape="rect" id="node30" href="$classrational__typet.html" title="Unbounded, signed rational numbers." alt="" coords="875,693,989,720"/>
+<area shape="rect" id="node31" href="$classreal__typet.html" title="Unbounded, signed real numbers." alt="" coords="888,744,976,771"/>
+<area shape="rect" id="node32" href="$classstate__typet.html" title=" " alt="" coords="884,795,980,821"/>
+<area shape="rect" id="node33" href="$classstring__typet.html" title="String type." alt="" coords="882,845,982,872"/>
+<area shape="rect" id="node34" href="$classstruct__union__typet.html" title="Base type for structs and unions." alt="" coords="861,896,1003,923"/>
+<area shape="rect" id="node41" href="$classtag__typet.html" title="A tag&#45;based type, i.e., typet with an identifier." alt="" coords="890,947,974,973"/>
+<area shape="rect" id="node47" href="$structtemplate__parameter__symbol__typet.html" title="a template parameter symbol that is a type" alt="" coords="854,998,1010,1039"/>
+<area shape="rect" id="node48" href="$classtemplate__typet.html" title=" " alt="" coords="871,1064,993,1091"/>
+<area shape="rect" id="node49" href="$classtype__with__subtypest.html" title="Type with multiple subtypes." alt="" coords="853,1115,1011,1141"/>
+<area shape="rect" id="node52" href="$classtype__with__subtypet.html" title="Type with a single subtype." alt="" coords="857,1203,1007,1229"/>
+<area shape="rect" id="node58" href="$classtypedef__typet.html" title="A typedef." alt="" coords="875,1253,989,1280"/>
+<area shape="rect" id="node59" href="$classuninitialized__typet.html" title=" " alt="" coords="861,1304,1003,1331"/>
+<area shape="rect" id="node2" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,744,699,771"/>
+<area shape="rect" id="node3" href="$classsharing__treet.html" title=" " alt="" coords="431,729,597,785"/>
+<area shape="rect" id="node4" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,737,187,778"/>
 <area shape="rect" id="node7" href="$classbv__typet.html" title="Fixed&#45;width bit&#45;vector without numerical interpretation." alt="" coords="1108,5,1187,32"/>
 <area shape="rect" id="node8" href="$classc__bit__field__typet.html" title="Type for C bit fields These are both &#39;bitvector_typet&#39; (they have a width) and &#39;type_with_subtypet&#39; (..." alt="" coords="1083,56,1212,83"/>
 <area shape="rect" id="node9" href="$classc__bool__typet.html" title="The C/C++ Booleans." alt="" coords="1095,107,1200,133"/>
@@ -35,27 +35,27 @@
 <area shape="rect" id="node13" href="$classsignedbv__typet.html" title="Fixed&#45;width bit&#45;vector with two&#39;s complement interpretation." alt="" coords="1329,208,1452,235"/>
 <area shape="rect" id="node14" href="$classunsignedbv__typet.html" title="Fixed&#45;width bit&#45;vector with unsigned binary interpretation." alt="" coords="1321,259,1460,285"/>
 <area shape="rect" id="node16" href="$classreference__typet.html" title="The reference type." alt="" coords="1328,309,1453,336"/>
-<area shape="rect" id="node17" href="$classjava__generic__parametert.html" title="Reference that points to a java_generic_parameter_tagt." alt="" coords="1547,284,1732,311"/>
-<area shape="rect" id="node18" href="$classjava__generic__typet.html" title="Reference that points to a java_generic_struct_tag_typet." alt="" coords="1566,335,1713,361"/>
-<area shape="rect" id="node21" href="$classcode__with__contract__typet.html" title=" " alt="" coords="1073,361,1221,402"/>
-<area shape="rect" id="node22" href="$classjava__method__typet.html" title=" " alt="" coords="1073,427,1221,453"/>
-<area shape="rect" id="node23" href="$classjsil__builtin__code__typet.html" title=" " alt="" coords="1063,477,1231,504"/>
-<area shape="rect" id="node24" href="$classjsil__spec__code__typet.html" title=" " alt="" coords="1069,528,1226,555"/>
-<area shape="rect" id="node36" href="$classstruct__typet.html" title="Structure type, corresponds to C style structs." alt="" coords="1097,853,1197,880"/>
-<area shape="rect" id="node39" href="$classunion__typet.html" title="The union type." alt="" coords="1098,904,1197,931"/>
-<area shape="rect" id="node37" href="$classclass__typet.html" title="Class type." alt="" coords="1343,803,1439,829"/>
-<area shape="rect" id="node38" href="$classrefined__string__typet.html" title=" " alt="" coords="1315,853,1467,880"/>
-<area shape="rect" id="node40" href="$classjsil__union__typet.html" title=" " alt="" coords="1328,904,1453,931"/>
-<area shape="rect" id="node42" href="$classc__enum__tag__typet.html" title="C enum tag type, i.e., c_enum_typet with an identifier." alt="" coords="1076,955,1219,981"/>
-<area shape="rect" id="node43" href="$classstruct__tag__typet.html" title="A struct tag type, i.e., struct_typet with an identifier." alt="" coords="1083,1005,1211,1032"/>
-<area shape="rect" id="node46" href="$classunion__tag__typet.html" title="A union tag type, i.e., union_typet with an identifier." alt="" coords="1084,1056,1211,1083"/>
-<area shape="rect" id="node44" href="$classjava__generic__parameter__tagt.html" title="Class to hold a Java generic type parameter (also called type variable), e.g., T in List&lt;T&gt;." alt="" coords="1284,980,1497,1007"/>
-<area shape="rect" id="node45" href="$classjava__generic__struct__tag__typet.html" title="Class to hold type with generic type arguments, for example java.util.List in either a reference of t..." alt="" coords="1316,1031,1465,1073"/>
-<area shape="rect" id="node50" href="$classmathematical__function__typet.html" title="A type for mathematical functions (do not confuse with functions/methods in code)" alt="" coords="1061,1107,1234,1149"/>
-<area shape="rect" id="node51" href="$classmerged__typet.html" title="holds a combination of types" alt="" coords="1091,1173,1204,1200"/>
-<area shape="rect" id="node53" href="$classalready__typechecked__typet.html" title=" " alt="" coords="1067,1225,1227,1266"/>
-<area shape="rect" id="node54" href="$classarray__typet.html" title="Arrays with given size." alt="" coords="1099,1291,1196,1317"/>
-<area shape="rect" id="node55" href="$classc__enum__typet.html" title="The type of C enums." alt="" coords="1090,1341,1205,1368"/>
-<area shape="rect" id="node56" href="$classcomplex__typet.html" title="Complex numbers made of pair of given subtype." alt="" coords="1088,1392,1207,1419"/>
-<area shape="rect" id="node57" href="$classvector__typet.html" title="The vector type." alt="" coords="1095,1443,1199,1469"/>
+<area shape="rect" id="node17" href="$classjava__generic__parametert.html" title="Reference that points to a java_generic_parameter_tagt." alt="" coords="1547,259,1732,285"/>
+<area shape="rect" id="node18" href="$classjava__generic__typet.html" title="Reference that points to a java_generic_struct_tag_typet." alt="" coords="1566,309,1713,336"/>
+<area shape="rect" id="node19" href="$classjava__reference__typet.html" title="This is a specialization of reference_typet." alt="" coords="1559,360,1719,387"/>
+<area shape="rect" id="node22" href="$classcode__with__contract__typet.html" title=" " alt="" coords="1073,361,1221,402"/>
+<area shape="rect" id="node23" href="$classjava__method__typet.html" title=" " alt="" coords="1073,427,1221,453"/>
+<area shape="rect" id="node35" href="$classstruct__typet.html" title="Structure type, corresponds to C style structs." alt="" coords="1097,795,1197,821"/>
+<area shape="rect" id="node40" href="$classunion__typet.html" title="The union type." alt="" coords="1098,845,1197,872"/>
+<area shape="rect" id="node36" href="$classclass__typet.html" title="Class type." alt="" coords="1343,765,1439,792"/>
+<area shape="rect" id="node39" href="$classrefined__string__typet.html" title=" " alt="" coords="1315,816,1467,843"/>
+<area shape="rect" id="node37" href="$classjava__class__typet.html" title=" " alt="" coords="1574,765,1705,792"/>
+<area shape="rect" id="node38" href="$classjava__generic__class__typet.html" title="Class to hold a class with generics, extends the java class type with a vector of java generic type p..." alt="" coords="1781,758,1927,799"/>
+<area shape="rect" id="node42" href="$classc__enum__tag__typet.html" title="C enum tag type, i.e., c_enum_typet with an identifier." alt="" coords="1076,896,1219,923"/>
+<area shape="rect" id="node43" href="$classstruct__tag__typet.html" title="A struct tag type, i.e., struct_typet with an identifier." alt="" coords="1083,947,1211,973"/>
+<area shape="rect" id="node46" href="$classunion__tag__typet.html" title="A union tag type, i.e., union_typet with an identifier." alt="" coords="1084,997,1211,1024"/>
+<area shape="rect" id="node44" href="$classjava__generic__parameter__tagt.html" title="Class to hold a Java generic type parameter (also called type variable), e.g., T in List&lt;T&gt;." alt="" coords="1284,917,1497,944"/>
+<area shape="rect" id="node45" href="$classjava__generic__struct__tag__typet.html" title="Class to hold type with generic type arguments, for example java.util.List in either a reference of t..." alt="" coords="1316,969,1465,1010"/>
+<area shape="rect" id="node50" href="$classmathematical__function__typet.html" title="A type for mathematical functions (do not confuse with functions/methods in code)" alt="" coords="1061,1049,1234,1090"/>
+<area shape="rect" id="node51" href="$classmerged__typet.html" title="holds a combination of types" alt="" coords="1091,1115,1204,1141"/>
+<area shape="rect" id="node53" href="$classalready__typechecked__typet.html" title=" " alt="" coords="1067,1166,1227,1207"/>
+<area shape="rect" id="node54" href="$classarray__typet.html" title="Arrays with given size." alt="" coords="1099,1232,1196,1259"/>
+<area shape="rect" id="node55" href="$classc__enum__typet.html" title="The type of C enums." alt="" coords="1090,1283,1205,1309"/>
+<area shape="rect" id="node56" href="$classcomplex__typet.html" title="Complex numbers made of pair of given subtype." alt="" coords="1088,1333,1207,1360"/>
+<area shape="rect" id="node57" href="$classvector__typet.html" title="The vector type." alt="" coords="1095,1384,1199,1411"/>
 </map>

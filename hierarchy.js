@@ -559,8 +559,7 @@ var hierarchy =
     [ "expr2c_configurationt", "structexpr2c__configurationt.html", null ],
     [ "expr2ct", "classexpr2ct.html", [
       [ "expr2cppt", "classexpr2cppt.html", null ],
-      [ "expr2javat", "classexpr2javat.html", null ],
-      [ "expr2jsilt", "classexpr2jsilt.html", null ]
+      [ "expr2javat", "classexpr2javat.html", null ]
     ] ],
     [ "expr2stlt", "classexpr2stlt.html", null ],
     [ "detail::expr_dynamic_cast_return_typet< Ret, T >", "structdetail_1_1expr__dynamic__cast__return__typet.html", null ],
@@ -981,8 +980,6 @@ var hierarchy =
     [ "java_simple_method_stubst", "classjava__simple__method__stubst.html", null ],
     [ "java_string_library_preprocesst", "classjava__string__library__preprocesst.html", null ],
     [ "configt::javat", "structconfigt_1_1javat.html", null ],
-    [ "jsil_convertt", "classjsil__convertt.html", null ],
-    [ "jsil_parse_treet", "classjsil__parse__treet.html", null ],
     [ "json_irept", "classjson__irept.html", null ],
     [ "json_streamt", "classjson__streamt.html", [
       [ "json_stream_arrayt", "classjson__stream__arrayt.html", null ],
@@ -1008,7 +1005,6 @@ var hierarchy =
       [ "ansi_c_languaget", "classansi__c__languaget.html", null ],
       [ "cpp_languaget", "classcpp__languaget.html", null ],
       [ "java_bytecode_languaget", "classjava__bytecode__languaget.html", null ],
-      [ "jsil_languaget", "classjsil__languaget.html", null ],
       [ "json_symtab_languaget", "classjson__symtab__languaget.html", null ],
       [ "statement_list_languaget", "classstatement__list__languaget.html", null ]
     ] ],
@@ -1109,7 +1105,6 @@ var hierarchy =
           [ "cpp_typecheckt", "classcpp__typecheckt.html", null ]
         ] ],
         [ "java_bytecode_typecheckt", "classjava__bytecode__typecheckt.html", null ],
-        [ "jsil_typecheckt", "classjsil__typecheckt.html", null ],
         [ "statement_list_typecheckt", "classstatement__list__typecheckt.html", null ]
       ] ]
     ] ],
@@ -1226,7 +1221,6 @@ var hierarchy =
       [ "assembler_parsert", "classassembler__parsert.html", null ],
       [ "cpp_parsert", "classcpp__parsert.html", null ],
       [ "java_bytecode_parsert", "classjava__bytecode__parsert.html", null ],
-      [ "jsil_parsert", "classjsil__parsert.html", null ],
       [ "json_parsert", "classjson__parsert.html", null ],
       [ "statement_list_parsert", "classstatement__list__parsert.html", null ],
       [ "xml_parsert", "classxml__parsert.html", null ]
@@ -1702,7 +1696,6 @@ var hierarchy =
           [ "field_sensitive_ssa_exprt", "classfield__sensitive__ssa__exprt.html", null ],
           [ "fieldref_exprt", "classfieldref__exprt.html", null ],
           [ "java_string_literal_exprt", "classjava__string__literal__exprt.html", null ],
-          [ "jsil_declarationt", "classjsil__declarationt.html", null ],
           [ "side_effect_exprt", "classside__effect__exprt.html", [
             [ "side_effect_expr_assignt", "classside__effect__expr__assignt.html", null ],
             [ "side_effect_expr_function_callt", "classside__effect__expr__function__callt.html", null ],
@@ -1790,9 +1783,7 @@ var hierarchy =
           [ "bool_typet", "classbool__typet.html", null ],
           [ "code_typet", "classcode__typet.html", [
             [ "code_with_contract_typet", "classcode__with__contract__typet.html", null ],
-            [ "java_method_typet", "classjava__method__typet.html", null ],
-            [ "jsil_builtin_code_typet", "classjsil__builtin__code__typet.html", null ],
-            [ "jsil_spec_code_typet", "classjsil__spec__code__typet.html", null ]
+            [ "java_method_typet", "classjava__method__typet.html", null ]
           ] ],
           [ "cpp_enum_typet", "classcpp__enum__typet.html", null ],
           [ "empty_typet", "classempty__typet.html", null ],
@@ -1815,9 +1806,7 @@ var hierarchy =
               ] ],
               [ "refined_string_typet", "classrefined__string__typet.html", null ]
             ] ],
-            [ "union_typet", "classunion__typet.html", [
-              [ "jsil_union_typet", "classjsil__union__typet.html", null ]
-            ] ]
+            [ "union_typet", "classunion__typet.html", null ]
           ] ],
           [ "tag_typet", "classtag__typet.html", [
             [ "c_enum_tag_typet", "classc__enum__tag__typet.html", null ],
