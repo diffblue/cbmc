@@ -32,7 +32,6 @@ containing the code for a different part of the system.
   * C: \ref ansi-c
   * C++: \ref cpp
   * Java: \ref java_bytecode
-  * JavaScript: \ref jsil
 
 - Tools
 
@@ -155,7 +154,6 @@ digraph directory_dependencies {
     ansi_c [label = "ansi-c", URL = "\ref ansi-c"];
     langapi [URL = "\ref langapi"];
     cpp [URL = "\ref cpp"];
-    jsil [URL = "\ref jsil"];
     java_bytecode [URL = "\ref java_bytecode"];  
   }
 
@@ -174,15 +172,14 @@ digraph directory_dependencies {
   JBMC -> { CBMC, java_bytecode };
   jdiff -> { goto_diff, java_bytecode };
   janalyzer -> { goto_analyzer, java_bytecode };
-  CBMC -> { goto_instrument, jsil };
+  CBMC -> { goto_instrument };
   goto_diff -> { goto_instrument };
-  goto_analyzer -> { analyses, jsil, cpp };
+  goto_analyzer -> { analyses, cpp };
   goto_instrument -> { goto_symex, cpp };
-  goto_cc -> { cpp, jsil };
+  goto_cc -> { cpp };
   smt2_solver -> solvers;
 
   java_bytecode -> { analyses, miniz };
-  jsil -> linking;
   cpp -> ansi_c;
   ansi_c -> langapi;
   langapi -> goto_programs;

@@ -91,10 +91,6 @@ src/ansi-c/ansi_c_y.tab.cpp
 src/ansi-c/ansi_c_y.tab.h
 src/assembler/assembler_lex.yy.cpp
 src/crangler/c_lex.yy.cpp
-src/jsil/jsil_lex.yy.cpp
-src/jsil/jsil_y.output
-src/jsil/jsil_y.tab.cpp
-src/jsil/jsil_y.tab.h
 src/json/json_lex.yy.cpp
 src/json/json_y.output
 src/json/json_y.tab.cpp

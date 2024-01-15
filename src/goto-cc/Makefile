@@ -51,11 +51,6 @@ else
 all: goto-gcc$(EXEEXT)
 endif
 
-ifneq ($(wildcard ../jsil/Makefile),)
-  OBJ += ../jsil/jsil$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JSIL
-endif
-
 ###############################################################################
 
 goto-gcc$(EXEEXT): goto-cc$(EXEEXT)

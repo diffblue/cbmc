@@ -41,7 +41,6 @@ list(APPEND
         "xml"
         "json"
         "json-symtab-language"
-        "jsil"
         "statement-list"
         "goto-symex"
         "pointer-analysis"

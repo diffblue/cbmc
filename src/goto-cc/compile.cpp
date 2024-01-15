@@ -141,7 +141,7 @@ static file_typet detect_file_type(
   if(
     ext == "c" || ext == "cc" || ext == "cp" || ext == "cpp" || ext == "CPP" ||
     ext == "c++" || ext == "C" || ext == "i" || ext == "ii" || ext == "class" ||
-    ext == "jar" || ext == "jsil")
+    ext == "jar")
   {
     return file_typet::SOURCE_FILE;
   }

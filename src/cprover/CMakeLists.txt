@@ -29,7 +29,6 @@ target_link_libraries(cprover-lib
 )
 
 add_if_library(cprover-lib bv_refinement)
-add_if_library(cprover-lib jsil)
 
 # Executable
 add_executable(cprover cprover_main.cpp)

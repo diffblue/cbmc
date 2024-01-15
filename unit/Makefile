@@ -259,7 +259,6 @@ BMC_DEPS =../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/goto-synthesizer/expr_enumerator$(OBJEXT) \
           ../src/xmllang/xmllang$(LIBEXT) \
           ../src/goto-symex/goto-symex$(LIBEXT) \
-          ../src/jsil/jsil$(LIBEXT) \
           # Empty last line
 #
 CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \

@@ -60,11 +60,6 @@ ifneq ($(wildcard ../bv_refinement/Makefile),)
   CP_CXXFLAGS += -DHAVE_BV_REFINEMENT
 endif
 
-ifneq ($(wildcard ../jsil/Makefile),)
-  OBJ += ../jsil/jsil$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JSIL
-endif
-
 ###############################################################################
 
 cbmc$(EXEEXT): $(OBJ)

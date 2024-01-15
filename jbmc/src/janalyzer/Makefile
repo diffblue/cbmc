@@ -34,11 +34,6 @@ CLEANFILES = janalyzer$(EXEEXT)
 
 all: janalyzer$(EXEEXT)
 
-ifneq ($(wildcard ../jsil/Makefile),)
-  OBJ += ../jsil/jsil$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JSIL
-endif
-
 ###############################################################################
 
 janalyzer$(EXEEXT): $(OBJ)
