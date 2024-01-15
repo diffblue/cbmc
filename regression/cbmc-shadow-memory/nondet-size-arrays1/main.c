@@ -69,12 +69,12 @@ int main()
   assert(__CPROVER_get_field(z + 4, "field1") == 15);
   assert(__CPROVER_get_field(z + 4, "field2") == 16);
 
-  int i;
-  __CPROVER_assume(0 <= i && i < n);
-  __CPROVER_set_field(&(B[i]), "field1", 42);
-  assert(__CPROVER_get_field(&(B[i]), "field1") == 42);
+  int j;
+  __CPROVER_assume(0 <= j && j < n);
+  __CPROVER_set_field(&(B[j]), "field1", 42);
+  assert(__CPROVER_get_field(&(B[j]), "field1") == 42);
 
-  z = &(B[i]);
+  z = &(B[j]);
   __CPROVER_set_field(z, "field1", 43);
   assert(__CPROVER_get_field(z, "field1") == 43);
 
@@ -101,12 +101,12 @@ int main()
   assert(__CPROVER_get_field(z + 4, "field1") == 15);
   assert(__CPROVER_get_field(z + 4, "field2") == 16);
 
-  int i;
-  __CPROVER_assume(0 <= i && i < n);
-  __CPROVER_set_field(&(C[i]), "field1", 42);
-  assert(__CPROVER_get_field(&(C[i]), "field1") == 42);
+  int l;
+  __CPROVER_assume(0 <= l && l < n);
+  __CPROVER_set_field(&(C[l]), "field1", 42);
+  assert(__CPROVER_get_field(&(C[l]), "field1") == 42);
 
-  z = &(C[i]);
+  z = &(C[l]);
   __CPROVER_set_field(z, "field1", 43);
   assert(__CPROVER_get_field(z, "field1") == 43);
 }

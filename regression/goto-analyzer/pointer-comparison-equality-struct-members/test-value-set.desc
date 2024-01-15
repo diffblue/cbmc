@@ -9,5 +9,5 @@ main.c
 ^\[main.assertion.4\] .* assertion pb != &\(x.a\): SUCCESS
 ^\[main.assertion.5\] .* assertion pa == &\(y.a\): FAILURE
 ^\[main.assertion.6\] .* assertion pa != &\(y.a\): SUCCESS
-^\[main.assertion.7\] .* assertion pb == &\(y.a\): FAILURE
-^\[main.assertion.8\] .* assertion pb != &\(y.a\): SUCCESS
+^\[main.assertion.7\] .* assertion pc == &\(y.a\): FAILURE
+^\[main.assertion.8\] .* assertion pc != &\(y.a\): SUCCESS

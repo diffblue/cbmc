@@ -141,7 +141,19 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     if(symbol.is_type)
       typecheck_redefinition_type(existing_symbol, symbol);
     else
+    {
+      if(
+        (!old_it->second.is_static_lifetime || !symbol.is_static_lifetime) &&
+        symbol.type.id() != ID_code)
+      {
+        error().source_location = symbol.location;
+        error() << "redeclaration of '" << symbol.display_name()
+                << "' with no linkage" << eom;
+        throw 0;
+      }
+
       typecheck_redefinition_non_type(existing_symbol, symbol);
+    }
   }
 }
 

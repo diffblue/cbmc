@@ -157,16 +157,16 @@ int main()
   int x = 4;
   int y = 5;
   int *ps[2] = {&x, &y};
-  int i;
+  int l;
   if(nondet > 2)
   {
-    i = 0;
+    l = 0;
   }
   else
   {
-    i = 1;
+    l = 1;
   }
-  *(ps[i]) = 4;
+  *(ps[l]) = 4;
 
   __CPROVER_assert(*ps[0] == 4, "*ps[0]==4");
   __CPROVER_assert(*ps[1] == 4, "*ps[1]==4");
