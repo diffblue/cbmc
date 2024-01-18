@@ -35,7 +35,7 @@
 
 # These files change frequently and changes are high-risk
 
-/src/cbmc/ @kroening @tautschnig @peterschrammel @NlightNFotis
+/src/cbmc/ @kroening @tautschnig @peterschrammel
 /src/goto-programs/ @kroening @tautschnig @peterschrammel
 /src/util/ @kroening @tautschnig @peterschrammel
 /src/solvers/refinement @martin-cs @peterschrammel
@@ -43,13 +43,13 @@
 /jbmc/src/java_bytecode/ @peterschrammel @TGWDB
 /src/analyses/ @martin-cs @peterschrammel
 /src/pointer-analysis/ @martin-cs @peterschrammel
-/src/libcprover-cpp @NlightNFotis @esteffin @TGWDB @peterschrammel
-/src/libcprover-rust @NlightNFotis @TGWDB @peterschrammel @esteffin
+/src/libcprover-cpp @esteffin @TGWDB @peterschrammel
+/src/libcprover-rust @TGWDB @peterschrammel @esteffin
 
 # These files change frequently and changes are medium-risk
 
 /src/goto-analyzer/ @martin-cs @peterschrammel
-/src/goto-bmc/ @NlightNFotis @esteffin @TGWDB @peterschrammel
+/src/goto-bmc/ @esteffin @TGWDB @peterschrammel
 /src/goto-harness/ @martin-cs @peterschrammel
 /src/goto-instrument/ @martin-cs @peterschrammel @tautschnig @kroening
 /src/goto-instrument/contracts/ @tautschnig @feliperodri @remi-delmas-3000
@@ -61,9 +61,9 @@
 /jbmc/src/janalyzer/ @peterschrammel @TGWDB
 /jbmc/src/jdiff/ @peterschrammel
 /src/cpp/ @kroening @tautschnig @peterschrammel
-/src/solvers/smt2 @kroening @martin-cs @peterschrammel @NlightNFotis @TGWDB
-/src/solvers/smt2_incremental @peterschrammel @thomasspriggs @NlightNFotis @TGWDB @esteffin
-/src/solvers/Makefile @kroening @tautschnig @peterschrammel @NlightNFotis @TGWDB @esteffin
+/src/solvers/smt2 @kroening @martin-cs @peterschrammel @TGWDB
+/src/solvers/smt2_incremental @peterschrammel @thomasspriggs @TGWDB @esteffin
+/src/solvers/Makefile @kroening @tautschnig @peterschrammel @TGWDB @esteffin
 /src/statement-list/ @kroening @tautschnig @peterschrammel
 
 /cmake/        @diffblue/diffblue-opensource
