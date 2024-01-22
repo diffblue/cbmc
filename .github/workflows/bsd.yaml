@@ -16,6 +16,7 @@ jobs:
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: freebsd-13.2-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -77,6 +78,7 @@ jobs:
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: openbsd-7.4-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -138,6 +140,7 @@ jobs:
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: netbsd-9.3-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |

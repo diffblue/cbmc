@@ -25,6 +25,7 @@ jobs:
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-CSMITH
           restore-keys: |

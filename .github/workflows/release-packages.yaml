@@ -29,6 +29,7 @@ jobs:
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
           restore-keys:
@@ -99,6 +100,7 @@ jobs:
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
           restore-keys: |
@@ -201,6 +203,7 @@ jobs:
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
           restore-keys: |
