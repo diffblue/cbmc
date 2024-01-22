@@ -1,5 +1,6 @@
 var NAVTREEINDEX71 =
 {
+"classxmlt.html#a5abca19a16d103a69235d01d99f4e813":[8,0,1363,23],
 "classxmlt.html#a639018f2711ccc63a51b7618a7b167b0":[8,0,1363,17],
 "classxmlt.html#a67bc17db924168790f945aa6fb64c2db":[8,0,1363,22],
 "classxmlt.html#a6ae4840e72c0dfd6a4e98ea28d328708":[8,0,1363,24],
@@ -248,6 +249,5 @@ var NAVTREEINDEX71 =
 "contracts-dev-spec-pointer-in-range.html":[1,1,0,5,3,5],
 "contracts-dev-spec-reminder.html":[1,1,0,0],
 "contracts-dev-spec-spec-rewriting.html":[1,1,0,3],
-"contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-assigns":[1,1,0,3,0],
-"contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-frees":[1,1,0,3,2]
+"contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-assigns":[1,1,0,3,0]
 };

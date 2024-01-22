@@ -10,7 +10,6 @@ var classbv__pointerst =
     [ "convert_bitvector", "classbv__pointerst.html#ad5b614797a4c4511cde33d807806a7ba", null ],
     [ "convert_pointer_type", "classbv__pointerst.html#af7a0d2775487740c970ef0bbacc68e7a", null ],
     [ "convert_rest", "classbv__pointerst.html#aca26f834139587796aefdead1aa57635", null ],
-    [ "do_postponed", "classbv__pointerst.html#a1975e0ab6b2817df29b3d54774ceb68b", null ],
     [ "encode", "classbv__pointerst.html#a8c656dd7b0e2180963cfc97f093328b4", null ],
     [ "endianness_map", "classbv__pointerst.html#a63c1652c1b3eb6373302dfd2d3b5a4a0", null ],
     [ "finish_eager_conversion", "classbv__pointerst.html#a746771902143d467faaa781fd77d0d25", null ],
@@ -24,6 +23,8 @@ var classbv__pointerst =
     [ "offset_arithmetic", "classbv__pointerst.html#a3f65ea0bd6e0b3a9dbb2b985ca593df3", null ],
     [ "offset_arithmetic", "classbv__pointerst.html#acdbc3575917e9712cc45a488a2b08bfe", null ],
     [ "offset_literals", "classbv__pointerst.html#ae674fa38b1681be35f34fec0e69a7a77", null ],
+    [ "prepare_postponed_is_dynamic_object", "classbv__pointerst.html#aa582dbd0cd2686e9a4736889270dfa04", null ],
+    [ "prepare_postponed_object_size", "classbv__pointerst.html#a2f3a8898ea0ef7b1ebe21ddc86e5ae41", null ],
     [ "pointer_logic", "classbv__pointerst.html#a2bfca0993635241a742ca3e98520559d", null ],
     [ "postponed_list", "classbv__pointerst.html#a4fb72a87c9c759ced9df5280e65493f0", null ]
 ];

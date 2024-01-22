@@ -36,10 +36,10 @@
 <path fill="none" stroke="midnightblue" d="M280.05,-296.91C258.6,-286.46 233.81,-274.38 213.54,-264.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="278.8,-300.19 289.33,-301.43 281.87,-293.9 278.8,-300.19"/>
 </g>
-<!-- Node8 -->
-<g id="node8" class="node">
-<title>Node8</title>
-<g id="a_node8"><a xlink:href="example_8cpp.html" target="_top" xlink:title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes.">
+<!-- Node9 -->
+<g id="node9" class="node">
+<title>Node9</title>
+<g id="a_node9"><a xlink:href="example_8cpp.html" target="_top" xlink:title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes.">
 <polygon fill="none" stroke="black" points="260.5,-223.5 260.5,-264.5 398.5,-264.5 398.5,-223.5 260.5,-223.5"/>
 <text text-anchor="start" x="268.5" y="-252.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="268.5" y="-241.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/bdd</text>
@@ -47,16 +47,16 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node8 -->
-<g id="edge8" class="edge">
-<title>Node1&#45;&gt;Node8</title>
+<!-- Node1&#45;&gt;Node9 -->
+<g id="edge9" class="edge">
+<title>Node1&#45;&gt;Node9</title>
 <path fill="none" stroke="midnightblue" d="M329.5,-291.3C329.5,-282.3 329.5,-272.65 329.5,-264.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="326,-291.43 329.5,-301.43 333,-291.43 326,-291.43"/>
 </g>
-<!-- Node9 -->
-<g id="node9" class="node">
-<title>Node9</title>
-<g id="a_node9"><a xlink:href="mini_b_d_d_8cpp.html" target="_top" xlink:title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes.">
+<!-- Node10 -->
+<g id="node10" class="node">
+<title>Node10</title>
+<g id="a_node10"><a xlink:href="mini_b_d_d_8cpp.html" target="_top" xlink:title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes.">
 <polygon fill="none" stroke="black" points="416.5,-223.5 416.5,-264.5 554.5,-264.5 554.5,-223.5 416.5,-223.5"/>
 <text text-anchor="start" x="424.5" y="-252.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="424.5" y="-241.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/bdd</text>
@@ -64,9 +64,9 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node9 -->
-<g id="edge9" class="edge">
-<title>Node1&#45;&gt;Node9</title>
+<!-- Node1&#45;&gt;Node10 -->
+<g id="edge10" class="edge">
+<title>Node1&#45;&gt;Node10</title>
 <path fill="none" stroke="midnightblue" d="M378.95,-296.91C400.4,-286.46 425.19,-274.38 445.46,-264.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="377.13,-293.9 369.67,-301.43 380.2,-300.19 377.13,-293.9"/>
 </g>
@@ -123,41 +123,58 @@
 <g id="node5" class="node">
 <title>Node5</title>
 <g id="a_node5"><a xlink:href="guard__bdd_8cpp.html" target="_top" xlink:title="Implementation of guards using BDDs.">
-<polygon fill="none" stroke="black" points="25.5,-0.5 25.5,-41.5 165.5,-41.5 165.5,-0.5 25.5,-0.5"/>
-<text text-anchor="start" x="33.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="33.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/guard</text>
-<text text-anchor="middle" x="95.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_bdd.cpp</text>
+<polygon fill="none" stroke="black" points="21.5,-0.5 21.5,-41.5 161.5,-41.5 161.5,-0.5 21.5,-0.5"/>
+<text text-anchor="start" x="29.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="29.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/analyses/guard</text>
+<text text-anchor="middle" x="91.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_bdd.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node4&#45;&gt;Node5 -->
 <g id="edge4" class="edge">
 <title>Node4&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M89.38,-73.66C90.61,-63.33 92.01,-51.44 93.17,-41.68"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="85.89,-73.36 88.19,-83.7 92.84,-74.19 85.89,-73.36"/>
+<path fill="none" stroke="midnightblue" d="M88.1,-73.66C88.78,-63.33 89.56,-51.44 90.21,-41.68"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="84.6,-73.5 87.44,-83.7 91.59,-73.96 84.6,-73.5"/>
 </g>
 <!-- Node6&#45;&gt;Node5 -->
 <g id="edge6" class="edge">
 <title>Node6&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M208.81,-74.19C185.98,-63.67 159.48,-51.47 137.85,-41.51"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="207.46,-77.42 218.01,-78.43 210.39,-71.07 207.46,-77.42"/>
+<path fill="none" stroke="midnightblue" d="M207.55,-74.19C184.17,-63.67 157.03,-51.47 134.87,-41.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="206.42,-77.52 216.98,-78.43 209.29,-71.13 206.42,-77.52"/>
 </g>
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="bdd__expr_8cpp.html" target="_top" xlink:title="Conversion between exprt and miniBDD.">
-<polygon fill="none" stroke="black" points="191.5,-0.5 191.5,-41.5 329.5,-41.5 329.5,-0.5 191.5,-0.5"/>
-<text text-anchor="start" x="199.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="199.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/prop</text>
-<text text-anchor="middle" x="260.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/bdd_expr.cpp</text>
+<g id="a_node7"><a xlink:href="bv__pointers_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="none" stroke="black" points="182,-0.5 182,-41.5 333,-41.5 333,-0.5 182,-0.5"/>
+<text text-anchor="start" x="190" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="190" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/flattening</text>
+<text text-anchor="middle" x="257.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/bv_pointers.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node6&#45;&gt;Node7 -->
 <g id="edge7" class="edge">
 <title>Node6&#45;&gt;Node7</title>
-<path fill="none" stroke="midnightblue" d="M260.5,-68.3C260.5,-59.3 260.5,-49.65 260.5,-41.51"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="257,-68.43 260.5,-78.43 264,-68.43 257,-68.43"/>
+<path fill="none" stroke="midnightblue" d="M259.33,-68.3C258.97,-59.3 258.59,-49.65 258.27,-41.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="255.84,-68.57 259.73,-78.43 262.83,-68.3 255.84,-68.57"/>
+</g>
+<!-- Node8 -->
+<g id="node8" class="node">
+<title>Node8</title>
+<g id="a_node8"><a xlink:href="bdd__expr_8cpp.html" target="_top" xlink:title="Conversion between exprt and miniBDD.">
+<polygon fill="none" stroke="black" points="351.5,-0.5 351.5,-41.5 489.5,-41.5 489.5,-0.5 351.5,-0.5"/>
+<text text-anchor="start" x="359.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="359.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/prop</text>
+<text text-anchor="middle" x="420.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">/bdd_expr.cpp</text>
+</a>
+</g>
+</g>
+<!-- Node6&#45;&gt;Node8 -->
+<g id="edge8" class="edge">
+<title>Node6&#45;&gt;Node8</title>
+<path fill="none" stroke="midnightblue" d="M310.92,-74.05C332.99,-63.57 358.55,-51.42 379.44,-41.51"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="309.24,-70.98 301.7,-78.43 312.24,-77.3 309.24,-70.98"/>
 </g>
 </g>
 </svg>
