@@ -1,5 +1,11 @@
 var NAVTREEINDEX13 =
 {
+"classbv__arithmetict.html#a6e0c7bd5eae31fd2f724eaa676e9be06":[8,0,132,19],
+"classbv__arithmetict.html#a760827203558b065c064cebae5a386d8":[8,0,132,25],
+"classbv__arithmetict.html#a840b0d070648e2e531baa9795626f857":[8,0,132,5],
+"classbv__arithmetict.html#a917ade3f7ac5711155ab77755bed15e5":[8,0,132,3],
+"classbv__arithmetict.html#a9a7a8e87a1b807a9889597a5b5843857":[8,0,132,8],
+"classbv__arithmetict.html#aaa288de4e57f66e1f97d23cb73587b68":[8,0,132,14],
 "classbv__arithmetict.html#aae6a9ba7fb1d61fe5146bd8c9fe59241":[8,0,132,11],
 "classbv__arithmetict.html#aae9fc121fade0a21b8e7cf1fbdfdaf13":[8,0,132,6],
 "classbv__arithmetict.html#ab9def40e92cbc19e212a915ba4fbca19":[8,0,132,21],
@@ -243,11 +249,5 @@ var NAVTREEINDEX13 =
 "classc__enum__typet.html#a5a412dc7c029702fcce84b8d8b999eef":[8,0,151,6],
 "classc__enum__typet.html#a633a050ca4dbbd889b046d2fcd2d7cd5":[8,0,151,7],
 "classc__enum__typet.html#a844d9bd6d1ba542aee05fa238c14b105":[8,0,151,5],
-"classc__enum__typet.html#ab44b372d7e603197c25648e9116624d7":[8,0,151,9],
-"classc__enum__typet.html#ae069110b0cd3d9f43b3a9e99d14b0191":[8,0,151,1],
-"classc__enum__typet.html#ae36cc9e36dcb5b8ea20e13ad8661f75a":[8,0,151,2],
-"classc__enum__typet.html#ae6e4efa08f8679da7937112e089fd609":[8,0,151,4],
-"classc__enum__typet_1_1c__enum__membert.html":[8,0,151,0],
-"classc__enum__typet_1_1c__enum__membert.html#a0d50214bf8c90a68159cb9d91fa587f2":[8,0,151,0,4],
-"classc__enum__typet_1_1c__enum__membert.html#a4ae0bee50375035fd36b3e7643e0ddc9":[8,0,151,0,5]
+"classc__enum__typet.html#ab44b372d7e603197c25648e9116624d7":[8,0,151,9]
 };
