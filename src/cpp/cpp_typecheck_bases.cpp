@@ -132,7 +132,7 @@ void cpp_typecheckt::add_base_components(
   if(bases.find(from_name)!=bases.end())
   {
     error().source_location=to.source_location();
-    error() << "error: non-virtual base class " << from_name
+    error() << "non-virtual base class " << from_name
             << " inherited multiple times" << eom;
     throw 0;
   }

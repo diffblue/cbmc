@@ -629,14 +629,6 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
 
   typecheck_expr(cond);
 
-  #if 0
-  if(cond.id()==ID_sideeffect &&
-     cond.get(ID_statement)==ID_assign)
-  {
-    warning("warning: assignment in if condition");
-  }
-  #endif
-
   implicit_typecast_bool(cond);
 
   if(code.then_case().get_statement() == ID_decl_block)

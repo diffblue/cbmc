@@ -1658,9 +1658,8 @@ exprt cpp_typecheck_resolvet::resolve(
       return nil_exprt();
 
     cpp_typecheck.error().source_location=result.source_location());
-    cpp_typecheck.str
-      << "error: member '" << result.get(ID_component_name)
-      << "' is not accessible";
+    cpp_typecheck.error() << "member '" << result.get(ID_component_name)
+                          << "' is not accessible" << messaget::eom;
     throw 0;
     #endif
   }
@@ -1676,7 +1675,7 @@ exprt cpp_typecheck_resolvet::resolve(
       cpp_typecheck.error().source_location=source_location;
 
       cpp_typecheck.error()
-        << "error: expected expression, but got type '"
+        << "expected expression, but got type '"
         << cpp_typecheck.to_string(result.type()) << "'" << messaget::eom;
 
       throw 0;
@@ -1692,7 +1691,7 @@ exprt cpp_typecheck_resolvet::resolve(
       cpp_typecheck.error().source_location=source_location;
 
       cpp_typecheck.error()
-        << "error: expected type, but got expression '"
+        << "expected type, but got expression '"
         << cpp_typecheck.to_string(result) << "'" << messaget::eom;
 
       throw 0;
