@@ -32,8 +32,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -117,8 +118,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -181,8 +183,9 @@ jobs:
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -225,8 +228,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -296,8 +300,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -361,8 +366,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -420,8 +426,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-gcc-13-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -466,8 +473,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-32-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -504,8 +512,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -550,8 +559,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -590,8 +600,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -641,8 +652,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-Release-Glucose-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -698,8 +710,9 @@ jobs:
       - name: Confirm cvc5 solver is available and log the version installed
         run: cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -756,8 +769,9 @@ jobs:
       - name: Initialise Developer Command Line
         uses: ilammy/msvc-dev-cmd@v1
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -811,8 +825,9 @@ jobs:
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PKG
           restore-keys: |
@@ -928,8 +943,9 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |

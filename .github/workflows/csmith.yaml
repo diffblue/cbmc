@@ -23,8 +23,9 @@ jobs:
           sudo apt-get install --no-install-recommends -y csmith libcsmith-dev
           make -C src minisat2-download
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          save-always: true
           path: .ccache
           key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-CSMITH
           restore-keys: |
