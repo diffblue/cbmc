@@ -62,3 +62,9 @@ jobs:
         
       - name: Check for goto-cc section in xen-syms binary
         run: objdump -h xen_4_13/xen/xen-syms | grep "goto-cc"
+
+      - name: Show goto-cc properties
+        run:  $(pwd)/src/cbmc/cbmc --show-properties xen_4_13/xen/xen-syms
+
+      - name: Show some goto-cc functions
+        run:  $(pwd)/src/cbmc/cbmc --list-goto-functions xen_4_13/xen/xen-syms | grep "arch"
