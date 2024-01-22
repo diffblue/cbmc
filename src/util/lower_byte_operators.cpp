@@ -511,6 +511,14 @@ static exprt unpack_array_vector_no_known_bounds(
                                     ? to_vector_type(src.type()).size()
                                     : to_array_type(src.type()).size();
 
+  if(array_vector_size.is_nil())
+  {
+    return array_comprehension_exprt{
+      std::move(array_comprehension_index),
+      std::move(body),
+      array_typet{bv_typet{bits_per_byte}, from_integer(0, size_type())}};
+  }
+
   return array_comprehension_exprt{
     std::move(array_comprehension_index),
     std::move(body),
