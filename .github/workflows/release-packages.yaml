@@ -27,7 +27,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
@@ -97,7 +97,7 @@ jobs:
           mv cvc5 /usr/local/bin
           cvc5 --version
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .ccache
           key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
@@ -199,7 +199,7 @@ jobs:
           echo "$(Split-Path -Path $(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe"))" >> $env:GITHUB_PATH
           echo "pfxcert=$([string](Get-Location)+'\CodeSignCertificate.pfx')" >> $env:GITHUB_ENV
       - name: Prepare ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
