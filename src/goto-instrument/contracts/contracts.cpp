@@ -896,16 +896,16 @@ void code_contractst::apply_loop_contract(
 
   for(const auto &loop_head_and_content : natural_loops.loop_map)
   {
-    const auto &loop_content = loop_head_and_content.second;
+    const auto &loop_body = loop_head_and_content.second;
     // Skip empty loops and self-looped node.
-    if(loop_content.size() <= 1)
+    if(loop_body.size() <= 1)
       continue;
 
     auto loop_head = loop_head_and_content.first;
     auto loop_end = loop_head;
 
     // Find the last back edge to `loop_head`
-    for(const auto &t : loop_content)
+    for(const auto &t : loop_body)
     {
       if(
         t->is_goto() && t->get_target() == loop_head &&
@@ -920,15 +920,15 @@ void code_contractst::apply_loop_contract(
       throw 0;
     }
 
-    // By definition the `loop_content` is a set of instructions computed
+    // By definition the `loop_body` is a set of instructions computed
     // by `natural_loops` based on the CFG.
     // Since we perform assigns clause instrumentation by sequentially
     // traversing instructions from `loop_head` to `loop_end`,
-    // here we ensure that all instructions in `loop_content` belong within
+    // here we ensure that all instructions in `loop_body` belong within
     // the [loop_head, loop_end] target range.
 
-    // Check 1. (i \in loop_content) ==> loop_head <= i <= loop_end
-    for(const auto &i : loop_content)
+    // Check 1. (i \in loop_body) ==> loop_head <= i <= loop_end
+    for(const auto &i : loop_body)
     {
       if(
         loop_head->location_number > i->location_number ||
@@ -946,8 +946,7 @@ void code_contractst::apply_loop_contract(
       }
     }
 
-    if(!loop_head_ends
-          .emplace(loop_head, std::make_pair(loop_end, loop_content))
+    if(!loop_head_ends.emplace(loop_head, std::make_pair(loop_end, loop_body))
           .second)
       UNREACHABLE;
   }
