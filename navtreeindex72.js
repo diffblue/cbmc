@@ -1,5 +1,6 @@
 var NAVTREEINDEX72 =
 {
+"contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-assigns":[1,1,0,3,0],
 "contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-frees":[1,1,0,3,2],
 "contracts-dev-spec-spec-rewriting.html#contracts-dev-spec-spec-rewriting-havoc":[1,1,0,3,1],
 "contracts-dev-spec-transform-params.html":[1,1,0,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX72 =
 "convert__int__literal_8cpp_source.html":[9,0,2,28,0,4],
 "convert__int__literal_8h.html":[9,0,2,28,0,5],
 "convert__int__literal_8h.html#a05b33711ac2181f80ff3a197d2b2e40e":[9,0,2,28,0,5,4],
-"convert__int__literal_8h.html#a0e8ad9cd668d2d104bf429371dd84ceb":[9,0,2,28,0,5,0],
-"convert__int__literal_8h.html#a9790e5175d14d017c55b938e59276307":[9,0,2,28,0,5,1]
+"convert__int__literal_8h.html#a0e8ad9cd668d2d104bf429371dd84ceb":[9,0,2,28,0,5,0]
 };
