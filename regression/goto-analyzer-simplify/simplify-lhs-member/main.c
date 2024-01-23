@@ -11,7 +11,6 @@ void main()
   struct test_struct value;
 
   // Simplify a pointer inside a struct
-  int symbol;
   value.pointer_component = &symbol;
 
   // Simplify
@@ -37,6 +36,6 @@ void main()
   value.array[constant] = 2;
 
   // No simplification
-  int nondet;
-  value.array[nondet] = 3;
+  int nondet2;
+  value.array[nondet2] = 3;
 }

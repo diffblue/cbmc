@@ -22,7 +22,7 @@ int main()
   assert(pa == &(y.a));
   assert(pa != &(y.a));
 
-  int *pb = &(x.b);
-  assert(pb == &(y.a));
-  assert(pb != &(y.a));
+  int *pc = &(x.b);
+  assert(pc == &(y.a));
+  assert(pc != &(y.a));
 }

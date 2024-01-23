@@ -107,9 +107,11 @@ SCENARIO("Compound blocks should have a location")
     "/*  4 */    {                            \n"
     "/*  5 */      int x;                     \n"
     "/*  6 */      if(x)                      \n"
-    "/*  7 */        int x = 1;               \n"
-    "/*  8 */    }                            \n"
-    "/*  9 */  }                              \n",
+    "/*  7 */      {                          \n"
+    "/*  8 */        int x = 1;               \n"
+    "/*  9 */      }                          \n"
+    "/* 10 */    }                            \n"
+    "/* 11 */  }                              \n",
     {{ID_while, 3}, {ID_ifthenelse, 6}});
 
   checker.check(
@@ -233,21 +235,31 @@ SCENARIO("Compound blocks should have a location")
     "/*  4 */    switch(x)                    \n"
     "/*  5 */    {                            \n"
     "/*  6 */    case 1:                      \n"
-    "/*  7 */      int y = 1;                 \n"
-    "/*  8 */      break;                     \n"
-    "/*  9 */    case 2:                      \n"
-    "/* 10 */      int y = 2;                 \n"
-    "/* 11 */      int z = 2;                 \n"
-    "/* 12 */      break;                     \n"
-    "/* 13 */    case 3:                      \n"
-    "/* 14 */      int y = 3;                 \n"
-    "/* 15 */    case 4:                      \n"
-    "/* 16 */      int y = 4;                 \n"
-    "/* 17 */      break;                     \n"
-    "/* 18 */    default:                     \n"
-    "/* 19 */      int y = 5;                 \n"
+    "/*  7 */    {                            \n"
+    "/*  8 */      int y = 1;                 \n"
+    "/*  9 */      break;                     \n"
+    "/* 10 */    }                            \n"
+    "/* 11 */    case 2:                      \n"
+    "/* 12 */    {                            \n"
+    "/* 13 */      int y = 2;                 \n"
+    "/* 14 */      int z = 2;                 \n"
+    "/* 15 */      break;                     \n"
+    "/* 16 */    }                            \n"
+    "/* 17 */    case 3:                      \n"
+    "/* 18 */    {                            \n"
+    "/* 19 */      int y = 3;                 \n"
     "/* 20 */    }                            \n"
-    "/* 21 */  }                              \n",
+    "/* 21 */    case 4:                      \n"
+    "/* 22 */    {                            \n"
+    "/* 23 */      int y = 4;                 \n"
+    "/* 24 */      break;                     \n"
+    "/* 25 */    }                            \n"
+    "/* 26 */    default:                     \n"
+    "/* 27 */    {                            \n"
+    "/* 28 */      int y = 5;                 \n"
+    "/* 29 */    }                            \n"
+    "/* 30 */    }                            \n"
+    "/* 31 */  }                              \n",
     {{ID_switch, 6}});
 }
 

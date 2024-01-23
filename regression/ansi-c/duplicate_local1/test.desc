@@ -1,0 +1,9 @@
+CORE
+main.c
+
+redeclaration of 'main::1::a' with no linkage$
+CONVERSION ERROR
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+redeclaration of 'x' with no linkage$
