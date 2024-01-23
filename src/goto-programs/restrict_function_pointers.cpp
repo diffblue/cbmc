@@ -35,7 +35,7 @@ void for_each_function_call(GotoFunctionT &&goto_function, Handler handler)
     handler);
 }
 
-static void restrict_function_pointer(
+[[nodiscard]] static bool restrict_function_pointer(
   message_handlert &message_handler,
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
@@ -54,7 +54,7 @@ static void restrict_function_pointer(
   const auto &original_function = location->call_function();
 
   if(!can_cast_expr<dereference_exprt>(original_function))
-    return;
+    return false;
 
   // because we run the label function pointer calls transformation pass before
   // this stage a dereference can only dereference a symbol expression
@@ -66,7 +66,7 @@ static void restrict_function_pointer(
     restrictions.restrictions.find(pointer_symbol.get_identifier());
 
   if(restriction_iterator == restrictions.restrictions.end())
-    return;
+    return false;
 
   const namespacet ns(symbol_table);
   std::unordered_set<symbol_exprt, irep_hash> candidates;
@@ -80,6 +80,8 @@ static void restrict_function_pointer(
     function_id,
     location,
     candidates);
+
+  return true;
 }
 } // namespace
 
@@ -180,8 +182,9 @@ void restrict_function_pointers(
   {
     goto_functiont &goto_function = function_item.second;
 
+    bool did_something = false;
     for_each_function_call(goto_function, [&](const goto_programt::targett it) {
-      restrict_function_pointer(
+      did_something |= restrict_function_pointer(
         message_handler,
         goto_model.symbol_table,
         goto_function.body,
@@ -189,6 +192,9 @@ void restrict_function_pointers(
         restrictions,
         it);
     });
+
+    if(did_something)
+      goto_function.body.update();
   }
 }
 

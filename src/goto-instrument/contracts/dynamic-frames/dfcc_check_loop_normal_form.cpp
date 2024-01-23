@@ -19,6 +19,12 @@ void dfcc_check_loop_normal_form(goto_programt &goto_program, messaget &log)
   // instruction span for each loop
   std::vector<std::pair<goto_programt::targett, goto_programt::targett>> spans;
 
+  std::map<
+    goto_programt::targett,
+    goto_programt::targett,
+    goto_programt::target_less_than>
+    latch_head_pairs;
+
   for(auto &loop : natural_loops.loop_map)
   {
     auto head = loop.first;
@@ -132,7 +138,15 @@ void dfcc_check_loop_normal_form(goto_programt &goto_program, messaget &log)
         "nested loop head and latch are in outer loop");
     }
 
+    if(!latch_head_pairs.emplace(latch, head).second)
+      UNREACHABLE;
+  }
+
     // all checks passed, now we perform some instruction rewriting
+  for(auto &entry_pair : latch_head_pairs)
+  {
+    auto latch = entry_pair.first;
+    auto head = entry_pair.second;
 
     // Convert conditional latch into exiting + unconditional latch.
     // ```

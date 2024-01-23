@@ -1174,6 +1174,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     }
 
     do_indirect_call_and_rtti_removal();
+    log.status() << "Trying to force one backedge per target" << messaget::eom;
+    ensure_one_backedge_per_target(goto_model);
 
     const irep_idt harness_id(cmdline.get_value(FLAG_DFCC));
 
@@ -1232,13 +1234,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       to_exclude_from_nondet_static,
       log.get_message_handler());
   }
-
-  if(
-    !use_dfcc &&
-    (cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
-     cmdline.isset(FLAG_ENFORCE_CONTRACT)))
+  else if((cmdline.isset(FLAG_LOOP_CONTRACTS) ||
+           cmdline.isset(FLAG_REPLACE_CALL) ||
+           cmdline.isset(FLAG_ENFORCE_CONTRACT)))
   {
     do_indirect_call_and_rtti_removal();
+    log.status() << "Trying to force one backedge per target" << messaget::eom;
+    ensure_one_backedge_per_target(goto_model);
     code_contractst contracts(goto_model, log);
 
     std::set<std::string> to_replace(

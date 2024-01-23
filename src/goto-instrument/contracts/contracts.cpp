@@ -888,18 +888,24 @@ void code_contractst::apply_loop_contract(
 
   std::list<size_t> to_check_contracts_on_children;
 
+  std::map<
+    goto_programt::targett,
+    std::pair<goto_programt::targett, natural_loops_mutablet::loopt>,
+    goto_programt::target_less_than>
+    loop_head_ends;
+
   for(const auto &loop_head_and_content : natural_loops.loop_map)
   {
-    const auto &loop_content = loop_head_and_content.second;
+    const auto &loop_body = loop_head_and_content.second;
     // Skip empty loops and self-looped node.
-    if(loop_content.size() <= 1)
+    if(loop_body.size() <= 1)
       continue;
 
     auto loop_head = loop_head_and_content.first;
     auto loop_end = loop_head;
 
     // Find the last back edge to `loop_head`
-    for(const auto &t : loop_content)
+    for(const auto &t : loop_body)
     {
       if(
         t->is_goto() && t->get_target() == loop_head &&
@@ -914,6 +920,41 @@ void code_contractst::apply_loop_contract(
       throw 0;
     }
 
+    // By definition the `loop_body` is a set of instructions computed
+    // by `natural_loops` based on the CFG.
+    // Since we perform assigns clause instrumentation by sequentially
+    // traversing instructions from `loop_head` to `loop_end`,
+    // here we ensure that all instructions in `loop_body` belong within
+    // the [loop_head, loop_end] target range.
+
+    // Check 1. (i \in loop_body) ==> loop_head <= i <= loop_end
+    for(const auto &i : loop_body)
+    {
+      if(
+        loop_head->location_number > i->location_number ||
+        i->location_number > loop_end->location_number)
+      {
+        log.conditional_output(
+          log.error(), [&i, &loop_head](messaget::mstreamt &mstream) {
+            mstream << "Computed loop at " << loop_head->source_location()
+                    << "contains an instruction beyond [loop_head, loop_end]:"
+                    << messaget::eom;
+            i->output(mstream);
+            mstream << messaget::eom;
+          });
+        throw 0;
+      }
+    }
+
+    if(!loop_head_ends.emplace(loop_head, std::make_pair(loop_end, loop_body))
+          .second)
+      UNREACHABLE;
+  }
+
+  for(auto &loop_head_end : loop_head_ends)
+  {
+    auto loop_head = loop_head_end.first;
+    auto loop_end = loop_head_end.second.first;
     // After loop-contract instrumentation, jumps to the `loop_head` will skip
     // some instrumented instructions. So we want to make sure that there is
     // only one jump targeting `loop_head` from `loop_end` before loop-contract
@@ -961,7 +1002,7 @@ void code_contractst::apply_loop_contract(
     }
 
     const auto idx = loop_nesting_graph.add_node(
-      loop_content,
+      loop_head_end.second.second,
       loop_head,
       loop_end,
       assigns_clause,
@@ -974,30 +1015,6 @@ void code_contractst::apply_loop_contract(
       continue;
 
     to_check_contracts_on_children.push_back(idx);
-
-    // By definition the `loop_content` is a set of instructions computed
-    // by `natural_loops` based on the CFG.
-    // Since we perform assigns clause instrumentation by sequentially
-    // traversing instructions from `loop_head` to `loop_end`,
-    // here we ensure that all instructions in `loop_content` belong within
-    // the [loop_head, loop_end] target range
-
-    // Check 1. (i \in loop_content) ==> loop_head <= i <= loop_end
-    for(const auto &i : loop_content)
-    {
-      if(std::distance(loop_head, i) < 0 || std::distance(i, loop_end) < 0)
-      {
-        log.conditional_output(
-          log.error(), [&i, &loop_head](messaget::mstreamt &mstream) {
-            mstream << "Computed loop at " << loop_head->source_location()
-                    << "contains an instruction beyond [loop_head, loop_end]:"
-                    << messaget::eom;
-            i->output(mstream);
-            mstream << messaget::eom;
-          });
-        throw 0;
-      }
-    }
   }
 
   for(size_t outer = 0; outer < loop_nesting_graph.size(); ++outer)
