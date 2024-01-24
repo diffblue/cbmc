@@ -22,7 +22,6 @@ Author: Michael Tautschnig, Daniel Kroening
 
 static void rename_symbols_in_function(
   goto_functionst::goto_functiont &function,
-  irep_idt &new_function_name,
   const rename_symbolt &rename_symbol)
 {
   for(auto &identifier : function.parameter_identifiers)
@@ -48,22 +47,39 @@ static bool link_functions(
   goto_functionst &dest_functions,
   const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
-  const rename_symbolt &rename_symbol,
+  const rename_symbolt &rename_dest_symbol,
+  const rename_symbolt &rename_src_symbol,
   const std::unordered_set<irep_idt> &weak_symbols)
 {
   namespacet ns(dest_symbol_table);
   namespacet src_ns(src_symbol_table);
+
+  // rename existing functions if linking requires us to do so
+  for(const auto &rename_entry : rename_dest_symbol.expr_map)
+  {
+    auto fn_candidate = dest_functions.function_map.find(rename_entry.first);
+    if(fn_candidate == dest_functions.function_map.end())
+      continue;
+
+    dest_functions.function_map.insert(
+      {rename_entry.second, std::move(fn_candidate->second)});
+    dest_functions.function_map.erase(fn_candidate);
+  }
+
+  // rename symbols in existing functions
+  for(auto &dest_entry : dest_functions.function_map)
+    rename_symbols_in_function(dest_entry.second, rename_dest_symbol);
 
   // merge functions
   for(auto &gf_entry : src_functions.function_map)
   {
     // the function might have been renamed
     rename_symbolt::expr_mapt::const_iterator e_it =
-      rename_symbol.expr_map.find(gf_entry.first);
+      rename_src_symbol.expr_map.find(gf_entry.first);
 
     irep_idt final_id = gf_entry.first;
 
-    if(e_it!=rename_symbol.expr_map.end())
+    if(e_it != rename_src_symbol.expr_map.end())
       final_id=e_it->second;
 
     // already there?
@@ -73,7 +89,7 @@ static bool link_functions(
     goto_functionst::goto_functiont &src_func = gf_entry.second;
     if(dest_f_it==dest_functions.function_map.end()) // not there yet
     {
-      rename_symbols_in_function(src_func, final_id, rename_symbol);
+      rename_symbols_in_function(src_func, rename_src_symbol);
       dest_functions.function_map.emplace(final_id, std::move(src_func));
     }
     else // collision!
@@ -84,7 +100,7 @@ static bool link_functions(
          weak_symbols.find(final_id)!=weak_symbols.end())
       {
         // the one with body wins!
-        rename_symbols_in_function(src_func, final_id, rename_symbol);
+        rename_symbols_in_function(src_func, rename_src_symbol);
 
         in_dest_symbol_table.body.swap(src_func.body);
         in_dest_symbol_table.parameter_identifiers.swap(
@@ -133,7 +149,8 @@ std::optional<replace_symbolt::expr_mapt> link_goto_model(
        dest.goto_functions,
        src.symbol_table,
        src.goto_functions,
-       linking.rename_symbol,
+       linking.rename_main_symbol,
+       linking.rename_new_symbol,
        weak_symbols))
   {
     messaget log{message_handler};
@@ -184,10 +201,7 @@ void finalize_linking(
   if(!macro_application.expr_map.empty())
   {
     for(auto &gf_entry : dest_functions.function_map)
-    {
-      irep_idt final_id = gf_entry.first;
-      rename_symbols_in_function(gf_entry.second, final_id, macro_application);
-    }
+      rename_symbols_in_function(gf_entry.second, macro_application);
   }
 
   if(!object_type_updates.empty())

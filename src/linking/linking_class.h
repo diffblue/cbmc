@@ -48,21 +48,24 @@ public:
   /// \return True, iff linking failed with unresolvable conflicts.
   bool link(const symbol_table_baset &src_symbol_table);
 
-  rename_symbolt rename_symbol;
+  rename_symbolt rename_main_symbol, rename_new_symbol;
   casting_replace_symbolt object_type_updates;
 
 protected:
-  bool needs_renaming_type(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol);
+  enum renamingt
+  {
+    NO_RENAMING,
+    RENAME_OLD,
+    RENAME_NEW
+  };
 
-  bool needs_renaming_non_type(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol);
+  renamingt
+  needs_renaming_type(const symbolt &old_symbol, const symbolt &new_symbol);
 
-  bool needs_renaming(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol)
+  renamingt
+  needs_renaming_non_type(const symbolt &old_symbol, const symbolt &new_symbol);
+
+  renamingt needs_renaming(const symbolt &old_symbol, const symbolt &new_symbol)
   {
     if(new_symbol.is_type)
       return needs_renaming_type(old_symbol, new_symbol);
