@@ -271,6 +271,61 @@ jobs:
             exit 1
           fi
 
+  # This job takes approximately 29 to 42 minutes
+  check-ubuntu-20_04-cmake-gcc-mergesat:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
+      - name: Prepare ccache
+        uses: actions/cache@v3
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-Release-mergesat-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-20.04-Release-mergesat-${{ github.ref }}
+            ${{ runner.os }}-20.04-Release-mergesat
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Configure using CMake
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="mergesat;cadical"
+      - name: Check that doc task works
+        run: ninja -C build doc
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with Ninja
+        run: ninja -C build -j2
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Checking completeness of help output
+        run: scripts/check_help.sh build/bin
+      - name: Check if package building works
+        run: |
+          cd build
+          ninja package
+          ls *.deb
+      - name: Run tests
+        run: cd build; ctest . -V -L CORE -j2
+
   # This job takes approximately 34 to 38 minutes
   check-ubuntu-22_04-make-clang:
     runs-on: ubuntu-22.04
