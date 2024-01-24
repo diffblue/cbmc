@@ -1,5 +1,10 @@
 var NAVTREEINDEX115 =
 {
+"namespace_minisat.html":[7,0,4],
+"namespacedetail.html":[7,0,1],
+"namespacedetail.html#a1e78b96b30ab3780ae8ded64d5058ce4":[7,0,1,4],
+"namespacedetail.html#a2329a33bcac0a825cbec18448c1bfa91":[7,0,1,8],
+"namespacedetail.html#a434cd54fea5ce8422a394345fefb8dc3":[7,0,1,5],
 "namespacedetail.html#a6500ba327a08ad092bf17fab12c6e898":[7,0,1,6],
 "namespacedetail.html#a7c5577a28222a80e92033155231bba1b":[7,0,1,9],
 "namespacedetail.html#a895dfc345144723357eca4f797a2bc27":[7,0,1,7],
@@ -244,10 +249,5 @@ var NAVTREEINDEX115 =
 "padding_8cpp.html#a4741a4d1120e3aa9fe608f788dccfd4a":[9,0,2,1,66,4],
 "padding_8cpp.html#a99d3d8f78529edfda0e8828fe4d0fafd":[9,0,2,1,66,3],
 "padding_8cpp.html#a9ac9627e514b409ffd5e8ea4315175d0":[9,0,2,1,66,2],
-"padding_8cpp.html#aa1e15c315479e9154a8667b171ec1332":[9,0,2,1,66,1],
-"padding_8cpp.html#ab04fe4f1a4f793415c7d0274cbcda583":[9,0,2,1,66,0],
-"padding_8cpp.html#ac388876f9b1669624440150910bc4707":[9,0,2,1,66,7],
-"padding_8cpp.html#ae5d7716dd42f147757b5e856254bc1db":[9,0,2,1,66,5],
-"padding_8cpp.html#af42f1594de19c0ff6ddc3b254d3f0f10":[9,0,2,1,66,6],
-"padding_8cpp_source.html":[9,0,2,1,66]
+"padding_8cpp.html#aa1e15c315479e9154a8667b171ec1332":[9,0,2,1,66,1]
 };

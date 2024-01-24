@@ -1,5 +1,10 @@
 var NAVTREEINDEX114 =
 {
+"miniz_8h.html#ac315062b2450716e20d21843f2022660":[9,0,1,0,4,1,153],
+"miniz_8h.html#ac3b62e37b9922d9496014515acd6083a":[9,0,1,0,4,1,80],
+"miniz_8h.html#ac4642bb91b5abc566c6b23c0658d6995":[9,0,1,0,4,1,246],
+"miniz_8h.html#ac4e4c006d234780922676ecc31fe1416":[9,0,1,0,4,1,243],
+"miniz_8h.html#ac5613fe8160cbbf89d3e470574b755fb":[9,0,1,0,4,1,101],
 "miniz_8h.html#ac578d55e6b8de8cfbea90ab62701a9c8":[9,0,1,0,4,1,116],
 "miniz_8h.html#ac73e9b464ae92e51b762f496296d7582":[9,0,1,0,4,1,36],
 "miniz_8h.html#ac78dfe8be78df919afad8d29c19264f8":[9,0,1,0,4,1,52],
@@ -244,10 +249,5 @@ var NAVTREEINDEX114 =
 "namespace_8h.html":[9,0,2,30,137],
 "namespace_8h_source.html":[9,0,2,30,137],
 "namespace_ca_di_ca_l.html":[7,0,0],
-"namespace_glucose.html":[7,0,2],
-"namespace_minisat.html":[7,0,4],
-"namespacedetail.html":[7,0,1],
-"namespacedetail.html#a1e78b96b30ab3780ae8ded64d5058ce4":[7,0,1,4],
-"namespacedetail.html#a2329a33bcac0a825cbec18448c1bfa91":[7,0,1,8],
-"namespacedetail.html#a434cd54fea5ce8422a394345fefb8dc3":[7,0,1,5]
+"namespace_glucose.html":[7,0,2]
 };
