@@ -11,6 +11,10 @@ Author: Michael Tautschnig
 
 #include "casting_replace_symbol.h"
 
+#include <util/pointer_expr.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+
 bool casting_replace_symbolt::replace(exprt &dest) const
 {
   bool result = true; // unchanged
