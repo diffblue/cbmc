@@ -124,14 +124,6 @@ protected:
     symbolt &old_symbol,
     const symbolt &new_symbol);
 
-  std::string expr_to_string(
-    const irep_idt &identifier,
-    const exprt &expr) const;
-
-  std::string type_to_string(
-    const irep_idt &identifier,
-    const typet &type) const;
-
   std::string type_to_string_verbose(
     const symbolt &symbol,
     const typet &type) const;

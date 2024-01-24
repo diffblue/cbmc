@@ -117,20 +117,6 @@ bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
   return false;
 }
 
-std::string linkingt::expr_to_string(
-  const irep_idt &identifier,
-  const exprt &expr) const
-{
-  return from_expr(ns, identifier, expr);
-}
-
-std::string linkingt::type_to_string(
-  const irep_idt &identifier,
-  const typet &type) const
-{
-  return from_type(ns, identifier, type);
-}
-
 static const typet &follow_tags_symbols(
   const namespacet &ns,
   const typet &type)
@@ -171,7 +157,7 @@ std::string linkingt::type_to_string_verbose(
       {
         const typet &subtype = c.type();
         result += "  ";
-        result += type_to_string(symbol.name, subtype);
+        result += from_type(ns, symbol.name, subtype);
         result += ' ';
 
         if(!c.get_base_name().empty())
@@ -194,7 +180,7 @@ std::string linkingt::type_to_string_verbose(
            " *";
   }
 
-  return type_to_string(symbol.name, type);
+  return from_type(ns, symbol.name, type);
 }
 
 bool linkingt::detailed_conflict_report_rec(
@@ -342,10 +328,10 @@ bool linkingt::detailed_conflict_report_rec(
     {
       msg="enum value types are different (";
       msg +=
-        type_to_string(old_symbol.name, to_c_enum_type(t1).underlying_type()) +
+        from_type(ns, old_symbol.name, to_c_enum_type(t1).underlying_type()) +
         '/';
       msg +=
-        type_to_string(new_symbol.name, to_c_enum_type(t2).underlying_type()) +
+        from_type(ns, new_symbol.name, to_c_enum_type(t2).underlying_type()) +
         ')';
       conclusive = true;
     }
@@ -468,7 +454,7 @@ bool linkingt::detailed_conflict_report_rec(
 #endif
     log.error() << '\n';
     log.error() << "reason for conflict at "
-                << expr_to_string(irep_idt(), conflict_path) << ": " << msg
+                << from_expr(ns, irep_idt(), conflict_path) << ": " << msg
                 << '\n';
 
     log.error() << '\n';
@@ -1162,10 +1148,10 @@ void linkingt::duplicate_object_symbol(
                       << " variable '" << old_symbol.name << "'\n";
         log.warning() << "using old value in module " << old_symbol.module
                       << " " << old_symbol.value.find_source_location() << '\n'
-                      << expr_to_string(old_symbol.name, tmp_old) << '\n';
+                      << from_expr(ns, old_symbol.name, tmp_old) << '\n';
         log.warning() << "ignoring new value in module " << new_symbol.module
                       << " " << new_symbol.value.find_source_location() << '\n'
-                      << expr_to_string(new_symbol.name, tmp_new)
+                      << from_expr(ns, new_symbol.name, tmp_new)
                       << messaget::eom;
       }
     }
