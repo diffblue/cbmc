@@ -14,22 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/rename_symbol.h>
-#include <util/replace_symbol.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
+
+#include "casting_replace_symbol.h"
 
 #include <unordered_set>
 
 class message_handlert;
-
-class casting_replace_symbolt : public replace_symbolt
-{
-public:
-  bool replace(exprt &dest) const override;
-
-private:
-  bool replace_symbol_expr(symbol_exprt &dest) const override;
-};
 
 class linkingt
 {
