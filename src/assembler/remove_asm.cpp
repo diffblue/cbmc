@@ -62,6 +62,7 @@ protected:
   void gcc_asm_function_call(
     const irep_idt &function_base_name,
     const code_asm_gcct &code,
+    std::size_t n_args,
     goto_programt &dest);
 
   void msc_asm_function_call(
@@ -77,10 +78,12 @@ protected:
 /// \param function_base_name: Name of the function to call
 /// \param code: gcc-style inline assembly statement to translate to function
 ///   call
+/// \param n_args: Number of arguments required by \p function_base_name
 /// \param dest: Goto program to append the function call to
 void remove_asmt::gcc_asm_function_call(
   const irep_idt &function_base_name,
   const code_asm_gcct &code,
+  std::size_t n_args,
   goto_programt &dest)
 {
   irep_idt function_identifier = function_base_name;
@@ -109,6 +112,16 @@ void remove_asmt::gcc_asm_function_call(
     }
   }
 
+  // An inline asm statement may consist of multiple commands, not all of which
+  // use all of the inputs/outputs of the inline asm statement.
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    arguments.size() >= n_args,
+    "insufficient number of arguments for calling " +
+      id2string(function_identifier),
+    "required arguments: " + std::to_string(n_args),
+    code.pretty());
+  arguments.resize(n_args);
+
   code_typet fkt_type{
     code_typet::parameterst{
       arguments.size(), code_typet::parametert{void_pointer}},
@@ -133,9 +146,12 @@ void remove_asmt::gcc_asm_function_call(
   }
   else
   {
-    DATA_INVARIANT(
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
       symbol_table.lookup_ref(function_identifier).type == fkt_type,
-      "function types should match");
+      "types of function " + id2string(function_identifier) + " should match",
+      code.pretty(),
+      symbol_table.lookup_ref(function_identifier).type.pretty(),
+      fkt_type.pretty());
   }
 }
 
@@ -293,12 +309,12 @@ void remove_asmt::process_instruction_gcc(
 
     if(command == "fstcw" || command == "fnstcw" || command == "fldcw") // x86
     {
-      gcc_asm_function_call("__asm_" + id2string(command), code, tmp_dest);
+      gcc_asm_function_call("__asm_" + id2string(command), code, 1, tmp_dest);
     }
     else if(
       command == "mfence" || command == "lfence" || command == "sfence") // x86
     {
-      gcc_asm_function_call("__asm_" + id2string(command), code, tmp_dest);
+      gcc_asm_function_call("__asm_" + id2string(command), code, 0, tmp_dest);
     }
     else if(command == ID_sync) // Power
     {
