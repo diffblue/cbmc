@@ -1,0 +1,116 @@
+# Run performance benchmarks comparing two different CBMC versions.
+name: Performance Benchmarking
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  perf-benchcomp:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Save push event HEAD and HEAD~ to environment variables
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo "NEW_REF=${{ github.event.after}}" | tee -a "$GITHUB_ENV"
+          echo "OLD_REF=${{ github.event.before }}" | tee -a "$GITHUB_ENV"
+
+      - name: Save pull request HEAD and base to environment variables
+        if: ${{ contains(fromJSON('["pull_request", "pull_request_target"]'), github.event_name) }}
+        run: |
+          echo "OLD_REF=${{ github.event.pull_request.base.sha }}" | tee -a "$GITHUB_ENV"
+          echo "NEW_REF=${{ github.event.pull_request.head.sha }}" | tee -a "$GITHUB_ENV"
+
+      - name: Check out CBMC (old variant)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          path: ./old
+          ref: ${{ env.OLD_REF }}
+          fetch-depth: 2
+
+      - name: Check out CBMC (new variant)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          path: ./new
+          ref: ${{ env.NEW_REF }}
+          fetch-depth: 1
+
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison ccache
+
+      - name: Prepare ccache
+        uses: actions/cache/restore@v4
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-20.04-Release-${{ github.ref }}
+            ${{ runner.os }}-20.04-Release
+      - name: ccache environment
+        run: echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+
+      - name: Configure using CMake (new variant)
+        run: cmake -S new/ -B new/build -G Ninja -DWITH_JBMC=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
+      - name: ccache environment (new variant)
+        run: echo "CCACHE_BASEDIR=$PWD/new" >> $GITHUB_ENV
+      - name: Build with Ninja (new variant)
+        run: ninja -C new/build -j2
+      - name: Print ccache stats (new variant)
+        run: ccache -s
+
+      - name: Configure using CMake (old variant)
+        run: cmake -S old/ -B old/build -G Ninja -DWITH_JBMC=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
+      - name: ccache environment (old variant)
+        run: echo "CCACHE_BASEDIR=$PWD/old" >> $GITHUB_ENV
+      - name: Build with Ninja (old variant)
+        run: ninja -C old/build -j2
+      - name: Print ccache stats (old variant)
+        run: ccache -s
+
+      - name: Obtain benchcomp
+        run: git clone --depth 1 https://github.com/model-checking/kani kani.git
+
+      - name: Fetch benchmarks
+        run: |
+          git clone --depth 1 https://github.com/awslabs/aws-c-common aws-c-common.git
+          pushd aws-c-common.git/verification/cbmc/proofs/
+          # keep 6 proofs of each kind of data structure
+          for c in $(ls -d aws_* | cut -f2 -d_ | uniq) ; do rm -rf $(ls -d aws_${c}_* | tail -n+7) ; done
+          popd
+          sudo apt-get install --no-install-recommends -yq gnuplot graphviz universal-ctags python3-pip
+          curl -L --remote-name \
+            https://github.com/awslabs/aws-build-accumulator/releases/download/1.29.0/litani-1.29.0.deb
+          sudo dpkg -i litani-1.29.0.deb
+          sudo python3 -m pip install cbmc-viewer
+
+      - name: Run benchcomp
+        run: |
+          kani.git/tools/benchcomp/bin/benchcomp \
+            --config new/.github/workflows/benchcomp-config.yaml \
+            run
+          kani.git/tools/benchcomp/bin/benchcomp \
+            --config new/.github/workflows/benchcomp-config.yaml \
+            collate
+
+      - name: Perf Regression Results Table
+        run: |
+          kani.git/tools/benchcomp/bin/benchcomp \
+            --config new/.github/workflows/benchcomp-config.yaml \
+            visualize --only dump_markdown_results_table >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run other visualizations
+        run: |
+          kani.git/tools/benchcomp/bin/benchcomp \
+            --config new/.github/workflows/benchcomp-config.yaml \
+            visualize --except dump_markdown_results_table
