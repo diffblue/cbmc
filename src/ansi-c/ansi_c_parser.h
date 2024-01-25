@@ -33,7 +33,9 @@ public:
       cpp98(false),
       cpp11(false),
       for_has_scope(false),
-      ts_18661_3_Floatn_types(false)
+      ts_18661_3_Floatn_types(false),
+      float16_type(false),
+      bf16_type(false)
   {
   }
 
@@ -78,6 +80,8 @@ public:
 
   // ISO/IEC TS 18661-3:2015
   bool ts_18661_3_Floatn_types;
+  bool float16_type;
+  bool bf16_type;
 
   typedef ansi_c_identifiert identifiert;
   typedef ansi_c_scopet scopet;

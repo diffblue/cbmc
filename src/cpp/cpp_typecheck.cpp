@@ -16,10 +16,62 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table.h>
 
 #include <ansi-c/builtin_factory.h>
+#include <ansi-c/gcc_version.h>
 
 #include "cpp_declarator.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
+
+cpp_typecheckt::cpp_typecheckt(
+  cpp_parse_treet &_cpp_parse_tree,
+  symbol_table_baset &_symbol_table,
+  const std::string &_module,
+  message_handlert &message_handler)
+  : c_typecheck_baset(_symbol_table, _module, message_handler),
+    cpp_parse_tree(_cpp_parse_tree),
+    template_counter(0),
+    anon_counter(0),
+    disable_access_control(false),
+    support_float16_type(false)
+{
+  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("gcc");
+    if(
+      gcc_version.flavor == gcc_versiont::flavort::GCC &&
+      gcc_version.is_at_least(13u))
+    {
+      support_float16_type = true;
+    }
+  }
+}
+
+cpp_typecheckt::cpp_typecheckt(
+  cpp_parse_treet &_cpp_parse_tree,
+  symbol_table_baset &_symbol_table1,
+  const symbol_table_baset &_symbol_table2,
+  const std::string &_module,
+  message_handlert &message_handler)
+  : c_typecheck_baset(_symbol_table1, _symbol_table2, _module, message_handler),
+    cpp_parse_tree(_cpp_parse_tree),
+    template_counter(0),
+    anon_counter(0),
+    disable_access_control(false),
+    support_float16_type(false)
+{
+  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("gcc");
+    if(
+      gcc_version.flavor == gcc_versiont::flavort::GCC &&
+      gcc_version.is_at_least(13u))
+    {
+      support_float16_type = true;
+    }
+  }
+}
 
 void cpp_typecheckt::convert(cpp_itemt &item)
 {
@@ -326,7 +378,7 @@ void cpp_typecheckt::clean_up()
 bool cpp_typecheckt::builtin_factory(const irep_idt &identifier)
 {
   return ::builtin_factory(
-    identifier, false, symbol_table, get_message_handler());
+    identifier, support_float16_type, symbol_table, get_message_handler());
 }
 
 bool cpp_typecheckt::contains_cpp_name(const exprt &expr)

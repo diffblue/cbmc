@@ -68,7 +68,7 @@ bool ansi_c_languaget::parse(
   // parsing
 
   std::string code;
-  ansi_c_internal_additions(code, config.ansi_c.ts_18661_3_Floatn_types);
+  ansi_c_internal_additions(code, config.ansi_c.float16_type);
   std::istringstream codestr(code);
 
   ansi_c_parser.clear();
@@ -77,6 +77,8 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.log.set_message_handler(message_handler);
   ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
+  ansi_c_parser.float16_type = config.ansi_c.float16_type;
+  ansi_c_parser.bf16_type = config.ansi_c.bf16_type;
   ansi_c_parser.cpp98=false; // it's not C++
   ansi_c_parser.cpp11=false; // it's not C++
   ansi_c_parser.mode=config.ansi_c.mode;
@@ -203,6 +205,8 @@ bool ansi_c_languaget::to_expr(
   ansi_c_parser.log.set_message_handler(message_handler);
   ansi_c_parser.mode=config.ansi_c.mode;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
+  ansi_c_parser.float16_type = config.ansi_c.float16_type;
+  ansi_c_parser.bf16_type = config.ansi_c.bf16_type;
   ansi_c_scanner_init();
 
   bool result=ansi_c_parser.parse();

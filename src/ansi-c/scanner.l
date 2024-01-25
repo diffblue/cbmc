@@ -217,10 +217,13 @@ hexfloat1       "0"[xX]{hexdigit}*"."{hexdigit}+[pP][+-]?{integer}
 hexfloat2       "0"[xX]{hexdigit}*"."[pP][+-]?{integer}
 hexfloat3       "0"[xX]{hexdigit}*[pP][+-]?{integer}
 float_suffix    [fFlLiIjJ]*
-gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?|"f16"|"f32"|"f64"|"f128"|"f32x"|"f64x"|"f128x"
+clang_ext_float_suffix [qQ]|"f16"|"F16"
+gcc_ext_float_width (("bf"|"BF")"16")|([fF]("32"|"64"|"128"|"32x"|"64x"|"128x"))
+gcc_ext_float_suffix {clang_ext_float_suffix}|[wW]|[dD][fFdDlL]?|{gcc_ext_float_width}
 float           {float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
 float_s         {float}{float_suffix}|{integer}[fF]
 gcc_ext_float_s {float}{gcc_ext_float_suffix}
+clang_ext_float_s {float}{clang_ext_float_suffix}
 cppstart        {ws}"#"{ws}
 cpplineno       {cppstart}"line"*{ws}{integer}{ws}.*{newline}
 cppdirective    {cppstart}({newline}|[^p].*|"p"[^r].*|"pr"[^a].*|"pra"[^g].*|"prag"[^m].*|"pragm"[^a].*)
@@ -524,13 +527,13 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"_Float16"      { if(PARSER.ts_18661_3_Floatn_types)
+"_Float16"      { if(PARSER.float16_type)
                   { loc(); return TOK_GCC_FLOAT16; }
                   else
                     return make_identifier();
                 }
 
-"__bf16"        { if(PARSER.ts_18661_3_Floatn_types)
+"__bf16"        { if(PARSER.bf16_type)
                   { loc(); return TOK_GCC_FLOAT16; }
                   else
                     return make_identifier();
@@ -1561,9 +1564,21 @@ __decltype          { if(PARSER.cpp98 &&
                   return TOK_INTEGER;
                 }
 
+{clang_ext_float_s} { if(PARSER.mode!=configt::ansi_ct::flavourt::GCC &&
+                         PARSER.mode != configt::ansi_ct::flavourt::CLANG)
+                      {
+                        yyansi_cerror("Floating-point constant with unsupported extension");
+                        return TOK_SCANNER_ERROR;
+                      }
+                      newstack(yyansi_clval);
+                      parser_stack(yyansi_clval)=convert_float_literal(yytext);
+                      PARSER.set_source_location(parser_stack(yyansi_clval));
+                      return TOK_FLOATING;
+                    }
+
 {gcc_ext_float_s} { if(PARSER.mode!=configt::ansi_ct::flavourt::GCC)
                     {
-                      yyansi_cerror("Preprocessor directive found");
+                      yyansi_cerror("Floating-point constant with unsupported extension");
                       return TOK_SCANNER_ERROR;
                     }
                     newstack(yyansi_clval);

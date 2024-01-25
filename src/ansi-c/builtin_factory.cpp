@@ -97,7 +97,7 @@ static bool convert(
 //! \return 'true' on error
 bool builtin_factory(
   const irep_idt &identifier,
-  bool support_ts_18661_3_Floatn_types,
+  bool support_float16_type,
   symbol_table_baset &symbol_table,
   message_handlert &mh)
 {
@@ -107,7 +107,7 @@ bool builtin_factory(
   std::ostringstream s;
 
   std::string code;
-  ansi_c_internal_additions(code, support_ts_18661_3_Floatn_types);
+  ansi_c_internal_additions(code, support_float16_type);
   s << code;
 
   // our own extensions
