@@ -9,7 +9,7 @@ typedef union {
 } vector_u;
 #endif
 
-int main()
+void test_shuffle()
 {
 #if defined(__GNUC__) && !defined(__clang__)
   // https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
@@ -31,7 +31,12 @@ int main()
   assert(res.members[1] == 5);
   assert(res.members[2] == 3);
   assert(res.members[3] == 6);
-#elif defined(__clang__)
+#endif
+}
+
+void test_shufflevector(void)
+{
+#if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 12)
   v4si a = {1, 2, 3, 4};
   v4si b = {5, 6, 7, 8};
 
@@ -49,4 +54,10 @@ int main()
   assert(res.members[2] == 3);
   assert(res.members[3] == 6);
 #endif
+}
+
+int main()
+{
+  test_shuffle();
+  test_shufflevector();
 }

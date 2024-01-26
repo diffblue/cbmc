@@ -2133,9 +2133,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
         return;
       }
-      else if(
-        identifier == "__builtin_shufflevector" &&
-        config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
+      else if(identifier == "__builtin_shufflevector")
       {
         exprt result = typecheck_shuffle_vector(expr);
         expr.swap(result);
