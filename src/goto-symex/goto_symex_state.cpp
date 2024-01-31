@@ -112,6 +112,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
       "pointer handling for concurrency is unsound");
 
   // Update constant propagation map -- the RHS is L2
+  branch_propagation.erase_if_exists(l1_identifier);
   if(!is_shared && record_value && goto_symex_can_forward_propagatet(ns)(rhs))
   {
     const auto propagation_entry = propagation.find(l1_identifier);
@@ -214,7 +215,8 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       {
         // We also consider propagation if we go up to L2.
         // L1 identifiers are used for propagation!
-        auto p_it = propagation.find(ssa.get_identifier());
+        const auto &l1_identifier = ssa.get_identifier();
+        auto p_it = propagation.find(l1_identifier);
 
         if(p_it.has_value())
         {
@@ -222,6 +224,10 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
         }
         else
         {
+          auto b_entry = branch_propagation.find(l1_identifier);
+          if(b_entry.has_value())
+            return renamedt<exprt, level>(*b_entry);
+
           if(level == L2)
             ssa = set_indices<L2>(std::move(ssa), ns).get();
           return renamedt<exprt, level>(std::move(ssa));
@@ -457,7 +463,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     // written this object within the atomic section. We must actually do this,
     // because goto_state::apply_condition may have placed the latest value in
     // the propagation map without recording an assignment.
-    auto p_it = propagation.find(ssa_l1.get_identifier());
+    auto p_it = branch_propagation.find(ssa_l1.get_identifier());
     const exprt l2_true_case =
       p_it.has_value() ? *p_it : set_indices<L2>(ssa_l1, ns).get();
 
