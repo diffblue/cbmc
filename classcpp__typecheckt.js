@@ -14,7 +14,7 @@ var classcpp__typecheckt =
     [ "add_implicit_dereference", "classcpp__typecheckt.html#ab3dc6840992ac20234eed9c5af166f46", null ],
     [ "add_method_body", "classcpp__typecheckt.html#a924c8ae57ff98d1cb091dd47b8fb919f", null ],
     [ "add_this_to_method_type", "classcpp__typecheckt.html#abd5a792d151bfe4c3a71c6ff71c1ea6a", null ],
-    [ "builtin_factory", "classcpp__typecheckt.html#ac6880bd48950ea09d209ff59b6270f4b", null ],
+    [ "builtin_factory", "classcpp__typecheckt.html#aa497e48d8df81cff721c01b6b6e03615", null ],
     [ "cast_away_constness", "classcpp__typecheckt.html#ab0a9d1388f3bb8ded6f677061bf474d1", null ],
     [ "check_component_access", "classcpp__typecheckt.html#a65b96de06f2d1aae9610adcc0118e461", null ],
     [ "check_fixed_size_array", "classcpp__typecheckt.html#a76d3b15fdc81731530c3db518672555c", null ],

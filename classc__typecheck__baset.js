@@ -10,6 +10,7 @@ var classc__typecheck__baset =
     [ "adjust_float_rel", "classc__typecheck__baset.html#a2cf54f29c5f492a2088291aaecb7161c", null ],
     [ "adjust_function_parameter", "classc__typecheck__baset.html#a86652842f848b51ad587922343e48b14", null ],
     [ "apply_asm_label", "classc__typecheck__baset.html#a5ad5ce0961c2c6bf511519905876478e", null ],
+    [ "builtin_factory", "classc__typecheck__baset.html#aff122e342339299630f489ab28c8616e", null ],
     [ "check_history_expr_return_value", "classc__typecheck__baset.html#a05e157cfcaf3396341bccbc967e7cb2c", null ],
     [ "check_was_freed", "classc__typecheck__baset.html#a2f04c70f93bebaf7eb53552075c17fcb", null ],
     [ "designator_enter", "classc__typecheck__baset.html#ae86b1677d8096073432b705a97c73ea3", null ],

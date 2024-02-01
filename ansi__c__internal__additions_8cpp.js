@@ -1,7 +1,7 @@
 var ansi__c__internal__additions_8cpp =
 [
     [ "ansi_c_architecture_strings", "ansi__c__internal__additions_8cpp.html#aec7fc27c0f7a8b975326962929cb193d", null ],
-    [ "ansi_c_internal_additions", "ansi__c__internal__additions_8cpp.html#a6c5f95fe1b31a724e46a34c0bc09c7ae", null ],
+    [ "ansi_c_internal_additions", "ansi__c__internal__additions_8cpp.html#ae64d9388620ddde50e4f129cee88710e", null ],
     [ "architecture_string", "ansi__c__internal__additions_8cpp.html#a0d94d6f95ba91a2551389375eae747e2", null ],
     [ "architecture_string", "ansi__c__internal__additions_8cpp.html#ad4225bc849a83cd28aa3bb9af0148958", null ],
     [ "max_malloc_size", "ansi__c__internal__additions_8cpp.html#aedcb41e4941b20dd7a5f946f6c18e83a", null ],

@@ -1,7 +1,7 @@
 var ansi__c__internal__additions_8h =
 [
     [ "ansi_c_architecture_strings", "ansi__c__internal__additions_8h.html#aec7fc27c0f7a8b975326962929cb193d", null ],
-    [ "ansi_c_internal_additions", "ansi__c__internal__additions_8h.html#a6c5f95fe1b31a724e46a34c0bc09c7ae", null ],
+    [ "ansi_c_internal_additions", "ansi__c__internal__additions_8h.html#ae64d9388620ddde50e4f129cee88710e", null ],
     [ "arm_builtin_headers", "ansi__c__internal__additions_8h.html#ad19dac0afb2d4714cff50d1b88cdecb5", null ],
     [ "clang_builtin_headers", "ansi__c__internal__additions_8h.html#abf89a09e8a5dced7db2e2d6177608002", null ],
     [ "cprover_builtin_headers", "ansi__c__internal__additions_8h.html#a15a12a121038e07a35dc86f6db772729", null ],
