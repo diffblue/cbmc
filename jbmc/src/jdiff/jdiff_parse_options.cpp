@@ -190,7 +190,7 @@ bool jdiff_parse_optionst::process_goto_program(
   class_hierarchyt class_hierarchy(goto_model.symbol_table);
   remove_instanceof(goto_model, class_hierarchy, ui_message_handler);
 
-  mm_io(goto_model);
+  mm_io(goto_model, ui_message_handler);
 
   // instrument library preconditions
   instrument_preconditions(goto_model);

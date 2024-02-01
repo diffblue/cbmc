@@ -31,9 +31,10 @@ Date:   April 2017
 
 class goto_functionst;
 class goto_modelt;
+class message_handlert;
 class symbol_tablet;
 
-void mm_io(const symbol_tablet &, goto_functionst &);
-void mm_io(goto_modelt &);
+void mm_io(const symbol_tablet &, goto_functionst &, message_handlert &);
+void mm_io(goto_modelt &, message_handlert &);
 
 #endif // CPROVER_GOTO_PROGRAMS_MM_IO_H

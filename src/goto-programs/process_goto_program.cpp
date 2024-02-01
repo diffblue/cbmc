@@ -45,7 +45,7 @@ bool process_goto_program(
                << messaget::eom;
   remove_function_pointers(log.get_message_handler(), goto_model, false);
 
-  mm_io(goto_model);
+  mm_io(goto_model, log.get_message_handler());
 
   // instrument library preconditions
   instrument_preconditions(goto_model);

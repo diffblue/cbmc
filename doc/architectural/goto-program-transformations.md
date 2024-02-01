@@ -62,7 +62,8 @@ See the device behaviour section of `modeling-mmio.md` for details of
 modeling memory-mapped I/O regions of device interfaces. This pass is always
 carried out but will only make changes if one of the modelling functions exist.
 
-The implementation of this pass is called via the \ref mm_io(goto_modelt &)
+The implementation of this pass is called via the
+\ref mm_io(goto_modelt &, message_handlert &)
 "mm_io" function. Further documentation of this pass can be found in \ref
 mm_io.h
 
