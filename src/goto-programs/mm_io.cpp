@@ -23,6 +23,48 @@ Date:   April 2017
 
 #include <set>
 
+class mm_iot
+{
+public:
+  explicit mm_iot(symbol_table_baset &symbol_table);
+
+  void mm_io(goto_functionst::goto_functiont &goto_function);
+
+protected:
+  const irep_idt id_r = CPROVER_PREFIX "mm_io_r";
+  const irep_idt id_w = CPROVER_PREFIX "mm_io_w";
+
+  const namespacet ns;
+  exprt mm_io_r;
+  exprt mm_io_r_value;
+  exprt mm_io_w;
+};
+
+mm_iot::mm_iot(symbol_table_baset &symbol_table)
+  : ns(symbol_table),
+    mm_io_r(nil_exprt{}),
+    mm_io_r_value(nil_exprt{}),
+    mm_io_w(nil_exprt{})
+{
+  if(const auto mm_io_r_symbol = symbol_table.lookup(id_r))
+  {
+    mm_io_r = mm_io_r_symbol->symbol_expr();
+
+    const auto &value_symbol = get_fresh_aux_symbol(
+      to_code_type(mm_io_r.type()).return_type(),
+      id2string(id_r) + "$value",
+      id2string(id_r) + "$value",
+      mm_io_r_symbol->location,
+      mm_io_r_symbol->mode,
+      symbol_table);
+
+    mm_io_r_value = value_symbol.symbol_expr();
+  }
+
+  if(const auto mm_io_w_symbol = symbol_table.lookup(id_w))
+    mm_io_w = mm_io_w_symbol->symbol_expr();
+}
+
 static std::set<dereference_exprt> collect_deref_expr(const exprt &src)
 {
   std::set<dereference_exprt> collected;
@@ -33,13 +75,12 @@ static std::set<dereference_exprt> collect_deref_expr(const exprt &src)
   return collected;
 }
 
-void mm_io(
-  const exprt &mm_io_r,
-  const exprt &mm_io_r_value,
-  const exprt &mm_io_w,
-  goto_functionst::goto_functiont &goto_function,
-  const namespacet &ns)
+void mm_iot::mm_io(goto_functionst::goto_functiont &goto_function)
 {
+  // return early when there is nothing to be done
+  if(mm_io_r.is_nil() && mm_io_w.is_nil())
+    return;
+
   for(auto it = goto_function.body.instructions.begin();
       it != goto_function.body.instructions.end();
       it++)
@@ -107,34 +148,10 @@ void mm_io(
 
 void mm_io(symbol_tablet &symbol_table, goto_functionst &goto_functions)
 {
-  const namespacet ns(symbol_table);
-  exprt mm_io_r = nil_exprt();
-  exprt mm_io_r_value = nil_exprt();
-  exprt mm_io_w = nil_exprt();
-
-  const irep_idt id_r = CPROVER_PREFIX "mm_io_r";
-  const irep_idt id_w = CPROVER_PREFIX "mm_io_w";
-
-  if(const auto mm_io_r_symbol = symbol_table.lookup(id_r))
-  {
-    mm_io_r = mm_io_r_symbol->symbol_expr();
-
-    const auto &value_symbol = get_fresh_aux_symbol(
-      to_code_type(mm_io_r.type()).return_type(),
-      id2string(id_r) + "$value",
-      id2string(id_r) + "$value",
-      mm_io_r_symbol->location,
-      mm_io_r_symbol->mode,
-      symbol_table);
-
-    mm_io_r_value = value_symbol.symbol_expr();
-  }
-
-  if(const auto mm_io_w_symbol = symbol_table.lookup(id_w))
-    mm_io_w = mm_io_w_symbol->symbol_expr();
+  mm_iot rewrite{symbol_table};
 
   for(auto & f : goto_functions.function_map)
-    mm_io(mm_io_r, mm_io_r_value, mm_io_w, f.second, ns);
+    rewrite.mm_io(f.second);
 }
 
 void mm_io(goto_modelt &model)
