@@ -2072,6 +2072,15 @@ void c_typecheck_baset::typecheck_obeys_contract_call(
   expr.type() = bool_typet();
 }
 
+bool c_typecheck_baset::builtin_factory(const irep_idt &identifier)
+{
+  return ::builtin_factory(
+    identifier,
+    config.ansi_c.ts_18661_3_Floatn_types,
+    symbol_table,
+    get_message_handler());
+}
+
 void c_typecheck_baset::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
@@ -2106,7 +2115,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         typecheck_typed_target_call(expr);
       }
       // Is this a builtin?
-      else if(!builtin_factory(identifier, symbol_table, get_message_handler()))
+      else if(!builtin_factory(identifier))
       {
         // yes, it's a builtin
       }

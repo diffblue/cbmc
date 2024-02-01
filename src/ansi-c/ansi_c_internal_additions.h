@@ -12,7 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-void ansi_c_internal_additions(std::string &code);
+void ansi_c_internal_additions(
+  std::string &code,
+  bool support_ts_18661_3_Floatn_types);
 void ansi_c_architecture_strings(std::string &code);
 
 extern const char clang_builtin_headers[];
