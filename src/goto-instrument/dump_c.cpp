@@ -208,10 +208,14 @@ void dump_ct::operator()(std::ostream &os)
 
     // we don't want to dump in full all definitions; in particular
     // do not dump anonymous types that are defined in system headers
-    if((!tag_added || symbol.is_type) &&
-       system_symbols.is_symbol_internal_symbol(symbol, system_headers) &&
-       symbol.name!=goto_functions.entry_point())
+    if(
+      (!tag_added || symbol.is_type) &&
+      system_symbols.is_symbol_internal_symbol(symbol, system_headers) &&
+      symbol.name != goto_functions.entry_point() &&
+      symbol.name != CPROVER_PREFIX "arg_string") // model for argc/argv
+    {
       continue;
+    }
 
     bool inserted=symbols_sorted.insert(name_str).second;
     CHECK_RETURN(inserted);

@@ -85,20 +85,22 @@ bool model_argc_argv(
   std::ostringstream oss;
   oss << "int ARGC;\n"
       << "char *ARGV[1];\n"
+      << "extern char " CPROVER_PREFIX "arg_string[4096];\n"
       << "void " << goto_model.goto_functions.entry_point() << "()\n"
       << "{\n"
       << "  unsigned next=0u;\n"
       << "  " CPROVER_PREFIX "assume(ARGC>=1);\n"
       << "  " CPROVER_PREFIX "assume(ARGC<=" << max_argc << ");\n"
-      << "  char arg_string[4096];\n"
-      << "  " CPROVER_PREFIX "input(\"arg_string\", &arg_string[0]);\n"
+      << "  " CPROVER_PREFIX "input(\"arg_string\", \n"
+      << "    &" CPROVER_PREFIX "arg_string[0]);\n"
       << "  for(int i=0; i<ARGC && i<" << max_argc << "; ++i)\n"
       << "  {\n"
       << "    unsigned len;\n"
       << "    " CPROVER_PREFIX "assume(len<4096);\n"
       << "    " CPROVER_PREFIX "assume(next+len<4096);\n"
-      << "    " CPROVER_PREFIX "assume(arg_string[next+len]==0);\n"
-      << "    ARGV[i]=&(arg_string[next]);\n"
+      << "    " CPROVER_PREFIX "assume(\n"
+      << "       " CPROVER_PREFIX "arg_string[next+len]==0);\n"
+      << "    ARGV[i]=&(" CPROVER_PREFIX "arg_string[next]);\n"
       << "    next+=len+1;\n"
       << "  }\n"
       << "}";
@@ -124,8 +126,11 @@ bool model_argc_argv(
     // add __CPROVER_assume if necessary (it might exist already)
     if(
       symbol_pair.first == CPROVER_PREFIX "assume" ||
-      symbol_pair.first == CPROVER_PREFIX "input")
+      symbol_pair.first == CPROVER_PREFIX "input" ||
+      symbol_pair.first == CPROVER_PREFIX "arg_string")
+    {
       goto_model.symbol_table.add(symbol_pair.second);
+    }
     else if(symbol_pair.first == goto_model.goto_functions.entry_point())
     {
       value = symbol_pair.second.value;
