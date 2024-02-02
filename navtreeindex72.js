@@ -1,5 +1,6 @@
 var NAVTREEINDEX72 =
 {
+"contracts-dev-spec-dfcc-instrument.html#contracts-dev-spec-dfcc-instrument-signature":[1,1,0,5,3,0],
 "contracts-dev-spec-dfcc-runtime.html":[1,1,0,5,2],
 "contracts-dev-spec-dfcc-runtime.html#contracts-dev-spec-dfcc-runtime-data":[1,1,0,5,2,0],
 "contracts-dev-spec-dfcc-runtime.html#contracts-dev-spec-dfcc-runtime-ops":[1,1,0,5,2,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX72 =
 "convert__float__literal_8h.html#a60068f40e48b4ff98b542c20e0bfca58":[9,0,2,1,2,3,0],
 "convert__float__literal_8h_source.html":[9,0,2,1,2,3],
 "convert__int__literal_8cpp.html":[9,0,2,28,0,4],
-"convert__int__literal_8cpp.html#a05b33711ac2181f80ff3a197d2b2e40e":[9,0,2,28,0,4,11],
-"convert__int__literal_8cpp.html#a0e8ad9cd668d2d104bf429371dd84ceb":[9,0,2,28,0,4,7]
+"convert__int__literal_8cpp.html#a05b33711ac2181f80ff3a197d2b2e40e":[9,0,2,28,0,4,11]
 };
