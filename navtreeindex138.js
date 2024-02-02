@@ -1,6 +1,5 @@
 var NAVTREEINDEX138 =
 {
-"symbol__table_8cpp.html":[9,0,2,30,234],
 "symbol__table_8cpp_source.html":[9,0,2,30,234],
 "symbol__table_8h.html":[9,0,2,30,235],
 "symbol__table_8h_source.html":[9,0,2,30,235],
@@ -249,5 +248,6 @@ var NAVTREEINDEX138 =
 "tutorial.html":[0,4,13],
 "tutorial.html#autotoc_md196":[0,4,13,0,0],
 "tutorial.html#autotoc_md197":[0,4,13,0,1],
-"tutorial.html#autotoc_md198":[0,4,13,0,1,0]
+"tutorial.html#autotoc_md198":[0,4,13,0,1,0],
+"tutorial.html#autotoc_md199":[0,4,13,0,1,1]
 };

@@ -1,7 +1,5 @@
 var NAVTREEINDEX77 =
 {
-"dfcc__pointer__in__range_8cpp.html":[9,0,2,15,1,1,38],
-"dfcc__pointer__in__range_8cpp_source.html":[9,0,2,15,1,1,38],
 "dfcc__pointer__in__range_8h.html":[9,0,2,15,1,1,39],
 "dfcc__pointer__in__range_8h_source.html":[9,0,2,15,1,1,39],
 "dfcc__root__object_8cpp.html":[9,0,2,15,1,1,40],
@@ -249,5 +247,7 @@ var NAVTREEINDEX77 =
 "enumerative__loop__contracts__synthesizer_8cpp.html#aad4ccf660c6afc6af586973c98be1ff8":[9,0,2,18,6,1],
 "enumerative__loop__contracts__synthesizer_8cpp_source.html":[9,0,2,18,6],
 "enumerative__loop__contracts__synthesizer_8h.html":[9,0,2,18,7],
-"enumerative__loop__contracts__synthesizer_8h_source.html":[9,0,2,18,7]
+"enumerative__loop__contracts__synthesizer_8h_source.html":[9,0,2,18,7],
+"equality_8cpp.html":[9,0,2,27,1,64],
+"equality_8cpp_source.html":[9,0,2,27,1,64]
 };

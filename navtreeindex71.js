@@ -1,7 +1,5 @@
 var NAVTREEINDEX71 =
 {
-"classxmlt.html#a29e68dc045ff72834e47f16bb8f86f8c":[8,0,1363,11],
-"classxmlt.html#a3f167d0c094f6a8fed3c41f1b0b0c84b":[8,0,1363,4],
 "classxmlt.html#a43780fe64b13427a4f4d05ef9665323f":[8,0,1363,0],
 "classxmlt.html#a492174bf3853a34c66137687f9fc09be":[8,0,1363,1],
 "classxmlt.html#a4b2087d32be40d3f068b3faf3cefe656":[8,0,1363,9],
@@ -249,5 +247,7 @@ var NAVTREEINDEX71 =
 "contracts-dev-spec-is-freeable.html":[1,1,0,5,3,2],
 "contracts-dev-spec-is-fresh.html":[1,1,0,5,3,3],
 "contracts-dev-spec-memory-predicates-rewriting.html":[1,1,0,4],
-"contracts-dev-spec-memory-predicates-rewriting.html#contracts-dev-spec-memory-predicate-collect":[1,1,0,4,0]
+"contracts-dev-spec-memory-predicates-rewriting.html#contracts-dev-spec-memory-predicate-collect":[1,1,0,4,0],
+"contracts-dev-spec-memory-predicates-rewriting.html#contracts-dev-spec-memory-predicate-rewrite":[1,1,0,4,1],
+"contracts-dev-spec-obeys-contract.html":[1,1,0,5,3,4]
 };
