@@ -130,8 +130,8 @@ void remove_returnst::replace_returns(
 
         // now turn the `return' into `assignment'
         auto labels = std::move(instruction.labels);
-        instruction = goto_programt::make_assignment(
-          assignment, instruction.source_location());
+        instruction.clear(goto_program_instruction_typet::ASSIGN);
+        instruction.code_nonconst() = std::move(assignment);
         instruction.labels = std::move(labels);
       }
       else
