@@ -115,7 +115,7 @@ Removal/Lowering of Function Pointers</h2>
 <h2><a class="anchor" id="mmio-transform"></a>
 Memory Mapped IO Instrumentation</h2>
 <p>This pass finds pointer dereferences and adds corresponding calls to the <code>__CPROVER_mm_io_r</code> and <code>__CPROVER_mm_io_w</code> modelling functions if they exist. See the device behaviour section of <code>modeling-mmio.md</code> for details of modeling memory-mapped I/O regions of device interfaces. This pass is always carried out but will only make changes if one of the modelling functions exist.</p>
-<p>The implementation of this pass is called via the <a class="el" href="mm__io_8h.html#aba2408a2ac06acdc97bcafad16586b23">mm_io</a> function. Further documentation of this pass can be found in <a class="el" href="mm__io_8h.html">mm_io.h</a></p>
+<p>The implementation of this pass is called via the <a class="el" href="mm__io_8h.html#ab990f28ba87ac487bc55b340e76da51d">mm_io</a> function. Further documentation of this pass can be found in <a class="el" href="mm__io_8h.html">mm_io.h</a></p>
 <p><em>Predecessor pass is <a class="el" href="goto-program-transformations.html#function-pointer-transform">Removal/Lowering of Function Pointers</a> .</em></p>
 <h2><a class="anchor" id="precondition-transform"></a>
 Instrument/Remove Preconditions</h2>
@@ -214,7 +214,7 @@ Add Coverage Goals</h2>
 Slicing</h2>
 <p>This includes several slicing passes as specified by various slicing command line options. The reachability slicer is enabled by the <code>--reachability-slice</code> command line option. The implementation of this pass is called via the <a class="el" href="reachability__slicer_8h.html#a7b182970f6c9e43371c61dba5cbc54a8">reachability_slicer(goto_modelt &amp;, message_handlert &amp;)</a> function. The full slicer is enabled by the <code>--full-slice</code> command line option. The implementation of this pass is called via the <a class="el" href="full__slicer_8h.html#a11fed0fe823caef378b79bb1eece8506">full_slicer(goto_modelt &amp;, message_handlert &amp;)</a> function.</p>
 <p><em>Predecessor pass is <a class="el" href="goto-program-transformations.html#properties-transform">Label Properties</a> .</em></p>
-<p>Last modified: 2024-02-02 16:42:36 +0100 </p>
+<p>Last modified: 2024-02-02 17:15:43 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

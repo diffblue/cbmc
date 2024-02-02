@@ -838,6 +838,7 @@ var annotated_dup =
     [ "mixd", "unionmixd.html", "unionmixd" ],
     [ "mixf", "unionmixf.html", "unionmixf" ],
     [ "mixl", "unionmixl.html", "unionmixl" ],
+    [ "mm_iot", "classmm__iot.html", "classmm__iot" ],
     [ "mod_exprt", "classmod__exprt.html", "classmod__exprt" ],
     [ "monomialt", "classmonomialt.html", "classmonomialt" ],
     [ "monotonic_timestampert", "classmonotonic__timestampert.html", "classmonotonic__timestampert" ],
