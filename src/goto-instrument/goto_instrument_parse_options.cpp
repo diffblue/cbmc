@@ -1764,6 +1764,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
     do_remove_returns();
     rewrite_rw_ok(goto_model);
+    // full_slicer requires that the model has unique location numbers:
+    goto_model.goto_functions.update();
 
     log.warning() << "**** WARNING: Experimental option --full-slice, "
                   << "analysis results may be unsound. See "
@@ -1775,8 +1777,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         goto_model, cmdline.get_values("property"), ui_message_handler);
     else
     {
-      // full_slicer requires that the model has unique location numbers:
-      goto_model.goto_functions.update();
       full_slicer(goto_model, ui_message_handler);
     }
   }
