@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/label_function_pointer_call_sites.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
+#include <goto-programs/mm_io.h>
 #include <goto-programs/parameter_assignments.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_calls_no_body.h>
@@ -899,6 +900,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("drop-unused-functions"))
     {
       do_indirect_call_and_rtti_removal();
+      mm_io(goto_model, ui_message_handler);
 
       log.status() << "Removing unused functions" << messaget::eom;
       remove_unused_functions(goto_model.goto_functions, ui_message_handler);
