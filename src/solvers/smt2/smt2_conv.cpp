@@ -4283,51 +4283,44 @@ void smt2_convt::convert_with(const with_exprt &expr)
           expr_type.id()==ID_unsignedbv ||
           expr_type.id()==ID_signedbv)
   {
-    // Update bits in a bit-vector. We will use masking and shifts.
-    // TODO: SMT2-ify
-    SMT2_TODO("SMT2-ify");
+    // Update bits in a bit-vector. We use masking and shifts.
+    const exprt &index = expr.where();
+    const exprt &new_value = expr.new_value();
 
-#if 0
     std::size_t total_width=boolbv_width(expr_type);
+    std::size_t value_width = boolbv_width(new_value.type());
 
-    const exprt &index=expr.operands()[1];
-    const exprt &value=expr.operands()[2];
-
-    std::size_t value_width=boolbv_width(value.type());
-
-    typecast_exprt index_tc(index, expr_type);
+    auto index_converted = typecast_exprt::conditional_cast(index, expr_type);
 
     out << "(bvor ";
-    out << "(band ";
+    out << "(bvand ";
 
     // the mask to get rid of the old bits
-    out << " (bvnot (bvshl";
-
-    out << " (concat";
-    out << " (repeat[" << total_width-value_width << "] bv0[1])";
-    out << " (repeat[" << value_width << "] bv1[1])";
-    out << ")"; // concat
+    out << "(bvnot (bvshl ";
+    out << "#b" << std::string(total_width - value_width, '0')
+        << std::string(value_width, '1');
 
     // shift it to the index
-    convert_expr(index_tc);
-    out << "))"; // bvshl, bvot
+    out << ' ';
+    convert_expr(index_converted);
+    out << "))"; // bvshl, bvnot
 
-    out << ")"; // bvand
+    out << ')'; // bvand
 
-    // the new value
+    // or-in the new value
     out << " (bvshl ";
-    convert_expr(value);
+    convert_expr(typecast_exprt::conditional_cast(new_value, expr_type));
 
     // shift it to the index
-    convert_expr(index_tc);
-    out << ")"; // bvshl
+    out << ' ';
+    convert_expr(index_converted);
+    out << ')'; // bvshl
 
-    out << ")"; // bvor
-#endif
+    out << ')'; // bvor
   }
   else
     UNEXPECTEDCASE(
-      "with expects struct, union, or array type, but got "+
+      "with expects struct, union, array, or bit-vector type, but got " +
       expr.type().id_string());
 }
 
