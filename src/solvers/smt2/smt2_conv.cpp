@@ -1683,6 +1683,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_update(to_update_expr(expr));
   }
+  else if(expr.id() == ID_update_bits)
+  {
+    convert_update_bits(to_update_bits_expr(expr));
+  }
   else if(expr.id() == ID_object_address)
   {
     out << "(object-address ";
@@ -4283,47 +4287,8 @@ void smt2_convt::convert_with(const with_exprt &expr)
           expr_type.id()==ID_unsignedbv ||
           expr_type.id()==ID_signedbv)
   {
-    // Update bits in a bit-vector. We will use masking and shifts.
-    // TODO: SMT2-ify
-    SMT2_TODO("SMT2-ify");
-
-#if 0
-    std::size_t total_width=boolbv_width(expr_type);
-
-    const exprt &index=expr.operands()[1];
-    const exprt &value=expr.operands()[2];
-
-    std::size_t value_width=boolbv_width(value.type());
-
-    typecast_exprt index_tc(index, expr_type);
-
-    out << "(bvor ";
-    out << "(band ";
-
-    // the mask to get rid of the old bits
-    out << " (bvnot (bvshl";
-
-    out << " (concat";
-    out << " (repeat[" << total_width-value_width << "] bv0[1])";
-    out << " (repeat[" << value_width << "] bv1[1])";
-    out << ")"; // concat
-
-    // shift it to the index
-    convert_expr(index_tc);
-    out << "))"; // bvshl, bvot
-
-    out << ")"; // bvand
-
-    // the new value
-    out << " (bvshl ";
-    convert_expr(value);
-
-    // shift it to the index
-    convert_expr(index_tc);
-    out << ")"; // bvshl
-
-    out << ")"; // bvor
-#endif
+    convert_update_bits(
+      update_bits_exprt(expr.old(), expr.where(), expr.new_value()));
   }
   else
     UNEXPECTEDCASE(
@@ -4336,6 +4301,11 @@ void smt2_convt::convert_update(const update_exprt &expr)
   PRECONDITION(expr.operands().size() == 3);
 
   SMT2_TODO("smt2_convt::convert_update to be implemented");
+}
+
+void smt2_convt::convert_update_bits(const update_bits_exprt &expr)
+{
+  return convert_expr(expr.lower());
 }
 
 void smt2_convt::convert_index(const index_exprt &expr)

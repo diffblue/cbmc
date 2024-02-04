@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class union_typet;
+class update_bits_exprt;
 
 class smt2_convt : public stack_decision_proceduret
 {
@@ -149,6 +150,7 @@ protected:
 
   void convert_with(const with_exprt &expr);
   void convert_update(const update_exprt &);
+  void convert_update_bits(const update_bits_exprt &);
 
   void convert_expr(const exprt &);
   void convert_type(const typet &);
