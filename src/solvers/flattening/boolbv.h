@@ -198,34 +198,34 @@ protected:
 
   void convert_with(
     const typet &type,
-    const exprt &op1,
-    const exprt &op2,
+    const exprt &where,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
   void convert_with_bv(
-    const exprt &op1,
-    const exprt &op2,
+    const exprt &index,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
   void convert_with_array(
     const array_typet &type,
-    const exprt &op1,
-    const exprt &op2,
+    const exprt &index,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
   void convert_with_union(
     const union_typet &type,
-    const exprt &op2,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
   void convert_with_struct(
     const struct_typet &type,
-    const exprt &op1,
-    const exprt &op2,
+    const exprt &where,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
