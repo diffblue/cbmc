@@ -6,18 +6,30 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
+#include "boolbv.h"
+
 bvt boolbvt::convert_with(const with_exprt &expr)
 {
+  auto &type = expr.type();
+
+  if(
+    type.id() == ID_bv || type.id() == ID_unsignedbv ||
+    type.id() == ID_signedbv)
+  {
+    PRECONDITION(expr.operands().size() == 3);
+    return convert_bv(
+      update_bits_exprt(expr.old(), expr.where(), expr.new_value()));
+  }
+
   bvt bv = convert_bv(expr.old());
 
-  std::size_t width=boolbv_width(expr.type());
+  std::size_t width = boolbv_width(type);
 
   if(width==0)
   {
@@ -62,7 +74,10 @@ void boolbvt::convert_with(
   else if(type.id()==ID_bv ||
           type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv)
-    return convert_with_bv(where, new_value, prev_bv, next_bv);
+  {
+    // already done
+    PRECONDITION(false);
+  }
   else if(type.id()==ID_struct)
     return convert_with_struct(
       to_struct_type(type), where, new_value, prev_bv, next_bv);
@@ -148,36 +163,6 @@ void boolbvt::convert_with_array(
     for(std::size_t j = 0; j < new_value_bv.size(); j++)
       next_bv[offset + j] =
         prop.lselect(eq_lit, new_value_bv[j], prev_bv[offset + j]);
-  }
-}
-
-void boolbvt::convert_with_bv(
-  const exprt &index,
-  const exprt &new_value,
-  const bvt &prev_bv,
-  bvt &next_bv)
-{
-  literalt l = convert(new_value);
-
-  if(const auto index_value_opt = numeric_cast<mp_integer>(index))
-  {
-    next_bv=prev_bv;
-
-    if(*index_value_opt >= 0 && *index_value_opt < next_bv.size())
-      next_bv[numeric_cast_v<std::size_t>(*index_value_opt)] = l;
-
-    return;
-  }
-
-  typet counter_type = index.type();
-
-  for(std::size_t i=0; i<prev_bv.size(); i++)
-  {
-    exprt counter=from_integer(i, counter_type);
-
-    literalt eq_lit = convert(equal_exprt(index, counter));
-
-    next_bv[i]=prop.lselect(eq_lit, l, prev_bv[i]);
   }
 }
 
