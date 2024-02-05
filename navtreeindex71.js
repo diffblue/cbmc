@@ -1,5 +1,6 @@
 var NAVTREEINDEX71 =
 {
+"classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48eac823cf4bec47f72dff19f5a0e029e2fa":[8,0,1359,1,2],
 "classwrite__stackt.html#a1ad1b670168ea98c8c60ee0092686573":[8,0,1359,9],
 "classwrite__stackt.html#a29d6b18206d65ad4c1614910590a6768":[8,0,1359,6],
 "classwrite__stackt.html#a38beb265d17690f5fb58e9f7882f41d6":[8,0,1359,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX71 =
 "contracts-decreases.html#autotoc_md74":[1,0,6,1],
 "contracts-decreases.html#autotoc_md75":[1,0,6,2],
 "contracts-dev-arch.html":[1,1,1],
-"contracts-dev-arch.html#autotoc_md29":[1,1,1,0],
-"contracts-dev-spec-codegen.html":[1,1,0,2]
+"contracts-dev-arch.html#autotoc_md29":[1,1,1,0]
 };

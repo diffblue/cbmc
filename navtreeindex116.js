@@ -1,5 +1,6 @@
 var NAVTREEINDEX116 =
 {
+"optional__utils_8h_source.html":[9,0,2,30,144],
 "options_8cpp.html":[9,0,2,30,145],
 "options_8cpp_source.html":[9,0,2,30,145],
 "options_8h.html":[9,0,2,30,146],
@@ -248,6 +249,5 @@ var NAVTREEINDEX116 =
 "pointer__offset__size_8cpp.html#acbc36bf5285e1134ef2675e42df8b5dd":[9,0,2,30,155,1],
 "pointer__offset__size_8cpp.html#acf57ee9d1ec8c2bacfdb4c8aeb35deca":[9,0,2,30,155,5],
 "pointer__offset__size_8cpp.html#ad97077eb0d7cce8a0b2eef8710fac220":[9,0,2,30,155,8],
-"pointer__offset__size_8cpp_source.html":[9,0,2,30,155],
-"pointer__offset__size_8h.html":[9,0,2,30,156]
+"pointer__offset__size_8cpp_source.html":[9,0,2,30,155]
 };
