@@ -21,6 +21,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
 
+#ifndef l_False
+#  define l_False Minisat::l_False
+#  define l_True Minisat::l_True
+#endif
+
 #ifndef HAVE_MINISAT2
 #error "Expected HAVE_MINISAT2"
 #endif
