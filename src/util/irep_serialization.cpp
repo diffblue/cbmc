@@ -212,11 +212,7 @@ void irep_serializationt::write_string_ref(
   std::ostream &out,
   const irep_idt &s)
 {
-#ifdef USE_DSTRING
   size_t id = s.get_no();
-#else
-  size_t id = get_string_container()[s];
-#endif
   if(id>=ireps_container.string_map.size())
     ireps_container.string_map.resize(id+1, false);
 

@@ -33,24 +33,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #endif
 
-#ifdef USE_DSTRING
 typedef dstringt irep_idt;
 // NOLINTNEXTLINE(readability/identifiers)
 typedef dstring_hash irep_id_hash;
-#else
-#include "string_hash.h"
-typedef std::string irep_idt;
-// NOLINTNEXTLINE(readability/identifiers)
-typedef string_hash irep_id_hash;
-#endif
 
 inline const std::string &id2string(const irep_idt &d)
 {
-  #ifdef USE_DSTRING
   return as_string(d);
-  #else
-  return d;
-  #endif
 }
 
 #ifdef IREP_DEBUG
@@ -76,9 +65,8 @@ struct ref_count_ift<true>
 
 /// A node with data in a tree, it contains:
 ///
-/// * \ref irept::dt::data : A string (Unless `USE_STD_STRING` is set, this is
-///   actually a \ref dstringt and thus an integer which is a reference into a
-///   string table.)
+/// * \ref irept::dt::data : A \ref dstringt and thus an integer which is a
+///   reference into a string table.)
 ///
 /// * \ref irept::dt::named_sub : A map from `irep_idt` (a string) to \ref
 ///   irept. This is used for named children, i.e.  subexpressions, parameters,

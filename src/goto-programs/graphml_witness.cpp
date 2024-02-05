@@ -20,9 +20,6 @@ Author: Daniel Kroening
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
-#ifndef USE_DSTRING
-#  include <util/string_container.h>
-#endif
 #include <util/symbol.h>
 
 #include <ansi-c/expr2c.h>
@@ -78,12 +75,7 @@ std::string graphml_witnesst::convert_assign_rec(
   const irep_idt &identifier,
   const code_assignt &assign)
 {
-#ifdef USE_DSTRING
   const auto cit = cache.find({identifier.get_no(), &assign.read()});
-#else
-  const auto cit =
-    cache.find({get_string_container()[id2string(identifier)], &assign.read()});
-#endif
   if(cit != cache.end())
     return cit->second;
 
@@ -219,12 +211,7 @@ std::string graphml_witnesst::convert_assign_rec(
     result = lhs + " = " + expr_to_string(ns, identifier, clean_rhs) + ";";
   }
 
-#ifdef USE_DSTRING
   cache.insert({{identifier.get_no(), &assign.read()}, result});
-#else
-  cache.insert(
-    {{get_string_container()[id2string(identifier)], &assign.read()}, result});
-#endif
   return result;
 }
 

@@ -72,9 +72,9 @@ standard data structures as in irept.
 
 \subsection irep_idt_section Strings: dstringt, the string_container and the ID_*
 
-Within cbmc, strings are represented using \ref irep_idt. By default this is
-typedefed to \ref dstringt. For debugging purposes you can set `USE_STD_STRING`
-to change this typedef to `std::string`. You can also easily convert an
+Within cbmc, strings are represented using \ref irep_idt, which is
+typedefed to \ref dstringt.
+You can also easily convert an
 [irep_idt](\ref irep_idt) to a `std::string` using the
 [id2string](\ref id2string) function, or to a `char*` using the
 [c_str()](\ref dstringt::c_str) member function.

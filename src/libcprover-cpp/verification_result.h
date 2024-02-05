@@ -12,16 +12,8 @@
 #include <string>
 #include <vector>
 
-#ifndef USE_STD_STRING
-#  define USE_DSTRING
-#endif
-
-#ifdef USE_DSTRING
 class dstringt;
 typedef dstringt irep_idt;
-#else
-typedef std::string irep_idt;
-#endif
 
 struct property_infot;
 using propertiest = std::map<irep_idt, property_infot>;

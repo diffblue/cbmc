@@ -203,12 +203,7 @@ class shift_exprt;
 class rw_range_sett
 {
 public:
-  #ifdef USE_DSTRING
   typedef std::map<irep_idt, std::unique_ptr<range_domain_baset>> objectst;
-  #else
-  typedef std::unordered_map<
-    irep_idt, std::unique_ptr<range_domain_baset>, string_hash> objectst;
-  #endif
 
   virtual ~rw_range_sett();
 

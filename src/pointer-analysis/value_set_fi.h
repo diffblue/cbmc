@@ -191,19 +191,11 @@ public:
 
   typedef std::unordered_set<unsigned int> dynamic_object_id_sett;
 
-  #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
   typedef std::set<idt> flatten_seent;
   typedef std::unordered_set<idt> gvs_recursion_sett;
   typedef std::unordered_set<idt> recfind_recursion_sett;
   typedef std::unordered_set<idt> assign_recursion_sett;
-  #else
-  typedef std::unordered_map<idt, entryt, string_hash> valuest;
-  typedef std::unordered_set<idt, string_hash> flatten_seent;
-  typedef std::unordered_set<idt, string_hash> gvs_recursion_sett;
-  typedef std::unordered_set<idt, string_hash> recfind_recursion_sett;
-  typedef std::unordered_set<idt, string_hash> assign_recursion_sett;
-  #endif
 
   std::vector<exprt>
   get_value_set(const exprt &expr, const namespacet &ns) const;
