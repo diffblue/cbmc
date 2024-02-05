@@ -276,7 +276,7 @@ Additional Inherited Members</h2></td></tr>
 <p>Many of the key descendants of <a class="el" href="classexprt.html">exprt</a> are declared in <a class="el" href="std__expr_8h.html">std_expr.h</a>. All expressions have a named subexpression with ID "type", which gives the type of the expression (slightly simplified from C/C++ as <a class="el" href="classunsignedbv__typet.html">unsignedbv_typet</a>, <a class="el" href="classsignedbv__typet.html">signedbv_typet</a>, <a class="el" href="classfloatbv__typet.html">floatbv_typet</a>, etc.). All type conversions are explicit with a <a class="el" href="classtypecast__exprt.html">typecast_exprt</a>. One key descendant of <a class="el" href="classexprt.html">exprt</a> is <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> which creates <a class="el" href="classirept.html">irept</a> instances with ID “symbol”. These are used to represent variables; the name of which can be found using the <code>get_identifier</code> accessor function.</p>
 <p><a class="el" href="classcodet.html">codet</a> inherits from <a class="el" href="classexprt.html">exprt</a> and is defined in <code><a class="el" href="std__code_8h.html">std_code.h</a></code>. It represents executable code; statements in a C-like language rather than expressions. In the front-end there are versions of these that hold whole code blocks, but in goto-programs these have been flattened so that each <a class="el" href="classirept.html">irept</a> represents one sequence point (almost one line of code / one semi-colon). The most common descendant of <a class="el" href="classcodet.html">codet</a> is <a class="el" href="classcode__assignt.html">code_assignt</a> so a common pattern is to cast the <a class="el" href="classcodet.html">codet</a> to an assignment and then recurse on the expression on either side. </p>
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00359">359</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00347">347</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a3fb8176c81e826cddf8604017b6d625c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3fb8176c81e826cddf8604017b6d625c">&#9670;&nbsp;</a></span>baset</h2>
@@ -290,7 +290,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00374">374</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00362">362</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -319,7 +319,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00385">385</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00373">373</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -363,7 +363,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00389">389</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00377">377</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -409,7 +409,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00111">111</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00103">103</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -439,7 +439,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00117">117</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00109">109</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -467,7 +467,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00452">452</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00440">440</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -489,7 +489,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>defines ordering on the internal representation comments are ignored </p>
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00309">309</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00301">301</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +509,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00101">101</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00093">93</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -529,7 +529,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00200">200</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00192">192</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -548,7 +548,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00461">461</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00453">453</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -655,7 +655,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00458">458</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00446">446</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -682,7 +682,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00459">459</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00447">447</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -730,7 +730,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00409">409</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00397">397</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -757,7 +757,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00456">456</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00444">444</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -784,7 +784,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00457">457</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00445">445</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -803,7 +803,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00423">423</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00415">415</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -830,7 +830,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00396">396</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00384">384</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -858,7 +858,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00402">402</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00390">390</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -885,7 +885,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00399">399</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00387">387</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -913,7 +913,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00468">468</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00456">456</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -940,7 +940,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00376">376</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00364">364</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -967,7 +967,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00380">380</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00368">368</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -994,7 +994,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00454">454</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00442">442</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -1074,7 +1074,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>count the number of named_sub elements that are not comments </p>
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00412">412</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00404">404</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -1102,7 +1102,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00437">437</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00425">425</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -1124,7 +1124,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>defines ordering on the internal representation </p>
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00403">403</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00395">395</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -1144,7 +1144,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00141">141</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00133">133</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -1166,7 +1166,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>defines ordering on the internal representation </p>
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00240">240</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00232">232</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -1196,7 +1196,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00490">490</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00482">482</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -1216,7 +1216,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00095">95</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00087">87</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -1254,7 +1254,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00420">420</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00408">408</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -1322,7 +1322,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00424">424</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00412">412</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -1352,7 +1352,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00086">86</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8cpp_source.html#l00082">82</a> of file <a class="el" href="irep_8cpp_source.html">irep.cpp</a>.</p>
 
 </div>
 </div>
@@ -1380,7 +1380,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00442">442</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00430">430</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>

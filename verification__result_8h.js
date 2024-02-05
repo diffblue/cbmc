@@ -1,7 +1,6 @@
 var verification__result_8h =
 [
     [ "verification_resultt", "structverification__resultt.html", "structverification__resultt" ],
-    [ "USE_DSTRING", "verification__result_8h.html#a1118e74e831941c3f34213d262571e06", null ],
     [ "irep_idt", "verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c", null ],
     [ "propertiest", "verification__result_8h.html#abd2cd2c17d94e0ef7640da993da898e1", null ],
     [ "prop_statust", "verification__result_8h.html#aad5ef57ee262e5fca2f042a94bc3d7ae", [

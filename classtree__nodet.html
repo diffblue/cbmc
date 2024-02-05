@@ -162,14 +162,14 @@ class tree_nodet&lt; treet, named_subtreest, sharing &gt;</h3>
 
 <p>A node with data in a tree, it contains: </p>
 <ul>
-<li><a class="el" href="classtree__nodet.html#aa64b07dd4c50732f898f0907c3ec7195">irept::dt::data</a> : A string (Unless <code>USE_STD_STRING</code> is set, this is actually a <a class="el" href="classdstringt.html">dstringt</a> and thus an integer which is a reference into a string table.)</li>
+<li><a class="el" href="classtree__nodet.html#aa64b07dd4c50732f898f0907c3ec7195">irept::dt::data</a> : A <a class="el" href="classdstringt.html">dstringt</a> and thus an integer which is a reference into a string table.)</li>
 <li><a class="el" href="classtree__nodet.html#a29d3309a833548c958ebedc6f8d8159c">irept::dt::named_sub</a> : A map from <code>irep_idt</code> (a string) to <a class="el" href="classirept.html">irept</a>. This is used for named children, i.e. subexpressions, parameters, etc. Children whose name begins with '#' are ignored by the default <a class="el" href="unit_2testing-utils_2smt2irep_8h.html#a22d3270557f0fadfba35e5ca1eb8ce94">operator==</a>.</li>
 <li><a class="el" href="classtree__nodet.html#a8f759d22dcd47e91046bd35ad06adc1d">irept::dt::sub</a> : A vector of <a class="el" href="classirept.html">irept</a> which is used to store ordered but unnamed children.</li>
 <li><code>ref_count</code> : if sharing is activated, this is used to count the number of references to a node.</li>
 <li><code>hash_code</code> : if HASH_CODE is activated, this is used to cache the result of the hash function. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00097">97</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00085">85</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a2a5dfabe21290780458ffb8e438ded57"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2a5dfabe21290780458ffb8e438ded57">&#9670;&nbsp;</a></span>named_subt</h2>
@@ -185,7 +185,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00106">106</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00094">94</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -203,7 +203,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00101">101</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00089">89</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -261,7 +261,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00142">142</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00130">130</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -307,7 +307,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00146">146</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00134">134</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -338,7 +338,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00120">120</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00108">108</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -368,7 +368,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00130">130</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00118">118</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -389,7 +389,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
 
 <p>This irep_idt is the only place to store data in an tree node. </p>
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00111">111</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00099">99</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -415,7 +415,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00117">117</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00105">105</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -433,7 +433,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00113">113</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00101">101</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -451,7 +451,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00114">114</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00102">102</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
@@ -469,7 +469,7 @@ template&lt;typename treet , typename named_subtreest , bool sharing = true&gt; 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00108">108</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="irep_8h_source.html#l00096">96</a> of file <a class="el" href="irep_8h_source.html">irep.h</a>.</p>
 
 </div>
 </div>
