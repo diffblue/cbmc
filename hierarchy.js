@@ -1692,6 +1692,7 @@ var hierarchy =
               ] ],
               [ "union_exprt", "classunion__exprt.html", null ]
             ] ],
+            [ "update_bits_exprt", "classupdate__bits__exprt.html", null ],
             [ "with_exprt", "classwith__exprt.html", null ]
           ] ],
           [ "field_sensitive_ssa_exprt", "classfield__sensitive__ssa__exprt.html", null ],

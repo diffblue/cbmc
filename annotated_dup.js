@@ -1330,6 +1330,7 @@ var annotated_dup =
     [ "unsupported_java_class_signature_exceptiont", "classunsupported__java__class__signature__exceptiont.html", "classunsupported__java__class__signature__exceptiont" ],
     [ "unsupported_operation_exceptiont", "classunsupported__operation__exceptiont.html", "classunsupported__operation__exceptiont" ],
     [ "unwindsett", "classunwindsett.html", "classunwindsett" ],
+    [ "update_bits_exprt", "classupdate__bits__exprt.html", "classupdate__bits__exprt" ],
     [ "update_exprt", "classupdate__exprt.html", "classupdate__exprt" ],
     [ "update_state_exprt", "classupdate__state__exprt.html", "classupdate__state__exprt" ],
     [ "user_input_error_exceptiont", "classuser__input__error__exceptiont.html", "classuser__input__error__exceptiont" ],

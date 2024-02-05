@@ -61,6 +61,7 @@ var dir_95992f7eabcbd576bf4841b6d0d09aae =
     [ "boolbv_unary_minus.cpp", "boolbv__unary__minus_8cpp.html", null ],
     [ "boolbv_union.cpp", "boolbv__union_8cpp.html", null ],
     [ "boolbv_update.cpp", "boolbv__update_8cpp.html", null ],
+    [ "boolbv_update_bits.cpp", "boolbv__update__bits_8cpp.html", null ],
     [ "boolbv_width.cpp", "boolbv__width_8cpp.html", null ],
     [ "boolbv_width.h", "boolbv__width_8h.html", [
       [ "boolbv_widtht", "classboolbv__widtht.html", "classboolbv__widtht" ],

@@ -1,5 +1,13 @@
 var NAVTREEINDEX64 =
 {
+"classstring__builtin__functiont.html#a95b7ed614059ec9dbfefb12b926fc105":[8,0,1187,11],
+"classstring__builtin__functiont.html#a9b9edca23571d13af07d88fa3bbc2ad0":[8,0,1187,7],
+"classstring__builtin__functiont.html#aaad510986ddf8173e25631cf47abf6e4":[8,0,1187,2],
+"classstring__builtin__functiont.html#aba539f24b082994d14fb207201ad1095":[8,0,1187,6],
+"classstring__builtin__functiont.html#aebe151eddcf376e42bd849dfea76c303":[8,0,1187,8],
+"classstring__builtin__functiont.html#aecba40aeb090fe8f506514c6a7513c1d":[8,0,1187,5],
+"classstring__concat__char__builtin__functiont.html":[8,0,1188],
+"classstring__concat__char__builtin__functiont.html#a11ebdd8a0dd938f21f3f2954800f99e2":[8,0,1188,0],
 "classstring__concat__char__builtin__functiont.html#a5c8d5e132db4860c3276727f60c916fd":[8,0,1188,5],
 "classstring__concat__char__builtin__functiont.html#a9dac887a3c0b98a77080b582affba6e4":[8,0,1188,2],
 "classstring__concat__char__builtin__functiont.html#adadec428c60374ce00550e4af6aea56e":[8,0,1188,4],
@@ -241,13 +249,5 @@ var NAVTREEINDEX64 =
 "classstring__refinementt.html#aab339349e5c6a8cb3c8f61010f04b5ca":[8,0,1206,9],
 "classstring__refinementt.html#aaf48a2003bc988341eea017fabde7ea9":[8,0,1206,14],
 "classstring__refinementt.html#aaf8c9d9cf504dbd8c993b6d89a9f548a":[8,0,1206,17],
-"classstring__refinementt.html#ab62c75d0bd760d85ec4cc163454f3c64":[8,0,1206,18],
-"classstring__refinementt.html#ac5296b634b2451a0a9859f62a2dddca6":[8,0,1206,8],
-"classstring__refinementt.html#adbcbc6bd9456a022cc47c360af88a5cc":[8,0,1206,10],
-"classstring__refinementt.html#ae869b4cfb8b365957ae07cd5a808df36":[8,0,1206,13],
-"classstring__refinementt.html#af301515460e1aad79df7279760115443":[8,0,1206,5],
-"classstring__set__char__builtin__functiont.html":[8,0,1207],
-"classstring__set__char__builtin__functiont.html#a1a1657addf1a3b77573d8d064b7382da":[8,0,1207,3],
-"classstring__set__char__builtin__functiont.html#a6ad89d464092c99e5d4d73df21adde90":[8,0,1207,6],
-"classstring__set__char__builtin__functiont.html#a6ff84c1f42b3eb65e8fb2c51529426b1":[8,0,1207,4]
+"classstring__refinementt.html#ab62c75d0bd760d85ec4cc163454f3c64":[8,0,1206,18]
 };
