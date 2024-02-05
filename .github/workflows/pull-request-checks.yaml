@@ -688,7 +688,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v2
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
@@ -744,7 +744,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v2
       - name: Fetch dependencies
         run: |
           choco install -y winflexbison3 strawberryperl wget
@@ -813,7 +813,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v2
       - name: Fetch dependencies
         run: |
           choco install winflexbison3
