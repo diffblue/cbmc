@@ -531,6 +531,92 @@ inline extractbits_exprt &to_extractbits_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Replaces a sub-range of a bit-vector operand
+class update_bits_exprt : public expr_protectedt
+{
+public:
+  /// Replace the bits [\p _index .. \p _index + size] from \p _src
+  /// where size is the width of \p _new_value to produce a result of
+  /// the same type as \p _src. The index counts from the
+  /// least-significant bit.
+  update_bits_exprt(exprt _src, exprt _index, exprt _new_value)
+    : expr_protectedt(
+        ID_update_bits,
+        _src.type(),
+        {_src, std::move(_index), std::move(_new_value)})
+  {
+  }
+
+  update_bits_exprt(exprt _src, const std::size_t _index, exprt _new_value);
+
+  exprt &src()
+  {
+    return op0();
+  }
+
+  exprt &index()
+  {
+    return op1();
+  }
+
+  exprt &new_value()
+  {
+    return op2();
+  }
+
+  const exprt &src() const
+  {
+    return op0();
+  }
+
+  const exprt &index() const
+  {
+    return op1();
+  }
+
+  const exprt &new_value() const
+  {
+    return op2();
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    validate_operands(expr, 3, "update_bits must have three operands");
+  }
+
+  /// A lowering to masking, shifting, or.
+  exprt lower() const;
+};
+
+template <>
+inline bool can_cast_expr<update_bits_exprt>(const exprt &base)
+{
+  return base.id() == ID_update_bits;
+}
+
+/// \brief Cast an exprt to an \ref update_bits_exprt
+///
+/// \a expr must be known to be \ref update_bits_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref update_bits_exprt
+inline const update_bits_exprt &to_update_bits_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_update_bits);
+  update_bits_exprt::check(expr);
+  return static_cast<const update_bits_exprt &>(expr);
+}
+
+/// \copydoc to_update_bits_expr(const exprt &)
+inline update_bits_exprt &to_update_bits_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_update_bits);
+  update_bits_exprt::check(expr);
+  return static_cast<update_bits_exprt &>(expr);
+}
+
 /// \brief Bit-vector replication
 class replication_exprt : public binary_exprt
 {

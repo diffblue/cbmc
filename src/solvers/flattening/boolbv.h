@@ -39,6 +39,7 @@ class overflow_result_exprt;
 class replication_exprt;
 class unary_overflow_exprt;
 class union_typet;
+class update_bits_exprt;
 
 class boolbvt:public arrayst
 {
@@ -176,6 +177,7 @@ protected:
   virtual bvt convert_member(const member_exprt &expr);
   virtual bvt convert_with(const with_exprt &expr);
   virtual bvt convert_update(const update_exprt &);
+  virtual bvt convert_update_bits(const update_bits_exprt &);
   virtual bvt convert_case(const exprt &expr);
   virtual bvt convert_cond(const cond_exprt &);
   virtual bvt convert_shift(const binary_exprt &expr);
@@ -196,36 +198,38 @@ protected:
   virtual bvt convert_saturating_add_sub(const binary_exprt &expr);
   virtual bvt convert_overflow_result(const overflow_result_exprt &expr);
 
+  bvt convert_update_bits(bvt src, const exprt &index, const bvt &new_value);
+
   void convert_with(
     const typet &type,
-    const exprt &op1,
-    const exprt &op2,
+    const exprt &where,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
   void convert_with_bv(
-    const exprt &op1,
-    const exprt &op2,
+    const exprt &index,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
   void convert_with_array(
     const array_typet &type,
-    const exprt &op1,
-    const exprt &op2,
+    const exprt &index,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
   void convert_with_union(
     const union_typet &type,
-    const exprt &op2,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 
   void convert_with_struct(
     const struct_typet &type,
-    const exprt &op1,
-    const exprt &op2,
+    const exprt &where,
+    const exprt &new_value,
     const bvt &prev_bv,
     bvt &next_bv);
 

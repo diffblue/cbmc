@@ -128,6 +128,7 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/boolbv_unary_minus.cpp \
       flattening/boolbv_union.cpp \
       flattening/boolbv_update.cpp \
+      flattening/boolbv_update_bits.cpp \
       flattening/boolbv_width.cpp \
       flattening/boolbv_with.cpp \
       flattening/bv_dimacs.cpp \
