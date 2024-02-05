@@ -1816,9 +1816,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       // the arguments of the shift need to have the same width
       out << "(bvlshr ";
       flatten2bv(extractbit_expr.src());
+      out << ' ';
       typecast_exprt tmp(extractbit_expr.index(), extractbit_expr.src().type());
       convert_expr(tmp);
-      out << ")) bin1)"; // bvlshr, extract, =
+      out << ")) #b1)"; // bvlshr, extract, =
     }
   }
   else if(expr.id()==ID_extractbits)
