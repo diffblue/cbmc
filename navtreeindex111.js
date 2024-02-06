@@ -1,5 +1,6 @@
 var NAVTREEINDEX111 =
 {
+"magic_8h.html#a7c14d03c74038c683de9c9b8fdc82770":[9,0,2,30,121,2],
 "magic_8h.html#aa34328d28009ef0d60eb12c611da6306":[9,0,2,30,121,3],
 "magic_8h.html#aa6b888da87e5caa4eaffb33e75a63744":[9,0,2,30,121,1],
 "magic_8h.html#ac67d81d8a573298a492e195959194502":[9,0,2,30,121,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX111 =
 "memory-bounds-checking.html":[0,4,5],
 "memory__analyzer__main_8cpp.html":[9,0,2,25,4],
 "memory__analyzer__main_8cpp.html#a217dbf8b442f20279ea00b898af96f52":[9,0,2,25,4,0],
-"memory__analyzer__main_8cpp_source.html":[9,0,2,25,4],
-"memory__analyzer__parse__options_8cpp.html":[9,0,2,25,5]
+"memory__analyzer__main_8cpp_source.html":[9,0,2,25,4]
 };

@@ -1,5 +1,6 @@
 var NAVTREEINDEX78 =
 {
+"endianness__map__wide_8cpp.html":[9,0,2,6,13],
 "endianness__map__wide_8cpp_source.html":[9,0,2,6,13],
 "endianness__map__wide_8h.html":[9,0,2,6,14],
 "endianness__map__wide_8h_source.html":[9,0,2,6,14],
@@ -248,6 +249,5 @@ var NAVTREEINDEX78 =
 "expr__util_8h.html#af4c4f4155fe7b0abb9827738a868b32b":[9,0,2,30,50,6],
 "expr__util_8h.html#afa6f127382aa2dcdc1e1bf553ce0e41d":[9,0,2,30,50,5],
 "expr__util_8h_source.html":[9,0,2,30,50],
-"external__sat_8cpp.html":[9,0,2,27,7,6],
-"external__sat_8cpp_source.html":[9,0,2,27,7,6]
+"external__sat_8cpp.html":[9,0,2,27,7,6]
 };

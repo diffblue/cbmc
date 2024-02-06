@@ -1,5 +1,6 @@
 var NAVTREEINDEX80 =
 {
+"free__symbols_8h_source.html":[9,0,2,6,24],
 "freer_8h.html":[9,0,2,30,71],
 "freer_8h_source.html":[9,0,2,30,71],
 "fresh__symbol_8cpp.html":[9,0,2,30,72],
@@ -248,6 +249,5 @@ var NAVTREEINDEX80 =
 "gcc__builtin__headers__alpha_8h.html#aaf3fc3492110de54edc6808ddf3ee0f7":[9,0,2,1,0,3,26],
 "gcc__builtin__headers__alpha_8h.html#ab2e03d0c5ae259af5fb9dd1cc0209cf1":[9,0,2,1,0,3,40],
 "gcc__builtin__headers__alpha_8h.html#ab4007ded2f32d79cd1f6dae0aaa3554c":[9,0,2,1,0,3,44],
-"gcc__builtin__headers__alpha_8h.html#ab4cae90d35d01a743cd57609b444ebd4":[9,0,2,1,0,3,36],
-"gcc__builtin__headers__alpha_8h.html#abea8e00498df057ab7d6b345bc46d311":[9,0,2,1,0,3,0]
+"gcc__builtin__headers__alpha_8h.html#ab4cae90d35d01a743cd57609b444ebd4":[9,0,2,1,0,3,36]
 };

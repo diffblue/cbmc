@@ -1,5 +1,6 @@
 var NAVTREEINDEX135 =
 {
+"structrecursive__initialization__configt.html#ad4477ff8a6fedc2d795b75f3eed82ebf":[8,0,969,12],
 "structrecursive__initialization__configt.html#afb9a79c0fba16c29507b60845f0544b6":[8,0,969,8],
 "structrecursive__initializationt_1_1constructor__keyt.html":[8,0,970,0],
 "structrecursive__initializationt_1_1constructor__keyt.html#a22732422a454f58610b4597c9fa45bf8":[8,0,970,0,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX135 =
 "structsmt__bit__vector__theoryt_1_1xnort.html#a56acd29fb3c4b2d8e6c3b3f5f7c995c4":[8,0,1094,31,2],
 "structsmt__bit__vector__theoryt_1_1xnort.html#a99b3e800c6503bc6ba751daca7339fdf":[8,0,1094,31,1],
 "structsmt__bit__vector__theoryt_1_1xnort.html#aae3f89dee78093dbaddded21e84ad3b9":[8,0,1094,31,0],
-"structsmt__bit__vector__theoryt_1_1xort.html":[8,0,1094,32],
-"structsmt__bit__vector__theoryt_1_1xort.html#a0a66aff3044f7b3bddeb1ae5c06a888d":[8,0,1094,32,0]
+"structsmt__bit__vector__theoryt_1_1xort.html":[8,0,1094,32]
 };
