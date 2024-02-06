@@ -1,5 +1,8 @@
 var NAVTREEINDEX71 =
 {
+"classwrite__stackt.html#a13df98fa03b2e27e3d21527859cb406b":[8,0,1359,12],
+"classwrite__stackt.html#a149f0ef591582273ba4d18d00f512127":[8,0,1359,11],
+"classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48e":[8,0,1359,1],
 "classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea031825cf2288aaec6d7569d61a744c75":[8,0,1359,1,0],
 "classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48ea336b77c59a41b84e0de049c773402fee":[8,0,1359,1,1],
 "classwrite__stackt.html#a15735f8514fa6c4b5859200e7336b48eac823cf4bec47f72dff19f5a0e029e2fa":[8,0,1359,1,2],
@@ -246,8 +249,5 @@ var NAVTREEINDEX71 =
 "contracts-assigns.html#autotoc_md68":[1,0,3,1,0],
 "contracts-assigns.html#autotoc_md69":[1,0,3,1,1],
 "contracts-assigns.html#autotoc_md70":[1,0,3,2],
-"contracts-decreases.html":[1,0,6],
-"contracts-decreases.html#autotoc_md73":[1,0,6,0],
-"contracts-decreases.html#autotoc_md74":[1,0,6,1],
-"contracts-decreases.html#autotoc_md75":[1,0,6,2]
+"contracts-decreases.html":[1,0,6]
 };

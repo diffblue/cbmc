@@ -1,5 +1,8 @@
 var NAVTREEINDEX128 =
 {
+"string__refinement_8cpp.html#a991d4e4c1957ba0deac23a69c3530be4":[9,0,2,27,10,30,17],
+"string__refinement_8cpp.html#a9ff6a77fc6c4d576a11ca242f26b2811":[9,0,2,27,10,30,12],
+"string__refinement_8cpp.html#aad8e3229c296bfae89e6810d022c550b":[9,0,2,27,10,30,31],
 "string__refinement_8cpp.html#aae7cc64774c0f85bbc970c876407f594":[9,0,2,27,10,30,19],
 "string__refinement_8cpp.html#aaea4a14c3de95dcc0267c6e8ebc4b637":[9,0,2,27,10,30,26],
 "string__refinement_8cpp.html#ab21a130d97489a6b2752b728a2608de7":[9,0,2,27,10,30,6],
@@ -246,8 +249,5 @@ var NAVTREEINDEX128 =
 "structapi__sessiont.html#a703f70350e66e0be5597fa15852afe14":[8,0,79,5],
 "structapi__sessiont.html#a82e5c6217f2ee63844e12a5cc6130518":[8,0,79,12],
 "structapi__sessiont.html#a9f46c4d48b00c26c4e87555d76dd24ac":[8,0,79,10],
-"structapi__sessiont.html#aa858032a31cc493c67f82ec1cca9cb3e":[8,0,79,3],
-"structapi__sessiont.html#aa8a7742671eed31e88a14c44c0dfe8a5":[8,0,79,11],
-"structapi__sessiont.html#aaa3cafffc780ab20bd764e319871a4a3":[8,0,79,13],
-"structapi__sessiont.html#abd292e751c8cc99001ba4107745f6e96":[8,0,79,0]
+"structapi__sessiont.html#aa858032a31cc493c67f82ec1cca9cb3e":[8,0,79,3]
 };
