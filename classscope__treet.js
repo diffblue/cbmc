@@ -10,6 +10,7 @@ var classscope__treet =
     [ "get_destructor", "classscope__treet.html#a8747528f22cae237c8d6683f8bec106d", null ],
     [ "get_destructors", "classscope__treet.html#a582c47d33b34e233ede5cee22cfd425b", null ],
     [ "get_nearest_common_ancestor_info", "classscope__treet.html#aca5d23e4fcdb7dffec516a3968b94c5c", null ],
+    [ "output_dot", "classscope__treet.html#a4455d86f0834c82c442782ed21f9afbc", null ],
     [ "set_current_node", "classscope__treet.html#af812b2ad055e50fe32d0a12d2a9588c7", null ],
     [ "set_current_node", "classscope__treet.html#a5642716a3581e46dbfbb9869a64602e9", null ],
     [ "current_node", "classscope__treet.html#a03053231670df7df828740dd383610a3", null ],
