@@ -89,8 +89,7 @@ $(document).ready(function(){initNavTree('assembler__parser_8cpp.html',''); init
 
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">assembler_parser.cpp File Reference</div>  </div>
 </div><!--header-->
@@ -109,19 +108,20 @@ $(document).ready(function(){initNavTree('assembler__parser_8cpp.html',''); init
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a8c075bff2b919b27fc1fdbe8faf1f847"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8cpp.html#a8c075bff2b919b27fc1fdbe8faf1f847">yyassemblererror</a> (const std::string &amp;error)</td></tr>
-<tr class="separator:a8c075bff2b919b27fc1fdbe8faf1f847"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:ac83ace5f35e36ecf1b1b2ff17c030702"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classassembler__parsert.html">assembler_parsert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8cpp.html#ac83ace5f35e36ecf1b1b2ff17c030702">assembler_parser</a></td></tr>
-<tr class="separator:ac83ace5f35e36ecf1b1b2ff17c030702"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdfe814d46b707f70557307a6179475b"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8cpp.html#afdfe814d46b707f70557307a6179475b">yyassemblertext</a></td></tr>
-<tr class="separator:afdfe814d46b707f70557307a6179475b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4119a7c10d3d2ad0109af348277a0a6c"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8cpp.html#a4119a7c10d3d2ad0109af348277a0a6c">yyassemblerget_text</a> (void *)</td></tr>
+<tr class="separator:a4119a7c10d3d2ad0109af348277a0a6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a754cfa90cfeade0919c67875f66f9f02"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8cpp.html#a754cfa90cfeade0919c67875f66f9f02">yyassemblererror</a> (<a class="el" href="classassembler__parsert.html">assembler_parsert</a> &amp;assembler_parser, void *scanner, const std::string &amp;error)</td></tr>
+<tr class="separator:a754cfa90cfeade0919c67875f66f9f02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5131e89170b3dd67525c6e9094b9db24"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8cpp.html#a5131e89170b3dd67525c6e9094b9db24">yyassemblerlex_init_extra</a> (<a class="el" href="classassembler__parsert.html">assembler_parsert</a> *, void **)</td></tr>
+<tr class="separator:a5131e89170b3dd67525c6e9094b9db24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2dd1cb2c2cb0444547b2be6651ba678"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8cpp.html#aa2dd1cb2c2cb0444547b2be6651ba678">yyassemblerlex</a> (void *)</td></tr>
+<tr class="separator:aa2dd1cb2c2cb0444547b2be6651ba678"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef604b5e9e35e4f05fb7894e626ad0c7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8cpp.html#aef604b5e9e35e4f05fb7894e626ad0c7">yyassemblerlex_destroy</a> (void *)</td></tr>
+<tr class="separator:aef604b5e9e35e4f05fb7894e626ad0c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a8c075bff2b919b27fc1fdbe8faf1f847"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c075bff2b919b27fc1fdbe8faf1f847">&#9670;&nbsp;</a></span>yyassemblererror()</h2>
+<a id="a754cfa90cfeade0919c67875f66f9f02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a754cfa90cfeade0919c67875f66f9f02">&#9670;&nbsp;</a></span>yyassemblererror()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -129,52 +129,111 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">int yyassemblererror </td>
           <td>(</td>
+          <td class="paramtype"><a class="el" href="classassembler__parsert.html">assembler_parsert</a> &amp;&#160;</td>
+          <td class="paramname"><em>assembler_parser</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>scanner</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>error</em></td><td>)</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="assembler__parser_8cpp_source.html#l00013">13</a> of file <a class="el" href="assembler__parser_8cpp_source.html">assembler_parser.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a4119a7c10d3d2ad0109af348277a0a6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4119a7c10d3d2ad0109af348277a0a6c">&#9670;&nbsp;</a></span>yyassemblerget_text()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* yyassemblerget_text </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="assembler__parser_8cpp_source.html#l00015">15</a> of file <a class="el" href="assembler__parser_8cpp_source.html">assembler_parser.cpp</a>.</p>
-
 </div>
 </div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="ac83ace5f35e36ecf1b1b2ff17c030702"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac83ace5f35e36ecf1b1b2ff17c030702">&#9670;&nbsp;</a></span>assembler_parser</h2>
+<a id="aa2dd1cb2c2cb0444547b2be6651ba678"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2dd1cb2c2cb0444547b2be6651ba678">&#9670;&nbsp;</a></span>yyassemblerlex()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classassembler__parsert.html">assembler_parsert</a> assembler_parser</td>
+          <td class="memname">int yyassemblerlex </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="assembler__parser_8cpp_source.html#l00011">11</a> of file <a class="el" href="assembler__parser_8cpp_source.html">assembler_parser.cpp</a>.</p>
-
 </div>
 </div>
-<a id="afdfe814d46b707f70557307a6179475b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdfe814d46b707f70557307a6179475b">&#9670;&nbsp;</a></span>yyassemblertext</h2>
+<a id="aef604b5e9e35e4f05fb7894e626ad0c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef604b5e9e35e4f05fb7894e626ad0c7">&#9670;&nbsp;</a></span>yyassemblerlex_destroy()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">char* yyassemblertext</td>
+          <td class="memname">int yyassemblerlex_destroy </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5131e89170b3dd67525c6e9094b9db24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5131e89170b3dd67525c6e9094b9db24">&#9670;&nbsp;</a></span>yyassemblerlex_init_extra()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int yyassemblerlex_init_extra </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classassembler__parsert.html">assembler_parsert</a> *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void **&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
 </div><div class="memdoc">
 
 </div>

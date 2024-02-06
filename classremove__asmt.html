@@ -102,14 +102,14 @@ $(document).ready(function(){initNavTree('classremove__asmt.html',''); initResiz
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classremove__asmt__coll__graph.svg" width="2056" height="410"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classremove__asmt__coll__graph.svg" width="2174" height="442"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7fd3533dc1ed4d1fc6e8fc5274def203"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__asmt.html#a7fd3533dc1ed4d1fc6e8fc5274def203">remove_asmt</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;_symbol_table, <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;_goto_functions)</td></tr>
-<tr class="separator:a7fd3533dc1ed4d1fc6e8fc5274def203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e572739661cc2fc020743650d494055"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__asmt.html#a0e572739661cc2fc020743650d494055">remove_asmt</a> (<a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;_symbol_table, <a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;_goto_functions, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;<a class="el" href="classremove__asmt.html#aa68bd1f630179dcf4c4274380ad1a238">message_handler</a>)</td></tr>
+<tr class="separator:a0e572739661cc2fc020743650d494055"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a344f08dc28c044e4516ecaeb2f8b1e98"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__asmt.html#a344f08dc28c044e4516ecaeb2f8b1e98">operator()</a> ()</td></tr>
 <tr class="separator:a344f08dc28c044e4516ecaeb2f8b1e98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -140,13 +140,15 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a1c517eb5fe863ef6928e4cab4ef8f823"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19759d0dd696acdfe8deab76778d11e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__asmt.html#a19759d0dd696acdfe8deab76778d11e8">goto_functions</a></td></tr>
 <tr class="separator:a19759d0dd696acdfe8deab76778d11e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa68bd1f630179dcf4c4274380ad1a238"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classremove__asmt.html#aa68bd1f630179dcf4c4274380ad1a238">message_handler</a></td></tr>
+<tr class="separator:aa68bd1f630179dcf4c4274380ad1a238"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00030">30</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a7fd3533dc1ed4d1fc6e8fc5274def203"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7fd3533dc1ed4d1fc6e8fc5274def203">&#9670;&nbsp;</a></span>remove_asmt()</h2>
+<a id="a0e572739661cc2fc020743650d494055"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e572739661cc2fc020743650d494055">&#9670;&nbsp;</a></span>remove_asmt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -164,7 +166,13 @@ Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classgoto__functionst.html">goto_functionst</a> &amp;&#160;</td>
-          <td class="paramname"><em>_goto_functions</em>&#160;</td>
+          <td class="paramname"><em>_goto_functions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -234,7 +242,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00081">81</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00087">87</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>
@@ -295,7 +303,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00150">150</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00156">156</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>
@@ -323,7 +331,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00038">38</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00043">43</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>
@@ -370,7 +378,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00521">521</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00527">527</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>
@@ -424,7 +432,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00202">202</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00208">208</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>
@@ -471,7 +479,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00224">224</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00230">230</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>
@@ -525,7 +533,7 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00394">394</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00400">400</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>
@@ -550,7 +558,31 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00046">46</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00051">51</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa68bd1f630179dcf4c4274380ad1a238"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa68bd1f630179dcf4c4274380ad1a238">&#9670;&nbsp;</a></span>message_handler</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmessage__handlert.html">message_handlert</a>&amp; remove_asmt::message_handler</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00052">52</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>
@@ -574,7 +606,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00045">45</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__asm_8cpp_source.html#l00050">50</a> of file <a class="el" href="remove__asm_8cpp_source.html">remove_asm.cpp</a>.</p>
 
 </div>
 </div>

@@ -90,8 +90,7 @@ $(document).ready(function(){initNavTree('assembler__parser_8h.html',''); initRe
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">assembler_parser.h File Reference</div>  </div>
 </div><!--header-->
@@ -124,38 +123,12 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1e1b3db7412542337859f16c7e8f360f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8h.html#a1e1b3db7412542337859f16c7e8f360f">yyassemblerlex</a> ()</td></tr>
-<tr class="separator:a1e1b3db7412542337859f16c7e8f360f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c075bff2b919b27fc1fdbe8faf1f847"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8h.html#a8c075bff2b919b27fc1fdbe8faf1f847">yyassemblererror</a> (const std::string &amp;error)</td></tr>
-<tr class="separator:a8c075bff2b919b27fc1fdbe8faf1f847"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68a7adb761cc1b5e2b3c8e5345276b51"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8h.html#a68a7adb761cc1b5e2b3c8e5345276b51">assembler_scanner_init</a> ()</td></tr>
-<tr class="separator:a68a7adb761cc1b5e2b3c8e5345276b51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:ac83ace5f35e36ecf1b1b2ff17c030702"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classassembler__parsert.html">assembler_parsert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8h.html#ac83ace5f35e36ecf1b1b2ff17c030702">assembler_parser</a></td></tr>
-<tr class="separator:ac83ace5f35e36ecf1b1b2ff17c030702"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af48b2a23cd9e72e1b262a16ada4e54df"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="assembler__parser_8h.html#af48b2a23cd9e72e1b262a16ada4e54df">yyassemblererror</a> (<a class="el" href="classassembler__parsert.html">assembler_parsert</a> &amp;, void *, const std::string &amp;error)</td></tr>
+<tr class="separator:af48b2a23cd9e72e1b262a16ada4e54df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a68a7adb761cc1b5e2b3c8e5345276b51"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a68a7adb761cc1b5e2b3c8e5345276b51">&#9670;&nbsp;</a></span>assembler_scanner_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void assembler_scanner_init </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8c075bff2b919b27fc1fdbe8faf1f847"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c075bff2b919b27fc1fdbe8faf1f847">&#9670;&nbsp;</a></span>yyassemblererror()</h2>
+<a id="af48b2a23cd9e72e1b262a16ada4e54df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af48b2a23cd9e72e1b262a16ada4e54df">&#9670;&nbsp;</a></span>yyassemblererror()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -163,56 +136,30 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">int yyassemblererror </td>
           <td>(</td>
+          <td class="paramtype"><a class="el" href="classassembler__parsert.html">assembler_parsert</a> &amp;&#160;</td>
+          <td class="paramname"><em>assembler_parser</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>scanner</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>error</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"><em>error</em>&#160;</td>
         </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="assembler__parser_8cpp_source.html#l00015">15</a> of file <a class="el" href="assembler__parser_8cpp_source.html">assembler_parser.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a1e1b3db7412542337859f16c7e8f360f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e1b3db7412542337859f16c7e8f360f">&#9670;&nbsp;</a></span>yyassemblerlex()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
         <tr>
-          <td class="memname">int yyassemblerlex </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
           <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="ac83ace5f35e36ecf1b1b2ff17c030702"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac83ace5f35e36ecf1b1b2ff17c030702">&#9670;&nbsp;</a></span>assembler_parser</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classassembler__parsert.html">assembler_parsert</a> assembler_parser</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="assembler__parser_8cpp_source.html#l00011">11</a> of file <a class="el" href="assembler__parser_8cpp_source.html">assembler_parser.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembler__parser_8cpp_source.html#l00013">13</a> of file <a class="el" href="assembler__parser_8cpp_source.html">assembler_parser.cpp</a>.</p>
 
 </div>
 </div>

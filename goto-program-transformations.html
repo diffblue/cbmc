@@ -99,7 +99,7 @@ Core Transformation Passes</h1>
 <h2><a class="anchor" id="assembly-transform"></a>
 Removal/Lowering of Assembly</h2>
 <p>This pass goes through the goto model and removes or lowers instances of assembly intructions. Assembly instructions are stored in instances of the <code>other</code> instruction.</p>
-<p>The implementation of this pass is called via the <a class="el" href="remove__asm_8h.html#a2b072c1e9ba650d417d6fa8eb28e381e">remove_asm(goto_modelt &amp;)</a> function. For full documentation of this pass see <a class="el" href="remove__asm_8h.html">remove_asm.h</a></p>
+<p>The implementation of this pass is called via the <a class="el" href="remove__asm_8h.html#a91a05c44e29f32fa11500ced8090a9e1">remove_asm(goto_modelt &amp;, message_handlert &amp;)</a> function. For full documentation of this pass see <a class="el" href="remove__asm_8h.html">remove_asm.h</a></p>
 <p><em>This pass has no predecessor.</em></p>
 <h2><a class="anchor" id="linking-transform"></a>
 Linking of Standard Libraries</h2>
@@ -214,7 +214,7 @@ Add Coverage Goals</h2>
 Slicing</h2>
 <p>This includes several slicing passes as specified by various slicing command line options. The reachability slicer is enabled by the <code>--reachability-slice</code> command line option. The implementation of this pass is called via the <a class="el" href="reachability__slicer_8h.html#a7b182970f6c9e43371c61dba5cbc54a8">reachability_slicer(goto_modelt &amp;, message_handlert &amp;)</a> function. The full slicer is enabled by the <code>--full-slice</code> command line option. The implementation of this pass is called via the <a class="el" href="full__slicer_8h.html#a11fed0fe823caef378b79bb1eece8506">full_slicer(goto_modelt &amp;, message_handlert &amp;)</a> function.</p>
 <p><em>Predecessor pass is <a class="el" href="goto-program-transformations.html#properties-transform">Label Properties</a> .</em></p>
-<p>Last modified: 2024-02-06 15:16:09 +0100 </p>
+<p>Last modified: 2024-02-06 15:16:28 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
