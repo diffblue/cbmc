@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_object_factory.cpp" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_object_factory.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1337,5,1556,61"/>
-<area shape="rect" id="node2" href="$java__object__factory_8h.html" title="This module is responsible for the synthesis of code (in the form of a sequence of codet statements) ..." alt="" coords="1852,117,2012,143"/>
-<area shape="rect" id="node17" href="$arith__tools_8h.html" title=" " alt="" coords="2760,295,2888,322"/>
-<area shape="rect" id="node21" href="$array__element__from__pointer_8h.html" title=" " alt="" coords="2329,109,2471,151"/>
-<area shape="rect" id="node23" href="$expr__initializer_8h.html" title="Expression Initialization." alt="" coords="563,117,717,143"/>
-<area shape="rect" id="node25" href="$fresh__symbol_8h.html" title="Fresh auxiliary symbol creation." alt="" coords="69,385,216,411"/>
-<area shape="rect" id="node26" href="$interval__constraint_8h.html" title=" " alt="" coords="809,117,991,143"/>
-<area shape="rect" id="node28" href="$src_2util_2message_8h.html" title=" " alt="" coords="243,295,362,322"/>
-<area shape="rect" id="node31" href="$nondet__bool_8h.html" title="Nondeterministic boolean helper." alt="" coords="1663,117,1801,143"/>
-<area shape="rect" id="node32" href="$prefix_8h.html" title=" " alt="" coords="5,541,101,568"/>
-<area shape="rect" id="node33" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="1413,295,1598,322"/>
-<area shape="rect" id="node37" href="$class__identifier_8h.html" title="Extract class identifier." alt="" coords="1484,109,1639,151"/>
-<area shape="rect" id="node38" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1238,288,1389,329"/>
-<area shape="rect" id="node41" href="$generic__parameter__specialization__map__keys_8h.html" title="Author: Diffblue Ltd." alt="" coords="2973,109,3216,151"/>
-<area shape="rect" id="node45" href="$java__object__factory__parameters_8h.html" title=" " alt="" coords="659,199,810,240"/>
-<area shape="rect" id="node48" href="$java__static__initializers_8h.html" title=" " alt="" coords="1006,206,1186,233"/>
-<area shape="rect" id="node51" href="$java__string__library__preprocess_8h.html" title="Produce code for simple implementation of String Java libraries." alt="" coords="2138,109,2281,151"/>
-<area shape="rect" id="node57" href="$java__string__literals_8h.html" title=" " alt="" coords="2569,117,2727,143"/>
-<area shape="rect" id="node58" href="$java__utils_8h.html" title=" " alt="" coords="1210,206,1307,233"/>
-<area shape="rect" id="node60" href="$select__pointer__type_8h.html" title="Handle selection of correct pointer type (for example changing abstract classes to concrete versions)..." alt="" coords="2839,206,3001,233"/>
-<area shape="rect" id="node3" href="$nondet_8h.html" title=" " alt="" coords="1918,206,1997,233"/>
-<area shape="rect" id="node4" href="$std__code_8h.html" title=" " alt="" coords="1965,295,2083,322"/>
-<area shape="rect" id="node14" href="$allocate__objects_8h.html" title=" " alt="" coords="1719,199,1894,240"/>
-<area shape="rect" id="node5" title=" " alt="" coords="1704,385,1747,411"/>
-<area shape="rect" id="node6" href="$std__code__base_8h.html" title=" " alt="" coords="2157,385,2288,411"/>
-<area shape="rect" id="node13" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="2425,385,2514,411"/>
-<area shape="rect" id="node7" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="2045,467,2142,493"/>
-<area shape="rect" id="node10" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1923,541,2015,568"/>
-<area shape="rect" id="node8" title=" " alt="" coords="1978,616,2070,643"/>
-<area shape="rect" id="node9" title=" " alt="" coords="1446,541,1533,568"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1195,616,1269,643"/>
-<area shape="rect" id="node12" title=" " alt="" coords="549,616,608,643"/>
-<area shape="rect" id="node15" href="$namespace_8h.html" title=" " alt="" coords="1771,385,1906,411"/>
-<area shape="rect" id="node16" href="$irep_8h.html" title=" " alt="" coords="784,467,843,493"/>
-<area shape="rect" id="node18" href="$mp__arith_8h.html" title=" " alt="" coords="1110,385,1202,411"/>
-<area shape="rect" id="node20" title=" " alt="" coords="2728,385,2787,411"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1124,467,1188,493"/>
-<area shape="rect" id="node22" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="2571,295,2685,322"/>
-<area shape="rect" id="node24" title=" " alt="" coords="655,467,729,493"/>
-<area shape="rect" id="node27" href="$integer__interval_8h.html" title=" " alt="" coords="467,206,605,233"/>
-<area shape="rect" id="node29" href="$deprecate_8h.html" title=" " alt="" coords="443,467,541,493"/>
-<area shape="rect" id="node30" href="$source__location_8h.html" title=" " alt="" coords="493,385,629,411"/>
-<area shape="rect" id="node34" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="1597,385,1680,411"/>
-<area shape="rect" id="node35" title=" " alt="" coords="1373,385,1424,411"/>
-<area shape="rect" id="node36" title=" " alt="" coords="1449,385,1573,411"/>
-<area shape="rect" id="node39" href="$goto__function_8h.html" title="Goto Function." alt="" coords="1227,385,1349,411"/>
-<area shape="rect" id="node40" href="$cprover__prefix_8h.html" title=" " alt="" coords="1931,385,2083,411"/>
-<area shape="rect" id="node42" href="$generic__parameter__specialization__map_8h.html" title=" " alt="" coords="3025,199,3268,240"/>
-<area shape="rect" id="node43" href="$java__types_8h.html" title=" " alt="" coords="2913,295,3018,322"/>
-<area shape="rect" id="node44" title=" " alt="" coords="2981,385,3024,411"/>
-<area shape="rect" id="node46" href="$interval__union_8h.html" title="Union of intervals." alt="" coords="488,295,640,322"/>
-<area shape="rect" id="node47" href="$object__factory__parameters_8h.html" title=" " alt="" coords="665,288,805,329"/>
-<area shape="rect" id="node49" href="$synthetic__methods__map_8h.html" title="Synthetic methods are particular methods internally generated by the Java frontend,..." alt="" coords="829,295,1024,322"/>
-<area shape="rect" id="node50" title=" " alt="" coords="1099,295,1213,322"/>
-<area shape="rect" id="node52" href="$refined__string__type_8h.html" title="Type for string expressions used by the string solver." alt="" coords="2157,288,2293,329"/>
-<area shape="rect" id="node53" href="$string__expr_8h.html" title="String expressions for the string solver." alt="" coords="2460,206,2591,233"/>
-<area shape="rect" id="node54" href="$goto__instruction__code_8h.html" title=" " alt="" coords="2318,295,2495,322"/>
-<area shape="rect" id="node55" href="$character__refine__preprocess_8h.html" title="Preprocess a goto&#45;programs so that calls to the java Character library are replaced by simple express..." alt="" coords="1622,295,1839,322"/>
-<area shape="rect" id="node56" title=" " alt="" coords="2275,206,2331,233"/>
-<area shape="rect" id="node59" href="$resolve__inherited__component_8h.html" title="Given a class and a component (either field or method), find the closest parent that defines that com..." alt="" coords="856,377,1035,419"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1506,5,1725,61"/>
+<area shape="rect" id="node2" href="$java__object__factory_8h.html" title="This module is responsible for the synthesis of code (in the form of a sequence of codet statements) ..." alt="" coords="2139,117,2299,143"/>
+<area shape="rect" id="node21" href="$arith__tools_8h.html" title=" " alt="" coords="2059,295,2187,322"/>
+<area shape="rect" id="node23" href="$array__element__from__pointer_8h.html" title=" " alt="" coords="2385,109,2528,151"/>
+<area shape="rect" id="node25" href="$expr__initializer_8h.html" title="Expression Initialization." alt="" coords="609,459,763,486"/>
+<area shape="rect" id="node27" href="$fresh__symbol_8h.html" title="Fresh auxiliary symbol creation." alt="" coords="25,459,171,486"/>
+<area shape="rect" id="node28" href="$interval__constraint_8h.html" title=" " alt="" coords="846,117,1027,143"/>
+<area shape="rect" id="node30" href="$src_2util_2message_8h.html" title=" " alt="" coords="301,377,420,404"/>
+<area shape="rect" id="node33" href="$nondet__bool_8h.html" title="Nondeterministic boolean helper." alt="" coords="2781,117,2919,143"/>
+<area shape="rect" id="node34" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="1273,295,1459,322"/>
+<area shape="rect" id="node37" href="$class__identifier_8h.html" title="Extract class identifier." alt="" coords="1595,109,1750,151"/>
+<area shape="rect" id="node38" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1483,288,1633,329"/>
+<area shape="rect" id="node41" href="$generic__parameter__specialization__map__keys_8h.html" title="Author: Diffblue Ltd." alt="" coords="3049,109,3291,151"/>
+<area shape="rect" id="node45" href="$java__object__factory__parameters_8h.html" title=" " alt="" coords="913,199,1064,240"/>
+<area shape="rect" id="node48" href="$java__static__initializers_8h.html" title=" " alt="" coords="1281,206,1461,233"/>
+<area shape="rect" id="node51" href="$java__string__library__preprocess_8h.html" title="Produce code for simple implementation of String Java libraries." alt="" coords="1792,109,1935,151"/>
+<area shape="rect" id="node57" href="$java__string__literals_8h.html" title=" " alt="" coords="2583,117,2741,143"/>
+<area shape="rect" id="node58" href="$java__utils_8h.html" title=" " alt="" coords="1093,206,1191,233"/>
+<area shape="rect" id="node60" href="$select__pointer__type_8h.html" title="Handle selection of correct pointer type (for example changing abstract classes to concrete versions)..." alt="" coords="2897,206,3059,233"/>
+<area shape="rect" id="node3" href="$nondet_8h.html" title=" " alt="" coords="2427,206,2505,233"/>
+<area shape="rect" id="node4" href="$std__code_8h.html" title=" " alt="" coords="2313,295,2430,322"/>
+<area shape="rect" id="node18" href="$allocate__objects_8h.html" title=" " alt="" coords="2125,199,2300,240"/>
+<area shape="rect" id="node5" title=" " alt="" coords="1633,377,1675,404"/>
+<area shape="rect" id="node6" href="$std__code__base_8h.html" title=" " alt="" coords="2262,377,2393,404"/>
+<area shape="rect" id="node17" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="2417,377,2507,404"/>
+<area shape="rect" id="node7" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="2289,541,2387,568"/>
+<area shape="rect" id="node10" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="2031,616,2123,643"/>
+<area shape="rect" id="node13" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1941,459,2039,486"/>
+<area shape="rect" id="node8" title=" " alt="" coords="2116,691,2208,717"/>
+<area shape="rect" id="node9" title=" " alt="" coords="660,616,747,643"/>
+<area shape="rect" id="node11" title=" " alt="" coords="1431,691,1506,717"/>
+<area shape="rect" id="node12" title=" " alt="" coords="674,691,733,717"/>
+<area shape="rect" id="node14" href="$mp__arith_8h.html" title=" " alt="" coords="1372,541,1464,568"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1765,541,1889,568"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1386,616,1450,643"/>
+<area shape="rect" id="node19" href="$namespace_8h.html" title=" " alt="" coords="2115,459,2249,486"/>
+<area shape="rect" id="node20" href="$irep_8h.html" title=" " alt="" coords="877,541,935,568"/>
+<area shape="rect" id="node22" title=" " alt="" coords="2078,377,2137,404"/>
+<area shape="rect" id="node24" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="2657,295,2771,322"/>
+<area shape="rect" id="node26" title=" " alt="" coords="661,541,735,568"/>
+<area shape="rect" id="node29" href="$integer__interval_8h.html" title=" " alt="" coords="1217,459,1355,486"/>
+<area shape="rect" id="node31" href="$deprecate_8h.html" title=" " alt="" coords="433,541,531,568"/>
+<area shape="rect" id="node32" href="$source__location_8h.html" title=" " alt="" coords="449,459,585,486"/>
+<area shape="rect" id="node35" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="1621,541,1703,568"/>
+<area shape="rect" id="node36" title=" " alt="" coords="1411,377,1462,404"/>
+<area shape="rect" id="node39" href="$goto__function_8h.html" title="Goto Function." alt="" coords="1486,377,1609,404"/>
+<area shape="rect" id="node40" href="$cprover__prefix_8h.html" title=" " alt="" coords="1801,377,1953,404"/>
+<area shape="rect" id="node42" href="$generic__parameter__specialization__map_8h.html" title=" " alt="" coords="3083,199,3326,240"/>
+<area shape="rect" id="node43" href="$java__types_8h.html" title=" " alt="" coords="2897,295,3003,322"/>
+<area shape="rect" id="node44" title=" " alt="" coords="2974,377,3017,404"/>
+<area shape="rect" id="node46" href="$interval__union_8h.html" title="Union of intervals." alt="" coords="1041,459,1193,486"/>
+<area shape="rect" id="node47" href="$object__factory__parameters_8h.html" title=" " alt="" coords="919,288,1059,329"/>
+<area shape="rect" id="node49" href="$synthetic__methods__map_8h.html" title="Synthetic methods are particular methods internally generated by the Java frontend,..." alt="" coords="1430,459,1625,486"/>
+<area shape="rect" id="node50" title=" " alt="" coords="1083,295,1198,322"/>
+<area shape="rect" id="node52" href="$refined__string__type_8h.html" title="Type for string expressions used by the string solver." alt="" coords="1899,288,2035,329"/>
+<area shape="rect" id="node53" href="$string__expr_8h.html" title="String expressions for the string solver." alt="" coords="1919,206,2050,233"/>
+<area shape="rect" id="node54" href="$goto__instruction__code_8h.html" title=" " alt="" coords="2455,295,2632,322"/>
+<area shape="rect" id="node55" href="$character__refine__preprocess_8h.html" title="Preprocess a goto&#45;programs so that calls to the java Character library are replaced by simple express..." alt="" coords="1657,295,1875,322"/>
+<area shape="rect" id="node56" title=" " alt="" coords="1738,206,1794,233"/>
+<area shape="rect" id="node59" href="$resolve__inherited__component_8h.html" title="Given a class and a component (either field or method), find the closest parent that defines that com..." alt="" coords="787,452,966,493"/>
 </map>

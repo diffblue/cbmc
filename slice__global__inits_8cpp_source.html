@@ -105,129 +105,127 @@ $(document).ready(function(){initNavTree('slice__global__inits_8cpp_source.html'
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="slice__global__inits_8h.html">slice_global_inits.h</a>&quot;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="call__graph_8h.html">analyses/call_graph.h</a>&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="find__symbols_8h.html">util/find_symbols.h</a>&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="std__expr_8h.html">util/std_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="cprover__prefix_8h.html">util/cprover_prefix.h</a>&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="prefix_8h.html">util/prefix.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="cprover__prefix_8h.html">util/cprover_prefix.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="find__symbols_8h.html">util/find_symbols.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="std__expr_8h.html">util/std_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="call__graph_8h.html">analyses/call_graph.h</a>&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="static__lifetime__init_8h.html">linking/static_lifetime_init.h</a>&gt;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="static__lifetime__init_8h.html">linking/static_lifetime_init.h</a>&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__functions_8h.html">goto_functions.h</a>&quot;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__model_8h.html">goto_model.h</a>&quot;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="slice__global__inits_8cpp.html#a0ca5308563109e2faa1d5bd90dd3fe66">   28</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="slice__global__inits_8cpp.html#a0ca5308563109e2faa1d5bd90dd3fe66">slice_global_inits</a>(</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;{</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// gather all functions reachable from the entry point</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> entry_point=<a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions=goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">if</span>(goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.count(entry_point) == 0)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classuser__input__error__exceptiont.html">user_input_error_exceptiont</a>(<span class="stringliteral">&quot;entry point not found&quot;</span>);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="comment">// Get the call graph restricted to functions reachable from</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="comment">// the entry point:</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="classcall__grapht.html">call_grapht</a> call_graph =</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="classcall__grapht.html#abeee6ed11bb1b4348159d4c63c408ea0">call_grapht::create_from_root_function</a>(goto_model, entry_point, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> directed_graph = call_graph.<a class="code" href="classcall__grapht.html#a9e78901d6460224a633d7329fb37a848">get_directed_graph</a>();</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    !directed_graph.empty(),</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="stringliteral">&quot;at least &quot;</span> + <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(entry_point) + <span class="stringliteral">&quot; should be reachable&quot;</span>);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__functions_8h.html">goto_functions.h</a>&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__model_8h.html">goto_model.h</a>&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="slice__global__inits_8cpp.html#a0ca5308563109e2faa1d5bd90dd3fe66">   26</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="slice__global__inits_8cpp.html#a0ca5308563109e2faa1d5bd90dd3fe66">slice_global_inits</a>(</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="comment">// gather all functions reachable from the entry point</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> entry_point=<a class="code" href="classgoto__functionst.html#aef874085aedd30a732016c058eb06491">goto_functionst::entry_point</a>();</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions=goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">if</span>(goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.count(entry_point) == 0)</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classuser__input__error__exceptiont.html">user_input_error_exceptiont</a>(<span class="stringliteral">&quot;entry point not found&quot;</span>);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="comment">// Get the call graph restricted to functions reachable from</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="comment">// the entry point:</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <a class="code" href="classcall__grapht.html">call_grapht</a> call_graph =</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classcall__grapht.html#abeee6ed11bb1b4348159d4c63c408ea0">call_grapht::create_from_root_function</a>(goto_model, entry_point, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> directed_graph = call_graph.<a class="code" href="classcall__grapht.html#a9e78901d6460224a633d7329fb37a848">get_directed_graph</a>();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    !directed_graph.empty(),</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="stringliteral">&quot;at least &quot;</span> + <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(entry_point) + <span class="stringliteral">&quot; should be reachable&quot;</span>);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="comment">// gather all symbols used by reachable functions</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="comment">// gather all symbols used by reachable functions</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> symbols_to_keep;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="find__symbols_8h.html#a5b290df97277e135e036f4126c0bd30c">find_symbols_sett</a> symbols_to_keep;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordflow">for</span>(std::size_t node_idx = 0; node_idx &lt; directed_graph.size(); ++node_idx)</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keywordtype">id</span> = directed_graph[node_idx].function;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">if</span>(<span class="keywordtype">id</span> == <a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>)</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">// assume function has no body if it is not in the function map</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;it = goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(<span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">if</span>(it == goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end())</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;i : it-&gt;second.body.instructions)</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      i.apply([&amp;symbols_to_keep](<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr) {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <a class="code" href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a>(expr, symbols_to_keep);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      });</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  }</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  goto_functionst::function_mapt::iterator f_it;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  f_it=goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(<a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keywordflow">if</span>(f_it == goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end())</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classincorrect__goto__program__exceptiont.html">incorrect_goto_program_exceptiont</a>(<span class="stringliteral">&quot;initialize function not found&quot;</span>);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">for</span>(std::size_t node_idx = 0; node_idx &lt; directed_graph.size(); ++node_idx)</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keywordtype">id</span> = directed_graph[node_idx].function;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span>(<span class="keywordtype">id</span> == <a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>)</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="comment">// assume function has no body if it is not in the function map</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;it = goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(<span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">if</span>(it == goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end())</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;i : it-&gt;second.body.instructions)</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      i.apply([&amp;symbols_to_keep](<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr) {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <a class="code" href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a>(expr, symbols_to_keep);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      });</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  }</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  goto_functionst::function_mapt::iterator f_it;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  f_it=goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.find(<a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keywordflow">if</span>(f_it == goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>.end())</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classincorrect__goto__program__exceptiont.html">incorrect_goto_program_exceptiont</a>(<span class="stringliteral">&quot;initialize function not found&quot;</span>);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program=f_it-&gt;second.body;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program=f_it-&gt;second.body;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <span class="comment">// add all symbols from right-hand sides of required symbols</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keywordtype">bool</span> fixed_point_reached = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="comment">// markers for each instruction to avoid repeatedly searching the same</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="comment">// instruction for new symbols; initialized to false, and set to true whenever</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="comment">// an instruction is determined to be irrelevant (not an assignment) or</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="comment">// symbols have been collected from it</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  std::vector&lt;bool&gt; seen(goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.size(), <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keywordflow">while</span>(!fixed_point_reached)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    fixed_point_reached = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    std::vector&lt;bool&gt;::iterator seen_it = seen.begin();</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    {</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="keywordflow">if</span>(!*seen_it &amp;&amp; instruction.is_assign())</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">id</span> =</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;          <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(instruction.assign_lhs()).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="comment">// if we are to keep the left-hand side, then we also need to keep all</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="comment">// symbols occurring in the right-hand side</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;          <a class="code" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(<span class="keywordtype">id</span>), <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a>) ||</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;          symbols_to_keep.find(<span class="keywordtype">id</span>) != symbols_to_keep.end())</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;          fixed_point_reached = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;          <a class="code" href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a>(instruction.assign_rhs(), symbols_to_keep);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;          *seen_it = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      }</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(!*seen_it)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        *seen_it = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      ++seen_it;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    }</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  }</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="comment">// now remove unnecessary initializations</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordtype">bool</span> changed = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code" href="classsymbol__tablet.html#a37f5fc099e1a366d89564aaa3b1f51a4">begin</a>();</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      it != goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code" href="classsymbol__tablet.html#ae1a1ccd9256b23858358c9c7d579756e">end</a>();</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      ++it)</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  {</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      it-&gt;second.is_static_lifetime &amp;&amp; !it-&gt;second.is_type &amp;&amp;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      !it-&gt;second.is_macro &amp;&amp; it-&gt;second.type.id() != ID_code &amp;&amp;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      !<a class="code" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(it-&gt;first), <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a>) &amp;&amp;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      symbols_to_keep.find(it-&gt;first) == symbols_to_keep.end())</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol = it.get_writeable_symbol();</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      symbol.<a class="code" href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">is_extern</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_C_no_nondet_initialization, 1);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      changed = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    }</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  }</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keywordflow">if</span>(changed &amp;&amp; goto_model.<a class="code" href="classgoto__modelt.html#a96412cc5efba5bcdb5e0780e3366a04a">can_produce_function</a>(<a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>))</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <a class="code" href="static__lifetime__init_8cpp.html#ae68969994397ecdaf13383f118cdc1b6">recreate_initialize_function</a>(goto_model, message_handler);</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;}</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="comment">// add all symbols from right-hand sides of required symbols</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keywordtype">bool</span> fixed_point_reached = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  <span class="comment">// markers for each instruction to avoid repeatedly searching the same</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="comment">// instruction for new symbols; initialized to false, and set to true whenever</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="comment">// an instruction is determined to be irrelevant (not an assignment) or</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="comment">// symbols have been collected from it</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  std::vector&lt;bool&gt; seen(goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.size(), <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keywordflow">while</span>(!fixed_point_reached)</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    fixed_point_reached = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    std::vector&lt;bool&gt;::iterator seen_it = seen.begin();</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : goto_program.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      <span class="keywordflow">if</span>(!*seen_it &amp;&amp; instruction.is_assign())</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> <span class="keywordtype">id</span> =</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;          <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(instruction.assign_lhs()).<a class="code" href="classsymbol__exprt.html#a8dc820d1f2bbd1c5d9144ad4849c2d4c">get_identifier</a>();</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="comment">// if we are to keep the left-hand side, then we also need to keep all</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="comment">// symbols occurring in the right-hand side</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;          <span class="keywordtype">id</span>.starts_with(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a>) ||</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;          symbols_to_keep.find(<span class="keywordtype">id</span>) != symbols_to_keep.end())</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;          fixed_point_reached = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;          <a class="code" href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a>(instruction.assign_rhs(), symbols_to_keep);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;          *seen_it = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        }</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(!*seen_it)</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        *seen_it = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      ++seen_it;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    }</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  }</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="comment">// now remove unnecessary initializations</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keywordtype">bool</span> changed = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code" href="classsymbol__tablet.html#a37f5fc099e1a366d89564aaa3b1f51a4">begin</a>();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      it != goto_model.<a class="code" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code" href="classsymbol__tablet.html#ae1a1ccd9256b23858358c9c7d579756e">end</a>();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      ++it)</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      it-&gt;second.is_static_lifetime &amp;&amp; !it-&gt;second.is_type &amp;&amp;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      !it-&gt;second.is_macro &amp;&amp; it-&gt;second.type.id() != ID_code &amp;&amp;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      !it-&gt;first.starts_with(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a>) &amp;&amp;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      symbols_to_keep.find(it-&gt;first) == symbols_to_keep.end())</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol = it.get_writeable_symbol();</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      symbol.<a class="code" href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">is_extern</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#aa8e14ca1bd9cdf71694f56172988e78a">make_nil</a>();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      symbol.<a class="code" href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">value</a>.<a class="code" href="classirept.html#a5bdc635315eaaa92f3a0560c91b0d53a">set</a>(ID_C_no_nondet_initialization, 1);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      changed = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    }</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  }</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="keywordflow">if</span>(changed &amp;&amp; goto_model.<a class="code" href="classgoto__modelt.html#a96412cc5efba5bcdb5e0780e3366a04a">can_produce_function</a>(<a class="code" href="static__lifetime__init_8h.html#a2f0ae8a1c812a7205d351da820888c98">INITIALIZE_FUNCTION</a>))</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <a class="code" href="static__lifetime__init_8cpp.html#ae68969994397ecdaf13383f118cdc1b6">recreate_initialize_function</a>(goto_model, message_handler);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;}</div>
 <div class="ttc" id="acall__graph_8h_html"><div class="ttname"><a href="call__graph_8h.html">call_graph.h</a></div><div class="ttdoc">Function Call Graphs.</div></div>
 <div class="ttc" id="aclasscall__grapht_html"><div class="ttname"><a href="classcall__grapht.html">call_grapht</a></div><div class="ttdoc">A call graph (https://en.wikipedia.org/wiki/Call_graph) for a GOTO model or GOTO functions collection...</div><div class="ttdef"><b>Definition:</b> <a href="call__graph_8h_source.html#l00043">call_graph.h:44</a></div></div>
 <div class="ttc" id="aclasscall__grapht_html_a9e78901d6460224a633d7329fb37a848"><div class="ttname"><a href="classcall__grapht.html#a9e78901d6460224a633d7329fb37a848">call_grapht::get_directed_graph</a></div><div class="ttdeci">directed_grapht get_directed_graph() const</div><div class="ttdoc">Returns a grapht representation of this call graph, suitable for use with generic grapht algorithms.</div><div class="ttdef"><b>Definition:</b> <a href="call__graph_8cpp_source.html#l00209">call_graph.cpp:209</a></div></div>
@@ -254,7 +252,6 @@ $(document).ready(function(){initNavTree('slice__global__inits_8cpp_source.html'
 <div class="ttc" id="aclasssymbolt_html_a3c53ea93abbeb54e57b1ba56bda908f6"><div class="ttname"><a href="classsymbolt.html#a3c53ea93abbeb54e57b1ba56bda908f6">symbolt::is_extern</a></div><div class="ttdeci">bool is_extern</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00074">symbol.h:74</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_ae9f24768cf9a0096bc3a9163a9662bdd"><div class="ttname"><a href="classsymbolt.html#ae9f24768cf9a0096bc3a9163a9662bdd">symbolt::value</a></div><div class="ttdeci">exprt value</div><div class="ttdoc">Initial value of symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00034">symbol.h:34</a></div></div>
 <div class="ttc" id="aclassuser__input__error__exceptiont_html"><div class="ttname"><a href="classuser__input__error__exceptiont.html">user_input_error_exceptiont</a></div><div class="ttdef"><b>Definition:</b> <a href="slice__global__inits_8h_source.html#l00022">slice_global_inits.h:23</a></div></div>
-<div class="ttc" id="aconverter_8cpp_html_ad8e2b943a39300fa9ca5cd4b40266848"><div class="ttname"><a href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a></div><div class="ttdeci">bool has_prefix(const std::string &amp;s, const std::string &amp;prefix)</div><div class="ttdef"><b>Definition:</b> <a href="converter_8cpp_source.html#l00013">converter.cpp:13</a></div></div>
 <div class="ttc" id="acprover__prefix_8h_html"><div class="ttname"><a href="cprover__prefix_8h.html">cprover_prefix.h</a></div></div>
 <div class="ttc" id="acprover__prefix_8h_html_a5f537726f4fcb4d977cbd151c99a39df"><div class="ttname"><a href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a></div><div class="ttdeci">#define CPROVER_PREFIX</div><div class="ttdef"><b>Definition:</b> <a href="cprover__prefix_8h_source.html#l00014">cprover_prefix.h:14</a></div></div>
 <div class="ttc" id="afind__symbols_8cpp_html_a09ec7a957b4d8e4e8e441aecd6acce2c"><div class="ttname"><a href="find__symbols_8cpp.html#a09ec7a957b4d8e4e8e441aecd6acce2c">find_symbols</a></div><div class="ttdeci">static bool find_symbols(symbol_kindt, const typet &amp;, std::function&lt; bool(const symbol_exprt &amp;)&gt;, std::unordered_set&lt; irep_idt &gt; &amp;bindings)</div><div class="ttdef"><b>Definition:</b> <a href="find__symbols_8cpp_source.html#l00120">find_symbols.cpp:120</a></div></div>
@@ -263,8 +260,7 @@ $(document).ready(function(){initNavTree('slice__global__inits_8cpp_source.html'
 <div class="ttc" id="agoto__functions_8h_html"><div class="ttname"><a href="goto__functions_8h.html">goto_functions.h</a></div><div class="ttdoc">Goto Programs with Functions.</div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div><div class="ttdoc">Symbol Table + CFG.</div></div>
 <div class="ttc" id="airep_8h_html_aec473a7cdee5da3223f587aa2c1c4132"><div class="ttname"><a href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00040">irep.h:40</a></div></div>
-<div class="ttc" id="aprefix_8h_html"><div class="ttname"><a href="prefix_8h.html">prefix.h</a></div></div>
-<div class="ttc" id="aslice__global__inits_8cpp_html_a0ca5308563109e2faa1d5bd90dd3fe66"><div class="ttname"><a href="slice__global__inits_8cpp.html#a0ca5308563109e2faa1d5bd90dd3fe66">slice_global_inits</a></div><div class="ttdeci">void slice_global_inits(goto_modelt &amp;goto_model, message_handlert &amp;message_handler)</div><div class="ttdoc">Remove initialization of global variables that are not used in any function reachable from the entry ...</div><div class="ttdef"><b>Definition:</b> <a href="slice__global__inits_8cpp_source.html#l00028">slice_global_inits.cpp:28</a></div></div>
+<div class="ttc" id="aslice__global__inits_8cpp_html_a0ca5308563109e2faa1d5bd90dd3fe66"><div class="ttname"><a href="slice__global__inits_8cpp.html#a0ca5308563109e2faa1d5bd90dd3fe66">slice_global_inits</a></div><div class="ttdeci">void slice_global_inits(goto_modelt &amp;goto_model, message_handlert &amp;message_handler)</div><div class="ttdoc">Remove initialization of global variables that are not used in any function reachable from the entry ...</div><div class="ttdef"><b>Definition:</b> <a href="slice__global__inits_8cpp_source.html#l00026">slice_global_inits.cpp:26</a></div></div>
 <div class="ttc" id="aslice__global__inits_8h_html"><div class="ttname"><a href="slice__global__inits_8h.html">slice_global_inits.h</a></div><div class="ttdoc">Remove initializations of unused global variables.</div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
 <div class="ttc" id="astatic__lifetime__init_8cpp_html_ae68969994397ecdaf13383f118cdc1b6"><div class="ttname"><a href="static__lifetime__init_8cpp.html#ae68969994397ecdaf13383f118cdc1b6">recreate_initialize_function</a></div><div class="ttdeci">void recreate_initialize_function(goto_modelt &amp;goto_model, message_handlert &amp;message_handler)</div><div class="ttdoc">Regenerates the CPROVER_INITIALIZE function, which initializes all non-function symbols of the goto m...</div><div class="ttdef"><b>Definition:</b> <a href="static__lifetime__init_8cpp_source.html#l00164">static_lifetime_init.cpp:164</a></div></div>

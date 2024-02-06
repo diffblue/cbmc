@@ -94,28 +94,26 @@ $(document).ready(function(){initNavTree('java__bytecode__language_8cpp.html',''
 <div class="title">java_bytecode_language.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>&quot;</code><br />
-<code>#include &lt;fstream&gt;</code><br />
-<code>#include &lt;string&gt;</code><br />
-<code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="java__bytecode__convert__class_8h_source.html">java_bytecode_convert_class.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="cmdline_8h_source.html">util/cmdline.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="config_8h_source.html">util/config.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="expr__iterator_8h_source.html">util/expr_iterator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2invariant_8h_source.html">util/invariant.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="journalling__symbol__table_8h_source.html">util/journalling_symbol_table.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="options_8h_source.html">util/options.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="suffix_8h_source.html">util/suffix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="symbol__table__builder_8h_source.html">util/symbol_table_builder.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="json__parser_8h_source.html">json/json_parser.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="class__hierarchy_8h_source.html">goto-programs/class_hierarchy.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="json__parser_8h_source.html">json/json_parser.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="ci__lazy__methods_8h_source.html">ci_lazy_methods.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="create__array__with__type__intrinsic_8h_source.html">create_array_with_type_intrinsic.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="expr2java_8h_source.html">expr2java.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__bytecode__concurrency__instrumentation_8h_source.html">java_bytecode_concurrency_instrumentation.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="java__bytecode__convert__class_8h_source.html">java_bytecode_convert_class.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__bytecode__convert__method_8h_source.html">java_bytecode_convert_method.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__bytecode__instrument_8h_source.html">java_bytecode_instrument.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__bytecode__internal__additions_8h_source.html">java_bytecode_internal_additions.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__bytecode__typecheck_8h_source.html">java_bytecode_typecheck.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__class__loader_8h_source.html">java_class_loader.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="java__class__loader__limit_8h_source.html">java_class_loader_limit.h</a>&quot;</code><br />
@@ -126,14 +124,15 @@ $(document).ready(function(){initNavTree('java__bytecode__language_8cpp.html',''
 <code>#include &quot;<a class="el" href="java__utils_8h_source.html">java_utils.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="lambda__synthesis_8h_source.html">lambda_synthesis.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="lift__clinit__calls_8h_source.html">lift_clinit_calls.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="expr2java_8h_source.html">expr2java.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="load__method__by__regex_8h_source.html">load_method_by_regex.h</a>&quot;</code><br />
+<code>#include &lt;fstream&gt;</code><br />
+<code>#include &lt;string&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for java_bytecode_language.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__language_8cpp__incl.svg" width="4715" height="559"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="java__bytecode__language_8cpp__incl.svg" width="4259" height="559"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -247,7 +246,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00649">649</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00646">646</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +307,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00732">732</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00729">729</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -362,7 +361,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00604">604</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00601">601</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +416,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>first incomplete ancestor encountered, including start_class_id itself. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00690">690</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00687">687</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -437,7 +436,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00115">115</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00112">112</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -492,7 +491,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>ldc result </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00567">567</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00564">564</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -540,7 +539,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>java.lang.Class typed symbol expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00526">526</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00523">523</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -587,7 +586,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00461">461</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00458">458</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -606,7 +605,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01545">1545</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01542">1542</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -653,7 +652,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01239">1239</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01236">1236</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -692,7 +691,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00054">54</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00051">51</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -720,7 +719,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00319">319</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00316">316</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
