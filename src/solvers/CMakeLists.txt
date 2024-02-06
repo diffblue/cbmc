@@ -167,6 +167,19 @@ foreach(SOLVER ${sat_impl})
             ${cadical_SOURCE_DIR}/src
         )
         target_link_libraries(solvers cadical_ipasir)
+    elseif("${SOLVER}" STREQUAL "system-cadical")
+        include(CheckIncludeFileCXX)
+        # if/when we move to CMake 3.12 (or later) we could also check for the
+        # library via CMAKE_REQUIRED_LIBRARIES
+        find_path(cadical_header_found "cadical.hpp")
+        if(cadical_header_found)
+            message(STATUS "Building solvers with cadical (${cadical_header_found})")
+            target_compile_definitions(solvers PUBLIC SATCHECK_CADICAL HAVE_CADICAL)
+            target_include_directories(solvers PRIVATE ${cadical_header_found})
+            target_link_libraries(solvers cadical)
+        else()
+            message(FATAL_ERROR "Unable to find header file for preinstalled cadical")
+        endif()
     elseif("${SOLVER}" STREQUAL "ipasir-custom")
         message(STATUS "Building with IPASIR solver linking: custom solver provided")
 
