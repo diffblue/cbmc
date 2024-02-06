@@ -79,6 +79,39 @@ public:
     return static_cast<source_locationt &>(add(ID_C_source_location));
   }
 
+  /// This is a 'fluent style' method for creating a new type
+  /// with an added-on source location.
+  typet &&with_source_location(source_locationt location) &&
+  {
+    if(location.is_not_nil())
+      add_source_location() = std::move(location);
+    return std::move(*this);
+  }
+
+  /// This is a 'fluent style' method for adding a source location.
+  typet &with_source_location(source_locationt location) &
+  {
+    if(location.is_not_nil())
+      add_source_location() = std::move(location);
+    return *this;
+  }
+
+  /// This is a 'fluent style' method for creating a new type
+  /// with an added-on source location.
+  typet &&with_source_location(const typet &type) &&
+  {
+    return std::move(*this).with_source_location(type.source_location());
+  }
+
+  /// This is a 'fluent style' method for adding a source location.
+  typet &with_source_location(const typet &type) &
+  {
+    auto &location = type.source_location();
+    if(location.is_not_nil())
+      add_source_location() = location;
+    return *this;
+  }
+
   typet &add_type(const irep_idt &name)
   {
     return static_cast<typet &>(add(name));
