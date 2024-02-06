@@ -17,7 +17,6 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
-#include <util/prefix.h>
 #include <util/string_constant.h>
 #include <util/symbol.h>
 
@@ -169,13 +168,13 @@ void axiomst::writeable_object()
   {
     if(a_it->object_identifier() == "return_value")
       continue;
-    else if(has_prefix(id2string(a_it->object_identifier()), "va_args::"))
+    else if(a_it->object_identifier().starts_with("va_args::"))
       continue;
-    else if(has_prefix(id2string(a_it->object_identifier()), "va_arg::"))
+    else if(a_it->object_identifier().starts_with("va_arg::"))
       continue;
-    else if(has_prefix(id2string(a_it->object_identifier()), "va_arg_array::"))
+    else if(a_it->object_identifier().starts_with("va_arg_array::"))
       continue;
-    else if(has_prefix(id2string(a_it->object_identifier()), "old::"))
+    else if(a_it->object_identifier().starts_with("old::"))
       continue;
 
     auto &symbol = ns.lookup(a_it->object_expr());

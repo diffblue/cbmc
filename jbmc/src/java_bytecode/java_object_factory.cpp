@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/interval_constraint.h>
 #include <util/message.h>
 #include <util/nondet_bool.h>
-#include <util/prefix.h>
 #include <util/symbol_table_base.h>
 
 #include <goto-programs/class_identifier.h>
@@ -204,7 +203,7 @@ void java_object_factoryt::gen_pointer_target_init(
   PRECONDITION(followed_target_type.id() == ID_struct);
 
   const auto &target_class_type = to_java_class_type(followed_target_type);
-  if(has_prefix(id2string(target_class_type.get_tag()), "java::array["))
+  if(target_class_type.get_tag().starts_with("java::array["))
   {
     assignments.append(gen_nondet_array_init(
       expr,

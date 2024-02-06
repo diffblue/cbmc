@@ -13,13 +13,11 @@ Date:   December 2016
 
 #include "slice_global_inits.h"
 
-#include <analyses/call_graph.h>
-
+#include <util/cprover_prefix.h>
 #include <util/find_symbols.h>
 #include <util/std_expr.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
 
+#include <analyses/call_graph.h>
 #include <linking/static_lifetime_init.h>
 
 #include "goto_functions.h"
@@ -98,7 +96,7 @@ void slice_global_inits(
         // if we are to keep the left-hand side, then we also need to keep all
         // symbols occurring in the right-hand side
         if(
-          has_prefix(id2string(id), CPROVER_PREFIX) ||
+          id.starts_with(CPROVER_PREFIX) ||
           symbols_to_keep.find(id) != symbols_to_keep.end())
         {
           fixed_point_reached = false;
@@ -122,7 +120,7 @@ void slice_global_inits(
     if(
       it->second.is_static_lifetime && !it->second.is_type &&
       !it->second.is_macro && it->second.type.id() != ID_code &&
-      !has_prefix(id2string(it->first), CPROVER_PREFIX) &&
+      !it->first.starts_with(CPROVER_PREFIX) &&
       symbols_to_keep.find(it->first) == symbols_to_keep.end())
     {
       symbolt &symbol = it.get_writeable_symbol();

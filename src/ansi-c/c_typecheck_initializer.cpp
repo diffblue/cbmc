@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
-#include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
@@ -231,7 +230,7 @@ exprt c_typecheck_baset::do_initializer_rec(
 void c_typecheck_baset::do_initializer(symbolt &symbol)
 {
   // this one doesn't need initialization
-  if(has_prefix(id2string(symbol.name), CPROVER_PREFIX "constant_infinity"))
+  if(symbol.name.starts_with(CPROVER_PREFIX "constant_infinity"))
     return;
 
   if(symbol.is_type)

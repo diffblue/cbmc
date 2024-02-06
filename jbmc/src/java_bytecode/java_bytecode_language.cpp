@@ -6,12 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "java_bytecode_language.h"
-
-#include <fstream>
-#include <string>
-
-#include <linking/static_lifetime_init.h>
+#include "java_bytecode_convert_class.h"
 
 #include <util/cmdline.h>
 #include <util/config.h>
@@ -19,21 +14,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/journalling_symbol_table.h>
 #include <util/options.h>
-#include <util/prefix.h>
 #include <util/suffix.h>
 #include <util/symbol_table_builder.h>
 
-#include <json/json_parser.h>
-
 #include <goto-programs/class_hierarchy.h>
+
+#include <json/json_parser.h>
+#include <linking/static_lifetime_init.h>
 
 #include "ci_lazy_methods.h"
 #include "create_array_with_type_intrinsic.h"
+#include "expr2java.h"
 #include "java_bytecode_concurrency_instrumentation.h"
-#include "java_bytecode_convert_class.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_instrument.h"
 #include "java_bytecode_internal_additions.h"
+#include "java_bytecode_language.h"
 #include "java_bytecode_typecheck.h"
 #include "java_class_loader.h"
 #include "java_class_loader_limit.h"
@@ -44,9 +40,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_utils.h"
 #include "lambda_synthesis.h"
 #include "lift_clinit_calls.h"
-
-#include "expr2java.h"
 #include "load_method_by_regex.h"
+
+#include <fstream>
+#include <string>
 
 /// Parse options that are java bytecode specific.
 /// \param cmd: Command line
@@ -536,7 +533,7 @@ static symbol_exprt get_or_create_class_literal_symbol(
     symbolt new_class_symbol{
       symbol_expr.get_identifier(), symbol_expr.type(), ID_java};
     INVARIANT(
-      has_prefix(id2string(new_class_symbol.name), "java::"),
+      new_class_symbol.name.starts_with("java::"),
       "class identifier should have 'java::' prefix");
     new_class_symbol.base_name =
       id2string(new_class_symbol.name).substr(6);

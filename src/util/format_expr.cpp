@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mathematical_expr.h"
 #include "mp_arith.h"
 #include "pointer_expr.h"
-#include "prefix.h"
 #include "string_utils.h"
 
 #include <map>
@@ -198,8 +197,7 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     if(is_null_pointer(src))
       return os << ID_NULL;
     else if(
-      src.get_value() == "INVALID" ||
-      has_prefix(id2string(src.get_value()), "INVALID-"))
+      src.get_value() == "INVALID" || src.get_value().starts_with("INVALID-"))
     {
       return os << "INVALID-POINTER";
     }

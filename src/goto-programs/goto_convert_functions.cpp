@@ -10,7 +10,6 @@ Date: June 2003
 
 #include "goto_convert_functions.h"
 
-#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/symbol_table_builder.h>
 
@@ -211,7 +210,7 @@ void goto_convert_functionst::convert_function(
   // handle SV-COMP's __VERIFIER_atomic_
   if(
     !f.body.instructions.empty() &&
-    has_prefix(id2string(identifier), "__VERIFIER_atomic_"))
+    identifier.starts_with("__VERIFIER_atomic_"))
   {
     goto_programt::instructiont a_begin = goto_programt::make_atomic_begin(
       f.body.instructions.front().source_location());

@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
-#include <util/prefix.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -26,7 +25,7 @@ void branch(
   for(auto &gf_entry : goto_model.goto_functions.function_map)
   {
     // don't instrument our internal functions
-    if(has_prefix(id2string(gf_entry.first), CPROVER_PREFIX))
+    if(gf_entry.first.starts_with(CPROVER_PREFIX))
       continue;
 
     // don't instrument the function to be called,

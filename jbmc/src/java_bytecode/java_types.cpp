@@ -6,17 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cctype>
-#include <iterator>
+#include "java_types.h"
 
-#include <util/prefix.h>
 #include <util/c_types.h>
-#include <util/std_expr.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/std_expr.h>
 
-#include "java_types.h"
 #include "java_utils.h"
+
+#include <cctype>
+#include <iterator>
 
 #ifdef DEBUG
 #include <iostream>
@@ -232,7 +232,7 @@ exprt get_array_element_type_field(const exprt &pointer)
 ///   of java::array[
 bool is_java_array_tag(const irep_idt& tag)
 {
-  return has_prefix(id2string(tag), "java::array[");
+  return tag.starts_with("java::array[");
 }
 
 /// Constructs a type indicated by the given character:
