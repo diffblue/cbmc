@@ -39,6 +39,7 @@ class overflow_result_exprt;
 class replication_exprt;
 class unary_overflow_exprt;
 class union_typet;
+class update_bit_exprt;
 class update_bits_exprt;
 
 class boolbvt:public arrayst
@@ -177,6 +178,7 @@ protected:
   virtual bvt convert_member(const member_exprt &expr);
   virtual bvt convert_with(const with_exprt &expr);
   virtual bvt convert_update(const update_exprt &);
+  virtual bvt convert_update_bit(const update_bit_exprt &);
   virtual bvt convert_update_bits(const update_bits_exprt &);
   virtual bvt convert_case(const exprt &expr);
   virtual bvt convert_cond(const cond_exprt &);

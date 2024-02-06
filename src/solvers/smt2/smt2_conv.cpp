@@ -1685,6 +1685,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_update(to_update_expr(expr));
   }
+  else if(expr.id() == ID_update_bit)
+  {
+    convert_update_bit(to_update_bit_expr(expr));
+  }
   else if(expr.id() == ID_update_bits)
   {
     convert_update_bits(to_update_bits_expr(expr));
@@ -4290,8 +4294,16 @@ void smt2_convt::convert_with(const with_exprt &expr)
           expr_type.id()==ID_unsignedbv ||
           expr_type.id()==ID_signedbv)
   {
-    convert_update_bits(
-      update_bits_exprt(expr.old(), expr.where(), expr.new_value()));
+    if(expr.new_value().type().id() == ID_bool)
+    {
+      convert_update_bit(
+        update_bit_exprt(expr.old(), expr.where(), expr.new_value()));
+    }
+    else
+    {
+      convert_update_bits(
+        update_bits_exprt(expr.old(), expr.where(), expr.new_value()));
+    }
   }
   else
     UNEXPECTEDCASE(
@@ -4304,6 +4316,11 @@ void smt2_convt::convert_update(const update_exprt &expr)
   PRECONDITION(expr.operands().size() == 3);
 
   SMT2_TODO("smt2_convt::convert_update to be implemented");
+}
+
+void smt2_convt::convert_update_bit(const update_bit_exprt &expr)
+{
+  return convert_expr(expr.lower());
 }
 
 void smt2_convt::convert_update_bits(const update_bits_exprt &expr)

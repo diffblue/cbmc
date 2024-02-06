@@ -109,6 +109,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_with(to_with_expr(expr));
   else if(expr.id()==ID_update)
     return convert_update(to_update_expr(expr));
+  else if(expr.id() == ID_update_bit)
+    return convert_update_bit(to_update_bit_expr(expr));
   else if(expr.id()==ID_case)
     return convert_case(expr);
   else if(expr.id()==ID_cond)
