@@ -283,10 +283,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
       else // give up, just use subtype
         result = to_type_with_subtype(type).subtype();
 
-      // save the location
-      result.add_source_location()=type.source_location();
-
-      type=result;
+      // preserve the location
+      type = result.with_source_location(type);
     }
     else if(underlying_type.id()==ID_complex)
     {
@@ -303,9 +301,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
         result = to_type_with_subtype(type).subtype();
 
       // save the location
-      result.add_source_location()=type.source_location();
-
-      type=complex_typet(result);
+      type = complex_typet(result).with_source_location(type);
     }
     else
     {
@@ -726,9 +722,8 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   // produce the type with ID_vector
   vector_typet new_type(
     c_index_type(), subtype, from_integer(s, signed_size_type()));
-  new_type.add_source_location() = source_location;
   new_type.size().add_source_location() = source_location;
-  type = new_type;
+  type = new_type.with_source_location(source_location);
 }
 
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
