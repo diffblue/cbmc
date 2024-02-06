@@ -61,7 +61,7 @@ const ancestry_resultt scope_treet::get_nearest_common_ancestor_info(
     }
   }
 
-  // At this point it dosen't matter which index we return as both are the same.
+  // At this point it doesn't matter which index we return as both are the same.
   return {right_index, left_unique_count, right_unique_count};
 }
 
