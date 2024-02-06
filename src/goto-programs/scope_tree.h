@@ -165,6 +165,12 @@ public:
   /// Walks the current node down to its child.
   void descend_tree();
 
+  /// Output scope tree to \p os in dot format.
+  void output_dot(std::ostream &os) const
+  {
+    scope_graph.output_dot(os);
+  }
+
 private:
   class scope_nodet : public graph_nodet<empty_edget>
   {
@@ -177,6 +183,15 @@ private:
 
     std::optional<codet> destructor_value;
     std::optional<declaration_statet> declaration;
+
+    std::string dot_attributes(const node_indext &n) const override
+    {
+      if(!declaration.has_value())
+        return "";
+
+      return id2string(
+        declaration->instruction->decl_symbol().get_identifier());
+    }
   };
 
   grapht<scope_nodet> scope_graph;
