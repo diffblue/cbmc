@@ -285,7 +285,8 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         targets.scope_stack.get_nearest_common_ancestor_info(
           goto_target, label_target);
 
-      // If our goto had no variables of note, just skip
+      // If our goto had no variables of note, just skip (0 is the index of the
+      // root of the scope tree)
       if(goto_target != 0)
       {
         // If the goto recorded a destructor stack, execute as much as is
