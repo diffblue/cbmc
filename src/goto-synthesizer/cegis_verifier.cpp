@@ -84,7 +84,7 @@ get_checked_pointer_from_null_pointer_check(const exprt &violation)
 void cegis_verifiert::preprocess_goto_model()
 {
   // Preprocess `goto_model`. Copied from `cbmc_parse_options.cpp`.
-  remove_asm(goto_model);
+  remove_asm(goto_model, log.get_message_handler());
   link_to_library(
     goto_model, log.get_message_handler(), cprover_cpp_library_factory);
   link_to_library(
@@ -92,7 +92,7 @@ void cegis_verifiert::preprocess_goto_model()
   // library functions may introduce inline assembler
   while(has_asm(goto_model))
   {
-    remove_asm(goto_model);
+    remove_asm(goto_model, log.get_message_handler());
     link_to_library(
       goto_model, log.get_message_handler(), cprover_cpp_library_factory);
     link_to_library(
