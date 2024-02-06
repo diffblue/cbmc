@@ -1,0 +1,11 @@
+CORE
+no-duplicate-decl.c
+--show-goto-functions
+^[[:space:]]*DECL main::\$tmp::return_value_foo
+^EXIT=0$
+^SIGNAL=0$
+--
+^[[:space:]]*DECL going_to::out
+^[[:space:]]*\d+: DECL main::\$tmp::return_value_foo
+--
+Test that no loop back to the declaration is generated.
