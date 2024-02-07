@@ -905,11 +905,14 @@ float sqrtf(float f)
     // number of exponent and significand bits.  Thus they are
     // given implicitly...
 
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     float lowerSquare = lower * lower;
     __CPROVER_assume(__CPROVER_isnormalf(lowerSquare));
 
     float upper = nextUpf(lower);
     float upperSquare = upper * upper;  // Might be +Inf
+#pragma CPROVER check pop
 
     // Restrict these to bound f and thus compute the possible
     // values for the square root.  Note that the lower bound
@@ -992,11 +995,14 @@ double sqrt(double d)
     __CPROVER_assume(lower > 0.0);
     __CPROVER_assume(__CPROVER_isnormald(lower));
 
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     double lowerSquare = lower * lower;
     __CPROVER_assume(__CPROVER_isnormald(lowerSquare));
 
     double upper = nextUp(lower);
     double upperSquare = upper * upper;  // Might be +Inf
+#pragma CPROVER check pop
 
     __CPROVER_assume(lowerSquare <= d);
     __CPROVER_assume(d < upperSquare);
@@ -1066,11 +1072,14 @@ long double sqrtl(long double d)
     __CPROVER_assume(lower > 0.0l);
     __CPROVER_assume(__CPROVER_isnormalld(lower));
 
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     long double lowerSquare = lower * lower;
     __CPROVER_assume(__CPROVER_isnormalld(lowerSquare));
 
     long double upper = nextUpl(lower);
     long double upperSquare = upper * upper;  // Might be +Inf
+#pragma CPROVER check pop
 
     __CPROVER_assume(lowerSquare <= d);
     __CPROVER_assume(d < upperSquare);
