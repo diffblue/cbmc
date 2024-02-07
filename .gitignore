@@ -115,8 +115,8 @@ src/cprover/cprover
 src/crangler/crangler
 src/goto-analyzer/goto-analyzer
 src/goto-analyzer/goto-analyzer.exe
-src/goto-bmc
-src/goto-bmc.exe
+src/goto-bmc/goto-bmc
+src/goto-bmc/goto-bmc.exe
 src/goto-cc/goto-cc
 src/goto-cc/goto-gcc
 src/goto-cc/goto-ld
