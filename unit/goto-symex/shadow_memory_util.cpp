@@ -162,15 +162,15 @@ TEST_CASE(
 
   // Using mp_integer types otherwise on 32-bit machines n << 48 wraps around.
   std::array<mp_integer, 7> values = GENERATE(
-    std::array<mp_integer, 7>{0, 0, 0, 0, 0, 0, 0},
-    std::array<mp_integer, 7>{1, 2, 3, 4, 5, 6, 7},
-    std::array<mp_integer, 7>{2, 3, 4, 5, 6, 7, 1},
-    std::array<mp_integer, 7>{3, 4, 5, 6, 7, 1, 2},
-    std::array<mp_integer, 7>{4, 5, 6, 7, 1, 2, 3},
-    std::array<mp_integer, 7>{5, 6, 7, 1, 2, 3, 4},
-    std::array<mp_integer, 7>{6, 7, 1, 2, 3, 4, 5},
-    std::array<mp_integer, 7>{7, 1, 2, 3, 4, 5, 6},
-    std::array<mp_integer, 7>{8, 8, 8, 8, 8, 8, 8});
+    std::array<mp_integer, 7>{{0, 0, 0, 0, 0, 0, 0}},
+    std::array<mp_integer, 7>{{1, 2, 3, 4, 5, 6, 7}},
+    std::array<mp_integer, 7>{{2, 3, 4, 5, 6, 7, 1}},
+    std::array<mp_integer, 7>{{3, 4, 5, 6, 7, 1, 2}},
+    std::array<mp_integer, 7>{{4, 5, 6, 7, 1, 2, 3}},
+    std::array<mp_integer, 7>{{5, 6, 7, 1, 2, 3, 4}},
+    std::array<mp_integer, 7>{{6, 7, 1, 2, 3, 4, 5}},
+    std::array<mp_integer, 7>{{7, 1, 2, 3, 4, 5, 6}},
+    std::array<mp_integer, 7>{{8, 8, 8, 8, 8, 8, 8}});
 
   SECTION("test set " + std::to_string(values[0].to_long()))
   {
@@ -279,15 +279,15 @@ TEST_CASE(
 
   // Using mp_integer types otherwise on 32-bit machines n << 48 wraps around.
   std::array<mp_integer, 7> values = GENERATE(
-    std::array<mp_integer, 7>{0, 0, 0, 0, 0, 0, 0},
-    std::array<mp_integer, 7>{2, 0, 0, 0, 0, 0, 0},
-    std::array<mp_integer, 7>{0, 2, 0, 0, 0, 0, 0},
-    std::array<mp_integer, 7>{0, 0, 2, 0, 0, 0, 0},
-    std::array<mp_integer, 7>{0, 0, 0, 2, 0, 0, 0},
-    std::array<mp_integer, 7>{0, 0, 0, 0, 2, 0, 0},
-    std::array<mp_integer, 7>{0, 0, 0, 0, 0, 2, 0},
-    std::array<mp_integer, 7>{0, 0, 0, 0, 0, 0, 2},
-    std::array<mp_integer, 7>{8, 8, 8, 8, 8, 8, 8});
+    std::array<mp_integer, 7>{{0, 0, 0, 0, 0, 0, 0}},
+    std::array<mp_integer, 7>{{2, 0, 0, 0, 0, 0, 0}},
+    std::array<mp_integer, 7>{{0, 2, 0, 0, 0, 0, 0}},
+    std::array<mp_integer, 7>{{0, 0, 2, 0, 0, 0, 0}},
+    std::array<mp_integer, 7>{{0, 0, 0, 2, 0, 0, 0}},
+    std::array<mp_integer, 7>{{0, 0, 0, 0, 2, 0, 0}},
+    std::array<mp_integer, 7>{{0, 0, 0, 0, 0, 2, 0}},
+    std::array<mp_integer, 7>{{0, 0, 0, 0, 0, 0, 2}},
+    std::array<mp_integer, 7>{{8, 8, 8, 8, 8, 8, 8}});
 
   SECTION("test set " + std::to_string(values[0].to_long()))
   {
