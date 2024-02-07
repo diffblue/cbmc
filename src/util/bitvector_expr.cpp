@@ -42,6 +42,34 @@ extractbits_exprt::extractbits_exprt(
     from_integer(_lower, integer_typet()));
 }
 
+exprt update_bit_exprt::lower() const
+{
+  const auto width = to_bitvector_type(type()).get_width();
+  auto src_bv_type = bv_typet(width);
+
+  // build a mask 0...0 1
+  auto mask_bv =
+    make_bvrep(width, [](std::size_t index) { return index == 0; });
+  auto mask_expr = constant_exprt(mask_bv, src_bv_type);
+
+  // shift the mask by the index
+  auto mask_shifted = shl_exprt(mask_expr, index());
+
+  auto src_masked = bitand_exprt(
+    typecast_exprt(src(), src_bv_type), bitnot_exprt(mask_shifted));
+
+  // zero-extend the replacement bit to match src
+  auto new_value_casted = typecast_exprt(
+    typecast_exprt(new_value(), unsignedbv_typet(width)), src_bv_type);
+
+  // shift the replacement bits
+  auto new_value_shifted = shl_exprt(new_value_casted, index());
+
+  // or the masked src and the shifted replacement bits
+  return typecast_exprt(
+    bitor_exprt(src_masked, new_value_shifted), src().type());
+}
+
 exprt update_bits_exprt::lower() const
 {
   const auto width = to_bitvector_type(type()).get_width();

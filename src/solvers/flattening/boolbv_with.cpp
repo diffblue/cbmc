@@ -22,9 +22,32 @@ bvt boolbvt::convert_with(const with_exprt &expr)
     type.id() == ID_bv || type.id() == ID_unsignedbv ||
     type.id() == ID_signedbv)
   {
+    if(expr.operands().size() > 3)
+    {
+      std::size_t s = expr.operands().size();
+
+      // strip off the trailing two operands
+      with_exprt tmp = expr;
+      tmp.operands().resize(s - 2);
+
+      with_exprt new_with_expr(
+        tmp, expr.operands()[s - 2], expr.operands().back());
+
+      // recursive call
+      return convert_with(new_with_expr);
+    }
+
     PRECONDITION(expr.operands().size() == 3);
-    return convert_bv(
-      update_bits_exprt(expr.old(), expr.where(), expr.new_value()));
+    if(expr.new_value().type().id() == ID_bool)
+    {
+      return convert_bv(
+        update_bit_exprt(expr.old(), expr.where(), expr.new_value()));
+    }
+    else
+    {
+      return convert_bv(
+        update_bits_exprt(expr.old(), expr.where(), expr.new_value()));
+    }
   }
 
   bvt bv = convert_bv(expr.old());

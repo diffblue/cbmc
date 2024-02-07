@@ -532,6 +532,93 @@ inline extractbits_exprt &to_extractbits_expr(exprt &expr)
 }
 
 /// \brief Replaces a sub-range of a bit-vector operand
+class update_bit_exprt : public expr_protectedt
+{
+public:
+  /// Replaces the bit [\p _index] from \p _src to produce a result of
+  /// the same type as \p _src. The index counts from the
+  /// least-significant bit. Updates outside of the range of \p _src
+  /// yield an expression equal to \p _src.
+  update_bit_exprt(exprt _src, exprt _index, exprt _new_value)
+    : expr_protectedt(
+        ID_update_bit,
+        _src.type(),
+        {_src, std::move(_index), std::move(_new_value)})
+  {
+    PRECONDITION(new_value().type().id() == ID_bool);
+  }
+
+  update_bit_exprt(exprt _src, const std::size_t _index, exprt _new_value);
+
+  exprt &src()
+  {
+    return op0();
+  }
+
+  exprt &index()
+  {
+    return op1();
+  }
+
+  exprt &new_value()
+  {
+    return op2();
+  }
+
+  const exprt &src() const
+  {
+    return op0();
+  }
+
+  const exprt &index() const
+  {
+    return op1();
+  }
+
+  const exprt &new_value() const
+  {
+    return op2();
+  }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    validate_operands(expr, 3, "update_bit must have three operands");
+  }
+
+  /// A lowering to masking, shifting, or.
+  exprt lower() const;
+};
+
+template <>
+inline bool can_cast_expr<update_bit_exprt>(const exprt &base)
+{
+  return base.id() == ID_update_bit;
+}
+
+/// \brief Cast an exprt to an \ref update_bit_exprt
+///
+/// \a expr must be known to be \ref update_bit_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref update_bit_exprt
+inline const update_bit_exprt &to_update_bit_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_update_bit);
+  update_bit_exprt::check(expr);
+  return static_cast<const update_bit_exprt &>(expr);
+}
+
+/// \copydoc to_update_bit_expr(const exprt &)
+inline update_bit_exprt &to_update_bit_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_update_bit);
+  update_bit_exprt::check(expr);
+  return static_cast<update_bit_exprt &>(expr);
+}
+
+/// \brief Replaces a sub-range of a bit-vector operand
 class update_bits_exprt : public expr_protectedt
 {
 public:
