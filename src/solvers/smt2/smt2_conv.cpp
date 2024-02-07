@@ -214,7 +214,7 @@ void smt2_convt::write_footer()
   {
     out << "(check-sat-assuming (";
     for(const auto &assumption : assumptions)
-      convert_literal(to_literal_expr(assumption).get_literal());
+      convert_literal(assumption);
     out << "))\n";
   }
   else
@@ -227,7 +227,7 @@ void smt2_convt::write_footer()
       for(const auto &assumption : assumptions)
       {
         out << "(assert ";
-        convert_literal(to_literal_expr(assumption).get_literal());
+        convert_literal(assumption);
         out << ")"
             << "\n";
       }
@@ -323,7 +323,7 @@ decision_proceduret::resultt smt2_convt::dec_solve(const exprt &assumption)
     write_footer();
   else
   {
-    assumptions.push_back(literal_exprt(convert(assumption)));
+    assumptions.push_back(convert(assumption));
     write_footer();
     assumptions.pop_back();
   }
@@ -987,7 +987,9 @@ void smt2_convt::push(const std::vector<exprt> &_assumptions)
 {
   INVARIANT(assumptions.empty(), "nested contexts are not supported");
 
-  assumptions = _assumptions;
+  assumptions.reserve(_assumptions.size());
+  for(auto &assumption : _assumptions)
+    assumptions.push_back(convert(assumption));
 }
 
 void smt2_convt::pop()
