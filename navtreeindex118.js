@@ -1,5 +1,6 @@
 var NAVTREEINDEX118 =
 {
+"qdimacs__core_8cpp_source.html":[9,0,2,27,5,19],
 "qdimacs__core_8h.html":[9,0,2,27,5,20],
 "qdimacs__core_8h_source.html":[9,0,2,27,5,20],
 "race__check_8cpp.html":[9,0,2,15,79],
@@ -248,6 +249,5 @@ var NAVTREEINDEX118 =
 "remove__java__new_8cpp_source.html":[9,0,1,0,1,109],
 "remove__java__new_8h.html":[9,0,1,0,1,110],
 "remove__java__new_8h.html#a30bdb44a630f8c0fd6efe84cda24305f":[9,0,1,0,1,110,0],
-"remove__java__new_8h.html#a485e52d5bcfede9b6379f232818b3a6b":[9,0,1,0,1,110,2],
-"remove__java__new_8h.html#a917510b94e3964149eca8d2b06e1ec61":[9,0,1,0,1,110,3]
+"remove__java__new_8h.html#a485e52d5bcfede9b6379f232818b3a6b":[9,0,1,0,1,110,2]
 };

@@ -90,7 +90,7 @@ var classsmt2__convt =
     [ "walk_array_tree", "classsmt2__convt.html#a9795fecf70f0723ce27376b3747d10ce", null ],
     [ "write_footer", "classsmt2__convt.html#a11ae922a2150c92bc15710980f83537c", null ],
     [ "write_header", "classsmt2__convt.html#ade4beb736a1d6f64b4bf21d0323f5476", null ],
-    [ "assumptions", "classsmt2__convt.html#ab4bca32d0d3a1bf114ccfcb74ec2ef34", null ],
+    [ "assumptions", "classsmt2__convt.html#ac06f861e09d8728951061b5056d40b0c", null ],
     [ "benchmark", "classsmt2__convt.html#a171a898f097537916f2129342a1a544e", null ],
     [ "boolbv_width", "classsmt2__convt.html#a3e8f12482655394a5e416f1ece37bf4f", null ],
     [ "boolean_assignment", "classsmt2__convt.html#aae080112e6bb440bf0626f755bbdbb83", null ],
