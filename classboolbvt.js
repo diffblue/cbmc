@@ -78,6 +78,7 @@ var classboolbvt =
     [ "convert_unary_overflow", "classboolbvt.html#acc020e5f1ff5f0a802d39b22427196f4", null ],
     [ "convert_union", "classboolbvt.html#a7b1abc39beb7e8f997102233bcb1c1cf", null ],
     [ "convert_update", "classboolbvt.html#a97cd4177e12c6a4bce43bf0f8e637353", null ],
+    [ "convert_update_bit", "classboolbvt.html#ad4d33cb29411396ee923821c96161430", null ],
     [ "convert_update_bits", "classboolbvt.html#a4284a8571fbde706405e7f5446b490cf", null ],
     [ "convert_update_bits", "classboolbvt.html#a6c33abbf98d2f40151bda07e24a91d31", null ],
     [ "convert_update_rec", "classboolbvt.html#a1e0ebc52d234aafaa34cf803dd9683da", null ],

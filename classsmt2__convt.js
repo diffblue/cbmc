@@ -55,6 +55,7 @@ var classsmt2__convt =
     [ "convert_typecast", "classsmt2__convt.html#a0b10edbc8cfe2edd2f323c9ea7db762a", null ],
     [ "convert_union", "classsmt2__convt.html#aaa662dfaa8d9773763b20c91a6db2561", null ],
     [ "convert_update", "classsmt2__convt.html#ad6b16cc8510e3e4bf5b77647822bb6e0", null ],
+    [ "convert_update_bit", "classsmt2__convt.html#a6db62fbf4aea81335e22f433acedc6db", null ],
     [ "convert_update_bits", "classsmt2__convt.html#ad38fd63c1704e1247c80a41c9bedea4d", null ],
     [ "convert_with", "classsmt2__convt.html#aaff22045e19cd027407a320a893c90b0", null ],
     [ "dec_solve", "classsmt2__convt.html#a29223dc8875131d6b5cf1202a9ef7764", null ],
