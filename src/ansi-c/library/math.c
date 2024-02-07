@@ -3599,3 +3599,141 @@ long double powl(long double x, long double y)
   return result_u.l;
 #endif
 }
+
+/* FUNCTION: fma */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#  include <fenv.h>
+#  define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __builtin_inf(void);
+
+double fma(double x, double y, double z)
+{
+  // see man fma (https://linux.die.net/man/3/fma)
+  if(isnan(x) || isnan(y))
+    return 0.0 / 0.0;
+  else if(
+    (isinf(x) || isinf(y)) &&
+    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0 / 0.0;
+  }
+  else if(isnan(z))
+    return 0.0 / 0.0;
+
+  double x_times_y = x * y;
+  if(
+    isinf(x_times_y) && isinf(z) &&
+    __CPROVER_signd(x_times_y) != __CPROVER_signd(z))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0 / 0.0;
+  }
+
+  // TODO: detect overflow (FE_OVERFLOW), return +/- __builtin_inf()
+  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+  return x_times_y + z;
+}
+
+/* FUNCTION: fmaf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#  include <fenv.h>
+#  define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __builtin_inff(void);
+
+float fmaf(float x, float y, float z)
+{
+  // see man fma (https://linux.die.net/man/3/fma)
+  if(isnanf(x) || isnanf(y))
+    return 0.0f / 0.0f;
+  else if(
+    (isinff(x) || isinff(y)) &&
+    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0f / 0.0f;
+  }
+  else if(isnanf(z))
+    return 0.0f / 0.0f;
+
+  float x_times_y = x * y;
+  if(
+    isinff(x_times_y) && isinff(z) &&
+    __CPROVER_signf(x_times_y) != __CPROVER_signf(z))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0f / 0.0f;
+  }
+
+  // TODO: detect overflow (FE_OVERFLOW), return +/- __builtin_inff()
+  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+  return x_times_y + z;
+}
+
+/* FUNCTION: fmal */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#  include <fenv.h>
+#  define __CPROVER_FENV_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FLOAT_H_INCLUDED
+#  include <float.h>
+#  define __CPROVER_FLOAT_H_INCLUDED
+#endif
+
+long double __builtin_infl(void);
+
+long double fmal(long double x, long double y, long double z)
+{
+  // see man fma (https://linux.die.net/man/3/fma)
+  if(isnanl(x) || isnanl(y))
+    return 0.0l / 0.0l;
+  else if(
+    (isinfl(x) || isinfl(y)) &&
+    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0l / 0.0l;
+  }
+  else if(isnanl(z))
+    return 0.0l / 0.0l;
+
+  long double x_times_y = x * y;
+  if(
+    isinfl(x_times_y) && isinfl(z) &&
+    __CPROVER_signld(x_times_y) != __CPROVER_signld(z))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0l / 0.0l;
+  }
+
+#if LDBL_MAX_EXP == DBL_MAX_EXP
+  return fma(x, y, z);
+#else
+  // TODO: detect overflow (FE_OVERFLOW), return +/- __builtin_infl()
+  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+  return x_times_y + z;
+#endif
+}
