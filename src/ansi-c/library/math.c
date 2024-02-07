@@ -2845,6 +2845,369 @@ long double logl(long double x)
 #endif
 }
 
+/* FUNCTION: log2 */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+double log2(double x)
+{
+  if(__CPROVER_isnand(x) || (__CPROVER_isinfd(x) && !__CPROVER_signd(x)))
+    return x;
+  else if(x == 1.0)
+    return +0.0;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+    return -HUGE_VAL;
+  }
+  else if(__CPROVER_signd(x))
+  {
+    errno = EDOM;
+    return 0.0 / 0.0;
+  }
+
+  _Static_assert(
+    sizeof(double) == 2 * sizeof(int32_t),
+    "bit width of double is 2x bit width of int32_t");
+  union
+  {
+    double d;
+    int32_t i[2];
+  } u = {x};
+  int32_t bias = (1 << 20) * ((1 << 10) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -90253 && exp_c <= 1);
+#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  return ((double)u.i[1] - (double)(bias + exp_c)) / (double)(1 << 20);
+#else
+  return ((double)u.i[0] - (double)(bias + exp_c)) / (double)(1 << 20);
+#endif
+}
+
+/* FUNCTION: log2f */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+float log2f(float x)
+{
+  if(__CPROVER_isnanf(x) || (__CPROVER_isinff(x) && !__CPROVER_signf(x)))
+    return x;
+  else if(x == 1.0f)
+    return +0.0f;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+    return -HUGE_VALF;
+  }
+  else if(__CPROVER_signf(x))
+  {
+    errno = EDOM;
+    return 0.0f / 0.0f;
+  }
+
+  _Static_assert(
+    sizeof(float) == sizeof(int32_t),
+    "bit width of float and int32_t should match");
+  union
+  {
+    float f;
+    int32_t i;
+  } u = {x};
+  int32_t bias = (1 << 23) * ((1 << 7) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -722019 && exp_c <= 1);
+  return ((float)u.i - (float)(bias + exp_c)) / (float)(1 << 23);
+}
+
+/* FUNCTION: log2l */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FLOAT_H_INCLUDED
+#  include <float.h>
+#  define __CPROVER_FLOAT_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+long double log2l(long double x)
+{
+  if(__CPROVER_isnanld(x) || (__CPROVER_isinfld(x) && !__CPROVER_signld(x)))
+    return x;
+  else if(x == 1.0l)
+    return +0.0l;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+    return -HUGE_VALL;
+  }
+  else if(__CPROVER_signld(x))
+  {
+    errno = EDOM;
+    return 0.0l / 0.0l;
+  }
+
+#if LDBL_MAX_EXP == DBL_MAX_EXP
+  return log2(x);
+#else
+  _Static_assert(
+    sizeof(long double) % sizeof(int32_t) == 0,
+    "bit width of long double is a multiple of bit width of int32_t");
+  union
+  {
+    long double l;
+    int32_t i[sizeof(long double) / sizeof(int32_t)];
+  } u = {x};
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  return ((long double)u.i[sizeof(long double) / sizeof(int32_t) - 1] -
+          (long double)(bias + exp_c)) /
+         (long double)(1 << 16);
+#  else
+  return ((long double)u.i[0] - (long double)(bias + exp_c)) /
+         (long double)(1 << 16);
+#  endif
+#endif
+}
+
+/* FUNCTION: log10 */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+double log10(double x)
+{
+  if(__CPROVER_isnand(x) || (__CPROVER_isinfd(x) && !__CPROVER_signd(x)))
+    return x;
+  else if(x == 1.0)
+    return +0.0;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+    return -HUGE_VAL;
+  }
+  else if(__CPROVER_signd(x))
+  {
+    errno = EDOM;
+    return 0.0 / 0.0;
+  }
+
+  _Static_assert(
+    sizeof(double) == 2 * sizeof(int32_t),
+    "bit width of double is 2x bit width of int32_t");
+  // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+  union
+  {
+    double d;
+    int32_t i[2];
+  } u = {x};
+  int32_t bias = (1 << 20) * ((1 << 10) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -90253 && exp_c <= 1);
+#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  return ((double)u.i[1] - (double)(bias + exp_c)) * (M_LN2 / M_LN10) /
+         (double)(1 << 20);
+#else
+  return ((double)u.i[0] - (double)(bias + exp_c)) * (M_LN2 / M_LN10) /
+         (double)(1 << 20);
+#endif
+}
+
+/* FUNCTION: log10f */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+float log10f(float x)
+{
+  if(__CPROVER_isnanf(x) || (__CPROVER_isinff(x) && !__CPROVER_signf(x)))
+    return x;
+  else if(x == 1.0f)
+    return +0.0f;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+    return -HUGE_VALF;
+  }
+  else if(__CPROVER_signf(x))
+  {
+    errno = EDOM;
+    return 0.0f / 0.0f;
+  }
+
+  _Static_assert(
+    sizeof(float) == sizeof(int32_t),
+    "bit width of float and int32_t should match");
+  // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+  union
+  {
+    float f;
+    int32_t i;
+  } u = {x};
+  int32_t bias = (1 << 23) * ((1 << 7) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -722019 && exp_c <= 1);
+  return ((float)u.i - (float)(bias + exp_c)) * (float)(M_LN2 / M_LN10) /
+         (float)(1 << 23);
+}
+
+/* FUNCTION: log10l */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FLOAT_H_INCLUDED
+#  include <float.h>
+#  define __CPROVER_FLOAT_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+long double log10l(long double x)
+{
+  if(__CPROVER_isnanld(x) || (__CPROVER_isinfld(x) && !__CPROVER_signld(x)))
+    return x;
+  else if(x == 1.0l)
+    return +0.0l;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+    return -HUGE_VALL;
+  }
+  else if(__CPROVER_signld(x))
+  {
+    errno = EDOM;
+    return 0.0l / 0.0l;
+  }
+
+#if LDBL_MAX_EXP == DBL_MAX_EXP
+  return log10(x);
+#else
+  _Static_assert(
+    sizeof(long double) % sizeof(int32_t) == 0,
+    "bit width of long double is a multiple of bit width of int32_t");
+  union
+  {
+    long double l;
+    int32_t i[sizeof(long double) / sizeof(int32_t)];
+  } u = {x};
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  return ((long double)u.i[sizeof(long double) / sizeof(int32_t) - 1] -
+          (long double)(bias + exp_c)) *
+         (M_LN2 / M_LN10) / (long double)(1 << 16);
+#  else
+  return ((long double)u.i[0] - (long double)(bias + exp_c)) *
+         (M_LN2 / M_LN10) / (long double)(1 << 16);
+#  endif
+#endif
+}
+
 /* FUNCTION: pow */
 
 #ifndef __CPROVER_MATH_H_INCLUDED
