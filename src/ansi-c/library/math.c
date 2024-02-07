@@ -2821,7 +2821,7 @@ long double logl(long double x)
   }
 
 #if LDBL_MAX_EXP == DBL_MAX_EXP
-  return logl(x);
+  return log(x);
 #else
   _Static_assert(
     sizeof(long double) % sizeof(int32_t) == 0,
