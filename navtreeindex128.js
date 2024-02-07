@@ -1,5 +1,6 @@
 var NAVTREEINDEX128 =
 {
+"string__refinement_8cpp.html#a0e03ce13d9c646a358ddb197f2d5fe9c":[9,0,2,27,10,30,21],
 "string__refinement_8cpp.html#a0e73fabc25ec14162a8a5302766081d1":[9,0,2,27,10,30,27],
 "string__refinement_8cpp.html#a129aff44f6131c8a0e2ac21ee44eb5cd":[9,0,2,27,10,30,36],
 "string__refinement_8cpp.html#a2d7f12fa04a320094eea1b3b51725214":[9,0,2,27,10,30,7],
@@ -248,6 +249,5 @@ var NAVTREEINDEX128 =
 "structacceleration__utilst_1_1polynomial__array__assignmentt.html":[8,0,33,0],
 "structacceleration__utilst_1_1polynomial__array__assignmentt.html#a045175cf80841296c7f1dd59adac9a67":[8,0,33,0,1],
 "structacceleration__utilst_1_1polynomial__array__assignmentt.html#ad142a41da6e8b9dfd4c00c09898ecdf0":[8,0,33,0,2],
-"structacceleration__utilst_1_1polynomial__array__assignmentt.html#ad8bcc3f36434c07cb6ebc14928afc04c":[8,0,33,0,0],
-"structai__history__baset_1_1compare__historyt.html":[8,0,44,0]
+"structacceleration__utilst_1_1polynomial__array__assignmentt.html#ad8bcc3f36434c07cb6ebc14928afc04c":[8,0,33,0,0]
 };
