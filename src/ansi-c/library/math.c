@@ -3742,6 +3742,7 @@ double fma(double x, double y, double z)
   else if(isnan(z))
     return 0.0 / 0.0;
 
+#pragma CPROVER check disable "float-overflow"
   double x_times_y = x * y;
   if(
     isinf(x_times_y) && isinf(z) &&
@@ -3752,8 +3753,13 @@ double fma(double x, double y, double z)
   }
 #pragma CPROVER check pop
 
-  // TODO: detect overflow (FE_OVERFLOW), return +/- __builtin_inf()
+  if(isinf(x_times_y))
+  {
+    feraiseexcept(FE_OVERFLOW);
+    return __CPROVER_signd(x_times_y) ? -__builtin_inf() : __builtin_inf();
+  }
   // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+
   return x_times_y + z;
 }
 
@@ -3788,6 +3794,7 @@ float fmaf(float x, float y, float z)
   else if(isnanf(z))
     return 0.0f / 0.0f;
 
+#pragma CPROVER check disable "float-overflow"
   float x_times_y = x * y;
   if(
     isinff(x_times_y) && isinff(z) &&
@@ -3798,8 +3805,13 @@ float fmaf(float x, float y, float z)
   }
 #pragma CPROVER check pop
 
-  // TODO: detect overflow (FE_OVERFLOW), return +/- __builtin_inff()
+  if(isinff(x_times_y))
+  {
+    feraiseexcept(FE_OVERFLOW);
+    return __CPROVER_signf(x_times_y) ? -__builtin_inff() : __builtin_inff();
+  }
   // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+
   return x_times_y + z;
 }
 
@@ -3839,6 +3851,7 @@ long double fmal(long double x, long double y, long double z)
   else if(isnanl(z))
     return 0.0l / 0.0l;
 
+#pragma CPROVER check disable "float-overflow"
   long double x_times_y = x * y;
   if(
     isinfl(x_times_y) && isinfl(z) &&
@@ -3852,8 +3865,13 @@ long double fmal(long double x, long double y, long double z)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return fma(x, y, z);
 #else
-  // TODO: detect overflow (FE_OVERFLOW), return +/- __builtin_infl()
+  if(isinfl(x_times_y))
+  {
+    feraiseexcept(FE_OVERFLOW);
+    return __CPROVER_signld(x_times_y) ? -__builtin_infl() : __builtin_infl();
+  }
   // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+
   return x_times_y + z;
 #endif
 }
