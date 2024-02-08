@@ -134,8 +134,19 @@ $(document).ready(function(){initNavTree('fenv_8c_source.html',''); initResizabl
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    0;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">return</span> 0; <span class="comment">// we never fail</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">/* FUNCTION: feraiseexcept */</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="fenv_8c.html#aeecf59ba4dd156c6a9954bd0c1a9f6eb">   46</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="fenv_8c.html#aeecf59ba4dd156c6a9954bd0c1a9f6eb">feraiseexcept</a>(<span class="keywordtype">int</span> excepts)</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;__CPROVER_HIDE:;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a>(excepts == 0, <span class="stringliteral">&quot;floating-point exception&quot;</span>);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">return</span> 0; <span class="comment">// we never fail</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>
+<div class="ttc" id="acprover__builtin__headers_8h_html_a564e8a5a7bebea04fdd5ee1277832478"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a></div><div class="ttdeci">void __CPROVER_assert(__CPROVER_bool assertion, const char *description)</div></div>
 <div class="ttc" id="afenv_8c_html_a5729c4728ebe75d4975bb7250a2d8f4a"><div class="ttname"><a href="fenv_8c.html#a5729c4728ebe75d4975bb7250a2d8f4a">fesetround</a></div><div class="ttdeci">int fesetround(int rounding_mode)</div><div class="ttdef"><b>Definition:</b> <a href="fenv_8c_source.html#l00027">fenv.c:27</a></div></div>
 <div class="ttc" id="afenv_8c_html_a94175070111cb2d4b3ba0c2a2742a016"><div class="ttname"><a href="fenv_8c.html#a94175070111cb2d4b3ba0c2a2742a016">__CPROVER_rounding_mode</a></div><div class="ttdeci">int __CPROVER_rounding_mode</div><div class="ttdef"><b>Definition:</b> <a href="x86__assembler_8c_source.html#l00014">x86_assembler.c:14</a></div></div>
+<div class="ttc" id="afenv_8c_html_aeecf59ba4dd156c6a9954bd0c1a9f6eb"><div class="ttname"><a href="fenv_8c.html#aeecf59ba4dd156c6a9954bd0c1a9f6eb">feraiseexcept</a></div><div class="ttdeci">int feraiseexcept(int excepts)</div><div class="ttdef"><b>Definition:</b> <a href="fenv_8c_source.html#l00046">fenv.c:46</a></div></div>
 <div class="ttc" id="afenv_8c_html_af43d2de25e6d5e3b65b1d1f32c01b3c8"><div class="ttname"><a href="fenv_8c.html#af43d2de25e6d5e3b65b1d1f32c01b3c8">fegetround</a></div><div class="ttdeci">int fegetround(void)</div><div class="ttdef"><b>Definition:</b> <a href="fenv_8c_source.html#l00007">fenv.c:7</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

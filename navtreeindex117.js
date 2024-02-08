@@ -1,5 +1,15 @@
 var NAVTREEINDEX117 =
 {
+"pointer__offset__size_8cpp.html":[9,0,2,30,155],
+"pointer__offset__size_8cpp.html#a349157d88463ecbc37f1ef6adeee3bf7":[9,0,2,30,155,0],
+"pointer__offset__size_8cpp.html#a3751585c30852e85bf3f6c089b5308f1":[9,0,2,30,155,6],
+"pointer__offset__size_8cpp.html#a3b37477af3bfef0e740adcc6b4ccf2e1":[9,0,2,30,155,7],
+"pointer__offset__size_8cpp.html#a40b117fcb74b388205d50cc4f2f31e6e":[9,0,2,30,155,9],
+"pointer__offset__size_8cpp.html#a62d0aab9adb8eecf3b2c36a91841955b":[9,0,2,30,155,3],
+"pointer__offset__size_8cpp.html#ab79b63ba225da50e6a2b6cb204da9ae6":[9,0,2,30,155,2],
+"pointer__offset__size_8cpp.html#ac341b0369fbfbcccfa6833a70572e0c8":[9,0,2,30,155,4],
+"pointer__offset__size_8cpp.html#acbc36bf5285e1134ef2675e42df8b5dd":[9,0,2,30,155,1],
+"pointer__offset__size_8cpp.html#acf57ee9d1ec8c2bacfdb4c8aeb35deca":[9,0,2,30,155,5],
 "pointer__offset__size_8cpp.html#ad97077eb0d7cce8a0b2eef8710fac220":[9,0,2,30,155,8],
 "pointer__offset__size_8cpp_source.html":[9,0,2,30,155],
 "pointer__offset__size_8h.html":[9,0,2,30,156],
@@ -239,15 +249,5 @@ var NAVTREEINDEX117 =
 "qbf__quantor_8cpp_source.html":[9,0,2,27,5,3],
 "qbf__quantor_8h.html":[9,0,2,27,5,4],
 "qbf__quantor_8h_source.html":[9,0,2,27,5,4],
-"qbf__qube_8cpp.html":[9,0,2,27,5,5],
-"qbf__qube_8cpp_source.html":[9,0,2,27,5,5],
-"qbf__qube_8h.html":[9,0,2,27,5,6],
-"qbf__qube_8h_source.html":[9,0,2,27,5,6],
-"qbf__qube__core_8cpp.html":[9,0,2,27,5,7],
-"qbf__qube__core_8cpp_source.html":[9,0,2,27,5,7],
-"qbf__qube__core_8h.html":[9,0,2,27,5,8],
-"qbf__qube__core_8h_source.html":[9,0,2,27,5,8],
-"qbf__skizzo_8cpp.html":[9,0,2,27,5,9],
-"qbf__skizzo_8cpp_source.html":[9,0,2,27,5,9],
-"qbf__skizzo_8h.html":[9,0,2,27,5,10]
+"qbf__qube_8cpp.html":[9,0,2,27,5,5]
 };

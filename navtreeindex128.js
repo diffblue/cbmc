@@ -1,5 +1,15 @@
 var NAVTREEINDEX128 =
 {
+"string__instrumentation_8h.html#a5f57b8d1ae38fae26ed679ebf46f7aa6":[9,0,2,16,139,3],
+"string__instrumentation_8h.html#a64a24742fe3e050a0056534d8a452bbd":[9,0,2,16,139,2],
+"string__instrumentation_8h.html#aa65dffaf781f21edce980dabb01d5433":[9,0,2,16,139,5],
+"string__instrumentation_8h.html#ab66a9d53717f617fc87b77bf50560010":[9,0,2,16,139,1],
+"string__instrumentation_8h.html#ade5f51774c6ac2f1e0743e9084c11827":[9,0,2,16,139,4],
+"string__instrumentation_8h_source.html":[9,0,2,16,139],
+"string__refinement_8cpp.html":[9,0,2,27,10,30],
+"string__refinement_8cpp.html#a01af496995e4473ade1505ec78db6fc1":[9,0,2,27,10,30,18],
+"string__refinement_8cpp.html#a0781922cc5aa65dddef7d7b466a89375":[9,0,2,27,10,30,28],
+"string__refinement_8cpp.html#a0a0d69f0ef04535d468689c3ec4651de":[9,0,2,27,10,30,8],
 "string__refinement_8cpp.html#a0e03ce13d9c646a358ddb197f2d5fe9c":[9,0,2,27,10,30,21],
 "string__refinement_8cpp.html#a0e73fabc25ec14162a8a5302766081d1":[9,0,2,27,10,30,27],
 "string__refinement_8cpp.html#a129aff44f6131c8a0e2ac21ee44eb5cd":[9,0,2,27,10,30,36],
@@ -239,15 +249,5 @@ var NAVTREEINDEX128 =
 "structabstract__object__statisticst.html#ac7932888b6793224d83521014d013722":[8,0,26,1],
 "structabstract__object__statisticst.html#aca8dc5aa4ab2418e9b8513869852cefc":[8,0,26,0],
 "structabstract__object__statisticst.html#ad740586f25bfe7f88fd60abbc8679c25":[8,0,26,7],
-"structabstract__object__statisticst.html#ae33014307e2687422fafbf52daf56a9f":[8,0,26,5],
-"structabstract__object__statisticst.html#ae40dc60ba4545c13c9142418fb5573ec":[8,0,26,3],
-"structabstract__objectt_1_1abstract__object__visitort.html":[8,0,27,0],
-"structabstract__objectt_1_1abstract__object__visitort.html#a4205d30d931cec63a5527ca7c7625c5e":[8,0,27,0,0],
-"structabstract__objectt_1_1combine__result.html":[8,0,27,1],
-"structabstract__objectt_1_1combine__result.html#a497fd14e8a70ee156d8364d715db87b7":[8,0,27,1,1],
-"structabstract__objectt_1_1combine__result.html#ae102a2c90d8a35057df5bb33ec7d3010":[8,0,27,1,0],
-"structacceleration__utilst_1_1polynomial__array__assignmentt.html":[8,0,33,0],
-"structacceleration__utilst_1_1polynomial__array__assignmentt.html#a045175cf80841296c7f1dd59adac9a67":[8,0,33,0,1],
-"structacceleration__utilst_1_1polynomial__array__assignmentt.html#ad142a41da6e8b9dfd4c00c09898ecdf0":[8,0,33,0,2],
-"structacceleration__utilst_1_1polynomial__array__assignmentt.html#ad8bcc3f36434c07cb6ebc14928afc04c":[8,0,33,0,0]
+"structabstract__object__statisticst.html#ae33014307e2687422fafbf52daf56a9f":[8,0,26,5]
 };
