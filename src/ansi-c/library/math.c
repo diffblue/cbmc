@@ -2575,9 +2575,13 @@ double exp(double x)
   __CPROVER_assume(result >= lower);
   __CPROVER_assume(result <= upper);
 
-  _Static_assert(
-    sizeof(double) == 2 * sizeof(int32_t),
-    "bit width of double is 2x bit width of int32_t");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
   union U
   {
     double d;
@@ -2642,9 +2646,13 @@ float expf(float x)
   __CPROVER_assume(result >= lower);
   __CPROVER_assume(result <= upper);
 
-  _Static_assert(
-    sizeof(float) == sizeof(int32_t),
-    "bit width of float and int32_t should match");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
   union U
   {
     float f;
@@ -2713,9 +2721,13 @@ long double expl(long double x)
   __CPROVER_assume(result >= lower);
   __CPROVER_assume(result <= upper);
 
-  _Static_assert(
-    sizeof(long double) % sizeof(int32_t) == 0,
-    "bit width of long double is a multiple of bit width of int32_t");
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
   union
   {
     long double l;
@@ -2772,9 +2784,13 @@ double log(double x)
 #pragma CPROVER check pop
   }
 
-  _Static_assert(
-    sizeof(double) == 2 * sizeof(int32_t),
-    "bit width of double is 2x bit width of int32_t");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
   // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
   union
   {
@@ -2833,9 +2849,13 @@ float logf(float x)
 #pragma CPROVER check pop
   }
 
-  _Static_assert(
-    sizeof(float) == sizeof(int32_t),
-    "bit width of float and int32_t should match");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
   // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
   union
   {
@@ -2898,9 +2918,13 @@ long double logl(long double x)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return log(x);
 #else
-  _Static_assert(
-    sizeof(long double) % sizeof(int32_t) == 0,
-    "bit width of long double is a multiple of bit width of int32_t");
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
   union
   {
     long double l;
@@ -2962,9 +2986,13 @@ double log2(double x)
 #pragma CPROVER check pop
   }
 
-  _Static_assert(
-    sizeof(double) == 2 * sizeof(int32_t),
-    "bit width of double is 2x bit width of int32_t");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
   union
   {
     double d;
@@ -3022,9 +3050,13 @@ float log2f(float x)
 #pragma CPROVER check pop
   }
 
-  _Static_assert(
-    sizeof(float) == sizeof(int32_t),
-    "bit width of float and int32_t should match");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
   union
   {
     float f;
@@ -3086,9 +3118,13 @@ long double log2l(long double x)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return log2(x);
 #else
-  _Static_assert(
-    sizeof(long double) % sizeof(int32_t) == 0,
-    "bit width of long double is a multiple of bit width of int32_t");
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
   union
   {
     long double l;
@@ -3150,9 +3186,13 @@ double log10(double x)
 #pragma CPROVER check pop
   }
 
-  _Static_assert(
-    sizeof(double) == 2 * sizeof(int32_t),
-    "bit width of double is 2x bit width of int32_t");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
   // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
   union
   {
@@ -3213,9 +3253,13 @@ float log10f(float x)
 #pragma CPROVER check pop
   }
 
-  _Static_assert(
-    sizeof(float) == sizeof(int32_t),
-    "bit width of float and int32_t should match");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
   // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
   union
   {
@@ -3279,9 +3323,13 @@ long double log10l(long double x)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return log10(x);
 #else
-  _Static_assert(
-    sizeof(long double) % sizeof(int32_t) == 0,
-    "bit width of long double is a multiple of bit width of int32_t");
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
   union
   {
     long double l;
@@ -3404,9 +3452,13 @@ double pow(double x, double y)
     return 0.0 / 0.0;
 #pragma CPROVER check pop
 
-  _Static_assert(
-    sizeof(double) == 2 * sizeof(int32_t),
-    "bit width of double is 2x bit width of int32_t");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
   // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
   union
   {
@@ -3545,9 +3597,13 @@ float powf(float x, float y)
     return 0.0f / 0.0f;
 #pragma CPROVER check pop
 
-  _Static_assert(
-    sizeof(float) == sizeof(int32_t),
-    "bit width of float and int32_t should match");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
   union
   {
     float f;
@@ -3684,9 +3740,13 @@ long double powl(long double x, long double y)
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return pow(x, y);
 #else
-  _Static_assert(
-    sizeof(long double) % sizeof(int32_t) == 0,
-    "bit width of long double is a multiple of bit width of int32_t");
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
   union U
   {
     long double l;
