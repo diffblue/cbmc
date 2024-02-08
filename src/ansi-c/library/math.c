@@ -2558,7 +2558,10 @@ double exp(double x)
   else if(x > 1024.0 * M_LN2)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return HUGE_VAL;
+#pragma CPROVER check pop
   }
 
   // Nicol N. Schraudolph: A Fast, Compact Approximation of the Exponential
@@ -2632,7 +2635,10 @@ float expf(float x)
   else if(x > 128.0f * (float)M_LN2)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return HUGE_VALF;
+#pragma CPROVER check pop
   }
 
   // 23 is 32 - 1 sign bit - 8 exponent bits
@@ -2708,7 +2714,10 @@ long double expl(long double x)
   else if(x > 16384.0l * M_LN2)
   {
     errno = ERANGE;
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "float-overflow"
     return HUGE_VALL;
+#  pragma CPROVER check pop
   }
   // 16 is 32 - 1 sign bit - 15 exponent bits
   int32_t bias = (1 << 16) * ((1 << 14) - 1);
@@ -2773,7 +2782,10 @@ double log(double x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VAL;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signd(x))
   {
@@ -2838,7 +2850,10 @@ float logf(float x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VALF;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signf(x))
   {
@@ -2904,7 +2919,10 @@ long double logl(long double x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VALL;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signld(x))
   {
@@ -2975,7 +2993,10 @@ double log2(double x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VAL;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signd(x))
   {
@@ -3039,7 +3060,10 @@ float log2f(float x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VALF;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signf(x))
   {
@@ -3104,7 +3128,10 @@ long double log2l(long double x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VALL;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signld(x))
   {
@@ -3175,7 +3202,10 @@ double log10(double x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VAL;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signd(x))
   {
@@ -3242,7 +3272,10 @@ float log10f(float x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VALF;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signf(x))
   {
@@ -3309,7 +3342,10 @@ long double log10l(long double x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VALL;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signld(x))
   {
@@ -3441,10 +3477,13 @@ double pow(double x, double y)
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signd(y))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     if(__CPROVER_signd(x) && nearbyint(y) == y && fabs(fmod(y, 2.0)) == 1.0)
       return -HUGE_VAL;
     else
       return HUGE_VAL;
+#pragma CPROVER check pop
   }
   else if(isnan(x) || isnan(y))
 #pragma CPROVER check push
@@ -3479,7 +3518,10 @@ double pow(double x, double y)
   if(fabs(mult_result) > (double)(1 << 30))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return y > 0.0 ? HUGE_VAL : 0.0;
+#pragma CPROVER check pop
   }
 #if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   u.i[1] = (int32_t)mult_result + (bias + exp_c);
@@ -3583,6 +3625,8 @@ float powf(float x, float y)
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signf(y))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     if(
       __CPROVER_signf(x) && nearbyintf(y) == y && fabsf(fmodf(y, 2.0f)) == 1.0f)
     {
@@ -3590,6 +3634,7 @@ float powf(float x, float y)
     }
     else
       return HUGE_VALF;
+#pragma CPROVER check pop
   }
   else if(isnanf(x) || isnanf(y))
 #pragma CPROVER check push
@@ -3619,7 +3664,10 @@ float powf(float x, float y)
   if(fabsf(mult_result) > (float)(1 << 30))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return y > 0.0f ? HUGE_VALF : 0.0f;
+#pragma CPROVER check pop
   }
   u.i = (int32_t)mult_result + (bias + exp_c);
   return u.f;
@@ -3722,6 +3770,8 @@ long double powl(long double x, long double y)
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signld(y))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     if(
       __CPROVER_signld(x) && nearbyintl(y) == y &&
       fabsl(fmodl(y, 2.0l)) == 1.0l)
@@ -3730,6 +3780,7 @@ long double powl(long double x, long double y)
     }
     else
       return HUGE_VALL;
+#pragma CPROVER check pop
   }
   else if(isnanl(x) || isnanl(y))
 #pragma CPROVER check push
@@ -3767,7 +3818,10 @@ long double powl(long double x, long double y)
   if(fabsl(mult_result) > (long double)(1 << 30))
   {
     errno = ERANGE;
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "float-overflow"
     return y > 0.0l ? HUGE_VALL : 0.0l;
+#  pragma CPROVER check pop
   }
   int32_t result = (int32_t)mult_result + (bias + exp_c);
   union U result_u = {.i = {0}};
