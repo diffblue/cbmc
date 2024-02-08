@@ -1,7 +1,7 @@
 var classremove__asmt =
 [
     [ "remove_asmt", "classremove__asmt.html#a0e572739661cc2fc020743650d494055", null ],
-    [ "gcc_asm_function_call", "classremove__asmt.html#ac56bd64a05a9e7432ee701a400454c29", null ],
+    [ "gcc_asm_function_call", "classremove__asmt.html#acb882ade3a481b11939d301acca3ff0f", null ],
     [ "msc_asm_function_call", "classremove__asmt.html#a4f8fb4b21e26f2d7f0b5bbae0f1c5d12", null ],
     [ "operator()", "classremove__asmt.html#a344f08dc28c044e4516ecaeb2f8b1e98", null ],
     [ "process_function", "classremove__asmt.html#a241b1deb2fd4c4dc06fb0d2972d98a7e", null ],
