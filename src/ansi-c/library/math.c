@@ -220,21 +220,33 @@ int __isnormalf(float f)
 
 float __builtin_inff(void)
 {
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-overflow"
   return 1.0f / 0.0f;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: __builtin_inf */
 
 double __builtin_inf(void)
 {
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-overflow"
   return 1.0 / 0.0;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: __builtin_infl */
 
 long double __builtin_infl(void)
 {
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-overflow"
   return 1.0l / 0.0l;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: __builtin_isinf */
@@ -276,21 +288,33 @@ int __builtin_isnanf(float f)
 
 float __builtin_huge_valf(void)
 {
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-overflow"
   return 1.0f / 0.0f;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: __builtin_huge_val */
 
 double __builtin_huge_val(void)
 {
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-overflow"
   return 1.0 / 0.0;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: __builtin_huge_vall */
 
 long double __builtin_huge_vall(void)
 {
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-overflow"
   return 1.0l / 0.0l;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: _dsign */
@@ -597,7 +621,10 @@ double __builtin_nan(const char *str)
   // the 'str' argument is not yet used
 __CPROVER_hide:;
   (void)*str;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
   return 0.0/0.0;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: __builtin_nanf */
@@ -607,7 +634,10 @@ float __builtin_nanf(const char *str)
   // the 'str' argument is not yet used
 __CPROVER_hide:;
   (void)*str;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
   return 0.0f/0.0f;
+#pragma CPROVER check pop
 }
 
 
@@ -630,7 +660,10 @@ double nan(const char *str) {
   // the 'str' argument is not yet used
  __CPROVER_hide:;
   (void)*str;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
   return 0.0/0.0;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: nanf */
@@ -639,7 +672,10 @@ float nanf(const char *str) {
   // the 'str' argument is not yet used
  __CPROVER_hide:;
   (void)*str;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
   return 0.0f/0.0f;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: nanl */
@@ -648,7 +684,10 @@ long double nanl(const char *str) {
   // the 'str' argument is not yet used
  __CPROVER_hide:;
   (void)*str;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
   return 0.0/0.0;
+#pragma CPROVER check pop
 }
 
 /* FUNCTION: nextUpf */
@@ -676,7 +715,10 @@ float nextUpf(float f)
 {
 __CPROVER_hide:;
   if (__CPROVER_isnanf(f))
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0f/0.0f;  // NaN
+#pragma CPROVER check pop
   else if (f == 0.0f)
     return 0x1p-149f;
   else if (f > 0.0f)
@@ -725,7 +767,10 @@ double nextUp(double d)
 {
 __CPROVER_hide:;
   if (__CPROVER_isnand(d))
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0/0.0;  // NaN
+#pragma CPROVER check pop
   else if (d == 0.0)
     return 0x1.0p-1074;
   else if (d > 0.0)
@@ -773,7 +818,10 @@ long double nextUpl(long double d)
 {
 __CPROVER_hide:;
   if(__CPROVER_isnanld(d))
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0/0.0;  // NaN
+#pragma CPROVER check pop
   else if (d == 0.0)
   {
     union mixl m;
@@ -840,7 +888,10 @@ float sqrtf(float f)
  __CPROVER_hide:;
 
   if ( f < 0.0f )
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0f/0.0f; // NaN
+#pragma CPROVER check pop
   else if (__CPROVER_isinff(f) ||   // +Inf only
            f == 0.0f          ||   // Includes -0
            __CPROVER_isnanf(f))
@@ -854,11 +905,14 @@ float sqrtf(float f)
     // number of exponent and significand bits.  Thus they are
     // given implicitly...
 
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     float lowerSquare = lower * lower;
     __CPROVER_assume(__CPROVER_isnormalf(lowerSquare));
 
     float upper = nextUpf(lower);
     float upperSquare = upper * upper;  // Might be +Inf
+#pragma CPROVER check pop
 
     // Restrict these to bound f and thus compute the possible
     // values for the square root.  Note that the lower bound
@@ -927,7 +981,10 @@ double sqrt(double d)
  __CPROVER_hide:;
 
   if ( d < 0.0 )
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0/0.0; // NaN
+#pragma CPROVER check pop
   else if (__CPROVER_isinfd(d) ||   // +Inf only
            d == 0.0            ||   // Includes -0
            __CPROVER_isnand(d))
@@ -938,11 +995,14 @@ double sqrt(double d)
     __CPROVER_assume(lower > 0.0);
     __CPROVER_assume(__CPROVER_isnormald(lower));
 
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     double lowerSquare = lower * lower;
     __CPROVER_assume(__CPROVER_isnormald(lowerSquare));
 
     double upper = nextUp(lower);
     double upperSquare = upper * upper;  // Might be +Inf
+#pragma CPROVER check pop
 
     __CPROVER_assume(lowerSquare <= d);
     __CPROVER_assume(d < upperSquare);
@@ -998,7 +1058,10 @@ long double sqrtl(long double d)
  __CPROVER_hide:;
 
   if(d < 0.0l)
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0l/0.0l; // NaN
+#pragma CPROVER check pop
   else if (__CPROVER_isinfld(d) ||   // +Inf only
            d == 0.0l            ||   // Includes -0
            __CPROVER_isnanld(d))
@@ -1009,11 +1072,14 @@ long double sqrtl(long double d)
     __CPROVER_assume(lower > 0.0l);
     __CPROVER_assume(__CPROVER_isnormalld(lower));
 
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     long double lowerSquare = lower * lower;
     __CPROVER_assume(__CPROVER_isnormalld(lowerSquare));
 
     long double upper = nextUpl(lower);
     long double upperSquare = upper * upper;  // Might be +Inf
+#pragma CPROVER check pop
 
     __CPROVER_assume(lowerSquare <= d);
     __CPROVER_assume(d < upperSquare);
@@ -2492,7 +2558,10 @@ double exp(double x)
   else if(x > 1024.0 * M_LN2)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return HUGE_VAL;
+#pragma CPROVER check pop
   }
 
   // Nicol N. Schraudolph: A Fast, Compact Approximation of the Exponential
@@ -2509,9 +2578,13 @@ double exp(double x)
   __CPROVER_assume(result >= lower);
   __CPROVER_assume(result <= upper);
 
-  _Static_assert(
-    sizeof(double) == 2 * sizeof(int32_t),
-    "bit width of double is 2x bit width of int32_t");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
   union U
   {
     double d;
@@ -2562,7 +2635,10 @@ float expf(float x)
   else if(x > 128.0f * (float)M_LN2)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return HUGE_VALF;
+#pragma CPROVER check pop
   }
 
   // 23 is 32 - 1 sign bit - 8 exponent bits
@@ -2576,9 +2652,13 @@ float expf(float x)
   __CPROVER_assume(result >= lower);
   __CPROVER_assume(result <= upper);
 
-  _Static_assert(
-    sizeof(float) == sizeof(int32_t),
-    "bit width of float and int32_t should match");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
   union U
   {
     float f;
@@ -2634,7 +2714,10 @@ long double expl(long double x)
   else if(x > 16384.0l * M_LN2)
   {
     errno = ERANGE;
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "float-overflow"
     return HUGE_VALL;
+#  pragma CPROVER check pop
   }
   // 16 is 32 - 1 sign bit - 15 exponent bits
   int32_t bias = (1 << 16) * ((1 << 14) - 1);
@@ -2647,9 +2730,13 @@ long double expl(long double x)
   __CPROVER_assume(result >= lower);
   __CPROVER_assume(result <= upper);
 
-  _Static_assert(
-    sizeof(long double) % sizeof(int32_t) == 0,
-    "bit width of long double is a multiple of bit width of int32_t");
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
   union
   {
     long double l;
@@ -2695,17 +2782,27 @@ double log(double x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VAL;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signd(x))
   {
     errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0 / 0.0;
+#pragma CPROVER check pop
   }
 
-  _Static_assert(
-    sizeof(double) == 2 * sizeof(int32_t),
-    "bit width of double is 2x bit width of int32_t");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
   // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
   union
   {
@@ -2753,17 +2850,27 @@ float logf(float x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VALF;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signf(x))
   {
     errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0f / 0.0f;
+#pragma CPROVER check pop
   }
 
-  _Static_assert(
-    sizeof(float) == sizeof(int32_t),
-    "bit width of float and int32_t should match");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
   // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
   union
   {
@@ -2812,20 +2919,30 @@ long double logl(long double x)
   else if(fpclassify(x) == FP_ZERO)
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return -HUGE_VALL;
+#pragma CPROVER check pop
   }
   else if(__CPROVER_signld(x))
   {
     errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0l / 0.0l;
+#pragma CPROVER check pop
   }
 
 #if LDBL_MAX_EXP == DBL_MAX_EXP
-  return logl(x);
+  return log(x);
 #else
-  _Static_assert(
-    sizeof(long double) % sizeof(int32_t) == 0,
-    "bit width of long double is a multiple of bit width of int32_t");
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
   union
   {
     long double l;
@@ -2841,6 +2958,429 @@ long double logl(long double x)
 #  else
   return ((long double)u.i[0] - (long double)(bias + exp_c)) * M_LN2 /
          (long double)(1 << 16);
+#  endif
+#endif
+}
+
+/* FUNCTION: log2 */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+double log2(double x)
+{
+  if(__CPROVER_isnand(x) || (__CPROVER_isinfd(x) && !__CPROVER_signd(x)))
+    return x;
+  else if(x == 1.0)
+    return +0.0;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
+    return -HUGE_VAL;
+#pragma CPROVER check pop
+  }
+  else if(__CPROVER_signd(x))
+  {
+    errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+    return 0.0 / 0.0;
+#pragma CPROVER check pop
+  }
+
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
+  union
+  {
+    double d;
+    int32_t i[2];
+  } u = {x};
+  int32_t bias = (1 << 20) * ((1 << 10) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -90253 && exp_c <= 1);
+#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  return ((double)u.i[1] - (double)(bias + exp_c)) / (double)(1 << 20);
+#else
+  return ((double)u.i[0] - (double)(bias + exp_c)) / (double)(1 << 20);
+#endif
+}
+
+/* FUNCTION: log2f */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+float log2f(float x)
+{
+  if(__CPROVER_isnanf(x) || (__CPROVER_isinff(x) && !__CPROVER_signf(x)))
+    return x;
+  else if(x == 1.0f)
+    return +0.0f;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
+    return -HUGE_VALF;
+#pragma CPROVER check pop
+  }
+  else if(__CPROVER_signf(x))
+  {
+    errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+    return 0.0f / 0.0f;
+#pragma CPROVER check pop
+  }
+
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
+  union
+  {
+    float f;
+    int32_t i;
+  } u = {x};
+  int32_t bias = (1 << 23) * ((1 << 7) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -722019 && exp_c <= 1);
+  return ((float)u.i - (float)(bias + exp_c)) / (float)(1 << 23);
+}
+
+/* FUNCTION: log2l */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FLOAT_H_INCLUDED
+#  include <float.h>
+#  define __CPROVER_FLOAT_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+long double log2l(long double x)
+{
+  if(__CPROVER_isnanld(x) || (__CPROVER_isinfld(x) && !__CPROVER_signld(x)))
+    return x;
+  else if(x == 1.0l)
+    return +0.0l;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
+    return -HUGE_VALL;
+#pragma CPROVER check pop
+  }
+  else if(__CPROVER_signld(x))
+  {
+    errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+    return 0.0l / 0.0l;
+#pragma CPROVER check pop
+  }
+
+#if LDBL_MAX_EXP == DBL_MAX_EXP
+  return log2(x);
+#else
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
+  union
+  {
+    long double l;
+    int32_t i[sizeof(long double) / sizeof(int32_t)];
+  } u = {x};
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  return ((long double)u.i[sizeof(long double) / sizeof(int32_t) - 1] -
+          (long double)(bias + exp_c)) /
+         (long double)(1 << 16);
+#  else
+  return ((long double)u.i[0] - (long double)(bias + exp_c)) /
+         (long double)(1 << 16);
+#  endif
+#endif
+}
+
+/* FUNCTION: log10 */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+double log10(double x)
+{
+  if(__CPROVER_isnand(x) || (__CPROVER_isinfd(x) && !__CPROVER_signd(x)))
+    return x;
+  else if(x == 1.0)
+    return +0.0;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
+    return -HUGE_VAL;
+#pragma CPROVER check pop
+  }
+  else if(__CPROVER_signd(x))
+  {
+    errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+    return 0.0 / 0.0;
+#pragma CPROVER check pop
+  }
+
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
+  // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+  union
+  {
+    double d;
+    int32_t i[2];
+  } u = {x};
+  int32_t bias = (1 << 20) * ((1 << 10) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -90253 && exp_c <= 1);
+#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  return ((double)u.i[1] - (double)(bias + exp_c)) * (M_LN2 / M_LN10) /
+         (double)(1 << 20);
+#else
+  return ((double)u.i[0] - (double)(bias + exp_c)) * (M_LN2 / M_LN10) /
+         (double)(1 << 20);
+#endif
+}
+
+/* FUNCTION: log10f */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+float log10f(float x)
+{
+  if(__CPROVER_isnanf(x) || (__CPROVER_isinff(x) && !__CPROVER_signf(x)))
+    return x;
+  else if(x == 1.0f)
+    return +0.0f;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
+    return -HUGE_VALF;
+#pragma CPROVER check pop
+  }
+  else if(__CPROVER_signf(x))
+  {
+    errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+    return 0.0f / 0.0f;
+#pragma CPROVER check pop
+  }
+
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
+  // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
+  union
+  {
+    float f;
+    int32_t i;
+  } u = {x};
+  int32_t bias = (1 << 23) * ((1 << 7) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -722019 && exp_c <= 1);
+  return ((float)u.i - (float)(bias + exp_c)) * (float)(M_LN2 / M_LN10) /
+         (float)(1 << 23);
+}
+
+/* FUNCTION: log10l */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  ifdef _WIN32
+#    define _USE_MATH_DEFINES
+#  endif
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDINT_H_INCLUDED
+#  include <stdint.h>
+#  define __CPROVER_STDINT_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FLOAT_H_INCLUDED
+#  include <float.h>
+#  define __CPROVER_FLOAT_H_INCLUDED
+#endif
+
+int32_t __VERIFIER_nondet_int32_t(void);
+
+long double log10l(long double x)
+{
+  if(__CPROVER_isnanld(x) || (__CPROVER_isinfld(x) && !__CPROVER_signld(x)))
+    return x;
+  else if(x == 1.0l)
+    return +0.0l;
+  else if(fpclassify(x) == FP_ZERO)
+  {
+    errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
+    return -HUGE_VALL;
+#pragma CPROVER check pop
+  }
+  else if(__CPROVER_signld(x))
+  {
+    errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+    return 0.0l / 0.0l;
+#pragma CPROVER check pop
+  }
+
+#if LDBL_MAX_EXP == DBL_MAX_EXP
+  return log10(x);
+#else
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
+  union
+  {
+    long double l;
+    int32_t i[sizeof(long double) / sizeof(int32_t)];
+  } u = {x};
+  int32_t bias = (1 << 16) * ((1 << 14) - 1);
+  int32_t exp_c = __VERIFIER_nondet_int32_t();
+  __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  return ((long double)u.i[sizeof(long double) / sizeof(int32_t) - 1] -
+          (long double)(bias + exp_c)) *
+         (M_LN2 / M_LN10) / (long double)(1 << 16);
+#  else
+  return ((long double)u.i[0] - (long double)(bias + exp_c)) *
+         (M_LN2 / M_LN10) / (long double)(1 << 16);
 #  endif
 #endif
 }
@@ -2874,7 +3414,10 @@ double pow(double x, double y)
     nearbyint(y) != y)
   {
     errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0 / 0.0;
+#pragma CPROVER check pop
   }
   else if(x == 1.0)
     return 1.0;
@@ -2934,17 +3477,27 @@ double pow(double x, double y)
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signd(y))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     if(__CPROVER_signd(x) && nearbyint(y) == y && fabs(fmod(y, 2.0)) == 1.0)
       return -HUGE_VAL;
     else
       return HUGE_VAL;
+#pragma CPROVER check pop
   }
   else if(isnan(x) || isnan(y))
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0 / 0.0;
+#pragma CPROVER check pop
 
-  _Static_assert(
-    sizeof(double) == 2 * sizeof(int32_t),
-    "bit width of double is 2x bit width of int32_t");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(double) == 2 * sizeof(int32_t),
+     "bit width of double is 2x bit width of int32_t");
   // https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
   union
   {
@@ -2954,15 +3507,21 @@ double pow(double x, double y)
   int32_t bias = (1 << 20) * ((1 << 10) - 1);
   int32_t exp_c = __VERIFIER_nondet_int32_t();
   __CPROVER_assume(exp_c >= -90253 && exp_c <= 1);
+#pragma CPROVER check push
+#pragma CPROVER check disable "signed-overflow"
 #if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   double mult_result = y * (double)(u.i[1] - (bias + exp_c));
 #else
   double mult_result = y * (double)(u.i[0] - (bias + exp_c));
 #endif
+#pragma CPROVER check pop
   if(fabs(mult_result) > (double)(1 << 30))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return y > 0.0 ? HUGE_VAL : 0.0;
+#pragma CPROVER check pop
   }
 #if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   u.i[1] = (int32_t)mult_result + (bias + exp_c);
@@ -3003,7 +3562,10 @@ float powf(float x, float y)
     nearbyintf(y) != y)
   {
     errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0f / 0.0f;
+#pragma CPROVER check pop
   }
   else if(x == 1.0f)
     return 1.0f;
@@ -3063,6 +3625,8 @@ float powf(float x, float y)
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signf(y))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     if(
       __CPROVER_signf(x) && nearbyintf(y) == y && fabsf(fmodf(y, 2.0f)) == 1.0f)
     {
@@ -3070,13 +3634,21 @@ float powf(float x, float y)
     }
     else
       return HUGE_VALF;
+#pragma CPROVER check pop
   }
   else if(isnanf(x) || isnanf(y))
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0f / 0.0f;
+#pragma CPROVER check pop
 
-  _Static_assert(
-    sizeof(float) == sizeof(int32_t),
-    "bit width of float and int32_t should match");
+#ifndef _MSC_VER
+  _Static_assert
+#else
+  static_assert
+#endif
+    (sizeof(float) == sizeof(int32_t),
+     "bit width of float and int32_t should match");
   union
   {
     float f;
@@ -3085,11 +3657,17 @@ float powf(float x, float y)
   int32_t bias = (1 << 23) * ((1 << 7) - 1);
   int32_t exp_c = __VERIFIER_nondet_int32_t();
   __CPROVER_assume(exp_c >= -722019 && exp_c <= 1);
+#pragma CPROVER check push
+#pragma CPROVER check disable "signed-overflow"
   float mult_result = y * (float)(u.i - (bias + exp_c));
+#pragma CPROVER check pop
   if(fabsf(mult_result) > (float)(1 << 30))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     return y > 0.0f ? HUGE_VALF : 0.0f;
+#pragma CPROVER check pop
   }
   u.i = (int32_t)mult_result + (bias + exp_c);
   return u.f;
@@ -3129,7 +3707,10 @@ long double powl(long double x, long double y)
     nearbyintl(y) != y)
   {
     errno = EDOM;
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0l / 0.0l;
+#pragma CPROVER check pop
   }
   else if(x == 1.0l)
     return 1.0l;
@@ -3189,6 +3770,8 @@ long double powl(long double x, long double y)
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signld(y))
   {
     errno = ERANGE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "float-overflow"
     if(
       __CPROVER_signld(x) && nearbyintl(y) == y &&
       fabsl(fmodl(y, 2.0l)) == 1.0l)
@@ -3197,16 +3780,24 @@ long double powl(long double x, long double y)
     }
     else
       return HUGE_VALL;
+#pragma CPROVER check pop
   }
   else if(isnanl(x) || isnanl(y))
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
     return 0.0l / 0.0l;
+#pragma CPROVER check pop
 
 #if LDBL_MAX_EXP == DBL_MAX_EXP
   return pow(x, y);
 #else
-  _Static_assert(
-    sizeof(long double) % sizeof(int32_t) == 0,
-    "bit width of long double is a multiple of bit width of int32_t");
+#  ifndef _MSC_VER
+  _Static_assert
+#  else
+  static_assert
+#  endif
+    (sizeof(long double) % sizeof(int32_t) == 0,
+     "bit width of long double is a multiple of bit width of int32_t");
   union U
   {
     long double l;
@@ -3220,11 +3811,17 @@ long double powl(long double x, long double y)
   int32_t bias = (1 << 16) * ((1 << 14) - 1);
   int32_t exp_c = __VERIFIER_nondet_int32_t();
   __CPROVER_assume(exp_c >= -5641 && exp_c <= 1);
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "signed-overflow"
   long double mult_result = y * (long double)(exponent - (bias + exp_c));
+#  pragma CPROVER check pop
   if(fabsl(mult_result) > (long double)(1 << 30))
   {
     errno = ERANGE;
+#  pragma CPROVER check push
+#  pragma CPROVER check disable "float-overflow"
     return y > 0.0l ? HUGE_VALL : 0.0l;
+#  pragma CPROVER check pop
   }
   int32_t result = (int32_t)mult_result + (bias + exp_c);
   union U result_u = {.i = {0}};
@@ -3234,5 +3831,170 @@ long double powl(long double x, long double y)
   result_u.i[0] = result;
 #  endif
   return result_u.l;
+#endif
+}
+
+/* FUNCTION: fma */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#  include <fenv.h>
+#  define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __builtin_inf(void);
+
+double fma(double x, double y, double z)
+{
+  // see man fma (https://linux.die.net/man/3/fma)
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+  if(isnan(x) || isnan(y))
+    return 0.0 / 0.0;
+  else if(
+    (isinf(x) || isinf(y)) &&
+    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0 / 0.0;
+  }
+  else if(isnan(z))
+    return 0.0 / 0.0;
+
+#pragma CPROVER check disable "float-overflow"
+  double x_times_y = x * y;
+  if(
+    isinf(x_times_y) && isinf(z) &&
+    __CPROVER_signd(x_times_y) != __CPROVER_signd(z))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0 / 0.0;
+  }
+#pragma CPROVER check pop
+
+  if(isinf(x_times_y))
+  {
+    feraiseexcept(FE_OVERFLOW);
+    return __CPROVER_signd(x_times_y) ? -__builtin_inf() : __builtin_inf();
+  }
+  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+
+  return x_times_y + z;
+}
+
+/* FUNCTION: fmaf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#  include <fenv.h>
+#  define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __builtin_inff(void);
+
+float fmaf(float x, float y, float z)
+{
+  // see man fma (https://linux.die.net/man/3/fma)
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+  if(isnanf(x) || isnanf(y))
+    return 0.0f / 0.0f;
+  else if(
+    (isinff(x) || isinff(y)) &&
+    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0f / 0.0f;
+  }
+  else if(isnanf(z))
+    return 0.0f / 0.0f;
+
+#pragma CPROVER check disable "float-overflow"
+  float x_times_y = x * y;
+  if(
+    isinff(x_times_y) && isinff(z) &&
+    __CPROVER_signf(x_times_y) != __CPROVER_signf(z))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0f / 0.0f;
+  }
+#pragma CPROVER check pop
+
+  if(isinff(x_times_y))
+  {
+    feraiseexcept(FE_OVERFLOW);
+    return __CPROVER_signf(x_times_y) ? -__builtin_inff() : __builtin_inff();
+  }
+  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+
+  return x_times_y + z;
+}
+
+/* FUNCTION: fmal */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#  include <math.h>
+#  define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#  include <fenv.h>
+#  define __CPROVER_FENV_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FLOAT_H_INCLUDED
+#  include <float.h>
+#  define __CPROVER_FLOAT_H_INCLUDED
+#endif
+
+long double __builtin_infl(void);
+
+long double fmal(long double x, long double y, long double z)
+{
+  // see man fma (https://linux.die.net/man/3/fma)
+#pragma CPROVER check push
+#pragma CPROVER check disable "div-by-zero"
+  if(isnanl(x) || isnanl(y))
+    return 0.0l / 0.0l;
+  else if(
+    (isinfl(x) || isinfl(y)) &&
+    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0l / 0.0l;
+  }
+  else if(isnanl(z))
+    return 0.0l / 0.0l;
+
+#pragma CPROVER check disable "float-overflow"
+  long double x_times_y = x * y;
+  if(
+    isinfl(x_times_y) && isinfl(z) &&
+    __CPROVER_signld(x_times_y) != __CPROVER_signld(z))
+  {
+    feraiseexcept(FE_INVALID);
+    return 0.0l / 0.0l;
+  }
+#pragma CPROVER check pop
+
+#if LDBL_MAX_EXP == DBL_MAX_EXP
+  return fma(x, y, z);
+#else
+  if(isinfl(x_times_y))
+  {
+    feraiseexcept(FE_OVERFLOW);
+    return __CPROVER_signld(x_times_y) ? -__builtin_infl() : __builtin_infl();
+  }
+  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
+
+  return x_times_y + z;
 #endif
 }

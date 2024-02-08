@@ -40,3 +40,12 @@ __CPROVER_HIDE:;
     0;
   return 0; // we never fail
 }
+
+/* FUNCTION: feraiseexcept */
+
+int feraiseexcept(int excepts)
+{
+__CPROVER_HIDE:;
+  __CPROVER_assert(excepts == 0, "floating-point exception");
+  return 0; // we never fail
+}
