@@ -161,6 +161,38 @@ public:
   {
     return get(ID_identifier);
   }
+
+  /// Add the source location from \p location, if it is non-nil.
+  symbol_exprt &with_source_location(source_locationt location) &
+  {
+    if(location.is_not_nil())
+      add_source_location() = std::move(location);
+    return *this;
+  }
+
+  /// Add the source location from \p location, if it is non-nil.
+  symbol_exprt &&with_source_location(source_locationt location) &&
+  {
+    if(location.is_not_nil())
+      add_source_location() = std::move(location);
+    return std::move(*this);
+  }
+
+  /// Add the source location from \p other, if it has any.
+  symbol_exprt &with_source_location(const exprt &other) &
+  {
+    if(other.source_location().is_not_nil())
+      add_source_location() = other.source_location();
+    return *this;
+  }
+
+  /// Add the source location from \p other, if it has any.
+  symbol_exprt &&with_source_location(const exprt &other) &&
+  {
+    if(other.source_location().is_not_nil())
+      add_source_location() = other.source_location();
+    return std::move(*this);
+  }
 };
 
 // NOLINTNEXTLINE(readability/namespace)

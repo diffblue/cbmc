@@ -97,6 +97,22 @@ public:
   const operandst &operands() const
   { return (const operandst &)get_sub(); }
 
+  /// Add the source location from \p location, if it is non-nil.
+  exprt &with_source_location(source_locationt location) &
+  {
+    if(location.is_not_nil())
+      add_source_location() = std::move(location);
+    return *this;
+  }
+
+  /// Add the source location from \p location, if it is non-nil.
+  exprt &&with_source_location(source_locationt location) &&
+  {
+    if(location.is_not_nil())
+      add_source_location() = std::move(location);
+    return std::move(*this);
+  }
+
   /// Add the source location from \p other, if it has any.
   exprt &with_source_location(const exprt &other) &
   {
