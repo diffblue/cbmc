@@ -133,7 +133,8 @@ void remove_asmt::gcc_asm_function_call(
       arguments.size(), code_typet::parametert{void_pointer}},
     empty_typet()};
 
-  symbol_exprt fkt(function_identifier, fkt_type);
+  auto fkt = symbol_exprt{function_identifier, fkt_type}.with_source_location(
+    code.source_location());
 
   code_function_callt function_call(std::move(fkt), std::move(arguments));
 
@@ -189,8 +190,8 @@ void remove_asmt::msc_asm_function_call(
       arguments.size(), code_typet::parametert{void_pointer}},
     empty_typet()};
 
-  symbol_exprt fkt(function_identifier, fkt_type);
-
+  auto fkt = symbol_exprt{function_identifier, fkt_type}.with_source_location(
+    code.source_location());
   code_function_callt function_call(std::move(fkt), std::move(arguments));
 
   dest.add(

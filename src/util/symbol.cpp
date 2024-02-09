@@ -120,7 +120,7 @@ void symbolt::swap(symbolt &b)
 ///   type of the symbol object.
 symbol_exprt symbolt::symbol_expr() const
 {
-  return symbol_exprt(name, type);
+  return symbol_exprt(name, type).with_source_location(location);
 }
 
 /// Check that the instance object is well formed.

@@ -236,7 +236,7 @@ exprt value_set_dereferencet::handle_dereference_base_case(
       pointer.type(),
       "derefd_pointer",
       "derefd_pointer",
-      source_locationt(),
+      pointer.find_source_location(),
       language_mode,
       new_symbol_table);
 
