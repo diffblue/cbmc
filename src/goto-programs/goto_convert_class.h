@@ -107,8 +107,6 @@ protected:
 
   void rewrite_boolean(exprt &dest);
 
-  static bool has_function_call(const exprt &expr);
-
   void remove_side_effect(
     side_effect_exprt &expr,
     goto_programt &dest,

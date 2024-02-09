@@ -22,21 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_expr.h>
 
-bool goto_convertt::has_function_call(const exprt &expr)
-{
-  for(const auto &op : expr.operands())
-  {
-    if(has_function_call(op))
-      return true;
-  }
-
-  if(expr.id()==ID_side_effect &&
-     expr.get(ID_statement)==ID_function_call)
-    return true;
-
-  return false;
-}
-
 void goto_convertt::remove_assignment(
   side_effect_exprt &expr,
   goto_programt &dest,
