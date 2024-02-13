@@ -13,7 +13,6 @@ Author: CM Wintersteiger
 
 #include <fstream>
 
-#include <util/exception_utils.h>
 #include <util/irep_serialization.h>
 #include <util/message.h>
 
@@ -144,12 +143,14 @@ static void write_goto_binary(
 bool write_goto_binary(
   std::ostream &out,
   const goto_modelt &goto_model,
+  message_handlert &message_handler,
   int version)
 {
   return write_goto_binary(
     out,
     goto_model.symbol_table,
     goto_model.goto_functions,
+    message_handler,
     version);
 }
 
@@ -158,6 +159,7 @@ bool write_goto_binary(
   std::ostream &out,
   const symbol_table_baset &symbol_table,
   const goto_functionst &goto_functions,
+  message_handlert &message_handler,
   int version)
 {
   // header
@@ -169,15 +171,19 @@ bool write_goto_binary(
 
   if(version < GOTO_BINARY_VERSION)
   {
-    throw invalid_command_line_argument_exceptiont(
-      "version " + std::to_string(version) + " no longer supported",
-      "supported version = " + std::to_string(GOTO_BINARY_VERSION));
+    messaget message{message_handler};
+    message.error() << "version " << version << " no longer supported; "
+                    << "supported version = " << GOTO_BINARY_VERSION
+                    << messaget::eom;
+    return true;
   }
   if(version > GOTO_BINARY_VERSION)
   {
-    throw invalid_command_line_argument_exceptiont(
-      "unknown goto binary version " + std::to_string(version),
-      "supported version = " + std::to_string(GOTO_BINARY_VERSION));
+    messaget message{message_handler};
+    message.error() << "unknown goto binary version " << version << "; "
+                    << "supported version = " << GOTO_BINARY_VERSION
+                    << messaget::eom;
+    return true;
   }
   write_goto_binary(out, symbol_table, goto_functions, irepconverter);
   return false;
@@ -198,5 +204,5 @@ bool write_goto_binary(
     return true;
   }
 
-  return write_goto_binary(out, goto_model);
+  return write_goto_binary(out, goto_model, message_handler);
 }

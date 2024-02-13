@@ -190,7 +190,6 @@ bool static_simplifier(
   goto_model.goto_functions.update();
 
   m.status() << "Writing goto binary" << messaget::eom;
-  return write_goto_binary(out,
-                           ns.get_symbol_table(),
-                           goto_model.goto_functions);
+  return write_goto_binary(
+    out, ns.get_symbol_table(), goto_model.goto_functions, message_handler);
 }

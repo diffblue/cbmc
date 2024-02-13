@@ -163,8 +163,13 @@ int goto_harness_parse_optionst::doit()
   }
   else
   {
-    write_goto_binary(
-      got_harness_config.out_file, goto_model, log.get_message_handler());
+    if(write_goto_binary(
+         got_harness_config.out_file, goto_model, log.get_message_handler()))
+    {
+      throw deserialization_exceptiont{
+        "failed to write goto program to file '" + got_harness_config.out_file +
+        "'"};
+    }
   }
 
   return CPROVER_EXIT_SUCCESS;
