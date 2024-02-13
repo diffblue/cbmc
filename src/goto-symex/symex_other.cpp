@@ -183,6 +183,11 @@ void goto_symext::symex_other(
     // obtain the actual array(s)
     process_array_expr(state, array_expr);
 
+    // if we dereferenced a void pointer, we may get a zero-sized (failed)
+    // object -- nothing to be assigned
+    if(array_expr.type().id() == ID_empty)
+      return;
+
     // prepare to build the array_of
     exprt value = clean_expr(code.op1(), state, false);
 

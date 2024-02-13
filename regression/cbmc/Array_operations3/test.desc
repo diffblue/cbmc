@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^\[main.assertion.1\] line 5 should fail: array_set had no effect on invalid object: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+An array_set on an invalid pointer must not result in an invariant failure.
