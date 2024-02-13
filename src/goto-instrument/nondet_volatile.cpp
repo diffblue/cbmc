@@ -13,6 +13,7 @@ Date: September 2011
 
 #include "nondet_volatile.h"
 
+#include <util/c_types.h>
 #include <util/cmdline.h>
 #include <util/fresh_symbol.h>
 #include <util/options.h>
@@ -94,14 +95,14 @@ bool nondet_volatilet::is_volatile(const namespacet &ns, const typet &src)
   if(src.get_bool(ID_C_volatile))
     return true;
 
-  if(
-    src.id() == ID_struct_tag || src.id() == ID_union_tag ||
-    src.id() == ID_c_enum_tag)
-  {
-    return is_volatile(ns, ns.follow(src));
-  }
-
-  return false;
+  if(auto struct_tag = type_try_dynamic_cast<struct_tag_typet>(src))
+    return is_volatile(ns, ns.follow_tag(*struct_tag));
+  else if(auto union_tag = type_try_dynamic_cast<union_tag_typet>(src))
+    return is_volatile(ns, ns.follow_tag(*union_tag));
+  else if(auto enum_tag = type_try_dynamic_cast<c_enum_tag_typet>(src))
+    return is_volatile(ns, ns.follow_tag(*enum_tag));
+  else
+    return false;
 }
 
 void nondet_volatilet::handle_volatile_expression(
