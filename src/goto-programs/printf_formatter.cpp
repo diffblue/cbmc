@@ -136,13 +136,29 @@ void printf_formattert::process_format(std::ostream &out)
       // this is the address of a string
       const exprt &op=*(next_operand++);
       if(
-        op.id() == ID_address_of &&
-        to_address_of_expr(op).object().id() == ID_index &&
-        to_index_expr(to_address_of_expr(op).object()).array().id() ==
-          ID_string_constant)
+        auto pointer_constant =
+          expr_try_dynamic_cast<annotated_pointer_constant_exprt>(op))
       {
-        out << format_constant(
-          to_index_expr(to_address_of_expr(op).object()).array());
+        if(
+          auto address_of = expr_try_dynamic_cast<address_of_exprt>(
+            skip_typecast(pointer_constant->symbolic_pointer())))
+        {
+          if(address_of->object().id() == ID_string_constant)
+          {
+            out << format_constant(address_of->object());
+          }
+          else if(
+            auto index_expr =
+              expr_try_dynamic_cast<index_exprt>(address_of->object()))
+          {
+            if(
+              index_expr->index().is_zero() &&
+              index_expr->array().id() == ID_string_constant)
+            {
+              out << format_constant(index_expr->array());
+            }
+          }
+        }
       }
     }
     break;
