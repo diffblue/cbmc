@@ -540,7 +540,7 @@ jobs:
           cd ../regression/cbmc
           sed -i '1s/^CORE\(.*\)broken-smt-backend/KNOWNBUG\1broken-smt-backend/' */*.desc
           # the following tests fail on Windows only
-          git checkout -- memory_allocation1 printf1 union12 va_list3
+          git checkout -- memory_allocation1 printf1 printf3 union12 va_list3
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
 
   # This job takes approximately 8 to 30 minutes

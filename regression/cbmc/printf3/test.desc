@@ -1,0 +1,12 @@
+CORE broken-smt-backend no-new-smt
+main.c
+--trace
+^10$
+^11$
+^12$
+^10.0+$
+^11.0+$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
