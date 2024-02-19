@@ -105,7 +105,9 @@ std::string expr2javat::convert_struct(
   const exprt &src,
   unsigned &precedence)
 {
-  const typet &full_type=ns.follow(src.type());
+  const typet &full_type = src.type().id() == ID_struct_tag
+                             ? ns.follow_tag(to_struct_tag_type(src.type()))
+                             : src.type();
 
   if(full_type.id()!=ID_struct)
     return convert_norep(src, precedence);
