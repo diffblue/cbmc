@@ -6,10 +6,14 @@ include ../../src/common
 test: test.z3 test.cvc5
 
 test.z3:
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --incremental-smt2-solver 'z3 --smt2 -in' --validate-goto-model --validate-ssa-equation"
+	@if command -v z3 > /dev/null 2>&1 ; then \
+	  ../test.pl -e -p -c "../../../src/cbmc/cbmc --incremental-smt2-solver 'z3 --smt2 -in' --validate-goto-model --validate-ssa-equation" ; \
+	fi
 
 test.cvc5:
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' --validate-goto-model --validate-ssa-equation"
+	@if command -v cvc5 > /dev/null 2>&1 ; then \
+	  ../test.pl -e -p -c "../../../src/cbmc/cbmc --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' --validate-goto-model --validate-ssa-equation" ; \
+	fi
 
 tests.log: ../test.pl test
 
