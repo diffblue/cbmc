@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;harness/memory_snapshot_harness_generator.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;harness/memory_snapshot_harness_generator.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1853,5,2059,76"/>
-<area shape="rect" id="node2" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="707,213,909,255"/>
-<area shape="rect" id="node15" title=" " alt="" coords="2529,616,2615,643"/>
-<area shape="rect" id="node35" href="$arith__tools_8h.html" title=" " alt="" coords="417,392,545,419"/>
-<area shape="rect" id="node36" href="$c__types_8h.html" title=" " alt="" coords="1741,310,1851,337"/>
-<area shape="rect" id="node39" href="$exception__utils_8h.html" title=" " alt="" coords="313,310,447,337"/>
-<area shape="rect" id="node40" href="$fresh__symbol_8h.html" title="Fresh auxiliary symbol creation." alt="" coords="44,392,191,419"/>
-<area shape="rect" id="node41" href="$string2int_8h.html" title=" " alt="" coords="563,541,685,568"/>
-<area shape="rect" id="node42" href="$string__utils_8h.html" title=" " alt="" coords="1529,467,1660,493"/>
-<area shape="rect" id="node43" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="3208,310,3355,337"/>
-<area shape="rect" id="node45" href="$goto__convert__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1968,124,2125,165"/>
-<area shape="rect" id="node50" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="2850,213,3001,255"/>
-<area shape="rect" id="node54" href="$json__symbol__table_8h.html" title=" " alt="" coords="3432,124,3600,165"/>
-<area shape="rect" id="node55" href="$json__parser_8h.html" title=" " alt="" coords="2412,131,2551,158"/>
-<area shape="rect" id="node59" href="$memory__snapshot__harness__generator__options_8h.html" title=" " alt="" coords="3625,124,3826,165"/>
-<area shape="rect" id="node3" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1169,303,1319,344"/>
-<area shape="rect" id="node7" title=" " alt="" coords="747,765,805,792"/>
-<area shape="rect" id="node26" title=" " alt="" coords="772,467,815,493"/>
-<area shape="rect" id="node28" href="$goto__harness__generator_8h.html" title=" " alt="" coords="671,392,862,419"/>
-<area shape="rect" id="node29" href="$recursive__initialization_8h.html" title=" " alt="" coords="1190,392,1373,419"/>
-<area shape="rect" id="node4" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1364,691,1481,717"/>
-<area shape="rect" id="node9" href="$source__location_8h.html" title=" " alt="" coords="1638,392,1799,419"/>
-<area shape="rect" id="node18" href="$goto__instruction__code_8h.html" title=" " alt="" coords="989,392,1166,419"/>
-<area shape="rect" id="node23" title=" " alt="" coords="2384,691,2448,717"/>
-<area shape="rect" id="node25" title=" " alt="" coords="639,467,697,493"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1100,467,1143,493"/>
-<area shape="rect" id="node5" title=" " alt="" coords="1390,765,1455,792"/>
-<area shape="rect" id="node6" title=" " alt="" coords="2196,765,2271,792"/>
-<area shape="rect" id="node8" title=" " alt="" coords="1189,765,1281,792"/>
-<area shape="rect" id="node10" href="$deprecate_8h.html" title=" " alt="" coords="2132,467,2231,493"/>
-<area shape="rect" id="node11" href="$irep_8h.html" title=" " alt="" coords="1684,467,1743,493"/>
-<area shape="rect" id="node17" title=" " alt="" coords="664,616,739,643"/>
-<area shape="rect" id="node12" title=" " alt="" coords="2063,541,2126,568"/>
-<area shape="rect" id="node13" href="$irep__ids_8h.html" title="util" alt="" coords="1601,541,1687,568"/>
-<area shape="rect" id="node14" href="$forward__list__as__map_8h.html" title=" " alt="" coords="1762,541,1931,568"/>
-<area shape="rect" id="node16" href="$narrow_8h.html" title=" " alt="" coords="865,616,943,643"/>
-<area shape="rect" id="node19" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="911,467,1025,493"/>
-<area shape="rect" id="node20" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="1237,616,1334,643"/>
-<area shape="rect" id="node21" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="1237,541,1334,568"/>
-<area shape="rect" id="node22" href="$mp__arith_8h.html" title=" " alt="" coords="1121,616,1213,643"/>
-<area shape="rect" id="node24" title=" " alt="" coords="1562,616,1686,643"/>
-<area shape="rect" id="node30" href="$cprover__prefix_8h.html" title=" " alt="" coords="1905,467,2057,493"/>
-<area shape="rect" id="node31" href="$prefix_8h.html" title=" " alt="" coords="477,691,573,717"/>
-<area shape="rect" id="node32" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="2327,541,2433,568"/>
-<area shape="rect" id="node33" title=" " alt="" coords="2660,467,2711,493"/>
-<area shape="rect" id="node34" title=" " alt="" coords="1767,467,1881,493"/>
-<area shape="rect" id="node37" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="1448,392,1563,419"/>
-<area shape="rect" id="node38" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="1218,467,1353,493"/>
-<area shape="rect" id="node44" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="3197,392,3357,419"/>
-<area shape="rect" id="node46" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="1967,221,2126,247"/>
-<area shape="rect" id="node49" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="2848,392,2979,419"/>
-<area shape="rect" id="node47" href="$src_2util_2message_8h.html" title=" " alt="" coords="2371,310,2490,337"/>
-<area shape="rect" id="node48" href="$namespace_8h.html" title=" " alt="" coords="2110,310,2245,337"/>
-<area shape="rect" id="node51" href="$journalling__symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="2717,303,2888,344"/>
-<area shape="rect" id="node52" href="$abstract__goto__model_8h.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="2963,310,3133,337"/>
-<area shape="rect" id="node53" href="$validate__goto__model_8h.html" title=" " alt="" coords="3003,392,3173,419"/>
-<area shape="rect" id="node56" title=" " alt="" coords="2718,221,2775,247"/>
-<area shape="rect" id="node57" href="$parser_8h.html" title="Parser utilities." alt="" coords="2387,221,2485,247"/>
-<area shape="rect" id="node58" href="$json_8h.html" title=" " alt="" coords="2534,392,2621,419"/>
-<area shape="rect" id="node60" href="$common__harness__generator__options_8h.html" title=" " alt="" coords="3622,213,3829,255"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1744,5,1949,76"/>
+<area shape="rect" id="node2" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="1158,213,1359,255"/>
+<area shape="rect" id="node15" title=" " alt="" coords="448,616,533,643"/>
+<area shape="rect" id="node35" href="$arith__tools_8h.html" title=" " alt="" coords="321,392,449,419"/>
+<area shape="rect" id="node36" href="$c__types_8h.html" title=" " alt="" coords="1448,310,1557,337"/>
+<area shape="rect" id="node39" href="$exception__utils_8h.html" title=" " alt="" coords="667,310,800,337"/>
+<area shape="rect" id="node40" href="$fresh__symbol_8h.html" title="Fresh auxiliary symbol creation." alt="" coords="1537,392,1684,419"/>
+<area shape="rect" id="node41" href="$string2int_8h.html" title=" " alt="" coords="94,541,215,568"/>
+<area shape="rect" id="node42" href="$string__utils_8h.html" title=" " alt="" coords="3108,467,3239,493"/>
+<area shape="rect" id="node43" href="$symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="1923,310,2069,337"/>
+<area shape="rect" id="node45" href="$goto__convert__functions_8h.html" title="Goto Programs with Functions." alt="" coords="2409,124,2567,165"/>
+<area shape="rect" id="node50" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="2701,213,2851,255"/>
+<area shape="rect" id="node54" href="$json__symbol__table_8h.html" title=" " alt="" coords="2975,124,3143,165"/>
+<area shape="rect" id="node55" href="$json__parser_8h.html" title=" " alt="" coords="3167,131,3305,158"/>
+<area shape="rect" id="node59" href="$memory__snapshot__harness__generator__options_8h.html" title=" " alt="" coords="3373,124,3574,165"/>
+<area shape="rect" id="node3" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1018,303,1169,344"/>
+<area shape="rect" id="node7" title=" " alt="" coords="1581,765,1640,792"/>
+<area shape="rect" id="node26" title=" " alt="" coords="1175,467,1217,493"/>
+<area shape="rect" id="node28" href="$goto__harness__generator_8h.html" title=" " alt="" coords="1271,392,1462,419"/>
+<area shape="rect" id="node29" href="$recursive__initialization_8h.html" title=" " alt="" coords="1709,392,1891,419"/>
+<area shape="rect" id="node4" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="776,691,893,717"/>
+<area shape="rect" id="node9" href="$source__location_8h.html" title=" " alt="" coords="2101,392,2262,419"/>
+<area shape="rect" id="node18" href="$goto__instruction__code_8h.html" title=" " alt="" coords="575,392,753,419"/>
+<area shape="rect" id="node23" title=" " alt="" coords="2649,691,2713,717"/>
+<area shape="rect" id="node25" title=" " alt="" coords="271,467,329,493"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1108,467,1151,493"/>
+<area shape="rect" id="node5" title=" " alt="" coords="802,765,867,792"/>
+<area shape="rect" id="node6" title=" " alt="" coords="2603,765,2677,792"/>
+<area shape="rect" id="node8" title=" " alt="" coords="359,765,451,792"/>
+<area shape="rect" id="node10" href="$deprecate_8h.html" title=" " alt="" coords="2720,467,2819,493"/>
+<area shape="rect" id="node11" href="$irep_8h.html" title=" " alt="" coords="1992,467,2051,493"/>
+<area shape="rect" id="node17" title=" " alt="" coords="5,616,80,643"/>
+<area shape="rect" id="node12" title=" " alt="" coords="2938,541,3001,568"/>
+<area shape="rect" id="node13" href="$irep__ids_8h.html" title="util" alt="" coords="1899,541,1984,568"/>
+<area shape="rect" id="node14" href="$forward__list__as__map_8h.html" title=" " alt="" coords="342,541,511,568"/>
+<area shape="rect" id="node16" href="$narrow_8h.html" title=" " alt="" coords="206,616,285,643"/>
+<area shape="rect" id="node19" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="607,467,721,493"/>
+<area shape="rect" id="node20" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="623,616,721,643"/>
+<area shape="rect" id="node21" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="857,541,954,568"/>
+<area shape="rect" id="node22" href="$mp__arith_8h.html" title=" " alt="" coords="1239,616,1331,643"/>
+<area shape="rect" id="node24" title=" " alt="" coords="898,616,1022,643"/>
+<area shape="rect" id="node30" href="$cprover__prefix_8h.html" title=" " alt="" coords="2469,467,2621,493"/>
+<area shape="rect" id="node31" href="$prefix_8h.html" title=" " alt="" coords="2059,691,2155,717"/>
+<area shape="rect" id="node32" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="1717,541,1824,568"/>
+<area shape="rect" id="node33" title=" " alt="" coords="2645,467,2696,493"/>
+<area shape="rect" id="node34" title=" " alt="" coords="2280,467,2395,493"/>
+<area shape="rect" id="node37" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="828,392,943,419"/>
+<area shape="rect" id="node38" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="847,467,982,493"/>
+<area shape="rect" id="node44" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="1916,392,2076,419"/>
+<area shape="rect" id="node46" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="2409,221,2567,247"/>
+<area shape="rect" id="node49" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="2751,392,2881,419"/>
+<area shape="rect" id="node47" href="$src_2util_2message_8h.html" title=" " alt="" coords="3242,310,3361,337"/>
+<area shape="rect" id="node48" href="$namespace_8h.html" title=" " alt="" coords="2490,392,2625,419"/>
+<area shape="rect" id="node51" href="$journalling__symbol__table_8h.html" title="Author: Diffblue Ltd." alt="" coords="2244,303,2415,344"/>
+<area shape="rect" id="node52" href="$abstract__goto__model_8h.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="2783,310,2953,337"/>
+<area shape="rect" id="node53" href="$validate__goto__model_8h.html" title=" " alt="" coords="2905,392,3076,419"/>
+<area shape="rect" id="node56" title=" " alt="" coords="3195,221,3253,247"/>
+<area shape="rect" id="node57" href="$parser_8h.html" title="Parser utilities." alt="" coords="3277,221,3376,247"/>
+<area shape="rect" id="node58" href="$json_8h.html" title=" " alt="" coords="3151,392,3238,419"/>
+<area shape="rect" id="node60" href="$common__harness__generator__options_8h.html" title=" " alt="" coords="3401,213,3607,255"/>
 </map>
