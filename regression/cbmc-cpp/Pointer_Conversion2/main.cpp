@@ -1,5 +1,5 @@
 #include <cassert>
-char a[100];
+signed char a[100];
 
 void f(const signed char x[])
 {
