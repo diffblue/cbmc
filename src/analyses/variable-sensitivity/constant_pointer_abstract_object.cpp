@@ -10,7 +10,6 @@
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
@@ -225,8 +224,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::write_dereference(
   if(stack.empty())
   {
     // We should not be changing the type of an abstract object
-    PRECONDITION(
-      new_value->type() == ns.follow(to_pointer_type(type()).base_type()));
+    PRECONDITION(new_value->type() == to_pointer_type(type()).base_type());
 
     // Get an expression that we can assign to
     exprt value = to_address_of_expr(value_stack.to_expression()).object();

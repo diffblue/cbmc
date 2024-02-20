@@ -33,7 +33,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   bool bottom)
   : abstract_aggregate_baset(t, top, bottom)
 {
-  PRECONDITION(t.id() == ID_struct);
+  PRECONDITION(t.id() == ID_struct || t.id() == ID_struct_tag);
   DATA_INVARIANT(verify(), "Structural invariants maintained");
 }
 
@@ -43,9 +43,11 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   const namespacet &ns)
   : abstract_aggregate_baset(e, environment, ns)
 {
-  PRECONDITION(ns.follow(e.type()).id() == ID_struct);
+  PRECONDITION(e.type().id() == ID_struct || e.type().id() == ID_struct_tag);
 
-  const struct_typet struct_type_def = to_struct_type(ns.follow(e.type()));
+  const struct_typet &struct_type_def =
+    e.type().id() == ID_struct ? to_struct_type(e.type())
+                               : ns.follow_tag(to_struct_tag_type(e.type()));
 
   bool did_initialize_values = false;
   auto struct_type_it = struct_type_def.components().begin();
@@ -204,7 +206,10 @@ void full_struct_abstract_objectt::output(
   // To ensure that a consistent ordering of fields is output, use
   // the underlying type declaration for this struct to determine
   // the ordering
-  struct_union_typet type_decl = to_struct_union_type(ns.follow(type()));
+  struct_union_typet type_decl =
+    (type().id() == ID_struct_tag || type().id() == ID_union_tag)
+      ? ns.follow_tag(to_struct_or_union_tag_type(type()))
+      : to_struct_union_type(type());
 
   bool first = true;
 

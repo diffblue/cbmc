@@ -33,7 +33,13 @@ public:
   abstract_aggregate_objectt(const typet &type, bool tp, bool bttm)
     : abstract_objectt(type, tp, bttm)
   {
-    PRECONDITION(type.id() == aggregate_traitst::TYPE_ID());
+    PRECONDITION(
+      type.id() != ID_struct_tag || ID_struct == aggregate_traitst::TYPE_ID());
+    PRECONDITION(
+      type.id() != ID_union_tag || ID_union == aggregate_traitst::TYPE_ID());
+    PRECONDITION(
+      type.id() == ID_struct_tag || type.id() == ID_union_tag ||
+      type.id() == aggregate_traitst::TYPE_ID());
   }
 
   abstract_aggregate_objectt(
@@ -42,7 +48,15 @@ public:
     const namespacet &ns)
     : abstract_objectt(expr, environment, ns)
   {
-    PRECONDITION(ns.follow(expr.type()).id() == aggregate_traitst::TYPE_ID());
+    PRECONDITION(
+      expr.type().id() != ID_struct_tag ||
+      ID_struct == aggregate_traitst::TYPE_ID());
+    PRECONDITION(
+      expr.type().id() != ID_union_tag ||
+      ID_union == aggregate_traitst::TYPE_ID());
+    PRECONDITION(
+      expr.type().id() == ID_struct_tag || expr.type().id() == ID_union_tag ||
+      expr.type().id() == aggregate_traitst::TYPE_ID());
   }
 
   abstract_object_pointert expression_transform(
