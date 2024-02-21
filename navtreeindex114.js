@@ -1,6 +1,5 @@
 var NAVTREEINDEX114 =
 {
-"miniz_8h.html#a995089c55642ae721d39970627a6f692":[9,0,1,0,4,1,213],
 "miniz_8h.html#a996d0ae919e19b0821cebbc7ce52ce91":[9,0,1,0,4,1,203],
 "miniz_8h.html#a9aa631c7bc8147b39b6d8a910682463e":[9,0,1,0,4,1,191],
 "miniz_8h.html#a9adc24aaf31eeb77293ebdb97ab6463c":[9,0,1,0,4,1,111],
@@ -249,5 +248,6 @@ var NAVTREEINDEX114 =
 "ms__cl__cmdline_8cpp_source.html":[9,0,2,10,38],
 "ms__cl__cmdline_8h.html":[9,0,2,10,39],
 "ms__cl__cmdline_8h_source.html":[9,0,2,10,39],
-"ms__cl__mode_8cpp.html":[9,0,2,10,40]
+"ms__cl__mode_8cpp.html":[9,0,2,10,40],
+"ms__cl__mode_8cpp.html#ab2007128f4e9061db0fae889a849f615":[9,0,2,10,40,0]
 };

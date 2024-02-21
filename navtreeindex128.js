@@ -1,6 +1,5 @@
 var NAVTREEINDEX128 =
 {
-"string__instrumentation_8cpp_source.html":[9,0,2,16,138],
 "string__instrumentation_8h.html":[9,0,2,16,139],
 "string__instrumentation_8h.html#a5bb2d583972281b195f855d4d61d9734":[9,0,2,16,139,0],
 "string__instrumentation_8h.html#a5f57b8d1ae38fae26ed679ebf46f7aa6":[9,0,2,16,139,3],
@@ -249,5 +248,6 @@ var NAVTREEINDEX128 =
 "structabstract__object__statisticst.html#a04f1873cf5c4deec98673149dbce932d":[8,0,26,6],
 "structabstract__object__statisticst.html#a33a800cefed7460fd306e8be45b646cf":[8,0,26,2],
 "structabstract__object__statisticst.html#a86fbb666da639798ab0bca177840097d":[8,0,26,4],
-"structabstract__object__statisticst.html#ac7932888b6793224d83521014d013722":[8,0,26,1]
+"structabstract__object__statisticst.html#ac7932888b6793224d83521014d013722":[8,0,26,1],
+"structabstract__object__statisticst.html#aca8dc5aa4ab2418e9b8513869852cefc":[8,0,26,0]
 };
