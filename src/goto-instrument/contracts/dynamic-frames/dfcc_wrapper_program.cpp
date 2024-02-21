@@ -607,7 +607,7 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
   {
     exprt ensures = to_lambda_expr(e)
                       .application(contract_lambda_parameters)
-                      .with_source_location<exprt>(e);
+                      .with_source_location(e);
 
     if(has_subexpr(ensures, ID_exists) || has_subexpr(ensures, ID_forall))
       add_quantified_variable(goto_model.symbol_table, ensures, language_mode);

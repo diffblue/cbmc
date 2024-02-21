@@ -1600,12 +1600,16 @@ public:
 
   array_exprt &with_source_location(const exprt &other) &
   {
-    return exprt::with_source_location<array_exprt>(other);
+    if(other.source_location().is_not_nil())
+      add_source_location() = other.source_location();
+    return *this;
   }
 
   array_exprt &&with_source_location(const exprt &other) &&
   {
-    return std::move(*this).exprt::with_source_location<array_exprt>(other);
+    if(other.source_location().is_not_nil())
+      add_source_location() = other.source_location();
+    return std::move(*this);
   }
 };
 

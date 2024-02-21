@@ -98,27 +98,19 @@ public:
   { return (const operandst &)get_sub(); }
 
   /// Add the source location from \p other, if it has any.
-  template <typename T>
-  T &with_source_location(const exprt &other) &
+  exprt &with_source_location(const exprt &other) &
   {
-    static_assert(
-      std::is_base_of<exprt, T>::value,
-      "The template argument T must be derived from exprt.");
     if(other.source_location().is_not_nil())
       add_source_location() = other.source_location();
-    return *static_cast<T *>(this);
+    return *this;
   }
 
   /// Add the source location from \p other, if it has any.
-  template <typename T>
-  T &&with_source_location(const exprt &other) &&
+  exprt &&with_source_location(const exprt &other) &&
   {
-    static_assert(
-      std::is_base_of<exprt, T>::value,
-      "The template argument T must be derived from exprt.");
     if(other.source_location().is_not_nil())
       add_source_location() = other.source_location();
-    return std::move(*static_cast<T *>(this));
+    return std::move(*this);
   }
 
 protected:
