@@ -1,10 +1,3 @@
-#include <assert.h>
-#include <stdlib.h>
-
-#ifdef _MSC_VER
-#  define _Static_assert(x, m) static_assert(x, m)
-#endif
-
 struct list;
 
 typedef struct list list_nodet;
@@ -22,11 +15,11 @@ int max_depth = 2;
 list_nodet *build_node(int depth)
 {
   if(max_depth < depth)
-    return ((list_nodet *)NULL);
+    return ((list_nodet *)0);
   else
   {
-    _Static_assert(sizeof(list_nodet) == 16, "");
-    list_nodet *result = malloc(16);
+    __CPROVER_assert(sizeof(list_nodet) == 16, "struct size is 16 bytes");
+    list_nodet *result = __CPROVER_allocate(16, 0);
 
     if(result)
     {
@@ -53,6 +46,6 @@ int main()
   {
     i = i + 1;
   }
-  assert(i == 3);
+  __CPROVER_assert(i == 3, "i should be 3");
   return 0;
 }
