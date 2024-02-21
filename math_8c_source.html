@@ -4092,6 +4092,367 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03998"></a><span class="lineno"> 3998</span>&#160;  <span class="keywordflow">return</span> x_times_y + z;</div>
 <div class="line"><a name="l03999"></a><span class="lineno"> 3999</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l04000"></a><span class="lineno"> 4000</span>&#160;}</div>
+<div class="line"><a name="l04001"></a><span class="lineno"> 4001</span>&#160; </div>
+<div class="line"><a name="l04002"></a><span class="lineno"> 4002</span>&#160;<span class="comment">/* FUNCTION: __builtin_powi */</span></div>
+<div class="line"><a name="l04003"></a><span class="lineno"> 4003</span>&#160; </div>
+<div class="line"><a name="l04004"></a><span class="lineno"> 4004</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l04005"></a><span class="lineno"> 4005</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l04006"></a><span class="lineno"> 4006</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l04007"></a><span class="lineno"> 4007</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04008"></a><span class="lineno"> 4008</span>&#160; </div>
+<div class="line"><a name="l04009"></a><span class="lineno"> 4009</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l04010"></a><span class="lineno"> 4010</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l04011"></a><span class="lineno"> 4011</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l04012"></a><span class="lineno"> 4012</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04013"></a><span class="lineno"> 4013</span>&#160; </div>
+<div class="line"><a name="l04014"></a><span class="lineno"> 4014</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l04015"></a><span class="lineno"> 4015</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l04016"></a><span class="lineno"> 4016</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l04017"></a><span class="lineno"> 4017</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04018"></a><span class="lineno"> 4018</span>&#160; </div>
+<div class="line"><a name="l04019"></a><span class="lineno"> 4019</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l04020"></a><span class="lineno"> 4020</span>&#160; </div>
+<div class="line"><a name="l04021"></a><span class="lineno"> 4021</span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l04022"></a><span class="lineno"> 4022</span>&#160; </div>
+<div class="line"><a name="l04023"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#a290bfd5f5d6c31625c5f364863a37dbf"> 4023</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#a4da35170c9de4e2ee6e6a49deb30a611">__builtin_powi</a>(<span class="keywordtype">double</span> x, <span class="keywordtype">int</span> y)</div>
+<div class="line"><a name="l04024"></a><span class="lineno"> 4024</span>&#160;{</div>
+<div class="line"><a name="l04025"></a><span class="lineno"> 4025</span>&#160;  <span class="comment">// see man pow (https://linux.die.net/man/3/pow), specialized for y being an</span></div>
+<div class="line"><a name="l04026"></a><span class="lineno"> 4026</span>&#160;  <span class="comment">// integer</span></div>
+<div class="line"><a name="l04027"></a><span class="lineno"> 4027</span>&#160;  <span class="keywordflow">if</span>(x == 1.0)</div>
+<div class="line"><a name="l04028"></a><span class="lineno"> 4028</span>&#160;    <span class="keywordflow">return</span> 1.0;</div>
+<div class="line"><a name="l04029"></a><span class="lineno"> 4029</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(y == 0)</div>
+<div class="line"><a name="l04030"></a><span class="lineno"> 4030</span>&#160;    <span class="keywordflow">return</span> 1.0;</div>
+<div class="line"><a name="l04031"></a><span class="lineno"> 4031</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; y &gt; 0)</div>
+<div class="line"><a name="l04032"></a><span class="lineno"> 4032</span>&#160;  {</div>
+<div class="line"><a name="l04033"></a><span class="lineno"> 4033</span>&#160;    <span class="keywordflow">if</span>(y % 2 == 1)</div>
+<div class="line"><a name="l04034"></a><span class="lineno"> 4034</span>&#160;      <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l04035"></a><span class="lineno"> 4035</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04036"></a><span class="lineno"> 4036</span>&#160;      <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l04037"></a><span class="lineno"> 4037</span>&#160;  }</div>
+<div class="line"><a name="l04038"></a><span class="lineno"> 4038</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abdd3ff867a71e23d7eddfad6b5e2fdd3">isinf</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x))</div>
+<div class="line"><a name="l04039"></a><span class="lineno"> 4039</span>&#160;  {</div>
+<div class="line"><a name="l04040"></a><span class="lineno"> 4040</span>&#160;    <span class="keywordflow">if</span>(y &lt; 0)</div>
+<div class="line"><a name="l04041"></a><span class="lineno"> 4041</span>&#160;    {</div>
+<div class="line"><a name="l04042"></a><span class="lineno"> 4042</span>&#160;      <span class="keywordflow">if</span>(-y % 2 == 1)</div>
+<div class="line"><a name="l04043"></a><span class="lineno"> 4043</span>&#160;        <span class="keywordflow">return</span> -0.0;</div>
+<div class="line"><a name="l04044"></a><span class="lineno"> 4044</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04045"></a><span class="lineno"> 4045</span>&#160;        <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l04046"></a><span class="lineno"> 4046</span>&#160;    }</div>
+<div class="line"><a name="l04047"></a><span class="lineno"> 4047</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04048"></a><span class="lineno"> 4048</span>&#160;    {</div>
+<div class="line"><a name="l04049"></a><span class="lineno"> 4049</span>&#160;      <span class="keywordflow">if</span>(y % 2 == 1)</div>
+<div class="line"><a name="l04050"></a><span class="lineno"> 4050</span>&#160;        <span class="keywordflow">return</span> -<a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>();</div>
+<div class="line"><a name="l04051"></a><span class="lineno"> 4051</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04052"></a><span class="lineno"> 4052</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>();</div>
+<div class="line"><a name="l04053"></a><span class="lineno"> 4053</span>&#160;    }</div>
+<div class="line"><a name="l04054"></a><span class="lineno"> 4054</span>&#160;  }</div>
+<div class="line"><a name="l04055"></a><span class="lineno"> 4055</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abdd3ff867a71e23d7eddfad6b5e2fdd3">isinf</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x))</div>
+<div class="line"><a name="l04056"></a><span class="lineno"> 4056</span>&#160;  {</div>
+<div class="line"><a name="l04057"></a><span class="lineno"> 4057</span>&#160;    <span class="keywordflow">if</span>(y &lt; 0)</div>
+<div class="line"><a name="l04058"></a><span class="lineno"> 4058</span>&#160;      <span class="keywordflow">return</span> +0.0;</div>
+<div class="line"><a name="l04059"></a><span class="lineno"> 4059</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04060"></a><span class="lineno"> 4060</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>();</div>
+<div class="line"><a name="l04061"></a><span class="lineno"> 4061</span>&#160;  }</div>
+<div class="line"><a name="l04062"></a><span class="lineno"> 4062</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; y &lt; 0)</div>
+<div class="line"><a name="l04063"></a><span class="lineno"> 4063</span>&#160;  {</div>
+<div class="line"><a name="l04064"></a><span class="lineno"> 4064</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l04065"></a><span class="lineno"> 4065</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04066"></a><span class="lineno"> 4066</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
+<div class="line"><a name="l04067"></a><span class="lineno"> 4067</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#afb1d42c16680daea0e1685510d5a1263">__CPROVER_signd</a>(x) &amp;&amp; -y % 2 == 1)</div>
+<div class="line"><a name="l04068"></a><span class="lineno"> 4068</span>&#160;      <span class="keywordflow">return</span> -HUGE_VAL;</div>
+<div class="line"><a name="l04069"></a><span class="lineno"> 4069</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04070"></a><span class="lineno"> 4070</span>&#160;      <span class="keywordflow">return</span> HUGE_VAL;</div>
+<div class="line"><a name="l04071"></a><span class="lineno"> 4071</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04072"></a><span class="lineno"> 4072</span>&#160;  }</div>
+<div class="line"><a name="l04073"></a><span class="lineno"> 4073</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(x))</div>
+<div class="line"><a name="l04074"></a><span class="lineno"> 4074</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04075"></a><span class="lineno"> 4075</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l04076"></a><span class="lineno"> 4076</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
+<div class="line"><a name="l04077"></a><span class="lineno"> 4077</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04078"></a><span class="lineno"> 4078</span>&#160; </div>
+<div class="line"><a name="l04079"></a><span class="lineno"> 4079</span>&#160;<span class="preprocessor">#ifndef _MSC_VER</span></div>
+<div class="line"><a name="l04080"></a><span class="lineno"> 4080</span>&#160;  _Static_assert</div>
+<div class="line"><a name="l04081"></a><span class="lineno"> 4081</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l04082"></a><span class="lineno"> 4082</span>&#160;  static_assert</div>
+<div class="line"><a name="l04083"></a><span class="lineno"> 4083</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04084"></a><span class="lineno"> 4084</span>&#160;    (<span class="keyword">sizeof</span>(double) == 2 * <span class="keyword">sizeof</span>(int32_t),</div>
+<div class="line"><a name="l04085"></a><span class="lineno"> 4085</span>&#160;     <span class="stringliteral">&quot;bit width of double is 2x bit width of int32_t&quot;</span>);</div>
+<div class="line"><a name="l04086"></a><span class="lineno"> 4086</span>&#160;  <span class="comment">// https://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/</span></div>
+<div class="line"><a name="l04087"></a><span class="lineno"> 4087</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l04088"></a><span class="lineno"> 4088</span>&#160;  {</div>
+<div class="line"><a name="l04089"></a><span class="lineno"> 4089</span>&#160;    <span class="keywordtype">double</span> d;</div>
+<div class="line"><a name="l04090"></a><span class="lineno"> 4090</span>&#160;    int32_t i[2];</div>
+<div class="line"><a name="l04091"></a><span class="lineno"> 4091</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l04092"></a><span class="lineno"> 4092</span>&#160;  int32_t bias = (1 &lt;&lt; 20) * ((1 &lt;&lt; 10) - 1);</div>
+<div class="line"><a name="l04093"></a><span class="lineno"> 4093</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l04094"></a><span class="lineno"> 4094</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -90253 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l04095"></a><span class="lineno"> 4095</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04096"></a><span class="lineno"> 4096</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;signed-overflow&quot;</span></div>
+<div class="line"><a name="l04097"></a><span class="lineno"> 4097</span>&#160;<span class="preprocessor">#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l04098"></a><span class="lineno"> 4098</span>&#160;  <span class="keywordtype">double</span> mult_result = (double)(y) * (double)(u.i[1] - (bias + exp_c));</div>
+<div class="line"><a name="l04099"></a><span class="lineno"> 4099</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l04100"></a><span class="lineno"> 4100</span>&#160;  <span class="keywordtype">double</span> mult_result = (double)(y) * (double)(u.i[0] - (bias + exp_c));</div>
+<div class="line"><a name="l04101"></a><span class="lineno"> 4101</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04102"></a><span class="lineno"> 4102</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04103"></a><span class="lineno"> 4103</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a>(mult_result) &gt; (double)(1 &lt;&lt; 30))</div>
+<div class="line"><a name="l04104"></a><span class="lineno"> 4104</span>&#160;  {</div>
+<div class="line"><a name="l04105"></a><span class="lineno"> 4105</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l04106"></a><span class="lineno"> 4106</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04107"></a><span class="lineno"> 4107</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
+<div class="line"><a name="l04108"></a><span class="lineno"> 4108</span>&#160;    <span class="keywordflow">return</span> y &gt; 0 ? HUGE_VAL : 0.0;</div>
+<div class="line"><a name="l04109"></a><span class="lineno"> 4109</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04110"></a><span class="lineno"> 4110</span>&#160;  }</div>
+<div class="line"><a name="l04111"></a><span class="lineno"> 4111</span>&#160;<span class="preprocessor">#if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l04112"></a><span class="lineno"> 4112</span>&#160;  u.i[1] = (int32_t)mult_result + (bias + exp_c);</div>
+<div class="line"><a name="l04113"></a><span class="lineno"> 4113</span>&#160;  u.i[0] = 0;</div>
+<div class="line"><a name="l04114"></a><span class="lineno"> 4114</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l04115"></a><span class="lineno"> 4115</span>&#160;  u.i[0] = (int32_t)mult_result + (bias + exp_c);</div>
+<div class="line"><a name="l04116"></a><span class="lineno"> 4116</span>&#160;  u.i[1] = 0;</div>
+<div class="line"><a name="l04117"></a><span class="lineno"> 4117</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04118"></a><span class="lineno"> 4118</span>&#160;  <span class="keywordflow">return</span> u.d;</div>
+<div class="line"><a name="l04119"></a><span class="lineno"> 4119</span>&#160;}</div>
+<div class="line"><a name="l04120"></a><span class="lineno"> 4120</span>&#160; </div>
+<div class="line"><a name="l04121"></a><span class="lineno"> 4121</span>&#160;<span class="comment">/* FUNCTION: __builtin_powif */</span></div>
+<div class="line"><a name="l04122"></a><span class="lineno"> 4122</span>&#160; </div>
+<div class="line"><a name="l04123"></a><span class="lineno"> 4123</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l04124"></a><span class="lineno"> 4124</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l04125"></a><span class="lineno"> 4125</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l04126"></a><span class="lineno"> 4126</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04127"></a><span class="lineno"> 4127</span>&#160; </div>
+<div class="line"><a name="l04128"></a><span class="lineno"> 4128</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l04129"></a><span class="lineno"> 4129</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l04130"></a><span class="lineno"> 4130</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l04131"></a><span class="lineno"> 4131</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04132"></a><span class="lineno"> 4132</span>&#160; </div>
+<div class="line"><a name="l04133"></a><span class="lineno"> 4133</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l04134"></a><span class="lineno"> 4134</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l04135"></a><span class="lineno"> 4135</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l04136"></a><span class="lineno"> 4136</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04137"></a><span class="lineno"> 4137</span>&#160; </div>
+<div class="line"><a name="l04138"></a><span class="lineno"> 4138</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l04139"></a><span class="lineno"> 4139</span>&#160; </div>
+<div class="line"><a name="l04140"></a><span class="lineno"> 4140</span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l04141"></a><span class="lineno"> 4141</span>&#160; </div>
+<div class="line"><a name="l04142"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#ae7e7799be7e4d7b420a6478a7ee4c299"> 4142</a></span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#a3696ff9c7bfd1ed4fec48b86d7d1996e">__builtin_powif</a>(<span class="keywordtype">float</span> x, <span class="keywordtype">int</span> y)</div>
+<div class="line"><a name="l04143"></a><span class="lineno"> 4143</span>&#160;{</div>
+<div class="line"><a name="l04144"></a><span class="lineno"> 4144</span>&#160;  <span class="comment">// see man pow (https://linux.die.net/man/3/pow), specialized for y being an</span></div>
+<div class="line"><a name="l04145"></a><span class="lineno"> 4145</span>&#160;  <span class="comment">// integer</span></div>
+<div class="line"><a name="l04146"></a><span class="lineno"> 4146</span>&#160;  <span class="keywordflow">if</span>(x == 1.0f)</div>
+<div class="line"><a name="l04147"></a><span class="lineno"> 4147</span>&#160;    <span class="keywordflow">return</span> 1.0f;</div>
+<div class="line"><a name="l04148"></a><span class="lineno"> 4148</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(y == 0)</div>
+<div class="line"><a name="l04149"></a><span class="lineno"> 4149</span>&#160;    <span class="keywordflow">return</span> 1.0f;</div>
+<div class="line"><a name="l04150"></a><span class="lineno"> 4150</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; y &gt; 0)</div>
+<div class="line"><a name="l04151"></a><span class="lineno"> 4151</span>&#160;  {</div>
+<div class="line"><a name="l04152"></a><span class="lineno"> 4152</span>&#160;    <span class="keywordflow">if</span>(y % 2 == 1)</div>
+<div class="line"><a name="l04153"></a><span class="lineno"> 4153</span>&#160;      <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l04154"></a><span class="lineno"> 4154</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04155"></a><span class="lineno"> 4155</span>&#160;      <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l04156"></a><span class="lineno"> 4156</span>&#160;  }</div>
+<div class="line"><a name="l04157"></a><span class="lineno"> 4157</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a8b8a30104d4cb0dd4b0a988ee56c5411">isinff</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x))</div>
+<div class="line"><a name="l04158"></a><span class="lineno"> 4158</span>&#160;  {</div>
+<div class="line"><a name="l04159"></a><span class="lineno"> 4159</span>&#160;    <span class="keywordflow">if</span>(y &lt; 0)</div>
+<div class="line"><a name="l04160"></a><span class="lineno"> 4160</span>&#160;    {</div>
+<div class="line"><a name="l04161"></a><span class="lineno"> 4161</span>&#160;      <span class="keywordflow">if</span>(-y % 2 == 1)</div>
+<div class="line"><a name="l04162"></a><span class="lineno"> 4162</span>&#160;        <span class="keywordflow">return</span> -0.0f;</div>
+<div class="line"><a name="l04163"></a><span class="lineno"> 4163</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04164"></a><span class="lineno"> 4164</span>&#160;        <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l04165"></a><span class="lineno"> 4165</span>&#160;    }</div>
+<div class="line"><a name="l04166"></a><span class="lineno"> 4166</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04167"></a><span class="lineno"> 4167</span>&#160;    {</div>
+<div class="line"><a name="l04168"></a><span class="lineno"> 4168</span>&#160;      <span class="keywordflow">if</span>(y % 2 == 1)</div>
+<div class="line"><a name="l04169"></a><span class="lineno"> 4169</span>&#160;        <span class="keywordflow">return</span> -<a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>();</div>
+<div class="line"><a name="l04170"></a><span class="lineno"> 4170</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04171"></a><span class="lineno"> 4171</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>();</div>
+<div class="line"><a name="l04172"></a><span class="lineno"> 4172</span>&#160;    }</div>
+<div class="line"><a name="l04173"></a><span class="lineno"> 4173</span>&#160;  }</div>
+<div class="line"><a name="l04174"></a><span class="lineno"> 4174</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#a8b8a30104d4cb0dd4b0a988ee56c5411">isinff</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x))</div>
+<div class="line"><a name="l04175"></a><span class="lineno"> 4175</span>&#160;  {</div>
+<div class="line"><a name="l04176"></a><span class="lineno"> 4176</span>&#160;    <span class="keywordflow">if</span>(y &lt; 0)</div>
+<div class="line"><a name="l04177"></a><span class="lineno"> 4177</span>&#160;      <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l04178"></a><span class="lineno"> 4178</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04179"></a><span class="lineno"> 4179</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>();</div>
+<div class="line"><a name="l04180"></a><span class="lineno"> 4180</span>&#160;  }</div>
+<div class="line"><a name="l04181"></a><span class="lineno"> 4181</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; y &lt; 0)</div>
+<div class="line"><a name="l04182"></a><span class="lineno"> 4182</span>&#160;  {</div>
+<div class="line"><a name="l04183"></a><span class="lineno"> 4183</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l04184"></a><span class="lineno"> 4184</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04185"></a><span class="lineno"> 4185</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
+<div class="line"><a name="l04186"></a><span class="lineno"> 4186</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#a1870b68a4306d30be59b70abe38ada70">__CPROVER_signf</a>(x) &amp;&amp; -y % 2 == 1)</div>
+<div class="line"><a name="l04187"></a><span class="lineno"> 4187</span>&#160;    {</div>
+<div class="line"><a name="l04188"></a><span class="lineno"> 4188</span>&#160;      <span class="keywordflow">return</span> -HUGE_VALF;</div>
+<div class="line"><a name="l04189"></a><span class="lineno"> 4189</span>&#160;    }</div>
+<div class="line"><a name="l04190"></a><span class="lineno"> 4190</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04191"></a><span class="lineno"> 4191</span>&#160;      <span class="keywordflow">return</span> HUGE_VALF;</div>
+<div class="line"><a name="l04192"></a><span class="lineno"> 4192</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04193"></a><span class="lineno"> 4193</span>&#160;  }</div>
+<div class="line"><a name="l04194"></a><span class="lineno"> 4194</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a>(x))</div>
+<div class="line"><a name="l04195"></a><span class="lineno"> 4195</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04196"></a><span class="lineno"> 4196</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l04197"></a><span class="lineno"> 4197</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
+<div class="line"><a name="l04198"></a><span class="lineno"> 4198</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04199"></a><span class="lineno"> 4199</span>&#160; </div>
+<div class="line"><a name="l04200"></a><span class="lineno"> 4200</span>&#160;<span class="preprocessor">#ifndef _MSC_VER</span></div>
+<div class="line"><a name="l04201"></a><span class="lineno"> 4201</span>&#160;  _Static_assert</div>
+<div class="line"><a name="l04202"></a><span class="lineno"> 4202</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l04203"></a><span class="lineno"> 4203</span>&#160;  static_assert</div>
+<div class="line"><a name="l04204"></a><span class="lineno"> 4204</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04205"></a><span class="lineno"> 4205</span>&#160;    (<span class="keyword">sizeof</span>(float) == <span class="keyword">sizeof</span>(int32_t),</div>
+<div class="line"><a name="l04206"></a><span class="lineno"> 4206</span>&#160;     <span class="stringliteral">&quot;bit width of float and int32_t should match&quot;</span>);</div>
+<div class="line"><a name="l04207"></a><span class="lineno"> 4207</span>&#160;  <span class="keyword">union</span></div>
+<div class="line"><a name="l04208"></a><span class="lineno"> 4208</span>&#160;  {</div>
+<div class="line"><a name="l04209"></a><span class="lineno"> 4209</span>&#160;    <span class="keywordtype">float</span> f;</div>
+<div class="line"><a name="l04210"></a><span class="lineno"> 4210</span>&#160;    int32_t i;</div>
+<div class="line"><a name="l04211"></a><span class="lineno"> 4211</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l04212"></a><span class="lineno"> 4212</span>&#160;  int32_t bias = (1 &lt;&lt; 23) * ((1 &lt;&lt; 7) - 1);</div>
+<div class="line"><a name="l04213"></a><span class="lineno"> 4213</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l04214"></a><span class="lineno"> 4214</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -722019 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l04215"></a><span class="lineno"> 4215</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04216"></a><span class="lineno"> 4216</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;signed-overflow&quot;</span></div>
+<div class="line"><a name="l04217"></a><span class="lineno"> 4217</span>&#160;  <span class="keywordtype">float</span> mult_result = (float)(y) * (float)(u.i - (bias + exp_c));</div>
+<div class="line"><a name="l04218"></a><span class="lineno"> 4218</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04219"></a><span class="lineno"> 4219</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#acd3521e6a0dbd207dc331c548414b366">fabsf</a>(mult_result) &gt; (float)(1 &lt;&lt; 30))</div>
+<div class="line"><a name="l04220"></a><span class="lineno"> 4220</span>&#160;  {</div>
+<div class="line"><a name="l04221"></a><span class="lineno"> 4221</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l04222"></a><span class="lineno"> 4222</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04223"></a><span class="lineno"> 4223</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
+<div class="line"><a name="l04224"></a><span class="lineno"> 4224</span>&#160;    <span class="keywordflow">return</span> y &gt; 0 ? HUGE_VALF : 0.0f;</div>
+<div class="line"><a name="l04225"></a><span class="lineno"> 4225</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04226"></a><span class="lineno"> 4226</span>&#160;  }</div>
+<div class="line"><a name="l04227"></a><span class="lineno"> 4227</span>&#160;  u.i = (int32_t)mult_result + (bias + exp_c);</div>
+<div class="line"><a name="l04228"></a><span class="lineno"> 4228</span>&#160;  <span class="keywordflow">return</span> u.f;</div>
+<div class="line"><a name="l04229"></a><span class="lineno"> 4229</span>&#160;}</div>
+<div class="line"><a name="l04230"></a><span class="lineno"> 4230</span>&#160; </div>
+<div class="line"><a name="l04231"></a><span class="lineno"> 4231</span>&#160;<span class="comment">/* FUNCTION: __builtin_powil */</span></div>
+<div class="line"><a name="l04232"></a><span class="lineno"> 4232</span>&#160; </div>
+<div class="line"><a name="l04233"></a><span class="lineno"> 4233</span>&#160;<span class="preprocessor">#ifndef __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l04234"></a><span class="lineno"> 4234</span>&#160;<span class="preprocessor">#  include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l04235"></a><span class="lineno"> 4235</span>&#160;<span class="preprocessor">#  define __CPROVER_MATH_H_INCLUDED</span></div>
+<div class="line"><a name="l04236"></a><span class="lineno"> 4236</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04237"></a><span class="lineno"> 4237</span>&#160; </div>
+<div class="line"><a name="l04238"></a><span class="lineno"> 4238</span>&#160;<span class="preprocessor">#ifndef __CPROVER_FLOAT_H_INCLUDED</span></div>
+<div class="line"><a name="l04239"></a><span class="lineno"> 4239</span>&#160;<span class="preprocessor">#  include &lt;float.h&gt;</span></div>
+<div class="line"><a name="l04240"></a><span class="lineno"> 4240</span>&#160;<span class="preprocessor">#  define __CPROVER_FLOAT_H_INCLUDED</span></div>
+<div class="line"><a name="l04241"></a><span class="lineno"> 4241</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04242"></a><span class="lineno"> 4242</span>&#160; </div>
+<div class="line"><a name="l04243"></a><span class="lineno"> 4243</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l04244"></a><span class="lineno"> 4244</span>&#160;<span class="preprocessor">#  include &lt;stdint.h&gt;</span></div>
+<div class="line"><a name="l04245"></a><span class="lineno"> 4245</span>&#160;<span class="preprocessor">#  define __CPROVER_STDINT_H_INCLUDED</span></div>
+<div class="line"><a name="l04246"></a><span class="lineno"> 4246</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04247"></a><span class="lineno"> 4247</span>&#160; </div>
+<div class="line"><a name="l04248"></a><span class="lineno"> 4248</span>&#160;<span class="preprocessor">#ifndef __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l04249"></a><span class="lineno"> 4249</span>&#160;<span class="preprocessor">#  include &lt;errno.h&gt;</span></div>
+<div class="line"><a name="l04250"></a><span class="lineno"> 4250</span>&#160;<span class="preprocessor">#  define __CPROVER_ERRNO_H_INCLUDED</span></div>
+<div class="line"><a name="l04251"></a><span class="lineno"> 4251</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04252"></a><span class="lineno"> 4252</span>&#160; </div>
+<div class="line"><a name="l04253"></a><span class="lineno"> 4253</span>&#160;int32_t <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l04254"></a><span class="lineno"> 4254</span>&#160; </div>
+<div class="line"><a name="l04255"></a><span class="lineno"> 4255</span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l04256"></a><span class="lineno"> 4256</span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#a4da35170c9de4e2ee6e6a49deb30a611">__builtin_powi</a>(<span class="keywordtype">double</span>, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l04257"></a><span class="lineno"> 4257</span>&#160; </div>
+<div class="line"><a name="l04258"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#a1a34e20af3df0ac647bb8ae36327582b"> 4258</a></span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#aeb47361b9691104fdbb3ff72a517f61e">__builtin_powil</a>(<span class="keywordtype">long</span> <span class="keywordtype">double</span> x, <span class="keywordtype">int</span> y)</div>
+<div class="line"><a name="l04259"></a><span class="lineno"> 4259</span>&#160;{</div>
+<div class="line"><a name="l04260"></a><span class="lineno"> 4260</span>&#160;  <span class="comment">// see man pow (https://linux.die.net/man/3/pow), specialized for y being an</span></div>
+<div class="line"><a name="l04261"></a><span class="lineno"> 4261</span>&#160;  <span class="comment">// integer</span></div>
+<div class="line"><a name="l04262"></a><span class="lineno"> 4262</span>&#160;  <span class="keywordflow">if</span>(x == 1.0l)</div>
+<div class="line"><a name="l04263"></a><span class="lineno"> 4263</span>&#160;    <span class="keywordflow">return</span> 1.0l;</div>
+<div class="line"><a name="l04264"></a><span class="lineno"> 4264</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(y == 0)</div>
+<div class="line"><a name="l04265"></a><span class="lineno"> 4265</span>&#160;    <span class="keywordflow">return</span> 1.0l;</div>
+<div class="line"><a name="l04266"></a><span class="lineno"> 4266</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; y &gt; 0)</div>
+<div class="line"><a name="l04267"></a><span class="lineno"> 4267</span>&#160;  {</div>
+<div class="line"><a name="l04268"></a><span class="lineno"> 4268</span>&#160;    <span class="keywordflow">if</span>(y % 2 == 1)</div>
+<div class="line"><a name="l04269"></a><span class="lineno"> 4269</span>&#160;      <span class="keywordflow">return</span> x;</div>
+<div class="line"><a name="l04270"></a><span class="lineno"> 4270</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04271"></a><span class="lineno"> 4271</span>&#160;      <span class="keywordflow">return</span> +0.0l;</div>
+<div class="line"><a name="l04272"></a><span class="lineno"> 4272</span>&#160;  }</div>
+<div class="line"><a name="l04273"></a><span class="lineno"> 4273</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abdd3ff867a71e23d7eddfad6b5e2fdd3">isinf</a>(x) &amp;&amp; <a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x))</div>
+<div class="line"><a name="l04274"></a><span class="lineno"> 4274</span>&#160;  {</div>
+<div class="line"><a name="l04275"></a><span class="lineno"> 4275</span>&#160;    <span class="keywordflow">if</span>(y &lt; 0)</div>
+<div class="line"><a name="l04276"></a><span class="lineno"> 4276</span>&#160;    {</div>
+<div class="line"><a name="l04277"></a><span class="lineno"> 4277</span>&#160;      <span class="keywordflow">if</span>(-y % 2 == 1)</div>
+<div class="line"><a name="l04278"></a><span class="lineno"> 4278</span>&#160;        <span class="keywordflow">return</span> -0.0l;</div>
+<div class="line"><a name="l04279"></a><span class="lineno"> 4279</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04280"></a><span class="lineno"> 4280</span>&#160;        <span class="keywordflow">return</span> +0.0l;</div>
+<div class="line"><a name="l04281"></a><span class="lineno"> 4281</span>&#160;    }</div>
+<div class="line"><a name="l04282"></a><span class="lineno"> 4282</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04283"></a><span class="lineno"> 4283</span>&#160;    {</div>
+<div class="line"><a name="l04284"></a><span class="lineno"> 4284</span>&#160;      <span class="keywordflow">if</span>(y % 2 == 1)</div>
+<div class="line"><a name="l04285"></a><span class="lineno"> 4285</span>&#160;        <span class="keywordflow">return</span> -<a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>();</div>
+<div class="line"><a name="l04286"></a><span class="lineno"> 4286</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04287"></a><span class="lineno"> 4287</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>();</div>
+<div class="line"><a name="l04288"></a><span class="lineno"> 4288</span>&#160;    }</div>
+<div class="line"><a name="l04289"></a><span class="lineno"> 4289</span>&#160;  }</div>
+<div class="line"><a name="l04290"></a><span class="lineno"> 4290</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abdd3ff867a71e23d7eddfad6b5e2fdd3">isinf</a>(x) &amp;&amp; !<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x))</div>
+<div class="line"><a name="l04291"></a><span class="lineno"> 4291</span>&#160;  {</div>
+<div class="line"><a name="l04292"></a><span class="lineno"> 4292</span>&#160;    <span class="keywordflow">if</span>(y &lt; 0)</div>
+<div class="line"><a name="l04293"></a><span class="lineno"> 4293</span>&#160;      <span class="keywordflow">return</span> +0.0f;</div>
+<div class="line"><a name="l04294"></a><span class="lineno"> 4294</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04295"></a><span class="lineno"> 4295</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>();</div>
+<div class="line"><a name="l04296"></a><span class="lineno"> 4296</span>&#160;  }</div>
+<div class="line"><a name="l04297"></a><span class="lineno"> 4297</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(fpclassify(x) == FP_ZERO &amp;&amp; y &lt; 0)</div>
+<div class="line"><a name="l04298"></a><span class="lineno"> 4298</span>&#160;  {</div>
+<div class="line"><a name="l04299"></a><span class="lineno"> 4299</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l04300"></a><span class="lineno"> 4300</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04301"></a><span class="lineno"> 4301</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
+<div class="line"><a name="l04302"></a><span class="lineno"> 4302</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#ae6fe7dbc8dcf57f192c42a8bf6ac1021">__CPROVER_signld</a>(x) &amp;&amp; -y % 2 == 1)</div>
+<div class="line"><a name="l04303"></a><span class="lineno"> 4303</span>&#160;    {</div>
+<div class="line"><a name="l04304"></a><span class="lineno"> 4304</span>&#160;      <span class="keywordflow">return</span> -HUGE_VALL;</div>
+<div class="line"><a name="l04305"></a><span class="lineno"> 4305</span>&#160;    }</div>
+<div class="line"><a name="l04306"></a><span class="lineno"> 4306</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04307"></a><span class="lineno"> 4307</span>&#160;      <span class="keywordflow">return</span> HUGE_VALL;</div>
+<div class="line"><a name="l04308"></a><span class="lineno"> 4308</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04309"></a><span class="lineno"> 4309</span>&#160;  }</div>
+<div class="line"><a name="l04310"></a><span class="lineno"> 4310</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(x))</div>
+<div class="line"><a name="l04311"></a><span class="lineno"> 4311</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
+<div class="line"><a name="l04312"></a><span class="lineno"> 4312</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l04313"></a><span class="lineno"> 4313</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
+<div class="line"><a name="l04314"></a><span class="lineno"> 4314</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04315"></a><span class="lineno"> 4315</span>&#160; </div>
+<div class="line"><a name="l04316"></a><span class="lineno"> 4316</span>&#160;<span class="preprocessor">#if LDBL_MAX_EXP == DBL_MAX_EXP</span></div>
+<div class="line"><a name="l04317"></a><span class="lineno"> 4317</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="math_8c.html#a4da35170c9de4e2ee6e6a49deb30a611">__builtin_powi</a>(x, y);</div>
+<div class="line"><a name="l04318"></a><span class="lineno"> 4318</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l04319"></a><span class="lineno"> 4319</span>&#160;<span class="preprocessor">#  ifndef _MSC_VER</span></div>
+<div class="line"><a name="l04320"></a><span class="lineno"> 4320</span>&#160;  _Static_assert</div>
+<div class="line"><a name="l04321"></a><span class="lineno"> 4321</span>&#160;<span class="preprocessor">#  else</span></div>
+<div class="line"><a name="l04322"></a><span class="lineno"> 4322</span>&#160;  static_assert</div>
+<div class="line"><a name="l04323"></a><span class="lineno"> 4323</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l04324"></a><span class="lineno"> 4324</span>&#160;    (<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) % <span class="keyword">sizeof</span>(int32_t) == 0,</div>
+<div class="line"><a name="l04325"></a><span class="lineno"> 4325</span>&#160;     <span class="stringliteral">&quot;bit width of long double is a multiple of bit width of int32_t&quot;</span>);</div>
+<div class="line"><a name="l04326"></a><span class="lineno"> 4326</span>&#160;  <span class="keyword">union </span>U</div>
+<div class="line"><a name="l04327"></a><span class="lineno"> 4327</span>&#160;  {</div>
+<div class="line"><a name="l04328"></a><span class="lineno"> 4328</span>&#160;    <span class="keywordtype">long</span> <span class="keywordtype">double</span> l;</div>
+<div class="line"><a name="l04329"></a><span class="lineno"> 4329</span>&#160;    int32_t i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t)];</div>
+<div class="line"><a name="l04330"></a><span class="lineno"> 4330</span>&#160;  } u = {x};</div>
+<div class="line"><a name="l04331"></a><span class="lineno"> 4331</span>&#160;<span class="preprocessor">#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l04332"></a><span class="lineno"> 4332</span>&#160;  int32_t exponent = u.i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t) - 1];</div>
+<div class="line"><a name="l04333"></a><span class="lineno"> 4333</span>&#160;<span class="preprocessor">#  else</span></div>
+<div class="line"><a name="l04334"></a><span class="lineno"> 4334</span>&#160;  int32_t exponent = u.i[0];</div>
+<div class="line"><a name="l04335"></a><span class="lineno"> 4335</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l04336"></a><span class="lineno"> 4336</span>&#160;  int32_t bias = (1 &lt;&lt; 16) * ((1 &lt;&lt; 14) - 1);</div>
+<div class="line"><a name="l04337"></a><span class="lineno"> 4337</span>&#160;  int32_t exp_c = <a class="code" href="math_8c.html#a67115817a750a87eb899252b5deb2f9f">__VERIFIER_nondet_int32_t</a>();</div>
+<div class="line"><a name="l04338"></a><span class="lineno"> 4338</span>&#160;  <a class="code" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(exp_c &gt;= -5641 &amp;&amp; exp_c &lt;= 1);</div>
+<div class="line"><a name="l04339"></a><span class="lineno"> 4339</span>&#160;<span class="preprocessor">#  pragma CPROVER check push</span></div>
+<div class="line"><a name="l04340"></a><span class="lineno"> 4340</span>&#160;<span class="preprocessor">#  pragma CPROVER check disable &quot;signed-overflow&quot;</span></div>
+<div class="line"><a name="l04341"></a><span class="lineno"> 4341</span>&#160;  <span class="keywordtype">long</span> <span class="keywordtype">double</span> mult_result =</div>
+<div class="line"><a name="l04342"></a><span class="lineno"> 4342</span>&#160;    (<span class="keywordtype">long</span> double)y * (<span class="keywordtype">long</span> <span class="keywordtype">double</span>)(exponent - (bias + exp_c));</div>
+<div class="line"><a name="l04343"></a><span class="lineno"> 4343</span>&#160;<span class="preprocessor">#  pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04344"></a><span class="lineno"> 4344</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#abd71b87b28007f30cb7f5c44908adabc">fabsl</a>(mult_result) &gt; (<span class="keywordtype">long</span> double)(1 &lt;&lt; 30))</div>
+<div class="line"><a name="l04345"></a><span class="lineno"> 4345</span>&#160;  {</div>
+<div class="line"><a name="l04346"></a><span class="lineno"> 4346</span>&#160;    errno = ERANGE;</div>
+<div class="line"><a name="l04347"></a><span class="lineno"> 4347</span>&#160;<span class="preprocessor">#  pragma CPROVER check push</span></div>
+<div class="line"><a name="l04348"></a><span class="lineno"> 4348</span>&#160;<span class="preprocessor">#  pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
+<div class="line"><a name="l04349"></a><span class="lineno"> 4349</span>&#160;    <span class="keywordflow">return</span> y &gt; 0 ? HUGE_VALL : 0.0l;</div>
+<div class="line"><a name="l04350"></a><span class="lineno"> 4350</span>&#160;<span class="preprocessor">#  pragma CPROVER check pop</span></div>
+<div class="line"><a name="l04351"></a><span class="lineno"> 4351</span>&#160;  }</div>
+<div class="line"><a name="l04352"></a><span class="lineno"> 4352</span>&#160;  int32_t result = (int32_t)mult_result + (bias + exp_c);</div>
+<div class="line"><a name="l04353"></a><span class="lineno"> 4353</span>&#160;  <span class="keyword">union </span>U result_u = {.i = {0}};</div>
+<div class="line"><a name="l04354"></a><span class="lineno"> 4354</span>&#160;<span class="preprocessor">#  if !defined(__BYTE_ORDER__) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__</span></div>
+<div class="line"><a name="l04355"></a><span class="lineno"> 4355</span>&#160;  result_u.i[<span class="keyword">sizeof</span>(<span class="keywordtype">long</span> double) / <span class="keyword">sizeof</span>(int32_t) - 1] = result;</div>
+<div class="line"><a name="l04356"></a><span class="lineno"> 4356</span>&#160;<span class="preprocessor">#  else</span></div>
+<div class="line"><a name="l04357"></a><span class="lineno"> 4357</span>&#160;  result_u.i[0] = result;</div>
+<div class="line"><a name="l04358"></a><span class="lineno"> 4358</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l04359"></a><span class="lineno"> 4359</span>&#160;  <span class="keywordflow">return</span> result_u.l;</div>
+<div class="line"><a name="l04360"></a><span class="lineno"> 4360</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04361"></a><span class="lineno"> 4361</span>&#160;}</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a0ae550b5df791740ca16a05ab1717ede"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a0ae550b5df791740ca16a05ab1717ede">__CPROVER_fabs</a></div><div class="ttdeci">double __CPROVER_fabs(double x)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a0b383637915343bca9bd7f2836360c59"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a0b383637915343bca9bd7f2836360c59">__CPROVER_isnormalld</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_isnormalld(long double f)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a11dd2c1c6eaaa857811c901c3557d0bf"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a11dd2c1c6eaaa857811c901c3557d0bf">__CPROVER_fmodf</a></div><div class="ttdeci">float __CPROVER_fmodf(float, float)</div></div>
@@ -4137,6 +4498,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a3009d7aa7b4e8a7e71f393ff3a4cdf35"><div class="ttname"><a href="math_8c.html#a3009d7aa7b4e8a7e71f393ff3a4cdf35">fminl</a></div><div class="ttdeci">long double fminl(long double f, long double g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01207">math.c:1207</a></div></div>
 <div class="ttc" id="amath_8c_html_a3337db086394bad101bd8d42d891640a"><div class="ttname"><a href="math_8c.html#a3337db086394bad101bd8d42d891640a">lrint</a></div><div class="ttdeci">long int lrint(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01834">math.c:1834</a></div></div>
 <div class="ttc" id="amath_8c_html_a33d95711621def731d3f88c4e606323e"><div class="ttname"><a href="math_8c.html#a33d95711621def731d3f88c4e606323e">llrintf</a></div><div class="ttdeci">long long int llrintf(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01924">math.c:1924</a></div></div>
+<div class="ttc" id="amath_8c_html_a3696ff9c7bfd1ed4fec48b86d7d1996e"><div class="ttname"><a href="math_8c.html#a3696ff9c7bfd1ed4fec48b86d7d1996e">__builtin_powif</a></div><div class="ttdeci">float __builtin_powif(float x, int y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l04142">math.c:4142</a></div></div>
 <div class="ttc" id="amath_8c_html_a370ff5cfa842822bfd8ea0a93d441a33"><div class="ttname"><a href="math_8c.html#a370ff5cfa842822bfd8ea0a93d441a33">remainderf</a></div><div class="ttdeci">float remainderf(float x, float y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02413">math.c:2413</a></div></div>
 <div class="ttc" id="amath_8c_html_a38bd88274dc5594b4826fd60c8054c8e"><div class="ttname"><a href="math_8c.html#a38bd88274dc5594b4826fd60c8054c8e">log2</a></div><div class="ttdeci">double log2(double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02987">math.c:2987</a></div></div>
 <div class="ttc" id="amath_8c_html_a3b4660b473f4842bbc3845661379fccb"><div class="ttname"><a href="math_8c.html#a3b4660b473f4842bbc3845661379fccb">__CPROVER_islessf</a></div><div class="ttdeci">int __CPROVER_islessf(float f, float g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00061">math.c:61</a></div></div>
@@ -4155,6 +4517,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_a4b51faf338f7d4f31224d0c096a8859b"><div class="ttname"><a href="math_8c.html#a4b51faf338f7d4f31224d0c096a8859b">nearbyintl</a></div><div class="ttdeci">long double nearbyintl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01738">math.c:1738</a></div></div>
 <div class="ttc" id="amath_8c_html_a4cbea82e07336b6c9280c66648730da0"><div class="ttname"><a href="math_8c.html#a4cbea82e07336b6c9280c66648730da0">fabs</a></div><div class="ttdeci">double fabs(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00003">math.c:3</a></div></div>
 <div class="ttc" id="amath_8c_html_a4cc2379a4ef2547a58a874e8ae6e796b"><div class="ttname"><a href="math_8c.html#a4cc2379a4ef2547a58a874e8ae6e796b">__builtin_isnan</a></div><div class="ttdeci">int __builtin_isnan(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00275">math.c:275</a></div></div>
+<div class="ttc" id="amath_8c_html_a4da35170c9de4e2ee6e6a49deb30a611"><div class="ttname"><a href="math_8c.html#a4da35170c9de4e2ee6e6a49deb30a611">__builtin_powi</a></div><div class="ttdeci">double __builtin_powi(double x, int y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l04023">math.c:4023</a></div></div>
 <div class="ttc" id="amath_8c_html_a4ef0d8eb09fbc8b2423c360ad7cb8f0e"><div class="ttname"><a href="math_8c.html#a4ef0d8eb09fbc8b2423c360ad7cb8f0e">fdimf</a></div><div class="ttdeci">float fdimf(float f, float g)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l01235">math.c:1235</a></div></div>
 <div class="ttc" id="amath_8c_html_a517c5789940d3f9b25d17efb1ac6404f"><div class="ttname"><a href="math_8c.html#a517c5789940d3f9b25d17efb1ac6404f">__sort_of_CPROVER_remainder</a></div><div class="ttdeci">double __sort_of_CPROVER_remainder(int rounding_mode, double x, double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02261">math.c:2261</a></div></div>
 <div class="ttc" id="amath_8c_html_a537296d1a8f9fb621676038b99ba7edf"><div class="ttname"><a href="math_8c.html#a537296d1a8f9fb621676038b99ba7edf">fmod</a></div><div class="ttdeci">double fmod(double x, double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02330">math.c:2330</a></div></div>
@@ -4255,6 +4618,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="ttc" id="amath_8c_html_ae60d4866e88abf023d92d33c6351ae6f"><div class="ttname"><a href="math_8c.html#ae60d4866e88abf023d92d33c6351ae6f">copysignl</a></div><div class="ttdeci">long double copysignl(long double x, long double y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02482">math.c:2482</a></div></div>
 <div class="ttc" id="amath_8c_html_ae824e49a04221dcf66b9791c5df8d6b6"><div class="ttname"><a href="math_8c.html#ae824e49a04221dcf66b9791c5df8d6b6">log10l</a></div><div class="ttdeci">long double log10l(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l03336">math.c:3336</a></div></div>
 <div class="ttc" id="amath_8c_html_ae87aa7b7444b2ae0ccfdfcfe00f91355"><div class="ttname"><a href="math_8c.html#ae87aa7b7444b2ae0ccfdfcfe00f91355">__builtin_isinf</a></div><div class="ttdeci">int __builtin_isinf(double d)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00254">math.c:254</a></div></div>
+<div class="ttc" id="amath_8c_html_aeb47361b9691104fdbb3ff72a517f61e"><div class="ttname"><a href="math_8c.html#aeb47361b9691104fdbb3ff72a517f61e">__builtin_powil</a></div><div class="ttdeci">long double __builtin_powil(long double x, int y)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l04258">math.c:4258</a></div></div>
 <div class="ttc" id="amath_8c_html_aeb537bfea71fa91192234a666f3a6a25"><div class="ttname"><a href="math_8c.html#aeb537bfea71fa91192234a666f3a6a25">sinl</a></div><div class="ttdeci">long double sinl(long double x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00515">math.c:515</a></div></div>
 <div class="ttc" id="amath_8c_html_aeb7e728350e442c10065da58f5adff56"><div class="ttname"><a href="math_8c.html#aeb7e728350e442c10065da58f5adff56">__builtin_huge_valf</a></div><div class="ttdeci">float __builtin_huge_valf(void)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l00289">math.c:289</a></div></div>
 <div class="ttc" id="amath_8c_html_aed26c6708ff2027f9a8214d206eef0e7"><div class="ttname"><a href="math_8c.html#aed26c6708ff2027f9a8214d206eef0e7">exp2f</a></div><div class="ttdeci">float exp2f(float x)</div><div class="ttdef"><b>Definition:</b> <a href="math_8c_source.html#l02507">math.c:2507</a></div></div>

@@ -1,5 +1,8 @@
 var NAVTREEINDEX118 =
 {
+"qbf__quantor_8h.html":[9,0,2,27,5,4],
+"qbf__quantor_8h_source.html":[9,0,2,27,5,4],
+"qbf__qube_8cpp.html":[9,0,2,27,5,5],
 "qbf__qube_8cpp_source.html":[9,0,2,27,5,5],
 "qbf__qube_8h.html":[9,0,2,27,5,6],
 "qbf__qube_8h_source.html":[9,0,2,27,5,6],
@@ -246,8 +249,5 @@ var NAVTREEINDEX118 =
 "remove__function__pointers_8h.html#a7e87fa040b93acfd34ee382a89b4e4b6":[9,0,2,16,97,0],
 "remove__function__pointers_8h.html#adcbbb61dec4ade79261bdbd77f4ebb52":[9,0,2,16,97,4],
 "remove__function__pointers_8h_source.html":[9,0,2,16,97],
-"remove__instanceof_8cpp.html":[9,0,1,0,1,107],
-"remove__instanceof_8cpp.html#a0748ad50b5f0739aad08a7bb3070c535":[9,0,1,0,1,107,6],
-"remove__instanceof_8cpp.html#a13b63b69ff3b414fe66c6074093595c1":[9,0,1,0,1,107,1],
-"remove__instanceof_8cpp.html#a382eec966dcd313c4692f1b186972f26":[9,0,1,0,1,107,2]
+"remove__instanceof_8cpp.html":[9,0,1,0,1,107]
 };
