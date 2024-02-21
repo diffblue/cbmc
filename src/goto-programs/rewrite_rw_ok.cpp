@@ -32,7 +32,7 @@ static std::optional<exprt> rewrite_rw_ok(exprt expr, const namespacet &ns)
           r_or_w_ok->size(),
           ns.lookup(CPROVER_PREFIX "deallocated").symbol_expr(),
           ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr()}
-          .with_source_location<exprt>(*it);
+          .with_source_location(*it);
 
       it.mutate() = std::move(replacement);
       unchanged = false;
@@ -49,7 +49,7 @@ static std::optional<exprt> rewrite_rw_ok(exprt expr, const namespacet &ns)
           pointer_in_range->upper_bound(),
           ns.lookup(CPROVER_PREFIX "deallocated").symbol_expr(),
           ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr()}
-          .with_source_location<exprt>(*it);
+          .with_source_location(*it);
 
       it.mutate() = std::move(replacement);
       unchanged = false;
