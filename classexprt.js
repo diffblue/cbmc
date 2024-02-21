@@ -57,6 +57,6 @@ var classexprt =
     [ "visit_post", "classexprt.html#abb069f3f8f25619139d97853e4c1740b", null ],
     [ "visit_pre", "classexprt.html#a5a331dafe7711470a9d3097b69691251", null ],
     [ "visit_pre", "classexprt.html#a8a4ea14980805786fbf1a3b05a51e620", null ],
-    [ "with_source_location", "classexprt.html#ae36ac8125b3a1bf9bbb50d1e5616337c", null ],
-    [ "with_source_location", "classexprt.html#ab83f30ce48997fc723e1d69516fb7b37", null ]
+    [ "with_source_location", "classexprt.html#ac9d535c6e4e412ab23f461ccec6d8f87", null ],
+    [ "with_source_location", "classexprt.html#a403852c60b7267777a1eee6abff0bd91", null ]
 ];
