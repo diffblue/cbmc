@@ -93,7 +93,6 @@ var classgoto__convertt =
     [ "get_string_constant", "classgoto__convertt.html#a7c6fd63b1487ab9eb4a8baebc40db6ef", null ],
     [ "goto_convert", "classgoto__convertt.html#a187f9b55fcb654516b520430116bfe4b", null ],
     [ "goto_convert_rec", "classgoto__convertt.html#a137d010104ad6bf0318df06ad4a353eb", null ],
-    [ "has_function_call", "classgoto__convertt.html#aa909e7ee22f459684fc9a76f4799465f", null ],
     [ "make_compound_literal", "classgoto__convertt.html#a694c094ea1cf14e4073a6e1c093c819c", null ],
     [ "make_temp_symbol", "classgoto__convertt.html#ae3d43c2f2fff1dfe570162d1a0c7ebd6", null ],
     [ "needs_cleaning", "classgoto__convertt.html#ab065db23ba8283f40bedca12ee1eddcf", null ],
