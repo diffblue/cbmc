@@ -77,17 +77,17 @@ exprt update_bits_exprt::lower() const
     to_bitvector_type(new_value().type()).get_width();
   auto src_bv_type = bv_typet(width);
 
-  // build a mask 1...1 0...0
+  // build a mask 0...0 1...1
   auto mask_bv = make_bvrep(width, [new_value_width](std::size_t index) {
-    return index >= new_value_width;
+    return index < new_value_width;
   });
   auto mask_expr = constant_exprt(mask_bv, src_bv_type);
 
   // shift the mask by the index
   auto mask_shifted = shl_exprt(mask_expr, index());
 
-  auto src_masked =
-    bitand_exprt(typecast_exprt(src(), src_bv_type), mask_shifted);
+  auto src_masked = bitand_exprt(
+    typecast_exprt(src(), src_bv_type), bitnot_exprt(mask_shifted));
 
   // zero-extend or shrink the replacement bits to match src
   auto new_value_casted = typecast_exprt(new_value(), src_bv_type);
