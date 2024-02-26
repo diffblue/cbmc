@@ -289,9 +289,17 @@ typet c_typecastt::follow_with_qualifiers(const typet &src_type)
   // collect qualifiers
   c_qualifierst qualifiers(src_type);
 
-  while(result_type.id() == ID_struct_tag || result_type.id() == ID_union_tag)
+  if(
+    auto struct_tag_type = type_try_dynamic_cast<struct_tag_typet>(result_type))
   {
-    const typet &followed_type = ns.follow(result_type);
+    const typet &followed_type = ns.follow_tag(*struct_tag_type);
+    result_type = followed_type;
+    qualifiers += c_qualifierst(followed_type);
+  }
+  else if(
+    auto union_tag_type = type_try_dynamic_cast<union_tag_typet>(result_type))
+  {
+    const typet &followed_type = ns.follow_tag(*union_tag_type);
     result_type = followed_type;
     qualifiers += c_qualifierst(followed_type);
   }

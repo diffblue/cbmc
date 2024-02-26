@@ -451,14 +451,13 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     exprt default_match=nil_exprt();
     exprt assoc_match=nil_exprt();
 
-    const typet &op_type = follow(op.type());
+    const typet &op_type = op.type();
 
     for(const auto &irep : generic_associations)
     {
       if(irep.get(ID_type_arg) == ID_default)
         default_match = static_cast<const exprt &>(irep.find(ID_value));
-      else if(
-        op_type == follow(static_cast<const typet &>(irep.find(ID_type_arg))))
+      else if(op_type == static_cast<const typet &>(irep.find(ID_type_arg)))
       {
         assoc_match = static_cast<const exprt &>(irep.find(ID_value));
       }
@@ -590,11 +589,9 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
   for(const auto &op : member.operands())
   {
-    type = follow(type);
-
     if(op.id() == ID_member)
     {
-      if(type.id()!=ID_union && type.id()!=ID_struct)
+      if(type.id() != ID_union_tag && type.id() != ID_struct_tag)
       {
         error().source_location = expr.source_location();
         error() << "offsetof of member expects struct/union type, "
@@ -607,20 +604,20 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
       while(!found)
       {
-        PRECONDITION(type.id() == ID_union || type.id() == ID_struct);
+        PRECONDITION(type.id() == ID_union_tag || type.id() == ID_struct_tag);
 
-        const struct_union_typet &struct_union_type=
-          to_struct_union_type(type);
+        const struct_union_typet &struct_union_type =
+          follow_tag(to_struct_or_union_tag_type(type));
 
         // direct member?
         if(struct_union_type.has_component(component_name))
         {
           found=true;
 
-          if(type.id()==ID_struct)
+          if(type.id() == ID_struct_tag)
           {
-            auto o_opt =
-              member_offset_expr(to_struct_type(type), component_name, *this);
+            auto o_opt = member_offset_expr(
+              follow_tag(to_struct_tag_type(type)), component_name, *this);
 
             if(!o_opt.has_value())
             {
@@ -650,10 +647,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
             {
               if(has_component_rec(c.type(), component_name, *this))
               {
-                if(type.id()==ID_struct)
+                if(type.id() == ID_struct_tag)
                 {
                   auto o_opt = member_offset_expr(
-                    to_struct_type(type), c.get_name(), *this);
+                    follow_tag(to_struct_tag_type(type)), c.get_name(), *this);
 
                   if(!o_opt.has_value())
                   {
@@ -669,9 +666,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
                       o_opt.value(), size_type()));
                 }
 
-                typet tmp = follow(c.type());
+                typet tmp = c.type();
                 type=tmp;
-                CHECK_RETURN(type.id() == ID_union || type.id() == ID_struct);
+                CHECK_RETURN(
+                  type.id() == ID_union_tag || type.id() == ID_struct_tag);
                 found2=true;
                 break; // we run into another iteration of the outer loop
               }
@@ -1377,7 +1375,7 @@ void c_typecheck_baset::typecheck_expr_rel(
 
   if(expr.id()==ID_equal || expr.id()==ID_notequal)
   {
-    if(follow(o_type0)==follow(o_type1))
+    if(o_type0 == o_type1)
     {
       if(o_type0.id() != ID_array)
       {
@@ -1530,10 +1528,7 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   exprt &op0 = to_unary_expr(expr).op();
   typet type=op0.type();
 
-  type = follow(type);
-
-  if(type.id()!=ID_struct &&
-     type.id()!=ID_union)
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
   {
     error().source_location = expr.source_location();
     error() << "member operator requires structure type "
@@ -1542,8 +1537,8 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
     throw 0;
   }
 
-  const struct_union_typet &struct_union_type=
-    to_struct_union_type(type);
+  const struct_union_typet &struct_union_type =
+    follow_tag(to_struct_or_union_tag_type(type));
 
   if(struct_union_type.is_incomplete())
   {
@@ -1585,8 +1580,12 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   if(op0.get_bool(ID_C_lvalue))
     expr.set(ID_C_lvalue, true);
 
-  if(op0.type().get_bool(ID_C_constant) || type.get_bool(ID_C_constant))
+  if(
+    op0.type().get_bool(ID_C_constant) ||
+    struct_union_type.get_bool(ID_C_constant))
+  {
     expr.type().set(ID_C_constant, true);
+  }
 
   // copy method identifier
   const irep_idt &identifier=component.get(ID_C_identifier);
@@ -3649,11 +3648,10 @@ exprt c_typecheck_baset::do_special_functions(
 
     // The value doesn't matter at all, we only care about the type.
     // Need to sync with typeclass.h.
-    typet type = follow(object.type());
-
     // use underlying type for bit fields
-    if(type.id() == ID_c_bit_field)
-      type = to_c_bit_field_type(type).underlying_type();
+    const typet &type = object.type().id() == ID_c_bit_field
+                          ? to_c_bit_field_type(object.type()).underlying_type()
+                          : object.type();
 
     unsigned type_number;
 
@@ -3665,23 +3663,17 @@ exprt c_typecheck_baset::do_special_functions(
     }
     else
     {
-      type_number =
-        type.id() == ID_empty
-          ? 0u
-          : (type.id() == ID_bool || type.id() == ID_c_bool)
-              ? 4u
-              : (type.id() == ID_pointer || type.id() == ID_array)
-                  ? 5u
-                  : type.id() == ID_floatbv
-                      ? 8u
-                      : (type.id() == ID_complex &&
-                         to_complex_type(type).subtype().id() == ID_floatbv)
-                          ? 9u
-                          : type.id() == ID_struct
-                              ? 12u
-                              : type.id() == ID_union
-                                  ? 13u
-                                  : 1u; // int, short, char, enum_tag
+      type_number = type.id() == ID_empty                                ? 0u
+                    : (type.id() == ID_bool || type.id() == ID_c_bool)   ? 4u
+                    : (type.id() == ID_pointer || type.id() == ID_array) ? 5u
+                    : type.id() == ID_floatbv                            ? 8u
+                    : (type.id() == ID_complex &&
+                       to_complex_type(type).subtype().id() == ID_floatbv)
+                      ? 9u
+                    : type.id() == ID_struct_tag ? 12u
+                    : type.id() == ID_union_tag
+                      ? 13u
+                      : 1u; // int, short, char, enum_tag
     }
 
     exprt tmp=from_integer(type_number, expr.type());

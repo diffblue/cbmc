@@ -890,13 +890,11 @@ std::string expr2ct::convert_with(
       const irep_idt &component_name=
         src.operands()[i].get(ID_component_name);
 
-      const typet &full_type = ns.follow(old.type());
-
-      const struct_union_typet &struct_union_type=
-        to_struct_union_type(full_type);
-
-      const struct_union_typet::componentt &comp_expr=
-        struct_union_type.get_component(component_name);
+      const struct_union_typet::componentt &comp_expr =
+        (old.type().id() == ID_struct_tag || old.type().id() == ID_union_tag)
+          ? ns.follow_tag(to_struct_or_union_tag_type(old.type()))
+              .get_component(component_name)
+          : to_struct_union_type(old.type()).get_component(component_name);
       CHECK_RETURN(comp_expr.is_not_nil());
 
       irep_idt display_component_name;
@@ -1551,14 +1549,19 @@ std::string expr2ct::convert_member(
     dest+='.';
   }
 
-  const typet &full_type = ns.follow(compound.type());
-
-  if(full_type.id()!=ID_struct &&
-     full_type.id()!=ID_union)
+  if(
+    compound.type().id() != ID_struct && compound.type().id() != ID_union &&
+    compound.type().id() != ID_struct_tag &&
+    compound.type().id() != ID_union_tag)
+  {
     return convert_norep(src, precedence);
+  }
 
-  const struct_union_typet &struct_union_type=
-    to_struct_union_type(full_type);
+  const struct_union_typet &struct_union_type =
+    (compound.type().id() == ID_struct_tag ||
+     compound.type().id() == ID_union_tag)
+      ? ns.follow_tag(to_struct_or_union_tag_type(compound.type()))
+      : to_struct_union_type(compound.type());
 
   irep_idt component_name=src.get_component_name();
 
@@ -2056,13 +2059,13 @@ std::string expr2ct::convert_struct(
   unsigned &precedence,
   bool include_padding_components)
 {
-  const typet full_type=ns.follow(src.type());
-
-  if(full_type.id()!=ID_struct)
+  if(src.type().id() != ID_struct && src.type().id() != ID_struct_tag)
     return convert_norep(src, precedence);
 
-  const struct_typet &struct_type=
-    to_struct_type(full_type);
+  const struct_typet &struct_type =
+    src.type().id() == ID_struct_tag
+      ? ns.follow_tag(to_struct_tag_type(src.type()))
+      : to_struct_type(src.type());
 
   const struct_typet::componentst &components=
     struct_type.components();

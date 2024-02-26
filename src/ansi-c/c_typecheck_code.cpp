@@ -387,9 +387,13 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
   }
   else if(type.id()==ID_vector)
     return is_complete_type(to_vector_type(type).element_type());
-  else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
+  else if(auto struct_tag_type = type_try_dynamic_cast<struct_tag_typet>(type))
   {
-    return is_complete_type(follow(type));
+    return is_complete_type(follow_tag(*struct_tag_type));
+  }
+  else if(auto union_tag_type = type_try_dynamic_cast<union_tag_typet>(type))
+  {
+    return is_complete_type(follow_tag(*union_tag_type));
   }
 
   return true;
