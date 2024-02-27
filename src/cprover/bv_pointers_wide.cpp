@@ -239,7 +239,6 @@ std::optional<bvt> bv_pointers_widet::convert_address_of_rec(const exprt &expr)
   {
     const member_exprt &member_expr = to_member_expr(expr);
     const exprt &struct_op = member_expr.compound();
-    const typet &struct_op_type = ns.follow(struct_op.type());
 
     // recursive call
     auto bv_opt = convert_address_of_rec(struct_op);
@@ -247,10 +246,12 @@ std::optional<bvt> bv_pointers_widet::convert_address_of_rec(const exprt &expr)
       return {};
 
     bvt bv = std::move(*bv_opt);
-    if(struct_op_type.id() == ID_struct)
+    if(struct_op.type().id() == ID_struct_tag)
     {
       auto offset = member_offset(
-        to_struct_type(struct_op_type), member_expr.get_component_name(), ns);
+        ns.follow_tag(to_struct_tag_type(struct_op.type())),
+        member_expr.get_component_name(),
+        ns);
       CHECK_RETURN(offset.has_value());
 
       // add offset
@@ -260,7 +261,7 @@ std::optional<bvt> bv_pointers_widet::convert_address_of_rec(const exprt &expr)
     else
     {
       INVARIANT(
-        struct_op_type.id() == ID_union,
+        struct_op.type().id() == ID_union_tag,
         "member expression should operate on struct or union");
       // nothing to do, all members have offset 0
     }
@@ -499,21 +500,22 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
   else if(expr.id() == ID_field_address)
   {
     const auto &field_address_expr = to_field_address_expr(expr);
-    const typet &compound_type = ns.follow(field_address_expr.compound_type());
 
     // recursive call
     auto bv = convert_bitvector(field_address_expr.base());
 
-    if(compound_type.id() == ID_struct)
+    if(field_address_expr.compound_type().id() == ID_struct_tag)
     {
       auto offset = member_offset(
-        to_struct_type(compound_type), field_address_expr.component_name(), ns);
+        ns.follow_tag(to_struct_tag_type(field_address_expr.compound_type())),
+        field_address_expr.component_name(),
+        ns);
       CHECK_RETURN(offset.has_value());
 
       // add offset
       bv = offset_arithmetic(field_address_expr.type(), bv, *offset);
     }
-    else if(compound_type.id() == ID_union)
+    else if(field_address_expr.compound_type().id() == ID_union_tag)
     {
       // nothing to do, all fields have offset 0
     }
