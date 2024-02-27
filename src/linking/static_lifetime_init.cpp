@@ -47,24 +47,24 @@ static std::optional<codet> static_lifetime_init(
   if(identifier.starts_with(CPROVER_PREFIX "architecture_"))
     return {};
 
-  const typet &type = ns.follow(symbol.type);
-
   // check type
-  if(type.id() == ID_code || type.id() == ID_empty)
+  if(symbol.type.id() == ID_code || symbol.type.id() == ID_empty)
     return {};
 
-  if(type.id() == ID_array && to_array_type(type).size().is_nil())
+  if(symbol.type.id() == ID_array && to_array_type(symbol.type).size().is_nil())
   {
     // C standard 6.9.2, paragraph 5
     // adjust the type to an array of size 1
     symbolt &writable_symbol = symbol_table.get_writeable_ref(identifier);
-    writable_symbol.type = type;
+    writable_symbol.type = symbol.type;
     writable_symbol.type.set(ID_size, from_integer(1, size_type()));
   }
 
   if(
-    (type.id() == ID_struct || type.id() == ID_union) &&
-    to_struct_union_type(type).is_incomplete())
+    (symbol.type.id() == ID_struct_tag &&
+     ns.follow_tag(to_struct_tag_type(symbol.type)).is_incomplete()) ||
+    (symbol.type.id() == ID_union_tag &&
+     ns.follow_tag(to_union_tag_type(symbol.type)).is_incomplete()))
   {
     return {}; // do not initialize
   }
