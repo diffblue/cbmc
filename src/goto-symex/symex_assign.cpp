@@ -168,7 +168,10 @@ void symex_assignt::assign_from_struct(
   const struct_exprt &rhs,
   const exprt::operandst &guard)
 {
-  const auto &components = to_struct_type(ns.follow(lhs.type())).components();
+  const auto &components =
+    lhs.type().id() == ID_struct_tag
+      ? ns.follow_tag(to_struct_tag_type(lhs.type())).components()
+      : to_struct_type(lhs.type()).components();
   PRECONDITION(rhs.operands().size() == components.size());
 
   for(const auto &comp_rhs : make_range(components).zip(rhs.operands()))

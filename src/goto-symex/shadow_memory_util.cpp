@@ -249,11 +249,12 @@ exprt deref_expr(const exprt &expr)
   return dereference_exprt(expr);
 }
 
-void clean_pointer_expr(exprt &expr, const typet &type)
+void clean_pointer_expr(exprt &expr)
 {
   if(
-    can_cast_type<array_typet>(type) && can_cast_expr<symbol_exprt>(expr) &&
-    to_array_type(type).size().get_bool(ID_C_SSA_symbol))
+    can_cast_type<array_typet>(expr.type()) &&
+    can_cast_expr<symbol_exprt>(expr) &&
+    to_array_type(expr.type()).size().get_bool(ID_C_SSA_symbol))
   {
     remove_array_type_l2(expr.type());
     exprt original_expr = to_ssa_expr(expr).get_original_expr();
@@ -448,12 +449,17 @@ exprt compute_or_over_bytes(
     can_cast_type<c_bool_typet>(field_type) ||
       can_cast_type<bool_typet>(field_type),
     "Can aggregate bytes with *or* only if the shadow memory type is _Bool.");
-  const typet type = ns.follow(expr.type());
 
-  if(type.id() == ID_struct || type.id() == ID_union)
+  if(
+    expr.type().id() == ID_struct || expr.type().id() == ID_union ||
+    expr.type().id() == ID_struct_tag || expr.type().id() == ID_union_tag)
   {
+    const auto &components =
+      (expr.type().id() == ID_struct_tag || expr.type().id() == ID_union_tag)
+        ? ns.follow_tag(to_struct_or_union_tag_type(expr.type())).components()
+        : to_struct_union_type(expr.type()).components();
     exprt::operandst values;
-    for(const auto &component : to_struct_union_type(type).components())
+    for(const auto &component : components)
     {
       if(component.get_is_padding())
       {
@@ -464,9 +470,9 @@ exprt compute_or_over_bytes(
     }
     return or_values(values, field_type);
   }
-  else if(type.id() == ID_array)
+  else if(expr.type().id() == ID_array)
   {
-    const array_typet &array_type = to_array_type(type);
+    const array_typet &array_type = to_array_type(expr.type());
     if(array_type.size().is_constant())
     {
       exprt::operandst values;
@@ -495,7 +501,10 @@ exprt compute_or_over_bytes(
   if(is_union)
   {
     extract_bytes_of_bv(
-      conditional_cast_floatbv_to_unsignedbv(expr), type, field_type, values);
+      conditional_cast_floatbv_to_unsignedbv(expr),
+      expr.type(),
+      field_type,
+      values);
   }
   else
   {
@@ -998,11 +1007,14 @@ normalize(const object_descriptor_exprt &expr, const namespacet &ns)
     else if(object.id() == ID_member)
     {
       const member_exprt &member_expr = to_member_expr(object);
+      const auto &struct_op = member_expr.struct_op();
       const struct_typet &struct_type =
-        to_struct_type(ns.follow(member_expr.struct_op().type()));
+        struct_op.type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(struct_op.type()))
+          : to_struct_type(struct_op.type());
       offset +=
         *member_offset(struct_type, member_expr.get_component_name(), ns);
-      object = member_expr.struct_op();
+      object = struct_op;
     }
     else
     {
