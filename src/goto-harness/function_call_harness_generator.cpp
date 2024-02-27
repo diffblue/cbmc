@@ -390,8 +390,7 @@ void function_call_harness_generatort::validate_options(
         "--" COMMON_HARNESS_GENERATOR_FUNCTION_POINTER_CAN_BE_NULL_OPT};
     }
 
-    const auto &function_pointer_type =
-      ns.follow(function_pointer_symbol_pointer->type);
+    const auto &function_pointer_type = function_pointer_symbol_pointer->type;
 
     if(!can_cast_type<pointer_typet>(function_pointer_type))
     {
