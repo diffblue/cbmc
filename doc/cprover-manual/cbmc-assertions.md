@@ -82,12 +82,7 @@ int foo(int a, int b) {
 }
 ```
 
-A future release of CPROVER will support using these pre and
-postconditions to create a function contract, which can be used for
-modular verification.
-
-
-Future CPROVER releases will support explicit quantifiers with a syntax
+CPROVER supports explicit quantifiers with a syntax
 that resembles Spec\#:
 
 ```C
