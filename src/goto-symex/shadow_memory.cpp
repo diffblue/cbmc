@@ -30,8 +30,9 @@ void shadow_memoryt::initialize_shadow_memory(
   exprt expr,
   const shadow_memory_field_definitionst::field_definitiont &fields)
 {
-  typet type = ns.follow(expr.type());
-  clean_pointer_expr(expr, type);
+  // clean_pointer_expr may change the type
+  typet type = expr.type();
+  clean_pointer_expr(expr);
   for(const auto &field_pair : fields)
   {
     const symbol_exprt &shadow = add_field(state, expr, field_pair.first, type);
