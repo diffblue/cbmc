@@ -1,0 +1,14 @@
+CORE thorough-z3-smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--no-standard-checks
+^\[main.assertion.5\] line 81 assertion __CPROVER_forall \{ size_t j; !\(j < i\) \|\| \(arr\[j\] == j \* 2\) \}: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Uses --no-standard-checks to contain verification time with MiniSat; with
+CaDiCaL this completes in under 5 seconds either way. Takes an unknown amount of
+time (has never been run to completition) when using Z3.
