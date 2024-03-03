@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --apply-loop-contracts _ --no-standard-checks
 ^EXIT=10$

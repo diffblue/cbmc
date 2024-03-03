@@ -2,7 +2,7 @@ CORE
 div_by_zero.c
 --div-by-zero-check --trace
 \[main\.division-by-zero\.1\] line \d division by zero in x / y: FAILURE
-\[main\.division-by-zero\.2\] line \d+ division by zero in x / z: SUCCESS
+\[main\.division-by-zero\.2\] line \d+ division by zero in x / z: UNKNOWN
 y=0
 ^VERIFICATION FAILED$
 ^EXIT=10$

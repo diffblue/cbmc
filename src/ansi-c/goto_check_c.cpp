@@ -1752,6 +1752,9 @@ void goto_check_ct::add_guarded_property(
     }
     else
     {
+      if(property_class == "division-by-zero")
+        annotated_location.property_fatal(true);
+
       new_code.add(goto_programt::make_assertion(
         std::move(guarded_expr), annotated_location));
     }

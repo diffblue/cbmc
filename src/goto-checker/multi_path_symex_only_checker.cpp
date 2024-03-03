@@ -68,6 +68,7 @@ operator()(propertiest &properties)
 
   resultt result(resultt::progresst::DONE);
   update_properties(properties, result.updated_properties);
+
   return result;
 }
 
