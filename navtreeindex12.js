@@ -142,11 +142,13 @@ var NAVTREEINDEX12 =
 "classboolbvt.html#a18803104616c1e368240391ed9fb8f57":[8,0,128,39],
 "classboolbvt.html#a1e0ebc52d234aafaa34cf803dd9683da":[8,0,128,77],
 "classboolbvt.html#a2148226783fd3301dc1147f3b1410347":[8,0,128,34],
+"classboolbvt.html#a21ca3c8ae10a75bc8063183d524d5627":[8,0,128,52],
 "classboolbvt.html#a2304cbe2c38973cac28b7ac4bfb9e4e9":[8,0,128,62],
 "classboolbvt.html#a286b2e50ca835de33ef579d393034bbf":[8,0,128,49],
 "classboolbvt.html#a2b5d5eddba7d75894a2797593901dc2f":[8,0,128,1],
 "classboolbvt.html#a2b73696145edbb3315c2fd6599020340":[8,0,128,35],
 "classboolbvt.html#a2c4a658f486316b812c5bfb5cdc3cddf":[8,0,128,33],
+"classboolbvt.html#a2d1deff76a3ad2b7b4b023f8bc1c7098":[8,0,128,53],
 "classboolbvt.html#a2efdca0ab81e8c4d53c8343b31bb748d":[8,0,128,30],
 "classboolbvt.html#a313fb1a806b40b7603d02232852dffc6":[8,0,128,9],
 "classboolbvt.html#a326f8ff589e6239a060d355a6587a304":[8,0,128,81],
@@ -177,6 +179,7 @@ var NAVTREEINDEX12 =
 "classboolbvt.html#a6c33abbf98d2f40151bda07e24a91d31":[8,0,128,76],
 "classboolbvt.html#a6e6700e5b4929aafa741aa6bad4fa9e7":[8,0,128,14],
 "classboolbvt.html#a7011fb859a3f53151d0ef82667ed39c3":[8,0,128,56],
+"classboolbvt.html#a73c1bb017e8df182aa42bfb64623de93":[8,0,128,54],
 "classboolbvt.html#a75c553be56250ab5a0ae9129414f6b15":[8,0,128,78],
 "classboolbvt.html#a75dded027dd411c5fc121d99688d5ed1":[8,0,128,48],
 "classboolbvt.html#a761e99d4769ae26d20400911afda67af":[8,0,128,37],
@@ -245,9 +248,6 @@ var NAVTREEINDEX12 =
 "classbswap__exprt.html#a92423b8af0a54075314441dcf674d78c":[8,0,130,2],
 "classbswap__exprt.html#aa286d0228029e1f74a2386657047b46b":[8,0,130,0],
 "classbswap__exprt.html#affebc305264ae4fa27fc3d396e06e24a":[8,0,130,3],
-"classbv__arithmetict.html":[8,0,132],
-"classbv__arithmetict.html#a0305b483a36ae59681f044940dd0624e":[8,0,132,0],
-"classbv__arithmetict.html#a031053207f45a45264d1198f85e0f9dd":[8,0,132,28],
-"classbv__arithmetict.html#a03dd921bafa400156863684113a7b97e":[8,0,132,20],
-"classbv__arithmetict.html#a0bfd09cdd94e28c324e89e97842bac65":[8,0,132,23]
+"classbv__pointers__widet.html#a041a719cda3609b491be0974242300f4":[8,0,137,3],
+"classbv__pointers__widet.html#a201791de3eabba312c28fbeeeadfa0f9":[8,0,137,9]
 };

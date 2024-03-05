@@ -109,7 +109,7 @@ var searchData=
   ['make_5foverflow_5floc_36629',['make_overflow_loc',['../classacceleratet.html#a965708d234fc87bdcbb47914b9833da1',1,'acceleratet']]],
   ['make_5fplus_5finfinity_36630',['make_plus_infinity',['../classieee__floatt.html#a3cd0941628d9589893b033dc134730d7',1,'ieee_floatt']]],
   ['make_5fpointer_36631',['make_pointer',['../structpointer__arithmetict.html#a2704616dd56860cf3816c2ad52e1a7a6',1,'pointer_arithmetict']]],
-  ['make_5fptr_5ftypecast_36632',['make_ptr_typecast',['../classcpp__typecastt.html#add9dbd783b761266a0bdc922f306af77',1,'cpp_typecastt::make_ptr_typecast()'],['../classcpp__typecheckt.html#adc5c8c5c375f1e15e225b84a6405d06f',1,'cpp_typecheckt::make_ptr_typecast()']]],
+  ['make_5fptr_5ftypecast_36632',['make_ptr_typecast',['../classcpp__typecastt.html#add9dbd783b761266a0bdc922f306af77',1,'cpp_typecastt::make_ptr_typecast()'],['../classcpp__typecheckt.html#ac02971a367443b84f4aefab668d34fbe',1,'cpp_typecheckt::make_ptr_typecast()']]],
   ['make_5fquery_36633',['make_query',['../expr__query_8h.html#add4a1a8e5afb0e07d66e6df3edb0aa26',1,'expr_query.h']]],
   ['make_5frange_36634',['make_range',['../range_8h.html#a3bac630c9834ad1c0add32d789a123b7',1,'make_range(iteratort begin, iteratort end):&#160;range.h'],['../range_8h.html#a2948dd27922860bd299c22690405a2d1',1,'make_range(containert &amp;container) -&gt; ranget&lt; decltype(container.begin())&gt;:&#160;range.h']]],
   ['make_5frenamed_36635',['make_renamed',['../renamed_8h.html#a114bea0981fd23e2726f9c03376f711c',1,'renamed.h']]],
