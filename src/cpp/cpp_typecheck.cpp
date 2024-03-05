@@ -67,9 +67,9 @@ const struct_typet &cpp_typecheckt::this_struct_type()
   CHECK_RETURN(this_expr.is_not_nil());
   CHECK_RETURN(this_expr.type().id() == ID_pointer);
 
-  const typet &t = follow(to_pointer_type(this_expr.type()).base_type());
-  CHECK_RETURN(t.id() == ID_struct);
-  return to_struct_type(t);
+  const typet &t = to_pointer_type(this_expr.type()).base_type();
+  CHECK_RETURN(t.id() == ID_struct_tag);
+  return follow_tag(to_struct_tag_type(t));
 }
 
 std::string cpp_typecheckt::to_string(const exprt &expr)

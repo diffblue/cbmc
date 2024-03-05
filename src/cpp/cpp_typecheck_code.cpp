@@ -9,15 +9,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
 
 #include "cpp_declarator_converter.h"
 #include "cpp_exception_id.h"
+#include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 
@@ -421,8 +421,13 @@ void cpp_typecheckt::typecheck_decl(codet &code)
 
   CHECK_RETURN(type.is_not_nil());
 
-  if(declaration.declarators().empty() &&
-     follow(type).get_bool(ID_C_is_anonymous))
+  if(
+    declaration.declarators().empty() &&
+    ((type.id() == ID_struct_tag &&
+      follow_tag(to_struct_tag_type(type)).get_bool(ID_C_is_anonymous)) ||
+     (type.id() == ID_union_tag &&
+      follow_tag(to_union_tag_type(type)).get_bool(ID_C_is_anonymous)) ||
+     type.get_bool(ID_C_is_anonymous)))
   {
     if(type.id() != ID_union_tag)
     {
@@ -470,8 +475,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     {
       decl_statement.copy_to_operands(symbol.value);
       DATA_INVARIANT(
-        has_auto(symbol.type) ||
-          follow(decl_statement.op1().type()) == follow(symbol.type),
+        has_auto(symbol.type) || decl_statement.op1().type() == symbol.type,
         "declarator type should match symbol type");
     }
 

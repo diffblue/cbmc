@@ -137,7 +137,18 @@ void cpp_typecheck_resolvet::remove_templates(
 
   for(const auto &old_id : old_identifiers)
   {
-    if(!cpp_typecheck.follow(old_id.type()).get_bool(ID_is_template))
+    const typet &followed =
+      old_id.type().id() == ID_struct_tag
+        ? static_cast<const typet &>(
+            cpp_typecheck.follow_tag(to_struct_tag_type(old_id.type())))
+      : old_id.type().id() == ID_union_tag
+        ? static_cast<const typet &>(
+            cpp_typecheck.follow_tag(to_union_tag_type(old_id.type())))
+      : old_id.type().id() == ID_c_enum_tag
+        ? static_cast<const typet &>(
+            cpp_typecheck.follow_tag(to_c_enum_tag_type(old_id.type())))
+        : old_id.type();
+    if(!followed.get_bool(ID_is_template))
       identifiers.push_back(old_id);
   }
 }
@@ -282,16 +293,21 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       }
 
       // check if the member can be applied to the object
-      typet object_type=cpp_typecheck.follow(object.type());
-
-      if(object_type.id()==ID_struct ||
-         object_type.id()==ID_union)
+      if(
+        object.type().id() == ID_struct_tag ||
+        object.type().id() == ID_union_tag)
       {
+        const struct_union_typet &object_type =
+          object.type().id() == ID_struct_tag
+            ? static_cast<const struct_union_typet &>(
+                cpp_typecheck.follow_tag(to_struct_tag_type(object.type())))
+            : static_cast<const struct_union_typet &>(
+                cpp_typecheck.follow_tag(to_union_tag_type(object.type())));
         if(!has_component_rec(
-             to_struct_union_type(object_type),
-             identifier.identifier,
-             cpp_typecheck))
+             object_type, identifier.identifier, cpp_typecheck))
+        {
           object.make_nil(); // failed!
+        }
       }
       else
         object.make_nil();
@@ -314,8 +330,11 @@ exprt cpp_typecheck_resolvet::convert_identifier(
         else
         {
           e.id(ID_ptrmember);
-          e.copy_to_operands(
-            exprt("cpp-this", pointer_type(compound_symbol.type)));
+          tag_typet class_tag_type{
+            compound_symbol.type.id() == ID_struct ? ID_struct_tag
+                                                   : ID_union_tag,
+            identifier.class_identifier};
+          e.copy_to_operands(exprt("cpp-this", pointer_type(class_tag_type)));
           e.type() = type;
         }
       }
@@ -538,20 +557,20 @@ void cpp_typecheck_resolvet::disambiguate_functions(
             type2=tmp;
           }
 
-          const typet &followed1=cpp_typecheck.follow(type1);
-          const typet &followed2=cpp_typecheck.follow(type2);
-
-          if(followed1.id() != ID_struct || followed2.id() != ID_struct)
+          if(type1.id() != ID_struct_tag || type2.id() != ID_struct_tag)
             continue;
 
-          const struct_typet &struct1=to_struct_type(followed1);
-          const struct_typet &struct2=to_struct_type(followed2);
-
-          if(f1_better && cpp_typecheck.subtype_typecast(struct1, struct2))
+          if(
+            f1_better && cpp_typecheck.subtype_typecast(
+                           cpp_typecheck.follow_tag(to_struct_tag_type(type1)),
+                           cpp_typecheck.follow_tag(to_struct_tag_type(type2))))
           {
             f2_better=false;
           }
-          else if(f2_better && cpp_typecheck.subtype_typecast(struct2, struct1))
+          else if(
+            f2_better && cpp_typecheck.subtype_typecast(
+                           cpp_typecheck.follow_tag(to_struct_tag_type(type2)),
+                           cpp_typecheck.follow_tag(to_struct_tag_type(type1))))
           {
             f1_better=false;
           }
@@ -584,11 +603,9 @@ void cpp_typecheck_resolvet::make_constructors(
       continue;
     }
 
-    const typet &symbol_type = cpp_typecheck.follow(identifier.type());
-
     // is it a POD?
 
-    if(cpp_typecheck.cpp_is_pod(symbol_type))
+    if(cpp_typecheck.cpp_is_pod(identifier.type()))
     {
       // there are two pod constructors:
 
@@ -608,7 +625,7 @@ void cpp_typecheck_resolvet::make_constructors(
       }
 
       // enums, in addition, can also be constructed from int
-      if(symbol_type.id()==ID_c_enum_tag)
+      if(identifier.type().id() == ID_c_enum_tag)
       {
         const code_typet t3(
           {code_typet::parametert(signed_int_type())}, identifier.type());
@@ -616,9 +633,10 @@ void cpp_typecheck_resolvet::make_constructors(
         new_identifiers.push_back(pod_constructor3);
       }
     }
-    else if(symbol_type.id()==ID_struct)
+    else if(identifier.type().id() == ID_struct_tag)
     {
-      const struct_typet &struct_type=to_struct_type(symbol_type);
+      const struct_typet &struct_type =
+        cpp_typecheck.follow_tag(to_struct_tag_type(identifier.type()));
 
       // go over components
       for(const auto &component : struct_type.components())
@@ -1880,7 +1898,17 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   const exprt &expr,
   const cpp_typecheck_fargst &fargs)
 {
-  typet tmp = cpp_typecheck.follow(expr.type());
+  const typet &tmp =
+    expr.type().id() == ID_struct_tag
+      ? static_cast<const typet &>(
+          cpp_typecheck.follow_tag(to_struct_tag_type(expr.type())))
+    : expr.type().id() == ID_union_tag
+      ? static_cast<const typet &>(
+          cpp_typecheck.follow_tag(to_union_tag_type(expr.type())))
+    : expr.type().id() == ID_c_enum_tag
+      ? static_cast<const typet &>(
+          cpp_typecheck.follow_tag(to_c_enum_tag_type(expr.type())))
+      : expr.type();
 
   if(!tmp.get_bool(ID_is_template))
     return nil_exprt(); // not a template
@@ -2333,10 +2361,15 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
   // not clear what this is good for
   for(const auto &arg : fargs.operands)
   {
-    const typet &final_type=cpp_typecheck.follow(arg.type());
-
-    if(final_type.id()!=ID_struct && final_type.id()!=ID_union)
+    if(arg.type().id() != ID_struct_tag && arg.type().id() != ID_union_tag)
       continue;
+
+    const struct_union_typet &final_type =
+      arg.type().id() == ID_struct_tag
+        ? static_cast<const struct_union_typet &>(
+            cpp_typecheck.follow_tag(to_struct_tag_type(arg.type())))
+        : static_cast<const struct_union_typet &>(
+            cpp_typecheck.follow_tag(to_union_tag_type(arg.type())));
 
     cpp_scopet &scope=
       cpp_typecheck.cpp_scopes.get_scope(final_type.get(ID_name));

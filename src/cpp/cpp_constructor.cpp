@@ -30,10 +30,9 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
   elaborate_class_template(object_tc.type());
 
-  typet tmp_type(follow(object_tc.type()));
-  CHECK_RETURN(!is_reference(tmp_type));
+  CHECK_RETURN(!is_reference(object_tc.type()));
 
-  if(tmp_type.id()==ID_array)
+  if(object_tc.type().id() == ID_array)
   {
     // We allow only one operand and it must be tagged with '#array_ini'.
     // Note that the operand is an array that is used for copy-initialization.
@@ -53,11 +52,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       operands.empty() || operands.size() == 1,
       "array constructor must have at most one operand");
 
-    if(operands.empty() && cpp_is_pod(tmp_type))
+    if(operands.empty() && cpp_is_pod(object_tc.type()))
       return {};
 
-    const exprt &size_expr=
-      to_array_type(tmp_type).size();
+    const exprt &size_expr = to_array_type(object_tc.type()).size();
 
     if(size_expr.id() == ID_infinity)
       return {}; // don't initialize
@@ -74,7 +72,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       throw 0;
     }
 
-    /*if(cpp_is_pod(tmp_type))
+    /*if(cpp_is_pod(object_tc.type()))
     {
       code_expressiont new_code;
       exprt op_tc=operands.front();
@@ -119,7 +117,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       return std::move(new_code);
     }
   }
-  else if(cpp_is_pod(tmp_type))
+  else if(cpp_is_pod(object_tc.type()))
   {
     exprt::operandst operands_tc=operands;
 
@@ -152,11 +150,11 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       throw 0;
     }
   }
-  else if(tmp_type.id()==ID_union)
+  else if(object_tc.type().id() == ID_union_tag)
   {
     UNREACHABLE; // Todo: union
   }
-  else if(tmp_type.id()==ID_struct)
+  else if(object_tc.type().id() == ID_struct_tag)
   {
     exprt::operandst operands_tc=operands;
 
@@ -166,8 +164,8 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       add_implicit_dereference(op);
     }
 
-    const struct_typet &struct_type=
-      to_struct_type(tmp_type);
+    const struct_typet &struct_type =
+      follow_tag(to_struct_tag_type(object_tc.type()));
 
     // set most-derived bits
     code_blockt block;

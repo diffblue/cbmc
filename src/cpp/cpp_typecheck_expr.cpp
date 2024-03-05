@@ -96,15 +96,13 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_type(base);
     typecheck_type(deriv);
 
-    base = follow(base);
-    deriv = follow(deriv);
-
-    if(base.id()!=ID_struct || deriv.id()!=ID_struct)
+    if(base.id() != ID_struct_tag || deriv.id() != ID_struct_tag)
       expr=false_exprt();
     else
     {
-      irep_idt base_name=base.get(ID_name);
-      const class_typet &class_type=to_class_type(deriv);
+      irep_idt base_name = follow_tag(to_struct_tag_type(base)).get(ID_name);
+      const class_typet &class_type =
+        to_class_type(follow_tag(to_struct_tag_type(deriv)));
 
       if(class_type.has_base(base_name))
         expr=true_exprt();
@@ -486,11 +484,11 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     // See if the struct declares the cast operator as a member
     bool found_in_struct=false;
     PRECONDITION(!expr.operands().empty());
-    typet t0(follow(to_unary_expr(expr).op().type()));
+    const typet &t0 = to_unary_expr(expr).op().type();
 
-    if(t0.id()==ID_struct)
+    if(t0.id() == ID_struct_tag)
     {
-      for(const auto &c : to_struct_type(t0).components())
+      for(const auto &c : follow_tag(to_struct_tag_type(t0)).components())
       {
         if(!c.get_bool(ID_from_base) && c.get_base_name() == op_name)
         {
@@ -565,9 +563,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
       // TODO: need to resolve an incomplete struct (template) here
       // go into scope of first operand
-      if(
-        to_multi_ary_expr(expr).op0().type().id() == ID_struct_tag &&
-        follow(to_multi_ary_expr(expr).op0().type()).id() == ID_struct)
+      if(to_multi_ary_expr(expr).op0().type().id() == ID_struct_tag)
       {
         const irep_idt &struct_identifier =
           to_multi_ary_expr(expr).op0().type().get(ID_identifier);
@@ -719,8 +715,8 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   else if(op.id() == ID_ptrmember && to_unary_expr(op).op().id() == "cpp-this")
   {
     expr.type() = pointer_type(op.type());
-    expr.type().add(ID_to_member) =
-      to_pointer_type(to_unary_expr(op).op().type()).base_type();
+    expr.type().add(ID_to_member) = to_struct_tag_type(
+      to_pointer_type(to_unary_expr(op).op().type()).base_type());
     return;
   }
 
@@ -1098,20 +1094,21 @@ void cpp_typecheckt::typecheck_expr_member(
   // The member operator will trigger template elaboration
   elaborate_class_template(op0.type());
 
-  const typet &followed_op0_type=follow(op0.type());
-
-  if(followed_op0_type.id()!=ID_struct &&
-     followed_op0_type.id()!=ID_union)
+  if(op0.type().id() != ID_struct_tag && op0.type().id() != ID_union_tag)
   {
     error().source_location=expr.find_source_location();
     error() << "error: member operator requires struct/union type "
-            << "on left hand side but got '" << to_string(followed_op0_type)
-            << "'" << eom;
+            << "on left hand side but got '" << to_string(op0.type()) << "'"
+            << eom;
     throw 0;
   }
 
-  const struct_union_typet &type=
-    to_struct_union_type(followed_op0_type);
+  const struct_union_typet &type =
+    op0.type().id() == ID_struct_tag
+      ? static_cast<const struct_union_typet &>(
+          follow_tag(to_struct_tag_type(op0.type())))
+      : static_cast<const struct_union_typet &>(
+          follow_tag(to_union_tag_type(op0.type())));
 
   if(type.is_incomplete())
   {
@@ -1576,8 +1573,6 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
   // look at type of function
 
-  expr.function().type() = follow(expr.function().type());
-
   if(expr.function().type().id()==ID_pointer)
   {
     if(expr.function().type().find(ID_to_member).is_not_nil())
@@ -1646,7 +1641,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         this_type.base_type().get_string(ID_identifier) + "::@vtable_pointer";
 
       const struct_typet &vt_struct =
-        to_struct_type(follow(this_type.base_type()));
+        follow_tag(to_struct_tag_type(this_type.base_type()));
 
       const struct_typet::componentt &vt_compo=
         vt_struct.get_component(vtable_name);
@@ -1689,7 +1684,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       return;
     }
   }
-  else if(expr.function().type().id()==ID_struct)
+  else if(expr.function().type().id() == ID_struct_tag)
   {
     const cpp_namet cppname("operator()", expr.source_location());
 
@@ -1759,8 +1754,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // will be available
     {
       // find name of destructor
-      const struct_typet::componentst &components=
-        to_struct_type(follow(tmp_object_expr.type())).components();
+      const struct_typet::componentst &components =
+        follow_tag(to_struct_tag_type(tmp_object_expr.type())).components();
 
       for(const auto &c : components)
       {
@@ -2201,18 +2196,15 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
 
   typet t1((const typet &)op1.type().find(ID_to_member));
 
-  t0=follow(t0);
-  t1=follow(t1);
-
-  if(t0.id()!=ID_struct)
+  if(t0.id() != ID_struct_tag)
   {
     error().source_location=expr.source_location();
     error() << "pointer-to-member type error" << eom;
     throw 0;
   }
 
-  const struct_typet &from_struct=to_struct_type(t0);
-  const struct_typet &to_struct=to_struct_type(t1);
+  const struct_typet &from_struct = follow_tag(to_struct_tag_type(t0));
+  const struct_typet &to_struct = follow_tag(to_struct_tag_type(t1));
 
   if(!subtype_typecast(from_struct, to_struct))
   {

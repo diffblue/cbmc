@@ -51,12 +51,13 @@ std::string expr2cppt::convert_struct(
   const exprt &src,
   unsigned &precedence)
 {
-  const typet &full_type=ns.follow(src.type());
-
-  if(full_type.id()!=ID_struct)
+  if(src.type().id() != ID_struct && src.type().id() != ID_struct_tag)
     return convert_norep(src, precedence);
 
-  const struct_typet &struct_type=to_struct_type(full_type);
+  const struct_typet &struct_type =
+    src.type().id() == ID_struct_tag
+      ? ns.follow_tag(to_struct_tag_type(src.type()))
+      : to_struct_type(src.type());
 
   std::string dest="{ ";
 

@@ -22,17 +22,15 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
 {
   elaborate_class_template(object.type());
 
-  typet tmp_type(follow(object.type()));
-  CHECK_RETURN(!is_reference(tmp_type));
+  CHECK_RETURN(!is_reference(object.type()));
 
   // PODs don't need a destructor
-  if(cpp_is_pod(tmp_type))
+  if(cpp_is_pod(object.type()))
     return {};
 
-  if(tmp_type.id()==ID_array)
+  if(object.type().id() == ID_array)
   {
-    const exprt &size_expr=
-      to_array_type(tmp_type).size();
+    const exprt &size_expr = to_array_type(object.type()).size();
 
     if(size_expr.id() == ID_infinity)
       return {}; // don't initialize
@@ -70,8 +68,8 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
   }
   else
   {
-    const struct_typet &struct_type=
-      to_struct_type(tmp_type);
+    const struct_typet &struct_type =
+      follow_tag(to_struct_tag_type(object.type()));
 
     // enter struct scope
     cpp_save_scopet save_scope(cpp_scopes);

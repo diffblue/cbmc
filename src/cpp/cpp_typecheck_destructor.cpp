@@ -134,9 +134,8 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
       bit++)
   {
     DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
-    const symbolt &psymb = lookup(bit->type());
 
-    dereference_exprt object{this_expr, psymb.type};
+    dereference_exprt object{this_expr, bit->type()};
     object.add_source_location() = source_location;
 
     const bool disabled_access_control = disable_access_control;
