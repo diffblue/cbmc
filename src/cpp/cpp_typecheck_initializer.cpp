@@ -72,7 +72,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       implicit_typecast(symbol.value, symbol.type);
     }
 
-    reference_initializer(symbol.value, symbol.type);
+    reference_initializer(symbol.value, to_reference_type(symbol.type));
   }
   else if(cpp_is_pod(symbol.type))
   {

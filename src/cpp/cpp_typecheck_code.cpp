@@ -258,8 +258,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     PRECONDITION(this_expr.is_not_nil());
 
     make_ptr_typecast(
-      this_expr,
-      code_type.parameters().front().type());
+      this_expr, to_pointer_type(code_type.parameters().front().type()));
 
     function_call.arguments().push_back(this_expr);
 
@@ -354,7 +353,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           throw 0;
         }
 
-        reference_initializer(code.op0(), symbol_expr.type());
+        reference_initializer(
+          code.op0(), to_reference_type(symbol_expr.type()));
 
         // assign the pointers
         symbol_expr.type().remove(ID_C_reference);

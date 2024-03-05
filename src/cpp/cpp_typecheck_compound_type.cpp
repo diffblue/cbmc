@@ -1680,18 +1680,17 @@ bool cpp_typecheckt::subtype_typecast(
 
 void cpp_typecheckt::make_ptr_typecast(
   exprt &expr,
-  const typet &dest_type)
+  const pointer_typet &dest_type)
 {
   typet src_type=expr.type();
 
   PRECONDITION(src_type.id() == ID_pointer);
-  PRECONDITION(dest_type.id() == ID_pointer);
 
   const struct_typet &src_struct = to_struct_type(
     static_cast<const typet &>(follow(to_pointer_type(src_type).base_type())));
 
-  const struct_typet &dest_struct = to_struct_type(
-    static_cast<const typet &>(follow(to_pointer_type(dest_type).base_type())));
+  const struct_typet &dest_struct =
+    to_struct_type(static_cast<const typet &>(follow(dest_type.base_type())));
 
   PRECONDITION(
     subtype_typecast(src_struct, dest_struct) ||
