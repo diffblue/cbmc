@@ -210,9 +210,6 @@ static std::optional<exprt> eager_quantifier_instantiation(
   mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
 
-  if(lb > ub)
-    return {};
-
   auto expr_simplified =
     quantifier_exprt(expr.id(), expr.variables(), where_simplified);
 
