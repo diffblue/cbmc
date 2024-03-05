@@ -72,7 +72,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       implicit_typecast(symbol.value, symbol.type);
     }
 
-    reference_initializer(symbol.value, symbol.type);
+    reference_initializer(symbol.value, to_reference_type(symbol.type));
   }
   else if(cpp_is_pod(symbol.type))
   {
@@ -199,11 +199,9 @@ void cpp_typecheckt::zero_initializer(
   const source_locationt &source_location,
   exprt::operandst &ops)
 {
-  const typet &final_type=follow(type);
-
-  if(final_type.id()==ID_struct)
+  if(type.id() == ID_struct_tag)
   {
-    const auto &struct_type = to_struct_type(final_type);
+    const auto &struct_type = follow_tag(to_struct_tag_type(type));
 
     if(struct_type.is_incomplete())
     {
@@ -230,8 +228,7 @@ void cpp_typecheckt::zero_initializer(
     }
   }
   else if(
-    final_type.id() == ID_array &&
-    !cpp_is_pod(to_array_type(final_type).element_type()))
+    type.id() == ID_array && !cpp_is_pod(to_array_type(type).element_type()))
   {
     const array_typet &array_type=to_array_type(type);
     const exprt &size_expr=array_type.size();
@@ -251,9 +248,9 @@ void cpp_typecheckt::zero_initializer(
       zero_initializer(index, array_type.element_type(), source_location, ops);
     }
   }
-  else if(final_type.id()==ID_union)
+  else if(type.id() == ID_union_tag)
   {
-    const auto &union_type = to_union_type(final_type);
+    const auto &union_type = follow_tag(to_union_tag_type(type));
 
     if(union_type.is_incomplete())
     {
@@ -298,10 +295,10 @@ void cpp_typecheckt::zero_initializer(
       zero_initializer(member, comp.type(), source_location, ops);
     }
   }
-  else if(final_type.id()==ID_c_enum)
+  else if(type.id() == ID_c_enum_tag)
   {
     const unsignedbv_typet enum_type(
-      to_bitvector_type(to_c_enum_type(final_type).underlying_type())
+      to_bitvector_type(follow_tag(to_c_enum_tag_type(type)).underlying_type())
         .get_width());
 
     exprt zero =
@@ -322,12 +319,11 @@ void cpp_typecheckt::zero_initializer(
   }
   else
   {
-    const auto value = ::zero_initializer(final_type, source_location, *this);
+    const auto value = ::zero_initializer(type, source_location, *this);
     if(!value.has_value())
     {
       error().source_location = source_location;
-      error() << "cannot zero-initialize '" << to_string(final_type) << "'"
-              << eom;
+      error() << "cannot zero-initialize '" << to_string(type) << "'" << eom;
       throw 0;
     }
 

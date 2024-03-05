@@ -52,7 +52,18 @@ codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
 
   if(!cpp_is_pod(declaration.type()))
   {
-    error().source_location=follow(declaration.type()).source_location();
+    const typet &followed =
+      declaration.type().id() == ID_struct_tag
+        ? static_cast<const typet &>(
+            follow_tag(to_struct_tag_type(declaration.type())))
+      : declaration.type().id() == ID_union_tag
+        ? static_cast<const typet &>(
+            follow_tag(to_union_tag_type(declaration.type())))
+      : declaration.type().id() == ID_c_enum_tag
+        ? static_cast<const typet &>(
+            follow_tag(to_c_enum_tag_type(declaration.type())))
+        : declaration.type();
+    error().source_location = followed.source_location();
     error() << "anonymous union is not POD" << eom;
     throw 0;
   }
@@ -60,8 +71,8 @@ codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
   new_code.add_to_operands(code_frontend_declt(cpp_symbol_expr(symbol)));
 
   // do scoping
-  symbolt &union_symbol =
-    symbol_table.get_writeable_ref(follow(symbol.type).get(ID_name));
+  symbolt &union_symbol = symbol_table.get_writeable_ref(
+    follow_tag(to_union_tag_type(symbol.type)).get(ID_name));
 
   for(const auto &c : to_union_type(union_symbol.type).components())
   {
@@ -120,14 +131,19 @@ void cpp_typecheckt::convert_non_template_declaration(
     already_typechecked_typet::make_already_typechecked(declaration_type);
 
   // Special treatment for anonymous unions
-  if(declaration.declarators().empty() &&
-     follow(declaration.type()).get_bool(ID_C_is_anonymous))
+  if(
+    declaration.declarators().empty() &&
+    ((declaration.type().id() == ID_struct_tag &&
+      follow_tag(to_struct_tag_type(declaration.type()))
+        .get_bool(ID_C_is_anonymous)) ||
+     (declaration.type().id() == ID_union_tag &&
+      follow_tag(to_union_tag_type(declaration.type()))
+        .get_bool(ID_C_is_anonymous)) ||
+     declaration.type().get_bool(ID_C_is_anonymous)))
   {
-    typet final_type=follow(declaration.type());
-
-    if(final_type.id()!=ID_union)
+    if(declaration.type().id() != ID_union_tag)
     {
-      error().source_location=final_type.source_location();
+      error().source_location = declaration.type().source_location();
       error() << "top-level declaration does not declare anything"
               << eom;
       throw 0;

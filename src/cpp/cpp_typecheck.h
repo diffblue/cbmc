@@ -25,6 +25,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <set>
 #include <unordered_set>
 
+class pointer_typet;
+class reference_typet;
+
 bool cpp_typecheck(
   cpp_parse_treet &cpp_parse_tree,
   symbol_table_baset &symbol_table,
@@ -524,14 +527,18 @@ public:
   bool user_defined_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr, unsigned &rank);
 
-  bool reference_related(
-    const exprt &expr, const typet &type) const;
+  bool reference_related(const exprt &expr, const reference_typet &type) const;
 
   bool reference_compatible(
-    const exprt &expr, const typet &type, unsigned &rank) const;
+    const exprt &expr,
+    const reference_typet &type,
+    unsigned &rank) const;
 
   bool reference_binding(
-    exprt expr, const typet &type, exprt &new_expr, unsigned &rank);
+    exprt expr,
+    const reference_typet &type,
+    exprt &new_expr,
+    unsigned &rank);
 
   bool implicit_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr, unsigned &rank);
@@ -542,7 +549,7 @@ public:
   bool implicit_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr);
 
-  void reference_initializer(exprt &expr, const typet &type);
+  void reference_initializer(exprt &expr, const reference_typet &type);
 
   void implicit_typecast(exprt &expr, const typet &type) override;
 
@@ -556,9 +563,7 @@ public:
     const struct_typet &from,
     const struct_typet &to) const;
 
-  void make_ptr_typecast(
-    exprt &expr,
-    const typet &dest_type);
+  void make_ptr_typecast(exprt &expr, const pointer_typet &dest_type);
 
   // the C++ typecasts
 

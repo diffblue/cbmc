@@ -1019,15 +1019,21 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         throw 0;
       }
 
-      typet final_type=follow(declaration.type());
-
       // anonymous member?
-      if(declaration.declarators().empty() &&
-         final_type.get_bool(ID_C_is_anonymous))
+      if(
+        declaration.declarators().empty() &&
+        ((declaration.type().id() == ID_struct_tag &&
+          follow_tag(to_struct_tag_type(declaration.type()))
+            .get_bool(ID_C_is_anonymous)) ||
+         (declaration.type().id() == ID_union_tag &&
+          follow_tag(to_union_tag_type(declaration.type()))
+            .get_bool(ID_C_is_anonymous)) ||
+         declaration.type().get_bool(ID_C_is_anonymous)))
       {
         // we only allow this on struct/union types
-        if(final_type.id()!=ID_union &&
-           final_type.id()!=ID_struct)
+        if(
+          declaration.type().id() != ID_union_tag &&
+          declaration.type().id() != ID_struct_tag)
         {
           error().source_location=declaration.type().source_location();
           error() << "member declaration does not declare anything"
@@ -1423,8 +1429,14 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   const irep_idt &access,
   struct_typet::componentst &components)
 {
+  const struct_union_typet &final_type =
+    declaration.type().id() == ID_struct_tag
+      ? static_cast<const struct_union_typet &>(
+          follow_tag(to_struct_tag_type(declaration.type())))
+      : static_cast<const struct_union_typet &>(
+          follow_tag(to_union_tag_type(declaration.type())));
   symbolt &struct_union_symbol =
-    symbol_table.get_writeable_ref(follow(declaration.type()).get(ID_name));
+    symbol_table.get_writeable_ref(final_type.get(ID_name));
 
   if(declaration.storage_spec().is_static() ||
      declaration.storage_spec().is_mutable())
@@ -1477,13 +1489,15 @@ bool cpp_typecheckt::get_component(
   const irep_idt &component_name,
   exprt &member)
 {
-  const typet &followed_type=follow(object.type());
-
   PRECONDITION(
-    followed_type.id() == ID_struct || followed_type.id() == ID_union);
+    object.type().id() == ID_struct_tag || object.type().id() == ID_union_tag);
 
-  struct_union_typet final_type=
-    to_struct_union_type(followed_type);
+  struct_union_typet final_type =
+    object.type().id() == ID_struct_tag
+      ? static_cast<const struct_union_typet &>(
+          follow_tag(to_struct_tag_type(object.type())))
+      : static_cast<const struct_union_typet &>(
+          follow_tag(to_union_tag_type(object.type())));
 
   const struct_union_typet::componentst &components=
     final_type.components();
@@ -1529,14 +1543,22 @@ bool cpp_typecheckt::get_component(
 
       return true; // component found
     }
-    else if(follow(component.type()).find(ID_C_unnamed_object).is_not_nil())
+    else if(
+      (component.type().id() == ID_struct_tag &&
+       follow_tag(to_struct_tag_type(component.type()))
+         .find(ID_C_unnamed_object)
+         .is_not_nil()) ||
+      (component.type().id() == ID_union_tag &&
+       follow_tag(to_union_tag_type(component.type()))
+         .find(ID_C_unnamed_object)
+         .is_not_nil()) ||
+      component.type().find(ID_C_unnamed_object).is_not_nil())
     {
       // could be anonymous union or struct
 
-      const typet &component_type=follow(component.type());
-
-      if(component_type.id()==ID_union ||
-         component_type.id()==ID_struct)
+      if(
+        component.type().id() == ID_union_tag ||
+        component.type().id() == ID_struct_tag)
       {
         // recursive call!
         if(get_component(source_location, tmp, component_name, member))
@@ -1680,18 +1702,17 @@ bool cpp_typecheckt::subtype_typecast(
 
 void cpp_typecheckt::make_ptr_typecast(
   exprt &expr,
-  const typet &dest_type)
+  const pointer_typet &dest_type)
 {
   typet src_type=expr.type();
 
   PRECONDITION(src_type.id() == ID_pointer);
-  PRECONDITION(dest_type.id() == ID_pointer);
 
-  const struct_typet &src_struct = to_struct_type(
-    static_cast<const typet &>(follow(to_pointer_type(src_type).base_type())));
+  const struct_typet &src_struct =
+    follow_tag(to_struct_tag_type(to_pointer_type(src_type).base_type()));
 
-  const struct_typet &dest_struct = to_struct_type(
-    static_cast<const typet &>(follow(to_pointer_type(dest_type).base_type())));
+  const struct_typet &dest_struct =
+    follow_tag(to_struct_tag_type(dest_type.base_type()));
 
   PRECONDITION(
     subtype_typecast(src_struct, dest_struct) ||
