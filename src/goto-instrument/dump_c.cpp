@@ -573,7 +573,10 @@ void dump_ct::convert_compound(
     typet comp_type_to_use = comp.type();
     if(is_anon)
     {
-      comp_type_to_use = ns.follow(comp.type());
+      comp_type_to_use =
+        (comp.type().id() == ID_struct_tag || comp.type().id() == ID_union_tag)
+          ? ns.follow_tag(to_struct_or_union_tag_type(comp.type()))
+          : comp.type();
       comp_type_to_use.remove(ID_tag);
       if(
         recursive && (comp_type_to_use.id() == ID_struct ||
@@ -1353,8 +1356,9 @@ void dump_ct::cleanup_expr(exprt &expr)
 
   if(expr.id()==ID_struct)
   {
-    struct_typet type=
-      to_struct_type(ns.follow(expr.type()));
+    struct_typet type = expr.type().id() == ID_struct_tag
+                          ? ns.follow_tag(to_struct_tag_type(expr.type()))
+                          : to_struct_type(expr.type());
 
     struct_union_typet::componentst old_components;
     old_components.swap(type.components());
@@ -1382,7 +1386,9 @@ void dump_ct::cleanup_expr(exprt &expr)
   else if(expr.id()==ID_union)
   {
     union_exprt &u=to_union_expr(expr);
-    const union_typet &u_type_f=to_union_type(ns.follow(u.type()));
+    const union_typet &u_type_f = u.type().id() == ID_union_tag
+                                    ? ns.follow_tag(to_union_tag_type(u.type()))
+                                    : to_union_type(u.type());
 
     if(!u.type().get_bool(ID_C_transparent_union) &&
        !u_type_f.get_bool(ID_C_transparent_union))
@@ -1440,7 +1446,10 @@ void dump_ct::cleanup_expr(exprt &expr)
         code_typet::parameterst::const_iterator it=parameters.begin();
         for(auto &argument : arguments)
         {
-          const typet &type=ns.follow(it->type());
+          const typet &type = it->type().id() == ID_union_tag
+                                ? static_cast<const typet &>(ns.follow_tag(
+                                    to_union_tag_type(it->type())))
+                                : it->type();
           if(type.id()==ID_union &&
              type.get_bool(ID_C_transparent_union))
           {
@@ -1494,7 +1503,9 @@ void dump_ct::cleanup_expr(exprt &expr)
     {
       const union_exprt &union_expr = to_union_expr(bu.op());
       const union_typet &union_type =
-        to_union_type(ns.follow(union_expr.type()));
+        union_expr.type().id() == ID_union_tag
+          ? ns.follow_tag(to_union_tag_type(union_expr.type()))
+          : to_union_type(union_expr.type());
 
       for(const auto &comp : union_type.components())
       {
@@ -1524,9 +1535,14 @@ void dump_ct::cleanup_expr(exprt &expr)
     else if(
       bu.op().id() == ID_side_effect &&
       to_side_effect_expr(bu.op()).get_statement() == ID_nondet &&
-      ns.follow(bu.op().type()).id() == ID_union && bu.offset().is_zero())
+      (bu.op().type().id() == ID_union ||
+       bu.op().type().id() == ID_union_tag) &&
+      bu.offset().is_zero())
     {
-      const union_typet &union_type = to_union_type(ns.follow(bu.op().type()));
+      const union_typet &union_type =
+        bu.op().type().id() == ID_union_tag
+          ? ns.follow_tag(to_union_tag_type(bu.op().type()))
+          : to_union_type(bu.op().type());
 
       for(const auto &comp : union_type.components())
       {
@@ -1542,7 +1558,7 @@ void dump_ct::cleanup_expr(exprt &expr)
 
     std::optional<exprt> clean_init;
     if(
-      ns.follow(bu.type()).id() == ID_union &&
+      (bu.type().id() == ID_union || bu.type().id() == ID_union_tag) &&
       bu.source_location().get_function().empty())
     {
       clean_init = zero_initializer(bu.op().type(), source_locationt{}, ns)
@@ -1553,7 +1569,10 @@ void dump_ct::cleanup_expr(exprt &expr)
 
     if(clean_init.has_value() && bu.op() == *clean_init)
     {
-      const union_typet &union_type = to_union_type(ns.follow(bu.type()));
+      const union_typet &union_type =
+        bu.type().id() == ID_union_tag
+          ? ns.follow_tag(to_union_tag_type(bu.type()))
+          : to_union_type(bu.type());
 
       for(const auto &comp : union_type.components())
       {
