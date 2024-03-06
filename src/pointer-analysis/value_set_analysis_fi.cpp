@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_analysis_fi.h"
 
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/symbol_table_base.h>
@@ -91,23 +92,31 @@ void value_set_analysis_fit::get_entries_rec(
   const typet &type,
   std::list<value_set_fit::entryt> &dest)
 {
-  const typet &t=ns.follow(type);
-
-  if(t.id()==ID_struct ||
-     t.id()==ID_union)
+  if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
-    for(const auto &c : to_struct_union_type(t).components())
+    const auto &components =
+      ns.follow_tag(to_struct_or_union_tag_type(type)).components();
+    for(const auto &c : components)
     {
       get_entries_rec(
         identifier, suffix + "." + id2string(c.get_name()), c.type(), dest);
     }
   }
-  else if(t.id()==ID_array)
+  else if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    const auto &components = to_struct_union_type(type).components();
+    for(const auto &c : components)
+    {
+      get_entries_rec(
+        identifier, suffix + "." + id2string(c.get_name()), c.type(), dest);
+    }
+  }
+  else if(type.id() == ID_array)
   {
     get_entries_rec(
-      identifier, suffix + "[]", to_array_type(t).element_type(), dest);
+      identifier, suffix + "[]", to_array_type(type).element_type(), dest);
   }
-  else if(check_type(t))
+  else if(check_type(type))
   {
     dest.push_back(value_set_fit::entryt(identifier, suffix));
   }
@@ -189,8 +198,10 @@ bool value_set_analysis_fit::check_type(const typet &type)
   }
   else if(type.id()==ID_array)
     return check_type(to_array_type(type).element_type());
-  else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
-    return check_type(ns.follow(type));
+  else if(type.id() == ID_struct_tag)
+    return check_type(ns.follow_tag(to_struct_tag_type(type)));
+  else if(type.id() == ID_union_tag)
+    return check_type(ns.follow_tag(to_union_tag_type(type)));
 
   return false;
 }

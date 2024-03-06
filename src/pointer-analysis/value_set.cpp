@@ -516,8 +516,6 @@ void value_sett::get_value_set_rec(
   std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
 #endif
 
-  const typet &expr_type=ns.follow(expr.type());
-
   if(expr.id()==ID_unknown || expr.id()==ID_invalid)
   {
     insert(dest, exprt(ID_unknown, original_type));
@@ -539,17 +537,20 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_member)
   {
-    const typet &type = ns.follow(to_member_expr(expr).compound().type());
+    const exprt &compound = to_member_expr(expr).compound();
 
     DATA_INVARIANT(
-      type.id() == ID_struct || type.id() == ID_union,
+      compound.type().id() == ID_struct ||
+        compound.type().id() == ID_struct_tag ||
+        compound.type().id() == ID_union ||
+        compound.type().id() == ID_union_tag,
       "compound of member expression must be struct or union");
 
     const std::string &component_name=
       expr.get_string(ID_component_name);
 
     get_value_set_rec(
-      to_member_expr(expr).compound(),
+      compound,
       dest,
       includes_nondet_pointer,
       "." + component_name + suffix,
@@ -559,7 +560,7 @@ void value_sett::get_value_set_rec(
   else if(expr.id()==ID_symbol)
   {
     auto entry_index = get_index_of_symbol(
-      to_symbol_expr(expr).get_identifier(), expr_type, suffix, ns);
+      to_symbol_expr(expr).get_identifier(), expr.type(), suffix, ns);
 
     if(entry_index.has_value())
       make_union(dest, find_entry(*entry_index)->object_map);
@@ -624,11 +625,11 @@ void value_sett::get_value_set_rec(
     {
       insert(
         dest,
-        exprt(ID_null_object, to_pointer_type(expr_type).base_type()),
+        exprt(ID_null_object, to_pointer_type(expr.type()).base_type()),
         mp_integer{0});
     }
-    else if(expr_type.id()==ID_unsignedbv ||
-            expr_type.id()==ID_signedbv)
+    else if(
+      expr.type().id() == ID_unsignedbv || expr.type().id() == ID_signedbv)
     {
       // an integer constant got turned into a pointer
       insert(dest, exprt(ID_integer_address, unsigned_char_type()));
@@ -703,7 +704,7 @@ void value_sett::get_value_set_rec(
     // special case for plus/minus and exactly one pointer
     std::optional<exprt> ptr_operand;
     if(
-      expr_type.id() == ID_pointer &&
+      expr.type().id() == ID_pointer &&
       (expr.id() == ID_plus || expr.id() == ID_minus))
     {
       bool non_const_offset = false;
@@ -879,10 +880,10 @@ void value_sett::get_value_set_rec(
             statement==ID_cpp_new_array)
     {
       PRECONDITION(suffix.empty());
-      PRECONDITION(expr_type.id() == ID_pointer);
+      PRECONDITION(expr.type().id() == ID_pointer);
 
       dynamic_object_exprt dynamic_object(
-        to_pointer_type(expr_type).base_type());
+        to_pointer_type(expr.type()).base_type());
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
@@ -893,7 +894,10 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_struct)
   {
-    const auto &struct_components = to_struct_type(expr_type).components();
+    const auto &struct_components =
+      expr.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(expr.type())).components()
+        : to_struct_type(expr.type()).components();
     INVARIANT(
       struct_components.size() == expr.operands().size(),
       "struct expression should have an operand per component");
@@ -950,7 +954,9 @@ void value_sett::get_value_set_rec(
 
     // If the suffix is empty we're looking for the whole struct:
     // default to combining both options as below.
-    if(expr_type.id() == ID_struct && !suffix.empty())
+    if(
+      (expr.type().id() == ID_struct_tag || expr.type().id() == ID_struct) &&
+      !suffix.empty())
     {
       irep_idt component_name = with_expr.where().get(ID_component_name);
       if(suffix_starts_with_field(suffix, id2string(component_name)))
@@ -966,7 +972,12 @@ void value_sett::get_value_set_rec(
           original_type,
           ns);
       }
-      else if(to_struct_type(expr_type).has_component(component_name))
+      else if(
+        (expr.type().id() == ID_struct &&
+         to_struct_type(expr.type()).has_component(component_name)) ||
+        (expr.type().id() == ID_struct_tag &&
+         ns.follow_tag(to_struct_tag_type(expr.type()))
+           .has_component(component_name)))
       {
         // Looking for a non-overwritten member, look through this expression
         get_value_set_rec(
@@ -998,7 +1009,7 @@ void value_sett::get_value_set_rec(
           ns);
       }
     }
-    else if(expr_type.id() == ID_array && !suffix.empty())
+    else if(expr.type().id() == ID_array && !suffix.empty())
     {
       std::string new_value_suffix;
       if(has_prefix(suffix, "[]"))
@@ -1105,8 +1116,9 @@ void value_sett::get_value_set_rec(
 
     bool found=false;
 
-    const typet &op_type = ns.follow(byte_extract_expr.op().type());
-    if(op_type.id() == ID_struct)
+    if(
+      byte_extract_expr.op().type().id() == ID_struct ||
+      byte_extract_expr.op().type().id() == ID_struct_tag)
     {
       exprt offset = byte_extract_expr.offset();
       if(eval_pointer_offset(offset, ns))
@@ -1115,7 +1127,10 @@ void value_sett::get_value_set_rec(
       const auto offset_int = numeric_cast<mp_integer>(offset);
       const auto type_size = pointer_offset_size(expr.type(), ns);
 
-      const struct_typet &struct_type = to_struct_type(op_type);
+      const struct_typet &struct_type =
+        byte_extract_expr.op().type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(byte_extract_expr.op().type()))
+          : to_struct_type(byte_extract_expr.op().type());
 
       for(const auto &c : struct_type.components())
       {
@@ -1150,10 +1165,17 @@ void value_sett::get_value_set_rec(
       }
     }
 
-    if(op_type.id() == ID_union)
+    if(
+      byte_extract_expr.op().type().id() == ID_union ||
+      byte_extract_expr.op().type().id() == ID_union_tag)
     {
       // just collect them all
-      for(const auto &c : to_union_type(op_type).components())
+      const auto &components =
+        byte_extract_expr.op().type().id() == ID_union_tag
+          ? ns.follow_tag(to_union_tag_type(byte_extract_expr.op().type()))
+              .components()
+          : to_union_type(byte_extract_expr.op().type()).components();
+      for(const auto &c : components)
       {
         const irep_idt &name = c.get_name();
         member_exprt member(byte_extract_expr.op(), name, c.type());
@@ -1429,13 +1451,13 @@ void value_sett::get_reference_set_rec(
         // We cannot introduce a cast from scalar to non-scalar,
         // thus, we can only adjust the types of structs and unions.
 
-        const typet &final_object_type = ns.follow(object.type());
-
-        if(final_object_type.id()==ID_struct ||
-           final_object_type.id()==ID_union)
+        if(
+          object.type().id() == ID_struct ||
+          object.type().id() == ID_struct_tag ||
+          object.type().id() == ID_union || object.type().id() == ID_union_tag)
         {
           // adjust type?
-          if(ns.follow(struct_op.type())!=final_object_type)
+          if(struct_op.type() != object.type())
           {
             member_expr.compound() =
               typecast_exprt(member_expr.compound(), struct_op.type());
@@ -1478,11 +1500,14 @@ void value_sett::assign(
   output(std::cout);
 #endif
 
-  const typet &type=ns.follow(lhs.type());
-
-  if(type.id() == ID_struct)
+  if(lhs.type().id() == ID_struct || lhs.type().id() == ID_struct_tag)
   {
-    for(const auto &c : to_struct_type(type).components())
+    const auto &components =
+      lhs.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(lhs.type())).components()
+        : to_struct_type(lhs.type()).components();
+
+    for(const auto &c : components)
     {
       const typet &subtype = c.type();
       const irep_idt &name = c.get_name();
@@ -1513,12 +1538,20 @@ void value_sett::assign(
           "rhs.type():\n" +
             rhs.type().pretty() + "\n" + "lhs.type():\n" + lhs.type().pretty());
 
-        const typet &followed = ns.follow(rhs.type());
-
-        if(followed.id() == ID_struct || followed.id() == ID_union)
+        if(rhs.type().id() == ID_struct_tag || rhs.type().id() == ID_union_tag)
         {
           const struct_union_typet &rhs_struct_union_type =
-            to_struct_union_type(followed);
+            ns.follow_tag(to_struct_or_union_tag_type(rhs.type()));
+
+          const typet &rhs_subtype = rhs_struct_union_type.component_type(name);
+          rhs_member = simplify_expr(member_exprt{rhs, name, rhs_subtype}, ns);
+
+          assign(lhs_member, rhs_member, ns, true, add_to_sets);
+        }
+        else if(rhs.type().id() == ID_struct || rhs.type().id() == ID_union)
+        {
+          const struct_union_typet &rhs_struct_union_type =
+            to_struct_union_type(rhs.type());
 
           const typet &rhs_subtype = rhs_struct_union_type.component_type(name);
           rhs_member = simplify_expr(member_exprt{rhs, name, rhs_subtype}, ns);
@@ -1528,19 +1561,19 @@ void value_sett::assign(
       }
     }
   }
-  else if(type.id()==ID_array)
+  else if(lhs.type().id() == ID_array)
   {
     const index_exprt lhs_index(
       lhs,
       exprt(ID_unknown, c_index_type()),
-      to_array_type(type).element_type());
+      to_array_type(lhs.type()).element_type());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
     {
       assign(
         lhs_index,
-        exprt(rhs.id(), to_array_type(type).element_type()),
+        exprt(rhs.id(), to_array_type(lhs.type()).element_type()),
         ns,
         is_simplified,
         add_to_sets);
@@ -1548,10 +1581,10 @@ void value_sett::assign(
     else
     {
       DATA_INVARIANT(
-        rhs.type() == type,
+        rhs.type() == lhs.type(),
         "value_sett::assign types should match, got: "
         "rhs.type():\n" +
-          rhs.type().pretty() + "\n" + "type:\n" + type.pretty());
+          rhs.type().pretty() + "\n" + "type:\n" + lhs.type().pretty());
 
       if(rhs.id()==ID_array_of)
       {
@@ -1575,7 +1608,7 @@ void value_sett::assign(
         const index_exprt op0_index(
           to_with_expr(rhs).old(),
           exprt(ID_unknown, c_index_type()),
-          to_array_type(type).element_type());
+          to_array_type(lhs.type()).element_type());
 
         assign(lhs_index, op0_index, ns, is_simplified, add_to_sets);
         assign(
@@ -1586,7 +1619,7 @@ void value_sett::assign(
         const index_exprt rhs_index(
           rhs,
           exprt(ID_unknown, c_index_type()),
-          to_array_type(type).element_type());
+          to_array_type(lhs.type()).element_type());
         assign(lhs_index, rhs_index, ns, is_simplified, true);
       }
     }
@@ -1683,15 +1716,17 @@ void value_sett::assign_rec(
   {
     const auto &lhs_member_expr = to_member_expr(lhs);
     const auto &component_name = lhs_member_expr.get_component_name();
-
-    const typet &type = ns.follow(lhs_member_expr.compound().type());
+    const exprt &compound = lhs_member_expr.compound();
 
     DATA_INVARIANT(
-      type.id() == ID_struct || type.id() == ID_union,
+      compound.type().id() == ID_struct ||
+        compound.type().id() == ID_struct_tag ||
+        compound.type().id() == ID_union ||
+        compound.type().id() == ID_union_tag,
       "operand 0 of member expression must be struct or union");
 
     assign_rec(
-      lhs_member_expr.compound(),
+      compound,
       values_rhs,
       "." + id2string(component_name) + suffix,
       ns,

@@ -436,10 +436,11 @@ void value_set_fit::get_value_set_rec(
 
     if(compound.is_not_nil())
     {
-      const typet &type = ns.follow(compound.type());
-
       DATA_INVARIANT(
-        type.id() == ID_struct || type.id() == ID_union,
+        compound.type().id() == ID_struct ||
+          compound.type().id() == ID_struct_tag ||
+          compound.type().id() == ID_union ||
+          compound.type().id() == ID_union_tag,
         "operand 0 of member expression must be struct or union");
 
       const std::string &component_name =
@@ -968,7 +969,7 @@ void value_set_fit::get_reference_set_sharing_rec(
         member_exprt member_expr(object, component_name, expr.type());
 
         // adjust type?
-        if(ns.follow(struct_op.type())!=ns.follow(object.type()))
+        if(struct_op.type() != object.type())
         {
           member_expr.compound() =
             typecast_exprt(member_expr.compound(), struct_op.type());
@@ -1007,18 +1008,19 @@ void value_set_fit::assign(
     return;
   }
 
-  const typet &type=ns.follow(lhs.type());
-
-  if(type.id()==ID_struct ||
-     type.id()==ID_union)
+  if(
+    lhs.type().id() == ID_struct || lhs.type().id() == ID_struct_tag ||
+    lhs.type().id() == ID_union || lhs.type().id() == ID_union_tag)
   {
-    const struct_union_typet &struct_type=to_struct_union_type(type);
+    const auto &components =
+      (lhs.type().id() == ID_struct_tag || lhs.type().id() == ID_union_tag)
+        ? ns.follow_tag(to_struct_or_union_tag_type(lhs.type())).components()
+        : to_struct_union_type(lhs.type()).components();
 
     std::size_t no=0;
 
-    for(struct_typet::componentst::const_iterator
-        c_it=struct_type.components().begin();
-        c_it!=struct_type.components().end();
+    for(struct_typet::componentst::const_iterator c_it = components.begin();
+        c_it != components.end();
         c_it++, no++)
     {
       const typet &subtype=c_it->type();
@@ -1086,18 +1088,20 @@ void value_set_fit::assign(
       }
     }
   }
-  else if(type.id()==ID_array)
+  else if(lhs.type().id() == ID_array)
   {
     const index_exprt lhs_index(
       lhs,
       exprt(ID_unknown, c_index_type()),
-      to_array_type(type).element_type());
+      to_array_type(lhs.type()).element_type());
 
     if(rhs.id()==ID_unknown ||
        rhs.id()==ID_invalid)
     {
       assign(
-        lhs_index, exprt(rhs.id(), to_array_type(type).element_type()), ns);
+        lhs_index,
+        exprt(rhs.id(), to_array_type(lhs.type()).element_type()),
+        ns);
     }
     else if(rhs.is_nil())
     {
@@ -1105,10 +1109,10 @@ void value_set_fit::assign(
     }
     else
     {
-      if(rhs.type() != type)
+      if(rhs.type() != lhs.type())
         throw "value_set_fit::assign type mismatch: "
               "rhs.type():\n"+rhs.type().pretty()+"\n"+
-              "type:\n"+type.pretty();
+              "type:\n"+lhs.type().pretty();
 
       if(rhs.id()==ID_array_of)
       {
@@ -1126,7 +1130,7 @@ void value_set_fit::assign(
         const index_exprt op0_index(
           to_with_expr(rhs).old(),
           exprt(ID_unknown, c_index_type()),
-          to_array_type(type).element_type());
+          to_array_type(lhs.type()).element_type());
 
         assign(lhs_index, op0_index, ns);
         assign(lhs_index, to_with_expr(rhs).new_value(), ns);
@@ -1136,7 +1140,7 @@ void value_set_fit::assign(
         const index_exprt rhs_index(
           rhs,
           exprt(ID_unknown, c_index_type()),
-          to_array_type(type).element_type());
+          to_array_type(lhs.type()).element_type());
         assign(lhs_index, rhs_index, ns);
       }
     }
@@ -1263,19 +1267,17 @@ void value_set_fit::assign_rec(
       return;
 
     const std::string &component_name=lhs.get_string(ID_component_name);
-
-    const typet &type = ns.follow(to_member_expr(lhs).compound().type());
+    const exprt &compound = to_member_expr(lhs).compound();
 
     DATA_INVARIANT(
-      type.id() == ID_struct || type.id() == ID_union,
+      compound.type().id() == ID_struct ||
+        compound.type().id() == ID_struct_tag ||
+        compound.type().id() == ID_union ||
+        compound.type().id() == ID_union_tag,
       "operand 0 of member expression must be struct or union");
 
     assign_rec(
-      to_member_expr(lhs).compound(),
-      values_rhs,
-      "." + component_name + suffix,
-      ns,
-      recursion_set);
+      compound, values_rhs, "." + component_name + suffix, ns, recursion_set);
   }
   else if(lhs.id()=="valid_object" ||
           lhs.id()=="dynamic_type")
