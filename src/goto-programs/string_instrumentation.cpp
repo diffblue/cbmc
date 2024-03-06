@@ -64,12 +64,6 @@ protected:
   symbol_table_baset &symbol_table;
   namespacet ns;
 
-  void make_type(exprt &dest, const typet &type)
-  {
-    if(ns.follow(dest.type())!=ns.follow(type))
-      dest = typecast_exprt(dest, type);
-  }
-
   void instrument(goto_programt &dest, goto_programt::targett it);
   void do_function_call(goto_programt &dest, goto_programt::targett target);
 
@@ -785,8 +779,7 @@ void string_instrumentationt::do_strerror(
 
   // assign address
   {
-    exprt rhs=ptr;
-    make_type(rhs, lhs.type());
+    exprt rhs = typecast_exprt::conditional_cast(ptr, lhs.type());
     tmp.add(goto_programt::make_assignment(
       code_assignt(lhs, rhs), it->source_location()));
   }

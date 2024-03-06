@@ -73,13 +73,6 @@ protected:
 
   bool is_ptr_string_struct(const typet &type) const;
 
-  void make_type(exprt &dest, const typet &type)
-  {
-    if(dest.is_not_nil() &&
-       ns.follow(dest.type())!=ns.follow(type))
-      dest = typecast_exprt(dest, type);
-  }
-
   goto_programt::targett abstract(
     goto_programt &dest, goto_programt::targett it);
   goto_programt::targett abstract_assign(
