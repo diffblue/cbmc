@@ -353,14 +353,10 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
     symbol.type.id() == ID_union_tag ||
     (symbol.type.id() == ID_struct_tag && symbol.type != string_struct))
   {
-    const struct_union_typet &su_source =
-      to_struct_union_type(ns.follow(source_type));
-    const struct_union_typet::componentst &s_components=
-      su_source.components();
-    const struct_union_typet &struct_union_type =
-      to_struct_union_type(ns.follow(symbol.type));
-    const struct_union_typet::componentst &components=
-      struct_union_type.components();
+    const struct_union_typet::componentst &s_components =
+      ns.follow_tag(to_struct_or_union_tag_type(source_type)).components();
+    const struct_union_typet::componentst &components =
+      ns.follow_tag(to_struct_or_union_tag_type(symbol.type)).components();
     unsigned seen=0;
 
     struct_union_typet::componentst::const_iterator it2=components.begin();
@@ -732,7 +728,10 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
   else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
     const struct_union_typet &struct_union_type =
-      to_struct_union_type(ns.follow(type));
+      type.id() == ID_struct_tag ? static_cast<const struct_union_typet &>(
+                                     ns.follow_tag(to_struct_tag_type(type)))
+                                 : static_cast<const struct_union_typet &>(
+                                     ns.follow_tag(to_union_tag_type(type)));
 
     struct_union_typet::componentst new_comp;
     for(const auto &comp : struct_union_type.components())

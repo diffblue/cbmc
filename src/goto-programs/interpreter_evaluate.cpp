@@ -1042,7 +1042,7 @@ mp_integer interpretert::evaluate_address(
   else if(expr.id()==ID_member)
   {
     const struct_typet &struct_type =
-      to_struct_type(ns.follow(to_member_expr(expr).compound().type()));
+      ns.follow_tag(to_struct_tag_type(to_member_expr(expr).compound().type()));
 
     const irep_idt &component_name=
       to_member_expr(expr).get_component_name();
