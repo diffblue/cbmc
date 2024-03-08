@@ -1044,15 +1044,16 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     new_expr = size_of_opt.value();
   }
 
+  source_locationt location = expr.source_location();
   new_expr.swap(expr);
-
+  expr.add_source_location() = location;
   expr.add(ID_C_c_sizeof_type)=type;
 
   // The type may contain side-effects.
   if(!clean_code.empty())
   {
     side_effect_exprt side_effect_expr(
-      ID_statement_expression, void_type(), expr.source_location());
+      ID_statement_expression, void_type(), location);
     auto decl_block=code_blockt::from_list(clean_code);
     decl_block.set_statement(ID_decl_block);
     side_effect_expr.copy_to_operands(decl_block);
@@ -1064,8 +1065,9 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     // It is not obvious whether the type or 'e' should be evaluated
     // first.
 
-    binary_exprt comma_expr{
-      std::move(side_effect_expr), ID_comma, expr, expr.type()};
+    exprt comma_expr =
+      binary_exprt{std::move(side_effect_expr), ID_comma, expr, expr.type()}
+        .with_source_location(location);
     expr.swap(comma_expr);
   }
 }
@@ -4656,6 +4658,8 @@ protected:
 
 void c_typecheck_baset::make_constant(exprt &expr)
 {
+  source_locationt location = expr.find_source_location();
+
   // Floating-point expressions may require a rounding mode.
   // ISO 9899:1999 F.7.2 says that the default is "round to nearest".
   // Some compilers have command-line options to override.
@@ -4664,10 +4668,11 @@ void c_typecheck_baset::make_constant(exprt &expr)
   adjust_float_expressions(expr, rounding_mode);
 
   simplify(expr, *this);
+  expr.add_source_location() = location;
 
   if(!is_compile_time_constantt(*this)(expr))
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = location;
     error() << "expected constant expression, but got '" << to_string(expr)
             << "'" << eom;
     throw 0;
@@ -4676,13 +4681,15 @@ void c_typecheck_baset::make_constant(exprt &expr)
 
 void c_typecheck_baset::make_constant_index(exprt &expr)
 {
+  source_locationt location = expr.find_source_location();
   make_constant(expr);
   make_index_type(expr);
   simplify(expr, *this);
+  expr.add_source_location() = location;
 
   if(!is_compile_time_constantt(*this)(expr))
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = location;
     error() << "conversion to integer constant failed" << eom;
     throw 0;
   }

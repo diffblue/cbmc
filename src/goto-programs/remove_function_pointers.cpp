@@ -205,6 +205,7 @@ static void fix_argument_types(code_function_callt &function_call)
 static void fix_return_type(
   const irep_idt &in_function_id,
   code_function_callt &function_call,
+  const source_locationt &source_location,
   symbol_tablet &symbol_table,
   goto_programt &dest)
 {
@@ -226,7 +227,7 @@ static void fix_return_type(
     code_type.return_type(),
     id2string(in_function_id),
     "tmp_return_val_" + id2string(function_symbol.base_name),
-    function_call.source_location(),
+    source_location,
     function_symbol.mode,
     symbol_table);
 
@@ -239,7 +240,7 @@ static void fix_return_type(
     old_lhs,
     make_byte_extract(
       tmp_symbol_expr, from_integer(0, c_index_type()), old_lhs.type()),
-    function_call.source_location())));
+    source_location)));
 }
 
 void remove_function_pointerst::remove_function_pointer(
@@ -407,7 +408,8 @@ void remove_function_pointer(
     fix_argument_types(new_call);
 
     goto_programt tmp;
-    fix_return_type(function_id, new_call, symbol_table, tmp);
+    fix_return_type(
+      function_id, new_call, target->source_location(), symbol_table, tmp);
 
     auto call = new_code_calls.add(
       goto_programt::make_function_call(new_call, target->source_location()));

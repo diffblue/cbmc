@@ -284,7 +284,14 @@ void goto_convertt::clean_expr(
 
     // generate guard for argument side-effects
     generate_ifthenelse(
-      if_expr.cond(), tmp_true, tmp_false, source_location, dest, mode);
+      if_expr.cond(),
+      source_location,
+      tmp_true,
+      if_expr.true_case().source_location(),
+      tmp_false,
+      if_expr.false_case().source_location(),
+      dest,
+      mode);
 
     return;
   }

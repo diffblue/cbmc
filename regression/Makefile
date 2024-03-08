@@ -50,6 +50,7 @@ DIRS = cbmc-shadow-memory \
        goto-harness \
        goto-harness-multi-file-project \
        goto-cc-file-local \
+       goto-cc-multi-file \
        goto-cc-regression-gh-issue-5380 \
        linking-goto-binaries \
        symtab2gb \

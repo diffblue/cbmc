@@ -41,6 +41,7 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
 {
   set(ID_C_SSA_symbol, true);
   add(ID_expression, expr);
+  with_source_location(expr.source_location());
   std::ostringstream os;
   initialize_ssa_identifier(os, expr);
   const std::string id = os.str();

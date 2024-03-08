@@ -673,7 +673,8 @@ static void instantiate_atomic_fetch_op(
   block.add(code_frontend_assignt{deref_ptr, std::move(op_expr)});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
+    symbol_exprt::typeless("__atomic_thread_fence")
+      .with_source_location(source_location),
     {parameter_exprs[2]},
     typet{},
     source_location}});
@@ -736,7 +737,8 @@ static void instantiate_atomic_op_fetch(
 
   // this instruction implies an mfence, i.e., WRfence
   block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
+    symbol_exprt::typeless("__atomic_thread_fence")
+      .with_source_location(source_location),
     {parameter_exprs[2]},
     typet{},
     source_location}});
@@ -767,11 +769,11 @@ static void instantiate_sync_fetch(
     parameter_exprs[1],
     from_integer(std::memory_order_seq_cst, signed_int_type())};
 
-  block.add(code_returnt{
-    side_effect_expr_function_callt{symbol_exprt::typeless(atomic_name),
-                                    std::move(arguments),
-                                    typet{},
-                                    source_location}});
+  block.add(code_returnt{side_effect_expr_function_callt{
+    symbol_exprt::typeless(atomic_name).with_source_location(source_location),
+    std::move(arguments),
+    typet{},
+    source_location}});
 }
 
 static void instantiate_sync_bool_compare_and_swap(
@@ -790,7 +792,8 @@ static void instantiate_sync_bool_compare_and_swap(
   // _Bool __sync_bool_compare_and_swap(type *ptr, type old, type new, ...)
 
   block.add(code_returnt{side_effect_expr_function_callt{
-    symbol_exprt::typeless(ID___atomic_compare_exchange),
+    symbol_exprt::typeless(ID___atomic_compare_exchange)
+      .with_source_location(source_location),
     {parameter_exprs[0],
      address_of_exprt{parameter_exprs[1]},
      address_of_exprt{parameter_exprs[2]},
@@ -968,7 +971,8 @@ static void instantiate_atomic_load(
                                   dereference_exprt{parameter_exprs[0]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
+    symbol_exprt::typeless("__atomic_thread_fence")
+      .with_source_location(source_location),
     {parameter_exprs[2]},
     typet{},
     source_location}});
@@ -999,7 +1003,8 @@ static void instantiate_atomic_load_n(
   block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless(ID___atomic_load),
+    symbol_exprt::typeless(ID___atomic_load)
+      .with_source_location(source_location),
     {parameter_exprs[0], address_of_exprt{result}, parameter_exprs[1]},
     typet{},
     source_location}});
@@ -1028,7 +1033,8 @@ static void instantiate_atomic_store(
                                   dereference_exprt{parameter_exprs[1]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
+    symbol_exprt::typeless("__atomic_thread_fence")
+      .with_source_location(source_location),
     {parameter_exprs[2]},
     typet{},
     source_location}});
@@ -1051,13 +1057,14 @@ static void instantiate_atomic_store_n(
   // This built-in function implements an atomic store operation. It writes
   // val into *ptr.
 
-  block.add(code_expressiont{
-    side_effect_expr_function_callt{symbol_exprt::typeless(ID___atomic_store),
-                                    {parameter_exprs[0],
-                                     address_of_exprt{parameter_exprs[1]},
-                                     parameter_exprs[2]},
-                                    typet{},
-                                    source_location}});
+  block.add(code_expressiont{side_effect_expr_function_callt{
+    symbol_exprt::typeless(ID___atomic_store)
+      .with_source_location(source_location),
+    {parameter_exprs[0],
+     address_of_exprt{parameter_exprs[1]},
+     parameter_exprs[2]},
+    typet{},
+    source_location}});
 }
 
 static void instantiate_atomic_exchange(
@@ -1083,7 +1090,8 @@ static void instantiate_atomic_exchange(
                                   dereference_exprt{parameter_exprs[1]}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
+    symbol_exprt::typeless("__atomic_thread_fence")
+      .with_source_location(source_location),
     {parameter_exprs[3]},
     typet{},
     source_location}});
@@ -1114,7 +1122,8 @@ static void instantiate_atomic_exchange_n(
   block.add(codet{ID_decl_block, {code_frontend_declt{result}}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless(ID___atomic_exchange),
+    symbol_exprt::typeless(ID___atomic_exchange)
+      .with_source_location(source_location),
     {parameter_exprs[0],
      address_of_exprt{parameter_exprs[1]},
      address_of_exprt{result},
@@ -1171,7 +1180,8 @@ static void instantiate_atomic_compare_exchange(
                                dereference_exprt{parameter_exprs[2]}};
   assign.add_source_location() = source_location;
   code_expressiont success_fence{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
+    symbol_exprt::typeless("__atomic_thread_fence")
+      .with_source_location(source_location),
     {parameter_exprs[4]},
     typet{},
     source_location}};
@@ -1181,7 +1191,8 @@ static void instantiate_atomic_compare_exchange(
                                          deref_ptr};
   assign_not_equal.add_source_location() = source_location;
   code_expressiont failure_fence{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
+    symbol_exprt::typeless("__atomic_thread_fence")
+      .with_source_location(source_location),
     {parameter_exprs[5]},
     typet{},
     source_location}};
@@ -1212,7 +1223,8 @@ static void instantiate_atomic_compare_exchange_n(
   // desired, bool weak, int success_memorder, int failure_memorder)
 
   block.add(code_returnt{side_effect_expr_function_callt{
-    symbol_exprt::typeless(ID___atomic_compare_exchange),
+    symbol_exprt::typeless(ID___atomic_compare_exchange)
+      .with_source_location(source_location),
     {parameter_exprs[0],
      parameter_exprs[1],
      address_of_exprt{parameter_exprs[2]},

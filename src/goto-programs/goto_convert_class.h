@@ -576,7 +576,9 @@ protected:
   // if(cond) { true_case } else { false_case }
   void generate_ifthenelse(
     const exprt &cond,
+    const source_locationt &,
     goto_programt &true_case,
+    const source_locationt &,
     goto_programt &false_case,
     const source_locationt &,
     goto_programt &dest,
