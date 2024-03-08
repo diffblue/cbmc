@@ -221,7 +221,7 @@ int __isnormalf(float f)
 float __builtin_inff(void)
 {
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
 #pragma CPROVER check disable "float-overflow"
   return 1.0f / 0.0f;
 #pragma CPROVER check pop
@@ -232,7 +232,7 @@ float __builtin_inff(void)
 double __builtin_inf(void)
 {
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
 #pragma CPROVER check disable "float-overflow"
   return 1.0 / 0.0;
 #pragma CPROVER check pop
@@ -243,7 +243,7 @@ double __builtin_inf(void)
 long double __builtin_infl(void)
 {
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
 #pragma CPROVER check disable "float-overflow"
   return 1.0l / 0.0l;
 #pragma CPROVER check pop
@@ -289,7 +289,7 @@ int __builtin_isnanf(float f)
 float __builtin_huge_valf(void)
 {
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
 #pragma CPROVER check disable "float-overflow"
   return 1.0f / 0.0f;
 #pragma CPROVER check pop
@@ -300,7 +300,7 @@ float __builtin_huge_valf(void)
 double __builtin_huge_val(void)
 {
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
 #pragma CPROVER check disable "float-overflow"
   return 1.0 / 0.0;
 #pragma CPROVER check pop
@@ -311,7 +311,7 @@ double __builtin_huge_val(void)
 long double __builtin_huge_vall(void)
 {
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
 #pragma CPROVER check disable "float-overflow"
   return 1.0l / 0.0l;
 #pragma CPROVER check pop
@@ -622,7 +622,7 @@ double __builtin_nan(const char *str)
 __CPROVER_hide:;
   (void)*str;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
   return 0.0/0.0;
 #pragma CPROVER check pop
 }
@@ -635,7 +635,7 @@ float __builtin_nanf(const char *str)
 __CPROVER_hide:;
   (void)*str;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
   return 0.0f/0.0f;
 #pragma CPROVER check pop
 }
@@ -661,7 +661,7 @@ double nan(const char *str) {
  __CPROVER_hide:;
   (void)*str;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
   return 0.0/0.0;
 #pragma CPROVER check pop
 }
@@ -673,7 +673,7 @@ float nanf(const char *str) {
  __CPROVER_hide:;
   (void)*str;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
   return 0.0f/0.0f;
 #pragma CPROVER check pop
 }
@@ -685,7 +685,7 @@ long double nanl(const char *str) {
  __CPROVER_hide:;
   (void)*str;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
   return 0.0/0.0;
 #pragma CPROVER check pop
 }
@@ -716,7 +716,7 @@ float nextUpf(float f)
 __CPROVER_hide:;
   if (__CPROVER_isnanf(f))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0f/0.0f;  // NaN
 #pragma CPROVER check pop
   else if (f == 0.0f)
@@ -768,7 +768,7 @@ double nextUp(double d)
 __CPROVER_hide:;
   if (__CPROVER_isnand(d))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0/0.0;  // NaN
 #pragma CPROVER check pop
   else if (d == 0.0)
@@ -819,7 +819,7 @@ long double nextUpl(long double d)
 __CPROVER_hide:;
   if(__CPROVER_isnanld(d))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0/0.0;  // NaN
 #pragma CPROVER check pop
   else if (d == 0.0)
@@ -889,7 +889,7 @@ float sqrtf(float f)
 
   if ( f < 0.0f )
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0f/0.0f; // NaN
 #pragma CPROVER check pop
   else if (__CPROVER_isinff(f) ||   // +Inf only
@@ -982,7 +982,7 @@ double sqrt(double d)
 
   if ( d < 0.0 )
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0/0.0; // NaN
 #pragma CPROVER check pop
   else if (__CPROVER_isinfd(d) ||   // +Inf only
@@ -1059,7 +1059,7 @@ long double sqrtl(long double d)
 
   if(d < 0.0l)
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0l/0.0l; // NaN
 #pragma CPROVER check pop
   else if (__CPROVER_isinfld(d) ||   // +Inf only
@@ -2791,7 +2791,7 @@ double log(double x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0 / 0.0;
 #pragma CPROVER check pop
   }
@@ -2859,7 +2859,7 @@ float logf(float x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0f / 0.0f;
 #pragma CPROVER check pop
   }
@@ -2928,7 +2928,7 @@ long double logl(long double x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0l / 0.0l;
 #pragma CPROVER check pop
   }
@@ -3002,7 +3002,7 @@ double log2(double x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0 / 0.0;
 #pragma CPROVER check pop
   }
@@ -3069,7 +3069,7 @@ float log2f(float x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0f / 0.0f;
 #pragma CPROVER check pop
   }
@@ -3137,7 +3137,7 @@ long double log2l(long double x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0l / 0.0l;
 #pragma CPROVER check pop
   }
@@ -3211,7 +3211,7 @@ double log10(double x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0 / 0.0;
 #pragma CPROVER check pop
   }
@@ -3281,7 +3281,7 @@ float log10f(float x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0f / 0.0f;
 #pragma CPROVER check pop
   }
@@ -3351,7 +3351,7 @@ long double log10l(long double x)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0l / 0.0l;
 #pragma CPROVER check pop
   }
@@ -3415,7 +3415,7 @@ double pow(double x, double y)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0 / 0.0;
 #pragma CPROVER check pop
   }
@@ -3487,7 +3487,7 @@ double pow(double x, double y)
   }
   else if(isnan(x) || isnan(y))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0 / 0.0;
 #pragma CPROVER check pop
 
@@ -3563,7 +3563,7 @@ float powf(float x, float y)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0f / 0.0f;
 #pragma CPROVER check pop
   }
@@ -3638,7 +3638,7 @@ float powf(float x, float y)
   }
   else if(isnanf(x) || isnanf(y))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0f / 0.0f;
 #pragma CPROVER check pop
 
@@ -3708,7 +3708,7 @@ long double powl(long double x, long double y)
   {
     errno = EDOM;
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0l / 0.0l;
 #pragma CPROVER check pop
   }
@@ -3784,7 +3784,7 @@ long double powl(long double x, long double y)
   }
   else if(isnanl(x) || isnanl(y))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0l / 0.0l;
 #pragma CPROVER check pop
 
@@ -3852,7 +3852,7 @@ double fma(double x, double y, double z)
 {
   // see man fma (https://linux.die.net/man/3/fma)
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
   if(isnan(x) || isnan(y))
     return 0.0 / 0.0;
   else if(
@@ -3904,7 +3904,7 @@ float fmaf(float x, float y, float z)
 {
   // see man fma (https://linux.die.net/man/3/fma)
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
   if(isnanf(x) || isnanf(y))
     return 0.0f / 0.0f;
   else if(
@@ -3961,7 +3961,7 @@ long double fmal(long double x, long double y, long double z)
 {
   // see man fma (https://linux.die.net/man/3/fma)
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
   if(isnanl(x) || isnanl(y))
     return 0.0l / 0.0l;
   else if(
@@ -4072,7 +4072,7 @@ double __builtin_powi(double x, int y)
   }
   else if(isnan(x))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0 / 0.0;
 #pragma CPROVER check pop
 
@@ -4193,7 +4193,7 @@ float __builtin_powif(float x, int y)
   }
   else if(isnanf(x))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0f / 0.0f;
 #pragma CPROVER check pop
 
@@ -4309,7 +4309,7 @@ long double __builtin_powil(long double x, int y)
   }
   else if(isnan(x))
 #pragma CPROVER check push
-#pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
     return 0.0l / 0.0l;
 #pragma CPROVER check pop
 

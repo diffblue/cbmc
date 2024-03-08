@@ -39,7 +39,8 @@ void goto_check_c(
 
 #define OPT_GOTO_CHECK                                                         \
   "(bounds-check)(pointer-check)(memory-leak-check)(memory-cleanup-check)"     \
-  "(div-by-zero-check)(enum-range-check)"                                      \
+  "(div-by-zero-check)(float-div-by-zero-check)"                               \
+  "(enum-range-check)"                                                         \
   "(signed-overflow-check)(unsigned-overflow-check)"                           \
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)"          \
   "(float-overflow-check)(nan-check)(no-built-in-assertions)"                  \
@@ -61,7 +62,10 @@ void goto_check_c(
   " {y--no-pointer-check} \t disable pointer checks\n"                         \
   " {y--memory-leak-check} \t enable memory leak checks\n"                     \
   " {y--memory-cleanup-check} \t enable memory cleanup checks\n"               \
-  " {y--div-by-zero-check} \t enable division by zero checks (default on)\n"   \
+  " {y--div-by-zero-check} \t "                                                \
+  "enable division by zero checks on integers (default on)\n"                  \
+  " {y--float-div-by-zero-check} \t "                                          \
+  "enable division by zero checks on floating-point numbers (default off)\n"   \
   " {y--no-div-by-zero-check} \t disable division by zero checks\n"            \
   " {y--signed-overflow-check} \t "                                            \
   "enable signed arithmetic over- and underflow checks (default on)\n"         \
@@ -123,6 +127,7 @@ void goto_check_c(
   PARSE_OPTION_OVERRIDE(cmdline, options, "bounds-check"); \
   PARSE_OPTION_OVERRIDE(cmdline, options, "pointer-check"); \
   PARSE_OPTION_OVERRIDE(cmdline, options, "div-by-zero-check"); \
+  PARSE_OPTION_OVERRIDE(cmdline, options, "float-div-by-zero-check"); \
   PARSE_OPTION_OVERRIDE(cmdline, options, "signed-overflow-check"); \
   PARSE_OPTION_OVERRIDE(cmdline, options, "undefined-shift-check"); \
   PARSE_OPTION_OVERRIDE(cmdline, options, "pointer-primitive-check"); \

@@ -1,0 +1,9 @@
+CORE no-new-smt
+floating_point_division2.c
+--float-div-by-zero-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.float-division-by-zero\.1\] line \d+ floating-point division by zero in 1\.0 / y: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
