@@ -1,6 +1,6 @@
-KNOWNBUG
-main.c
---pointer-check --bounds-check
+CORE
+farith2
+
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

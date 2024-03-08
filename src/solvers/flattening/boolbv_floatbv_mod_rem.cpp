@@ -19,7 +19,10 @@ bvt boolbvt::convert_floatbv_mod_rem(const binary_exprt &expr)
 
   float_utilst float_utils(prop);
 
-  auto rm = bv_utils.build_constant(ieee_floatt::ROUND_TO_EVEN, 32);
+  auto rm = bv_utils.build_constant(
+    expr.id() == ID_floatbv_rem ? ieee_floatt::ROUND_TO_EVEN
+                                : ieee_floatt::ROUND_TO_ZERO,
+    32);
   float_utils.set_rounding_mode(rm);
 
   float_utils.spec = ieee_float_spect(to_floatbv_type(expr.type()));
