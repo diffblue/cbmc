@@ -85,7 +85,7 @@ var classgoto__convertt =
     [ "finish_gotos", "classgoto__convertt.html#a2e79544a60b6ad45440bf77cb385784e", null ],
     [ "generate_conditional_branch", "classgoto__convertt.html#ac795efbe4217efbc5be8d4ab1d7fedda", null ],
     [ "generate_conditional_branch", "classgoto__convertt.html#a3914738161cb1e433a38528a02ca2528", null ],
-    [ "generate_ifthenelse", "classgoto__convertt.html#ad1bab15314a3d0c5375dc0daf6d13773", null ],
+    [ "generate_ifthenelse", "classgoto__convertt.html#a23d10edc4d78f6e07deed67439371a69", null ],
     [ "generate_thread_block", "classgoto__convertt.html#af81e40f8e24bbe1f7b71890024500791", null ],
     [ "get_array_argument", "classgoto__convertt.html#aa93f416ebaa66bf43a59588c76e68025", null ],
     [ "get_constant", "classgoto__convertt.html#a233e527fdbe44177319cebec3c4b9e2c", null ],

@@ -1,5 +1,10 @@
 var NAVTREEINDEX118 =
 {
+"qbf__core_8h.html#a9eda71af6b80953c36fb856322337226":[9,0,2,27,5,2,0],
+"qbf__core_8h_source.html":[9,0,2,27,5,2],
+"qbf__quantor_8cpp.html":[9,0,2,27,5,3],
+"qbf__quantor_8cpp_source.html":[9,0,2,27,5,3],
+"qbf__quantor_8h.html":[9,0,2,27,5,4],
 "qbf__quantor_8h_source.html":[9,0,2,27,5,4],
 "qbf__qube_8cpp.html":[9,0,2,27,5,5],
 "qbf__qube_8cpp_source.html":[9,0,2,27,5,5],
@@ -233,21 +238,16 @@ var NAVTREEINDEX118 =
 "remove__function__pointers_8cpp.html#a1620bf1eaa1bf6e495bef180b1006c27":[9,0,2,16,96,6],
 "remove__function__pointers_8cpp.html#a240e4c3e726fe0288e9adc5a4cff8f21":[9,0,2,16,96,1],
 "remove__function__pointers_8cpp.html#a4b64614447da79ee7425440890d3cf5c":[9,0,2,16,96,9],
-"remove__function__pointers_8cpp.html#a5647bf6de34c41c6e66e5dd029a117c5":[9,0,2,16,96,3],
 "remove__function__pointers_8cpp.html#a7a4bac0e520c89f3ac8b388ac3c3521d":[9,0,2,16,96,7],
 "remove__function__pointers_8cpp.html#a7e87fa040b93acfd34ee382a89b4e4b6":[9,0,2,16,96,4],
 "remove__function__pointers_8cpp.html#a92a6dddcd9b4d251d07734527303bee1":[9,0,2,16,96,5],
 "remove__function__pointers_8cpp.html#ab8da3e3cbe3fd9411adf00c207825f81":[9,0,2,16,96,2],
 "remove__function__pointers_8cpp.html#adcbbb61dec4ade79261bdbd77f4ebb52":[9,0,2,16,96,10],
 "remove__function__pointers_8cpp.html#ae7a781b46531cfb144f787c1777ad230":[9,0,2,16,96,8],
+"remove__function__pointers_8cpp.html#aee2935e089cdcfabf874c468056febf8":[9,0,2,16,96,3],
 "remove__function__pointers_8cpp_source.html":[9,0,2,16,96],
 "remove__function__pointers_8h.html":[9,0,2,16,97],
 "remove__function__pointers_8h.html#a271472cba61f723c57d5016ebd3d9d92":[9,0,2,16,97,1],
 "remove__function__pointers_8h.html#a4b64614447da79ee7425440890d3cf5c":[9,0,2,16,97,3],
-"remove__function__pointers_8h.html#a68f13a4739e830c215df5003dcd48b5f":[9,0,2,16,97,2],
-"remove__function__pointers_8h.html#a7e87fa040b93acfd34ee382a89b4e4b6":[9,0,2,16,97,0],
-"remove__function__pointers_8h.html#adcbbb61dec4ade79261bdbd77f4ebb52":[9,0,2,16,97,4],
-"remove__function__pointers_8h_source.html":[9,0,2,16,97],
-"remove__instanceof_8cpp.html":[9,0,1,0,1,107],
-"remove__instanceof_8cpp.html#a0748ad50b5f0739aad08a7bb3070c535":[9,0,1,0,1,107,6]
+"remove__function__pointers_8h.html#a68f13a4739e830c215df5003dcd48b5f":[9,0,2,16,97,2]
 };

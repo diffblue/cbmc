@@ -58,5 +58,7 @@ var classexprt =
     [ "visit_pre", "classexprt.html#a5a331dafe7711470a9d3097b69691251", null ],
     [ "visit_pre", "classexprt.html#a8a4ea14980805786fbf1a3b05a51e620", null ],
     [ "with_source_location", "classexprt.html#ac9d535c6e4e412ab23f461ccec6d8f87", null ],
-    [ "with_source_location", "classexprt.html#a403852c60b7267777a1eee6abff0bd91", null ]
+    [ "with_source_location", "classexprt.html#a403852c60b7267777a1eee6abff0bd91", null ],
+    [ "with_source_location", "classexprt.html#a26dc5ed3eae280461a37042955e74bb9", null ],
+    [ "with_source_location", "classexprt.html#a6c3045054d122c4bf62069b28ce539fe", null ]
 ];

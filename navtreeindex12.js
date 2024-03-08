@@ -248,6 +248,6 @@ var NAVTREEINDEX12 =
 "classbswap__exprt.html#a92423b8af0a54075314441dcf674d78c":[8,0,130,2],
 "classbswap__exprt.html#aa286d0228029e1f74a2386657047b46b":[8,0,130,0],
 "classbswap__exprt.html#affebc305264ae4fa27fc3d396e06e24a":[8,0,130,3],
-"classbv__pointers__widet.html#a041a719cda3609b491be0974242300f4":[8,0,137,3],
-"classbv__pointers__widet.html#a201791de3eabba312c28fbeeeadfa0f9":[8,0,137,9]
+"classbv__arithmetict.html":[8,0,132],
+"classbv__arithmetict.html#a0305b483a36ae59681f044940dd0624e":[8,0,132,0]
 };

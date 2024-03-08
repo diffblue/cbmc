@@ -181,6 +181,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab33453726d7cb050fc23fb9b9d2375ac inherit pub_methods_classexprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab088730175eb9719ab66af8d0d865946 inherit pub_methods_classexprt"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">operandst</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classexprt.html#ab088730175eb9719ab66af8d0d865946">operands</a> () const</td></tr>
 <tr class="separator:ab088730175eb9719ab66af8d0d865946 inherit pub_methods_classexprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26dc5ed3eae280461a37042955e74bb9 inherit pub_methods_classexprt"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classexprt.html#a26dc5ed3eae280461a37042955e74bb9">with_source_location</a> (<a class="el" href="classsource__locationt.html">source_locationt</a> location) &amp;</td></tr>
+<tr class="memdesc:a26dc5ed3eae280461a37042955e74bb9 inherit pub_methods_classexprt"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the source location from <code>location</code>, if it is non-nil.  <a href="classexprt.html#a26dc5ed3eae280461a37042955e74bb9">More...</a><br /></td></tr>
+<tr class="separator:a26dc5ed3eae280461a37042955e74bb9 inherit pub_methods_classexprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c3045054d122c4bf62069b28ce539fe inherit pub_methods_classexprt"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a> &amp;&amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classexprt.html#a6c3045054d122c4bf62069b28ce539fe">with_source_location</a> (<a class="el" href="classsource__locationt.html">source_locationt</a> location) &amp;&amp;</td></tr>
+<tr class="memdesc:a6c3045054d122c4bf62069b28ce539fe inherit pub_methods_classexprt"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the source location from <code>location</code>, if it is non-nil.  <a href="classexprt.html#a6c3045054d122c4bf62069b28ce539fe">More...</a><br /></td></tr>
+<tr class="separator:a6c3045054d122c4bf62069b28ce539fe inherit pub_methods_classexprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9d535c6e4e412ab23f461ccec6d8f87 inherit pub_methods_classexprt"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classexprt.html#ac9d535c6e4e412ab23f461ccec6d8f87">with_source_location</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;other) &amp;</td></tr>
 <tr class="memdesc:ac9d535c6e4e412ab23f461ccec6d8f87 inherit pub_methods_classexprt"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the source location from <code>other</code>, if it has any.  <a href="classexprt.html#ac9d535c6e4e412ab23f461ccec6d8f87">More...</a><br /></td></tr>
 <tr class="separator:ac9d535c6e4e412ab23f461ccec6d8f87 inherit pub_methods_classexprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -474,7 +480,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="textblock"><p>Expression that introduces a new symbol that is equal to the operand. </p>
 <p>This expression corresponds to the SMT-LIB2 feature 'named term'. The symbol is not bound, i.e., visible outside of this expression. The expression roughly corresponds to Python's "walrus operator", but is not a side effect. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03571">3571</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03603">3603</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a408217e4d7b3c69164db562231e4c225"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a408217e4d7b3c69164db562231e4c225">&#9670;&nbsp;</a></span>named_term_exprt()</h2>
@@ -510,7 +516,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03574">3574</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03606">3606</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -538,7 +544,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03589">3589</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03621">3621</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -565,7 +571,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03584">3584</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03616">3616</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -592,7 +598,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03599">3599</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03631">3631</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -619,7 +625,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03594">3594</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03626">3626</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
