@@ -340,6 +340,13 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       PARSE_OPTIONS_VSD(cmdline, options);
       options.set_option("data-dependencies", true); // Always set
     }
+    else if(cmdline.isset("predicate-tracking"))
+    {
+      options.set_option("predicate-tracking", true);
+      options.set_option("domain set", true);
+
+      PARSE_OPTIONS_VSD(cmdline, options);
+    }
 
     // Reachability questions, when given with a domain swap from specific
     // to general tasks so that they can use the domain & parameterisations.
@@ -782,6 +789,7 @@ void goto_analyzer_parse_optionst::help()
     " {y--vsd}, {y--variable-sensitivity} \t a configurable non-relational"
     " domain\n"
     " {y--dependence-graph-vs} \t dependencies between instructions using VSD\n"
+    " {y--predicate-tracking} \t an extension of VSD that tracks relational predicates\n" // NOLINT(*)
     "\n"
     "Variable sensitivity domain (VSD) options:\n"
     HELP_VSD

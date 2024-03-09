@@ -47,7 +47,7 @@ void variable_sensitivity_domaint::transform(
         .abstract_object_factory(
           instruction.decl_symbol().type(), ns, true, false)
         ->write_location_context(from);
-    abstract_state.assign(instruction.decl_symbol(), top_object, ns);
+    assign(instruction.decl_symbol(), top_object, ns);
   }
   // We now store top.
   break;
@@ -64,7 +64,7 @@ void variable_sensitivity_domaint::transform(
     abstract_object_pointert rhs =
       abstract_state.eval(instruction.assign_rhs(), ns)
         ->write_location_context(from);
-    abstract_state.assign(instruction.assign_lhs(), rhs, ns);
+    assign(instruction.assign_lhs(), rhs, ns);
   }
   break;
 
@@ -117,7 +117,7 @@ void variable_sensitivity_domaint::transform(
     for(const auto &param : type.parameters())
     {
       // Top the arguments to the function
-      abstract_state.assign(
+      assign(
         symbol_exprt(param.get_identifier(), param.type()),
         abstract_state.abstract_object_factory(param.type(), ns, true, false),
         ns);
@@ -344,7 +344,7 @@ void variable_sensitivity_domaint::transform_function_call(
         {
           if(symbol.second.is_static_lifetime)
           {
-            abstract_state.assign(
+            assign(
               symbol_exprt(symbol.first, symbol.second.type),
               abstract_state.abstract_object_factory(
                 symbol.second.type, ns, true, false),
@@ -382,7 +382,7 @@ void variable_sensitivity_domaint::transform_function_call(
         // parameter of the function
         const symbol_exprt parameter_expr(
           parameter_it->get_identifier(), called_arg.type());
-        abstract_state.assign(parameter_expr, param_val, ns);
+        assign(parameter_expr, param_val, ns);
 
         ++parameter_it;
       }
@@ -441,9 +441,8 @@ void variable_sensitivity_domaint::merge_three_way_function_return(
 
   for(const auto &symbol : modified_symbols)
   {
-    abstract_object_pointert value =
-      cast_function_end.abstract_state.eval(symbol, ns);
-    abstract_state.assign(symbol, value, ns);
+    abstract_object_pointert value = source.abstract_state.eval(symbol, ns);
+    assign(symbol, value, ns);
   }
 
   return;
@@ -453,6 +452,18 @@ void variable_sensitivity_domaint::assume(exprt expr, namespacet ns)
 {
   ai_simplify(expr, ns);
   abstract_state.assume(expr, ns);
+
+  // Sets bottom, not needed for this domain but useful for inheriting
+  if(abstract_state.is_bottom())
+    this->make_bottom();
+}
+
+bool variable_sensitivity_domaint::assign(
+  const exprt &expr,
+  const abstract_object_pointert &value,
+  const namespacet &ns)
+{
+  return abstract_state.assign(expr, value, ns);
 }
 
 #ifdef ENABLE_STATS
