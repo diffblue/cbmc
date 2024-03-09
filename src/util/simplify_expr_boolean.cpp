@@ -377,3 +377,66 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
 
   return unchanged(expr);
 }
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_not_preorder(const not_exprt &expr)
+{
+  const exprt &op = expr.op();
+
+  if(!expr.is_boolean() || !op.is_boolean())
+  {
+    return unchanged(expr);
+  }
+
+  if(op.id() == ID_not) // (not not a) == a
+  {
+    return changed(simplify_rec(to_not_expr(op).op()));
+  }
+  else if(op.is_false())
+  {
+    return true_exprt{};
+  }
+  else if(op.is_true())
+  {
+    return false_exprt{};
+  }
+  else if(op.id() == ID_and || op.id() == ID_or)
+  {
+    exprt tmp = op;
+
+    Forall_operands(it, tmp)
+    {
+      *it = boolean_negate(*it);
+    }
+
+    tmp.id(tmp.id() == ID_and ? ID_or : ID_and);
+
+    return changed(simplify_rec(tmp));
+  }
+  else if(op.id() == ID_notequal) // !(a!=b) <-> a==b
+  {
+    exprt tmp = op;
+    tmp.id(ID_equal);
+    return changed(simplify_rec(tmp));
+  }
+  else if(op.id() == ID_exists) // !(exists: a) <-> forall: not a
+  {
+    auto const &op_as_exists = to_exists_expr(op);
+    return changed(simplify_rec(
+      forall_exprt{op_as_exists.symbol(), not_exprt{op_as_exists.where()}}));
+  }
+  else if(op.id() == ID_forall) // !(forall: a) <-> exists: not a
+  {
+    auto const &op_as_forall = to_forall_expr(op);
+    return changed(simplify_rec(
+      exists_exprt{op_as_forall.symbol(), not_exprt{op_as_forall.where()}}));
+  }
+
+  auto op_result = simplify_rec(op);
+  if(!op_result.has_changed())
+    return unchanged(expr);
+
+  not_exprt tmp = expr;
+  tmp.op() = std::move(op_result.expr);
+  return std::move(tmp);
+}
