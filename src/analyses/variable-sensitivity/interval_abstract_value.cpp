@@ -455,7 +455,9 @@ abstract_value_pointert interval_abstract_valuet::constrain(
     make_interval(constant_interval_exprt(lower_bound, upper_bound)));
 }
 
-exprt interval_abstract_valuet::to_predicate_internal(const exprt &name) const
+exprt interval_abstract_valuet::to_predicate_internal(
+  const exprt &name,
+  const std::set<exprt> &) const
 {
   if(interval.is_single_value_interval())
     return equal_exprt(name, interval.get_lower());

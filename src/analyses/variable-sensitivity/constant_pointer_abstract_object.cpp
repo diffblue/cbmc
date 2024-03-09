@@ -387,7 +387,50 @@ exprt constant_pointer_abstract_objectt::ptr_comparison_expr(
 }
 
 exprt constant_pointer_abstract_objectt::to_predicate_internal(
-  const exprt &name) const
+  const exprt &name,
+  const std::set<exprt> &scope) const
 {
-  return equal_exprt(name, value_stack.to_expression());
+  exprt target = value_stack.to_expression();
+
+  // This is simple if there are no restrictions:
+  if(scope.size() == 0)
+  {
+    return equal_exprt(name, target);
+  }
+  else
+  {
+    // However handling the scope requires some care.
+    // Because if you have a pointer to a[i]->field then you need to
+    // check if a[i]->field, a[i] or a is in the scope.
+    exprt working = target;
+    do
+    {
+      if(scope.find(working) != scope.end())
+      {
+        return equal_exprt(name, target);
+      }
+
+      if(working.id() == ID_index)
+      {
+        working = to_index_expr(working).array();
+      }
+      else if(working.id() == ID_member)
+      {
+        working = to_member_expr(working).compound();
+      }
+      else if(working.id() == ID_symbol || working.id() == ID_dynamic_object)
+      {
+        // If this has not been found then the object that the
+        // (abstract) pointer points to is not in scope and so can't
+        // be directly expressed, so true is the best we can do
+        return true_exprt();
+      }
+      else
+      {
+        // These should be the only things generated from a write stack
+        UNREACHABLE;
+      }
+    } while(1);
+  }
+  UNREACHABLE;
 }

@@ -1,0 +1,13 @@
+CORE
+main.c
+--instrument out.gb --instrument-targets any_goto_target --verbosity 9 --vsd
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+^Instrumenting example_function\nInstruction \d+ because any_goto_target... single history... condition is example_function::argument = 1 ∧ true_from_calling_context = 1... added as assumption\nInstruction \d+ because any_goto_target... single history... condition is example_function::argument = 1 ∧ true_from_calling_context = 1 ∧ \(10 ≤ example_function::1::1::i ∧ example_function::1::1::i ≤ max_value\)... added as assumption$
+--
+^warning: ignoring
+--
+Testing instrumenting at goto targets
+
+

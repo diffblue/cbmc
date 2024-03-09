@@ -232,7 +232,8 @@ private:
     const full_array_pointert &other,
     const widen_modet &widen_mode) const;
 
-  exprt to_predicate_internal(const exprt &name) const override;
+  exprt to_predicate_internal(const exprt &name, const std::set<exprt> &scope)
+    const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_ARRAY_ABSTRACT_OBJECT_H

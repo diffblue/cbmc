@@ -424,7 +424,9 @@ void abstract_environmentt::output(
   out << "}\n";
 }
 
-exprt abstract_environmentt::to_predicate() const
+exprt abstract_environmentt::to_predicate(
+  const std::set<exprt> &scope,
+  const namespacet &ns) const
 {
   if(is_bottom())
     return false_exprt();
@@ -432,13 +434,61 @@ exprt abstract_environmentt::to_predicate() const
     return true_exprt();
 
   exprt::operandst predicates;
-  for(const auto &entry : map.get_view())
-  {
-    auto sym = entry.first;
-    auto val = entry.second;
-    auto pred = val->to_predicate(symbol_exprt(sym, val->type()));
 
-    predicates.push_back(pred);
+  if(scope.size() == 0)
+  {
+    for(const auto &entry : map.get_view())
+    {
+      auto sym = entry.first;
+      auto val = entry.second;
+
+      INVARIANT(
+        !val->is_bottom(),
+        "If one variable is bottom, the whole domain should be");
+      if(val->is_top())
+      {
+        continue;
+      }
+      else
+      {
+        auto pred = val->to_predicate(symbol_exprt(sym, val->type()), scope);
+
+        // It is possible that the abstract object is not top but the
+        // information it contains is not expressible as a predicate.
+        // For example if it just has write locations.
+        INVARIANT(!pred.is_false(), "Only bottom should give false");
+        if(!pred.is_true())
+        {
+          predicates.push_back(pred);
+        }
+      }
+    }
+  }
+  else
+  {
+    for(const auto &expr : scope)
+    {
+      auto val = eval(expr, ns);
+
+      if(val->is_top())
+      {
+        continue;
+      }
+      else if(val->is_bottom())
+      {
+        // Unlike the previous case, this is possible if the user
+        // passes an expression like 'x == 1' which can be evaluated
+        // to false
+        return false_exprt();
+      }
+
+      auto pred = val->to_predicate(expr, scope);
+      INVARIANT(!pred.is_false(), "Only bottom should give false");
+      if(!pred.is_true())
+      {
+        predicates.push_back(pred);
+      }
+    }
   }
 
   if(predicates.size() == 1)

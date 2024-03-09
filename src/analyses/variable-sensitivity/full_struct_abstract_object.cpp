@@ -296,7 +296,8 @@ abstract_object_pointert full_struct_abstract_objectt::visit_sub_elements(
 }
 
 exprt full_struct_abstract_objectt::to_predicate_internal(
-  const exprt &name) const
+  const exprt &name,
+  const std::set<exprt> &scope) const
 {
   const auto &compound_type = to_struct_union_type(name.type());
   auto all_predicates = exprt::operandst{};
@@ -305,7 +306,7 @@ exprt full_struct_abstract_objectt::to_predicate_internal(
   {
     auto field_name =
       member_exprt(name, compound_type.get_component(field.first));
-    auto field_expr = field.second->to_predicate(field_name);
+    auto field_expr = field.second->to_predicate(field_name, scope);
 
     if(!field_expr.is_true())
       all_predicates.push_back(field_expr);
