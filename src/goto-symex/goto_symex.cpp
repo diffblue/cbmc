@@ -53,8 +53,8 @@ void goto_symext::symex_assign(
   log.conditional_output(
     log.debug(), [this, &lhs](messaget::mstreamt &mstream) {
       mstream << "Assignment to " << format(lhs) << " ["
-              << pointer_offset_bits(lhs.type(), ns).value_or(0) << " bits]"
-              << messaget::eom;
+              << pointer_offset_bits(lhs.type(), ns).value_or(bitst{0})
+              << " bits]" << messaget::eom;
     });
 
   // rvalues present within the lhs (for example, "some_array[this_rvalue]" or

@@ -95,7 +95,7 @@ private:
   {
   private:
     size_t begin_int;
-    mp_integer byte_size;
+    bytest byte_size;
     irep_idt name;
 
     /// Convert base-16 memory address to a natural number
@@ -108,13 +108,14 @@ private:
     /// \return true if the point is inside this scope
     bool check_containment(const size_t &point_int) const
     {
-      return point_int >= begin_int && (begin_int + byte_size) > point_int;
+      return point_int >= begin_int &&
+             (bytest{begin_int} + byte_size) > bytest{point_int};
     }
 
   public:
     memory_scopet(
       const memory_addresst &begin,
-      const mp_integer &byte_size,
+      const bytest &byte_size,
       const irep_idt &name);
 
     /// Check if \p point points somewhere in this memory scope
@@ -129,8 +130,7 @@ private:
     /// \param point: memory address to have the offset computed
     /// \param member_size: size of one element of this scope in bytes
     /// \return `n' such that \p point is the n-th element of this scope
-    mp_integer
-    distance(const memory_addresst &point, mp_integer member_size) const;
+    bytest distance(const memory_addresst &point, bytest member_size) const;
 
     /// Getter for the name of this memory scope
     /// \return the name as irep id
@@ -141,7 +141,7 @@ private:
 
     /// Getter for the allocation size of this memory scope
     /// \return the size in bytes
-    mp_integer size() const
+    bytest size() const
     {
       return byte_size;
     }
@@ -172,7 +172,7 @@ private:
   /// Search for the size of the allocated memory for \p name
   /// \param name: name of the pointer used during allocation
   /// \return the size if have a record of \p name's allocation (1 otherwise)
-  mp_integer get_malloc_size(irep_idt name);
+  bytest get_malloc_size(irep_idt name);
 
   /// Build the pointee string for address \p point assuming it points to a
   ///   dynamic allocation of `n' elements each of size \p member_size. E.g.:
@@ -186,12 +186,12 @@ private:
   /// \param member_size: size of each allocated element
   /// \return pointee as a string if we have a record of the allocation
   std::optional<std::string>
-  get_malloc_pointee(const memory_addresst &point, mp_integer member_size);
+  get_malloc_pointee(const memory_addresst &point, const bytest &member_size);
 
   /// Wrapper for call get_offset_pointer_bits
   /// \param type: type to get the size of
   /// \return the size of the type in bytes
-  mp_integer get_type_size(const typet &type) const;
+  bytest get_type_size(const typet &type) const;
 
   /// Assign the gdb-extracted value for \p symbol_name to its symbol
   ///   expression and then process outstanding assignments that this

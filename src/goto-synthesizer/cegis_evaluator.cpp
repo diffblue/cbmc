@@ -230,7 +230,7 @@ mp_integer cegis_evaluatort::evaluate_rec_int(
   {
     if(cex.object_sizes.find(expr.operands()[0]) != cex.object_sizes.end())
     {
-      result = cex.object_sizes.at(expr.operands()[0]);
+      result = cex.object_sizes.at(expr.operands()[0]).get();
     }
     else
     {
@@ -268,7 +268,7 @@ mp_integer cegis_evaluatort::evaluate_rec_int(
       {
         // Use havoc values only if we are evaluating the expression against
         // the negative example---is_positive is false.
-        result = cex.havoced_pointer_offsets.at(expr.operands()[0]);
+        result = cex.havoced_pointer_offsets.at(expr.operands()[0]).get();
       }
       else if(
         cex.loop_entry_offsets.find(expr.operands()[0]) !=
@@ -276,7 +276,7 @@ mp_integer cegis_evaluatort::evaluate_rec_int(
       {
         // The pointer is not havoced. So look up the offset in the loop-entry
         // set instead.
-        result = cex.loop_entry_offsets.at(expr.operands()[0]);
+        result = cex.loop_entry_offsets.at(expr.operands()[0]).get();
       }
       else
       {
@@ -292,7 +292,8 @@ mp_integer cegis_evaluatort::evaluate_rec_int(
         cex.loop_entry_offsets.find(expr.operands()[0].operands()[0]) !=
         cex.loop_entry_offsets.end())
       {
-        result = cex.loop_entry_offsets.at(expr.operands()[0].operands()[0]);
+        result =
+          cex.loop_entry_offsets.at(expr.operands()[0].operands()[0]).get();
       }
       else
       {

@@ -205,9 +205,9 @@ std::optional<exprt> bits2expr(
   if(
     !type_bits.has_value() ||
     (type.id() != ID_union && type.id() != ID_union_tag &&
-     *type_bits != bits.size()) ||
+     *type_bits != bitst{bits.size()}) ||
     ((type.id() == ID_union || type.id() == ID_union_tag) &&
-     *type_bits < bits.size()))
+     *type_bits < bitst{bits.size()}))
   {
     return {};
   }
@@ -298,11 +298,11 @@ std::optional<exprt> bits2expr(
     struct_exprt result({}, type);
     result.reserve_operands(components.size());
 
-    mp_integer m_offset_bits = 0;
+    bitst m_offset_bits{0};
     for(const auto &component : components)
     {
       const auto m_size = pointer_offset_bits(component.type(), ns);
-      CHECK_RETURN(m_size.has_value() && *m_size >= 0);
+      CHECK_RETURN(m_size.has_value() && *m_size >= bitst{0});
 
       std::string comp_bits = std::string(
         bits,
@@ -342,7 +342,7 @@ std::optional<exprt> bits2expr(
       numeric_cast_v<std::size_t>(to_constant_expr(size_expr));
 
     const auto el_size_opt = pointer_offset_bits(array_type.element_type(), ns);
-    CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);
+    CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > bitst{0});
 
     const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
 
@@ -369,7 +369,7 @@ std::optional<exprt> bits2expr(
 
     const auto el_size_opt =
       pointer_offset_bits(vector_type.element_type(), ns);
-    CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);
+    CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > bitst{0});
 
     const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
 
@@ -393,7 +393,7 @@ std::optional<exprt> bits2expr(
     const complex_typet &complex_type = to_complex_type(type);
 
     const auto sub_size_opt = pointer_offset_bits(complex_type.subtype(), ns);
-    CHECK_RETURN(sub_size_opt.has_value() && *sub_size_opt > 0);
+    CHECK_RETURN(sub_size_opt.has_value() && *sub_size_opt > bitst{0});
 
     const std::size_t sub_size = numeric_cast_v<std::size_t>(*sub_size_opt);
 

@@ -620,10 +620,8 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
         offset_op0.is_constant() && offset_op1.is_constant() &&
         object_size.has_value() && element_size.has_value() &&
         element_size->is_constant() && !element_size->is_zero() &&
-        numeric_cast_v<mp_integer>(to_constant_expr(offset_op0)) <=
-          *object_size &&
-        numeric_cast_v<mp_integer>(to_constant_expr(offset_op1)) <=
-          *object_size)
+        numeric_cast_v<bytest>(to_constant_expr(offset_op0)) <= *object_size &&
+        numeric_cast_v<bytest>(to_constant_expr(offset_op1)) <= *object_size)
       {
         return changed(simplify_rec(div_exprt{
           minus_exprt{offset_op0, offset_op1},
@@ -1138,8 +1136,8 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
     return unchanged(expr);
   }
 
-  const auto start = numeric_cast<mp_integer>(expr.upper());
-  const auto end = numeric_cast<mp_integer>(expr.lower());
+  const auto start = numeric_cast<bitst>(expr.upper());
+  const auto end = numeric_cast<bitst>(expr.lower());
 
   if(!start.has_value())
     return unchanged(expr);
@@ -1152,7 +1150,9 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
   if(!width.has_value())
     return unchanged(expr);
 
-  if(*start < 0 || *start >= (*width) || *end < 0 || *end >= (*width))
+  if(
+    *start < bitst{0} || *start >= (*width) || *end < bitst{0} ||
+    *end >= (*width))
     return unchanged(expr);
 
   DATA_INVARIANT(*start >= *end, "extractbits must have upper() >= lower()");
@@ -1161,12 +1161,12 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
   {
     const auto svalue = expr2bits(expr.src(), true, ns);
 
-    if(!svalue.has_value() || svalue->size() != *width)
+    if(!svalue.has_value() || bitst{svalue->size()} != *width)
       return unchanged(expr);
 
     std::string extracted_value = svalue->substr(
       numeric_cast_v<std::size_t>(*end),
-      numeric_cast_v<std::size_t>(*start - *end + 1));
+      numeric_cast_v<std::size_t>(*start - *end + bitst{1}));
 
     auto result = bits2expr(extracted_value, expr.type(), true, ns);
     if(!result.has_value())
@@ -1178,13 +1178,13 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
   {
     // the most-significant bit comes first in an concatenation_exprt, hence we
     // count down
-    mp_integer offset = *width;
+    bitst offset = *width;
 
     for(const auto &op : expr.src().operands())
     {
       auto op_width = pointer_offset_bits(op.type(), ns);
 
-      if(!op_width.has_value() || *op_width <= 0)
+      if(!op_width.has_value() || *op_width <= bitst{0})
         return unchanged(expr);
 
       if(*start < offset && offset <= *end + *op_width)
@@ -1207,14 +1207,14 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
     {
       extractbits_exprt result = *eb_src;
       result.type() = expr.type();
-      const mp_integer src_lower =
-        numeric_cast_v<mp_integer>(to_constant_expr(eb_src->lower()));
+      const bitst src_lower =
+        numeric_cast_v<bitst>(to_constant_expr(eb_src->lower()));
       result.lower() = from_integer(src_lower + *end, eb_src->lower().type());
       result.upper() = from_integer(src_lower + *start, eb_src->lower().type());
       return changed(simplify_extractbits(result));
     }
   }
-  else if(*end == 0 && *start + 1 == *width)
+  else if(*end == bitst{0} && *start + bitst{1} == *width)
   {
     typecast_exprt tc{expr.src(), expr.type()};
     return changed(simplify_typecast(tc));
@@ -1808,7 +1808,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
             pointer_offset_size(address_of->object().type(), ns);
           if(
             object_size.has_value() &&
-            numeric_cast_v<mp_integer>(to_constant_expr(offset)) < *object_size)
+            numeric_cast_v<bytest>(to_constant_expr(offset)) < *object_size)
           {
             return false_exprt();
           }

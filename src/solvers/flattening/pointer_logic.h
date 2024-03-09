@@ -27,9 +27,10 @@ public:
 
   struct pointert
   {
-    mp_integer object, offset;
+    mp_integer object;
+    bytest offset;
 
-    pointert(mp_integer _obj, mp_integer _off)
+    pointert(mp_integer _obj, bytest _off)
       : object(std::move(_obj)), offset(std::move(_off))
     {
     }
