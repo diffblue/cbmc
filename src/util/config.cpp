@@ -1480,3 +1480,8 @@ irep_idt configt::this_operating_system()
 
   return this_os;
 }
+
+irep_idt configt::rounding_mode_identifier() const
+{
+  return CPROVER_PREFIX "rounding_mode";
+}
