@@ -225,6 +225,8 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("recursive-interprocedural", true);
     else if(cmdline.isset("three-way-merge"))
       options.set_option("three-way-merge", true);
+    else if(cmdline.isset("local"))
+      options.set_option("local", true);
     else if(cmdline.isset("legacy-ait") || cmdline.isset("location-sensitive"))
     {
       options.set_option("legacy-ait", true);
@@ -758,6 +760,7 @@ void goto_analyzer_parse_optionst::help()
     " reasoning\n"
     " {y--three-way-merge} \t use VSD's three-way merge on return from function"
     " call\n"
+    " {y--local} \t perform function-local analysis for every function\n"
     " {y--legacy-concurrent} \t legacy-ait with an extended fixed-point for"
     " concurrency\n"
     " {y--location-sensitive} \t use location-sensitive abstract interpreter\n"

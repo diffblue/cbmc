@@ -117,7 +117,8 @@ class optionst;
   "(recursive-interprocedural)" \
   "(three-way-merge)" \
   "(legacy-ait)" \
-  "(legacy-concurrent)"
+  "(legacy-concurrent)" \
+  "(local)"
 
 #define GOTO_ANALYSER_OPTIONS_HISTORY \
   "(ahistorical)" \
