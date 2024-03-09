@@ -254,17 +254,16 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
       simplify_rec(r_cond.expr.is_true() ? truevalue : falsevalue));
   }
 
+  bool swap_branches = false;
+
+  if(r_cond.expr.id() == ID_not)
+  {
+    r_cond = changed(to_not_expr(r_cond.expr).op());
+    swap_branches = true;
+  }
+
   if(do_simplify_if)
   {
-    bool swap_branches = false;
-
-    if(r_cond.expr.id() == ID_not)
-    {
-      r_cond = changed(to_not_expr(r_cond.expr).op());
-      swap_branches = true;
-    }
-
-#ifdef USE_LOCAL_REPLACE_MAP
     replace_mapt map_before(local_replace_map);
 
     // a ? b : c  --> a ? b[a/true] : c
@@ -273,7 +272,10 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
       for(const auto &op : r_cond.expr.operands())
       {
         if(op.id() == ID_not)
-          local_replace_map.insert(std::make_pair(op.op0(), false_exprt()));
+        {
+          local_replace_map.insert(
+            std::make_pair(to_not_expr(op).op(), false_exprt()));
+        }
         else
           local_replace_map.insert(std::make_pair(op, true_exprt()));
       }
@@ -291,7 +293,10 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
       for(const auto &op : r_cond.expr.operands())
       {
         if(op.id() == ID_not)
-          local_replace_map.insert(std::make_pair(op.op0(), true_exprt()));
+        {
+          local_replace_map.insert(
+            std::make_pair(to_not_expr(op).op(), true_exprt()));
+        }
         else
           local_replace_map.insert(std::make_pair(op, false_exprt()));
       }
@@ -306,11 +311,13 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
     if(swap_branches)
     {
       // tell build_if_expr to replace truevalue and falsevalue
-      r_truevalue.expr_changed = CHANGED;
-      r_falsevalue.expr_changed = CHANGED;
+      r_truevalue.expr_changed = resultt<>::CHANGED;
+      r_falsevalue.expr_changed = resultt<>::CHANGED;
     }
     return build_if_expr(expr, r_cond, r_truevalue, r_falsevalue);
-#else
+  }
+  else
+  {
     if(!swap_branches)
     {
       return build_if_expr(
@@ -324,12 +331,6 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
         changed(simplify_rec(falsevalue)),
         changed(simplify_rec(truevalue)));
     }
-#endif
-  }
-  else
-  {
-    return build_if_expr(
-      expr, r_cond, simplify_rec(truevalue), simplify_rec(falsevalue));
   }
 }
 
@@ -339,49 +340,46 @@ simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
   const exprt &truevalue = expr.true_case();
   const exprt &falsevalue = expr.false_case();
 
-  if(do_simplify_if)
-  {
 #if 0
-    no_change = simplify_if_cond(cond) && no_change;
-    no_change = simplify_if_branch(truevalue, falsevalue, cond) && no_change;
+  no_change = simplify_if_cond(cond) && no_change;
+  no_change = simplify_if_branch(truevalue, falsevalue, cond) && no_change;
 #endif
 
-    if(expr.type() == bool_typet())
-    {
-      // a?b:c <-> (a && b) || (!a && c)
+  if(expr.type() == bool_typet())
+  {
+    // a?b:c <-> (a && b) || (!a && c)
 
-      if(truevalue.is_true() && falsevalue.is_false())
-      {
-        // a?1:0 <-> a
-        return cond;
-      }
-      else if(truevalue.is_false() && falsevalue.is_true())
-      {
-        // a?0:1 <-> !a
-        return changed(simplify_not(not_exprt(cond)));
-      }
-      else if(falsevalue.is_false())
-      {
-        // a?b:0 <-> a AND b
-        return changed(simplify_boolean(and_exprt(cond, truevalue)));
-      }
-      else if(falsevalue.is_true())
-      {
-        // a?b:1 <-> !a OR b
-        return changed(
-          simplify_boolean(or_exprt(simplify_not(not_exprt(cond)), truevalue)));
-      }
-      else if(truevalue.is_true())
-      {
-        // a?1:b <-> a||(!a && b) <-> a OR b
-        return changed(simplify_boolean(or_exprt(cond, falsevalue)));
-      }
-      else if(truevalue.is_false())
-      {
-        // a?0:b <-> !a && b
-        return changed(simplify_boolean(
-          and_exprt(simplify_not(not_exprt(cond)), falsevalue)));
-      }
+    if(truevalue.is_true() && falsevalue.is_false())
+    {
+      // a?1:0 <-> a
+      return cond;
+    }
+    else if(truevalue.is_false() && falsevalue.is_true())
+    {
+      // a?0:1 <-> !a
+      return changed(simplify_not(not_exprt(cond)));
+    }
+    else if(falsevalue.is_false())
+    {
+      // a?b:0 <-> a AND b
+      return changed(simplify_boolean(and_exprt(cond, truevalue)));
+    }
+    else if(falsevalue.is_true())
+    {
+      // a?b:1 <-> !a OR b
+      return changed(
+        simplify_boolean(or_exprt(simplify_not(not_exprt(cond)), truevalue)));
+    }
+    else if(truevalue.is_true())
+    {
+      // a?1:b <-> a||(!a && b) <-> a OR b
+      return changed(simplify_boolean(or_exprt(cond, falsevalue)));
+    }
+    else if(truevalue.is_false())
+    {
+      // a?0:b <-> !a && b
+      return changed(
+        simplify_boolean(and_exprt(simplify_not(not_exprt(cond)), falsevalue)));
     }
   }
 
