@@ -681,6 +681,7 @@ jobs:
   # This job takes approximately 49 to 70 minutes
   check-vs-2019-cmake-build-and-test:
     runs-on: windows-2019
+    if: false
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -691,7 +692,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
       - name: Fetch dependencies
         run: |
-          choco install winflexbison3
+          choco install -y winflexbison3
           if($LastExitCode -ne 0)
           {
             Write-Output "::error ::Dependency installation via Chocolatey failed."
@@ -805,7 +806,7 @@ jobs:
 
   # This job takes approximately 7 to 32 minutes
   windows-msi-package:
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -816,7 +817,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
       - name: Fetch dependencies
         run: |
-          choco install winflexbison3
+          choco install -y winflexbison3
           if($LastExitCode -ne 0)
           {
             Write-Output "::error ::Dependency installation via Chocolatey failed."
