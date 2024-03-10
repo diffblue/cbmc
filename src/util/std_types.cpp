@@ -225,9 +225,14 @@ bool is_constant_or_has_constant_components(
   // we have to use the namespace to resolve to its definition:
   // struct t { const int a; };
   // struct t t1;
-  if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
+  if(type.id() == ID_struct_tag)
   {
-    const auto &resolved_type = ns.follow(type);
+    const auto &resolved_type = ns.follow_tag(to_struct_tag_type(type));
+    return has_constant_components(resolved_type);
+  }
+  else if(type.id() == ID_union_tag)
+  {
+    const auto &resolved_type = ns.follow_tag(to_union_tag_type(type));
     return has_constant_components(resolved_type);
   }
 

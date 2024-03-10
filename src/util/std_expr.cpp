@@ -82,8 +82,11 @@ auto component(T &struct_expr, const irep_idt &name, const namespacet &ns)
 {
   static_assert(
     std::is_base_of<struct_exprt, T>::value, "T must be a struct_exprt.");
-  const auto index =
-    to_struct_type(ns.follow(struct_expr.type())).component_number(name);
+  const struct_typet &struct_type =
+    struct_expr.type().id() == ID_struct_tag
+      ? ns.follow_tag(to_struct_tag_type(struct_expr.type()))
+      : to_struct_type(struct_expr.type());
+  const auto index = struct_type.component_number(name);
   DATA_INVARIANT(
     index < struct_expr.operands().size(),
     "component matching index should exist");
@@ -119,9 +122,11 @@ void member_exprt::validate(
 
   const auto &member_expr = to_member_expr(expr);
 
-  const typet &compound_type = ns.follow(member_expr.compound().type());
+  const typet &compound_type = member_expr.compound().type();
   const auto *struct_union_type =
-    type_try_dynamic_cast<struct_union_typet>(compound_type);
+    (compound_type.id() == ID_struct_tag || compound_type.id() == ID_union_tag)
+      ? &ns.follow_tag(to_struct_or_union_tag_type(compound_type))
+      : type_try_dynamic_cast<struct_union_typet>(compound_type);
   DATA_CHECK(
     vm,
     struct_union_type != nullptr,
