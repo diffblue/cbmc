@@ -107,9 +107,11 @@ void boolbvt::convert_update_rec(
   {
     const irep_idt &component_name=designator.get(ID_component_name);
 
-    if(ns.follow(type).id() == ID_struct)
+    if(type.id() == ID_struct || type.id() == ID_struct_tag)
     {
-      const struct_typet &struct_type = to_struct_type(ns.follow(type));
+      const struct_typet &struct_type =
+        type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                   : to_struct_type(type);
 
       std::size_t struct_offset=0;
 
@@ -144,9 +146,11 @@ void boolbvt::convert_update_rec(
       convert_update_rec(
         designators, d+1, new_type, new_offset, new_value, bv);
     }
-    else if(ns.follow(type).id() == ID_union)
+    else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
-      const union_typet &union_type = to_union_type(ns.follow(type));
+      const union_typet &union_type = type.id() == ID_union_tag
+                                        ? ns.follow_tag(to_union_tag_type(type))
+                                        : to_union_type(type);
 
       const union_typet::componentt &component=
         union_type.get_component(component_name);

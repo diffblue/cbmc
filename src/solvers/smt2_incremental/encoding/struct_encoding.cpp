@@ -105,8 +105,7 @@ extricate_updates(const with_exprt &struct_expr)
 static exprt encode(const with_exprt &with, const namespacet &ns)
 {
   const auto tag_type = type_checked_cast<struct_tag_typet>(with.type());
-  const auto struct_type =
-    type_checked_cast<struct_typet>(ns.follow(with.type()));
+  const auto struct_type = ns.follow_tag(tag_type);
   const auto updates = extricate_updates(with);
   const auto components =
     make_range(struct_type.components())
@@ -194,11 +193,19 @@ static std::size_t count_trailing_bit_width(
 /// the combined width of the fields which follow the field being selected.
 exprt struct_encodingt::encode_member(const member_exprt &member_expr) const
 {
-  const auto &type = ns.get().follow(member_expr.compound().type());
+  const auto &compound_type = member_expr.compound().type();
   const auto offset_bits = [&]() -> std::size_t {
-    if(can_cast_type<union_typet>(type))
+    if(
+      can_cast_type<union_typet>(compound_type) ||
+      can_cast_type<union_tag_typet>(compound_type))
+    {
       return 0;
-    const auto &struct_type = type_checked_cast<struct_typet>(type);
+    }
+    const auto &struct_type =
+      compound_type.id() == ID_struct_tag
+        ? ns.get().follow_tag(
+            type_checked_cast<struct_tag_typet>(compound_type))
+        : type_checked_cast<struct_typet>(compound_type);
     return count_trailing_bit_width(
       struct_type, member_expr.get_component_name(), *boolbv_width);
   }();

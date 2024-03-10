@@ -341,7 +341,10 @@ static void add_equations_for_symbol_resolution(
     {
       if(rhs.type().id() == ID_struct || rhs.type().id() == ID_struct_tag)
       {
-        const struct_typet &struct_type = to_struct_type(ns.follow(rhs.type()));
+        const struct_typet &struct_type =
+          rhs.type().id() == ID_struct_tag
+            ? ns.follow_tag(to_struct_tag_type(rhs.type()))
+            : to_struct_type(rhs.type());
         for(const auto &comp : struct_type.components())
         {
           if(is_char_pointer_type(comp.type()))
@@ -377,7 +380,10 @@ extract_strings_from_lhs(const exprt &lhs, const namespacet &ns)
     result.push_back(lhs);
   else if(lhs.type().id() == ID_struct || lhs.type().id() == ID_struct_tag)
   {
-    const struct_typet &struct_type = to_struct_type(ns.follow(lhs.type()));
+    const struct_typet &struct_type =
+      lhs.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(lhs.type()))
+        : to_struct_type(lhs.type());
     for(const auto &comp : struct_type.components())
     {
       const std::vector<exprt> strings_in_comp = extract_strings_from_lhs(
@@ -439,7 +445,9 @@ static void add_string_equation_to_symbol_resolution(
       eq.rhs().type().id() == ID_struct_tag)
     {
       const struct_typet &struct_type =
-        to_struct_type(ns.follow(eq.rhs().type()));
+        eq.rhs().type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(eq.rhs().type()))
+          : to_struct_type(eq.rhs().type());
       for(const auto &comp : struct_type.components())
       {
         const member_exprt lhs_data(eq.lhs(), comp.get_name(), comp.type());
