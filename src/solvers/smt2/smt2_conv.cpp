@@ -846,7 +846,10 @@ void smt2_convt::convert_address_of_rec(
       struct_op_type.id() == ID_struct || struct_op_type.id() == ID_struct_tag,
       "member expression operand shall have struct type");
 
-    const struct_typet &struct_type = to_struct_type(ns.follow(struct_op_type));
+    const struct_typet &struct_type =
+      struct_op_type.id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(struct_op_type))
+        : to_struct_type(struct_op_type);
 
     const irep_idt &component_name = member_expr.get_component_name();
 
@@ -3167,7 +3170,10 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
 void smt2_convt::convert_struct(const struct_exprt &expr)
 {
-  const struct_typet &struct_type = to_struct_type(ns.follow(expr.type()));
+  const struct_typet &struct_type =
+    expr.type().id() == ID_struct_tag
+      ? ns.follow_tag(to_struct_tag_type(expr.type()))
+      : to_struct_type(expr.type());
 
   const struct_typet::componentst &components=
     struct_type.components();
@@ -3270,10 +3276,9 @@ void smt2_convt::flatten_array(const exprt &expr)
 
 void smt2_convt::convert_union(const union_exprt &expr)
 {
-  const union_typet &union_type = to_union_type(ns.follow(expr.type()));
   const exprt &op=expr.op();
 
-  std::size_t total_width=boolbv_width(union_type);
+  std::size_t total_width = boolbv_width(expr.type());
 
   std::size_t member_width=boolbv_width(op.type());
 
@@ -4190,7 +4195,10 @@ void smt2_convt::convert_with(const with_exprt &expr)
   }
   else if(expr_type.id() == ID_struct || expr_type.id() == ID_struct_tag)
   {
-    const struct_typet &struct_type = to_struct_type(ns.follow(expr_type));
+    const struct_typet &struct_type =
+      expr_type.id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(expr_type))
+        : to_struct_type(expr_type);
 
     const exprt &index = expr.where();
     const exprt &value = expr.new_value();
@@ -4261,11 +4269,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
   }
   else if(expr_type.id() == ID_union || expr_type.id() == ID_union_tag)
   {
-    const union_typet &union_type = to_union_type(ns.follow(expr_type));
-
     const exprt &value = expr.new_value();
 
-    std::size_t total_width=boolbv_width(union_type);
+    std::size_t total_width = boolbv_width(expr_type);
 
     std::size_t member_width=boolbv_width(value.type());
 
@@ -4407,7 +4413,10 @@ void smt2_convt::convert_member(const member_exprt &expr)
 
   if(struct_op_type.id() == ID_struct || struct_op_type.id() == ID_struct_tag)
   {
-    const struct_typet &struct_type = to_struct_type(ns.follow(struct_op_type));
+    const struct_typet &struct_type =
+      struct_op_type.id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(struct_op_type))
+        : to_struct_type(struct_op_type);
 
     INVARIANT(
       struct_type.has_component(name), "struct should have accessed component");
@@ -4504,7 +4513,9 @@ void smt2_convt::flatten2bv(const exprt &expr)
     if(use_datatypes)
     {
       // concatenate elements
-      const struct_typet &struct_type = to_struct_type(ns.follow(type));
+      const struct_typet &struct_type =
+        type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                   : to_struct_type(type);
 
       const struct_typet::componentst &components=
         struct_type.components();
@@ -4630,7 +4641,9 @@ void smt2_convt::unflatten(
 
         out << "(mk-" << smt_typename;
 
-        const struct_typet &struct_type = to_struct_type(ns.follow(type));
+        const struct_typet &struct_type =
+          type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                     : to_struct_type(type);
 
         const struct_typet::componentst &components=
           struct_type.components();
@@ -5509,8 +5522,11 @@ void smt2_convt::convert_type(const typet &type)
   else if(type.id() == ID_union || type.id() == ID_union_tag)
   {
     std::size_t width=boolbv_width(type);
+    const union_typet &union_type = type.id() == ID_union_tag
+                                      ? ns.follow_tag(to_union_tag_type(type))
+                                      : to_union_type(type);
     CHECK_RETURN_WITH_DIAGNOSTICS(
-      to_union_type(ns.follow(type)).components().empty() || width != 0,
+      union_type.components().empty() || width != 0,
       "failed to get width of union");
 
     out << "(_ BitVec " << width << ")";
