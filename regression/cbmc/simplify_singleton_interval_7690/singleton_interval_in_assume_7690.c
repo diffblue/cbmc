@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-extern size_t __CPROVER_max_malloc_size;
-
 #if defined(_WIN32) && defined(_M_X64)
 int __builtin_clzll(unsigned long long);
 #define __nof_symex_objects                                                    \

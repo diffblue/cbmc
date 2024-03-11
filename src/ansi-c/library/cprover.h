@@ -26,8 +26,11 @@ extern const void *__CPROVER_deallocated;
 extern const void *__CPROVER_memory_leak;
 
 extern int __CPROVER_malloc_failure_mode;
-extern __CPROVER_size_t __CPROVER_max_malloc_size;
 extern __CPROVER_bool __CPROVER_malloc_may_fail;
+// The maximum size of an object that we can handle under the object:offset
+// pointer encoding. Marked thread-local as it is a per-analysis constant that
+// can safely be constant-propagated even in concurrent execution.
+extern __CPROVER_thread_local __CPROVER_size_t __CPROVER_max_malloc_size;
 
 // malloc failure modes
 extern int __CPROVER_malloc_failure_mode_return_null;
