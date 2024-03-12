@@ -10,5 +10,6 @@ var classcpp__parsert =
     [ "parenthesis_counter", "classcpp__parsert.html#ad836624d598a50f1a7c162fc469de442", null ],
     [ "parse_tree", "classcpp__parsert.html#a2e3cd57f805d48aab6cc4f0c183e7074", null ],
     [ "recognize_wchar_t", "classcpp__parsert.html#ab85866c8e23ac90731e7394c704fe108", null ],
+    [ "support_float16", "classcpp__parsert.html#a61ff01ca8bfcd264e6f1414a17dc76d3", null ],
     [ "token_buffer", "classcpp__parsert.html#a15b1b6942e69ff07e4da59b1e0413f39", null ]
 ];

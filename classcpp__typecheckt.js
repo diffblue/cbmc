@@ -183,6 +183,7 @@ var classcpp__typecheckt =
     [ "instantiation_stack", "classcpp__typecheckt.html#a380f8f615575dca9074433eaf43b4a9f", null ],
     [ "method_bodies", "classcpp__typecheckt.html#a946c947488f715d1f2b19176c507e84d", null ],
     [ "methods_seen", "classcpp__typecheckt.html#a1eddda2447eb5b554c41cfc553b8213c", null ],
+    [ "support_float16_type", "classcpp__typecheckt.html#a99246c450eb3905936babbc6facb0839", null ],
     [ "template_counter", "classcpp__typecheckt.html#a63b93afce419c20278f347139466ca8f", null ],
     [ "template_map", "classcpp__typecheckt.html#a41f587e1445b097c4cd5165ed522bfcb", null ]
 ];

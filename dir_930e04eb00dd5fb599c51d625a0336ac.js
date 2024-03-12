@@ -19,7 +19,6 @@ var dir_930e04eb00dd5fb599c51d625a0336ac =
     [ "gcc_builtin_headers_power.h", "gcc__builtin__headers__power_8h.html", null ],
     [ "gcc_builtin_headers_tm.h", "gcc__builtin__headers__tm_8h.html", "gcc__builtin__headers__tm_8h" ],
     [ "gcc_builtin_headers_types.h", "gcc__builtin__headers__types_8h.html", "gcc__builtin__headers__types_8h" ],
-    [ "gcc_builtin_headers_types_gcc7plus.h", "gcc__builtin__headers__types__gcc7plus_8h.html", "gcc__builtin__headers__types__gcc7plus_8h" ],
     [ "gcc_builtin_headers_ubsan.h", "gcc__builtin__headers__ubsan_8h.html", "gcc__builtin__headers__ubsan_8h" ],
     [ "windows_builtin_headers.h", "windows__builtin__headers_8h.html", "windows__builtin__headers_8h" ]
 ];

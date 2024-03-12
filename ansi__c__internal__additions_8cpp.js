@@ -1,7 +1,7 @@
 var ansi__c__internal__additions_8cpp =
 [
     [ "ansi_c_architecture_strings", "ansi__c__internal__additions_8cpp.html#aec7fc27c0f7a8b975326962929cb193d", null ],
-    [ "ansi_c_internal_additions", "ansi__c__internal__additions_8cpp.html#ae64d9388620ddde50e4f129cee88710e", null ],
+    [ "ansi_c_internal_additions", "ansi__c__internal__additions_8cpp.html#a553646fc663d572687daafc0425f392a", null ],
     [ "architecture_string", "ansi__c__internal__additions_8cpp.html#a0d94d6f95ba91a2551389375eae747e2", null ],
     [ "architecture_string", "ansi__c__internal__additions_8cpp.html#ad4225bc849a83cd28aa3bb9af0148958", null ],
     [ "max_malloc_size", "ansi__c__internal__additions_8cpp.html#aedcb41e4941b20dd7a5f946f6c18e83a", null ],
@@ -25,7 +25,6 @@ var ansi__c__internal__additions_8cpp =
     [ "gcc_builtin_headers_power", "ansi__c__internal__additions_8cpp.html#adf3181d15d079bbcd145ae64841c1d0d", null ],
     [ "gcc_builtin_headers_tm", "ansi__c__internal__additions_8cpp.html#a7eedb8df19efe80d6b48df5d7edea091", null ],
     [ "gcc_builtin_headers_types", "ansi__c__internal__additions_8cpp.html#a155c9b7f110109b8361afeda9b74db50", null ],
-    [ "gcc_builtin_headers_types_gcc7plus", "ansi__c__internal__additions_8cpp.html#acf7da312c7dba78cbc8aa386a5697921", null ],
     [ "gcc_builtin_headers_ubsan", "ansi__c__internal__additions_8cpp.html#a33eee7a9c7d1aafcd895e15eba5b4bac", null ],
     [ "windows_builtin_headers", "ansi__c__internal__additions_8cpp.html#a5e9bb612a7daf01f152de597a8141eca", null ]
 ];
