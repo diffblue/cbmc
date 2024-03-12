@@ -22,12 +22,6 @@ const char gcc_builtin_headers_types[] =
 #include "compiler_headers/gcc_builtin_headers_types.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_types_gcc7plus[] =
-  "#line 1 \"gcc_builtin_headers_types_gcc7plus.h\"\n"
-// NOLINTNEXTLINE(whitespace/line_length)
-#include "compiler_headers/gcc_builtin_headers_types_gcc7plus.inc" // IWYU pragma: keep
-  ; // NOLINT(whitespace/semicolon)
-
 const char gcc_builtin_headers_generic[] =
   "#line 1 \"gcc_builtin_headers_generic.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_generic.inc" // IWYU pragma: keep
@@ -158,9 +152,7 @@ max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
   return ((mp_integer)1) << (mp_integer)bits_for_positive_offset;
 }
 
-void ansi_c_internal_additions(
-  std::string &code,
-  bool support_ts_18661_3_Floatn_types)
+void ansi_c_internal_additions(std::string &code, bool support_float16_type)
 {
   // clang-format off
   // do the built-in types and variables
@@ -249,8 +241,15 @@ void ansi_c_internal_additions(
     config.ansi_c.mode == configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_types;
-    if(support_ts_18661_3_Floatn_types)
-      code += gcc_builtin_headers_types_gcc7plus;
+    if(support_float16_type)
+    {
+      code +=
+        "typedef _Float16 __gcc_v8hf __attribute__((__vector_size__(16)));\n";
+      code +=
+        "typedef _Float16 __gcc_v16hf __attribute__((__vector_size__(32)));\n";
+      code +=
+        "typedef _Float16 __gcc_v32hf __attribute__((__vector_size__(64)));\n";
+    }
 
     // there are many more, e.g., look at
     // https://developer.apple.com/library/mac/#documentation/developertools/gcc-4.0.1/gcc/Target-Builtins.html

@@ -162,4 +162,16 @@ void configure_gcc(const gcc_versiont &gcc_version)
   config.ansi_c.gcc__float128_type =
     gcc_version.flavor == gcc_versiont::flavort::GCC &&
     gcc_version.is_at_least(4u, gcc_float128_minor_version);
+
+  config.ansi_c.float16_type =
+    (gcc_version.flavor == gcc_versiont::flavort::GCC &&
+     gcc_version.is_at_least(12u)) ||
+    (gcc_version.flavor == gcc_versiont::flavort::CLANG &&
+     gcc_version.is_at_least(15u));
+
+  config.ansi_c.bf16_type =
+    (gcc_version.flavor == gcc_versiont::flavort::GCC &&
+     gcc_version.is_at_least(13u)) ||
+    (gcc_version.flavor == gcc_versiont::flavort::CLANG &&
+     gcc_version.is_at_least(15u));
 }

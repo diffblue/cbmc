@@ -52,7 +52,6 @@ src/ansi-c/compiler_headers/gcc_builtin_headers_omp.inc
 src/ansi-c/compiler_headers/gcc_builtin_headers_power.inc
 src/ansi-c/compiler_headers/gcc_builtin_headers_tm.inc
 src/ansi-c/compiler_headers/gcc_builtin_headers_types.inc
-src/ansi-c/compiler_headers/gcc_builtin_headers_types_gcc7plus.inc
 src/ansi-c/compiler_headers/gcc_builtin_headers_ubsan.inc
 src/ansi-c/compiler_headers/windows_builtin_headers.inc
 src/cpp/cprover_library.inc

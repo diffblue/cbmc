@@ -2077,7 +2077,7 @@ bool c_typecheck_baset::builtin_factory(const irep_idt &identifier)
 {
   return ::builtin_factory(
     identifier,
-    config.ansi_c.ts_18661_3_Floatn_types,
+    config.ansi_c.float16_type,
     symbol_table,
     get_message_handler());
 }

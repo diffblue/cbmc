@@ -151,6 +151,8 @@ public:
     bool for_has_scope;
     bool ts_18661_3_Floatn_types; // ISO/IEC TS 18661-3:2015
     bool gcc__float128_type;      // __float128, a gcc extension since 4.3/4.5
+    bool float16_type;            // _Float16 (Clang >= 15, GCC >= 12)
+    bool bf16_type;               // __bf16 (Clang >= 15, GCC >= 13)
     bool single_precision_constant;
     enum class c_standardt
     {

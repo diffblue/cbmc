@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_parse_tree.h"
 #include "cpp_token_buffer.h"
 
+#include <optional>
+
 class cpp_parsert:public parsert
 {
 public:
@@ -34,10 +36,11 @@ public:
     asm_block_following=false;
   }
 
-  cpp_parsert():
-    mode(configt::ansi_ct::flavourt::ANSI),
-    recognize_wchar_t(true),
-    asm_block_following(false)
+  cpp_parsert()
+    : mode(configt::ansi_ct::flavourt::ANSI),
+      recognize_wchar_t(true),
+      asm_block_following(false),
+      support_float16(std::nullopt)
   {
   }
 
@@ -65,6 +68,9 @@ public:
   // scanner
   unsigned parenthesis_counter;
   bool asm_block_following;
+
+protected:
+  std::optional<bool> support_float16;
 };
 
 extern cpp_parsert cpp_parser;

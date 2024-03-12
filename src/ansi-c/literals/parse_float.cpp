@@ -77,8 +77,8 @@ parse_floatt::parse_floatt(const std::string &src)
       p++;
 
     // get exponent
-    while(*p!=0 && *p!='f' && *p!='l' &&
-          *p!='w' && *p!='q' && *p!='d')
+    while(*p != 0 && *p != 'f' && *p != 'l' && *p != 'w' && *p != 'q' &&
+          *p != 'd' && *p != 'b')
     {
       str_exponent+=*p;
       p++;
@@ -121,10 +121,8 @@ parse_floatt::parse_floatt(const std::string &src)
       p++;
 
     // get fraction part
-    while(*p!=0 && *p!='e' &&
-          *p!='f' && *p!='l' &&
-          *p!='w' && *p!='q' && *p!='d' &&
-          *p!='i' && *p!='j')
+    while(*p != 0 && *p != 'e' && *p != 'f' && *p != 'l' && *p != 'w' &&
+          *p != 'q' && *p != 'd' && *p != 'i' && *p != 'j' && *p != 'b')
     {
       str_fraction_part+=*p;
       p++;
@@ -139,9 +137,8 @@ parse_floatt::parse_floatt(const std::string &src)
       p++;
 
     // get exponent
-    while(*p!=0 && *p!='f' && *p!='l' &&
-          *p!='w' && *p!='q' && *p!='d' &&
-          *p!='i' && *p!='j')
+    while(*p != 0 && *p != 'f' && *p != 'l' && *p != 'w' && *p != 'q' &&
+          *p != 'd' && *p != 'i' && *p != 'j' && *p != 'b')
     {
       str_exponent+=*p;
       p++;
@@ -173,7 +170,7 @@ parse_floatt::parse_floatt(const std::string &src)
   is_float80=false;
   is_float128=is_float128x=false;
 
-  if(strcmp(p, "f16")==0)
+  if(strcmp(p, "f16") == 0 || strcmp(p, "bf16") == 0)
     is_float16=true;
   else if(strcmp(p, "f32")==0)
     is_float32=true;

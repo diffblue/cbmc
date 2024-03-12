@@ -46,32 +46,14 @@ public:
     cpp_parse_treet &_cpp_parse_tree,
     symbol_table_baset &_symbol_table,
     const std::string &_module,
-    message_handlert &message_handler)
-    : c_typecheck_baset(_symbol_table, _module, message_handler),
-      cpp_parse_tree(_cpp_parse_tree),
-      template_counter(0),
-      anon_counter(0),
-      disable_access_control(false)
-  {
-  }
+    message_handlert &message_handler);
 
   cpp_typecheckt(
     cpp_parse_treet &_cpp_parse_tree,
     symbol_table_baset &_symbol_table1,
     const symbol_table_baset &_symbol_table2,
     const std::string &_module,
-    message_handlert &message_handler)
-    : c_typecheck_baset(
-        _symbol_table1,
-        _symbol_table2,
-        _module,
-        message_handler),
-      cpp_parse_tree(_cpp_parse_tree),
-      template_counter(0),
-      anon_counter(0),
-      disable_access_control(false)
-  {
-  }
+    message_handlert &message_handler);
 
   ~cpp_typecheckt() override
   {
@@ -596,6 +578,7 @@ private:
   dynamic_initializationst dynamic_initializations;
   bool disable_access_control;           // Disable protect and private
   std::unordered_set<irep_idt> deferred_typechecking;
+  bool support_float16_type;
 };
 
 #endif // CPROVER_CPP_CPP_TYPECHECK_H
