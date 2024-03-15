@@ -301,7 +301,6 @@ var menudata={children:[
 {text:"t",url:"globals_vars.html#index_t"},
 {text:"u",url:"globals_vars.html#index_u"},
 {text:"w",url:"globals_vars.html#index_w"},
-{text:"x",url:"globals_vars.html#index_x"},
 {text:"y",url:"globals_vars.html#index_y"}]},
 {text:"Typedefs",url:"globals_type.html",children:[
 {text:"_",url:"globals_type.html#index__5F"},

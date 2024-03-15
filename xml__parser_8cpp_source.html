@@ -104,59 +104,64 @@ $(document).ready(function(){initNavTree('xml__parser_8cpp_source.html',''); ini
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;fstream&gt;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">   13</a></span>&#160;<a class="code" href="classxml__parsert.html">xml_parsert</a> <a class="code" href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">xml_parser</a>;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keywordtype">int</span> <a class="code" href="classxml__parsert.html#a3c8f30a91495125f5e3dcbc0bbabc7d3">xml_parsert::instance_count</a> = 0;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">// &#39;do it all&#39; function</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">   16</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">parse_xml</a>(</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  std::istream &amp;in,</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;dest)</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">xml_parser</a>.<a class="code" href="classxml__parsert.html#ac02dc72f47f05fafd06170164ad4fec8">clear</a>();</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <a class="code" href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">xml_parser</a>.<a class="code" href="classparsert.html#a6b55d724b8b450d0bd89814e05acb283">set_file</a>(filename);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">xml_parser</a>.<a class="code" href="classparsert.html#a400e7c320c73c1e83ca4c6c531e3722c">in</a>=&amp;in;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <a class="code" href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">xml_parser</a>.<a class="code" href="classparsert.html#a94e006a32fee9b88158cb35bc2788b65">log</a>.<a class="code" href="classmessaget.html#a9ec2e501c0a66f8cd195ae3639b1bbba">set_message_handler</a>(message_handler);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordtype">bool</span> result=<a class="code" href="xml__parser_8h.html#a58cb763f21ee8d2ee4f9736ab59c6efa">yyxmlparse</a>()!=0;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="comment">// save result</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <a class="code" href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">xml_parser</a>.<a class="code" href="classxml__parsert.html#ae358b581f9caf0cde9b37db6daafe8ac">parse_tree</a>.<a class="code" href="classxml__parse__treet.html#ae0588b71e82c38fd9b3363abc6b6e828">element</a>.<a class="code" href="classxmlt.html#a6ae4840e72c0dfd6a4e98ea28d328708">swap</a>(dest);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// save some memory</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">xml_parser</a>.<a class="code" href="classxml__parsert.html#ac02dc72f47f05fafd06170164ad4fec8">clear</a>();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;}</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">// &#39;do it all&#39; function</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="xml__parser_8cpp.html#a00d7074032c10658b6d7e180132d85c2">   39</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">parse_xml</a>(</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;dest)</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  std::ifstream in(filename);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">if</span>(!in)</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">parse_xml</a>(in, filename, message_handler, dest);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="xml__parser_8cpp.html#a17eb5b948cdfa63010721f2f58a5c100">   15</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="xml__parser_8cpp.html#a17eb5b948cdfa63010721f2f58a5c100">yyxmllex_init_extra</a>(<a class="code" href="classxml__parsert.html">xml_parsert</a> *, <span class="keywordtype">void</span> **);</div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="xml__parser_8cpp.html#aa3d094ae57087a6486c1120cbb8c2efc">   16</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="xml__parser_8cpp.html#aa3d094ae57087a6486c1120cbb8c2efc">yyxmllex_destroy</a>(<span class="keywordtype">void</span> *);</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="xml__parser_8cpp.html#ac65716b3b18f426296210725dde2f8de">   17</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="xml__parser_8cpp.html#ac65716b3b18f426296210725dde2f8de">yyxmlparse</a>(<a class="code" href="classxml__parsert.html">xml_parsert</a> &amp;, <span class="keywordtype">void</span> *);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classxml__parsert.html#aa90f62281bb54cb34eb6a4b80c8247dc">   19</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classxml__parsert.html#aa90f62281bb54cb34eb6a4b80c8247dc">xml_parsert::parse</a>()</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordtype">void</span> *scanner;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="xml__parser_8cpp.html#a17eb5b948cdfa63010721f2f58a5c100">yyxmllex_init_extra</a>(<span class="keyword">this</span>, &amp;scanner);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordtype">bool</span> parse_fail = <a class="code" href="xml__parser_8cpp.html#ac65716b3b18f426296210725dde2f8de">yyxmlparse</a>(*<span class="keyword">this</span>, scanner) != 0;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="xml__parser_8cpp.html#aa3d094ae57087a6486c1120cbb8c2efc">yyxmllex_destroy</a>(scanner);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keywordflow">return</span> parse_fail;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;}</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">// &#39;do it all&#39; function</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">   29</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">parse_xml</a>(</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  std::istream &amp;in,</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;dest)</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;{</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <a class="code" href="classxml__parsert.html">xml_parsert</a> xml_parser{message_handler};</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  xml_parser.set_file(filename);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  xml_parser.in=&amp;in;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordtype">bool</span> result = xml_parser.parse();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="comment">// save result</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  xml_parser.parse_tree.element.swap(dest);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;}</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">// &#39;do it all&#39; function</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="xml__parser_8cpp.html#a00d7074032c10658b6d7e180132d85c2">   49</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">parse_xml</a>(</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <a class="code" href="classxmlt.html">xmlt</a> &amp;dest)</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;{</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  std::ifstream in(filename);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordflow">if</span>(!in)</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">parse_xml</a>(in, filename, message_handler, dest);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00027">message.h:28</a></div></div>
-<div class="ttc" id="aclassmessaget_html_a9ec2e501c0a66f8cd195ae3639b1bbba"><div class="ttname"><a href="classmessaget.html#a9ec2e501c0a66f8cd195ae3639b1bbba">messaget::set_message_handler</a></div><div class="ttdeci">virtual void set_message_handler(message_handlert &amp;_message_handler)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00179">message.h:179</a></div></div>
-<div class="ttc" id="aclassparsert_html_a400e7c320c73c1e83ca4c6c531e3722c"><div class="ttname"><a href="classparsert.html#a400e7c320c73c1e83ca4c6c531e3722c">parsert::in</a></div><div class="ttdeci">std::istream * in</div><div class="ttdef"><b>Definition:</b> <a href="parser_8h_source.html#l00027">parser.h:27</a></div></div>
-<div class="ttc" id="aclassparsert_html_a6b55d724b8b450d0bd89814e05acb283"><div class="ttname"><a href="classparsert.html#a6b55d724b8b450d0bd89814e05acb283">parsert::set_file</a></div><div class="ttdeci">void set_file(const irep_idt &amp;file)</div><div class="ttdef"><b>Definition:</b> <a href="parser_8h_source.html#l00092">parser.h:92</a></div></div>
-<div class="ttc" id="aclassparsert_html_a94e006a32fee9b88158cb35bc2788b65"><div class="ttname"><a href="classparsert.html#a94e006a32fee9b88158cb35bc2788b65">parsert::log</a></div><div class="ttdeci">messaget log</div><div class="ttdef"><b>Definition:</b> <a href="parser_8h_source.html#l00143">parser.h:143</a></div></div>
-<div class="ttc" id="aclassxml__parse__treet_html_ae0588b71e82c38fd9b3363abc6b6e828"><div class="ttname"><a href="classxml__parse__treet.html#ae0588b71e82c38fd9b3363abc6b6e828">xml_parse_treet::element</a></div><div class="ttdeci">xmlt element</div><div class="ttdef"><b>Definition:</b> <a href="xml__parse__tree_8h_source.html#l00019">xml_parse_tree.h:19</a></div></div>
-<div class="ttc" id="aclassxml__parsert_html"><div class="ttname"><a href="classxml__parsert.html">xml_parsert</a></div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8h_source.html#l00019">xml_parser.h:20</a></div></div>
-<div class="ttc" id="aclassxml__parsert_html_ac02dc72f47f05fafd06170164ad4fec8"><div class="ttname"><a href="classxml__parsert.html#ac02dc72f47f05fafd06170164ad4fec8">xml_parsert::clear</a></div><div class="ttdeci">virtual void clear()</div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8h_source.html#l00042">xml_parser.h:42</a></div></div>
-<div class="ttc" id="aclassxml__parsert_html_ae358b581f9caf0cde9b37db6daafe8ac"><div class="ttname"><a href="classxml__parsert.html#ae358b581f9caf0cde9b37db6daafe8ac">xml_parsert::parse_tree</a></div><div class="ttdeci">xml_parse_treet parse_tree</div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8h_source.html#l00022">xml_parser.h:22</a></div></div>
+<div class="ttc" id="aclassxml__parsert_html"><div class="ttname"><a href="classxml__parsert.html">xml_parsert</a></div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8h_source.html#l00017">xml_parser.h:18</a></div></div>
+<div class="ttc" id="aclassxml__parsert_html_a3c8f30a91495125f5e3dcbc0bbabc7d3"><div class="ttname"><a href="classxml__parsert.html#a3c8f30a91495125f5e3dcbc0bbabc7d3">xml_parsert::instance_count</a></div><div class="ttdeci">static int instance_count</div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8h_source.html#l00065">xml_parser.h:65</a></div></div>
+<div class="ttc" id="aclassxml__parsert_html_aa90f62281bb54cb34eb6a4b80c8247dc"><div class="ttname"><a href="classxml__parsert.html#aa90f62281bb54cb34eb6a4b80c8247dc">xml_parsert::parse</a></div><div class="ttdeci">bool parse() override</div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8cpp_source.html#l00019">xml_parser.cpp:19</a></div></div>
 <div class="ttc" id="aclassxmlt_html"><div class="ttname"><a href="classxmlt.html">xmlt</a></div><div class="ttdef"><b>Definition:</b> <a href="xml_8h_source.html#l00020">xml.h:21</a></div></div>
-<div class="ttc" id="aclassxmlt_html_a6ae4840e72c0dfd6a4e98ea28d328708"><div class="ttname"><a href="classxmlt.html#a6ae4840e72c0dfd6a4e98ea28d328708">xmlt::swap</a></div><div class="ttdeci">void swap(xmlt &amp;xml)</div><div class="ttdef"><b>Definition:</b> <a href="xml_8cpp_source.html#l00025">xml.cpp:25</a></div></div>
-<div class="ttc" id="axml__parser_8cpp_html_a65bb27935fc51f25714dac5512373313"><div class="ttname"><a href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">parse_xml</a></div><div class="ttdeci">bool parse_xml(std::istream &amp;in, const std::string &amp;filename, message_handlert &amp;message_handler, xmlt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8cpp_source.html#l00016">xml_parser.cpp:16</a></div></div>
-<div class="ttc" id="axml__parser_8cpp_html_a7fad9d548a8e83cce08de2ad52738d8e"><div class="ttname"><a href="xml__parser_8cpp.html#a7fad9d548a8e83cce08de2ad52738d8e">xml_parser</a></div><div class="ttdeci">xml_parsert xml_parser</div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8cpp_source.html#l00013">xml_parser.cpp:13</a></div></div>
+<div class="ttc" id="axml__parser_8cpp_html_a17eb5b948cdfa63010721f2f58a5c100"><div class="ttname"><a href="xml__parser_8cpp.html#a17eb5b948cdfa63010721f2f58a5c100">yyxmllex_init_extra</a></div><div class="ttdeci">int yyxmllex_init_extra(xml_parsert *, void **)</div></div>
+<div class="ttc" id="axml__parser_8cpp_html_a65bb27935fc51f25714dac5512373313"><div class="ttname"><a href="xml__parser_8cpp.html#a65bb27935fc51f25714dac5512373313">parse_xml</a></div><div class="ttdeci">bool parse_xml(std::istream &amp;in, const std::string &amp;filename, message_handlert &amp;message_handler, xmlt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="xml__parser_8cpp_source.html#l00029">xml_parser.cpp:29</a></div></div>
+<div class="ttc" id="axml__parser_8cpp_html_aa3d094ae57087a6486c1120cbb8c2efc"><div class="ttname"><a href="xml__parser_8cpp.html#aa3d094ae57087a6486c1120cbb8c2efc">yyxmllex_destroy</a></div><div class="ttdeci">int yyxmllex_destroy(void *)</div></div>
+<div class="ttc" id="axml__parser_8cpp_html_ac65716b3b18f426296210725dde2f8de"><div class="ttname"><a href="xml__parser_8cpp.html#ac65716b3b18f426296210725dde2f8de">yyxmlparse</a></div><div class="ttdeci">int yyxmlparse(xml_parsert &amp;, void *)</div></div>
 <div class="ttc" id="axml__parser_8h_html"><div class="ttname"><a href="xml__parser_8h.html">xml_parser.h</a></div></div>
-<div class="ttc" id="axml__parser_8h_html_a58cb763f21ee8d2ee4f9736ab59c6efa"><div class="ttname"><a href="xml__parser_8h.html#a58cb763f21ee8d2ee4f9736ab59c6efa">yyxmlparse</a></div><div class="ttdeci">int yyxmlparse()</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
