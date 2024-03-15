@@ -50,17 +50,6 @@ public:
     stack.push_back(&current().elements.back());
   }
 
-  /// Clears the parser state. May be removed in future as there should not be a
-  /// need to re-use an existing parser object.
-  void clear() override
-  {
-    parse_tree.clear();
-    // set up stack
-    stack.clear();
-    stack.push_back(&parse_tree.element);
-    parsert::clear();
-  }
-
 protected:
   static int instance_count;
 };

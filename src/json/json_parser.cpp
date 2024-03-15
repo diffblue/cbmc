@@ -41,9 +41,6 @@ bool parse_json(
   if(json_parser.stack.size()==1)
     dest.swap(json_parser.stack.top());
 
-  // save some memory
-  json_parser.clear();
-
   return result;
 }
 

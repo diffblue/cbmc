@@ -43,24 +43,6 @@ public:
 
   bool parse() override;
 
-  void clear() override
-  {
-    parsert::clear();
-    parse_tree.clear();
-
-    // scanner state
-    tag_following=false;
-    asm_block_following=false;
-    parenthesis_counter=0;
-    string_literal.clear();
-    pragma_pack.clear();
-    pragma_cprover_stack.clear();
-
-    // set up global scope
-    scopes.clear();
-    scopes.push_back(scopet());
-  }
-
   // internal state of the scanner
   bool tag_following;
   bool asm_block_following;

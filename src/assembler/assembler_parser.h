@@ -42,12 +42,6 @@ public:
   }
 
   bool parse() override;
-
-  void clear() override
-  {
-    parsert::clear();
-    instructions.clear();
-  }
 };
 
 #endif // CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H

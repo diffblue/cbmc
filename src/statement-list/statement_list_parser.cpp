@@ -352,12 +352,6 @@ bool statement_list_parsert::parse()
   return parse_fail;
 }
 
-void statement_list_parsert::clear()
-{
-  parsert::clear();
-  parse_tree.clear();
-}
-
 void statement_list_parsert::print_tree(std::ostream &out) const
 {
   output_parse_tree(out, parse_tree);
