@@ -13,7 +13,8 @@ var statement__list__parser_8cpp =
     [ "find_variables", "statement__list__parser_8cpp.html#a911b8cb2bb9c150c1dbf751992ef6dd1", null ],
     [ "find_variables", "statement__list__parser_8cpp.html#a2497cc8bf702a23c5e3330836169c4d1", null ],
     [ "find_version", "statement__list__parser_8cpp.html#a3156ff61dc10802ccd99c19ff537cffb", null ],
-    [ "yystatement_listerror", "statement__list__parser_8cpp.html#ab84ba2a5b84913b1fbf6ecd0c97311f8", null ],
-    [ "statement_list_parser", "statement__list__parser_8cpp.html#aa3717c0fc2837b4f43296ad943afcc90", null ],
-    [ "yystatement_listtext", "statement__list__parser_8cpp.html#af76569a714a187930e38aff476ecba13", null ]
+    [ "yystatement_listlex_destroy", "statement__list__parser_8cpp.html#afefab34c4716d3094a3dcfad31910a27", null ],
+    [ "yystatement_listlex_init_extra", "statement__list__parser_8cpp.html#abd5794d9a445c69b42954cd009810965", null ],
+    [ "yystatement_listparse", "statement__list__parser_8cpp.html#ad2f08084a886ff8f28dc5e7f1c58fb97", null ],
+    [ "yystatement_listset_debug", "statement__list__parser_8cpp.html#a382b45d83b2d5809782164a5b15e22ea", null ]
 ];

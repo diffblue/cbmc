@@ -90,8 +90,7 @@ $(document).ready(function(){initNavTree('statement__list__parser_8h.html',''); 
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">statement_list_parser.h File Reference</div>  </div>
 </div><!--header-->
@@ -128,49 +127,17 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a2df7b7a23a12ecb80e6266d49aa48693"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__parser_8h.html#a2df7b7a23a12ecb80e6266d49aa48693">yystatement_listparse</a> ()</td></tr>
-<tr class="memdesc:a2df7b7a23a12ecb80e6266d49aa48693"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defined in statement_list_y.tab.cpp.  <a href="statement__list__parser_8h.html#a2df7b7a23a12ecb80e6266d49aa48693">More...</a><br /></td></tr>
-<tr class="separator:a2df7b7a23a12ecb80e6266d49aa48693"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab84ba2a5b84913b1fbf6ecd0c97311f8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__parser_8h.html#ab84ba2a5b84913b1fbf6ecd0c97311f8">yystatement_listerror</a> (const std::string &amp;error)</td></tr>
-<tr class="memdesc:ab84ba2a5b84913b1fbf6ecd0c97311f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forwards any errors that are encountered during the parse process.  <a href="statement__list__parser_8h.html#ab84ba2a5b84913b1fbf6ecd0c97311f8">More...</a><br /></td></tr>
-<tr class="separator:ab84ba2a5b84913b1fbf6ecd0c97311f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee0b1be83b2c6dad534542d92196a571"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__parser_8h.html#aee0b1be83b2c6dad534542d92196a571">statement_list_scanner_init</a> ()</td></tr>
-<tr class="memdesc:aee0b1be83b2c6dad534542d92196a571"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defined in scanner.l.  <a href="statement__list__parser_8h.html#aee0b1be83b2c6dad534542d92196a571">More...</a><br /></td></tr>
-<tr class="separator:aee0b1be83b2c6dad534542d92196a571"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:aa3717c0fc2837b4f43296ad943afcc90"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstatement__list__parsert.html">statement_list_parsert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__parser_8h.html#aa3717c0fc2837b4f43296ad943afcc90">statement_list_parser</a></td></tr>
-<tr class="memdesc:aa3717c0fc2837b4f43296ad943afcc90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the parser, used by other modules.  <a href="statement__list__parser_8h.html#aa3717c0fc2837b4f43296ad943afcc90">More...</a><br /></td></tr>
-<tr class="separator:aa3717c0fc2837b4f43296ad943afcc90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a321ddc19607ab168adaccd1bcf4175fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="statement__list__parser_8h.html#a321ddc19607ab168adaccd1bcf4175fe">yystatement_listerror</a> (<a class="el" href="classstatement__list__parsert.html">statement_list_parsert</a> &amp;parser, void *scanner, const std::string &amp;error)</td></tr>
+<tr class="memdesc:a321ddc19607ab168adaccd1bcf4175fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forwards any errors that are encountered during the parse process.  <a href="statement__list__parser_8h.html#a321ddc19607ab168adaccd1bcf4175fe">More...</a><br /></td></tr>
+<tr class="separator:a321ddc19607ab168adaccd1bcf4175fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Statement List Language <a class="el" href="class_parser.html">Parser</a>. </p>
 
 <p class="definition">Definition in file <a class="el" href="statement__list__parser_8h_source.html">statement_list_parser.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aee0b1be83b2c6dad534542d92196a571"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee0b1be83b2c6dad534542d92196a571">&#9670;&nbsp;</a></span>statement_list_scanner_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void statement_list_scanner_init </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Defined in scanner.l. </p>
-<p>This function initialises the scanner by setting debug flags (if present) and its initial state. </p>
-
-</div>
-</div>
-<a id="ab84ba2a5b84913b1fbf6ecd0c97311f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab84ba2a5b84913b1fbf6ecd0c97311f8">&#9670;&nbsp;</a></span>yystatement_listerror()</h2>
+<a id="a321ddc19607ab168adaccd1bcf4175fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a321ddc19607ab168adaccd1bcf4175fe">&#9670;&nbsp;</a></span>yystatement_listerror()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -178,9 +145,25 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">int yystatement_listerror </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>error</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classstatement__list__parsert.html">statement_list_parsert</a> &amp;&#160;</td>
+          <td class="paramname"><em>parser</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>scanner</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -188,60 +171,13 @@ Variables</h2></td></tr>
 <p>Forwards any errors that are encountered during the parse process. </p>
 <p>This function gets called by the generated files of flex and bison. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramname">parser</td><td><a class="el" href="class_parser.html">Parser</a> object. </td></tr>
+    <tr><td class="paramname">scanner</td><td>Lexer state. </td></tr>
     <tr><td class="paramname">error</td><td>Error message. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Always 0. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="statement__list__parser_8cpp_source.html#l00343">343</a> of file <a class="el" href="statement__list__parser_8cpp_source.html">statement_list_parser.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a2df7b7a23a12ecb80e6266d49aa48693"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2df7b7a23a12ecb80e6266d49aa48693">&#9670;&nbsp;</a></span>yystatement_listparse()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int yystatement_listparse </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Defined in statement_list_y.tab.cpp. </p>
-<p>Main function for the parse process generated by bison, performs all necessary steps to fill the parse tree. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="aa3717c0fc2837b4f43296ad943afcc90"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3717c0fc2837b4f43296ad943afcc90">&#9670;&nbsp;</a></span>statement_list_parser</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classstatement__list__parsert.html">statement_list_parsert</a> statement_list_parser</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Instance of the parser, used by other modules. </p>
-
-<p class="definition">Definition at line <a class="el" href="statement__list__parser_8cpp_source.html#l00024">24</a> of file <a class="el" href="statement__list__parser_8cpp_source.html">statement_list_parser.cpp</a>.</p>
 
 </div>
 </div>
