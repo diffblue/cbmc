@@ -1,0 +1,9 @@
+CORE
+main.c
+--assert-to-assume
+^\[main.assertion.1\] line 8 cannot fail with assert-to-assume: SUCCESS$
+^\*\* 0 of 1 failed
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
