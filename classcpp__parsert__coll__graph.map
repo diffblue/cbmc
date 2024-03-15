@@ -1,34 +1,48 @@
 <map id="cpp_parsert" name="cpp_parsert">
-<area shape="rect" id="node1" title=" " alt="" coords="2020,120,2119,147"/>
-<area shape="rect" id="node2" href="$classparsert.html" title=" " alt="" coords="1773,407,1841,433"/>
-<area shape="rect" id="node3" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1425,660,1511,687"/>
-<area shape="rect" id="node9" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1728,620,1887,647"/>
-<area shape="rect" id="node4" href="$classmessage__handlert.html" title=" " alt="" coords="1052,601,1195,628"/>
-<area shape="rect" id="node5" title=" " alt="" coords="643,601,829,628"/>
-<area shape="rect" id="node6" title=" " alt="" coords="306,343,435,369"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1046,320,1201,347"/>
-<area shape="rect" id="node29" title=" " alt="" coords="853,85,1008,126"/>
-<area shape="rect" id="node7" title=" " alt="" coords="69,93,108,120"/>
-<area shape="rect" id="node27" title=" " alt="" coords="682,67,790,93"/>
-<area shape="rect" id="node8" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1041,783,1205,809"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1397,547,1539,573"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1032,535,1215,577"/>
-<area shape="rect" id="node12" title=" " alt="" coords="663,535,809,577"/>
-<area shape="rect" id="node13" title=" " alt="" coords="285,489,456,516"/>
-<area shape="rect" id="node19" title=" " alt="" coords="665,418,807,459"/>
-<area shape="rect" id="node14" href="$classsource__locationt.html" title=" " alt="" coords="1403,495,1533,521"/>
-<area shape="rect" id="node15" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="345,168,397,195"/>
-<area shape="rect" id="node23" href="$classexprt.html" title="Base class for all expressions." alt="" coords="708,168,764,195"/>
-<area shape="rect" id="node26" href="$classcpp__itemt.html" title=" " alt="" coords="693,5,779,32"/>
-<area shape="rect" id="node16" href="$classsharing__treet.html" title=" " alt="" coords="5,153,172,209"/>
-<area shape="rect" id="node17" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1059,833,1187,860"/>
-<area shape="rect" id="node18" title=" " alt="" coords="1249,433,1349,460"/>
-<area shape="rect" id="node20" title=" " alt="" coords="693,279,779,305"/>
-<area shape="rect" id="node31" href="$classcpp__tokent.html" title=" " alt="" coords="1077,204,1170,231"/>
-<area shape="rect" id="node21" title=" " alt="" coords="301,271,440,313"/>
-<area shape="rect" id="node24" href="$classcpp__parse__treet.html" title=" " alt="" coords="1577,40,1704,67"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1041,31,1206,57"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1383,133,1553,160"/>
-<area shape="rect" id="node28" href="$classcpp__token__buffert.html" title=" " alt="" coords="1738,120,1877,147"/>
-<area shape="rect" id="node32" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="700,219,772,245"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2763,753,2861,780"/>
+<area shape="rect" id="node2" href="$classparsert.html" title=" " alt="" coords="1939,753,2007,780"/>
+<area shape="rect" id="node33" href="$classansi__c__parsert.html" title=" " alt="" coords="2233,328,2349,355"/>
+<area shape="rect" id="node3" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1577,1083,1663,1109"/>
+<area shape="rect" id="node9" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1894,1067,2053,1093"/>
+<area shape="rect" id="node4" href="$classmessage__handlert.html" title=" " alt="" coords="1092,895,1235,921"/>
+<area shape="rect" id="node5" title=" " alt="" coords="664,895,851,921"/>
+<area shape="rect" id="node6" title=" " alt="" coords="306,801,435,828"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1086,713,1241,740"/>
+<area shape="rect" id="node29" title=" " alt="" coords="875,655,1029,697"/>
+<area shape="rect" id="node7" title=" " alt="" coords="69,299,108,325"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1109,237,1217,264"/>
+<area shape="rect" id="node39" title=" " alt="" coords="295,123,447,165"/>
+<area shape="rect" id="node43" title=" " alt="" coords="303,72,438,99"/>
+<area shape="rect" id="node8" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1081,1081,1245,1108"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1549,1157,1691,1184"/>
+<area shape="rect" id="node11" title=" " alt="" coords="1072,1183,1255,1225"/>
+<area shape="rect" id="node12" title=" " alt="" coords="685,1075,830,1117"/>
+<area shape="rect" id="node13" title=" " alt="" coords="285,1011,456,1037"/>
+<area shape="rect" id="node19" title=" " alt="" coords="687,967,828,1009"/>
+<area shape="rect" id="node14" href="$classsource__locationt.html" title=" " alt="" coords="1555,897,1685,924"/>
+<area shape="rect" id="node15" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="345,680,397,707"/>
+<area shape="rect" id="node23" href="$classexprt.html" title="Base class for all expressions." alt="" coords="729,596,785,623"/>
+<area shape="rect" id="node26" href="$classcpp__itemt.html" title=" " alt="" coords="909,783,995,809"/>
+<area shape="rect" id="node16" href="$classsharing__treet.html" title=" " alt="" coords="5,665,172,721"/>
+<area shape="rect" id="node17" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1099,1132,1227,1159"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1340,860,1440,887"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1120,372,1207,399"/>
+<area shape="rect" id="node31" href="$classcpp__tokent.html" title=" " alt="" coords="1573,492,1667,519"/>
+<area shape="rect" id="node36" href="$classansi__c__scopet.html" title=" " alt="" coords="1563,105,1677,132"/>
+<area shape="rect" id="node21" title=" " alt="" coords="688,393,827,434"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1553,379,1687,405"/>
+<area shape="rect" id="node46" href="$classansi__c__declarationt.html" title=" " alt="" coords="1089,423,1237,449"/>
+<area shape="rect" id="node24" href="$classcpp__parse__treet.html" title=" " alt="" coords="2083,832,2209,859"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1537,776,1703,803"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1888,492,2059,519"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1902,157,2045,184"/>
+<area shape="rect" id="node41" title=" " alt="" coords="1524,27,1716,69"/>
+<area shape="rect" id="node45" title=" " alt="" coords="1507,328,1733,355"/>
+<area shape="rect" id="node28" href="$classcpp__token__buffert.html" title=" " alt="" coords="2491,572,2629,599"/>
+<area shape="rect" id="node32" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="335,208,407,235"/>
+<area shape="rect" id="node37" title=" " alt="" coords="1053,154,1273,195"/>
+<area shape="rect" id="node38" href="$classansi__c__identifiert.html" title=" " alt="" coords="691,269,824,296"/>
+<area shape="rect" id="node42" title=" " alt="" coords="664,13,851,54"/>
+<area shape="rect" id="node40" title=" " alt="" coords="69,103,108,129"/>
+<area shape="rect" id="node44" href="$classansi__c__parse__treet.html" title=" " alt="" coords="1901,328,2045,355"/>
 </map>

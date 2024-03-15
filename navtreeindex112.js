@@ -1,17 +1,5 @@
 var NAVTREEINDEX112 =
 {
-"mathematical__expr_8h.html#afab452d2a0693c4ac37aab8346849a25":[9,0,2,30,123,19],
-"mathematical__expr_8h.html#afb8957c3798aff3bd9b45883124bc7c9":[9,0,2,30,123,14],
-"mathematical__expr_8h_source.html":[9,0,2,30,123],
-"mathematical__types_8cpp.html":[9,0,2,30,124],
-"mathematical__types_8cpp.html#a4dbd3512cff41a42aad30545c12268e3":[9,0,2,30,124,0],
-"mathematical__types_8cpp_source.html":[9,0,2,30,124],
-"mathematical__types_8h.html":[9,0,2,30,125],
-"mathematical__types_8h.html#a4dbd3512cff41a42aad30545c12268e3":[9,0,2,30,125,6],
-"mathematical__types_8h.html#a516c2dadf52addd013a19bc7389b3f03":[9,0,2,30,125,7],
-"mathematical__types_8h.html#a7f27524524d5789769d0efdab0f1da02":[9,0,2,30,125,8],
-"mathematical__types_8h.html#ac759df92b404d29bde2652f17994c8ad":[9,0,2,30,125,5],
-"mathematical__types_8h_source.html":[9,0,2,30,125],
 "may__alias_8cpp.html":[9,0,2,6,33],
 "may__alias_8cpp.html#a2b8c90e0feca57539e391fb46ff1e7a0":[9,0,2,6,33,4],
 "may__alias_8cpp.html#a34abad41da3fe92dbae7ab103611eb6e":[9,0,2,6,33,5],
@@ -249,5 +237,17 @@ var NAVTREEINDEX112 =
 "miniz_8cpp.html#a7a7b50a0d965d229ce14f3afa5981edd":[9,0,1,0,4,0,50],
 "miniz_8cpp.html#a7ab43238d8cd27afaf9ee668c8f6ab70":[9,0,1,0,4,0,11],
 "miniz_8cpp.html#a7ac2826eb7d5b0df83a06d43a4489f4f":[9,0,1,0,4,0,136],
-"miniz_8cpp.html#a7ac49ded3cc37713226764131602e857":[9,0,1,0,4,0,159]
+"miniz_8cpp.html#a7ac49ded3cc37713226764131602e857":[9,0,1,0,4,0,159],
+"miniz_8cpp.html#a7b85d16940dcbcb59615be2442e54f66":[9,0,1,0,4,0,156],
+"miniz_8cpp.html#a7bdc0af59e4ca6d7bd8b7d5d005ff55e":[9,0,1,0,4,0,60],
+"miniz_8cpp.html#a7dd776de8caf03a8e44e7f0329953b68":[9,0,1,0,4,0,39],
+"miniz_8cpp.html#a7e65ca89365aca18317932a5a6a53ec5":[9,0,1,0,4,0,148],
+"miniz_8cpp.html#a80eaca434d785016af778ef5c93399e8":[9,0,1,0,4,0,100],
+"miniz_8cpp.html#a84813b57c1313c2e2d94a1f62d3ab9b3":[9,0,1,0,4,0,133],
+"miniz_8cpp.html#a862e12a5b9361933538572c4692d4544":[9,0,1,0,4,0,185],
+"miniz_8cpp.html#a8b262a8e0d2b58d0d0d5523655bd07bc":[9,0,1,0,4,0,131],
+"miniz_8cpp.html#a8b4c858b16cf5ea4508ca2e38a8e2a0a":[9,0,1,0,4,0,163],
+"miniz_8cpp.html#a8b7cb38252f297265f6b850ab4ae0f01":[9,0,1,0,4,0,52],
+"miniz_8cpp.html#a8c64687454aca17948eb58730dc6f41b":[9,0,1,0,4,0,175],
+"miniz_8cpp.html#a8e6757d07832c14a6310ca0524c3f024":[9,0,1,0,4,0,158]
 };

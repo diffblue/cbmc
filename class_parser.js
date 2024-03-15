@@ -12,7 +12,7 @@ var class_parser =
       [ "tdk_specialization", "class_parser.html#a8d6c27227dca39c3d78ba4f85775c3a8a9d7226a845b010557418ce966e78b4e7", null ],
       [ "num_tdks", "class_parser.html#a8d6c27227dca39c3d78ba4f85775c3a8a81e498a86178df422bc8f8b3c756a1d9", null ]
     ] ],
-    [ "Parser", "class_parser.html#a33f3e8b6789a355cd78a4f783c6df666", null ],
+    [ "Parser", "class_parser.html#ae2e72ca93d341001b76a09ef1ca7c6b5", null ],
     [ "add_id", "class_parser.html#a9ddd54f05afd647f62dce0c2fae78ccf", null ],
     [ "add_id", "class_parser.html#a6db58627e6debeab3a19cc84aff8096e", null ],
     [ "isAllocateExpr", "class_parser.html#aafb41ef1ebb18c176007d89407f7d117", null ],
@@ -144,7 +144,8 @@ var class_parser =
     [ "current_scope", "class_parser.html#aad1a7f8a14617955335cdb7bd7ffba2c", null ],
     [ "lex", "class_parser.html#a5f60b827c61c71f01df042a656d310a1", null ],
     [ "max_errors", "class_parser.html#a9fd23e1af6aba4391f16830e34a27f5e", null ],
+    [ "message_handler", "class_parser.html#a178f28c3ef7fc0a4438e284aaa494fbb", null ],
     [ "number_of_errors", "class_parser.html#ae77c5d06f6732cc9f08da73777688529", null ],
-    [ "parser", "class_parser.html#aa918411cbd74c3a7daabd85c26c06223", null ],
+    [ "parse_tree", "class_parser.html#a5f8fc924e4d98c8228c3af6dc8421f7d", null ],
     [ "root_scope", "class_parser.html#a5ac70dde2c3ed414f6e20be3f146f7f1", null ]
 ];
