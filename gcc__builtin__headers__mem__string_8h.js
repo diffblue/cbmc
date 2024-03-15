@@ -69,6 +69,7 @@ var gcc__builtin__headers__mem__string_8h =
     [ "__builtin_ctzll", "gcc__builtin__headers__mem__string_8h.html#afeea4af201f503e70f02d3c0fb843a28", null ],
     [ "__builtin_dcgettext", "gcc__builtin__headers__mem__string_8h.html#a291f2d1fccce26b8701e34036a7c3811", null ],
     [ "__builtin_dgettext", "gcc__builtin__headers__mem__string_8h.html#a5a198eeded8f3215f7995f0bd5a5a2d8", null ],
+    [ "__builtin_dynamic_object_size", "gcc__builtin__headers__mem__string_8h.html#a5bf8235b0d8f9fe7dd9d09abea65a9c3", null ],
     [ "__builtin_extract_return_addr", "gcc__builtin__headers__mem__string_8h.html#a2b9bd9c552af7989344834df7c1e34d6", null ],
     [ "__builtin_ffs", "gcc__builtin__headers__mem__string_8h.html#a52a5526c93ac7aaaaf7b05c4c866434d", null ],
     [ "__builtin_ffsl", "gcc__builtin__headers__mem__string_8h.html#ac677d13d7923e2ea939020b312b12562", null ],
