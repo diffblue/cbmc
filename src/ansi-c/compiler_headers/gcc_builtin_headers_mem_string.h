@@ -119,6 +119,7 @@ void* __builtin_memmove(void*, const void*, __CPROVER_size_t);
 void* __builtin_mempcpy(void*, const void*, __CPROVER_size_t);
 void* __builtin_memset(void*, int, __CPROVER_size_t);
 __CPROVER_size_t __builtin_object_size(const void*, int);
+__CPROVER_size_t __builtin_dynamic_object_size(const void*, int);
 int __builtin_popcount(unsigned);
 int __builtin_popcountimax(uintmax_t);
 int __builtin_popcountll(unsigned long long int x);
