@@ -41,7 +41,7 @@ static int isatty(int) { return 0; }
 #endif
 
 // Value inside of statement_list_parser.h.
-#define PARSER statement_list_parser
+#define PARSER (*yyextra)
 
 // Sets the type of yystatement_listlval so that it can be used as the stack 
 // index.
@@ -58,22 +58,12 @@ static int isatty(int) { return 0; }
 #define loc() \
   { newstack(yystatement_listlval); \
     PARSER.set_source_location(parser_stack(yystatement_listlval)); }
-  
-#ifdef STATEMENT_LIST_DEBUG
-extern int yystatement_listdebug;
-#endif
-void statement_list_scanner_init()
-{
-#ifdef STATEMENT_LIST_DEBUG
-  yystatement_listdebug=1;
-#endif
-  YY_FLUSH_BUFFER;
-  BEGIN(0);
-}
 %}
 %option noyywrap
 %option noinput
 %option nounput
+%option reentrant
+%option extra-type="statement_list_parsert *"
 
 %x GRAMMAR
 %x TAG_NAME

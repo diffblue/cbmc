@@ -23,8 +23,17 @@
 
 #include <iterator>
 
-int yystatement_listlex();
-extern char *yystatement_listtext;
+int yystatement_listlex(void *);
+char *yystatement_listget_text(void *);
+
+int yystatement_listerror(
+  statement_list_parsert &statement_list_parser,
+  void *scanner,
+  const std::string &error)
+{
+  statement_list_parser.parse_error(error, yystatement_listget_text(scanner));
+  return 0;
+}
 
 #define YYSTYPE unsigned
 #define YYSTYPE_IS_TRIVIAL 1
@@ -43,9 +52,13 @@ extern char *yystatement_listtext;
 // Disable warning for unreachable code.
 #pragma warning(disable:4702)
 #endif
+%}
+
+%parse-param {statement_list_parsert &statement_list_parser}
+%parse-param {void *scanner}
+%lex-param {void *scanner}
 
 /*** Token declaration *******************************************************/
-%}
 
 /*** STL file structure keywords *********************************************/
 %token TOK_VERSION              "VERSION"
