@@ -3,6 +3,9 @@
 %option noinput
 %option nounistd
 %option never-interactive
+%option noyywrap
+%option reentrant
+%option extra-type="xml_parsert *"
 
 %{
 
@@ -19,7 +22,7 @@
 #include "xml_parser.h"
 #include "xml_y.tab.h"
 
-#define PARSER xml_parser
+#define PARSER (*yyextra)
 
 //static int keep;  /* To store start condition */
 
@@ -87,9 +90,5 @@ string     \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 <DTD>.            {/* skip */}
 <DTD>\]{close}    {BEGIN(INITIAL); /* skip */}
 
-.                 { yyxmlerror("unexpected character"); }
+.                 { yyxmlerror(*yyextra, yyscanner, "unexpected character"); }
 {nl}              {/* skip, must be an extra one at EOF */;}
-
-%%
-
-int yywrap() { return 1; }
