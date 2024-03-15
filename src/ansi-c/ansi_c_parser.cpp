@@ -10,7 +10,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_storage_spec.h"
 
-ansi_c_parsert ansi_c_parser;
+int yyansi_clex_init_extra(ansi_c_parsert *, void **);
+int yyansi_clex_destroy(void *);
+int yyansi_cparse(ansi_c_parsert &, void *);
+void yyansi_cset_debug(int, void *);
+
+bool ansi_c_parsert::parse()
+{
+  void *scanner;
+  yyansi_clex_init_extra(this, &scanner);
+#ifdef ANSI_C_DEBUG
+  yyansi_cset_debug(1, scanner);
+#endif
+  bool parse_fail = yyansi_cparse(*this, scanner) != 0;
+  yyansi_clex_destroy(scanner);
+  return parse_fail;
+}
 
 ansi_c_id_classt ansi_c_parsert::lookup(
   const irep_idt &base_name,
@@ -71,14 +86,6 @@ void ansi_c_parsert::add_tag_with_body(irept &tag)
     identifier.prefixed_name=prefixed_name;
     tag.set(ID_identifier, prefixed_name);
   }
-}
-
-extern char *yyansi_ctext;
-
-int yyansi_cerror(const std::string &error)
-{
-  ansi_c_parser.parse_error(error, yyansi_ctext);
-  return 0;
 }
 
 void ansi_c_parsert::add_declarator(

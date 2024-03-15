@@ -9,7 +9,7 @@
 
 #define mto(x, y) parser_stack(x).add_to_operands(std::move(parser_stack(y)))
 #define mts(x, y) (to_type_with_subtypes(stack_type(x)).move_to_subtypes(stack_type(y)))
-#define binary(x, y, l, id, z) { init(x, id); \
+#define binary(x, y, l, id, z) { init(PARSER, x, id); \
   parser_stack(x).add_source_location()=parser_stack(l).source_location(); \
   parser_stack(x).add_to_operands(std::move(parser_stack(y)), std::move(parser_stack(z))); }
 
@@ -25,7 +25,7 @@ Function: init
 
 \*******************************************************************/
 
-static void init(YYSTYPE &expr)
+static void init(ansi_c_parsert &ansi_c_parser, YYSTYPE &expr)
 {
   newstack(expr);
 }
@@ -42,7 +42,10 @@ Function: init
 
 \*******************************************************************/
 
-inline static void init(YYSTYPE &expr, const irep_idt &id)
+inline static void init(
+  ansi_c_parsert &ansi_c_parser,
+  YYSTYPE &expr,
+  const irep_idt &id)
 {
   newstack(expr);
   parser_stack(expr).id(id);
@@ -60,7 +63,10 @@ Function: set
 
 \*******************************************************************/
 
-inline static void set(YYSTYPE expr, const irep_idt &id)
+inline static void set(
+  ansi_c_parsert &ansi_c_parser,
+  YYSTYPE expr,
+  const irep_idt &id)
 {
   parser_stack(expr).id(id);
 }
@@ -77,9 +83,12 @@ Function: statement
 
 \*******************************************************************/
 
-static void statement(YYSTYPE &expr, const irep_idt &id)
+static void statement(
+  ansi_c_parsert &ansi_c_parser,
+  YYSTYPE &expr,
+  const irep_idt &id)
 {
-  set(expr, ID_code);
+  set(ansi_c_parser, expr, ID_code);
   parser_stack(expr).set(ID_statement, id);
 }
 
@@ -136,7 +145,10 @@ Function: merge_types
 \*******************************************************************/
 
 #if 0
-static void merge_types(const YYSTYPE dest, const YYSTYPE src)
+static void merge_types(
+  ansi_c_parsert &ansi_c_parser,
+  const YYSTYPE dest,
+  const YYSTYPE src)
 {
   merge_types(parser_stack(dest), parser_stack(src));
 }
@@ -154,7 +166,10 @@ Function: merge
 
 \*******************************************************************/
 
-static YYSTYPE merge(const YYSTYPE src1, const YYSTYPE src2)
+static YYSTYPE merge(
+  ansi_c_parsert &ansi_c_parser,
+  const YYSTYPE src1,
+  const YYSTYPE src2)
 {
   merge_types(parser_stack(src1), parser_stack(src2));
   return src1;
@@ -270,7 +285,10 @@ Function: make_subtype
 
 \*******************************************************************/
 
-static void make_subtype(YYSTYPE dest, YYSTYPE src)
+static void make_subtype(
+  ansi_c_parsert &ansi_c_parser,
+  YYSTYPE dest,
+  YYSTYPE src)
 {
   make_subtype(stack_type(dest), stack_type(src));
 }
@@ -287,7 +305,7 @@ Function: make_pointer
 
 \*******************************************************************/
 
-static void make_pointer(const YYSTYPE dest)
+static void make_pointer(ansi_c_parsert &ansi_c_parser, const YYSTYPE dest)
 {
   // The below deliberately avoids pointer_type().
   // The width is set during conversion.
@@ -307,10 +325,13 @@ Function: do_pointer
 
 \*******************************************************************/
 
-static void do_pointer(const YYSTYPE ptr, const YYSTYPE dest)
+static void do_pointer(
+  ansi_c_parsert &ansi_c_parser,
+  const YYSTYPE ptr,
+  const YYSTYPE dest)
 {
-  make_pointer(ptr);
-  make_subtype(dest, ptr);
+  make_pointer(ansi_c_parser, ptr);
+  make_subtype(ansi_c_parser, dest, ptr);
 }
 
 /*******************************************************************\
@@ -325,7 +346,9 @@ Function: create_function_scope
 
 \*******************************************************************/
 
-static void create_function_scope(const YYSTYPE d)
+static void create_function_scope(
+  ansi_c_parsert &ansi_c_parser,
+  const YYSTYPE d)
 {
   ansi_c_declarationt &declaration=to_ansi_c_declaration(parser_stack(d));
   ansi_c_declaratort &declarator=declaration.declarator();

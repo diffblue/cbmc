@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: CPP lexer test
+
+Author: Daniel Kroening, 2015
+
+\*******************************************************************/
+
 #include <fstream>
 #include <iostream>
 
@@ -32,6 +40,9 @@ int main(int argc, const char *argv[])
   ansi_c_parser.mode=ansi_c_parsert::GCC;
   ansi_c_parser.cpp98=true;
   ansi_c_parser.cpp11=false;
+  ansi_c_parser.ts_18661_3_Floatn_types = false;
+  ansi_c_parser.float16_type = false;
+  ansi_c_parser.bf16_type = false;
   ansi_c_parser.in=&in;
   cpp_parser.in=&in;
 

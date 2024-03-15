@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_token_buffer.h"
 
-#include <ansi-c/ansi_c_parser.h>
-
 int cpp_token_buffert::LookAhead(unsigned offset)
 {
   PRECONDITION(current_pos <= token_vector.size());
@@ -67,8 +65,8 @@ int cpp_token_buffert::LookAhead(unsigned offset, cpp_tokent &token)
   return token.kind;
 }
 
-int yyansi_clex();
-extern char *yyansi_ctext;
+int yyansi_clex(void *);
+char *yyansi_cget_text(void *);
 
 void cpp_token_buffert::read_token()
 {
@@ -78,8 +76,8 @@ void cpp_token_buffert::read_token()
   int kind;
 
   ansi_c_parser.stack.clear();
-  kind=yyansi_clex();
-  tokens.back().text=yyansi_ctext;
+  kind = yyansi_clex(ansi_c_scanner_state);
+  tokens.back().text = yyansi_cget_text(ansi_c_scanner_state);
   if(ansi_c_parser.stack.size()==1)
   {
     tokens.back().data=ansi_c_parser.stack.front();

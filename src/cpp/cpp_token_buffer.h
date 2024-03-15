@@ -12,17 +12,40 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_TOKEN_BUFFER_H
 #define CPROVER_CPP_CPP_TOKEN_BUFFER_H
 
+#include <util/config.h>
+#include <util/invariant.h>
+
+#include <ansi-c/ansi_c_parser.h>
+
 #include "cpp_token.h"
 
 #include <list>
 
-#include <util/invariant.h>
+int yyansi_clex_init_extra(ansi_c_parsert *, void **);
+int yyansi_clex_destroy(void *);
+int yyansi_cparse(ansi_c_parsert &, void *);
 
 class cpp_token_buffert
 {
 public:
-  cpp_token_buffert():current_pos(0)
+  explicit cpp_token_buffert(message_handlert &message_handler)
+    : ansi_c_parser(message_handler), current_pos(0)
   {
+    // We use the ANSI-C scanner
+    ansi_c_parser.cpp98 = true;
+    ansi_c_parser.cpp11 =
+      config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
+      config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
+      config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17;
+    ansi_c_parser.ts_18661_3_Floatn_types = false;
+    ansi_c_parser.mode = config.ansi_c.mode;
+
+    yyansi_clex_init_extra(&ansi_c_parser, &ansi_c_scanner_state);
+  }
+
+  ~cpp_token_buffert()
+  {
+    yyansi_clex_destroy(ansi_c_scanner_state);
   }
 
   typedef unsigned int post;
@@ -51,6 +74,8 @@ public:
     return tokens.back();
   }
 
+  ansi_c_parsert ansi_c_parser;
+
 protected:
   typedef std::list<cpp_tokent> tokenst;
   tokenst tokens;
@@ -58,6 +83,8 @@ protected:
   std::vector<tokenst::iterator> token_vector;
 
   post current_pos;
+
+  void *ansi_c_scanner_state;
 
   // get another token from lexer
   void read_token();

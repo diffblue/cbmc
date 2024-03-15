@@ -17,8 +17,17 @@
 
 #include "ansi_c_parser.h"
 
-int yyansi_clex();
-extern char *yyansi_ctext;
+int yyansi_clex(void *);
+char *yyansi_cget_text(void *);
+
+int yyansi_cerror(
+  ansi_c_parsert &ansi_c_parser,
+  void *scanner,
+  const std::string &error)
+{
+  ansi_c_parser.parse_error(error, yyansi_cget_text(scanner));
+  return 0;
+}
 
 #include "parser_static.inc"
 
@@ -44,9 +53,13 @@ extern char *yyansi_ctext;
 // statements have right recursion, deep nesting of statements thus
 // requires more stack space
 #define YYMAXDEPTH 25600
+%}
+
+%parse-param {ansi_c_parsert &ansi_c_parser}
+%parse-param {void *scanner}
+%lex-param {void *scanner}
 
 /*** token declaration **************************************************/
-%}
 
 /*** ANSI-C keywords ***/
 
@@ -358,7 +371,7 @@ generic_selection:
           TOK_GENERIC '(' assignment_expression ',' generic_assoc_list ')'
         {
           $$=$1;
-          set($$, ID_generic_selection);
+          set(PARSER, $$, ID_generic_selection);
           mto($$, $3);
           parser_stack($$).add(ID_generic_associations).get_sub().swap((irept::subt&)parser_stack($5).operands());
         }
@@ -367,7 +380,7 @@ generic_selection:
 generic_assoc_list:
           generic_association
         {
-          init($$); mto($$, $1);
+          init(PARSER, $$); mto($$, $1);
         }
         | generic_assoc_list ',' generic_association
         {
@@ -445,7 +458,7 @@ offsetof:
 offsetof_member_designator:
           member_name
         {
-          init($$);
+          init(PARSER, $$);
           exprt op{ID_member};
           op.add_source_location()=parser_stack($1).source_location();
           op.set(ID_component_name, parser_stack($1).get(ID_C_base_name));
@@ -454,24 +467,24 @@ offsetof_member_designator:
         | offsetof_member_designator '.' member_name
         {
           $$=$1;
-          set($2, ID_member);
+          set(PARSER, $2, ID_member);
           parser_stack($2).set(ID_component_name, parser_stack($3).get(ID_C_base_name));
           mto($$, $2);
         }
         | offsetof_member_designator '[' comma_expression ']'
         {
           $$=$1;
-          set($2, ID_index);
+          set(PARSER, $2, ID_index);
           mto($2, $3);
           mto($$, $2);
         }
         | offsetof_member_designator TOK_ARROW member_name
         {
           $$=$1;
-          set($2, ID_index);
+          set(PARSER, $2, ID_index);
           parser_stack($2).add_to_operands(convert_integer_literal("0"));
           mto($$, $2);
-          set($2, ID_member);
+          set(PARSER, $2, ID_member);
           parser_stack($2).set(ID_component_name, parser_stack($3).get(ID_C_base_name));
           mto($$, $2);
         }
@@ -481,7 +494,7 @@ quantifier_expression:
           TOK_FORALL compound_scope '{' declaration comma_expression '}'
         {
           $$=$1;
-          set($$, ID_forall);
+          set(PARSER, $$, ID_forall);
           parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($4)) } ));
           mto($$, $5);
           PARSER.pop_scope();
@@ -489,7 +502,7 @@ quantifier_expression:
         | TOK_EXISTS compound_scope '{' declaration comma_expression '}'
         {
           $$=$1;
-          set($$, ID_exists);
+          set(PARSER, $$, ID_exists);
           parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($4)) } ));
           mto($$, $5);
           PARSER.pop_scope();
@@ -503,27 +516,27 @@ cprover_contract_loop_invariant:
 
 cprover_contract_loop_invariant_list:
           cprover_contract_loop_invariant
-        { init($$); mto($$, $1); }
+        { init(PARSER, $$); mto($$, $1); }
         | cprover_contract_loop_invariant_list cprover_contract_loop_invariant
         { $$=$1; mto($$, $2); }
         ;
 
 cprover_contract_loop_invariant_list_opt:
         /* nothing */
-        { init($$); parser_stack($$).make_nil(); }
+        { init(PARSER, $$); parser_stack($$).make_nil(); }
         | cprover_contract_loop_invariant_list
         ;
 
 ACSL_binding_expression_list:
           ACSL_binding_expression
-        { init($$); mto($$, $1); }
+        { init(PARSER, $$); mto($$, $1); }
         | ACSL_binding_expression_list ',' ACSL_binding_expression
         { $$=$1; mto($$, $3); }
         ;
 
 cprover_contract_decreases_opt:
         /* nothing */
-        { init($$); parser_stack($$).make_nil(); }
+        { init(PARSER, $$); parser_stack($$).make_nil(); }
         | TOK_CPROVER_DECREASES '(' ACSL_binding_expression_list ')'
         { $$=$3; }
         ;
@@ -531,7 +544,7 @@ cprover_contract_decreases_opt:
 statement_expression: '(' compound_statement ')'
         { 
           $$=$1;
-          set($$, ID_side_effect);
+          set(PARSER, $$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_statement_expression);
           mto($$, $2);
         }
@@ -543,7 +556,7 @@ postfix_expression:
         { binary($$, $1, $2, ID_index, $3); }
         | postfix_expression '(' ')'
         { $$=$2;
-          set($$, ID_side_effect);
+          set(PARSER, $$, ID_side_effect);
           auto &side_effect = to_side_effect_expr(parser_stack($$));
           side_effect.set_statement(ID_function_call);
           side_effect.operands().resize(2);
@@ -553,7 +566,7 @@ postfix_expression:
         }
         | postfix_expression '(' argument_expression_list ')'
         { $$=$2;
-          set($$, ID_side_effect);
+          set(PARSER, $$, ID_side_effect);
           auto &side_effect = to_side_effect_expr(parser_stack($$));
           side_effect.set_statement(ID_function_call);
           side_effect.operands().resize(2);
@@ -563,25 +576,25 @@ postfix_expression:
         }
         | postfix_expression '.' member_name
         { $$=$2;
-          set($$, ID_member);
+          set(PARSER, $$, ID_member);
           mto($$, $1);
           parser_stack($$).set(ID_component_name, parser_stack($3).get(ID_C_base_name));
         }
         | postfix_expression TOK_ARROW member_name
         { $$=$2;
-          set($$, ID_ptrmember);
+          set(PARSER, $$, ID_ptrmember);
           mto($$, $1);
           parser_stack($$).set(ID_component_name, parser_stack($3).get(ID_C_base_name));
         }
         | postfix_expression TOK_INCR
         { $$=$2;
-          set($$, ID_side_effect);
+          set(PARSER, $$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_postincrement);
           mto($$, $1);
         }
         | postfix_expression TOK_DECR
         { $$=$2;
-          set($$, ID_side_effect);
+          set(PARSER, $$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_postdecrement);
           mto($$, $1);
         }
@@ -592,7 +605,7 @@ postfix_expression:
           tmp.add_source_location()=parser_stack($4).source_location();
           tmp.operands().swap(parser_stack($5).operands());
           $$=$1;
-          set($$, ID_typecast);
+          set(PARSER, $$, ID_typecast);
           parser_stack($$).add_to_operands(std::move(tmp));
           parser_stack($$).type().swap(parser_stack($2));
         }
@@ -603,7 +616,7 @@ postfix_expression:
           tmp.add_source_location()=parser_stack($4).source_location();
           tmp.operands().swap(parser_stack($5).operands());
           $$=$1;
-          set($$, ID_typecast);
+          set(PARSER, $$, ID_typecast);
           parser_stack($$).add_to_operands(std::move(tmp));
           parser_stack($$).type().swap(parser_stack($2));
         }
@@ -617,7 +630,7 @@ member_name:
 argument_expression_list:
           assignment_expression
         {
-          init($$, ID_expression_list);
+          init(PARSER, $$, ID_expression_list);
           mto($$, $1);
         }
         | argument_expression_list ',' assignment_expression
@@ -631,26 +644,26 @@ unary_expression:
           postfix_expression
         | TOK_INCR unary_expression
         { $$=$1;
-          set($$, ID_side_effect);
+          set(PARSER, $$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_preincrement);
           mto($$, $2);
         }
         | TOK_DECR unary_expression
         { $$=$1;
-          set($$, ID_side_effect);
+          set(PARSER, $$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_predecrement);
           mto($$, $2);
         }
         | '&' cast_expression
         { $$=$1;
-          set($$, ID_address_of);
+          set(PARSER, $$, ID_address_of);
           mto($$, $2);
         }
         | TOK_ANDAND gcc_local_label
         { // this takes the address of a label (a gcc extension)
           $$=$1;
           irep_idt identifier=PARSER.lookup_label(parser_stack($2).get(ID_C_base_name));
-          set($$, ID_address_of);
+          set(PARSER, $$, ID_address_of);
           parser_stack($$).operands().resize(1);
           auto &op = to_unary_expr(parser_stack($$)).op();
           op=parser_stack($2);
@@ -659,43 +672,43 @@ unary_expression:
         }
         | '*' cast_expression
         { $$=$1;
-          set($$, ID_dereference);
+          set(PARSER, $$, ID_dereference);
           mto($$, $2);
         }
         | '+' cast_expression
         { $$=$1;
-          set($$, ID_unary_plus);
+          set(PARSER, $$, ID_unary_plus);
           mto($$, $2);
         }
         | '-' cast_expression
         { $$=$1;
-          set($$, ID_unary_minus);
+          set(PARSER, $$, ID_unary_minus);
           mto($$, $2);
         }
         | '~' cast_expression
         { $$=$1;
-          set($$, ID_bitnot);
+          set(PARSER, $$, ID_bitnot);
           mto($$, $2);
         }
         | '!' cast_expression
         { $$=$1;
-          set($$, ID_not);
+          set(PARSER, $$, ID_not);
           mto($$, $2);
         }
         | TOK_SIZEOF unary_expression
         { $$=$1;
-          set($$, ID_sizeof);
+          set(PARSER, $$, ID_sizeof);
           mto($$, $2);
         }
         | TOK_SIZEOF '(' type_name ')'
         { $$=$1;
-          set($$, ID_sizeof);
+          set(PARSER, $$, ID_sizeof);
           parser_stack($$).add(ID_type_arg).swap(parser_stack($3));
         }
         | TOK_ALIGNOF unary_expression
         { // note no parentheses for expressions, just like sizeof
           $$=$1;
-          set($$, ID_alignof);
+          set(PARSER, $$, ID_alignof);
           mto($$, $2);
         }
         | TOK_ALIGNOF '(' type_name ')'
@@ -711,18 +724,18 @@ cast_expression:
         | '(' type_name ')' cast_expression
         {
           $$=$1;
-          set($$, ID_typecast);
+          set(PARSER, $$, ID_typecast);
           mto($$, $4);
           parser_stack($$).type().swap(parser_stack($2));
         }
         | TOK_REAL cast_expression
         { $$=$1;
-          set($$, ID_complex_real);
+          set(PARSER, $$, ID_complex_real);
           mto($$, $2);
         }
         | TOK_IMAG cast_expression
         { $$=$1;
-          set($$, ID_complex_imag);
+          set(PARSER, $$, ID_complex_imag);
           mto($$, $2);
         }
         ;
@@ -833,7 +846,7 @@ ACSL_binding_expression:
         | TOK_ACSL_FORALL compound_scope declaration ACSL_binding_expression
         {
           $$=$1;
-          set($$, ID_forall);
+          set(PARSER, $$, ID_forall);
           parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($3)) } ));
           mto($$, $4);
           PARSER.pop_scope();
@@ -841,7 +854,7 @@ ACSL_binding_expression:
         | TOK_ACSL_EXISTS compound_scope declaration ACSL_binding_expression
         {
           $$=$1;
-          set($$, ID_exists);
+          set(PARSER, $$, ID_exists);
           parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($3)) } ));
           mto($$, $4);
           PARSER.pop_scope();
@@ -849,7 +862,7 @@ ACSL_binding_expression:
         | TOK_ACSL_LAMBDA compound_scope declaration ACSL_binding_expression
         {
           $$=$1;
-          set($$, ID_lambda);
+          set(PARSER, $$, ID_lambda);
           parser_stack($$).add_to_operands(tuple_exprt( { std::move(parser_stack($3)) } ));
           mto($$, $4);
           PARSER.pop_scope();
@@ -912,7 +925,7 @@ constant_expression:
 
 comma_expression_opt:
         /* nothing */
-        { init($$); parser_stack($$).make_nil(); }
+        { init(PARSER, $$); parser_stack($$).make_nil(); }
         | comma_expression
         ;
 
@@ -922,13 +935,13 @@ declaration:
           declaration_specifier ';'
         {
           // type only, no declarator!
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
         }
         | type_specifier ';'
         {
           // type only, no identifier!
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
         }
         | static_assert_declaration ';'
@@ -940,7 +953,7 @@ static_assert_declaration:
           TOK_STATIC_ASSERT '(' assignment_expression ',' assignment_expression ')'
         {
           $$=$1;
-          set($$, ID_declaration);
+          set(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_static_assert(true);
           mto($$, $3);
           mto($$, $5);
@@ -950,7 +963,7 @@ static_assert_declaration:
 default_declaring_list:
           declaration_qualifier_list identifier_declarator
           {
-            init($$, ID_declaration);
+            init(PARSER, $$, ID_declaration);
             parser_stack($$).type().swap(parser_stack($1));
             PARSER.add_declarator(parser_stack($$), parser_stack($2));
           }
@@ -962,7 +975,7 @@ default_declaring_list:
         }
         | type_qualifier_list identifier_declarator
           {
-            init($$, ID_declaration);
+            init(PARSER, $$, ID_declaration);
             parser_stack($$).type().swap(parser_stack($1));
             PARSER.add_declarator(parser_stack($$), parser_stack($2));
           }
@@ -1001,7 +1014,7 @@ post_declarator_attribute:
 post_declarator_attributes:
           post_declarator_attributes post_declarator_attribute
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | post_declarator_attribute
         ;
@@ -1009,7 +1022,7 @@ post_declarator_attributes:
 post_declarator_attributes_opt:
           /* nothing */
         {
-          init($$);
+          init(PARSER, $$);
         }
         | post_declarator_attributes
         ;
@@ -1018,10 +1031,10 @@ declaring_list:
           declaration_specifier declarator
           post_declarator_attributes_opt
           {
-            $2=merge($3, $2); // type attribute
+            $2=merge(PARSER, $3, $2); // type attribute
             
             // the symbol has to be visible during initialization
-            init($$, ID_declaration);
+            init(PARSER, $$, ID_declaration);
             parser_stack($$).type().swap(parser_stack($1));
             PARSER.add_declarator(parser_stack($$), parser_stack($2));
           }
@@ -1034,10 +1047,10 @@ declaring_list:
         | type_specifier declarator
           post_declarator_attributes_opt
           {
-            $2=merge($3, $2);
+            $2=merge(PARSER, $3, $2);
             
             // the symbol has to be visible during initialization
-            init($$, ID_declaration);
+            init(PARSER, $$, ID_declaration);
             parser_stack($$).type().swap(parser_stack($1));
             PARSER.add_declarator(parser_stack($$), parser_stack($2));
           }
@@ -1054,10 +1067,10 @@ declaring_list:
           parser_stack($1).id(ID_typeof);
           parser_stack($1).copy_to_operands(parser_stack($5));
 
-          $2=merge($3, $2);
+          $2=merge(PARSER, $3, $2);
 
           // the symbol has to be visible during initialization
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
           // add the initializer
@@ -1067,8 +1080,8 @@ declaring_list:
           post_declarator_attributes_opt
           {
             // type attribute goes into declarator
-            $5=merge($5, $3);
-            $4=merge($5, $4);
+            $5=merge(PARSER, $5, $3);
+            $4=merge(PARSER, $5, $4);
             PARSER.add_declarator(parser_stack($1), parser_stack($4));
           }
           initializer_opt
@@ -1099,16 +1112,16 @@ declaration_qualifier_list:
           storage_class
         | type_qualifier_list storage_class
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | gcc_attribute_specifier
         | declaration_qualifier_list gcc_attribute_specifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | declaration_qualifier_list declaration_qualifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         ;
 
@@ -1116,14 +1129,14 @@ type_qualifier_list:
           type_qualifier
         | type_qualifier_list type_qualifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         /* The following is to allow mixing of type attributes with
            type qualifiers, but the list has to start with a
            proper type qualifier. */
         | type_qualifier_list gcc_attribute_specifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         ;
 
@@ -1131,7 +1144,7 @@ attribute_type_qualifier_list:
           attribute_or_type_qualifier
         | attribute_type_qualifier_list attribute_or_type_qualifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         ;
 
@@ -1141,14 +1154,14 @@ declaration_qualifier:
         ;
 
 type_qualifier:
-          TOK_ATOMIC_TYPE_QUALIFIER { $$=$1; set($$, ID_atomic); }
-        | TOK_CONST                 { $$=$1; set($$, ID_const); }
-        | TOK_RESTRICT              { $$=$1; set($$, ID_restrict); }
-        | TOK_VOLATILE              { $$=$1; set($$, ID_volatile); }
-        | TOK_CPROVER_ATOMIC        { $$=$1; set($$, ID_cprover_atomic); }
-        | TOK_PTR32                 { $$=$1; set($$, ID_ptr32); }
-        | TOK_PTR64                 { $$=$1; set($$, ID_ptr64); }
-        | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); mto($$, $3); }
+          TOK_ATOMIC_TYPE_QUALIFIER { $$=$1; set(PARSER, $$, ID_atomic); }
+        | TOK_CONST                 { $$=$1; set(PARSER, $$, ID_const); }
+        | TOK_RESTRICT              { $$=$1; set(PARSER, $$, ID_restrict); }
+        | TOK_VOLATILE              { $$=$1; set(PARSER, $$, ID_volatile); }
+        | TOK_CPROVER_ATOMIC        { $$=$1; set(PARSER, $$, ID_cprover_atomic); }
+        | TOK_PTR32                 { $$=$1; set(PARSER, $$, ID_ptr32); }
+        | TOK_PTR64                 { $$=$1; set(PARSER, $$, ID_ptr64); }
+        | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set(PARSER, $$, ID_msc_based); mto($$, $3); }
         | alignas_specifier
         ;
 
@@ -1180,60 +1193,60 @@ attribute_type_qualifier_storage_class_list:
           attribute_or_type_qualifier_or_storage_class
         | attribute_type_qualifier_storage_class_list attribute_or_type_qualifier_or_storage_class
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         ;
 
 basic_declaration_specifier:
           declaration_qualifier_list basic_type_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | basic_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | basic_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | basic_declaration_specifier basic_type_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
 basic_type_specifier:
           basic_type_name gcc_type_attribute_opt
         {
-          $$=merge($1, $2); // type attribute
+          $$=merge(PARSER, $1, $2); // type attribute
         }
         | type_qualifier_list basic_type_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | basic_type_specifier type_qualifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | basic_type_specifier basic_type_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | sue_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | sue_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
@@ -1241,71 +1254,71 @@ sue_type_specifier:
           elaborated_type_name
         | type_qualifier_list elaborated_type_name
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | sue_type_specifier type_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
 typedef_declaration_specifier:
           typedef_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | declaration_qualifier_list typedef_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | typedef_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
 typeof_declaration_specifier:
           typeof_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | declaration_qualifier_list typeof_specifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | typeof_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
 atomic_declaration_specifier:
           atomic_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | declaration_qualifier_list atomic_specifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | atomic_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
 typedef_type_specifier:
           typedef_name gcc_type_attribute_opt
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | type_qualifier_list typedef_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | typedef_type_specifier type_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
@@ -1326,15 +1339,15 @@ typeof_type_specifier:
           typeof_specifier
         | type_qualifier_list typeof_specifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | type_qualifier_list typeof_specifier type_qualifier_list
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | typeof_specifier type_qualifier_list
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         ;
 
@@ -1351,15 +1364,15 @@ atomic_type_specifier:
           atomic_specifier
         | type_qualifier_list atomic_specifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         | type_qualifier_list atomic_specifier type_qualifier_list
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | atomic_specifier type_qualifier_list
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         ;
 
@@ -1396,13 +1409,13 @@ msc_decl_modifier:
         {
           $$=$1; mto($$, $3); mto($$, $5); mto($$, $7); mto($$, $9);
         }
-        | ',' { init($$, ID_nil); }
+        | ',' { init(PARSER, $$, ID_nil); }
         ;
 
 msc_declspec_seq:
           msc_decl_modifier
         {
-          init($$); mto($$, $1);
+          init(PARSER, $$); mto($$, $1);
         }
         | msc_declspec_seq msc_decl_modifier
         {
@@ -1413,19 +1426,19 @@ msc_declspec_seq:
 msc_declspec:
           TOK_MSC_DECLSPEC '(' msc_declspec_seq ')'
         {
-          $$=$1; set($$, ID_msc_declspec);
+          $$=$1; set(PARSER, $$, ID_msc_declspec);
           parser_stack($$).operands().swap(parser_stack($3).operands());
         }
         | TOK_MSC_DECLSPEC '(' ')'
         {
-          $$=$1; set($$, ID_msc_declspec);
+          $$=$1; set(PARSER, $$, ID_msc_declspec);
         }
         ;
 
 msc_declspec_opt:
           /* blank */
         {
-          init($$, ID_nil);
+          init(PARSER, $$, ID_nil);
         }
         | msc_declspec_opt msc_declspec
         {
@@ -1444,85 +1457,85 @@ msc_declspec_opt:
         ;
 
 storage_class:
-          TOK_TYPEDEF      { $$=$1; set($$, ID_typedef); }
-        | TOK_EXTERN       { $$=$1; set($$, ID_extern); }
-        | TOK_STATIC       { $$=$1; set($$, ID_static); }
-        | TOK_AUTO         { $$=$1; set($$, ID_auto); }
-        | TOK_REGISTER     { $$=$1; set($$, ID_register); }
-        | TOK_INLINE       { $$=$1; set($$, ID_inline); }
-        | TOK_THREAD_LOCAL { $$=$1; set($$, ID_thread_local); }
-        | TOK_GCC_ASM      { $$=$1; set($$, ID_asm); }
+          TOK_TYPEDEF      { $$=$1; set(PARSER, $$, ID_typedef); }
+        | TOK_EXTERN       { $$=$1; set(PARSER, $$, ID_extern); }
+        | TOK_STATIC       { $$=$1; set(PARSER, $$, ID_static); }
+        | TOK_AUTO         { $$=$1; set(PARSER, $$, ID_auto); }
+        | TOK_REGISTER     { $$=$1; set(PARSER, $$, ID_register); }
+        | TOK_INLINE       { $$=$1; set(PARSER, $$, ID_inline); }
+        | TOK_THREAD_LOCAL { $$=$1; set(PARSER, $$, ID_thread_local); }
+        | TOK_GCC_ASM      { $$=$1; set(PARSER, $$, ID_asm); }
         | msc_declspec     { $$=$1; }
         | TOK_MSC_FORCEINLINE
         {
           // equivalent to always_inline, and seemingly also has the semantics
           // of extern inline in that multiple definitions can be provided in
           // the same translation unit
-          init($$);
-          set($$, ID_static);
-          set($1, ID_inline);
+          init(PARSER, $$);
+          set(PARSER, $$, ID_static);
+          set(PARSER, $1, ID_inline);
           #if 0
           // enable once always_inline support is reinstantiated
           $1=merge($1, $$);
 
-          init($$);
-          set($$, ID_always_inline);
-          $$=merge($1, $$);
+          init(PARSER, $$);
+          set(PARSER, $$, ID_always_inline);
+          $$=merge(PARSER, $1, $$);
           #else
-          $$=merge($1, $$);
+          $$=merge(PARSER, $1, $$);
           #endif
         }
         ;
 
 basic_type_name:
-          TOK_INT      { $$=$1; set($$, ID_int); }
-        | TOK_INT8     { $$=$1; set($$, ID_int8); }
-        | TOK_INT16    { $$=$1; set($$, ID_int16); }
-        | TOK_INT32    { $$=$1; set($$, ID_int32); }
-        | TOK_INT64    { $$=$1; set($$, ID_int64); }
-        | TOK_CHAR     { $$=$1; set($$, ID_char); }
-        | TOK_SHORT    { $$=$1; set($$, ID_short); }
-        | TOK_LONG     { $$=$1; set($$, ID_long); }
-        | TOK_FLOAT    { $$=$1; set($$, ID_float); }
-        | TOK_GCC_FLOAT16   { $$=$1; set($$, ID_gcc_float16); }
-        | TOK_GCC_FLOAT32   { $$=$1; set($$, ID_gcc_float32); }
-        | TOK_GCC_FLOAT32X  { $$=$1; set($$, ID_gcc_float32x); }
-        | TOK_GCC_FLOAT64   { $$=$1; set($$, ID_gcc_float64); }
-        | TOK_GCC_FLOAT64X  { $$=$1; set($$, ID_gcc_float64x); }
-        | TOK_GCC_FLOAT80   { $$=$1; set($$, ID_gcc_float80); }
-        | TOK_GCC_FLOAT128  { $$=$1; set($$, ID_gcc_float128); }
-        | TOK_GCC_FLOAT128X { $$=$1; set($$, ID_gcc_float128x); }
-        | TOK_GCC_INT128    { $$=$1; set($$, ID_gcc_int128); }
-        | TOK_GCC_DECIMAL32 { $$=$1; set($$, ID_gcc_decimal32); }
-        | TOK_GCC_DECIMAL64 { $$=$1; set($$, ID_gcc_decimal64); }
-        | TOK_GCC_DECIMAL128 { $$=$1; set($$, ID_gcc_decimal128); }
-        | TOK_DOUBLE   { $$=$1; set($$, ID_double); }
-        | TOK_SIGNED   { $$=$1; set($$, ID_signed); }
-        | TOK_UNSIGNED { $$=$1; set($$, ID_unsigned); }
-        | TOK_VOID     { $$=$1; set($$, ID_void); }
-        | TOK_BOOL     { $$=$1; set($$, ID_c_bool); }
-        | TOK_COMPLEX  { $$=$1; set($$, ID_complex); }
+          TOK_INT      { $$=$1; set(PARSER, $$, ID_int); }
+        | TOK_INT8     { $$=$1; set(PARSER, $$, ID_int8); }
+        | TOK_INT16    { $$=$1; set(PARSER, $$, ID_int16); }
+        | TOK_INT32    { $$=$1; set(PARSER, $$, ID_int32); }
+        | TOK_INT64    { $$=$1; set(PARSER, $$, ID_int64); }
+        | TOK_CHAR     { $$=$1; set(PARSER, $$, ID_char); }
+        | TOK_SHORT    { $$=$1; set(PARSER, $$, ID_short); }
+        | TOK_LONG     { $$=$1; set(PARSER, $$, ID_long); }
+        | TOK_FLOAT    { $$=$1; set(PARSER, $$, ID_float); }
+        | TOK_GCC_FLOAT16   { $$=$1; set(PARSER, $$, ID_gcc_float16); }
+        | TOK_GCC_FLOAT32   { $$=$1; set(PARSER, $$, ID_gcc_float32); }
+        | TOK_GCC_FLOAT32X  { $$=$1; set(PARSER, $$, ID_gcc_float32x); }
+        | TOK_GCC_FLOAT64   { $$=$1; set(PARSER, $$, ID_gcc_float64); }
+        | TOK_GCC_FLOAT64X  { $$=$1; set(PARSER, $$, ID_gcc_float64x); }
+        | TOK_GCC_FLOAT80   { $$=$1; set(PARSER, $$, ID_gcc_float80); }
+        | TOK_GCC_FLOAT128  { $$=$1; set(PARSER, $$, ID_gcc_float128); }
+        | TOK_GCC_FLOAT128X { $$=$1; set(PARSER, $$, ID_gcc_float128x); }
+        | TOK_GCC_INT128    { $$=$1; set(PARSER, $$, ID_gcc_int128); }
+        | TOK_GCC_DECIMAL32 { $$=$1; set(PARSER, $$, ID_gcc_decimal32); }
+        | TOK_GCC_DECIMAL64 { $$=$1; set(PARSER, $$, ID_gcc_decimal64); }
+        | TOK_GCC_DECIMAL128 { $$=$1; set(PARSER, $$, ID_gcc_decimal128); }
+        | TOK_DOUBLE   { $$=$1; set(PARSER, $$, ID_double); }
+        | TOK_SIGNED   { $$=$1; set(PARSER, $$, ID_signed); }
+        | TOK_UNSIGNED { $$=$1; set(PARSER, $$, ID_unsigned); }
+        | TOK_VOID     { $$=$1; set(PARSER, $$, ID_void); }
+        | TOK_BOOL     { $$=$1; set(PARSER, $$, ID_c_bool); }
+        | TOK_COMPLEX  { $$=$1; set(PARSER, $$, ID_complex); }
         | TOK_CPROVER_BITVECTOR '[' comma_expression ']'
         {
           $$=$1;
-          set($$, ID_custom_bv);
+          set(PARSER, $$, ID_custom_bv);
           parser_stack($$).add(ID_size).swap(parser_stack($3));
         }
         | TOK_CPROVER_FLOATBV '[' comma_expression ']' '[' comma_expression ']'
         {
           $$=$1;
-          set($$, ID_custom_floatbv);
+          set(PARSER, $$, ID_custom_floatbv);
           parser_stack($$).add(ID_size).swap(parser_stack($3));
           parser_stack($$).add(ID_f).swap(parser_stack($6));
         }
         | TOK_CPROVER_FIXEDBV '[' comma_expression ']' '[' comma_expression ']'
         {
           $$=$1;
-          set($$, ID_custom_fixedbv);
+          set(PARSER, $$, ID_custom_fixedbv);
           parser_stack($$).add(ID_size).swap(parser_stack($3));
           parser_stack($$).add(ID_f).swap(parser_stack($6));
         }
-        | TOK_CPROVER_BOOL { $$=$1; set($$, ID_proper_bool); }
+        | TOK_CPROVER_BOOL { $$=$1; set(PARSER, $$, ID_proper_bool); }
         ;
 
 elaborated_type_name:
@@ -1538,10 +1551,10 @@ array_of_construct:
 
 pragma_packed:
         {
-          init($$);
+          init(PARSER, $$);
           if(!PARSER.pragma_pack.empty() &&
              PARSER.pragma_pack.back().is_one())
-            set($$, ID_packed);
+            set(PARSER, $$, ID_packed);
         }
         ;
 
@@ -1561,7 +1574,7 @@ aggregate_name:
             (irept::subt &)parser_stack($6).operands());
 
           // throw in the gcc attributes
-          $$=merge($1, merge($2, merge($8, $9)));
+          $$=merge(PARSER, $1, merge(PARSER, $2, merge(PARSER, $8, $9)));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1581,7 +1594,7 @@ aggregate_name:
             (irept::subt &)parser_stack($7).operands());
 
           // throw in the gcc attributes
-          $$=merge($1, merge($2, merge($9, $10)));
+          $$=merge(PARSER, $1, merge(PARSER, $2, merge(PARSER, $9, $10)));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1595,57 +1608,57 @@ aggregate_name:
         {
           parser_stack($1).set(ID_components, ID_nil);
           // type attributes
-          $$=merge($1, merge($2, $6));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $6));
         }
         ;
 
 aggregate_key:
           TOK_STRUCT
-        { $$=$1; set($$, ID_struct); }
+        { $$=$1; set(PARSER, $$, ID_struct); }
         | TOK_UNION
-        { $$=$1; set($$, ID_union); }
+        { $$=$1; set(PARSER, $$, ID_union); }
         ;
 
 gcc_type_attribute:
           TOK_GCC_ATTRIBUTE_PACKED
-        { $$=$1; set($$, ID_packed); }
+        { $$=$1; set(PARSER, $$, ID_packed); }
         | TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION
-        { $$=$1; set($$, ID_transparent_union); }
+        { $$=$1; set(PARSER, $$, ID_transparent_union); }
         | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')'
-        { $$=$1; set($$, ID_frontend_vector); parser_stack($$).add(ID_size)=parser_stack($3); }
+        { $$=$1; set(PARSER, $$, ID_frontend_vector); parser_stack($$).add(ID_size)=parser_stack($3); }
         | TOK_GCC_ATTRIBUTE_ALIGNED
-        { $$=$1; set($$, ID_aligned); }
+        { $$=$1; set(PARSER, $$, ID_aligned); }
         | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')'
-        { $$=$1; set($$, ID_aligned); parser_stack($$).set(ID_size, parser_stack($3)); }
+        { $$=$1; set(PARSER, $$, ID_aligned); parser_stack($$).set(ID_size, parser_stack($3)); }
         | TOK_GCC_ATTRIBUTE_MODE '(' identifier ')'
-        { $$=$1; set($$, ID_gcc_attribute_mode); parser_stack($$).set(ID_size, parser_stack($3).get(ID_identifier)); }
+        { $$=$1; set(PARSER, $$, ID_gcc_attribute_mode); parser_stack($$).set(ID_size, parser_stack($3).get(ID_identifier)); }
         | TOK_GCC_ATTRIBUTE_GNU_INLINE
-        { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
+        { $$=$1; set(PARSER, $$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
         | TOK_GCC_ATTRIBUTE_WEAK
-        { $$=$1; set($$, ID_weak); }
+        { $$=$1; set(PARSER, $$, ID_weak); }
         | TOK_GCC_ATTRIBUTE_ALIAS '(' TOK_STRING ')'
-        { $$=$1; set($$, ID_alias); mto($$, $3); }
+        { $$=$1; set(PARSER, $$, ID_alias); mto($$, $3); }
         | TOK_GCC_ATTRIBUTE_SECTION '(' TOK_STRING ')'
-        { $$=$1; set($$, ID_section); mto($$, $3); }
+        { $$=$1; set(PARSER, $$, ID_section); mto($$, $3); }
         | TOK_GCC_ATTRIBUTE_NORETURN
-        { $$=$1; set($$, ID_noreturn); }
+        { $$=$1; set(PARSER, $$, ID_noreturn); }
         | TOK_GCC_ATTRIBUTE_CONSTRUCTOR
-        { $$=$1; set($$, ID_constructor); }
+        { $$=$1; set(PARSER, $$, ID_constructor); }
         | TOK_GCC_ATTRIBUTE_DESTRUCTOR
-        { $$=$1; set($$, ID_destructor); }
+        { $$=$1; set(PARSER, $$, ID_destructor); }
         | TOK_GCC_ATTRIBUTE_USED
-        { $$=$1; set($$, ID_used); }
+        { $$=$1; set(PARSER, $$, ID_used); }
         ;
 
 gcc_attribute:
           /* empty */
         {
-          init($$);
+          init(PARSER, $$);
         }
         | TOK_GCC_ATTRIBUTE_FALLTHROUGH
         {
           // attribute ignored
-          init($$);
+          init(PARSER, $$);
         }
         | gcc_type_attribute
         ;
@@ -1654,7 +1667,7 @@ gcc_attribute_list:
           gcc_attribute
         | gcc_attribute_list ',' gcc_attribute
         {
-          $$=merge($1, $3);
+          $$=merge(PARSER, $1, $3);
         }
         ;          
 
@@ -1662,13 +1675,13 @@ gcc_attribute_specifier:
           TOK_GCC_ATTRIBUTE '(' '(' gcc_attribute_list ')' ')'
         { $$=$4; }
         | TOK_NORETURN
-        { $$=$1; set($$, ID_noreturn); }
+        { $$=$1; set(PARSER, $$, ID_noreturn); }
         ;
 
 gcc_type_attribute_opt:
           /* empty */
         {
-          init($$);
+          init(PARSER, $$);
         }
         | gcc_type_attribute_list
         ;
@@ -1677,14 +1690,14 @@ gcc_type_attribute_list:
           gcc_attribute_specifier
         | gcc_type_attribute_list gcc_attribute_specifier
         {
-          $$=merge($1, $2);
+          $$=merge(PARSER, $1, $2);
         }
         ;
 
 member_declaration_list_opt:
                   /* Nothing */
         {
-          init($$, ID_declaration_list);
+          init(PARSER, $$, ID_declaration_list);
         }
         | member_declaration_list
         ;
@@ -1692,7 +1705,7 @@ member_declaration_list_opt:
 member_declaration_list:
           member_declaration
         {
-          init($$, ID_declaration_list);
+          init(PARSER, $$, ID_declaration_list);
           mto($$, $1);
         }
         | member_declaration_list member_declaration
@@ -1721,9 +1734,9 @@ member_default_declaring_list:
           type_qualifier_list
           member_identifier_declarator
         {
-          $2=merge($2, $1);
+          $2=merge(PARSER, $2, $1);
 
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_member(true);
           parser_stack($$).add_source_location()=parser_stack($2).source_location();
           parser_stack($$).type().swap(parser_stack($2));
@@ -1749,19 +1762,19 @@ member_declaring_list:
             // communicate #pragma pack(n) alignment constraints by
             // by both setting packing AND alignment for individual struct/union
             // members; see padding.cpp for more details
-            init($$);
-            set($$, ID_packed);
-            $2=merge($2, $$);
+            init(PARSER, $$);
+            set(PARSER, $$, ID_packed);
+            $2=merge(PARSER, $2, $$);
 
-            init($$);
-            set($$, ID_aligned);
+            init(PARSER, $$);
+            set(PARSER, $$, ID_aligned);
             parser_stack($$).set(ID_size, PARSER.pragma_pack.back());
-            $2=merge($2, $$);
+            $2=merge(PARSER, $2, $$);
           }
 
-          $2=merge($2, $1);
+          $2=merge(PARSER, $2, $1);
 
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_member(true);
           parser_stack($$).add_source_location()=parser_stack($2).source_location();
           parser_stack($$).type().swap(parser_stack($2));
@@ -1780,14 +1793,14 @@ member_declarator:
           $$=$1;
 
           if(parser_stack($2).is_not_nil())
-            make_subtype($$, $2);
+            make_subtype(PARSER, $$, $2);
 
           if(parser_stack($3).is_not_nil()) // type attribute
-            $$=merge($3, $$);
+            $$=merge(PARSER, $3, $$);
         }
         | /* empty */
         {
-          init($$, ID_abstract);
+          init(PARSER, $$, ID_abstract);
         }
         | bit_field_size gcc_type_attribute_opt
         {
@@ -1795,7 +1808,7 @@ member_declarator:
           stack_type($$).add_subtype()=typet(ID_abstract);
 
           if(parser_stack($2).is_not_nil()) // type attribute
-            $$=merge($2, $$);
+            $$=merge(PARSER, $2, $$);
         }
         ;
 
@@ -1804,10 +1817,10 @@ member_identifier_declarator:
         {
           $$=$1;
           if(parser_stack($2).is_not_nil())
-            make_subtype($$, $2);
+            make_subtype(PARSER, $$, $2);
           
           if(parser_stack($3).is_not_nil()) // type attribute
-            $$=merge($3, $$);
+            $$=merge(PARSER, $3, $$);
         }
         | bit_field_size gcc_type_attribute_opt
         {
@@ -1815,14 +1828,14 @@ member_identifier_declarator:
           stack_type($$).add_subtype()=typet(ID_abstract);
 
           if(parser_stack($2).is_not_nil()) // type attribute
-            $$=merge($2, $$);
+            $$=merge(PARSER, $2, $$);
         }
         ;
 
 bit_field_size_opt:
         /* nothing */
         {
-          init($$, ID_nil);
+          init(PARSER, $$, ID_nil);
         }
         | bit_field_size
         ;
@@ -1831,7 +1844,7 @@ bit_field_size:
         ':' constant_expression
         {
           $$=$1;
-          set($$, ID_c_bit_field);
+          set(PARSER, $$, ID_c_bit_field);
           stack_type($$).set(ID_size, parser_stack($2));
           stack_type($$).add_subtype().id(ID_abstract);
         }
@@ -1852,7 +1865,7 @@ enum_name:
           gcc_type_attribute_opt
         {
           parser_stack($1).operands().swap(parser_stack($6).operands());
-          $$=merge($1, merge($2, $8)); // throw in the gcc attributes
+          $$=merge(PARSER, $1, merge(PARSER, $2, $8)); // throw in the gcc attributes
         }
         | enum_key
           gcc_type_attribute_opt
@@ -1879,7 +1892,7 @@ enum_name:
             parser_stack($1).id(ID_c_enum_tag);
           }
 
-          $$=merge($1, merge($2, $7)); // throw in the gcc attributes
+          $$=merge(PARSER, $1, merge(PARSER, $2, $7)); // throw in the gcc attributes
         }
         ;
 
@@ -1887,7 +1900,7 @@ basic_type_name_list:
     basic_type_name
   | basic_type_name_list basic_type_name
   {
-    $$ = merge($1, $2);
+    $$ = merge(PARSER, $1, $2);
   }
 
 enum_underlying_type:
@@ -1897,7 +1910,7 @@ enum_underlying_type:
 enum_underlying_type_opt:
         /* empty */
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).make_nil();
         }
         | ':' enum_underlying_type
@@ -1908,7 +1921,7 @@ enum_underlying_type_opt:
 braced_enumerator_list_opt:
         /* empty */
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).make_nil();
         }
         | '{' enumerator_list_opt '}'
@@ -1919,14 +1932,14 @@ braced_enumerator_list_opt:
 enum_key: TOK_ENUM
         {
           $$=$1;
-          set($$, ID_c_enum);
+          set(PARSER, $$, ID_c_enum);
         }
         ;
 
 enumerator_list_opt:
           /* nothing */
         {
-          init($$, ID_declaration_list);
+          init(PARSER, $$, ID_declaration_list);
         }
         | enumerator_list
         ;
@@ -1934,7 +1947,7 @@ enumerator_list_opt:
 enumerator_list:
           enumerator_declaration
         {
-          init($$, ID_declaration_list);
+          init(PARSER, $$, ID_declaration_list);
           mto($$, $1);
         }
         | enumerator_list ',' enumerator_declaration
@@ -1951,7 +1964,7 @@ enumerator_list:
 enumerator_declaration:
           identifier_or_typedef_name gcc_type_attribute_opt enumerator_value_opt
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_enum_constant(true);
           PARSER.add_declarator(parser_stack($$), parser_stack($1));
           to_ansi_c_declaration(parser_stack($$)).add_initializer(parser_stack($3));
@@ -1961,7 +1974,7 @@ enumerator_declaration:
 enumerator_value_opt:
         /* nothing */
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).make_nil();
         }
         | '=' constant_expression
@@ -1983,7 +1996,7 @@ parameter_type_list:
 KnR_parameter_list:
           KnR_parameter
         {
-          init($$, ID_parameters);
+          init(PARSER, $$, ID_parameters);
           mts($$, $1);
         }
         | KnR_parameter_list ',' KnR_parameter
@@ -1995,7 +2008,7 @@ KnR_parameter_list:
 
 KnR_parameter: identifier
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type()=typet(ID_KnR);
           PARSER.add_declarator(parser_stack($$), parser_stack($1));
         }
@@ -2004,7 +2017,7 @@ KnR_parameter: identifier
 parameter_list:
           parameter_declaration
         {
-          init($$, ID_parameters);
+          init(PARSER, $$, ID_parameters);
           mts($$, $1);
         }
         | parameter_list ',' parameter_declaration
@@ -2017,7 +2030,7 @@ parameter_list:
 parameter_declaration:
           declaration_specifier
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           exprt declarator=exprt(ID_abstract);
@@ -2025,15 +2038,15 @@ parameter_declaration:
         }
         | declaration_specifier parameter_abstract_declarator
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
         | declaration_specifier identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($3, $2); // type attribute to go into declarator
-          init($$, ID_declaration);
+          $2=merge(PARSER, $3, $2); // type attribute to go into declarator
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
@@ -2042,14 +2055,14 @@ parameter_declaration:
         {
           // the second tree is really the declarator -- not part
           // of the type!
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
         | declaration_qualifier_list
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           exprt declarator=exprt(ID_abstract);
@@ -2057,22 +2070,22 @@ parameter_declaration:
         }
         | declaration_qualifier_list parameter_abstract_declarator
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
         | declaration_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($3, $2); // type attribute to go into declarator
-          init($$, ID_declaration);
+          $2=merge(PARSER, $3, $2); // type attribute to go into declarator
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
         | type_specifier
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           exprt declarator=exprt(ID_abstract);
@@ -2080,15 +2093,15 @@ parameter_declaration:
         }
         | type_specifier parameter_abstract_declarator
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
         | type_specifier identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($3, $2); // type attribute to go into declarator
-          init($$, ID_declaration);
+          $2=merge(PARSER, $3, $2); // type attribute to go into declarator
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
@@ -2096,14 +2109,14 @@ parameter_declaration:
         | type_specifier parameter_typedef_declarator
         {
           // the second tree is really the declarator -- not part of the type!
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
         | type_qualifier_list
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           exprt declarator=exprt(ID_abstract);
@@ -2111,15 +2124,15 @@ parameter_declaration:
         }
         | type_qualifier_list parameter_abstract_declarator
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
         | type_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($3, $2); // type attribute to go into declarator
-          init($$, ID_declaration);
+          $2=merge(PARSER, $3, $2); // type attribute to go into declarator
+          init(PARSER, $$, ID_declaration);
           to_ansi_c_declaration(parser_stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(parser_stack($$)).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
@@ -2134,28 +2147,28 @@ identifier_or_typedef_name:
 type_name:
           gcc_type_attribute_opt type_specifier
         {
-          $$=merge($2, $1);
+          $$=merge(PARSER, $2, $1);
         }
         | gcc_type_attribute_opt type_specifier abstract_declarator
         {
-          $$=merge($2, $1);
-          make_subtype($$, $3);
+          $$=merge(PARSER, $2, $1);
+          make_subtype(PARSER, $$, $3);
         }
         | gcc_type_attribute_opt type_qualifier_list
         {
-          $$=merge($2, $1);
+          $$=merge(PARSER, $2, $1);
         }
         | gcc_type_attribute_opt type_qualifier_list abstract_declarator
         {
-          $$=merge($2, $1);
-          make_subtype($$, $3);
+          $$=merge(PARSER, $2, $1);
+          make_subtype(PARSER, $$, $3);
         }
         ;
 
 initializer_opt:
         /* nothing */
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).make_nil();
         }
         | '=' initializer
@@ -2172,13 +2185,13 @@ initializer:
         | '{' initializer_list_opt '}'
         {
           $$=$1;
-          set($$, ID_initializer_list);
+          set(PARSER, $$, ID_initializer_list);
           parser_stack($$).operands().swap(parser_stack($2).operands());
         }
         | '{' initializer_list ',' '}'
         {
           $$=$1;
-          set($$, ID_initializer_list);
+          set(PARSER, $$, ID_initializer_list);
           parser_stack($$).operands().swap(parser_stack($2).operands());
         }
         ;
@@ -2203,8 +2216,8 @@ initializer_list_opt:
           initializer_list
         | /* nothing */
         {
-          init($$);
-          set($$, ID_initializer_list);
+          init(PARSER, $$);
+          set(PARSER, $$, ID_initializer_list);
           parser_stack($$).operands().clear();
         }
         ;
@@ -2221,7 +2234,7 @@ designated_initializer:
         /* the following two are obsolete GCC extensions */
         | designator initializer
         {
-          init($$, ID_designated_initializer);
+          init(PARSER, $$, ID_designated_initializer);
           parser_stack($$).add(ID_designator).swap(parser_stack($1));
           mto($$, $2);
         }
@@ -2242,14 +2255,14 @@ designated_initializer:
 designator:
           '.' member_name
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($1).id(ID_member);
           parser_stack($1).set(ID_component_name, parser_stack($2).get(ID_C_base_name));
           mto($$, $1);
         }
         | '[' comma_expression ']'
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($1).id(ID_index);
           mto($1, $2);
           mto($$, $1);
@@ -2257,7 +2270,7 @@ designator:
         | '[' comma_expression TOK_ELLIPSIS comma_expression ']'
         {
           // TODO
-          init($$);
+          init(PARSER, $$);
           parser_stack($1).id(ID_index);
           mto($1, $2);
           mto($$, $1);
@@ -2311,8 +2324,8 @@ stmt_not_decl_or_attr:
 declaration_statement:
           declaration
         {
-          init($$);
-          statement($$, ID_decl);
+          init(PARSER, $$);
+          statement(PARSER, $$, ID_decl);
           mto($$, $1);
         }
         ;
@@ -2320,7 +2333,7 @@ declaration_statement:
 gcc_attribute_specifier_opt:
           /* empty */
         {
-          init($$);
+          init(PARSER, $$);
         }
         | gcc_attribute_specifier
         ;
@@ -2335,7 +2348,7 @@ labeled_statement:
         {
           // we ignore the GCC attribute
           $$=$2;
-          statement($$, ID_label);
+          statement(PARSER, $$, ID_label);
           irep_idt identifier=PARSER.lookup_label(parser_stack($1).get(ID_C_base_name));
           parser_stack($$).set(ID_label, identifier);
           mto($$, $4);
@@ -2343,7 +2356,7 @@ labeled_statement:
         | msc_label_identifier ':' statement
         {
           $$=$2;
-          statement($$, ID_label);
+          statement(PARSER, $$, ID_label);
           irep_idt identifier=PARSER.lookup_label(parser_stack($1).get(ID_C_base_name));
           parser_stack($$).set(ID_label, identifier);
           mto($$, $3);
@@ -2351,7 +2364,7 @@ labeled_statement:
         | TOK_CASE constant_expression ':' statement
         {
           $$=$1;
-          statement($$, ID_switch_case);
+          statement(PARSER, $$, ID_switch_case);
           mto($$, $2);
           mto($$, $4);
         }
@@ -2359,7 +2372,7 @@ labeled_statement:
         {
           // this is a GCC extension
           $$=$1;
-          statement($$, ID_gcc_switch_case_range);
+          statement(PARSER, $$, ID_gcc_switch_case_range);
           mto($$, $2);
           mto($$, $4);
           mto($$, $6);
@@ -2367,7 +2380,7 @@ labeled_statement:
         | TOK_DEFAULT ':' statement
         {
           $$=$1;
-          statement($$, ID_switch_case);
+          statement(PARSER, $$, ID_switch_case);
           parser_stack($$).operands().push_back(nil_exprt());
           mto($$, $3);
           parser_stack($$).set(ID_default, true);
@@ -2382,7 +2395,7 @@ statement_attribute:
           // https://gcc.gnu.org/onlinedocs/gcc/Label-Attributes.html
           // We ignore all such attributes.
           $$=$1;
-          statement($$, ID_skip);
+          statement(PARSER, $$, ID_skip);
         }
         ;
 
@@ -2390,14 +2403,14 @@ compound_statement:
           compound_scope '{' '}'
         {
           $$=$2;
-          statement($$, ID_block);
+          statement(PARSER, $$, ID_block);
           parser_stack($$).set(ID_C_end_location, parser_stack($3).source_location());
           PARSER.pop_scope();
         }
         | compound_scope '{' statement_list '}'
         {
           $$=$2;
-          statement($$, ID_block);
+          statement(PARSER, $$, ID_block);
           parser_stack($$).set(ID_C_end_location, parser_stack($4).source_location());
           parser_stack($$).operands().swap(parser_stack($3).operands());
           PARSER.pop_scope();
@@ -2405,7 +2418,7 @@ compound_statement:
         | compound_scope '{' TOK_ASM_STRING '}'
         {
           $$=$2;
-          statement($$, ID_asm);
+          statement(PARSER, $$, ID_asm);
           parser_stack($$).set(ID_C_end_location, parser_stack($4).source_location());
           mto($$, $3);
           PARSER.pop_scope();
@@ -2423,7 +2436,7 @@ compound_scope:
 statement_list:
           statement
         {
-          init($$);
+          init(PARSER, $$);
           mto($$, $1);
         }
         | statement_list statement
@@ -2438,10 +2451,10 @@ expression_statement:
           $$=$2;
 
           if(parser_stack($1).is_nil())
-            statement($$, ID_skip);
+            statement(PARSER, $$, ID_skip);
           else
           {
-            statement($$, ID_expression);
+            statement(PARSER, $$, ID_expression);
             mto($$, $1);
           }
         }
@@ -2451,21 +2464,21 @@ selection_statement:
           TOK_IF '(' comma_expression ')' statement
         {
           $$=$1;
-          statement($$, ID_ifthenelse);
+          statement(PARSER, $$, ID_ifthenelse);
           parser_stack($$).add_to_operands(
             std::move(parser_stack($3)), std::move(parser_stack($5)), nil_exprt());
         }
         | TOK_IF '(' comma_expression ')' statement TOK_ELSE statement
         {
           $$=$1;
-          statement($$, ID_ifthenelse);
+          statement(PARSER, $$, ID_ifthenelse);
           parser_stack($$).add_to_operands(
             std::move(parser_stack($3)), std::move(parser_stack($5)), std::move(parser_stack($7)));
         }
         | TOK_SWITCH '(' comma_expression ')' statement
         {
           $$=$1;
-          statement($$, ID_switch);
+          statement(PARSER, $$, ID_switch);
           parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($5)));
         }
         ;
@@ -2483,7 +2496,7 @@ iteration_statement:
           statement
         {
           $$=$1;
-          statement($$, ID_while);
+          statement(PARSER, $$, ID_while);
           parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($8)));
 
           if(!parser_stack($5).operands().empty())
@@ -2503,7 +2516,7 @@ iteration_statement:
           TOK_WHILE '(' comma_expression ')' ';'
         {
           $$=$1;
-          statement($$, ID_dowhile);
+          statement(PARSER, $$, ID_dowhile);
           parser_stack($$).add_to_operands(std::move(parser_stack($8)), std::move(parser_stack($5)));
 
           if(!parser_stack($2).operands().empty())
@@ -2533,7 +2546,7 @@ iteration_statement:
           statement
         {
           $$=$1;
-          statement($$, ID_for);
+          statement(PARSER, $$, ID_for);
           parser_stack($$).operands().reserve(4);
           mto($$, $4);
           mto($$, $5);
@@ -2560,7 +2573,7 @@ jump_statement:
           $$=$1;
           if(parser_stack($2).id()==ID_symbol)
           {
-            statement($$, ID_goto);
+            statement(PARSER, $$, ID_goto);
             irep_idt identifier=PARSER.lookup_label(parser_stack($2).get(ID_C_base_name));
             parser_stack($$).set(ID_destination, identifier);
           }
@@ -2568,36 +2581,36 @@ jump_statement:
           {
             // this is a gcc extension.
             // the original grammar uses identifier_or_typedef_name
-            statement($$, ID_gcc_computed_goto);
+            statement(PARSER, $$, ID_gcc_computed_goto);
             mto($$, $2);
           }
         }
         | TOK_GOTO typedef_name ';'
         {
           $$=$1;
-          statement($$, ID_goto);
+          statement(PARSER, $$, ID_goto);
           irep_idt identifier=PARSER.lookup_label(parser_stack($2).get(ID_C_base_name));
           parser_stack($$).set(ID_destination, identifier);
         }
         | TOK_CONTINUE ';'
-        { $$=$1; statement($$, ID_continue); }
+        { $$=$1; statement(PARSER, $$, ID_continue); }
         | TOK_BREAK ';'
-        { $$=$1; statement($$, ID_break); }
+        { $$=$1; statement(PARSER, $$, ID_break); }
         | TOK_RETURN ';'
         {
           $$=$1;
-          statement($$, ID_return);
+          statement(PARSER, $$, ID_return);
           parser_stack($$).operands().push_back(nil_exprt());
         }
         | TOK_RETURN comma_expression ';'
-        { $$=$1; statement($$, ID_return); mto($$, $2); }
+        { $$=$1; statement(PARSER, $$, ID_return); mto($$, $2); }
         ;
 
 gcc_local_label_statement:
           TOK_GCC_LABEL gcc_local_label_list ';'
         { 
           $$=$1;
-          statement($$, ID_gcc_local_label);
+          statement(PARSER, $$, ID_gcc_local_label);
           
           // put these into the scope
           for(const auto &op : as_const(parser_stack($2)).operands())
@@ -2618,7 +2631,7 @@ gcc_local_label_statement:
 gcc_local_label_list:
           gcc_local_label
         {
-          init($$);
+          init(PARSER, $$);
           mto($$, $1);
         }
         | gcc_local_label_list ',' gcc_local_label
@@ -2634,14 +2647,14 @@ gcc_local_label: identifier_or_typedef_name
 gcc_asm_statement:
           TOK_GCC_ASM_PAREN volatile_or_goto_opt '(' gcc_asm_commands ')' ';'
         { $$=$1;
-          statement($$, ID_asm);
+          statement(PARSER, $$, ID_asm);
           parser_stack($$).set(ID_flavor, ID_gcc);
           parser_stack($$).operands().swap(parser_stack($4).operands());
         }
         | TOK_GCC_ASM_PAREN volatile_or_goto_opt '{' TOK_ASM_STRING '}'
         {
           $$=$1;
-          statement($$, ID_asm);
+          statement(PARSER, $$, ID_asm);
           parser_stack($$).set(ID_flavor, ID_gcc);
           parser_stack($$).operands().resize(5);
           to_multi_ary_expr(parser_stack($$)).op0()=parser_stack($4);
@@ -2651,13 +2664,13 @@ gcc_asm_statement:
 msc_asm_statement:
           TOK_MSC_ASM '{' TOK_ASM_STRING '}'
         { $$=$1;
-          statement($$, ID_asm);
+          statement(PARSER, $$, ID_asm);
           parser_stack($$).set(ID_flavor, ID_msc);
           mto($$, $3);
         }
         | TOK_MSC_ASM TOK_ASM_STRING
         { $$=$1;
-          statement($$, ID_asm);
+          statement(PARSER, $$, ID_asm);
           parser_stack($$).set(ID_flavor, ID_msc);
           mto($$, $2);
         }
@@ -2668,7 +2681,7 @@ msc_seh_statement:
           TOK_MSC_EXCEPT '(' comma_expression ')' compound_statement
         {
           $$=$1;
-          statement($$, ID_msc_try_except);
+          statement(PARSER, $$, ID_msc_try_except);
           mto($$, $2);
           mto($$, $5);
           mto($$, $7);
@@ -2677,14 +2690,14 @@ msc_seh_statement:
           TOK_MSC_FINALLY compound_statement
         {
           $$=$1;
-          statement($$, ID_msc_try_finally);
+          statement(PARSER, $$, ID_msc_try_finally);
           mto($$, $2);
           mto($$, $4);
         }
         | TOK_MSC_LEAVE
         {
           $$=$1;
-          statement($$, ID_msc_leave);
+          statement(PARSER, $$, ID_msc_leave);
         }
         ;
 
@@ -2692,13 +2705,13 @@ cprover_exception_statement:
           TOK_CPROVER_THROW ';'
         {
           $$=$1;
-          statement($$, ID_CPROVER_throw);
+          statement(PARSER, $$, ID_CPROVER_throw);
         }
         | TOK_CPROVER_TRY compound_statement
           TOK_CPROVER_CATCH compound_statement
         {
           $$=$1;
-          statement($$, ID_CPROVER_try_catch);
+          statement(PARSER, $$, ID_CPROVER_try_catch);
           mto($$, $2);
           mto($$, $4);
         }
@@ -2706,7 +2719,7 @@ cprover_exception_statement:
           TOK_CPROVER_FINALLY compound_statement
         {
           $$=$1;
-          statement($$, ID_CPROVER_try_finally);
+          statement(PARSER, $$, ID_CPROVER_try_finally);
           mto($$, $2);
           mto($$, $4);
         }
@@ -2730,20 +2743,20 @@ volatile_or_goto_opt:
 gcc_asm_commands:
           gcc_asm_assembler_template
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).operands().resize(5);
           parser_stack($$).operands()[0]=parser_stack($1);
         }
         | gcc_asm_assembler_template gcc_asm_outputs
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).operands().resize(5);
           parser_stack($$).operands()[0]=parser_stack($1);
           parser_stack($$).operands()[1]=parser_stack($2);
         }
         | gcc_asm_assembler_template gcc_asm_outputs gcc_asm_inputs
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).operands().resize(5);
           parser_stack($$).operands()[0]=parser_stack($1);
           parser_stack($$).operands()[1]=parser_stack($2);
@@ -2751,7 +2764,7 @@ gcc_asm_commands:
         }
         | gcc_asm_assembler_template gcc_asm_outputs gcc_asm_inputs gcc_asm_clobbered_registers
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).operands().resize(5);
           parser_stack($$).operands()[0]=parser_stack($1);
           parser_stack($$).operands()[1]=parser_stack($2);
@@ -2760,7 +2773,7 @@ gcc_asm_commands:
         }
         | gcc_asm_assembler_template gcc_asm_outputs gcc_asm_inputs gcc_asm_clobbered_registers gcc_asm_labels
         {
-          init($$);
+          init(PARSER, $$);
           parser_stack($$).operands().resize(5);
           parser_stack($$).operands()[0]=parser_stack($1);
           parser_stack($$).operands()[1]=parser_stack($2);
@@ -2800,7 +2813,7 @@ gcc_asm_output:
 gcc_asm_output_list:
           gcc_asm_output
         {
-          init($$, irep_idt());
+          init(PARSER, $$, irep_idt());
           mto($$, $1);
         }
         | gcc_asm_output_list ',' gcc_asm_output
@@ -2837,7 +2850,7 @@ gcc_asm_input:
 gcc_asm_input_list:
           gcc_asm_input
         {
-          init($$, irep_idt());
+          init(PARSER, $$, irep_idt());
           mto($$, $1);
         }
         | gcc_asm_input_list ',' gcc_asm_input
@@ -2858,7 +2871,7 @@ gcc_asm_clobbered_registers:
 gcc_asm_clobbered_register:
           string
         {
-          init($$, ID_gcc_asm_clobbered_register);
+          init(PARSER, $$, ID_gcc_asm_clobbered_register);
           mto($$, $1);
         }
         ;
@@ -2866,7 +2879,7 @@ gcc_asm_clobbered_register:
 gcc_asm_clobbered_registers_list:
           gcc_asm_clobbered_register
         {
-          init($$, irep_idt());
+          init(PARSER, $$, irep_idt());
           mto($$, $1);
         }
         | gcc_asm_clobbered_registers_list ',' gcc_asm_clobbered_register
@@ -2887,7 +2900,7 @@ gcc_asm_labels:
 gcc_asm_labels_list:
           gcc_asm_label
         {
-          init($$);
+          init(PARSER, $$);
           mto($$, $1);
         }
         | gcc_asm_labels_list ',' gcc_asm_label
@@ -2971,7 +2984,7 @@ function_body:
 KnR_parameter_header_opt:
           /* empty */
         {
-          init($$);
+          init(PARSER, $$);
         }
         | KnR_parameter_header
         ;
@@ -2979,7 +2992,7 @@ KnR_parameter_header_opt:
 KnR_parameter_header:
           KnR_parameter_declaration
         {
-          init($$, ID_decl_block);
+          init(PARSER, $$, ID_decl_block);
           mto($$, $1);
         }
         | KnR_parameter_header KnR_parameter_declaration
@@ -2998,30 +3011,30 @@ KnR_declaration_qualifier_list:
           storage_class
         | type_qualifier storage_class
         {
-          $$=merge($2, $1);
+          $$=merge(PARSER, $2, $1);
         }
         | KnR_declaration_qualifier_list declaration_qualifier
         {
-          $$=merge($2, $1);
+          $$=merge(PARSER, $2, $1);
         }
         ;
 
 KnR_basic_declaration_specifier:
           KnR_declaration_qualifier_list basic_type_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | basic_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | KnR_basic_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | KnR_basic_declaration_specifier basic_type_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
@@ -3029,15 +3042,15 @@ KnR_basic_declaration_specifier:
 KnR_typedef_declaration_specifier:
           typedef_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | KnR_declaration_qualifier_list typedef_name gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         | KnR_typedef_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, merge($2, $3));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $3));
         }
         ;
 
@@ -3046,13 +3059,13 @@ KnR_sue_declaration_specifier:
         KnR_declaration_qualifier_list aggregate_key identifier_or_typedef_name gcc_type_attribute_opt
         {
           parser_stack($2).set(ID_tag, parser_stack($3));
-          $$=merge($1, merge($2, $4));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $4));
         }
         | KnR_declaration_qualifier_list enum_key identifier_or_typedef_name gcc_type_attribute_opt
         {
           parser_stack($2).id(ID_c_enum_tag);
           parser_stack($2).set(ID_tag, parser_stack($3));
-          $$=merge($1, merge($2, $4));
+          $$=merge(PARSER, $1, merge(PARSER, $2, $4));
         }
         ;
 
@@ -3066,13 +3079,13 @@ KnR_declaration_specifier:
 KnR_parameter_declaring_list:
           KnR_declaration_specifier declarator
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
         | type_specifier declarator
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
         }
@@ -3086,41 +3099,41 @@ KnR_parameter_declaring_list:
 function_head:
           identifier_declarator /* no return type given */
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           irept return_type(ID_int);
           parser_stack($$).type().swap(return_type);
           PARSER.add_declarator(parser_stack($$), parser_stack($1));
-          create_function_scope($$);
+          create_function_scope(PARSER, $$);
         }
         | declaration_specifier declarator post_declarator_attributes_opt
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
-          $2=merge($3, $2);
+          $2=merge(PARSER, $3, $2);
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
-          create_function_scope($$);
+          create_function_scope(PARSER, $$);
         }
         | type_specifier declarator post_declarator_attributes_opt
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
-          $2=merge($3, $2);
+          $2=merge(PARSER, $3, $2);
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
-          create_function_scope($$);
+          create_function_scope(PARSER, $$);
         }
         | declaration_qualifier_list identifier_declarator
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
-          create_function_scope($$);
+          create_function_scope(PARSER, $$);
         }
         | type_qualifier_list identifier_declarator
         {
-          init($$, ID_declaration);
+          init(PARSER, $$, ID_declaration);
           parser_stack($$).type().swap(parser_stack($1));
           PARSER.add_declarator(parser_stack($$), parser_stack($2));
-          create_function_scope($$);
+          create_function_scope(PARSER, $$);
         }
         ;
 
@@ -3134,24 +3147,24 @@ paren_attribute_declarator:
           '(' gcc_type_attribute_list identifier_declarator ')'
         {
           stack_type($1)=typet(ID_abstract);
-          $2=merge($2, $1); // dest=$2
-          make_subtype($3, $2); // dest=$3
+          $2=merge(PARSER, $2, $1); // dest=$2
+          make_subtype(PARSER, $3, $2); // dest=$3
           $$=$3;
         }
         | '(' gcc_type_attribute_list identifier_declarator ')' postfixing_abstract_declarator
         {
           stack_type($1)=typet(ID_abstract);
-          $2=merge($2, $1); // dest=$2
-          make_subtype($3, $2); // dest=$3
+          $2=merge(PARSER, $2, $1); // dest=$2
+          make_subtype(PARSER, $3, $2); // dest=$3
           /* note: this is (a pointer to) a function ($5) */
           /* or an array ($5) with name ($3) */
           $$=$3;
-          make_subtype($$, $5);
+          make_subtype(PARSER, $$, $5);
         }
         | '*' paren_attribute_declarator
         {
           $$=$2;
-          do_pointer($1, $2);
+          do_pointer(PARSER, $1, $2);
         }
         ;
 
@@ -3165,7 +3178,7 @@ parameter_typedef_declarator:
         | typedef_name postfixing_abstract_declarator
         {
           $$=$1;
-          make_subtype($$, $2);
+          make_subtype(PARSER, $$, $2);
         }
         | clean_typedef_declarator
         ;
@@ -3175,12 +3188,12 @@ clean_typedef_declarator:
         | '*' parameter_typedef_declarator
         {
           $$=$2;
-          do_pointer($1, $2);
+          do_pointer(PARSER, $1, $2);
         }
         | '*' attribute_type_qualifier_list parameter_typedef_declarator
         {
-          $$=merge($2, $3);
-          do_pointer($1, $2);
+          $$=merge(PARSER, $2, $3);
+          do_pointer(PARSER, $1, $2);
         }
         ;
 
@@ -3192,7 +3205,7 @@ clean_postfix_typedef_declarator:
           /* note: this is a pointer ($2) to a function ($4) */
           /* or an array ($4)! */
           $$=$2;
-          make_subtype($$, $4);
+          make_subtype(PARSER, $$, $4);
         }
         ;
 
@@ -3201,23 +3214,23 @@ paren_typedef_declarator:
         | '*' '(' simple_paren_typedef_declarator ')'
         {
           $$=$3;
-          do_pointer($1, $3);
+          do_pointer(PARSER, $1, $3);
         }
         | '*' attribute_type_qualifier_list '(' simple_paren_typedef_declarator ')'
         {
           // not sure where the type qualifiers belong
-          $$=merge($2, $4);
-          do_pointer($1, $2);
+          $$=merge(PARSER, $2, $4);
+          do_pointer(PARSER, $1, $2);
         }
         | '*' paren_typedef_declarator
         {
           $$=$2;
-          do_pointer($1, $2);
+          do_pointer(PARSER, $1, $2);
         }
         | '*' attribute_type_qualifier_list paren_typedef_declarator
         {
-          $$=merge($2, $3);
-          do_pointer($1, $2);
+          $$=merge(PARSER, $2, $3);
+          do_pointer(PARSER, $1, $2);
         }
         ;
 
@@ -3227,14 +3240,14 @@ paren_postfix_typedef_declarator:
         | '(' simple_paren_typedef_declarator postfixing_abstract_declarator ')'
         {        /* note: this is a function ($3) with a typedef name ($2) */
           $$=$2;
-          make_subtype($$, $3);
+          make_subtype(PARSER, $$, $3);
         }
         | '(' paren_typedef_declarator ')' postfixing_abstract_declarator
         {
           /* note: this is a pointer ($2) to a function ($4) */
           /* or an array ($4)! */
           $$=$2;
-          make_subtype($$, $4);
+          make_subtype(PARSER, $$, $4);
         }
         ;
 
@@ -3254,14 +3267,14 @@ unary_identifier_declarator:
         | '*' identifier_declarator
         {
           $$=$2;
-          do_pointer($1, $2);
+          do_pointer(PARSER, $1, $2);
         }
         | '^' identifier_declarator
         {
           // This is an Apple extension to C/C++/Objective C.
           // http://en.wikipedia.org/wiki/Blocks_(C_language_extension)
           $$=$2;
-          do_pointer($1, $2);
+          do_pointer(PARSER, $1, $2);
         }
         | '*' attribute_type_qualifier_list identifier_declarator
         {
@@ -3271,8 +3284,8 @@ unary_identifier_declarator:
           // the width is added during conversion.
           stack_type($1).id(ID_frontend_pointer);
           stack_type($1).add_subtype()=typet(ID_abstract);
-          $2=merge($2, $1); // dest=$2
-          make_subtype($3, $2); // dest=$3
+          $2=merge(PARSER, $2, $1); // dest=$2
+          make_subtype(PARSER, $3, $2); // dest=$3
           $$=$3;
         }
         ;
@@ -3282,7 +3295,7 @@ postfix_identifier_declarator:
         {
           /* note: this is a function or array ($2) with name ($1) */
           $$=$1;
-          make_subtype($$, $2);
+          make_subtype(PARSER, $$, $2);
         }
         | '(' unary_identifier_declarator ')'
         { $$ = $2; }
@@ -3291,7 +3304,7 @@ postfix_identifier_declarator:
           /* note: this is a pointer ($2) to a function ($4) */
           /* or an array ($4)! */
           $$=$2;
-          make_subtype($$, $4);
+          make_subtype(PARSER, $$, $4);
         }
         ;
 
@@ -3322,13 +3335,13 @@ cprover_function_contract:
           TOK_CPROVER_ENSURES '(' ACSL_binding_expression ')'
         {
           $$=$1;
-          set($$, ID_C_spec_ensures);
+          set(PARSER, $$, ID_C_spec_ensures);
           mto($$, $3);
         }
         | TOK_CPROVER_REQUIRES '(' ACSL_binding_expression ')'
         {
           $$=$1;
-          set($$, ID_C_spec_requires);
+          set(PARSER, $$, ID_C_spec_requires);
           mto($$, $3);
         }
         | cprover_contract_assigns
@@ -3338,7 +3351,7 @@ cprover_function_contract:
 unary_expression_list:
           unary_expression
         {
-          init($$, ID_expression_list);
+          init(PARSER, $$, ID_expression_list);
           parser_stack($$).add_source_location()=parser_stack($1).source_location();
           mto($$, $1);
         }
@@ -3352,7 +3365,7 @@ unary_expression_list:
 conditional_target_group:
           unary_expression_list
         {
-          init($$, ID_conditional_target_group);
+          init(PARSER, $$, ID_conditional_target_group);
           parser_stack($$).add_source_location()=parser_stack($1).source_location();
           parser_stack($$).add_to_operands(true_exprt{});
           mto($$, $1);
@@ -3360,7 +3373,7 @@ conditional_target_group:
         | logical_equivalence_expression ':' unary_expression_list
         { 
           $$=$2;
-          set($$, ID_conditional_target_group);
+          set(PARSER, $$, ID_conditional_target_group);
           mto($$, $1);
           mto($$, $3);
         }
@@ -3369,7 +3382,7 @@ conditional_target_group:
 conditional_target_list:
           conditional_target_group
         {
-          init($$, ID_target_list);
+          init(PARSER, $$, ID_target_list);
           mto($$, $1);
         }
         | conditional_target_list ';' conditional_target_group
@@ -3393,20 +3406,20 @@ cprover_contract_assigns:
          TOK_CPROVER_ASSIGNS '(' conditional_target_list_opt_semicol ')'
         {
           $$=$1;
-          set($$, ID_C_spec_assigns);
+          set(PARSER, $$, ID_C_spec_assigns);
           mto($$, $3);
         }
         | TOK_CPROVER_ASSIGNS '(' ')'
         {
           $$=$1;
-          set($$, ID_C_spec_assigns);
+          set(PARSER, $$, ID_C_spec_assigns);
           parser_stack($$).add_to_operands(exprt(ID_target_list));
         }
         ;
 
 cprover_contract_assigns_opt:
         /* nothing */
-        { init($$); parser_stack($$).make_nil(); }
+        { init(PARSER, $$); parser_stack($$).make_nil(); }
         | cprover_contract_assigns
         ;
 
@@ -3414,13 +3427,13 @@ cprover_contract_frees:
          TOK_CPROVER_FREES '(' conditional_target_list_opt_semicol ')'
         {
           $$=$1;
-          set($$, ID_C_spec_frees);
+          set(PARSER, $$, ID_C_spec_frees);
           mto($$, $3);
         }
         | TOK_CPROVER_FREES '(' ')'
         {
           $$=$1;
-          set($$, ID_C_spec_frees);
+          set(PARSER, $$, ID_C_spec_frees);
           parser_stack($$).add_to_operands(exprt(ID_target_list));
         }
         ;
@@ -3430,13 +3443,13 @@ cprover_function_contract_sequence:
         | cprover_function_contract_sequence cprover_function_contract
         {
           $$=$1;
-          merge($$, $2);
+          merge(PARSER, $$, $2);
         }
         ;
 
 cprover_function_contract_sequence_opt:
           /* nothing */
-          { init($$); }
+          { init(PARSER, $$); }
         | cprover_function_contract_sequence
         {
           // Function contracts should either be attached to a
@@ -3447,7 +3460,10 @@ cprover_function_contract_sequence_opt:
           int contract_in_top_level_function_scope = (PARSER.scopes.size() == 2);
           if(!contract_in_global_scope && !contract_in_top_level_function_scope)
           {
-            yyansi_cerror("Function contracts allowed only at top-level declarations.");
+            yyansi_cerror(
+              PARSER,
+              scanner,
+              "Function contracts allowed only at top-level declarations.");
             YYABORT;
           }
         }
@@ -3461,7 +3477,7 @@ postfixing_abstract_declarator:
           KnR_parameter_header
         {
           $$=$1;
-          set($$, ID_code);
+          set(PARSER, $$, ID_code);
           stack_type($$).add_subtype()=typet(ID_abstract);
           stack_type($$).add(ID_parameters);
           stack_type($$).set(ID_C_KnR, true);
@@ -3478,7 +3494,7 @@ postfixing_abstract_declarator:
           KnR_parameter_header_opt
         {
           $$=$1;
-          set($$, ID_code);
+          set(PARSER, $$, ID_code);
           stack_type($$).add_subtype()=typet(ID_abstract);
           stack_type($$).add(ID_parameters).get_sub().
             swap((irept::subt &)(to_type_with_subtypes(stack_type($3)).subtypes()));
@@ -3505,7 +3521,7 @@ parameter_postfixing_abstract_declarator:
           }
           cprover_function_contract_sequence_opt
         {
-          set($1, ID_code);
+          set(PARSER, $1, ID_code);
           stack_type($1).add(ID_parameters);
           stack_type($1).add_subtype()=typet(ID_abstract);
           PARSER.pop_scope();
@@ -3516,7 +3532,7 @@ parameter_postfixing_abstract_declarator:
             PARSER.set_function(irep_idt());
           }
 
-          $$ = merge($4, $1);
+          $$ = merge(PARSER, $4, $1);
         }
         | '('
           {
@@ -3536,7 +3552,7 @@ parameter_postfixing_abstract_declarator:
           KnR_parameter_header_opt
           cprover_function_contract_sequence_opt
         {
-          set($1, ID_code);
+          set(PARSER, $1, ID_code);
           stack_type($1).add_subtype()=typet(ID_abstract);
           stack_type($1).add(ID_parameters).get_sub().
             swap((irept::subt &)(to_type_with_subtypes(stack_type($3)).subtypes()));
@@ -3554,7 +3570,7 @@ parameter_postfixing_abstract_declarator:
             parser_stack($$).set(ID_C_KnR, true);
           }
 
-          $$ = merge($6, $1);
+          $$ = merge(PARSER, $6, $1);
         }
         ;
 
@@ -3562,7 +3578,7 @@ array_abstract_declarator:
           '[' ']'
         {
           $$=$1;
-          set($$, ID_array);
+          set(PARSER, $$, ID_array);
           stack_type($$).add_subtype()=typet(ID_abstract);
           stack_type($$).add(ID_size).make_nil();
         }
@@ -3571,23 +3587,23 @@ array_abstract_declarator:
           // this is C99: e.g., restrict, const, etc
           // The type qualifier belongs to the array, not the
           // contents of the array, nor the size.
-          set($1, ID_array);
+          set(PARSER, $1, ID_array);
           stack_type($1).add_subtype()=typet(ID_abstract);
           stack_type($1).add(ID_size).make_nil();
-          $$=merge($2, $1);
+          $$=merge(PARSER, $2, $1);
         }
         | '[' '*' ']'
         {
           // these should be allowed in prototypes only
           $$=$1;
-          set($$, ID_array);
+          set(PARSER, $$, ID_array);
           stack_type($$).add_subtype()=typet(ID_abstract);
           stack_type($$).add(ID_size).make_nil();
         }
         | '[' constant_expression ']'
         {
           $$=$1;
-          set($$, ID_array);
+          set(PARSER, $$, ID_array);
           stack_type($$).add(ID_size).swap(parser_stack($2));
           stack_type($$).add_subtype()=typet(ID_abstract);
         }
@@ -3595,29 +3611,29 @@ array_abstract_declarator:
         {
           // The type qualifier belongs to the array, not the
           // contents of the array, nor the size.
-          set($1, ID_array);
+          set(PARSER, $1, ID_array);
           stack_type($1).add(ID_size).swap(parser_stack($3));
           stack_type($1).add_subtype()=typet(ID_abstract);
-          $$=merge($2, $1); // dest=$2
+          $$=merge(PARSER, $2, $1); // dest=$2
         }
         | array_abstract_declarator '[' constant_expression ']'
         {
           // we need to push this down
           $$=$1;
-          set($2, ID_array);
+          set(PARSER, $2, ID_array);
           stack_type($2).add(ID_size).swap(parser_stack($3));
           stack_type($2).add_subtype()=typet(ID_abstract);
-          make_subtype($1, $2);
+          make_subtype(PARSER, $1, $2);
         }
         | array_abstract_declarator '[' '*' ']'
         {
           // these should be allowed in prototypes only
           // we need to push this down
           $$=$1;
-          set($2, ID_array);
+          set(PARSER, $2, ID_array);
           stack_type($2).add(ID_size).make_nil();
           stack_type($2).add_subtype()=typet(ID_abstract);
-          make_subtype($1, $2);
+          make_subtype(PARSER, $1, $2);
         }
         ;
 
@@ -3638,12 +3654,12 @@ unary_abstract_declarator:
           // the width is added during conversion.
           stack_type($1).id(ID_frontend_pointer);
           stack_type($1).add_subtype()=typet(ID_abstract);
-          $$=merge($2, $1);
+          $$=merge(PARSER, $2, $1);
         }
         | '*' abstract_declarator
         {
           $$=$2;
-          do_pointer($1, $2);
+          do_pointer(PARSER, $1, $2);
         }
         | '*' attribute_type_qualifier_list abstract_declarator
         {
@@ -3653,8 +3669,8 @@ unary_abstract_declarator:
           // the width is added during conversion.
           stack_type($1).id(ID_frontend_pointer);
           stack_type($1).add_subtype()=typet(ID_abstract);
-          $2=merge($2, $1); // dest=$2
-          make_subtype($3, $2); // dest=$3
+          $2=merge(PARSER, $2, $1); // dest=$2
+          make_subtype(PARSER, $3, $2); // dest=$3
           $$=$3;
         }
         | '^'
@@ -3662,7 +3678,7 @@ unary_abstract_declarator:
           // This is an Apple extension to C/C++/Objective C.
           // http://en.wikipedia.org/wiki/Blocks_(C_language_extension)
           $$=$1;
-          set($$, ID_block_pointer);
+          set(PARSER, $$, ID_block_pointer);
           stack_type($$).add_subtype()=typet(ID_abstract);
         }
         ;
@@ -3684,12 +3700,12 @@ parameter_unary_abstract_declarator:
           // the width is added during conversion.
           stack_type($1).id(ID_frontend_pointer);
           stack_type($1).add_subtype()=typet(ID_abstract);
-          $$=merge($2, $1);
+          $$=merge(PARSER, $2, $1);
         }
         | '*' parameter_abstract_declarator
         {
           $$=$2;
-          do_pointer($1, $2);
+          do_pointer(PARSER, $1, $2);
         }
         | '*' attribute_type_qualifier_list parameter_abstract_declarator
         {
@@ -3699,8 +3715,8 @@ parameter_unary_abstract_declarator:
           // the width is added during conversion.
           stack_type($1).id(ID_frontend_pointer);
           stack_type($1).add_subtype()=typet(ID_abstract);
-          $2=merge($2, $1); // dest=$2
-          make_subtype($3, $2); // dest=$3
+          $2=merge(PARSER, $2, $1); // dest=$2
+          make_subtype(PARSER, $3, $2); // dest=$3
           $$=$3;
         }
         | '^'
@@ -3708,7 +3724,7 @@ parameter_unary_abstract_declarator:
           // This is an Apple extension to C/C++/Objective C.
           // http://en.wikipedia.org/wiki/Blocks_(C_language_extension)
           $$=$1;
-          set($$, ID_block_pointer);
+          set(PARSER, $$, ID_block_pointer);
           stack_type($$).add_subtype()=typet(ID_abstract);
         }
         ;
@@ -3724,13 +3740,13 @@ postfix_abstract_declarator:
         {
           /* note: this is a pointer ($2) to a function or array ($4) */
           $$=$2;
-          make_subtype($$, $4);
+          make_subtype(PARSER, $$, $4);
         }
         | '(' unary_abstract_declarator ')' postfixing_abstract_declarator
         {
           /* note: this is a pointer ($2) to a function or array ($4) */
           $$=$2;
-          make_subtype($$, $4);
+          make_subtype(PARSER, $$, $4);
         }
         ;
 
@@ -3744,8 +3760,6 @@ parameter_postfix_abstract_declarator:
         {
           /* note: this is a pointer ($2) to a function ($4) */
           $$=$2;
-          make_subtype($$, $4);
+          make_subtype(PARSER, $$, $4);
         }
         ;
-
-%%
