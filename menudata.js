@@ -300,7 +300,8 @@ var menudata={children:[
 {text:"s",url:"globals_vars.html#index_s"},
 {text:"t",url:"globals_vars.html#index_t"},
 {text:"u",url:"globals_vars.html#index_u"},
-{text:"w",url:"globals_vars.html#index_w"}]},
+{text:"w",url:"globals_vars.html#index_w"},
+{text:"y",url:"globals_vars.html#index_y"}]},
 {text:"Typedefs",url:"globals_type.html",children:[
 {text:"_",url:"globals_type.html#index__5F"},
 {text:"a",url:"globals_type.html#index_a"},

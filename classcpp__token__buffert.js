@@ -3,7 +3,6 @@ var classcpp__token__buffert =
     [ "post", "classcpp__token__buffert.html#a72e0ac0ebec205087e6e3be30dbd4ce4", null ],
     [ "tokenst", "classcpp__token__buffert.html#a6596ff1ebffb0bd3ca29cd1d4b3785c7", null ],
     [ "cpp_token_buffert", "classcpp__token__buffert.html#a30e1316b3b94f61f17c82b9b7fefa3e0", null ],
-    [ "~cpp_token_buffert", "classcpp__token__buffert.html#a267211c4133395e6dc89952da865920b", null ],
     [ "clear", "classcpp__token__buffert.html#a2947ba2fedd45e5cccab37ee4d433649", null ],
     [ "current_token", "classcpp__token__buffert.html#a61f07c762f39faf21deca5bcbc8454a5", null ],
     [ "get_token", "classcpp__token__buffert.html#aa7f63aa5616827042ea29c4d9b864e15", null ],

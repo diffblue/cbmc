@@ -72,7 +72,9 @@ var dir_dfdbda394c3f7a3aa55229f33a559c41 =
       [ "cpp_tokent", "classcpp__tokent.html", "classcpp__tokent" ]
     ] ],
     [ "cpp_token_buffer.cpp", "cpp__token__buffer_8cpp.html", "cpp__token__buffer_8cpp" ],
-    [ "cpp_token_buffer.h", "cpp__token__buffer_8h.html", "cpp__token__buffer_8h" ],
+    [ "cpp_token_buffer.h", "cpp__token__buffer_8h.html", [
+      [ "cpp_token_buffert", "classcpp__token__buffert.html", "classcpp__token__buffert" ]
+    ] ],
     [ "cpp_type2name.cpp", "cpp__type2name_8cpp.html", "cpp__type2name_8cpp" ],
     [ "cpp_type2name.h", "cpp__type2name_8h.html", "cpp__type2name_8h" ],
     [ "cpp_typecast.h", "cpp__typecast_8h.html", [

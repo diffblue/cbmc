@@ -21,10 +21,8 @@ var dir_f88182c44268ef6b082d02d66ccc5f99 =
     [ "ansi_c_parse_tree.h", "ansi__c__parse__tree_8h.html", [
       [ "ansi_c_parse_treet", "classansi__c__parse__treet.html", "classansi__c__parse__treet" ]
     ] ],
-    [ "ansi_c_parser.cpp", "ansi__c__parser_8cpp.html", "ansi__c__parser_8cpp" ],
-    [ "ansi_c_parser.h", "ansi__c__parser_8h.html", [
-      [ "ansi_c_parsert", "classansi__c__parsert.html", "classansi__c__parsert" ]
-    ] ],
+    [ "ansi_c_parser.cpp", "ansi__c__parser_8cpp.html", null ],
+    [ "ansi_c_parser.h", "ansi__c__parser_8h.html", "ansi__c__parser_8h" ],
     [ "ansi_c_scope.cpp", "ansi__c__scope_8cpp.html", null ],
     [ "ansi_c_scope.h", "ansi__c__scope_8h.html", "ansi__c__scope_8h" ],
     [ "ansi_c_typecheck.cpp", "ansi__c__typecheck_8cpp.html", "ansi__c__typecheck_8cpp" ],
