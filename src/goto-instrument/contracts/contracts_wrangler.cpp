@@ -150,6 +150,7 @@ void contracts_wranglert::mangle(
   ansi_c_parser.cpp98 = false; // it's not C++
   ansi_c_parser.cpp11 = false; // it's not C++
   ansi_c_parser.mode = config.ansi_c.mode;
+  ansi_c_scanner_init(ansi_c_parser);
   ansi_c_parser.parse();
 
   // Extract the invariants from prase_tree.

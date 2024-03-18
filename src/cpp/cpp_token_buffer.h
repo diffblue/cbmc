@@ -21,10 +21,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <list>
 
-int yyansi_clex_init_extra(ansi_c_parsert *, void **);
-int yyansi_clex_destroy(void *);
-int yyansi_cparse(ansi_c_parsert &, void *);
-
 class cpp_token_buffert
 {
 public:
@@ -39,13 +35,7 @@ public:
       config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17;
     ansi_c_parser.ts_18661_3_Floatn_types = false;
     ansi_c_parser.mode = config.ansi_c.mode;
-
-    yyansi_clex_init_extra(&ansi_c_parser, &ansi_c_scanner_state);
-  }
-
-  ~cpp_token_buffert()
-  {
-    yyansi_clex_destroy(ansi_c_scanner_state);
+    ansi_c_scanner_init(ansi_c_parser);
   }
 
   typedef unsigned int post;
