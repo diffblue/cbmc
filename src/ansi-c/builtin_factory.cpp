@@ -58,6 +58,8 @@ static bool convert(
   ansi_c_parser.cpp11=false; // it's not C++
   ansi_c_parser.mode=config.ansi_c.mode;
 
+  ansi_c_scanner_init(ansi_c_parser);
+
   if(ansi_c_parser.parse())
     return true;
 

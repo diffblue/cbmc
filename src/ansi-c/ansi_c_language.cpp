@@ -82,6 +82,8 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.cpp11=false; // it's not C++
   ansi_c_parser.mode=config.ansi_c.mode;
 
+  ansi_c_scanner_init(ansi_c_parser);
+
   bool result=ansi_c_parser.parse();
 
   if(!result)
@@ -89,6 +91,7 @@ bool ansi_c_languaget::parse(
     ansi_c_parser.set_line_no(0);
     ansi_c_parser.set_file(path);
     ansi_c_parser.in=&i_preprocessed;
+    ansi_c_scanner_init(ansi_c_parser);
     result=ansi_c_parser.parse();
   }
 
@@ -202,6 +205,7 @@ bool ansi_c_languaget::to_expr(
   ansi_c_parser.cpp98 = false; // it's not C++
   ansi_c_parser.cpp11 = false; // it's not C++
   ansi_c_parser.mode = config.ansi_c.mode;
+  ansi_c_scanner_init(ansi_c_parser);
 
   bool result=ansi_c_parser.parse();
 
