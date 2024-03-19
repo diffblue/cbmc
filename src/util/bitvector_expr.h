@@ -447,38 +447,29 @@ inline extractbit_exprt &to_extractbit_expr(exprt &expr)
 class extractbits_exprt : public expr_protectedt
 {
 public:
-  /// Extract the bits [\p _lower .. \p _upper] from \p _src to produce a result
-  /// of type \p _type. Note that this specifies a closed interval, i.e., both
-  /// bits \p _lower and \p _upper are included. Indices count from the
-  /// least-significant bit, and are not affected by endianness.
-  /// The ordering upper-lower matches what SMT-LIB uses.
-  extractbits_exprt(exprt _src, exprt _upper, exprt _lower, typet _type)
+  /// Extract the bits [\p _index .. \p _index + width - 1] from \p _src
+  /// to produce a result of type \p _type where width is the number of bits
+  /// of \p _type. Note that this specifies a closed interval, i.e., both
+  /// bits \p _lower and \p _index + width - 1 are included. Indices count
+  /// from the least-significant bit, and are not affected by endianness.
+  extractbits_exprt(exprt _src, exprt _index, typet _type)
     : expr_protectedt(
         ID_extractbits,
         std::move(_type),
-        {std::move(_src), std::move(_upper), std::move(_lower)})
+        {std::move(_src), std::move(_index)})
   {
   }
 
-  extractbits_exprt(
-    exprt _src,
-    const std::size_t _upper,
-    const std::size_t _lower,
-    typet _type);
+  extractbits_exprt(exprt _src, const std::size_t _index, typet _type);
 
   exprt &src()
   {
     return op0();
   }
 
-  exprt &upper()
+  exprt &index()
   {
     return op1();
-  }
-
-  exprt &lower()
-  {
-    return op2();
   }
 
   const exprt &src() const
@@ -486,14 +477,9 @@ public:
     return op0();
   }
 
-  const exprt &upper() const
+  const exprt &index() const
   {
     return op1();
-  }
-
-  const exprt &lower() const
-  {
-    return op2();
   }
 };
 
@@ -505,7 +491,7 @@ inline bool can_cast_expr<extractbits_exprt>(const exprt &base)
 
 inline void validate_expr(const extractbits_exprt &value)
 {
-  validate_operands(value, 3, "Extract bits must have three operands");
+  validate_operands(value, 2, "Extractbits must have two operands");
 }
 
 /// \brief Cast an exprt to an \ref extractbits_exprt

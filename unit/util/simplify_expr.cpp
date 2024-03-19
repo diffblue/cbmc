@@ -176,7 +176,7 @@ TEST_CASE("Simplify extractbits", "[core][util]")
 
   const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
 
-  exprt eb = extractbits_exprt(deadbeef, 15, 8, unsignedbv_typet(8));
+  exprt eb = extractbits_exprt(deadbeef, 8, unsignedbv_typet(8));
   bool unmodified = simplify(eb, ns);
 
   REQUIRE(!unmodified);

@@ -206,7 +206,7 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
       const exprt expected = equal_exprt{
         zero,
         extractbits_exprt{
-          symbol_exprt{"breakfast", bv_typet{72}}, 71, 40, field_type}};
+          symbol_exprt{"breakfast", bv_typet{72}}, 40, field_type}};
       REQUIRE(test.struct_encoding.encode(input) == expected);
     }
     SECTION("Second member")
@@ -218,7 +218,7 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
       const exprt expected = equal_exprt{
         dozen,
         extractbits_exprt{
-          symbol_exprt{"breakfast", bv_typet{72}}, 39, 24, field_type}};
+          symbol_exprt{"breakfast", bv_typet{72}}, 24, field_type}};
       REQUIRE(test.struct_encoding.encode(input) == expected);
     }
     SECTION("Third member")
@@ -230,7 +230,7 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
       const exprt expected = equal_exprt{
         two,
         extractbits_exprt{
-          symbol_exprt{"breakfast", bv_typet{72}}, 23, 0, field_type}};
+          symbol_exprt{"breakfast", bv_typet{72}}, 0, field_type}};
       REQUIRE(test.struct_encoding.encode(input) == expected);
     }
   }
@@ -244,8 +244,8 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         from_integer(0, signedbv_typet{32})};
       const concatenation_exprt expected{
         {from_integer(0, signedbv_typet{32}),
-         extractbits_exprt{symbol_expr_as_bv, 39, 24, unsignedbv_typet{16}},
-         extractbits_exprt{symbol_expr_as_bv, 23, 0, signedbv_typet{24}}},
+         extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
+         extractbits_exprt{symbol_expr_as_bv, 0, signedbv_typet{24}}},
         bv_typet{72}};
       REQUIRE(test.struct_encoding.encode(with) == expected);
     }
@@ -256,9 +256,9 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         make_member_name_expression("eggs"),
         from_integer(0, unsignedbv_typet{16})};
       const concatenation_exprt expected{
-        {extractbits_exprt{symbol_expr_as_bv, 71, 40, signedbv_typet{32}},
+        {extractbits_exprt{symbol_expr_as_bv, 40, signedbv_typet{32}},
          from_integer(0, unsignedbv_typet{16}),
-         extractbits_exprt{symbol_expr_as_bv, 23, 0, signedbv_typet{24}}},
+         extractbits_exprt{symbol_expr_as_bv, 0, signedbv_typet{24}}},
         bv_typet{72}};
       REQUIRE(test.struct_encoding.encode(with) == expected);
     }
@@ -269,8 +269,8 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         make_member_name_expression("ham"),
         from_integer(0, signedbv_typet{24})};
       const concatenation_exprt expected{
-        {extractbits_exprt{symbol_expr_as_bv, 71, 40, signedbv_typet{32}},
-         extractbits_exprt{symbol_expr_as_bv, 39, 24, unsignedbv_typet{16}},
+        {extractbits_exprt{symbol_expr_as_bv, 40, signedbv_typet{32}},
+         extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
          from_integer(0, signedbv_typet{24})},
         bv_typet{72}};
       REQUIRE(test.struct_encoding.encode(with) == expected);
@@ -280,7 +280,7 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
       const concatenation_exprt expected{
         {from_integer(0, signedbv_typet{32}),
          from_integer(1, unsignedbv_typet{16}),
-         extractbits_exprt{symbol_expr_as_bv, 23, 0, signedbv_typet{24}}},
+         extractbits_exprt{symbol_expr_as_bv, 0, signedbv_typet{24}}},
         bv_typet{72}};
       SECTION("Operands in field order")
       {
@@ -309,7 +309,7 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
     {
       const concatenation_exprt expected{
         {from_integer(0, signedbv_typet{32}),
-         extractbits_exprt{symbol_expr_as_bv, 39, 24, unsignedbv_typet{16}},
+         extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
          from_integer(1, signedbv_typet{24})},
         bv_typet{72}};
       SECTION("Operands in field order")
@@ -337,7 +337,7 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
     SECTION("Second and third members")
     {
       const concatenation_exprt expected{
-        {extractbits_exprt{symbol_expr_as_bv, 71, 40, signedbv_typet{32}},
+        {extractbits_exprt{symbol_expr_as_bv, 40, signedbv_typet{32}},
          from_integer(0, unsignedbv_typet{16}),
          from_integer(1, signedbv_typet{24})},
         bv_typet{72}};
@@ -564,8 +564,8 @@ TEST_CASE("encoding of union expressions", "[core][smt2_incremental]")
       const exprt zero = from_integer(0, field_type);
       const exprt input =
         equal_exprt{zero, member_exprt{symbol_expr, "ham", field_type}};
-      const exprt expected = equal_exprt{
-        zero, extractbits_exprt{symbol_expr_as_bv, 31, 0, field_type}};
+      const exprt expected =
+        equal_exprt{zero, extractbits_exprt{symbol_expr_as_bv, 0, field_type}};
       REQUIRE(test.struct_encoding.encode(input) == expected);
     }
     SECTION("Member which is smaller than the union as a whole")
@@ -573,8 +573,8 @@ TEST_CASE("encoding of union expressions", "[core][smt2_incremental]")
       const typet field_type = unsignedbv_typet{8};
       const exprt input =
         equal_exprt{dozen, member_exprt{symbol_expr, "eggs", field_type}};
-      const exprt expected = equal_exprt{
-        dozen, extractbits_exprt{symbol_expr_as_bv, 7, 0, field_type}};
+      const exprt expected =
+        equal_exprt{dozen, extractbits_exprt{symbol_expr_as_bv, 0, field_type}};
       REQUIRE(test.struct_encoding.encode(input) == expected);
     }
   }

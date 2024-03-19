@@ -33,7 +33,6 @@ protected:
   std::string convert_cpp_this();
   std::string convert_cpp_new(const exprt &src);
   std::string convert_extractbit(const exprt &src);
-  std::string convert_extractbits(const exprt &src);
   std::string convert_code_cpp_delete(const exprt &src, unsigned indent);
   std::string convert_code_cpp_new(const exprt &src, unsigned indent);
   std::string convert_struct(const exprt &src, unsigned &precedence) override;
@@ -433,11 +432,6 @@ std::string expr2cppt::convert_with_precedence(
     precedence = 15;
     return convert_extractbit(src);
   }
-  else if(src.id()==ID_extractbits)
-  {
-    precedence = 15;
-    return convert_extractbits(src);
-  }
   else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_cpp_new ||
            src.get(ID_statement)==ID_cpp_new_array))
@@ -487,14 +481,6 @@ std::string expr2cppt::convert_extractbit(const exprt &src)
   const auto &extractbit_expr = to_extractbit_expr(src);
   return convert(extractbit_expr.op0()) + "[" + convert(extractbit_expr.op1()) +
          "]";
-}
-
-std::string expr2cppt::convert_extractbits(const exprt &src)
-{
-  const auto &extractbits_expr = to_extractbits_expr(src);
-  return convert(extractbits_expr.src()) + ".range(" +
-         convert(extractbits_expr.upper()) + "," +
-         convert(extractbits_expr.lower()) + ")";
 }
 
 std::string expr2cpp(const exprt &expr, const namespacet &ns)
