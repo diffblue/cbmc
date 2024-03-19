@@ -397,10 +397,16 @@ void goto_symext::symex_printf(
       return;
     }
 
+    // Visual Studio has va_list == char*, else we have va_list == void** and
+    // need to add dereferencing
+    const bool need_deref =
+      operands.back().type().id() == ID_pointer &&
+      to_pointer_type(operands.back().type()).base_type().id() == ID_pointer;
+
     for(const auto &op : va_args->operands())
     {
       exprt parameter = skip_typecast(op);
-      if(parameter.id() == ID_address_of)
+      if(need_deref && parameter.id() == ID_address_of)
         parameter = to_address_of_expr(parameter).object();
       clean_expr(parameter, state, false);
       parameter = state.rename(std::move(parameter), ns).get();
