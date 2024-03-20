@@ -554,3 +554,20 @@ TEST_CASE("Simplify inequality", "[core][util]")
     REQUIRE(simp == true_exprt{});
   }
 }
+
+TEST_CASE("Simplify bitxor", "[core][util]")
+{
+  config.set_arch("none");
+
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
+  SECTION("Simplification for c_bool")
+  {
+    constant_exprt false_c_bool = from_integer(0, c_bool_type());
+
+    REQUIRE(
+      simplify_expr(bitxor_exprt{false_c_bool, false_c_bool}, ns) ==
+      false_c_bool);
+  }
+}
