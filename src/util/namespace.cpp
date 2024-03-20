@@ -92,6 +92,15 @@ namespace_baset::follow_tag(const c_enum_tag_typet &src) const
   return to_c_enum_type(symbol.type);
 }
 
+const struct_union_typet &namespace_baset::follow_struct_or_union_tag(
+  const struct_or_union_tag_typet &src) const
+{
+  const symbolt &symbol = lookup(src.get_identifier());
+  CHECK_RETURN(symbol.is_type);
+  CHECK_RETURN(symbol.type.id() == ID_struct || symbol.type.id() == ID_union);
+  return to_struct_union_type(symbol.type);
+}
+
 /// Follow macros to their values in a given expression.
 /// \param expr: The expression to follow macros in.
 void namespace_baset::follow_macros(exprt &expr) const

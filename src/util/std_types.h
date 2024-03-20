@@ -444,12 +444,56 @@ inline tag_typet &to_tag_type(typet &type)
   return static_cast<tag_typet &>(type);
 }
 
+/// A struct or union tag type. This is only to be used to create type-safe /
+/// APIs, no instances of this one can be created directly, use \ref
+/// struct_tag_typet or \ref union_tag_typet when creating objects.
+class struct_or_union_tag_typet : public tag_typet
+{
+protected:
+  struct_or_union_tag_typet(const irep_idt &id, const irep_idt &identifier)
+    : tag_typet(id, identifier)
+  {
+    PRECONDITION(id == ID_struct_tag || id == ID_union_tag);
+  }
+};
+
+/// Check whether a reference to a typet is a \ref struct_or_union_tag_typet.
+/// \param type: Source type.
+/// \return True if \p type is a \ref struct_or_union_tag_typet.
+template <>
+inline bool can_cast_type<struct_or_union_tag_typet>(const typet &type)
+{
+  return type.id() == ID_struct_tag || type.id() == ID_union_tag;
+}
+
+/// \brief Cast a typet to a \ref struct_or_union_tag_typet
+///
+/// This is an unchecked conversion. \a type must be known to be \ref
+/// struct_or_union_tag_typet. Will fail with a precondition violation if type
+/// doesn't match.
+///
+/// \param type: Source type.
+/// \return Object of type \ref struct_or_union_tag_typet
+inline const struct_or_union_tag_typet &
+to_struct_or_union_tag_type(const typet &type)
+{
+  PRECONDITION(can_cast_type<struct_or_union_tag_typet>(type));
+  return static_cast<const struct_or_union_tag_typet &>(type);
+}
+
+/// \copydoc to_struct_or_union_tag_type(const typet &)
+inline struct_or_union_tag_typet &to_struct_or_union_tag_type(typet &type)
+{
+  PRECONDITION(can_cast_type<struct_or_union_tag_typet>(type));
+  return static_cast<struct_or_union_tag_typet &>(type);
+}
+
 /// A struct tag type, i.e., \ref struct_typet with an identifier
-class struct_tag_typet:public tag_typet
+class struct_tag_typet : public struct_or_union_tag_typet
 {
 public:
-  explicit struct_tag_typet(const irep_idt &identifier):
-    tag_typet(ID_struct_tag, identifier)
+  explicit struct_tag_typet(const irep_idt &identifier)
+    : struct_or_union_tag_typet(ID_struct_tag, identifier)
   {
   }
 };

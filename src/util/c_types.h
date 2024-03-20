@@ -195,11 +195,11 @@ inline union_typet &to_union_type(typet &type)
 }
 
 /// A union tag type, i.e., \ref union_typet with an identifier
-class union_tag_typet : public tag_typet
+class union_tag_typet : public struct_or_union_tag_typet
 {
 public:
   explicit union_tag_typet(const irep_idt &identifier)
-    : tag_typet(ID_union_tag, identifier)
+    : struct_or_union_tag_typet(ID_union_tag, identifier)
   {
   }
 };
