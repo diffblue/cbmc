@@ -1,0 +1,106 @@
+# Compare CBMC performance of selected benchmarks across two versions of CBMC,
+# erroring out on regression. This config file is to be used together with the
+# set-up in performance.yaml, because it assumes that there are two CBMC
+# checkouts in the 'old' and 'new' directories; benchcomp compares the
+# performance of these two checkouts.
+#
+# This configuration file is based on Benchcomp's perf-regression.yaml that
+# ships with Kani.
+
+variants:
+  aws-c-common@old:
+    config:
+      command_line: cd verification/cbmc/proofs && export PATH=/home/runner/work/cbmc/cbmc/old/build/bin:$PATH &&
+        ./run-cbmc-proofs.py
+      directory: /home/runner/work/cbmc/cbmc/aws-c-common.git
+      env: {}
+  aws-c-common@new:
+    config:
+      command_line: cd verification/cbmc/proofs && export PATH=/home/runner/work/cbmc/cbmc/new/build/bin:$PATH &&
+        ./run-cbmc-proofs.py
+      directory: /home/runner/work/cbmc/cbmc/aws-c-common.git
+      env: {}
+
+run:
+  suites:
+    aws-c-common:
+      parser:
+        command: /home/runner/work/cbmc/cbmc/new/.github/workflows/benchcomp-parse_cbmc.py
+      variants:
+        - aws-c-common@old
+        - aws-c-common@new
+
+visualize:
+  - type: dump_yaml
+    out_file: '-'
+
+  - type: dump_markdown_results_table
+    out_file: '-'
+    scatterplot: linear
+    extra_columns:
+
+      # For these two metrics, display the difference between old and new and
+      # embolden if the absolute difference is more than 10% of the old value
+      number_vccs:
+      - column_name: diff old → new
+        text: >
+          lambda b: "" if b["aws-c-common@new"] == b["aws-c-common@old"]
+          else ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.1 else "")
+          + ("+" if b["aws-c-common@new"] > b["aws-c-common@old"] else "")
+          + str(b["aws-c-common@new"] - b["aws-c-common@old"])
+          + ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.1 else "")
+      number_program_steps:
+      - column_name: diff old → new
+        text: >
+          lambda b: "" if b["aws-c-common@new"] == b["aws-c-common@old"]
+          else ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.1 else "")
+          + ("+" if b["aws-c-common@new"] > b["aws-c-common@old"] else "")
+          + str(b["aws-c-common@new"] - b["aws-c-common@old"])
+          + ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.1 else "")
+
+      # For 'runtime' metrics, display the % change from old to new, emboldening
+      # cells whose absolute change is >50%
+      solver_runtime:
+      - column_name: "% change old → new"
+        text: >
+          lambda b: "" if b["aws-c-common@new"] == b["aws-c-common@old"]
+          else ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.5 else "")
+          + ("+" if b["aws-c-common@new"] > b["aws-c-common@old"] else "")
+          + "%.3f%%" % ((b["aws-c-common@new"] - b["aws-c-common@old"]) * 100 / b["aws-c-common@old"])
+          + ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.5 else "")
+      verification_time:
+      - column_name: "% change old → new"
+        text: >
+          lambda b: "" if b["aws-c-common@new"] == b["aws-c-common@old"]
+          else ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.5 else "")
+          + ("+" if b["aws-c-common@new"] > b["aws-c-common@old"] else "")
+          + "%.3f%%" % ((b["aws-c-common@new"] - b["aws-c-common@old"]) * 100 / b["aws-c-common@old"])
+          + ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.5 else "")
+      symex_runtime:
+      - column_name: "% change old → new"
+        text: >
+          lambda b: "" if b["aws-c-common@new"] == b["aws-c-common@old"]
+          else ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.5 else "")
+          + ("+" if b["aws-c-common@new"] > b["aws-c-common@old"] else "")
+          + "%.3f%%" % ((b["aws-c-common@new"] - b["aws-c-common@old"]) * 100 / b["aws-c-common@old"])
+          + ("**" if abs((b["aws-c-common@new"]-b["aws-c-common@old"])/b["aws-c-common@old"]) > 0.5 else "")
+
+      # For success metric, display some text if success has changed
+      success:
+      - column_name: change
+        text: >
+          lambda b: "" if b["aws-c-common@new"] == b["aws-c-common@old"]
+          else "❌ newly failing" if b["aws-c-common@old"]
+          else "✅ newly passing"
+
+  - type: error_on_regression
+    variant_pairs: [[aws-c-common@old, aws-c-common@new]]
+    checks:
+      - metric: success
+        # Compare the old and new variants of each benchmark. The
+        # benchmark has regressed if the lambda returns true.
+        test: "lambda old, new: False if not old else not new"
+      - metric: solver_runtime
+        test: "lambda old, new: False if new < 10 else new/old > 1.5"
+      - metric: symex_runtime
+        test: "lambda old, new: False if new < 10 else new/old > 1.5"
