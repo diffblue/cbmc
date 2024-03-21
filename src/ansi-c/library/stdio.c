@@ -1540,6 +1540,26 @@ __CPROVER_HIDE:;
   return result;
 }
 
+/* FUNCTION: asprintf */
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+// declare here instead of relying on stdio.h as even those platforms that do
+// have it at all may require _GNU_SOURCE to be set
+int vasprintf(char **ptr, const char *fmt, va_list ap);
+
+int asprintf(char **ptr, const char *fmt, ...)
+{
+  va_list list;
+  va_start(list, fmt);
+  int result = vasprintf(ptr, fmt, list);
+  va_end(list);
+  return result;
+}
+
 /* FUNCTION: vasprintf */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -1570,6 +1590,8 @@ int vasprintf(char **ptr, const char *fmt, va_list ap)
     return -1;
 
   *ptr=malloc(result_buffer_size);
+  if(!*ptr)
+    return -1;
   int i=0;
   for( ; i<result_buffer_size; ++i)
   {
