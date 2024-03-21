@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
-#include "goto_symex.h"
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/std_code.h>
+
+#include "goto_symex.h"
 
 void goto_symext::havoc_rec(
   statet &state,
@@ -219,27 +220,36 @@ void goto_symext::symex_other(
     // 2. find the actual array objects/candidates for objects (via
     // process_array_expr)
     // 3. build an assignment where the lhs is the previous third argument, and
-    // the right-hand side is an equality over the arrays, if their types match;
-    // if the types don't match the result trivially is false
+    // the right-hand side is an equality over the size of their arrays and
+    // their contents
     DATA_INVARIANT(
       code.operands().size() == 3,
       "expected array_equal statement to have three operands");
 
     // we need to add dereferencing for the first two
-    exprt array1 = clean_expr(code.op0(), state, false);
-    exprt array2 = clean_expr(code.op1(), state, false);
+    exprt array_ptr1 = clean_expr(code.op0(), state, false);
+    exprt array_ptr2 = clean_expr(code.op1(), state, false);
 
     // obtain the actual arrays
+    exprt array1 = array_ptr1;
     process_array_expr(state, array1);
+    exprt array2 = array_ptr2;
     process_array_expr(state, array2);
 
     exprt rhs;
 
-    // Types don't match? Make it 'false'.
-    if(array1.type() != array2.type())
-      rhs = false_exprt();
-    else
+    // Types match: just compare contents
+    if(array1.type() == array2.type())
       rhs = equal_exprt(array1, array2);
+    else
+    {
+      rhs = and_exprt{
+        equal_exprt{object_size(array_ptr1), object_size(array_ptr2)},
+        equal_exprt{
+          array1,
+          make_byte_extract(
+            array2, from_integer(0, c_index_type()), array1.type())}};
+    }
 
     symex_assign(state, code.op2(), rhs);
   }
