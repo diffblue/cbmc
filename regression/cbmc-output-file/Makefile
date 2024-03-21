@@ -4,10 +4,14 @@ include ../../src/config.inc
 include ../../src/common
 
 test:
-	@../test.pl -f -e -p -c '../chain.py ../../../src/cbmc/cbmc'
+	@if which cvc5 ; then \
+	  ../test.pl -f -e -p -c '../chain.py ../../../src/cbmc/cbmc' ; \
+	fi
 
 tests.log:
-	@../test.pl -f -e -p -c '../chain.py ../../../src/cbmc/cbmc'
+	@if which cvc5 ; then \
+	  ../test.pl -f -e -p -c '../chain.py ../../../src/cbmc/cbmc' ; \
+	fi
 
 clean:
 	@for dir in *; do \
