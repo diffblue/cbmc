@@ -74,10 +74,6 @@ public:
   /// \param other: Parse tree which should be used in the swap operation.
   void swap_tree(statement_list_parse_treet &other);
 
-  /// Removes all functions and function blocks from the parse tree and
-  /// clears the internal state of the parser.
-  void clear() override;
-
 private:
   /// Tree that is being filled by the parsing process.
   statement_list_parse_treet parse_tree;

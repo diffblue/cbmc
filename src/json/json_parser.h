@@ -41,11 +41,6 @@ public:
     dest.swap(stack.top());
     stack.pop();
   }
-
-  virtual void clear() override
-  {
-    stack=stackt();
-  }
 };
 
 // 'do it all' functions
