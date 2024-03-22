@@ -10,16 +10,16 @@
 variants:
   aws-c-common@old:
     config:
-      command_line: cd verification/cbmc/proofs && export PATH=/home/runner/work/cbmc/cbmc/old/build/bin:$PATH &&
-        ./run-cbmc-proofs.py
+      command_line: cd verification/cbmc/proofs && ./run-cbmc-proofs.py
       directory: /home/runner/work/cbmc/cbmc/aws-c-common.git
-      env: {}
+      env:
+        PATH: /home/runner/work/cbmc/cbmc/old/build/bin:${PATH}
   aws-c-common@new:
     config:
-      command_line: cd verification/cbmc/proofs && export PATH=/home/runner/work/cbmc/cbmc/new/build/bin:$PATH &&
-        ./run-cbmc-proofs.py
+      command_line: cd verification/cbmc/proofs && ./run-cbmc-proofs.py
       directory: /home/runner/work/cbmc/cbmc/aws-c-common.git
-      env: {}
+      env:
+        PATH: /home/runner/work/cbmc/cbmc/new/build/bin:${PATH}
 
 run:
   suites:
