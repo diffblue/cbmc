@@ -1,5 +1,6 @@
 var NAVTREEINDEX125 =
 {
+"static__lifetime__init_8cpp.html":[9,0,2,24,5],
 "static__lifetime__init_8cpp.html#a591d79cb5efc9fd6b07a0ce62f53d8e6":[9,0,2,24,5,2],
 "static__lifetime__init_8cpp.html#a93314eab046d62e65e263cde42db0435":[9,0,2,24,5,1],
 "static__lifetime__init_8cpp.html#ae68969994397ecdaf13383f118cdc1b6":[9,0,2,24,5,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX125 =
 "std__expr_8h.html#a6662a285d4d229964538bfc2113f19c7":[9,0,2,30,213,182],
 "std__expr_8h.html#a66729c23a31c76f6adafea863c78b90c":[9,0,2,30,213,145],
 "std__expr_8h.html#a670859ef4e33e2ba0a5ab7d9b70cf850":[9,0,2,30,213,151],
-"std__expr_8h.html#a67dd1858b167b6ba67dae0b2fa599ef2":[9,0,2,30,213,110],
-"std__expr_8h.html#a67e69daf20446881ce1980da775406c3":[9,0,2,30,213,208]
+"std__expr_8h.html#a67dd1858b167b6ba67dae0b2fa599ef2":[9,0,2,30,213,110]
 };
