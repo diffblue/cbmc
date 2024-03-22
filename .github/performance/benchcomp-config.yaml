@@ -25,7 +25,7 @@ run:
   suites:
     aws-c-common:
       parser:
-        command: /home/runner/work/cbmc/cbmc/new/.github/workflows/benchcomp-parse_cbmc.py
+        command: /home/runner/work/cbmc/cbmc/new/.github/performance/benchcomp-parse_cbmc.py
       variants:
         - aws-c-common@old
         - aws-c-common@new
