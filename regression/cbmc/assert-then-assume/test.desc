@@ -1,0 +1,10 @@
+CORE
+main.c
+--assert-then-assume
+^\[main.pointer_dereference.1\] line 7 dereference failure: pointer NULL in \*p: FAILURE$
+^\[main.assertion.1\] line 8 cannot fail with assert-to-assume: SUCCESS$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--

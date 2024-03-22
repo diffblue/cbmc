@@ -74,6 +74,7 @@ public:
     enable_nan_check = _options.get_bool_option("nan-check");
     retain_trivial = _options.get_bool_option("retain-trivial-checks");
     enable_assert_to_assume = _options.get_bool_option("assert-to-assume");
+    enable_assert_then_assume = _options.get_bool_option("assert-then-assume");
     error_labels = _options.get_list_option("error-label");
     enable_pointer_primitive_check =
       _options.get_bool_option("pointer-primitive-check");
@@ -273,6 +274,7 @@ protected:
   bool enable_nan_check;
   bool retain_trivial;
   bool enable_assert_to_assume;
+  bool enable_assert_then_assume;
   bool enable_pointer_primitive_check;
 
   /// Maps a named-check name to the corresponding boolean flag.
@@ -1719,14 +1721,14 @@ void goto_check_ct::add_guarded_property(
 
     add_all_checked_named_check_pragmas(annotated_location);
 
-    if(enable_assert_to_assume)
-    {
-      new_code.add(goto_programt::make_assumption(
-        std::move(guarded_expr), annotated_location));
-    }
-    else
+    if(!enable_assert_to_assume)
     {
       new_code.add(goto_programt::make_assertion(
+        std::move(guarded_expr), annotated_location));
+    }
+    if(enable_assert_to_assume || enable_assert_then_assume)
+    {
+      new_code.add(goto_programt::make_assumption(
         std::move(guarded_expr), annotated_location));
     }
   }
@@ -2082,15 +2084,15 @@ void goto_check_ct::goto_check(
         annotated_location.set_comment("error label " + label);
         annotated_location.set("user-provided", true);
 
-        if(enable_assert_to_assume)
-        {
-          new_code.add(
-            goto_programt::make_assumption(false_exprt{}, annotated_location));
-        }
-        else
+        if(!enable_assert_to_assume)
         {
           new_code.add(
             goto_programt::make_assertion(false_exprt{}, annotated_location));
+        }
+        if(enable_assert_to_assume || enable_assert_then_assume)
+        {
+          new_code.add(
+            goto_programt::make_assumption(false_exprt{}, annotated_location));
         }
       }
     }

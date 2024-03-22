@@ -48,6 +48,7 @@ void goto_check_c(
   "(error-label):"                                                             \
   "(no-assertions)(no-assumptions)"                                            \
   "(assert-to-assume)"                                                         \
+  "(assert-then-assume)"                                                       \
   "(no-bounds-check)(no-pointer-check)(no-signed-overflow-check)"              \
   "(no-pointer-primitive-check)(no-undefined-shift-check)"                     \
   "(no-div-by-zero-check)"
@@ -91,7 +92,8 @@ void goto_check_c(
   " {y--no-built-in-assertions} \t ignore assertions in built-in library\n"    \
   " {y--no-assertions} \t ignore user assertions\n"                            \
   " {y--no-assumptions} \t ignore user assumptions\n"                          \
-  " {y--assert-to-assume} \t convert user assertions to assumptions\n"
+  " {y--assert-to-assume} \t convert user assertions to assumptions\n"         \
+  " {y--assert-then-assume} \t follow each inserted check by an assumption\n"
 // clang-format on
 
 #define PARSE_OPTION_OVERRIDE(cmdline, options, option)                        \
@@ -117,6 +119,7 @@ void goto_check_c(
   options.set_option("assertions", !cmdline.isset("no-assertions")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("assumptions", !cmdline.isset("no-assumptions")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("assert-to-assume", cmdline.isset("assert-to-assume")); /* NOLINT(whitespace/line_length) */ \
+  options.set_option("assert-then-assume", cmdline.isset("assert-then-assume")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("retain-trivial", cmdline.isset("retain-trivial")); /* NOLINT(whitespace/line_length) */ \
   if(cmdline.isset("error-label")) \
     options.set_option("error-label", cmdline.get_values("error-label"));      \
