@@ -275,13 +275,6 @@ public:
 
   virtual bool simplify(exprt &expr);
 
-  static bool is_bitvector_type(const typet &type)
-  {
-    return type.id()==ID_unsignedbv ||
-           type.id()==ID_signedbv ||
-           type.id()==ID_bv;
-  }
-
 protected:
   const namespacet &ns;
 #ifdef DEBUG_ON_DEMAND
