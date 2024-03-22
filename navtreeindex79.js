@@ -1,5 +1,7 @@
 var NAVTREEINDEX79 =
 {
+"expr__skeleton_8h.html":[9,0,2,17,8],
+"expr__skeleton_8h_source.html":[9,0,2,17,8],
 "expr__util_8cpp.html":[9,0,2,30,49],
 "expr__util_8cpp.html#a2136c5a8afa707d785e91b233df849b9":[9,0,2,30,49,11],
 "expr__util_8cpp.html#a4a5b8328a59c893b808298ab27a14857":[9,0,2,30,49,12],
@@ -247,7 +249,5 @@ var NAVTREEINDEX79 =
 "format__specifier_8cpp_source.html":[9,0,2,27,10,4],
 "format__specifier_8h.html":[9,0,2,27,10,5],
 "format__specifier_8h.html#a5bf2ea38ad7736ffc14ebca7a67f9ff1":[9,0,2,27,10,5,3],
-"format__specifier_8h_source.html":[9,0,2,27,10,5],
-"format__strings_8cpp.html":[9,0,2,16,19],
-"format__strings_8cpp.html#a2e2ad3843e0852239c1c58a0ec273674":[9,0,2,16,19,2]
+"format__specifier_8h_source.html":[9,0,2,27,10,5]
 };

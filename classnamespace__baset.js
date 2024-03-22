@@ -3,6 +3,7 @@ var classnamespace__baset =
     [ "~namespace_baset", "classnamespace__baset.html#abe5c53b1b62505c9659705752d62f4c0", null ],
     [ "follow", "classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a", null ],
     [ "follow_macros", "classnamespace__baset.html#a502de850e529a8dc9395c3839142740c", null ],
+    [ "follow_struct_or_union_tag", "classnamespace__baset.html#afa162a25b5003bcd5229414dd9ec8e67", null ],
     [ "follow_tag", "classnamespace__baset.html#a1dd4e7c520bf6fa01b07276b786360a8", null ],
     [ "follow_tag", "classnamespace__baset.html#ac865821b708ccc6d325c4d79b4a66c13", null ],
     [ "follow_tag", "classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710", null ],

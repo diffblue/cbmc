@@ -1813,11 +1813,13 @@ var hierarchy =
           ] ],
           [ "tag_typet", "classtag__typet.html", [
             [ "c_enum_tag_typet", "classc__enum__tag__typet.html", null ],
-            [ "struct_tag_typet", "classstruct__tag__typet.html", [
-              [ "java_generic_parameter_tagt", "classjava__generic__parameter__tagt.html", null ],
-              [ "java_generic_struct_tag_typet", "classjava__generic__struct__tag__typet.html", null ]
-            ] ],
-            [ "union_tag_typet", "classunion__tag__typet.html", null ]
+            [ "struct_or_union_tag_typet", "classstruct__or__union__tag__typet.html", [
+              [ "struct_tag_typet", "classstruct__tag__typet.html", [
+                [ "java_generic_parameter_tagt", "classjava__generic__parameter__tagt.html", null ],
+                [ "java_generic_struct_tag_typet", "classjava__generic__struct__tag__typet.html", null ]
+              ] ],
+              [ "union_tag_typet", "classunion__tag__typet.html", null ]
+            ] ]
           ] ],
           [ "template_parameter_symbol_typet", "structtemplate__parameter__symbol__typet.html", null ],
           [ "template_typet", "classtemplate__typet.html", null ],

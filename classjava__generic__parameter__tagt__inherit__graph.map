@@ -1,9 +1,9 @@
 <map id="java_generic_parameter_tagt" name="java_generic_parameter_tagt">
-<area shape="rect" id="node1" title="Class to hold a Java generic type parameter (also called type variable), e.g., T in List&lt;T&gt;." alt="" coords="5,533,219,560"/>
-<area shape="rect" id="node2" href="$classstruct__tag__typet.html" title="A struct tag type, i.e., struct_typet with an identifier." alt="" coords="48,457,176,484"/>
-<area shape="rect" id="node3" href="$classtag__typet.html" title="A tag&#45;based type, i.e., typet with an identifier." alt="" coords="70,381,154,408"/>
-<area shape="rect" id="node4" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="84,305,140,332"/>
-<area shape="rect" id="node5" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="86,229,138,256"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title=" " alt="" coords="29,124,195,180"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="21,5,203,47"/>
+<area shape="rect" id="node1" title="Class to hold a Java generic type parameter (also called type variable), e.g., T in List&lt;T&gt;." alt="" coords="5,497,219,524"/>
+<area shape="rect" id="node2" href="$classstruct__tag__typet.html" title="A struct tag type, i.e., struct_typet with an identifier." alt="" coords="48,423,176,449"/>
+<area shape="rect" id="node3" href="$classstruct__or__union__tag__typet.html" title="A struct or union tag type." alt="" coords="37,333,187,375"/>
+<area shape="rect" id="node4" href="$classtag__typet.html" title="A tag&#45;based type, i.e., typet with an identifier." alt="" coords="70,259,154,285"/>
+<area shape="rect" id="node5" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="84,184,140,211"/>
+<area shape="rect" id="node6" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="86,109,138,136"/>
+<area shape="rect" id="node7" href="$classsharing__treet.html" title=" " alt="" coords="29,5,195,61"/>
 </map>

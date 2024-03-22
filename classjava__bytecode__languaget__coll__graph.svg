@@ -99,25 +99,25 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="516.6,-188.63 508.18,-182.2 510.76,-192.48 516.6,-188.63"/>
 <text text-anchor="middle" x="650.5" y="-534.5" font-family="Helvetica,sans-Serif" font-size="10.00"> descriptor</text>
 </g>
-<!-- Node71 -->
+<!-- Node72 -->
 <g id="node51" class="node">
-<title>Node71</title>
+<title>Node72</title>
 <g id="a_node51"><a xlink:href="classjava__class__loadert.html" target="_top" xlink:title="Class responsible to load .class files.">
 <polygon fill="none" stroke="black" points="1690.5,-374 1690.5,-393 1797.5,-393 1797.5,-374 1690.5,-374"/>
 <text text-anchor="middle" x="1744" y="-381" font-family="Helvetica,sans-Serif" font-size="10.00">java_class_loadert</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node71 -->
+<!-- Node4&#45;&gt;Node72 -->
 <g id="edge94" class="edge">
-<title>Node4&#45;&gt;Node71</title>
+<title>Node4&#45;&gt;Node72</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M529.51,-158.73C547.05,-150.7 570.36,-141.08 592,-135.5 684.73,-111.61 710.24,-110.5 806,-110.5 806,-110.5 806,-110.5 1442.5,-110.5 1602.5,-110.5 1715.02,-325.15 1738.46,-373.78"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="527.97,-155.59 520.4,-163 530.94,-161.93 527.97,-155.59"/>
 <text text-anchor="middle" x="1133" y="-113.5" font-family="Helvetica,sans-Serif" font-size="10.00"> java_cp_include_files</text>
 </g>
-<!-- Node74 -->
+<!-- Node75 -->
 <g id="node54" class="node">
-<title>Node74</title>
+<title>Node75</title>
 <g id="a_node54"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="746,-278.5 746,-308.5 868,-308.5 868,-278.5 746,-278.5"/>
 <text text-anchor="start" x="754" y="-296.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; std::string,</text>
@@ -125,16 +125,16 @@
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node74 -->
+<!-- Node4&#45;&gt;Node75 -->
 <g id="edge88" class="edge">
-<title>Node4&#45;&gt;Node74</title>
+<title>Node4&#45;&gt;Node75</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M543.55,-167.84C596.87,-162.9 684.81,-158.31 709,-178.5 738.65,-203.24 701.88,-234.17 727,-263.5 732.25,-269.63 738.89,-274.51 746.08,-278.39"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="542.99,-164.38 533.37,-168.83 543.66,-171.34 542.99,-164.38"/>
 <text text-anchor="middle" x="650.5" y="-181.5" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node81 -->
+<!-- Node82 -->
 <g id="node56" class="node">
-<title>Node81</title>
+<title>Node82</title>
 <g id="a_node56"><a xlink:href="structjava__class__loader__baset_1_1classpath__entryt.html" target="_top" xlink:title="An entry in the classpath.">
 <polygon fill="none" stroke="black" points="739,-155.5 739,-185.5 875,-185.5 875,-155.5 739,-155.5"/>
 <text text-anchor="start" x="747" y="-173.5" font-family="Helvetica,sans-Serif" font-size="10.00">java_class_loader_baset</text>
@@ -142,9 +142,9 @@
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node81 -->
+<!-- Node4&#45;&gt;Node82 -->
 <g id="edge92" class="edge">
-<title>Node4&#45;&gt;Node81</title>
+<title>Node4&#45;&gt;Node82</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M535.49,-159.33C552.23,-153.53 572.88,-147.39 592,-144.5 643.42,-136.73 657.45,-137.71 709,-144.5 725.77,-146.71 743.75,-150.98 759.63,-155.43"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="533.85,-156.2 525.62,-162.86 536.21,-162.79 533.85,-156.2"/>
 <text text-anchor="middle" x="650.5" y="-147.5" font-family="Helvetica,sans-Serif" font-size="10.00"> path</text>
@@ -262,9 +262,9 @@
 <text text-anchor="start" x="594.5" y="-1001.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; std::string, object</text>
 <text text-anchor="middle" x="650.5" y="-990.5" font-family="Helvetica,sans-Serif" font-size="10.00">_creation_referencet &gt;</text>
 </g>
-<!-- Node63 -->
+<!-- Node64 -->
 <g id="node42" class="node">
-<title>Node63</title>
+<title>Node64</title>
 <g id="a_node42"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="747.5,-1268.5 747.5,-1298.5 866.5,-1298.5 866.5,-1268.5 747.5,-1268.5"/>
 <text text-anchor="start" x="755.5" y="-1286.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
@@ -272,16 +272,16 @@
 </a>
 </g>
 </g>
-<!-- Node17&#45;&gt;Node63 -->
+<!-- Node17&#45;&gt;Node64 -->
 <g id="edge68" class="edge">
-<title>Node17&#45;&gt;Node63</title>
+<title>Node17&#45;&gt;Node64</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M526.6,-1319.78C543.79,-1332.9 567.78,-1348.51 592,-1355.5 641.96,-1369.92 659.63,-1371.82 709,-1355.5 742.85,-1344.31 774.52,-1316.23 791.98,-1298.63"/>
 <polygon fill="orange" stroke="orange" points="528.76,-1317.02 518.74,-1313.59 524.43,-1322.52 528.76,-1317.02"/>
 <text text-anchor="middle" x="650.5" y="-1369.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; irep_idt, irep_idt &gt;</text>
 </g>
-<!-- Node70 -->
+<!-- Node71 -->
 <g id="node50" class="node">
-<title>Node70</title>
+<title>Node71</title>
 <g id="a_node50"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="744.5,-1424 744.5,-1465 869.5,-1465 869.5,-1424 744.5,-1424"/>
 <text text-anchor="start" x="752.5" y="-1453" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
@@ -290,17 +290,17 @@
 </a>
 </g>
 </g>
-<!-- Node17&#45;&gt;Node70 -->
+<!-- Node17&#45;&gt;Node71 -->
 <g id="edge82" class="edge">
-<title>Node17&#45;&gt;Node70</title>
+<title>Node17&#45;&gt;Node71</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M518.6,-1322.04C533.31,-1342.3 555.07,-1372.31 574,-1398.5 582.02,-1409.6 580.13,-1416.67 592,-1423.5 617.11,-1437.96 690.47,-1442.6 744.32,-1444.02"/>
 <polygon fill="orange" stroke="orange" points="521.28,-1319.77 512.57,-1313.74 515.61,-1323.88 521.28,-1319.77"/>
 <text text-anchor="start" x="594.5" y="-1456.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; dstringt, conversion</text>
 <text text-anchor="middle" x="650.5" y="-1445.5" font-family="Helvetica,sans-Serif" font-size="10.00">_functiont &gt;</text>
 </g>
-<!-- Node83 -->
+<!-- Node84 -->
 <g id="node58" class="node">
-<title>Node83</title>
+<title>Node84</title>
 <g id="a_node58"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="749,-1161 749,-1202 865,-1202 865,-1161 749,-1161"/>
 <text text-anchor="start" x="757" y="-1190" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
@@ -309,9 +309,9 @@
 </a>
 </g>
 </g>
-<!-- Node17&#45;&gt;Node83 -->
+<!-- Node17&#45;&gt;Node84 -->
 <g id="edge103" class="edge">
-<title>Node17&#45;&gt;Node83</title>
+<title>Node17&#45;&gt;Node84</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M568.01,-1299.23C620.44,-1298.42 688.09,-1293.85 709,-1276.5 730.43,-1258.72 708.59,-1237.38 727,-1216.5 733.05,-1209.64 740.7,-1204.06 748.85,-1199.54"/>
 <polygon fill="orange" stroke="orange" points="567.7,-1295.73 557.74,-1299.34 567.78,-1302.73 567.7,-1295.73"/>
 <text text-anchor="start" x="599" y="-1311.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; irep_idt, synthetic</text>
@@ -366,18 +366,18 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="312.23,-1250.41 304.73,-1257.9 315.26,-1256.73 312.23,-1250.41"/>
 <text text-anchor="middle" x="384.5" y="-1234.5" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node62 -->
+<!-- Node63 -->
 <g id="node41" class="node">
-<title>Node62</title>
+<title>Node63</title>
 <g id="a_node41"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="432,-1408 432,-1427 569,-1427 569,-1408 432,-1408"/>
 <text text-anchor="middle" x="500.5" y="-1415" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_set&lt; K &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node62 -->
+<!-- Node18&#45;&gt;Node63 -->
 <g id="edge65" class="edge">
-<title>Node18&#45;&gt;Node62</title>
+<title>Node18&#45;&gt;Node63</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M312.12,-1280C355.06,-1311.51 451.44,-1382.23 486.46,-1407.93"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="314.18,-1277.17 304.04,-1274.07 310.03,-1282.81 314.18,-1277.17"/>
 <text text-anchor="middle" x="384.5" y="-1352.5" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
@@ -444,34 +444,34 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="293.59,-662.34 293.9,-672.93 300.26,-664.46 293.59,-662.34"/>
 <text text-anchor="middle" x="384.5" y="-516.5" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node68 -->
+<!-- Node69 -->
 <g id="node48" class="node">
-<title>Node68</title>
+<title>Node69</title>
 <g id="a_node48"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="604.5,-1211 604.5,-1230 696.5,-1230 696.5,-1211 604.5,-1211"/>
 <text text-anchor="middle" x="650.5" y="-1218" font-family="Helvetica,sans-Serif" font-size="10.00">std::array&lt; T &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node15&#45;&gt;Node68 -->
+<!-- Node15&#45;&gt;Node69 -->
 <g id="edge78" class="edge">
-<title>Node15&#45;&gt;Node68</title>
+<title>Node15&#45;&gt;Node69</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M293.35,-702.24C303.85,-786.65 349.32,-1115.7 427,-1177.5 477.8,-1217.92 555.55,-1224.1 604.4,-1223.38"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="296.81,-701.71 292.13,-692.2 289.87,-702.55 296.81,-701.71"/>
 <text text-anchor="middle" x="384.5" y="-1159.5" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node79 -->
+<!-- Node80 -->
 <g id="node60" class="node">
-<title>Node79</title>
+<title>Node80</title>
 <g id="a_node60"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="441.5,-10 441.5,-29 559.5,-29 559.5,-10 441.5,-10"/>
 <text text-anchor="middle" x="500.5" y="-17" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; T &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node15&#45;&gt;Node79 -->
+<!-- Node15&#45;&gt;Node80 -->
 <g id="edge107" class="edge">
-<title>Node15&#45;&gt;Node79</title>
+<title>Node15&#45;&gt;Node80</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M294.94,-662.55C316.14,-555.49 416.01,-53.48 427,-41.5 431.89,-36.17 438.03,-32.12 444.65,-29.03"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="291.46,-662.15 292.95,-672.64 298.32,-663.51 291.46,-662.15"/>
 <text text-anchor="middle" x="384.5" y="-331.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ptr</text>
@@ -641,25 +641,25 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="501.54,-1011.37 503.07,-1021.86 508.42,-1012.71 501.54,-1011.37"/>
 <text text-anchor="middle" x="650.5" y="-847.5" font-family="Helvetica,sans-Serif" font-size="10.00"> name</text>
 </g>
-<!-- Node55 -->
+<!-- Node56 -->
 <g id="node38" class="node">
-<title>Node55</title>
+<title>Node56</title>
 <g id="a_node38"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="743,-575 743,-594 871,-594 871,-575 743,-575"/>
 <text text-anchor="middle" x="807" y="-582" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; dstringt &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node16&#45;&gt;Node55 -->
+<!-- Node16&#45;&gt;Node56 -->
 <g id="edge57" class="edge">
-<title>Node16&#45;&gt;Node55</title>
+<title>Node16&#45;&gt;Node56</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M503.4,-1011.79C508.87,-965.07 528.57,-846.16 592,-774.5 630.47,-731.04 674.57,-763.23 709,-716.5 738.9,-675.91 692.96,-641.69 727,-604.5 731.49,-599.59 736.99,-595.82 742.99,-592.92"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="499.91,-1011.49 502.32,-1021.81 506.87,-1012.24 499.91,-1011.49"/>
 <text text-anchor="middle" x="650.5" y="-777.5" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node61 -->
+<!-- Node62 -->
 <g id="node40" class="node">
-<title>Node61</title>
+<title>Node62</title>
 <g id="a_node40"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="753.5,-1484.5 753.5,-1514.5 860.5,-1514.5 860.5,-1484.5 753.5,-1484.5"/>
 <text text-anchor="start" x="761.5" y="-1502.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_set</text>
@@ -667,31 +667,31 @@
 </a>
 </g>
 </g>
-<!-- Node16&#45;&gt;Node61 -->
+<!-- Node16&#45;&gt;Node62 -->
 <g id="edge63" class="edge">
-<title>Node16&#45;&gt;Node61</title>
+<title>Node16&#45;&gt;Node62</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M519.07,-1048.45C536.46,-1066.48 562.17,-1096.72 574,-1128.5 593.67,-1181.32 555.71,-1338.37 592,-1381.5 626.49,-1422.5 670.53,-1373.21 709,-1410.5 730.22,-1431.07 706.45,-1453.27 727,-1474.5 734.2,-1481.94 743.61,-1487.17 753.4,-1490.85"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="521.27,-1045.7 511.74,-1041.07 516.3,-1050.63 521.27,-1045.7"/>
 <text text-anchor="middle" x="650.5" y="-1413.5" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node16&#45;&gt;Node63 -->
+<!-- Node16&#45;&gt;Node64 -->
 <g id="edge67" class="edge">
-<title>Node16&#45;&gt;Node63</title>
+<title>Node16&#45;&gt;Node64</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M518.41,-1048.72C535.28,-1066.96 560.56,-1097.36 574,-1128.5 592.41,-1171.17 558.94,-1198.84 592,-1231.5 610.74,-1250.01 683.44,-1244.12 709,-1250.5 728.33,-1255.32 749.31,-1262.24 766.8,-1268.5"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="520.74,-1046.09 511.32,-1041.24 515.66,-1050.91 520.74,-1046.09"/>
 <text text-anchor="middle" x="650.5" y="-1264.5" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 <text text-anchor="middle" x="650.5" y="-1253.5" font-family="Helvetica,sans-Serif" font-size="10.00">keys</text>
 </g>
-<!-- Node16&#45;&gt;Node70 -->
+<!-- Node16&#45;&gt;Node71 -->
 <g id="edge81" class="edge">
-<title>Node16&#45;&gt;Node70</title>
+<title>Node16&#45;&gt;Node71</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M518.92,-1048.51C536.21,-1066.58 561.82,-1096.85 574,-1128.5 589.47,-1168.7 562.86,-1289.78 592,-1321.5 627.74,-1360.4 662.49,-1317.45 709,-1342.5 745.36,-1362.08 775.99,-1400.26 792.6,-1423.95"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="521.15,-1045.78 511.65,-1041.11 516.16,-1050.69 521.15,-1045.78"/>
 <text text-anchor="middle" x="650.5" y="-1345.5" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node82 -->
+<!-- Node83 -->
 <g id="node57" class="node">
-<title>Node82</title>
+<title>Node83</title>
 <g id="a_node57"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="727,-368.5 727,-398.5 887,-398.5 887,-368.5 727,-368.5"/>
 <text text-anchor="start" x="735" y="-386.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::map&lt; irep_idt,</text>
@@ -699,16 +699,16 @@
 </a>
 </g>
 </g>
-<!-- Node16&#45;&gt;Node82 -->
+<!-- Node16&#45;&gt;Node83 -->
 <g id="edge97" class="edge">
-<title>Node16&#45;&gt;Node82</title>
+<title>Node16&#45;&gt;Node83</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M505.71,-1012.2C523.17,-932.08 589.23,-629.67 592,-625.5 627.29,-572.4 674.99,-596.43 709,-542.5 734.02,-502.82 701.8,-478.07 727,-438.5 738.04,-421.16 756.71,-407.79 773.13,-398.57"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="502.28,-1011.46 503.57,-1021.97 509.12,-1012.95 502.28,-1011.46"/>
 <text text-anchor="middle" x="650.5" y="-628.5" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
 </g>
-<!-- Node16&#45;&gt;Node83 -->
+<!-- Node16&#45;&gt;Node84 -->
 <g id="edge102" class="edge">
-<title>Node16&#45;&gt;Node83</title>
+<title>Node16&#45;&gt;Node84</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M511.68,-1050.14C526.11,-1074.66 554.95,-1117.13 592,-1138.5 637.76,-1164.9 657.23,-1148.99 709,-1159.5 721.95,-1162.13 735.82,-1165.15 748.9,-1168.1"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="514.54,-1048.09 506.55,-1041.13 508.45,-1051.55 514.54,-1048.09"/>
 <text text-anchor="middle" x="650.5" y="-1162.5" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
@@ -794,32 +794,32 @@
 <polygon fill="orange" stroke="orange" points="513.93,-699.36 506.15,-692.17 507.74,-702.64 513.93,-699.36"/>
 <text text-anchor="middle" x="650.5" y="-809.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; exceptiont &gt;</text>
 </g>
-<!-- Node50 -->
+<!-- Node51 -->
 <g id="node37" class="node">
-<title>Node50</title>
+<title>Node51</title>
 <g id="a_node37"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="731,-663 731,-682 883,-682 883,-663 731,-663"/>
 <text text-anchor="middle" x="807" y="-670" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; annotationst &gt;</text>
 </a>
 </g>
 </g>
-<!-- Node14&#45;&gt;Node50 -->
+<!-- Node14&#45;&gt;Node51 -->
 <g id="edge53" class="edge">
-<title>Node14&#45;&gt;Node50</title>
+<title>Node14&#45;&gt;Node51</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M559.41,-693.55C570.2,-695.19 581.42,-696.63 592,-697.5 643.82,-701.77 657.67,-705.83 709,-697.5 717.32,-696.15 718.89,-693.82 727,-691.5 738.66,-688.16 751.41,-684.92 763.19,-682.09"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="559.65,-690.04 549.22,-691.92 558.54,-696.95 559.65,-690.04"/>
 <text text-anchor="middle" x="650.5" y="-704.5" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node14&#45;&gt;Node50 -->
+<!-- Node14&#45;&gt;Node51 -->
 <g id="edge54" class="edge">
-<title>Node14&#45;&gt;Node50</title>
+<title>Node14&#45;&gt;Node51</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M559.13,-680.61C607.81,-679.01 677.87,-676.71 730.93,-674.97"/>
 <polygon fill="orange" stroke="orange" points="558.96,-677.11 549.08,-680.94 559.19,-684.11 558.96,-677.11"/>
 <text text-anchor="middle" x="650.5" y="-681.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; annotationst &gt;</text>
 </g>
-<!-- Node14&#45;&gt;Node55 -->
+<!-- Node14&#45;&gt;Node56 -->
 <g id="edge58" class="edge">
-<title>Node14&#45;&gt;Node55</title>
+<title>Node14&#45;&gt;Node56</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M513.33,-664.22C528.8,-639.75 556.04,-594.66 574,-553.5 584.46,-529.54 570.87,-512.9 592,-497.5 613.01,-482.18 688.14,-481.98 709,-497.5 731.34,-514.12 707.69,-537.44 727,-557.5 734.64,-565.44 744.71,-571.04 755.09,-575"/>
 <polygon fill="orange" stroke="orange" points="510.28,-662.5 507.84,-672.81 516.18,-666.27 510.28,-662.5"/>
 <text text-anchor="middle" x="650.5" y="-500.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; dstringt &gt;</text>
@@ -839,17 +839,17 @@
 <text text-anchor="start" x="1070.5" y="-846.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; irep_idt, class_method</text>
 <text text-anchor="middle" x="1133" y="-835.5" font-family="Helvetica,sans-Serif" font-size="10.00">_and_bytecodet &gt;</text>
 </g>
-<!-- Node23&#45;&gt;Node74 -->
+<!-- Node23&#45;&gt;Node75 -->
 <g id="edge89" class="edge">
-<title>Node23&#45;&gt;Node74</title>
+<title>Node23&#45;&gt;Node75</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M512.09,-478.21C527.4,-451.21 555.84,-398.76 574,-351.5 584.75,-323.52 568.14,-304.65 592,-286.5 642,-248.47 719.25,-263.7 765.98,-278.45"/>
 <polygon fill="orange" stroke="orange" points="509.02,-476.53 507.09,-486.95 515.1,-480.01 509.02,-476.53"/>
 <text text-anchor="start" x="609.5" y="-300.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; std::string, jar</text>
 <text text-anchor="middle" x="650.5" y="-289.5" font-family="Helvetica,sans-Serif" font-size="10.00">_filet &gt;</text>
 </g>
-<!-- Node23&#45;&gt;Node82 -->
+<!-- Node23&#45;&gt;Node83 -->
 <g id="edge98" class="edge">
-<title>Node23&#45;&gt;Node82</title>
+<title>Node23&#45;&gt;Node83</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M509.86,-477.56C522.94,-450.61 551.04,-402.28 592,-382.5 637.33,-360.61 694.63,-362.17 738.53,-368.49"/>
 <polygon fill="orange" stroke="orange" points="506.64,-476.19 505.59,-486.73 512.98,-479.14 506.64,-476.19"/>
 <text text-anchor="start" x="596" y="-396.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; irep_idt, parse_tree</text>
@@ -924,9 +924,9 @@
 <polygon fill="orange" stroke="orange" points="550.6,-318.65 541.4,-323.89 551.86,-325.54 550.6,-318.65"/>
 <text text-anchor="middle" x="650.5" y="-319.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; std::string &gt;</text>
 </g>
-<!-- Node80 -->
+<!-- Node81 -->
 <g id="node55" class="node">
-<title>Node80</title>
+<title>Node81</title>
 <g id="a_node55"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="1064.5,-217 1064.5,-258 1201.5,-258 1201.5,-217 1064.5,-217"/>
 <text text-anchor="start" x="1072.5" y="-246" font-family="Helvetica,sans-Serif" font-size="10.00">std::list&lt; java_class</text>
@@ -935,17 +935,17 @@
 </a>
 </g>
 </g>
-<!-- Node30&#45;&gt;Node80 -->
+<!-- Node30&#45;&gt;Node81 -->
 <g id="edge93" class="edge">
-<title>Node30&#45;&gt;Node80</title>
+<title>Node30&#45;&gt;Node81</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M516.68,-315.01C533.22,-297.3 561.43,-270.83 592,-258.5 675.75,-224.72 938.88,-229.87 1064.27,-234.5"/>
 <polygon fill="orange" stroke="orange" points="513.66,-313.13 509.54,-322.9 518.85,-317.83 513.66,-313.13"/>
 <text text-anchor="start" x="741.5" y="-249.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; java_class_loader</text>
 <text text-anchor="middle" x="807" y="-238.5" font-family="Helvetica,sans-Serif" font-size="10.00">_baset::classpath_entryt &gt;</text>
 </g>
-<!-- Node30&#45;&gt;Node82 -->
+<!-- Node30&#45;&gt;Node83 -->
 <g id="edge96" class="edge">
-<title>Node30&#45;&gt;Node82</title>
+<title>Node30&#45;&gt;Node83</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M551.36,-333.46C593.7,-335.07 655.88,-339.33 709,-350.5 709.73,-350.65 736.67,-359.82 761.97,-368.46"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="551.42,-329.96 541.31,-333.11 551.18,-336.95 551.42,-329.96"/>
 <text text-anchor="middle" x="650.5" y="-353.5" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
@@ -1046,37 +1046,37 @@
 <polygon fill="#9a32cd" stroke="#9a32cd" points="868.68,-718.32 858.23,-720.06 867.48,-725.22 868.68,-718.32"/>
 <text text-anchor="middle" x="970.5" y="-744.5" font-family="Helvetica,sans-Serif" font-size="10.00"> exception_table</text>
 </g>
-<!-- Node50&#45;&gt;Node37 -->
+<!-- Node51&#45;&gt;Node37 -->
 <g id="edge52" class="edge">
-<title>Node50&#45;&gt;Node37</title>
+<title>Node51&#45;&gt;Node37</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M859.78,-684.25C874.37,-687.42 890.28,-690.73 905,-693.5 962.95,-704.41 978.93,-699.67 1036,-714.5 1056.09,-719.72 1077.87,-727.48 1095.59,-734.37"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="860.43,-680.81 849.92,-682.09 858.94,-687.65 860.43,-680.81"/>
 <text text-anchor="middle" x="970.5" y="-717.5" font-family="Helvetica,sans-Serif" font-size="10.00"> parameter_annotations</text>
 </g>
-<!-- Node55&#45;&gt;Node1 -->
+<!-- Node56&#45;&gt;Node1 -->
 <g id="edge104" class="edge">
-<title>Node55&#45;&gt;Node1</title>
+<title>Node56&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M870.74,-595.9C916.61,-604.41 980.29,-616.57 1036,-628.5 1515.96,-731.25 1639.17,-746.24 2111,-881.5 2160.18,-895.6 2174.13,-895.84 2220,-918.5 2248.86,-932.76 2279.38,-955.09 2295.81,-967.8"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="871.12,-592.41 860.65,-594.03 869.84,-599.29 871.12,-592.41"/>
 <text text-anchor="middle" x="1583.5" y="-758.5" font-family="Helvetica,sans-Serif" font-size="10.00"> main_jar_classes</text>
 </g>
-<!-- Node55&#45;&gt;Node37 -->
+<!-- Node56&#45;&gt;Node37 -->
 <g id="edge56" class="edge">
-<title>Node55&#45;&gt;Node37</title>
+<title>Node56&#45;&gt;Node37</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M873.79,-597.74C878.4,-599.69 882.86,-601.93 887,-604.5 897.45,-610.98 894.27,-619.49 905,-625.5 956.45,-654.31 983.97,-618.76 1036,-646.5 1075.48,-667.54 1107.57,-711.13 1122.66,-734.28"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="874.75,-594.36 864.16,-594.12 872.29,-600.92 874.75,-594.36"/>
 <text text-anchor="middle" x="970.5" y="-649.5" font-family="Helvetica,sans-Serif" font-size="10.00"> throws_exception_table</text>
 </g>
-<!-- Node55&#45;&gt;Node71 -->
+<!-- Node56&#45;&gt;Node72 -->
 <g id="edge99" class="edge">
-<title>Node55&#45;&gt;Node71</title>
+<title>Node56&#45;&gt;Node72</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M881.5,-584.63C1037.37,-584.11 1396.19,-578.56 1511,-539.5 1607.95,-506.51 1702.69,-421.93 1733,-393.21"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="881.08,-581.13 871.08,-584.65 881.09,-588.13 881.08,-581.13"/>
 <text text-anchor="middle" x="1292" y="-577.5" font-family="Helvetica,sans-Serif" font-size="10.00"> java_load_classes</text>
 </g>
-<!-- Node60 -->
+<!-- Node61 -->
 <g id="node39" class="node">
-<title>Node60</title>
+<title>Node61</title>
 <g id="a_node39"><a xlink:href="classjava__string__library__preprocesst.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="1388,-1447.5 1388,-1477.5 1495,-1477.5 1495,-1447.5 1388,-1447.5"/>
 <text text-anchor="start" x="1396" y="-1465.5" font-family="Helvetica,sans-Serif" font-size="10.00">java_string_library</text>
@@ -1084,30 +1084,30 @@
 </a>
 </g>
 </g>
-<!-- Node60&#45;&gt;Node1 -->
+<!-- Node61&#45;&gt;Node1 -->
 <g id="edge61" class="edge">
-<title>Node60&#45;&gt;Node1</title>
+<title>Node61&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1482.44,-1443.15C1573.01,-1399.95 1801.8,-1294.75 2003,-1234.5 2097.19,-1206.29 2144.06,-1253.94 2220,-1191.5 2287.33,-1136.14 2303.75,-1020.87 2307.18,-987.03"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="1480.86,-1440.02 1473.35,-1447.5 1483.88,-1446.34 1480.86,-1440.02"/>
 <text text-anchor="middle" x="1917.5" y="-1288.5" font-family="Helvetica,sans-Serif" font-size="10.00"> string_preprocess</text>
 </g>
-<!-- Node61&#45;&gt;Node60 -->
+<!-- Node62&#45;&gt;Node61 -->
 <g id="edge62" class="edge">
-<title>Node61&#45;&gt;Node60</title>
+<title>Node62&#45;&gt;Node61</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M870.8,-1506.03C973.21,-1515.03 1181.99,-1526.44 1354,-1491.5 1370.14,-1488.22 1387.45,-1482.82 1402.3,-1477.56"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="870.91,-1502.53 860.63,-1505.11 870.28,-1509.5 870.91,-1502.53"/>
 <text text-anchor="middle" x="1133" y="-1517.5" font-family="Helvetica,sans-Serif" font-size="10.00"> string_types</text>
 </g>
-<!-- Node62&#45;&gt;Node61 -->
+<!-- Node63&#45;&gt;Node62 -->
 <g id="edge64" class="edge">
-<title>Node62&#45;&gt;Node61</title>
+<title>Node63&#45;&gt;Node62</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M522.21,-1433.22C539.8,-1445.73 566.24,-1462.56 592,-1471.5 644.92,-1489.87 709.01,-1496.33 753.18,-1498.53"/>
 <polygon fill="orange" stroke="orange" points="524.01,-1430.2 513.86,-1427.14 519.88,-1435.86 524.01,-1430.2"/>
 <text text-anchor="middle" x="650.5" y="-1497.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; dstringt &gt;</text>
 </g>
-<!-- Node63&#45;&gt;Node60 -->
+<!-- Node64&#45;&gt;Node61 -->
 <g id="edge66" class="edge">
-<title>Node63&#45;&gt;Node60</title>
+<title>Node64&#45;&gt;Node61</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M876.88,-1278.09C958.99,-1273.97 1099.26,-1274.35 1212,-1312.5 1300.78,-1342.54 1388.57,-1415.51 1424.06,-1447.29"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="876.47,-1274.61 866.67,-1278.64 876.85,-1281.6 876.47,-1274.61"/>
 <text text-anchor="start" x="1071" y="-1436.5" font-family="Helvetica,sans-Serif" font-size="10.00"> cprover_equivalent</text>
@@ -1123,9 +1123,9 @@
 <text text-anchor="start" x="1071" y="-1326.5" font-family="Helvetica,sans-Serif" font-size="10.00">_java_string_returning</text>
 <text text-anchor="middle" x="1133" y="-1315.5" font-family="Helvetica,sans-Serif" font-size="10.00">_function</text>
 </g>
-<!-- Node67 -->
+<!-- Node68 -->
 <g id="node47" class="node">
-<title>Node67</title>
+<title>Node68</title>
 <g id="a_node47"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="1076,-1209.5 1076,-1239.5 1190,-1239.5 1190,-1209.5 1076,-1209.5"/>
 <text text-anchor="start" x="1084" y="-1227.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::array&lt; id_mapt</text>
@@ -1133,193 +1133,193 @@
 </a>
 </g>
 </g>
-<!-- Node63&#45;&gt;Node67 -->
+<!-- Node64&#45;&gt;Node68 -->
 <g id="edge76" class="edge">
-<title>Node63&#45;&gt;Node67</title>
+<title>Node64&#45;&gt;Node68</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M872.07,-1265.99C883.02,-1263.29 894.3,-1260.67 905,-1258.5 962.8,-1246.76 1029.64,-1237.23 1075.74,-1231.28"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="870.99,-1262.65 862.15,-1268.49 872.7,-1269.44 870.99,-1262.65"/>
 <text text-anchor="middle" x="970.5" y="-1261.5" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node64 -->
+<!-- Node65 -->
 <g id="node43" class="node">
-<title>Node64</title>
+<title>Node65</title>
 <g id="a_node43"><a xlink:href="classrefined__string__typet.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="1076,-1559 1076,-1578 1190,-1578 1190,-1559 1076,-1559"/>
 <text text-anchor="middle" x="1133" y="-1566" font-family="Helvetica,sans-Serif" font-size="10.00">refined_string_typet</text>
 </a>
 </g>
 </g>
-<!-- Node64&#45;&gt;Node60 -->
+<!-- Node65&#45;&gt;Node61 -->
 <g id="edge69" class="edge">
-<title>Node64&#45;&gt;Node60</title>
+<title>Node65&#45;&gt;Node61</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1200.67,-1571.64C1245.88,-1571.26 1305.93,-1565.71 1354,-1543.5 1386.31,-1528.57 1414.45,-1496.83 1429.31,-1477.81"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="1200.39,-1568.14 1190.39,-1571.64 1200.39,-1575.14 1200.39,-1568.14"/>
 <text text-anchor="middle" x="1292" y="-1573.5" font-family="Helvetica,sans-Serif" font-size="10.00"> refined_string_type</text>
 </g>
-<!-- Node65 -->
+<!-- Node66 -->
 <g id="node44" class="node">
-<title>Node65</title>
+<title>Node66</title>
 <g id="a_node44"><a xlink:href="classstruct__typet.html" target="_top" xlink:title="Structure type, corresponds to C style structs.">
 <polygon fill="none" stroke="black" points="769.5,-1551 769.5,-1570 844.5,-1570 844.5,-1551 769.5,-1551"/>
 <text text-anchor="middle" x="807" y="-1558" font-family="Helvetica,sans-Serif" font-size="10.00">struct_typet</text>
 </a>
 </g>
 </g>
-<!-- Node65&#45;&gt;Node64 -->
+<!-- Node66&#45;&gt;Node65 -->
 <g id="edge70" class="edge">
-<title>Node65&#45;&gt;Node64</title>
+<title>Node66&#45;&gt;Node65</title>
 <path fill="none" stroke="midnightblue" d="M854.6,-1561.65C913.05,-1563.09 1013.19,-1565.57 1075.82,-1567.11"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="854.62,-1558.15 844.54,-1561.4 854.45,-1565.15 854.62,-1558.15"/>
 </g>
-<!-- Node66 -->
+<!-- Node67 -->
 <g id="node45" class="node">
-<title>Node66</title>
+<title>Node67</title>
 <g id="a_node45"><a xlink:href="classstruct__union__typet.html" target="_top" xlink:title="Base type for structs and unions.">
 <polygon fill="none" stroke="black" points="447,-1551 447,-1570 554,-1570 554,-1551 447,-1551"/>
 <text text-anchor="middle" x="500.5" y="-1558" font-family="Helvetica,sans-Serif" font-size="10.00">struct_union_typet</text>
 </a>
 </g>
 </g>
-<!-- Node66&#45;&gt;Node65 -->
+<!-- Node67&#45;&gt;Node66 -->
 <g id="edge71" class="edge">
-<title>Node66&#45;&gt;Node65</title>
+<title>Node67&#45;&gt;Node66</title>
 <path fill="none" stroke="midnightblue" d="M564.22,-1560.5C626.06,-1560.5 718.45,-1560.5 769.25,-1560.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="564.19,-1557 554.19,-1560.5 564.19,-1564 564.19,-1557"/>
 </g>
-<!-- Node41&#45;&gt;Node60 -->
+<!-- Node41&#45;&gt;Node61 -->
 <g id="edge74" class="edge">
-<title>Node41&#45;&gt;Node60</title>
+<title>Node41&#45;&gt;Node61</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M320.76,-1571.34C360.81,-1584.94 434.54,-1606.5 499.5,-1606.5 499.5,-1606.5 499.5,-1606.5 1134,-1606.5 1232.22,-1606.5 1269.08,-1634.86 1354,-1585.5 1396.88,-1560.57 1423.76,-1504.89 1434.77,-1477.84"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="321.69,-1567.96 311.09,-1567.99 319.4,-1574.58 321.69,-1567.96"/>
 <text text-anchor="middle" x="807" y="-1620.5" font-family="Helvetica,sans-Serif" font-size="10.00"> char_type</text>
 <text text-anchor="middle" x="807" y="-1609.5" font-family="Helvetica,sans-Serif" font-size="10.00">index_type</text>
 </g>
-<!-- Node41&#45;&gt;Node66 -->
+<!-- Node41&#45;&gt;Node67 -->
 <g id="edge72" class="edge">
-<title>Node41&#45;&gt;Node66</title>
+<title>Node41&#45;&gt;Node67</title>
 <path fill="none" stroke="midnightblue" d="M321.69,-1560.5C354.48,-1560.5 407.07,-1560.5 446.57,-1560.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="321.37,-1557 311.37,-1560.5 321.37,-1564 321.37,-1557"/>
 </g>
-<!-- Node67&#45;&gt;Node60 -->
+<!-- Node68&#45;&gt;Node61 -->
 <g id="edge75" class="edge">
-<title>Node67&#45;&gt;Node60</title>
+<title>Node68&#45;&gt;Node61</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1200.58,-1216.05C1247.97,-1213.69 1310.68,-1218.44 1354,-1251.5 1418.99,-1301.1 1435.41,-1407.97 1439.34,-1447.45"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="1200.17,-1212.57 1190.4,-1216.68 1200.6,-1219.56 1200.17,-1212.57"/>
 <text text-anchor="middle" x="1292" y="-1254.5" font-family="Helvetica,sans-Serif" font-size="10.00"> id_maps</text>
 </g>
-<!-- Node68&#45;&gt;Node67 -->
+<!-- Node69&#45;&gt;Node68 -->
 <g id="edge77" class="edge">
-<title>Node68&#45;&gt;Node67</title>
+<title>Node69&#45;&gt;Node68</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M706.95,-1220.96C799.22,-1221.73 983.25,-1223.26 1075.92,-1224.03"/>
 <polygon fill="orange" stroke="orange" points="706.73,-1217.46 696.7,-1220.88 706.67,-1224.46 706.73,-1217.46"/>
 <text text-anchor="middle" x="807" y="-1224.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; id_mapt *, 5 &gt;</text>
 </g>
-<!-- Node69 -->
+<!-- Node70 -->
 <g id="node49" class="node">
-<title>Node69</title>
+<title>Node70</title>
 <g id="a_node49"><a xlink:href="classcharacter__refine__preprocesst.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="1054,-1474 1054,-1493 1212,-1493 1212,-1474 1054,-1474"/>
 <text text-anchor="middle" x="1133" y="-1481" font-family="Helvetica,sans-Serif" font-size="10.00">character_refine_preprocesst</text>
 </a>
 </g>
 </g>
-<!-- Node69&#45;&gt;Node60 -->
+<!-- Node70&#45;&gt;Node61 -->
 <g id="edge79" class="edge">
-<title>Node69&#45;&gt;Node60</title>
+<title>Node70&#45;&gt;Node61</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1222.3,-1477.45C1275.76,-1473.79 1342.16,-1469.24 1387.58,-1466.13"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="1221.87,-1473.97 1212.14,-1478.15 1222.35,-1480.95 1221.87,-1473.97"/>
 <text text-anchor="middle" x="1292" y="-1479.5" font-family="Helvetica,sans-Serif" font-size="10.00"> character_preprocess</text>
 </g>
-<!-- Node70&#45;&gt;Node60 -->
+<!-- Node71&#45;&gt;Node61 -->
 <g id="edge83" class="edge">
-<title>Node70&#45;&gt;Node60</title>
+<title>Node71&#45;&gt;Node61</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M879.67,-1445.73C960.44,-1447.2 1095.66,-1449.91 1212,-1453.5 1272.32,-1455.36 1341.56,-1458.18 1387.87,-1460.17"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="879.67,-1442.23 869.61,-1445.55 879.54,-1449.23 879.67,-1442.23"/>
 <text text-anchor="middle" x="1133" y="-1456.5" font-family="Helvetica,sans-Serif" font-size="10.00"> conversion_table</text>
 </g>
-<!-- Node70&#45;&gt;Node69 -->
+<!-- Node71&#45;&gt;Node70 -->
 <g id="edge80" class="edge">
-<title>Node70&#45;&gt;Node69</title>
+<title>Node71&#45;&gt;Node70</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M879.54,-1455.1C888.12,-1456.29 896.75,-1457.45 905,-1458.5 954.46,-1464.79 1010.1,-1470.93 1053.92,-1475.56"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="879.92,-1451.62 869.53,-1453.7 878.95,-1458.55 879.92,-1451.62"/>
 <text text-anchor="middle" x="970.5" y="-1475.5" font-family="Helvetica,sans-Serif" font-size="10.00"> conversion_table</text>
 </g>
-<!-- Node71&#45;&gt;Node1 -->
+<!-- Node72&#45;&gt;Node1 -->
 <g id="edge84" class="edge">
-<title>Node71&#45;&gt;Node1</title>
+<title>Node72&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1808,-389.45C1910.64,-402.65 2113.19,-443.97 2220,-569.5 2274,-632.97 2302,-911.73 2307.13,-967.69"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="1808.14,-385.94 1797.79,-388.19 1807.28,-392.89 1808.14,-385.94"/>
 <text text-anchor="middle" x="2057" y="-482.5" font-family="Helvetica,sans-Serif" font-size="10.00"> java_class_loader</text>
 </g>
-<!-- Node72 -->
+<!-- Node73 -->
 <g id="node52" class="node">
-<title>Node72</title>
+<title>Node73</title>
 <g id="a_node52"><a xlink:href="classjava__class__loader__baset.html" target="_top" xlink:title="Base class for maintaining classpath.">
 <polygon fill="none" stroke="black" points="1373.5,-284 1373.5,-303 1509.5,-303 1509.5,-284 1373.5,-284"/>
 <text text-anchor="middle" x="1441.5" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">java_class_loader_baset</text>
 </a>
 </g>
 </g>
-<!-- Node72&#45;&gt;Node71 -->
+<!-- Node73&#45;&gt;Node72 -->
 <g id="edge85" class="edge">
-<title>Node72&#45;&gt;Node71</title>
+<title>Node73&#45;&gt;Node72</title>
 <path fill="none" stroke="midnightblue" d="M1484.01,-305.93C1544.67,-324.1 1656.26,-357.52 1711,-373.92"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1484.96,-302.56 1474.37,-303.05 1482.95,-309.27 1484.96,-302.56"/>
 </g>
-<!-- Node73 -->
+<!-- Node74 -->
 <g id="node53" class="node">
-<title>Node73</title>
+<title>Node74</title>
 <g id="a_node53"><a xlink:href="classjar__poolt.html" target="_top" xlink:title="A chache for jar_filet objects, by file name.">
 <polygon fill="none" stroke="black" points="1103.5,-284 1103.5,-303 1162.5,-303 1162.5,-284 1103.5,-284"/>
 <text text-anchor="middle" x="1133" y="-291" font-family="Helvetica,sans-Serif" font-size="10.00">jar_poolt</text>
 </a>
 </g>
 </g>
-<!-- Node73&#45;&gt;Node72 -->
+<!-- Node74&#45;&gt;Node73 -->
 <g id="edge86" class="edge">
-<title>Node73&#45;&gt;Node72</title>
+<title>Node74&#45;&gt;Node73</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1172.69,-293.5C1223.03,-293.5 1311.77,-293.5 1373.24,-293.5"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="1172.56,-290 1162.56,-293.5 1172.56,-297 1172.56,-290"/>
 <text text-anchor="middle" x="1292" y="-296.5" font-family="Helvetica,sans-Serif" font-size="10.00"> jar_pool</text>
 </g>
-<!-- Node74&#45;&gt;Node73 -->
+<!-- Node75&#45;&gt;Node74 -->
 <g id="edge87" class="edge">
-<title>Node74&#45;&gt;Node73</title>
+<title>Node75&#45;&gt;Node74</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M878.28,-293.5C948.5,-293.5 1053,-293.5 1103.13,-293.5"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="878.18,-290 868.18,-293.5 878.18,-297 878.18,-290"/>
 <text text-anchor="middle" x="970.5" y="-296.5" font-family="Helvetica,sans-Serif" font-size="10.00"> m_archives</text>
 </g>
-<!-- Node80&#45;&gt;Node72 -->
+<!-- Node81&#45;&gt;Node73 -->
 <g id="edge90" class="edge">
-<title>Node80&#45;&gt;Node72</title>
+<title>Node81&#45;&gt;Node73</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1211.75,-251.71C1267.03,-261.81 1339.78,-275.1 1388.24,-283.95"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="1212.11,-248.21 1201.64,-249.86 1210.85,-255.1 1212.11,-248.21"/>
 <text text-anchor="middle" x="1292" y="-279.5" font-family="Helvetica,sans-Serif" font-size="10.00"> classpath_entries</text>
 </g>
-<!-- Node81&#45;&gt;Node80 -->
+<!-- Node82&#45;&gt;Node81 -->
 <g id="edge91" class="edge">
-<title>Node81&#45;&gt;Node80</title>
+<title>Node82&#45;&gt;Node81</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M885.22,-183.29C929.51,-190.98 986.06,-201.41 1036,-212.5 1045.25,-214.55 1054.95,-216.88 1064.49,-219.26"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="885.55,-179.79 875.1,-181.54 884.36,-186.69 885.55,-179.79"/>
 <text text-anchor="middle" x="970.5" y="-215.5" font-family="Helvetica,sans-Serif" font-size="10.00"> elements</text>
 </g>
-<!-- Node82&#45;&gt;Node71 -->
+<!-- Node83&#45;&gt;Node72 -->
 <g id="edge95" class="edge">
-<title>Node82&#45;&gt;Node71</title>
+<title>Node83&#45;&gt;Node72</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M897.38,-383.5C1089.49,-383.5 1536.78,-383.5 1690.22,-383.5"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="897.31,-380 887.31,-383.5 897.31,-387 897.31,-380"/>
 <text text-anchor="middle" x="1292" y="-386.5" font-family="Helvetica,sans-Serif" font-size="10.00"> class_map</text>
 </g>
-<!-- Node83&#45;&gt;Node1 -->
+<!-- Node84&#45;&gt;Node1 -->
 <g id="edge101" class="edge">
-<title>Node83&#45;&gt;Node1</title>
+<title>Node84&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M875.25,-1180.19C940.78,-1179.02 1043.23,-1177.5 1132,-1177.5 1132,-1177.5 1132,-1177.5 2058,-1177.5 2133.76,-1177.5 2160.8,-1171.77 2220,-1124.5 2268.12,-1086.08 2295.96,-1013.68 2304.85,-987.37"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="875,-1176.69 865.06,-1180.37 875.12,-1183.69 875,-1176.69"/>
 <text text-anchor="middle" x="1583.5" y="-1180.5" font-family="Helvetica,sans-Serif" font-size="10.00"> synthetic_methods</text>
 </g>
-<!-- Node84 -->
+<!-- Node85 -->
 <g id="node59" class="node">
-<title>Node84</title>
+<title>Node85</title>
 <g id="a_node59"><a xlink:title=" ">
 <polygon fill="none" stroke="#bfbfbf" points="905,-0.5 905,-30.5 1036,-30.5 1036,-0.5 905,-0.5"/>
 <text text-anchor="start" x="913" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unique_ptr&lt; const</text>
@@ -1327,16 +1327,16 @@
 </a>
 </g>
 </g>
-<!-- Node84&#45;&gt;Node1 -->
+<!-- Node85&#45;&gt;Node1 -->
 <g id="edge105" class="edge">
-<title>Node84&#45;&gt;Node1</title>
+<title>Node85&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1046.17,-17.33C1110.92,-18.76 1207.14,-20.5 1291,-20.5 1291,-20.5 1291,-20.5 2058,-20.5 2131.14,-20.5 2170.46,4.31 2220,-49.5 2285.77,-120.94 2305.56,-874.05 2307.78,-967.92"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="1046.13,-13.83 1036.06,-17.1 1045.97,-20.83 1046.13,-13.83"/>
 <text text-anchor="middle" x="1583.5" y="-23.5" font-family="Helvetica,sans-Serif" font-size="10.00"> pointer_type_selector</text>
 </g>
-<!-- Node79&#45;&gt;Node84 -->
+<!-- Node80&#45;&gt;Node85 -->
 <g id="edge106" class="edge">
-<title>Node79&#45;&gt;Node84</title>
+<title>Node80&#45;&gt;Node85</title>
 <path fill="none" stroke="orange" stroke-dasharray="5,2" d="M569.92,-18.92C659.86,-18.15 816.74,-16.81 904.8,-16.05"/>
 <polygon fill="orange" stroke="orange" points="569.8,-15.42 559.83,-19 569.86,-22.42 569.8,-15.42"/>
 <text text-anchor="start" x="594" y="-33.5" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; const select_pointer</text>

@@ -1,10 +1,11 @@
 <map id="struct_tag_typet" name="struct_tag_typet">
-<area shape="rect" id="node1" title="A struct tag type, i.e., struct_typet with an identifier." alt="" coords="151,457,279,484"/>
-<area shape="rect" id="node7" href="$classjava__generic__parameter__tagt.html" title="Class to hold a Java generic type parameter (also called type variable), e.g., T in List&lt;T&gt;." alt="" coords="5,541,219,567"/>
-<area shape="rect" id="node8" href="$classjava__generic__struct__tag__typet.html" title="Class to hold type with generic type arguments, for example java.util.List in either a reference of t..." alt="" coords="243,533,392,575"/>
-<area shape="rect" id="node2" href="$classtag__typet.html" title="A tag&#45;based type, i.e., typet with an identifier." alt="" coords="173,381,257,408"/>
-<area shape="rect" id="node3" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="187,305,243,332"/>
-<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="189,229,241,256"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="131,124,298,180"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="124,5,305,47"/>
+<area shape="rect" id="node1" title="A struct tag type, i.e., struct_typet with an identifier." alt="" coords="151,548,279,575"/>
+<area shape="rect" id="node8" href="$classjava__generic__parameter__tagt.html" title="Class to hold a Java generic type parameter (also called type variable), e.g., T in List&lt;T&gt;." alt="" coords="5,631,219,658"/>
+<area shape="rect" id="node9" href="$classjava__generic__struct__tag__typet.html" title="Class to hold type with generic type arguments, for example java.util.List in either a reference of t..." alt="" coords="243,624,392,665"/>
+<area shape="rect" id="node2" href="$classstruct__or__union__tag__typet.html" title="A struct or union tag type." alt="" coords="139,457,290,499"/>
+<area shape="rect" id="node3" href="$classtag__typet.html" title="A tag&#45;based type, i.e., typet with an identifier." alt="" coords="173,381,257,408"/>
+<area shape="rect" id="node4" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="187,305,243,332"/>
+<area shape="rect" id="node5" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="189,229,241,256"/>
+<area shape="rect" id="node6" href="$classsharing__treet.html" title=" " alt="" coords="131,124,298,180"/>
+<area shape="rect" id="node7" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="124,5,305,47"/>
 </map>

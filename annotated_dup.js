@@ -1232,6 +1232,7 @@ var annotated_dup =
     [ "struct_aggregate_typet", "structstruct__aggregate__typet.html", "structstruct__aggregate__typet" ],
     [ "struct_encodingt", "classstruct__encodingt.html", "classstruct__encodingt" ],
     [ "struct_exprt", "classstruct__exprt.html", "classstruct__exprt" ],
+    [ "struct_or_union_tag_typet", "classstruct__or__union__tag__typet.html", "classstruct__or__union__tag__typet" ],
     [ "struct_tag_typet", "classstruct__tag__typet.html", "classstruct__tag__typet" ],
     [ "struct_typet", "classstruct__typet.html", "classstruct__typet" ],
     [ "struct_union_typet", "classstruct__union__typet.html", "classstruct__union__typet" ],
