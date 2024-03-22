@@ -64,15 +64,10 @@ public:
   DEPRECATED(SINCE(2024, 2, 19, "use follow_tag(...) instead"))
   const typet &follow(const typet &) const;
 
-  // These produce union_typet, struct_typet, c_enum_typet or
-  // the incomplete version.
   const union_typet &follow_tag(const union_tag_typet &) const;
   const struct_typet &follow_tag(const struct_tag_typet &) const;
   const c_enum_typet &follow_tag(const c_enum_tag_typet &) const;
-
-  /// Resolve a `struct_tag_typet` or `union_tag_typet` to the complete version.
-  const struct_union_typet &
-  follow_struct_or_union_tag(const struct_or_union_tag_typet &) const;
+  const struct_union_typet &follow_tag(const struct_or_union_tag_typet &) const;
 
   /// Returns the minimal integer n such that there is no symbol (in any of the
   /// symbol tables) whose name is of the form "An" where A is \p prefix.

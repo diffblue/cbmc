@@ -92,8 +92,9 @@ namespace_baset::follow_tag(const c_enum_tag_typet &src) const
   return to_c_enum_type(symbol.type);
 }
 
-const struct_union_typet &namespace_baset::follow_struct_or_union_tag(
-  const struct_or_union_tag_typet &src) const
+/// Resolve a `struct_tag_typet` or `union_tag_typet` to the complete version.
+const struct_union_typet &
+namespace_baset::follow_tag(const struct_or_union_tag_typet &src) const
 {
   const symbolt &symbol = lookup(src.get_identifier());
   CHECK_RETURN(symbol.is_type);
