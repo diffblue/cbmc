@@ -807,7 +807,8 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   {
     // Initialise the supertype with the appropriate classid:
     namespacet ns(symbol_table);
-    const struct_typet &lhs_type = to_struct_type(ns.follow(deref.type()));
+    const struct_typet &lhs_type =
+      ns.follow_tag(to_struct_tag_type(deref.type()));
     auto zero_base_object = *zero_initializer(
       lhs_type.components().front().type(), source_locationt{}, ns);
     set_class_identifier(

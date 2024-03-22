@@ -667,7 +667,7 @@ static member_exprt to_member(
 
   exprt accessed_object = checked_dereference(typed_pointer);
   const auto type_of = [&ns](const exprt &object) {
-    return to_struct_type(ns.follow(object.type()));
+    return ns.follow_tag(to_struct_tag_type(object.type()));
   };
 
   // The field access is described as being against a particular type, but it
