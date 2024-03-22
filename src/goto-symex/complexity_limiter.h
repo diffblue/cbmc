@@ -48,8 +48,6 @@ class optionst;
 class complexity_limitert
 {
 public:
-  complexity_limitert() = default;
-
   complexity_limitert(message_handlert &logger, const optionst &options);
 
   /// Is the complexity module active?
