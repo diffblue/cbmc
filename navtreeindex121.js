@@ -1,6 +1,5 @@
 var NAVTREEINDEX121 =
 {
-"satcheck__lingeling_8h_source.html":[9,0,2,27,7,23],
 "satcheck__minisat2_8cpp.html":[9,0,2,27,7,26],
 "satcheck__minisat2_8cpp.html#a075f860aa9ba72c736fbebd1390c3ec7":[9,0,2,27,7,26,5],
 "satcheck__minisat2_8cpp.html#a22a0bc2658cb8d521ef0d536650ac832":[9,0,2,27,7,26,4],
@@ -249,5 +248,6 @@ var NAVTREEINDEX121 =
 "show__program_8cpp.html#a7bd9e1ff80490f997ad5fc1ec9d8604f":[9,0,2,17,44,4],
 "show__program_8cpp.html#a8b339b437148a7d9172a4685896ea30f":[9,0,2,17,44,10],
 "show__program_8cpp.html#ac00076e929879cb072e7edf584bf5791":[9,0,2,17,44,12],
-"show__program_8cpp.html#acd74f458c42e22407ab68d9a4216e59f":[9,0,2,17,44,11]
+"show__program_8cpp.html#acd74f458c42e22407ab68d9a4216e59f":[9,0,2,17,44,11],
+"show__program_8cpp.html#addc28f08f2c7becc42ad7e6eda1da98d":[9,0,2,17,44,2]
 };
