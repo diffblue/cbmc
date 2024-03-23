@@ -92,8 +92,7 @@ exprt float_bvt::convert(const exprt &expr) const
       return nil_exprt{};
     }
 
-    return extractbits_exprt{
-      to_typecast_expr(expr).op(), dest_type.get_width() - 1, 0, dest_type};
+    return extractbits_exprt{to_typecast_expr(expr).op(), 0, dest_type};
   }
   else if(expr.id()==ID_floatbv_plus)
   {
@@ -669,12 +668,11 @@ exprt float_bvt::limit_distance(
     return dist;
 
   const extractbits_exprt upper_bits(
-    dist, dist_width - 1, nb_bits, unsignedbv_typet(dist_width - nb_bits));
+    dist, nb_bits, unsignedbv_typet(dist_width - nb_bits));
   const equal_exprt upper_bits_zero(
     upper_bits, from_integer(0, upper_bits.type()));
 
-  const extractbits_exprt lower_bits(
-    dist, nb_bits - 1, 0, unsignedbv_typet(nb_bits));
+  const extractbits_exprt lower_bits(dist, 0, unsignedbv_typet(nb_bits));
 
   return if_exprt(
     upper_bits_zero,
@@ -924,9 +922,7 @@ exprt float_bvt::get_exponent(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return extractbits_exprt(
-    src, spec.f+spec.e-1, spec.f,
-    unsignedbv_typet(spec.e));
+  return extractbits_exprt(src, spec.f, unsignedbv_typet(spec.e));
 }
 
 /// Gets the fraction without hidden bit in a floating-point bit-vector src
@@ -934,9 +930,7 @@ exprt float_bvt::get_fraction(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return extractbits_exprt(
-    src, spec.f-1, 0,
-    unsignedbv_typet(spec.f));
+  return extractbits_exprt(src, 0, unsignedbv_typet(spec.f));
 }
 
 exprt float_bvt::isnan(
@@ -975,10 +969,7 @@ void float_bvt::normalization_shift(
 
     // check if first 'distance'-many bits are zeros
     const extractbits_exprt prefix(
-      fraction,
-      fraction_bits - 1,
-      fraction_bits - distance,
-      unsignedbv_typet(distance));
+      fraction, fraction_bits - distance, unsignedbv_typet(distance));
     const equal_exprt prefix_is_zero(prefix, from_integer(0, prefix.type()));
 
     // If so, shift the zeros out left by 'distance'.
@@ -1147,7 +1138,7 @@ exprt float_bvt::fraction_rounding_decision(
     // We keep most-significant bits, and thus the tail is made
     // of least-significant bits.
     const extractbits_exprt tail(
-      fraction, extra_bits - 2, 0, unsignedbv_typet(extra_bits - 2 + 1));
+      fraction, 0, unsignedbv_typet(extra_bits - 2 + 1));
     sticky_bit=notequal_exprt(tail, from_integer(0, tail.type()));
   }
 
@@ -1216,9 +1207,8 @@ void float_bvt::round_fraction(
       fraction_size, result.sign, result.fraction, rounding_mode_bits);
 
     // chop off all the extra bits
-    result.fraction=extractbits_exprt(
-      result.fraction, result_fraction_size-1, extra_bits,
-      unsignedbv_typet(fraction_size));
+    result.fraction = extractbits_exprt(
+      result.fraction, extra_bits, unsignedbv_typet(fraction_size));
 
 #if 0
     // *** does not catch when the overflow goes subnormal -> normal ***
@@ -1306,8 +1296,8 @@ void float_bvt::round_exponent(
   else // exponent gets smaller -- chop off top bits
   {
     exprt old_exponent=result.exponent;
-    result.exponent=
-      extractbits_exprt(result.exponent, spec.e-1, 0, signedbv_typet(spec.e));
+    result.exponent =
+      extractbits_exprt(result.exponent, 0, signedbv_typet(spec.e));
 
     // max_exponent is the maximum representable
     // i.e. 1 higher than the maximum possible for a normal number
@@ -1374,10 +1364,8 @@ float_bvt::biased_floatt float_bvt::bias(
   const extractbit_exprt hidden_bit(src.fraction, spec.f);
   const not_exprt denormal(hidden_bit);
 
-  result.fraction=
-    extractbits_exprt(
-      src.fraction, spec.f-1, 0,
-      unsignedbv_typet(spec.f));
+  result.fraction =
+    extractbits_exprt(src.fraction, 0, unsignedbv_typet(spec.f));
 
   // make exponent zero if its denormal
   // (includes zero)
@@ -1490,7 +1478,7 @@ exprt float_bvt::sticky_right_shift(
     exprt lost_bits;
 
     if(d<=width)
-      lost_bits=extractbits_exprt(result, d-1, 0, unsignedbv_typet(d));
+      lost_bits = extractbits_exprt(result, 0, unsignedbv_typet(d));
     else
       lost_bits=result;
 

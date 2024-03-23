@@ -30,16 +30,11 @@ extractbit_exprt::extractbit_exprt(exprt _src, const std::size_t _index)
 
 extractbits_exprt::extractbits_exprt(
   exprt _src,
-  const std::size_t _upper,
-  const std::size_t _lower,
+  const std::size_t _index,
   typet _type)
   : expr_protectedt(ID_extractbits, std::move(_type))
 {
-  PRECONDITION(_upper >= _lower);
-  add_to_operands(
-    std::move(_src),
-    from_integer(_upper, integer_typet()),
-    from_integer(_lower, integer_typet()));
+  add_to_operands(std::move(_src), from_integer(_index, integer_typet()));
 }
 
 exprt update_bit_exprt::lower() const

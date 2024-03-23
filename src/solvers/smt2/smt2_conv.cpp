@@ -1831,22 +1831,14 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_extractbits)
   {
     const extractbits_exprt &extractbits_expr = to_extractbits_expr(expr);
+    auto width = boolbv_width(expr.type());
 
-    if(
-      extractbits_expr.upper().is_constant() &&
-      extractbits_expr.lower().is_constant())
+    if(extractbits_expr.index().is_constant())
     {
-      mp_integer op1_i =
-        numeric_cast_v<mp_integer>(to_constant_expr(extractbits_expr.upper()));
-      mp_integer op2_i =
-        numeric_cast_v<mp_integer>(to_constant_expr(extractbits_expr.lower()));
+      mp_integer index_i =
+        numeric_cast_v<mp_integer>(to_constant_expr(extractbits_expr.index()));
 
-      if(op2_i>op1_i)
-        std::swap(op1_i, op2_i);
-
-      // now op1_i>=op2_i
-
-      out << "((_ extract " << op1_i << " " << op2_i << ") ";
+      out << "((_ extract " << (width + index_i - 1) << " " << index_i << ") ";
       flatten2bv(extractbits_expr.src());
       out << ")";
     }

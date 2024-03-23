@@ -17,43 +17,28 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 
   auto const &src_bv = convert_bv(expr.src());
 
-  auto const maybe_upper_as_int = numeric_cast<mp_integer>(expr.upper());
-  auto const maybe_lower_as_int = numeric_cast<mp_integer>(expr.lower());
+  auto const maybe_index_as_int = numeric_cast<mp_integer>(expr.index());
 
   // We only do constants for now.
   // Should implement a shift here.
-  if(!maybe_upper_as_int.has_value() || !maybe_lower_as_int.has_value())
+  if(!maybe_index_as_int.has_value())
     return conversion_failed(expr);
 
-  auto upper_as_int = maybe_upper_as_int.value();
-  auto lower_as_int = maybe_lower_as_int.value();
+  auto index_as_int = maybe_index_as_int.value();
 
   DATA_INVARIANT_WITH_DIAGNOSTICS(
-    upper_as_int >= 0 && upper_as_int < src_bv.size(),
-    "upper end of extracted bits must be within the bitvector",
+    index_as_int >= 0 && index_as_int < src_bv.size(),
+    "index of extractbits must be within the bitvector",
     expr.find_source_location(),
     irep_pretty_diagnosticst{expr});
 
   DATA_INVARIANT_WITH_DIAGNOSTICS(
-    lower_as_int >= 0 && lower_as_int < src_bv.size(),
-    "lower end of extracted bits must be within the bitvector",
+    index_as_int + bv_width - 1 < src_bv.size(),
+    "index+width-1 of extractbits must be within the bitvector",
     expr.find_source_location(),
     irep_pretty_diagnosticst{expr});
 
-  DATA_INVARIANT(
-    lower_as_int <= upper_as_int,
-    "upper bound must be greater or equal to lower bound");
-
-  // now lower_as_int <= upper_as_int
-
-  DATA_INVARIANT_WITH_DIAGNOSTICS(
-    (upper_as_int - lower_as_int + 1) == bv_width,
-    "the difference between upper and lower end of the range must have the "
-    "same width as the resulting bitvector type",
-    expr.find_source_location(),
-    irep_pretty_diagnosticst{expr});
-
-  const std::size_t offset = numeric_cast_v<std::size_t>(lower_as_int);
+  const std::size_t offset = numeric_cast_v<std::size_t>(index_as_int);
 
   bvt result_bv(src_bv.begin() + offset, src_bv.begin() + offset + bv_width);
 

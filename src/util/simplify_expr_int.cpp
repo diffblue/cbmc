@@ -923,13 +923,14 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
         const extractbits_exprt &eb_n = to_extractbits_expr(skip_typecast(opn));
 
         if(
-          eb_i.src() == eb_n.src() && eb_i.lower().is_constant() &&
-          eb_n.upper().is_constant() &&
-          numeric_cast_v<mp_integer>(to_constant_expr(eb_i.lower())) ==
-            numeric_cast_v<mp_integer>(to_constant_expr(eb_n.upper())) + 1)
+          eb_i.src() == eb_n.src() && eb_i.index().is_constant() &&
+          eb_n.index().is_constant() &&
+          numeric_cast_v<mp_integer>(to_constant_expr(eb_i.index())) ==
+            numeric_cast_v<mp_integer>(to_constant_expr(eb_n.index())) +
+              to_bitvector_type(eb_n.type()).get_width())
         {
           extractbits_exprt eb_merged = eb_i;
-          eb_merged.lower() = eb_n.lower();
+          eb_merged.index() = eb_n.index();
           to_bitvector_type(eb_merged.type())
             .set_width(
               to_bitvector_type(eb_i.type()).get_width() +
@@ -1138,11 +1139,7 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
     return unchanged(expr);
   }
 
-  const auto start = numeric_cast<mp_integer>(expr.upper());
-  const auto end = numeric_cast<mp_integer>(expr.lower());
-
-  if(!start.has_value())
-    return unchanged(expr);
+  const auto end = numeric_cast<mp_integer>(expr.index());
 
   if(!end.has_value())
     return unchanged(expr);
@@ -1152,10 +1149,17 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
   if(!width.has_value())
     return unchanged(expr);
 
+  const auto result_width = pointer_offset_bits(expr.type(), ns);
+
+  if(!result_width.has_value())
+    return unchanged(expr);
+
+  const auto start = std::optional(*end + *result_width - 1);
+
   if(*start < 0 || *start >= (*width) || *end < 0 || *end >= (*width))
     return unchanged(expr);
 
-  DATA_INVARIANT(*start >= *end, "extractbits must have upper() >= lower()");
+  DATA_INVARIANT(*start >= *end, "extractbits must have start >= end");
 
   if(expr.src().is_constant())
   {
@@ -1191,10 +1195,8 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
       {
         extractbits_exprt result = expr;
         result.src() = op;
-        result.lower() =
-          from_integer(*end - (offset - *op_width), expr.lower().type());
-        result.upper() =
-          from_integer(*start - (offset - *op_width), expr.upper().type());
+        result.index() =
+          from_integer(*end - (offset - *op_width), expr.index().type());
         return changed(simplify_extractbits(result));
       }
 
@@ -1203,14 +1205,13 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
   }
   else if(auto eb_src = expr_try_dynamic_cast<extractbits_exprt>(expr.src()))
   {
-    if(eb_src->upper().is_constant() && eb_src->lower().is_constant())
+    if(eb_src->index().is_constant())
     {
       extractbits_exprt result = *eb_src;
       result.type() = expr.type();
-      const mp_integer src_lower =
-        numeric_cast_v<mp_integer>(to_constant_expr(eb_src->lower()));
-      result.lower() = from_integer(src_lower + *end, eb_src->lower().type());
-      result.upper() = from_integer(src_lower + *start, eb_src->lower().type());
+      const mp_integer src_index =
+        numeric_cast_v<mp_integer>(to_constant_expr(eb_src->index()));
+      result.index() = from_integer(src_index + *end, eb_src->index().type());
       return changed(simplify_extractbits(result));
     }
   }

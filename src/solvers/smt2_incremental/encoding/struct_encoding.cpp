@@ -195,7 +195,6 @@ static std::size_t count_trailing_bit_width(
 exprt struct_encodingt::encode_member(const member_exprt &member_expr) const
 {
   const auto &type = ns.get().follow(member_expr.compound().type());
-  const auto member_bits_width = (*boolbv_width)(member_expr.type());
   const auto offset_bits = [&]() -> std::size_t {
     if(can_cast_type<union_typet>(type))
       return 0;
@@ -204,10 +203,7 @@ exprt struct_encodingt::encode_member(const member_exprt &member_expr) const
       struct_type, member_expr.get_component_name(), *boolbv_width);
   }();
   return extractbits_exprt{
-    member_expr.compound(),
-    offset_bits + member_bits_width - 1,
-    offset_bits,
-    member_expr.type()};
+    member_expr.compound(), offset_bits, member_expr.type()};
 }
 
 exprt struct_encodingt::encode(exprt expr) const

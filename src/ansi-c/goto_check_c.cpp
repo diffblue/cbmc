@@ -999,7 +999,6 @@ void goto_check_ct::integer_overflow_check(
 
       const exprt top_bits = extractbits_exprt(
         op_ext_shifted,
-        new_type.get_width() - 1,
         new_type.get_width() - number_of_top_bits,
         unsignedbv_typet(number_of_top_bits));
 

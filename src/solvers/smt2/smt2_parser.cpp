@@ -638,15 +638,14 @@ exprt smt2_parsert::function_application()
           if(op.size()!=1)
             throw error("extract takes one operand");
 
-          auto upper_e=from_integer(upper, integer_typet());
-          auto lower_e=from_integer(lower, integer_typet());
-
           if(upper<lower)
             throw error("extract got bad indices");
 
+          auto lower_e = from_integer(lower, integer_typet());
+
           unsignedbv_typet t(upper-lower+1);
 
-          return extractbits_exprt(op[0], upper_e, lower_e, t);
+          return extractbits_exprt(op[0], lower_e, t);
         }
         else if(id=="rotate_left" ||
                 id=="rotate_right" ||
