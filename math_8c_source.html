@@ -315,7 +315,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00221"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#a9e2bcaa7903406e650466164fb5d90f7">  221</a></span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#a9e2bcaa7903406e650466164fb5d90f7">__builtin_inff</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;{</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keywordflow">return</span> 1.0f / 0.0f;</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
@@ -326,7 +326,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00232"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#a724ef91997ed2b6b1982c4dda28f6b28">  232</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#a724ef91997ed2b6b1982c4dda28f6b28">__builtin_inf</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;{</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keywordflow">return</span> 1.0 / 0.0;</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
@@ -337,7 +337,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00243"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#af8375111d664d7b4b7ceeec9108868fc">  243</a></span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#af8375111d664d7b4b7ceeec9108868fc">__builtin_infl</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;{</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="keywordflow">return</span> 1.0l / 0.0l;</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
@@ -383,7 +383,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00289"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#aeb7e728350e442c10065da58f5adff56">  289</a></span>&#160;<span class="keywordtype">float</span> <a class="code" href="math_8c.html#aeb7e728350e442c10065da58f5adff56">__builtin_huge_valf</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;{</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
 <div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  <span class="keywordflow">return</span> 1.0f / 0.0f;</div>
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
@@ -394,7 +394,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00300"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#a59aa9692bfeb8a907e16ff7ad2c0932e">  300</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="math_8c.html#a59aa9692bfeb8a907e16ff7ad2c0932e">__builtin_huge_val</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;{</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <span class="keywordflow">return</span> 1.0 / 0.0;</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
@@ -405,7 +405,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00311"></a><span class="lineno"><a class="line" href="gcc__builtin__headers__math_8h.html#af4f6badf29e0064603766a6f0875f6fc">  311</a></span>&#160;<span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="math_8c.html#af4f6badf29e0064603766a6f0875f6fc">__builtin_huge_vall</a>(<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;{</div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-overflow&quot;</span></div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <span class="keywordflow">return</span> 1.0l / 0.0l;</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
@@ -716,7 +716,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;__CPROVER_hide:;</div>
 <div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;  (void)*str;</div>
 <div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;  <span class="keywordflow">return</span> 0.0/0.0;</div>
 <div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;}</div>
@@ -729,7 +729,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;__CPROVER_hide:;</div>
 <div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;  (void)*str;</div>
 <div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;  <span class="keywordflow">return</span> 0.0f/0.0f;</div>
 <div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;}</div>
@@ -755,7 +755,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160; __CPROVER_hide:;</div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;  (void)*str;</div>
 <div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;  <span class="keywordflow">return</span> 0.0/0.0;</div>
 <div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;}</div>
@@ -767,7 +767,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160; __CPROVER_hide:;</div>
 <div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;  (void)*str;</div>
 <div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;  <span class="keywordflow">return</span> 0.0f/0.0f;</div>
 <div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;}</div>
@@ -779,7 +779,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160; __CPROVER_hide:;</div>
 <div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;  (void)*str;</div>
 <div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;  <span class="keywordflow">return</span> 0.0/0.0;</div>
 <div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;}</div>
@@ -810,7 +810,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;__CPROVER_hide:;</div>
 <div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="cprover__builtin__headers_8h.html#a295eae882b9fed7ffcde88218023563d">__CPROVER_isnanf</a>(f))</div>
 <div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    <span class="keywordflow">return</span> 0.0f/0.0f;  <span class="comment">// NaN</span></div>
 <div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (f == 0.0f)</div>
@@ -862,7 +862,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;__CPROVER_hide:;</div>
 <div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="cprover__builtin__headers_8h.html#aee912cd47a11dde6f608ea7cff6b9720">__CPROVER_isnand</a>(d))</div>
 <div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;    <span class="keywordflow">return</span> 0.0/0.0;  <span class="comment">// NaN</span></div>
 <div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (d == 0.0)</div>
@@ -913,7 +913,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;__CPROVER_hide:;</div>
 <div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="cprover__builtin__headers_8h.html#abf7a77c5a397eda1e77d31598b793036">__CPROVER_isnanld</a>(d))</div>
 <div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    <span class="keywordflow">return</span> 0.0/0.0;  <span class="comment">// NaN</span></div>
 <div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (d == 0.0)</div>
@@ -983,7 +983,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160; </div>
 <div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;  <span class="keywordflow">if</span> ( <a class="code" href="unionmixl.html#acc3a388e31f40b697032f90b422add79">f</a> &lt; 0.0f )</div>
 <div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;    <span class="keywordflow">return</span> 0.0f/0.0f; <span class="comment">// NaN</span></div>
 <div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code" href="cprover__builtin__headers_8h.html#a6752cc1f8eb7e1c9bfed7fd6ab847e5a">__CPROVER_isinff</a>(<a class="code" href="unionmixl.html#acc3a388e31f40b697032f90b422add79">f</a>) ||   <span class="comment">// +Inf only</span></div>
@@ -1076,7 +1076,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160; </div>
 <div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;  <span class="keywordflow">if</span> ( d &lt; 0.0 )</div>
 <div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;    <span class="keywordflow">return</span> 0.0/0.0; <span class="comment">// NaN</span></div>
 <div class="line"><a name="l00987"></a><span class="lineno">  987</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l00988"></a><span class="lineno">  988</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code" href="cprover__builtin__headers_8h.html#aaf68da028fdbb175dc47d568fc62851a">__CPROVER_isinfd</a>(d) ||   <span class="comment">// +Inf only</span></div>
@@ -1153,7 +1153,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160; </div>
 <div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;  <span class="keywordflow">if</span>(d &lt; 0.0l)</div>
 <div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;    <span class="keywordflow">return</span> 0.0l/0.0l; <span class="comment">// NaN</span></div>
 <div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code" href="cprover__builtin__headers_8h.html#a35e917dcd1896efbaceb063dd940bf95">__CPROVER_isinfld</a>(d) ||   <span class="comment">// +Inf only</span></div>
@@ -2885,7 +2885,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l02791"></a><span class="lineno"> 2791</span>&#160;  {</div>
 <div class="line"><a name="l02792"></a><span class="lineno"> 2792</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l02793"></a><span class="lineno"> 2793</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l02794"></a><span class="lineno"> 2794</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l02794"></a><span class="lineno"> 2794</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l02795"></a><span class="lineno"> 2795</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
 <div class="line"><a name="l02796"></a><span class="lineno"> 2796</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l02797"></a><span class="lineno"> 2797</span>&#160;  }</div>
@@ -2953,7 +2953,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l02859"></a><span class="lineno"> 2859</span>&#160;  {</div>
 <div class="line"><a name="l02860"></a><span class="lineno"> 2860</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l02861"></a><span class="lineno"> 2861</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l02862"></a><span class="lineno"> 2862</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l02862"></a><span class="lineno"> 2862</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l02863"></a><span class="lineno"> 2863</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
 <div class="line"><a name="l02864"></a><span class="lineno"> 2864</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l02865"></a><span class="lineno"> 2865</span>&#160;  }</div>
@@ -3022,7 +3022,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l02928"></a><span class="lineno"> 2928</span>&#160;  {</div>
 <div class="line"><a name="l02929"></a><span class="lineno"> 2929</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l02930"></a><span class="lineno"> 2930</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l02931"></a><span class="lineno"> 2931</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l02931"></a><span class="lineno"> 2931</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l02932"></a><span class="lineno"> 2932</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
 <div class="line"><a name="l02933"></a><span class="lineno"> 2933</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l02934"></a><span class="lineno"> 2934</span>&#160;  }</div>
@@ -3096,7 +3096,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03002"></a><span class="lineno"> 3002</span>&#160;  {</div>
 <div class="line"><a name="l03003"></a><span class="lineno"> 3003</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03004"></a><span class="lineno"> 3004</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03005"></a><span class="lineno"> 3005</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03005"></a><span class="lineno"> 3005</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03006"></a><span class="lineno"> 3006</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
 <div class="line"><a name="l03007"></a><span class="lineno"> 3007</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03008"></a><span class="lineno"> 3008</span>&#160;  }</div>
@@ -3163,7 +3163,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03069"></a><span class="lineno"> 3069</span>&#160;  {</div>
 <div class="line"><a name="l03070"></a><span class="lineno"> 3070</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03071"></a><span class="lineno"> 3071</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03072"></a><span class="lineno"> 3072</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03072"></a><span class="lineno"> 3072</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03073"></a><span class="lineno"> 3073</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
 <div class="line"><a name="l03074"></a><span class="lineno"> 3074</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03075"></a><span class="lineno"> 3075</span>&#160;  }</div>
@@ -3231,7 +3231,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03137"></a><span class="lineno"> 3137</span>&#160;  {</div>
 <div class="line"><a name="l03138"></a><span class="lineno"> 3138</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03139"></a><span class="lineno"> 3139</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03140"></a><span class="lineno"> 3140</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03140"></a><span class="lineno"> 3140</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03141"></a><span class="lineno"> 3141</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
 <div class="line"><a name="l03142"></a><span class="lineno"> 3142</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03143"></a><span class="lineno"> 3143</span>&#160;  }</div>
@@ -3305,7 +3305,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03211"></a><span class="lineno"> 3211</span>&#160;  {</div>
 <div class="line"><a name="l03212"></a><span class="lineno"> 3212</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03213"></a><span class="lineno"> 3213</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03214"></a><span class="lineno"> 3214</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03214"></a><span class="lineno"> 3214</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03215"></a><span class="lineno"> 3215</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
 <div class="line"><a name="l03216"></a><span class="lineno"> 3216</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03217"></a><span class="lineno"> 3217</span>&#160;  }</div>
@@ -3375,7 +3375,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03281"></a><span class="lineno"> 3281</span>&#160;  {</div>
 <div class="line"><a name="l03282"></a><span class="lineno"> 3282</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03283"></a><span class="lineno"> 3283</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03284"></a><span class="lineno"> 3284</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03284"></a><span class="lineno"> 3284</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03285"></a><span class="lineno"> 3285</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
 <div class="line"><a name="l03286"></a><span class="lineno"> 3286</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03287"></a><span class="lineno"> 3287</span>&#160;  }</div>
@@ -3445,7 +3445,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03351"></a><span class="lineno"> 3351</span>&#160;  {</div>
 <div class="line"><a name="l03352"></a><span class="lineno"> 3352</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03353"></a><span class="lineno"> 3353</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03354"></a><span class="lineno"> 3354</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03354"></a><span class="lineno"> 3354</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03355"></a><span class="lineno"> 3355</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
 <div class="line"><a name="l03356"></a><span class="lineno"> 3356</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03357"></a><span class="lineno"> 3357</span>&#160;  }</div>
@@ -3509,7 +3509,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03415"></a><span class="lineno"> 3415</span>&#160;  {</div>
 <div class="line"><a name="l03416"></a><span class="lineno"> 3416</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03417"></a><span class="lineno"> 3417</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03418"></a><span class="lineno"> 3418</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03418"></a><span class="lineno"> 3418</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03419"></a><span class="lineno"> 3419</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
 <div class="line"><a name="l03420"></a><span class="lineno"> 3420</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03421"></a><span class="lineno"> 3421</span>&#160;  }</div>
@@ -3581,7 +3581,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03487"></a><span class="lineno"> 3487</span>&#160;  }</div>
 <div class="line"><a name="l03488"></a><span class="lineno"> 3488</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(x) || <a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(y))</div>
 <div class="line"><a name="l03489"></a><span class="lineno"> 3489</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03490"></a><span class="lineno"> 3490</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03490"></a><span class="lineno"> 3490</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03491"></a><span class="lineno"> 3491</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
 <div class="line"><a name="l03492"></a><span class="lineno"> 3492</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03493"></a><span class="lineno"> 3493</span>&#160; </div>
@@ -3657,7 +3657,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03563"></a><span class="lineno"> 3563</span>&#160;  {</div>
 <div class="line"><a name="l03564"></a><span class="lineno"> 3564</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03565"></a><span class="lineno"> 3565</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03566"></a><span class="lineno"> 3566</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03566"></a><span class="lineno"> 3566</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03567"></a><span class="lineno"> 3567</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
 <div class="line"><a name="l03568"></a><span class="lineno"> 3568</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03569"></a><span class="lineno"> 3569</span>&#160;  }</div>
@@ -3732,7 +3732,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03638"></a><span class="lineno"> 3638</span>&#160;  }</div>
 <div class="line"><a name="l03639"></a><span class="lineno"> 3639</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a>(x) || <a class="code" href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a>(y))</div>
 <div class="line"><a name="l03640"></a><span class="lineno"> 3640</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03641"></a><span class="lineno"> 3641</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03641"></a><span class="lineno"> 3641</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03642"></a><span class="lineno"> 3642</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
 <div class="line"><a name="l03643"></a><span class="lineno"> 3643</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03644"></a><span class="lineno"> 3644</span>&#160; </div>
@@ -3802,7 +3802,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03708"></a><span class="lineno"> 3708</span>&#160;  {</div>
 <div class="line"><a name="l03709"></a><span class="lineno"> 3709</span>&#160;    errno = EDOM;</div>
 <div class="line"><a name="l03710"></a><span class="lineno"> 3710</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03711"></a><span class="lineno"> 3711</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03711"></a><span class="lineno"> 3711</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03712"></a><span class="lineno"> 3712</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
 <div class="line"><a name="l03713"></a><span class="lineno"> 3713</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03714"></a><span class="lineno"> 3714</span>&#160;  }</div>
@@ -3878,7 +3878,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03784"></a><span class="lineno"> 3784</span>&#160;  }</div>
 <div class="line"><a name="l03785"></a><span class="lineno"> 3785</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#aa9a1e7cefb5331a6c8090fcd85124a45">isnanl</a>(x) || <a class="code" href="math_8c.html#aa9a1e7cefb5331a6c8090fcd85124a45">isnanl</a>(y))</div>
 <div class="line"><a name="l03786"></a><span class="lineno"> 3786</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03787"></a><span class="lineno"> 3787</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03787"></a><span class="lineno"> 3787</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03788"></a><span class="lineno"> 3788</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
 <div class="line"><a name="l03789"></a><span class="lineno"> 3789</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l03790"></a><span class="lineno"> 3790</span>&#160; </div>
@@ -3946,7 +3946,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03852"></a><span class="lineno"> 3852</span>&#160;{</div>
 <div class="line"><a name="l03853"></a><span class="lineno"> 3853</span>&#160;  <span class="comment">// see man fma (https://linux.die.net/man/3/fma)</span></div>
 <div class="line"><a name="l03854"></a><span class="lineno"> 3854</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03855"></a><span class="lineno"> 3855</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03855"></a><span class="lineno"> 3855</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03856"></a><span class="lineno"> 3856</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(x) || <a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(y))</div>
 <div class="line"><a name="l03857"></a><span class="lineno"> 3857</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
 <div class="line"><a name="l03858"></a><span class="lineno"> 3858</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
@@ -3998,7 +3998,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03904"></a><span class="lineno"> 3904</span>&#160;{</div>
 <div class="line"><a name="l03905"></a><span class="lineno"> 3905</span>&#160;  <span class="comment">// see man fma (https://linux.die.net/man/3/fma)</span></div>
 <div class="line"><a name="l03906"></a><span class="lineno"> 3906</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03907"></a><span class="lineno"> 3907</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03907"></a><span class="lineno"> 3907</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03908"></a><span class="lineno"> 3908</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a>(x) || <a class="code" href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a>(y))</div>
 <div class="line"><a name="l03909"></a><span class="lineno"> 3909</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
 <div class="line"><a name="l03910"></a><span class="lineno"> 3910</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
@@ -4055,7 +4055,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l03961"></a><span class="lineno"> 3961</span>&#160;{</div>
 <div class="line"><a name="l03962"></a><span class="lineno"> 3962</span>&#160;  <span class="comment">// see man fma (https://linux.die.net/man/3/fma)</span></div>
 <div class="line"><a name="l03963"></a><span class="lineno"> 3963</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l03964"></a><span class="lineno"> 3964</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l03964"></a><span class="lineno"> 3964</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l03965"></a><span class="lineno"> 3965</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#aa9a1e7cefb5331a6c8090fcd85124a45">isnanl</a>(x) || <a class="code" href="math_8c.html#aa9a1e7cefb5331a6c8090fcd85124a45">isnanl</a>(y))</div>
 <div class="line"><a name="l03966"></a><span class="lineno"> 3966</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
 <div class="line"><a name="l03967"></a><span class="lineno"> 3967</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
@@ -4166,7 +4166,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l04072"></a><span class="lineno"> 4072</span>&#160;  }</div>
 <div class="line"><a name="l04073"></a><span class="lineno"> 4073</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(x))</div>
 <div class="line"><a name="l04074"></a><span class="lineno"> 4074</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l04075"></a><span class="lineno"> 4075</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l04075"></a><span class="lineno"> 4075</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l04076"></a><span class="lineno"> 4076</span>&#160;    <span class="keywordflow">return</span> 0.0 / 0.0;</div>
 <div class="line"><a name="l04077"></a><span class="lineno"> 4077</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l04078"></a><span class="lineno"> 4078</span>&#160; </div>
@@ -4287,7 +4287,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l04193"></a><span class="lineno"> 4193</span>&#160;  }</div>
 <div class="line"><a name="l04194"></a><span class="lineno"> 4194</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ade8117d49ed4d18874edacda5ff06ba1">isnanf</a>(x))</div>
 <div class="line"><a name="l04195"></a><span class="lineno"> 4195</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l04196"></a><span class="lineno"> 4196</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l04196"></a><span class="lineno"> 4196</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l04197"></a><span class="lineno"> 4197</span>&#160;    <span class="keywordflow">return</span> 0.0f / 0.0f;</div>
 <div class="line"><a name="l04198"></a><span class="lineno"> 4198</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l04199"></a><span class="lineno"> 4199</span>&#160; </div>
@@ -4403,7 +4403,7 @@ $(document).ready(function(){initNavTree('math_8c_source.html',''); initResizabl
 <div class="line"><a name="l04309"></a><span class="lineno"> 4309</span>&#160;  }</div>
 <div class="line"><a name="l04310"></a><span class="lineno"> 4310</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="math_8c.html#ab3f108437bca4812aef4b47a226495a1">isnan</a>(x))</div>
 <div class="line"><a name="l04311"></a><span class="lineno"> 4311</span>&#160;<span class="preprocessor">#pragma CPROVER check push</span></div>
-<div class="line"><a name="l04312"></a><span class="lineno"> 4312</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;div-by-zero&quot;</span></div>
+<div class="line"><a name="l04312"></a><span class="lineno"> 4312</span>&#160;<span class="preprocessor">#pragma CPROVER check disable &quot;float-div-by-zero&quot;</span></div>
 <div class="line"><a name="l04313"></a><span class="lineno"> 4313</span>&#160;    <span class="keywordflow">return</span> 0.0l / 0.0l;</div>
 <div class="line"><a name="l04314"></a><span class="lineno"> 4314</span>&#160;<span class="preprocessor">#pragma CPROVER check pop</span></div>
 <div class="line"><a name="l04315"></a><span class="lineno"> 4315</span>&#160; </div>
