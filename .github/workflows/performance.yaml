@@ -97,20 +97,20 @@ jobs:
       - name: Run benchcomp
         run: |
           kani.git/tools/benchcomp/bin/benchcomp \
-            --config new/.github/workflows/benchcomp-config.yaml \
+            --config new/.github/performance/benchcomp-config.yaml \
             run
           kani.git/tools/benchcomp/bin/benchcomp \
-            --config new/.github/workflows/benchcomp-config.yaml \
+            --config new/.github/performance/benchcomp-config.yaml \
             collate
 
       - name: Perf Regression Results Table
         run: |
           kani.git/tools/benchcomp/bin/benchcomp \
-            --config new/.github/workflows/benchcomp-config.yaml \
+            --config new/.github/performance/benchcomp-config.yaml \
             visualize --only dump_markdown_results_table >> "$GITHUB_STEP_SUMMARY"
 
       - name: Run other visualizations
         run: |
           kani.git/tools/benchcomp/bin/benchcomp \
-            --config new/.github/workflows/benchcomp-config.yaml \
+            --config new/.github/performance/benchcomp-config.yaml \
             visualize --except dump_markdown_results_table
