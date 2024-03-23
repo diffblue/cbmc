@@ -58,6 +58,8 @@ public:
     enable_memory_cleanup_check =
       _options.get_bool_option("memory-cleanup-check");
     enable_div_by_zero_check = _options.get_bool_option("div-by-zero-check");
+    enable_float_div_by_zero_check =
+      _options.get_bool_option("float-div-by-zero-check");
     enable_enum_range_check = _options.get_bool_option("enum-range-check");
     enable_signed_overflow_check =
       _options.get_bool_option("signed-overflow-check");
@@ -179,6 +181,7 @@ protected:
   void bounds_check_index(const index_exprt &, const guardt &);
   void bounds_check_bit_count(const unary_exprt &, const guardt &);
   void div_by_zero_check(const div_exprt &, const guardt &);
+  void float_div_by_zero_check(const div_exprt &, const guardt &);
   void mod_by_zero_check(const mod_exprt &, const guardt &);
   void mod_overflow_check(const mod_exprt &, const guardt &);
   void enum_range_check(const exprt &, const guardt &);
@@ -262,6 +265,7 @@ protected:
   bool enable_memory_leak_check;
   bool enable_memory_cleanup_check;
   bool enable_div_by_zero_check;
+  bool enable_float_div_by_zero_check;
   bool enable_enum_range_check;
   bool enable_signed_overflow_check;
   bool enable_unsigned_overflow_check;
@@ -282,6 +286,7 @@ protected:
     {"memory-leak-check", &enable_memory_leak_check},
     {"memory-cleanup-check", &enable_memory_cleanup_check},
     {"div-by-zero-check", &enable_div_by_zero_check},
+    {"float-div-by-zero-check", &enable_float_div_by_zero_check},
     {"enum-range-check", &enable_enum_range_check},
     {"signed-overflow-check", &enable_signed_overflow_check},
     {"unsigned-overflow-check", &enable_unsigned_overflow_check},
@@ -503,6 +508,27 @@ void goto_check_ct::div_by_zero_check(
     inequality,
     "division by zero",
     "division-by-zero",
+    expr.find_source_location(),
+    expr,
+    guard);
+}
+
+void goto_check_ct::float_div_by_zero_check(
+  const div_exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_float_div_by_zero_check)
+    return;
+
+  // add divison by zero subgoal
+
+  exprt zero = from_integer(0, expr.op1().type());
+  const notequal_exprt inequality(expr.op1(), std::move(zero));
+
+  add_guarded_property(
+    inequality,
+    "floating-point division by zero",
+    "float-division-by-zero",
     expr.find_source_location(),
     expr,
     guard);
@@ -1850,7 +1876,21 @@ void goto_check_ct::check_rec_div(
   const div_exprt &div_expr,
   const guardt &guard)
 {
-  div_by_zero_check(to_div_expr(div_expr), guard);
+  if(
+    div_expr.type().id() == ID_signedbv ||
+    div_expr.type().id() == ID_unsignedbv || div_expr.type().id() == ID_c_bool)
+  {
+    // Division by zero is undefined behavior for all integer types.
+    div_by_zero_check(to_div_expr(div_expr), guard);
+  }
+  else if(div_expr.type().id() == ID_floatbv)
+  {
+    // Division by zero on floating-point numbers may be undefined behavior.
+    // Annex F of the ISO C21 suggests that implementations that
+    // define __STDC_IEC_559__ follow IEEE 754 semantics,
+    // which defines the outcome of division by zero.
+    float_div_by_zero_check(to_div_expr(div_expr), guard);
+  }
 
   if(div_expr.type().id() == ID_signedbv)
     integer_overflow_check(div_expr, guard);

@@ -16,6 +16,7 @@ int main()
 #pragma CPROVER check disable "bounds"
 #pragma CPROVER check disable "pointer"
 #pragma CPROVER check disable "div-by-zero"
+#pragma CPROVER check disable "float-div-by-zero"
 #pragma CPROVER check disable "enum-range"
 #pragma CPROVER check disable "signed-overflow"
 #pragma CPROVER check disable "unsigned-overflow"
@@ -36,7 +37,7 @@ int main()
     ABC e;
     bool readable;
     char i;
-    signed int j;
+    signed int j, k;
     readable = __CPROVER_r_ok(q, 1);
     q = p + 2000000000000;
     q = r;
@@ -45,14 +46,16 @@ int main()
     else
       den = 1.0;
     y = x / den;
+    j = 10 / 0;
     e = 10;
     i += 1;
-    j += 1;
+    k += 1;
   }
 #pragma CPROVER check push
 #pragma CPROVER check enable "bounds"
 #pragma CPROVER check enable "pointer"
 #pragma CPROVER check enable "div-by-zero"
+#pragma CPROVER check enable "float-div-by-zero"
 #pragma CPROVER check enable "enum-range"
 #pragma CPROVER check enable "signed-overflow"
 #pragma CPROVER check enable "unsigned-overflow"
@@ -73,7 +76,7 @@ int main()
     ABC e;
     bool readable;
     char i;
-    signed int j;
+    signed int j, k;
     readable = __CPROVER_r_ok(q, 1);
     q = p + 2000000000000;
     q = r;
@@ -82,9 +85,10 @@ int main()
     else
       den = 1.0;
     y = x / den;
+    j = 10 / 0;
     e = 10;
     i += 1;
-    j += 1;
+    k += 1;
   }
 #pragma CPROVER check pop
 #pragma CPROVER check pop

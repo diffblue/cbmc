@@ -255,7 +255,7 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 
 CPROVER_PREFIX  "__CPROVER_"
 
-arith_check     ("conversion"|"undefined-shift"|"nan"|"div-by-zero")
+arith_check     ("conversion"|"undefined-shift"|"nan"|"div-by-zero"|"float-div-by-zero")
 enum_check      "enum-range"
 pointer_primitive "pointer-primitive"
 memory_check    ("bounds"|"pointer"|"memory-leak")
