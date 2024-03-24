@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_DESTRUCTOR_TREE_H
-#define CPROVER_GOTO_PROGRAMS_DESTRUCTOR_TREE_H
+#ifndef CPROVER_ANSI_C_GOTO_CONVERSION_SCOPE_TREE_H
+#define CPROVER_ANSI_C_GOTO_CONVERSION_SCOPE_TREE_H
 
 #include <util/graph.h>
 #include <util/std_code_base.h>
@@ -198,4 +198,4 @@ private:
   node_indext current_node = 0;
 };
 
-#endif // CPROVER_GOTO_PROGRAMS_DESTRUCTOR_TREE_H
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERSION_DESTRUCTOR_TREE_H

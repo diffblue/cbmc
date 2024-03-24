@@ -12,9 +12,9 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
 #define CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
 
-#include <set>
+#include "allocate_objects.h"
 
-#include <goto-programs/allocate_objects.h>
+#include <set>
 
 struct c_object_factory_parameterst;
 

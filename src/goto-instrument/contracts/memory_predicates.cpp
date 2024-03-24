@@ -19,9 +19,8 @@ Date: July 2021
 #include <util/fresh_symbol.h>
 #include <util/prefix.h>
 
-#include <goto-programs/goto_convert_functions.h>
-
 #include <ansi-c/ansi_c_language.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <linking/static_lifetime_init.h>
 
 #include "instrument_spec_assigns.h"

@@ -12,7 +12,6 @@
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_skip.h>
@@ -22,6 +21,7 @@
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/cprover_library.h>
 #include <ansi-c/gcc_version.h>
+#include <ansi-c/goto-conversion/link_to_library.h>
 #include <assembler/remove_asm.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
 #include <goto-checker/multi_path_symex_checker.h>

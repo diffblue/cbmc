@@ -14,11 +14,11 @@ Author: Diffblue Ltd.
 #include <util/help_formatter.h>
 #include <util/version.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <ansi-c/ansi_c_language.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <json-symtab-language/json_symtab_language.h>
 #include <langapi/mode.h>
 #include <linking/linking.h>

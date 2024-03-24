@@ -7,7 +7,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 \*******************************************************************/
 
 #include "dfcc_spec_functions.h"
-#include <goto-programs/goto_convert_class.h>
+#include <ansi-c/goto-conversion/goto_convert_class.h>
 
 #include <util/format_expr.h>
 #include <util/namespace.h>

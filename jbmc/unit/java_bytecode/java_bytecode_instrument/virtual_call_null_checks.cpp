@@ -8,12 +8,13 @@ Author: Diffblue Limited.
 \*******************************************************************/
 
 #include <java-testing-utils/load_java_class.h>
-#include <testing-utils/message.h>
-#include <testing-utils/use_catch.h>
+
+#include <util/expr_iterator.h>
 
 #include <analyses/local_safe_pointers.h>
-#include <goto-programs/goto_convert_functions.h>
-#include <util/expr_iterator.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 // We're expecting a call "something->field . B.virtualmethod()":
 static bool is_expected_virtualmethod_call(

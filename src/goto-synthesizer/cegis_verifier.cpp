@@ -17,8 +17,6 @@ Author: Qinheping Hu
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/pointer_arithmetic.h>
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/remove_skip.h>
@@ -26,6 +24,8 @@ Author: Qinheping Hu
 
 #include <analyses/dependence_graph.h>
 #include <ansi-c/cprover_library.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <ansi-c/goto-conversion/link_to_library.h>
 #include <assembler/remove_asm.h>
 #include <cpp/cprover_library.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>

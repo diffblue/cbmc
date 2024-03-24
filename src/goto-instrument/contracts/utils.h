@@ -11,7 +11,7 @@ Date: September 2021
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_UTILS_H
 
-#include <goto-programs/goto_convert_class.h>
+#include <ansi-c/goto-conversion/goto_convert_class.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/loop_ids.h>

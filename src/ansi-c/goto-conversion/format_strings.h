@@ -9,8 +9,8 @@ Author: CM Wintersteiger
 /// \file
 /// Format String Parser
 
-#ifndef CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H
-#define CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H
+#ifndef CPROVER_ANSI_C_GOTO_CONVERSION_FORMAT_STRINGS_H
+#define CPROVER_ANSI_C_GOTO_CONVERSION_FORMAT_STRINGS_H
 
 #include <util/irep.h>
 #include <util/mp_arith.h>
@@ -28,9 +28,9 @@ public:
   {
     UNKNOWN,
     TEXT,
-    INT, // d, i, o, u, x
-    FLOAT, // a, e, f, g
-    CHAR, // c
+    INT,    // d, i, o, u, x
+    FLOAT,  // a, e, f, g
+    CHAR,   // c
     STRING, // s
     POINTER // p
   };
@@ -70,13 +70,14 @@ public:
     : type(_type),
       length_modifier(length_modifierst::LEN_undef),
       representation(representationt::SIGNED_undef)
-    { }
-  format_tokent():
-    type(token_typet::UNKNOWN),
-    length_modifier(length_modifierst::LEN_undef),
-    representation(representationt::SIGNED_undef)
-    { }
-
+  {
+  }
+  format_tokent()
+    : type(token_typet::UNKNOWN),
+      length_modifier(length_modifierst::LEN_undef),
+      representation(representationt::SIGNED_undef)
+  {
+  }
 
   token_typet type;
   std::list<flag_typet> flags;
@@ -93,4 +94,4 @@ format_token_listt parse_format_string(const std::string &);
 
 std::optional<typet> get_type(const format_tokent &);
 
-#endif // CPROVER_GOTO_PROGRAMS_FORMAT_STRINGS_H
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERSION_FORMAT_STRINGS_H

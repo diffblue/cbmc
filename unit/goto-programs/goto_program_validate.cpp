@@ -17,10 +17,10 @@
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/validate_goto_model.h>
 
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 

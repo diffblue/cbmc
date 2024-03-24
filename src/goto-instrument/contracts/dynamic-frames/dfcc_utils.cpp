@@ -19,10 +19,10 @@ Date: August 2022
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_model.h>
 
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <goto-instrument/contracts/inlining_decorator.h>
 #include <goto-instrument/contracts/utils.h>
 #include <linking/static_lifetime_init.h>

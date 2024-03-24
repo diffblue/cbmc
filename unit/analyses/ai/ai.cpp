@@ -9,20 +9,16 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for ait
 
-#include <testing-utils/message.h>
-#include <testing-utils/use_catch.h>
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/config.h>
 
 #include <analyses/ai.h>
-
 #include <ansi-c/ansi_c_language.h>
-
-#include <goto-programs/goto_convert_functions.h>
-
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <langapi/mode.h>
-
-#include <util/arith_tools.h>
-#include <util/config.h>
-#include <util/c_types.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 /// A very simple analysis that counts executed instructions along a particular
 /// path, taking the max at merge points and saturating at 100 instructions.

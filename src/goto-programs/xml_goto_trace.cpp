@@ -19,10 +19,10 @@ Author: Daniel Kroening
 #include <util/symbol.h>
 #include <util/xml_irep.h>
 
+#include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
 
 #include "goto_trace.h"
-#include "printf_formatter.h"
 #include "structured_trace_util.h"
 #include "xml_expr.h"
 

@@ -37,10 +37,9 @@ void goto_convertt::do_function_call(
 {
   // make it all side effect free
 
-  exprt new_lhs=lhs,
-        new_function=function;
+  exprt new_lhs = lhs, new_function = function;
 
-  exprt::operandst new_arguments=arguments;
+  exprt::operandst new_arguments = arguments;
 
   if(!new_lhs.is_nil())
     clean_expr(new_lhs, dest, mode);
@@ -52,12 +51,12 @@ void goto_convertt::do_function_call(
 
   // split on the function
 
-  if(new_function.id()==ID_if)
+  if(new_function.id() == ID_if)
   {
     do_function_call_if(
       new_lhs, to_if_expr(new_function), new_arguments, dest, mode);
   }
-  else if(new_function.id()==ID_symbol)
+  else if(new_function.id() == ID_symbol)
   {
     do_function_call_symbol(
       new_lhs, to_symbol_expr(new_function), new_arguments, dest, mode);
@@ -65,8 +64,9 @@ void goto_convertt::do_function_call(
   else if(new_function.id() == ID_null_object)
   {
   }
-  else if(new_function.id()==ID_dereference ||
-          new_function.id()=="virtual_function")
+  else if(
+    new_function.id() == ID_dereference ||
+    new_function.id() == "virtual_function")
   {
     do_function_call_other(new_lhs, new_function, new_arguments, dest);
   }
@@ -120,7 +120,7 @@ void goto_convertt::do_function_call_if(
   if(tmp_y.instructions.empty())
     y = tmp_y.add(goto_programt::make_skip());
   else
-    y=tmp_y.instructions.begin();
+    y = tmp_y.instructions.begin();
 
   // v: if(!c) goto y;
   v->complete_goto(y);
@@ -151,7 +151,7 @@ void goto_convertt::do_function_call_other(
 {
   // don't know what to do with it
   code_function_callt function_call(lhs, function, arguments);
-  function_call.add_source_location()=function.source_location();
+  function_call.add_source_location() = function.source_location();
   dest.add(goto_programt::make_function_call(
     function_call, function.source_location()));
 }

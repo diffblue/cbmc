@@ -11,9 +11,10 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 
 #include "convert_java_nondet.h"
 
-#include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
+
+#include <ansi-c/goto-conversion/goto_convert.h>
 
 #include "java_object_factory.h" // gen_nondet_init
 #include "java_object_factory_parameters.h"

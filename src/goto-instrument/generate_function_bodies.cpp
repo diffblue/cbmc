@@ -8,18 +8,18 @@ Author: Diffblue Ltd.
 
 #include "generate_function_bodies.h"
 
-#include <ansi-c/c_nondet_symbol_factory.h>
-
-#include <goto-programs/goto_convert.h>
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_model.h>
-#include <goto-programs/remove_skip.h>
-
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/string2int.h>
 #include <util/string_utils.h>
+
+#include <goto-programs/goto_model.h>
+#include <goto-programs/remove_skip.h>
+
+#include <ansi-c/c_nondet_symbol_factory.h>
+#include <ansi-c/goto-conversion/goto_convert.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 
 void generate_function_bodiest::generate_function_body(
   goto_functiont &function,

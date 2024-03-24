@@ -13,7 +13,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_WRAPPER_PROGRAM_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_WRAPPER_PROGRAM_H
 
-#include <goto-programs/goto_convert_class.h>
+#include <ansi-c/goto-conversion/goto_convert_class.h>
 
 #include <util/message.h>
 #include <util/namespace.h>

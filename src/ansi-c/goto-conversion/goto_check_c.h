@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
-#ifndef CPROVER_ANSI_C_GOTO_CHECK_C_H
-#define CPROVER_ANSI_C_GOTO_CHECK_C_H
+#ifndef CPROVER_ANSI_C_GOTO_CONVERSION_GOTO_CHECK_C_H
+#define CPROVER_ANSI_C_GOTO_CONVERSION_GOTO_CHECK_C_H
 
 #include <goto-programs/goto_functions.h>
 
@@ -134,4 +134,4 @@ void goto_check_c(
   (void)0
 // clang-format on
 
-#endif // CPROVER_ANALYSES_GOTO_CHECK_C_H
+#endif // CPROVER_ANSI_C_GOTO_CONVERSION_GOTO_CHECK_C_H

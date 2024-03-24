@@ -13,22 +13,22 @@ Date: April 2016
 
 #include "model_argc_argv.h"
 
-#include <sstream>
-
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/invariant.h>
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/config.h>
+#include <util/prefix.h>
 #include <util/replace_symbol.h>
 #include <util/symbol_table.h>
-#include <util/prefix.h>
 
-#include <ansi-c/ansi_c_language.h>
-
-#include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
+
+#include <ansi-c/ansi_c_language.h>
+#include <ansi-c/goto-conversion/goto_convert.h>
+
+#include <sstream>
 
 /// Set up argv with up to max_argc pointers into an array of 4096 bytes.
 /// \param goto_model: Contains the input program's symbol table and

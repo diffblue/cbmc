@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
-#ifndef CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_H
-#define CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_H
+#ifndef CPROVER_ANSI_C_GOTO_CONVERSION_GOTO_CONVERT_H
+#define CPROVER_ANSI_C_GOTO_CONVERSION_GOTO_CONVERT_H
 
 #include <util/irep.h>
 
@@ -33,4 +33,4 @@ void goto_convert(
   goto_programt &dest,
   message_handlert &message_handler);
 
-#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_H
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERSION_GOTO_CONVERT_H
