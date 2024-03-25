@@ -696,7 +696,10 @@ static array_exprt unpack_struct(
   const std::size_t bits_per_byte,
   const namespacet &ns)
 {
-  const struct_typet &struct_type = to_struct_type(ns.follow(src.type()));
+  const struct_typet &struct_type =
+    src.type().id() == ID_struct_tag
+      ? ns.follow_tag(to_struct_tag_type(src.type()))
+      : to_struct_type(src.type());
   const struct_typet::componentst &components = struct_type.components();
 
   std::optional<mp_integer> offset_in_member;
@@ -963,7 +966,10 @@ static exprt unpack_rec(
   }
   else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
   {
-    const union_typet &union_type = to_union_type(ns.follow(src.type()));
+    const union_typet &union_type =
+      src.type().id() == ID_union_tag
+        ? ns.follow_tag(to_union_tag_type(src.type()))
+        : to_union_type(src.type());
 
     const auto widest_member = union_type.find_widest_union_component(ns);
 
@@ -1316,7 +1322,10 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   }
   else if(src.type().id() == ID_struct || src.type().id() == ID_struct_tag)
   {
-    const struct_typet &struct_type = to_struct_type(ns.follow(src.type()));
+    const struct_typet &struct_type =
+      src.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(src.type()))
+        : to_struct_type(src.type());
     const struct_typet::componentst &components = struct_type.components();
 
     bool failed = false;
@@ -1361,7 +1370,10 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   }
   else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
   {
-    const union_typet &union_type = to_union_type(ns.follow(src.type()));
+    const union_typet &union_type =
+      src.type().id() == ID_union_tag
+        ? ns.follow_tag(to_union_tag_type(src.type()))
+        : to_union_type(src.type());
 
     const auto widest_member = union_type.find_widest_union_component(ns);
 
@@ -2355,23 +2367,23 @@ static exprt lower_byte_update(
   }
   else if(src.type().id() == ID_struct || src.type().id() == ID_struct_tag)
   {
+    const struct_typet &struct_type =
+      src.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(src.type()))
+        : to_struct_type(src.type());
     exprt result = lower_byte_update_struct(
-      src,
-      to_struct_type(ns.follow(src.type())),
-      value_as_byte_array,
-      non_const_update_bound,
-      ns);
+      src, struct_type, value_as_byte_array, non_const_update_bound, ns);
     result.type() = src.type();
     return result;
   }
   else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
   {
+    const union_typet &union_type =
+      src.type().id() == ID_union_tag
+        ? ns.follow_tag(to_union_tag_type(src.type()))
+        : to_union_type(src.type());
     exprt result = lower_byte_update_union(
-      src,
-      to_union_type(ns.follow(src.type())),
-      value_as_byte_array,
-      non_const_update_bound,
-      ns);
+      src, union_type, value_as_byte_array, non_const_update_bound, ns);
     result.type() = src.type();
     return result;
   }

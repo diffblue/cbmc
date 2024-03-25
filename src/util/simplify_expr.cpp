@@ -1449,11 +1449,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
   // copy
   auto with_expr = expr;
 
-  const typet old_type_followed = ns.follow(with_expr.old().type());
-
   // now look at first operand
 
-  if(old_type_followed.id() == ID_struct)
+  if(
+    with_expr.old().type().id() == ID_struct ||
+    with_expr.old().type().id() == ID_struct_tag)
   {
     if(with_expr.old().id() == ID_struct || with_expr.old().is_constant())
     {
@@ -1462,11 +1462,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
         const irep_idt &component_name =
           with_expr.where().get(ID_component_name);
 
-        if(!to_struct_type(old_type_followed).has_component(component_name))
+        const struct_typet &old_type_followed =
+          with_expr.old().type().id() == ID_struct_tag
+            ? ns.follow_tag(to_struct_tag_type(with_expr.old().type()))
+            : to_struct_type(with_expr.old().type());
+        if(!old_type_followed.has_component(component_name))
           return unchanged(expr);
 
-        std::size_t number =
-          to_struct_type(old_type_followed).component_number(component_name);
+        std::size_t number = old_type_followed.component_number(component_name);
 
         if(number >= with_expr.old().operands().size())
           return unchanged(expr);
@@ -1530,8 +1533,6 @@ simplify_exprt::simplify_update(const update_exprt &expr)
 
   for(const auto &e : designator)
   {
-    const typet &value_ptr_type=ns.follow(value_ptr->type());
-
     if(e.id()==ID_index_designator &&
        value_ptr->id()==ID_array)
     {
@@ -1551,7 +1552,9 @@ simplify_exprt::simplify_update(const update_exprt &expr)
       const irep_idt &component_name=
         e.get(ID_component_name);
       const struct_typet &value_ptr_struct_type =
-        to_struct_type(value_ptr_type);
+        value_ptr->type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(value_ptr->type()))
+          : to_struct_type(value_ptr->type());
       if(!value_ptr_struct_type.has_component(component_name))
         return unchanged(expr);
       auto &designator_as_struct_expr = to_struct_expr(*value_ptr);
@@ -1788,14 +1791,18 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   }
 
   if(
-    (expr.type().id() == ID_union || expr.type().id() == ID_union_tag) &&
-    to_union_type(ns.follow(expr.type())).components().empty())
+    (expr.type().id() == ID_union &&
+     to_union_type(expr.type()).components().empty()) ||
+    (expr.type().id() == ID_union_tag &&
+     ns.follow_tag(to_union_tag_type(expr.type())).components().empty()))
   {
     return empty_union_exprt{expr.type()};
   }
   else if(
-    (expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag) &&
-    to_struct_type(ns.follow(expr.type())).components().empty())
+    (expr.type().id() == ID_struct &&
+     to_struct_type(expr.type()).components().empty()) ||
+    (expr.type().id() == ID_struct_tag &&
+     ns.follow_tag(to_struct_tag_type(expr.type())).components().empty()))
   {
     return struct_exprt{{}, expr.type()};
   }
@@ -1870,7 +1877,9 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
         if(type.id() != ID_struct && type.id() != ID_struct_tag)
           return false;
 
-        const struct_typet &st = to_struct_type(ns.follow(type));
+        const struct_typet &st = type.id() == ID_struct_tag
+                                   ? ns.follow_tag(to_struct_tag_type(type))
+                                   : to_struct_type(type);
         const auto &comps = st.components();
         if(comps.empty() || comps.back().type().id() != ID_array)
           return false;
@@ -1905,7 +1914,10 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   {
     if(expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag)
     {
-      const struct_typet &struct_type = to_struct_type(ns.follow(expr.type()));
+      const struct_typet &struct_type =
+        expr.type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(expr.type()))
+          : to_struct_type(expr.type());
       const struct_typet::componentst &components = struct_type.components();
 
       bool failed = false;
@@ -1950,7 +1962,10 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     }
     else if(expr.type().id() == ID_union || expr.type().id() == ID_union_tag)
     {
-      const union_typet &union_type = to_union_type(ns.follow(expr.type()));
+      const union_typet &union_type =
+        expr.type().id() == ID_union_tag
+          ? ns.follow_tag(to_union_tag_type(expr.type()))
+          : to_union_type(expr.type());
       auto widest_member_opt = union_type.find_widest_union_component(ns);
       if(widest_member_opt.has_value())
       {
@@ -2150,10 +2165,12 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
       if(!(offset==extract.offset()))
         return unchanged(expr);
 
-      const typet &tp=ns.follow(with.type());
-      if(tp.id()==ID_struct)
+      if(with.type().id() == ID_struct || with.type().id() == ID_struct_tag)
       {
-        const struct_typet &struct_type=to_struct_type(tp);
+        const struct_typet &struct_type =
+          with.type().id() == ID_struct_tag
+            ? ns.follow_tag(to_struct_tag_type(with.type()))
+            : to_struct_type(with.type());
         const irep_idt &component_name=with.where().get(ID_component_name);
         const typet &c_type = struct_type.get_component(component_name).type();
 
@@ -2178,9 +2195,10 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
           }
         }
       }
-      else if(tp.id()==ID_array)
+      else if(with.type().id() == ID_array)
       {
-        auto i = pointer_offset_size(to_array_type(tp).element_type(), ns);
+        auto i =
+          pointer_offset_size(to_array_type(with.type()).element_type(), ns);
         if(i.has_value())
         {
           const exprt &index=with.where();
@@ -2209,23 +2227,23 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   if(!offset_int.has_value() || *offset_int < 0)
     return unchanged(expr);
 
-  const typet &op_type=ns.follow(root.type());
-
   // size must be known
   if(!val_size.has_value() || *val_size == 0)
     return unchanged(expr);
 
   // Are we updating (parts of) a struct? Do individual member updates
   // instead, unless there are non-byte-sized bit fields
-  if(op_type.id()==ID_struct)
+  if(root.type().id() == ID_struct || root.type().id() == ID_struct_tag)
   {
     exprt result_expr;
     result_expr.make_nil();
 
     auto update_size = pointer_offset_size(value.type(), ns);
 
-    const struct_typet &struct_type=
-      to_struct_type(op_type);
+    const struct_typet &struct_type =
+      root.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(root.type()))
+        : to_struct_type(root.type());
     const struct_typet::componentst &components=
       struct_type.components();
 
@@ -2316,7 +2334,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   if(root.id()==ID_array)
   {
     auto el_size =
-      pointer_offset_bits(to_type_with_subtype(op_type).subtype(), ns);
+      pointer_offset_bits(to_type_with_subtype(root.type()).subtype(), ns);
 
     if(
       !el_size.has_value() || *el_size == 0 ||
