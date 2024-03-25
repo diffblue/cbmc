@@ -1380,8 +1380,6 @@ void goto_program2codet::add_local_types(const typet &type)
 {
   if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
-    const typet &full_type=ns.follow(type);
-
     const irep_idt &identifier = to_tag_type(type).get_identifier();
     const symbolt &symbol = ns.lookup(identifier);
 
@@ -1390,7 +1388,9 @@ void goto_program2codet::add_local_types(const typet &type)
       !type_names_set.insert(identifier).second)
       return;
 
-    for(const auto &c : to_struct_union_type(full_type).components())
+    const auto &components =
+      ns.follow_tag(to_struct_or_union_tag_type(type)).components();
+    for(const auto &c : components)
       add_local_types(c.type());
 
     type_names.push_back(identifier);
