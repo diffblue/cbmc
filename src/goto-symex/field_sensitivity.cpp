@@ -99,7 +99,10 @@ exprt field_sensitivityt::apply(
        be.op().type().id() == ID_union_tag) &&
       is_ssa_expr(be.op()) && be.offset().is_constant())
     {
-      const union_typet &type = to_union_type(ns.follow(be.op().type()));
+      const union_typet &type =
+        be.op().type().id() == ID_union_tag
+          ? ns.follow_tag(to_union_tag_type(be.op().type()))
+          : to_union_type(be.op().type());
       for(const auto &comp : type.components())
       {
         ssa_exprt tmp = to_ssa_expr(be.op());
@@ -221,9 +224,12 @@ exprt field_sensitivityt::get_fields(
     (!disjoined_fields_only && (ssa_expr.type().id() == ID_union ||
                                 ssa_expr.type().id() == ID_union_tag)))
   {
-    const struct_union_typet &type =
-      to_struct_union_type(ns.follow(ssa_expr.type()));
-    const struct_union_typet::componentst &components = type.components();
+    const struct_union_typet::componentst &components =
+      (ssa_expr.type().id() == ID_struct_tag ||
+       ssa_expr.type().id() == ID_union_tag)
+        ? ns.follow_tag(to_struct_or_union_tag_type(ssa_expr.type()))
+            .components()
+        : to_struct_union_type(ssa_expr.type()).components();
 
     exprt::operandst fields;
     fields.reserve(components.size());
@@ -371,7 +377,10 @@ void field_sensitivityt::field_assignments_rec(
   else if(
     ssa_rhs.type().id() == ID_struct || ssa_rhs.type().id() == ID_struct_tag)
   {
-    const struct_typet &type = to_struct_type(ns.follow(ssa_rhs.type()));
+    const struct_typet &type =
+      ssa_rhs.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(ssa_rhs.type()))
+        : to_struct_type(ssa_rhs.type());
     const struct_union_typet::componentst &components = type.components();
 
     PRECONDITION(
@@ -409,7 +418,10 @@ void field_sensitivityt::field_assignments_rec(
   else if(
     ssa_rhs.type().id() == ID_union || ssa_rhs.type().id() == ID_union_tag)
   {
-    const union_typet &type = to_union_type(ns.follow(ssa_rhs.type()));
+    const union_typet &type =
+      ssa_rhs.type().id() == ID_union_tag
+        ? ns.follow_tag(to_union_tag_type(ssa_rhs.type()))
+        : to_union_type(ssa_rhs.type());
     const struct_union_typet::componentst &components = type.components();
 
     PRECONDITION(

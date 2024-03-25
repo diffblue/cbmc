@@ -741,17 +741,22 @@ void goto_symex_statet::rename(
     }
   }
 
-  // expand struct and union tag types
-  type = ns.follow(type);
-
   if(type.id()==ID_array)
   {
     auto &array_type = to_array_type(type);
     rename<level>(array_type.element_type(), irep_idt(), ns);
     array_type.size() = rename<level>(std::move(array_type.size()), ns).get();
   }
-  else if(type.id() == ID_struct || type.id() == ID_union)
+  else if(
+    type.id() == ID_struct || type.id() == ID_union ||
+    type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
+    // expand struct and union tag types
+    if(type.id() == ID_struct_tag)
+      type = ns.follow_tag(to_struct_tag_type(type));
+    else if(type.id() == ID_union_tag)
+      type = ns.follow_tag(to_union_tag_type(type));
+
     struct_union_typet &s_u_type=to_struct_union_type(type);
     struct_union_typet::componentst &components=s_u_type.components();
 
