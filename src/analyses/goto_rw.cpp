@@ -250,7 +250,9 @@ void rw_range_sett::get_objects_member(
     return;
   }
 
-  const struct_typet &struct_type = to_struct_type(ns.follow(type));
+  const struct_typet &struct_type = type.id() == ID_struct
+                                      ? to_struct_type(type)
+                                      : ns.follow_tag(to_struct_tag_type(type));
 
   auto offset_bits =
     member_offset_bits(struct_type, expr.get_component_name(), ns);
@@ -367,8 +369,10 @@ void rw_range_sett::get_objects_struct(
   const range_spect &range_start,
   const range_spect &size)
 {
-  const struct_typet &struct_type=
-    to_struct_type(ns.follow(expr.type()));
+  const struct_typet &struct_type =
+    expr.type().id() == ID_struct
+      ? to_struct_type(expr.type())
+      : ns.follow_tag(to_struct_tag_type(expr.type()));
 
   auto struct_bits = pointer_offset_bits(struct_type, ns);
 

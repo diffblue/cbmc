@@ -233,8 +233,10 @@ void custom_bitvector_domaint::assign_struct_rec(
 {
   if(lhs.type().id() == ID_struct || lhs.type().id() == ID_struct_tag)
   {
-    const struct_typet &struct_type=
-      to_struct_type(ns.follow(lhs.type()));
+    const struct_typet &struct_type =
+      lhs.type().id() == ID_struct
+        ? to_struct_type(lhs.type())
+        : ns.follow_tag(to_struct_tag_type(lhs.type()));
 
     // assign member-by-member
     for(const auto &c : struct_type.components())
