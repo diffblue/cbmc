@@ -424,11 +424,11 @@ void interpretert::execute_decl()
 struct_typet::componentt
 interpretert::get_component(const typet &object_type, const mp_integer &offset)
 {
-  const typet real_type = ns.follow(object_type);
-  if(real_type.id()!=ID_struct)
+  if(object_type.id() != ID_struct_tag)
     throw "request for member of non-struct";
 
-  const struct_typet &struct_type=to_struct_type(real_type);
+  const struct_typet &struct_type =
+    ns.follow_tag(to_struct_tag_type(object_type));
   const struct_typet::componentst &components=struct_type.components();
 
   mp_integer tmp_offset=offset;
@@ -460,11 +460,10 @@ exprt interpretert::get_value(
   const mp_integer &offset,
   bool use_non_det)
 {
-  const typet real_type=ns.follow(type);
-  if(real_type.id()==ID_struct)
+  if(type.id() == ID_struct_tag)
   {
-    struct_exprt result({}, real_type);
-    const struct_typet &struct_type=to_struct_type(real_type);
+    struct_exprt result({}, type);
+    const struct_typet &struct_type = ns.follow_tag(to_struct_tag_type(type));
     const struct_typet::componentst &components=struct_type.components();
 
     // Retrieve the values for the individual members
@@ -482,10 +481,10 @@ exprt interpretert::get_value(
 
     return std::move(result);
   }
-  else if(real_type.id()==ID_array)
+  else if(type.id() == ID_array)
   {
     // Get size of array
-    array_exprt result({}, to_array_type(real_type));
+    array_exprt result({}, to_array_type(type));
     const exprt &size_expr = to_array_type(type).size();
     mp_integer subtype_size = get_size(to_array_type(type).element_type());
     mp_integer count;
@@ -526,13 +525,12 @@ exprt interpretert::get_value(
   mp_vectort &rhs,
   const mp_integer &offset)
 {
-  const typet real_type=ns.follow(type);
   PRECONDITION(!rhs.empty());
 
-  if(real_type.id()==ID_struct)
+  if(type.id() == ID_struct_tag)
   {
-    struct_exprt result({}, real_type);
-    const struct_typet &struct_type=to_struct_type(real_type);
+    struct_exprt result({}, type);
+    const struct_typet &struct_type = ns.follow_tag(to_struct_tag_type(type));
     const struct_typet::componentst &components=struct_type.components();
 
     // Retrieve the values for the individual members
@@ -548,10 +546,10 @@ exprt interpretert::get_value(
     }
     return std::move(result);
   }
-  else if(real_type.id()==ID_array)
+  else if(type.id() == ID_array)
   {
-    array_exprt result({}, to_array_type(real_type));
-    const exprt &size_expr = to_array_type(real_type).size();
+    array_exprt result({}, to_array_type(type));
+    const exprt &size_expr = to_array_type(type).size();
 
     // Get size of array
     mp_integer subtype_size = get_size(to_array_type(type).element_type());
@@ -576,34 +574,34 @@ exprt interpretert::get_value(
     }
     return std::move(result);
   }
-  else if(real_type.id()==ID_floatbv)
+  else if(type.id() == ID_floatbv)
   {
     ieee_floatt f(to_floatbv_type(type));
     f.unpack(rhs[numeric_cast_v<std::size_t>(offset)]);
     return f.to_expr();
   }
-  else if(real_type.id()==ID_fixedbv)
+  else if(type.id() == ID_fixedbv)
   {
     fixedbvt f;
     f.from_integer(rhs[numeric_cast_v<std::size_t>(offset)]);
     return f.to_expr();
   }
-  else if(real_type.id()==ID_bool)
+  else if(type.id() == ID_bool)
   {
     if(rhs[numeric_cast_v<std::size_t>(offset)] != 0)
       return true_exprt();
     else
       false_exprt();
   }
-  else if(real_type.id()==ID_c_bool)
+  else if(type.id() == ID_c_bool)
   {
     return from_integer(
       rhs[numeric_cast_v<std::size_t>(offset)] != 0 ? 1 : 0, type);
   }
-  else if(real_type.id() == ID_pointer)
+  else if(type.id() == ID_pointer)
   {
     if(rhs[numeric_cast_v<std::size_t>(offset)] == 0)
-      return null_pointer_exprt(to_pointer_type(real_type)); // NULL pointer
+      return null_pointer_exprt(to_pointer_type(type)); // NULL pointer
 
     if(rhs[numeric_cast_v<std::size_t>(offset)] < memory.size())
     {
@@ -634,7 +632,7 @@ exprt interpretert::get_value(
 
     throw "interpreter: reading from invalid pointer";
   }
-  else if(real_type.id()==ID_string)
+  else if(type.id() == ID_string)
   {
     // Strings are currently encoded by their irep_idt ID.
     return constant_exprt(

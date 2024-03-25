@@ -139,7 +139,10 @@ static bool restore_union_rec(exprt &expr, const namespacet &ns)
     byte_extract_exprt &be = to_byte_extract_expr(expr);
     if(be.op().type().id() == ID_union || be.op().type().id() == ID_union_tag)
     {
-      const union_typet &union_type = to_union_type(ns.follow(be.op().type()));
+      const union_typet &union_type =
+        be.op().type().id() == ID_union_tag
+          ? ns.follow_tag(to_union_tag_type(be.op().type()))
+          : to_union_type(be.op().type());
 
       for(const auto &comp : union_type.components())
       {

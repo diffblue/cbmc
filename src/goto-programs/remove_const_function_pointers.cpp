@@ -800,7 +800,8 @@ bool remove_const_function_pointerst::is_const_type(const typet &type) const
 exprt remove_const_function_pointerst::get_component_value(
   const struct_exprt &struct_expr, const member_exprt &member_expr)
 {
-  const struct_typet &struct_type=to_struct_type(ns.follow(struct_expr.type()));
+  const struct_typet &struct_type =
+    ns.follow_tag(to_struct_tag_type(struct_expr.type()));
   size_t component_number=
     struct_type.component_number(member_expr.get_component_name());
 

@@ -132,10 +132,11 @@ std::string graphml_witnesst::convert_assign_rec(
       return convert_assign_rec(identifier, tmp);
     }
 
-    const struct_union_typet &type=
-      to_struct_union_type(ns.follow(assign.lhs().type()));
-    const struct_union_typet::componentst &components=
-      type.components();
+    const typet &lhs_type = assign.lhs().type();
+    const struct_union_typet::componentst &components =
+      (lhs_type.id() == ID_struct_tag || lhs_type.id() == ID_union_tag)
+        ? ns.follow_tag(to_struct_or_union_tag_type(lhs_type)).components()
+        : to_struct_union_type(lhs_type).components();
 
     exprt::operandst::const_iterator it=
       assign.rhs().operands().begin();
