@@ -487,13 +487,13 @@ if($opt_p && $failures != 0) {
       if(0 == $printed_this_test) {
         $printed_this_test = 1;
         print "\n\n";
-        print "Failed test: $current_test\n";
+        print "Failed test: $current_test/$descriptor_file\n";
         open FH, "<$current_test/$output_file";
         while (my $f = <FH>) {
           print $f;
         }
         close FH;
-        print "\n\nFailed $descriptor_file lines:\n";
+        print "\n\nFailed $current_test/$descriptor_file lines:\n";
       }
 
       print "$line\n";
