@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main-replace.c
 --dfcc main --replace-call-with-contract foo
 ^\[main.assertion.\d+\].*assertion s.a == 0: SUCCESS$

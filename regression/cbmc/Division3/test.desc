@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line 5 non-fatal assertion: FAILURE$
+^\[main\.division-by-zero\.1\] line 12 division by zero in 10 / divisor: FAILURE$
+^\[main\.assertion\.2\] line 14 divisor value: UNKNOWN$
+^\[main\.assertion\.3\] line 17 independent assertion: FAILURE$
+^\*\* 3 of 4 failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring

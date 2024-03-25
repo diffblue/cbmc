@@ -12,10 +12,12 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_ALL_PROPERTIES_VERIFIER_WITH_TRACE_STORAGE_H
 #define CPROVER_GOTO_CHECKER_ALL_PROPERTIES_VERIFIER_WITH_TRACE_STORAGE_H
 
-#include "goto_verifier.h"
+#include <goto-programs/abstract_goto_model.h>
 
 #include "bmc_util.h"
+#include "fatal_assertions.h"
 #include "goto_trace_storage.h"
+#include "goto_verifier.h"
 #include "incremental_goto_checker.h"
 #include "properties.h"
 #include "report_util.h"
@@ -44,23 +46,22 @@ public:
       if(result.progress == incremental_goto_checkert::resultt::progresst::DONE)
         break;
 
-      // we've got an error trace
-      if(options.get_bool_option("trace"))
+      message_building_error_trace(log);
+      for(const auto &property_id : result.updated_properties)
       {
-        message_building_error_trace(log);
-        for(const auto &property_id : result.updated_properties)
+        if(properties.at(property_id).status == property_statust::FAIL)
         {
-          if(properties.at(property_id).status == property_statust::FAIL)
-          {
-            // get correctly truncated error trace for property and store it
-            (void)traces.insert(
-              incremental_goto_checker.build_trace(property_id));
-          }
+          // get correctly truncated error trace for property and store it
+          (void)traces.insert(
+            incremental_goto_checker.build_trace(property_id));
         }
       }
 
       ++iterations;
     }
+
+    propagate_fatal_assertions(
+      properties, traces, goto_model.get_goto_functions());
 
     return determine_result(properties);
   }

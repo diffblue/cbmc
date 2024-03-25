@@ -96,6 +96,11 @@ public:
     return find(ID_basic_block_source_lines);
   }
 
+  bool property_fatal() const
+  {
+    return get_bool(ID_property_fatal);
+  }
+
   void set_file(const irep_idt &file)
   {
     set(ID_file, file);
@@ -161,6 +166,14 @@ public:
   void set_basic_block_source_lines(irept source_lines)
   {
     add(ID_basic_block_source_lines, std::move(source_lines));
+  }
+
+  void property_fatal(bool _property_fatal)
+  {
+    if(_property_fatal)
+      set(ID_property_fatal, true);
+    else
+      remove(ID_property_fatal);
   }
 
   void set_hide()

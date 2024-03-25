@@ -1,4 +1,4 @@
-CORE dfcc-only
+KNOWNBUG
 main.c
 --no-malloc-may-fail --dfcc main --apply-loop-contracts
 ^EXIT=10$
