@@ -58,11 +58,11 @@ exprt c_typecheck_baset::do_initializer_rec(
   const typet &type,
   bool force_constant)
 {
-  const typet &full_type=follow(type);
-
   if(
-    (full_type.id() == ID_struct || full_type.id() == ID_union) &&
-    to_struct_union_type(full_type).is_incomplete())
+    (type.id() == ID_struct_tag &&
+     follow_tag(to_struct_tag_type(type)).is_incomplete()) ||
+    (type.id() == ID_union_tag &&
+     follow_tag(to_union_tag_type(type)).is_incomplete()))
   {
     error().source_location = value.source_location();
     error() << "type '" << to_string(type)
@@ -75,25 +75,24 @@ exprt c_typecheck_baset::do_initializer_rec(
 
   if(
     value.id() == ID_array && value.get_bool(ID_C_string_constant) &&
-    full_type.id() == ID_array &&
-    (to_array_type(full_type).element_type().id() == ID_signedbv ||
-     to_array_type(full_type).element_type().id() == ID_unsignedbv) &&
-    to_bitvector_type(to_array_type(full_type).element_type()).get_width() ==
+    type.id() == ID_array &&
+    (to_array_type(type).element_type().id() == ID_signedbv ||
+     to_array_type(type).element_type().id() == ID_unsignedbv) &&
+    to_bitvector_type(to_array_type(type).element_type()).get_width() ==
       to_bitvector_type(to_array_type(value.type()).element_type()).get_width())
   {
     exprt tmp=value;
 
     // adjust char type
     to_array_type(tmp.type()).element_type() =
-      to_array_type(full_type).element_type();
+      to_array_type(type).element_type();
 
     Forall_operands(it, tmp)
-      it->type() = to_array_type(full_type).element_type();
+      it->type() = to_array_type(type).element_type();
 
-    if(full_type.id()==ID_array &&
-       to_array_type(full_type).is_complete())
+    if(type.id() == ID_array && to_array_type(type).is_complete())
     {
-      const auto &array_type = to_array_type(full_type);
+      const auto &array_type = to_array_type(type);
 
       // check size
       const auto array_size = numeric_cast<mp_integer>(array_type.size());
@@ -139,10 +138,10 @@ exprt c_typecheck_baset::do_initializer_rec(
   }
 
   if(
-    value.id() == ID_string_constant && full_type.id() == ID_array &&
-    (to_array_type(full_type).element_type().id() == ID_signedbv ||
-     to_array_type(full_type).element_type().id() == ID_unsignedbv) &&
-    to_bitvector_type(to_array_type(full_type).element_type()).get_width() ==
+    value.id() == ID_string_constant && type.id() == ID_array &&
+    (to_array_type(type).element_type().id() == ID_signedbv ||
+     to_array_type(type).element_type().id() == ID_unsignedbv) &&
+    to_bitvector_type(to_array_type(type).element_type()).get_width() ==
       char_type().get_width())
   {
     // will go away, to be replaced by the above block
@@ -150,21 +149,20 @@ exprt c_typecheck_baset::do_initializer_rec(
     string_constantt tmp1=to_string_constant(value);
     // adjust char type
     to_array_type(tmp1.type()).element_type() =
-      to_array_type(full_type).element_type();
+      to_array_type(type).element_type();
 
     exprt tmp2=tmp1.to_array_expr();
 
-    if(full_type.id()==ID_array &&
-       to_array_type(full_type).is_complete())
+    if(type.id() == ID_array && to_array_type(type).is_complete())
     {
       // check size
       const auto array_size =
-        numeric_cast<mp_integer>(to_array_type(full_type).size());
+        numeric_cast<mp_integer>(to_array_type(type).size());
       if(!array_size.has_value())
       {
         error().source_location = value.source_location();
         error() << "array size needs to be constant, got "
-                << to_string(to_array_type(full_type).size()) << eom;
+                << to_string(to_array_type(type).size()) << eom;
         throw 0;
       }
 
@@ -186,14 +184,12 @@ exprt c_typecheck_baset::do_initializer_rec(
         // fill up
         tmp2.type()=type;
         const auto zero = zero_initializer(
-          to_array_type(full_type).element_type(),
-          value.source_location(),
-          *this);
+          to_array_type(type).element_type(), value.source_location(), *this);
         if(!zero.has_value())
         {
           error().source_location = value.source_location();
           error() << "cannot zero-initialize array with subtype '"
-                  << to_string(to_array_type(full_type).element_type()) << "'"
+                  << to_string(to_array_type(type).element_type()) << "'"
                   << eom;
           throw 0;
         }
@@ -204,20 +200,18 @@ exprt c_typecheck_baset::do_initializer_rec(
     return tmp2;
   }
 
-  if(full_type.id()==ID_array &&
-     to_array_type(full_type).size().is_nil())
+  if(type.id() == ID_array && to_array_type(type).size().is_nil())
   {
     error().source_location = value.source_location();
-    error() << "type '" << to_string(full_type)
-            << "' cannot be initialized with '" << to_string(value) << "'"
-            << eom;
+    error() << "type '" << to_string(type) << "' cannot be initialized with '"
+            << to_string(value) << "'" << eom;
     throw 0;
   }
 
   if(value.id()==ID_designated_initializer)
   {
     error().source_location = value.source_location();
-    error() << "type '" << to_string(full_type)
+    error() << "type '" << to_string(type)
             << "' cannot be initialized with designated initializer" << eom;
     throw 0;
   }
@@ -259,11 +253,9 @@ void c_typecheck_baset::designator_enter(
 {
   designatort::entryt entry(type);
 
-  const typet &full_type=follow(type);
-
-  if(full_type.id()==ID_struct)
+  if(auto struct_tag_type = type_try_dynamic_cast<struct_tag_typet>(type))
   {
-    const struct_typet &struct_type=to_struct_type(full_type);
+    const struct_typet &struct_type = follow_tag(*struct_tag_type);
 
     entry.size=struct_type.components().size();
     entry.subtype.make_nil();
@@ -286,9 +278,9 @@ void c_typecheck_baset::designator_enter(
       ++entry.index;
     }
   }
-  else if(full_type.id()==ID_union)
+  else if(auto union_tag_type = type_try_dynamic_cast<union_tag_typet>(type))
   {
-    const union_typet &union_type=to_union_type(full_type);
+    const union_typet &union_type = follow_tag(*union_tag_type);
 
     if(union_type.components().empty())
     {
@@ -303,9 +295,9 @@ void c_typecheck_baset::designator_enter(
       entry.subtype=union_type.components().front().type();
     }
   }
-  else if(full_type.id()==ID_array)
+  else if(type.id() == ID_array)
   {
-    const array_typet &array_type=to_array_type(full_type);
+    const array_typet &array_type = to_array_type(type);
 
     if(array_type.size().is_nil())
     {
@@ -327,9 +319,9 @@ void c_typecheck_baset::designator_enter(
       entry.subtype = array_type.element_type();
     }
   }
-  else if(full_type.id()==ID_vector)
+  else if(type.id() == ID_vector)
   {
-    const vector_typet &vector_type=to_vector_type(full_type);
+    const vector_typet &vector_type = to_vector_type(type);
 
     const auto vector_size = numeric_cast<mp_integer>(vector_type.size());
 
@@ -387,10 +379,8 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
   {
     size_t index=designator[i].index;
     const typet &type=designator[i].type;
-    const typet &full_type=follow(type);
 
-    if(full_type.id()==ID_array ||
-       full_type.id()==ID_vector)
+    if(type.id() == ID_array || type.id() == ID_vector)
     {
       // zero_initializer may have built an array_of expression for a large
       // array; as we have a designated initializer we need to have an array of
@@ -403,7 +393,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         {
           error().source_location = value.source_location();
           error() << "cannot zero-initialize array with element type '"
-                  << to_string(to_type_with_subtype(full_type).subtype()) << "'"
+                  << to_string(to_type_with_subtype(type).subtype()) << "'"
                   << eom;
           throw 0;
         }
@@ -414,11 +404,11 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       if(index>=dest->operands().size())
       {
-        if(full_type.id()==ID_array &&
-           (to_array_type(full_type).size().is_zero() ||
-            to_array_type(full_type).size().is_nil()))
+        if(
+          type.id() == ID_array && (to_array_type(type).size().is_zero() ||
+                                    to_array_type(type).size().is_nil()))
         {
-          const typet &element_type = to_array_type(full_type).element_type();
+          const typet &element_type = to_array_type(type).element_type();
 
           // we are willing to grow an incomplete or zero-sized array --
           // do_initializer_list will fix up the resulting type
@@ -446,10 +436,11 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       dest = &(dest->operands()[numeric_cast_v<std::size_t>(index)]);
     }
-    else if(full_type.id()==ID_struct)
+    else if(
+      auto struct_tag_type = type_try_dynamic_cast<struct_tag_typet>(type))
     {
-      const struct_typet::componentst &components=
-        to_struct_type(full_type).components();
+      const struct_typet::componentst &components =
+        follow_tag(*struct_tag_type).components();
 
       if(index>=dest->operands().size())
       {
@@ -471,9 +462,9 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       dest=&(dest->operands()[index]);
     }
-    else if(full_type.id()==ID_union)
+    else if(auto union_tag_type = type_try_dynamic_cast<union_tag_typet>(type))
     {
-      const union_typet &union_type=to_union_type(full_type);
+      const union_typet &union_type = follow_tag(*union_tag_type);
 
       const union_typet::componentst &components=
         union_type.components();
@@ -574,13 +565,11 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
     // see what type we have to initialize
 
     const typet &type=designator.back().subtype;
-    const typet &full_type=follow(type);
 
     // do we initialize a scalar?
-    if(full_type.id()!=ID_struct &&
-       full_type.id()!=ID_union &&
-       full_type.id()!=ID_array &&
-       full_type.id()!=ID_vector)
+    if(
+      type.id() != ID_struct_tag && type.id() != ID_union_tag &&
+      type.id() != ID_array && type.id() != ID_vector)
     {
       // The initializer for a scalar shall be a single expression,
       // * optionally enclosed in braces. *
@@ -594,16 +583,16 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       else
         *dest=do_initializer_rec(value, type, force_constant);
 
-      DATA_INVARIANT(full_type == follow(dest->type()), "matching types");
+      DATA_INVARIANT(type == dest->type(), "matching types");
 
       return ++init_it; // done
     }
 
     // union? The component in the zero initializer might
     // not be the first one.
-    if(full_type.id()==ID_union)
+    if(auto union_tag_type = type_try_dynamic_cast<union_tag_typet>(type))
     {
-      const union_typet &union_type=to_union_type(full_type);
+      const union_typet &union_type = follow_tag(*union_tag_type);
 
       const union_typet::componentst &components=
         union_type.components();
@@ -640,22 +629,22 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       // which are like arrays. We only do so if we are to
       // initialize an array of scalars.
       if(
-        full_type.id() == ID_array &&
-        (to_array_type(full_type).element_type().id() == ID_signedbv ||
-         to_array_type(full_type).element_type().id() == ID_unsignedbv))
+        type.id() == ID_array &&
+        (to_array_type(type).element_type().id() == ID_signedbv ||
+         to_array_type(type).element_type().id() == ID_unsignedbv))
       {
         *dest=do_initializer_rec(value, type, force_constant);
         return ++init_it; // done
       }
     }
-    else if(follow(value.type())==full_type)
+    else if(value.type() == type)
     {
       // a struct/union/vector can be initialized directly with
       // an expression of the right type. This doesn't
       // work with arrays, unfortunately.
-      if(full_type.id()==ID_struct ||
-         full_type.id()==ID_union ||
-         full_type.id()==ID_vector)
+      if(
+        type.id() == ID_struct_tag || type.id() == ID_union_tag ||
+        type.id() == ID_vector)
       {
         *dest=value;
         return ++init_it; // done
@@ -663,13 +652,13 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
     }
 
     DATA_INVARIANT(
-      full_type.id() == ID_struct || full_type.id() == ID_union ||
-        full_type.id() == ID_array || full_type.id() == ID_vector,
+      type.id() == ID_struct_tag || type.id() == ID_union_tag ||
+        type.id() == ID_array || type.id() == ID_vector,
       "full type must be composite");
 
     // we are initializing a compound type, and enter it!
-    // this may change the type, full_type might not be valid any more
-    const typet dest_type=full_type;
+    // this may change the type, type might not be valid any more
+    const typet dest_type = type;
     const bool vla_permitted=designator.back().vla_permitted;
     designator_enter(type, designator);
 
@@ -721,20 +710,17 @@ void c_typecheck_baset::increment_designator(designatort &designator)
   while(true)
   {
     designatort::entryt &entry=designator[designator.size()-1];
-    const typet &full_type=follow(entry.type);
 
     entry.index++;
 
-    if(full_type.id()==ID_array &&
-       to_array_type(full_type).size().is_nil())
+    if(entry.type.id() == ID_array && to_array_type(entry.type).size().is_nil())
       return; // we will keep going forever
 
-    if(full_type.id()==ID_struct &&
-       entry.index<entry.size)
+    if(entry.type.id() == ID_struct_tag && entry.index < entry.size)
     {
       // need to adjust subtype
-      const struct_typet &struct_type=
-        to_struct_type(full_type);
+      const struct_typet &struct_type =
+        follow_tag(to_struct_tag_type(entry.type));
       const struct_typet::componentst &components=
         struct_type.components();
       DATA_INVARIANT(
@@ -779,9 +765,8 @@ designatort c_typecheck_baset::make_designator(
   for(const auto &d_op : src.operands())
   {
     designatort::entryt entry(type);
-    const typet &full_type=follow(entry.type);
 
-    if(full_type.id()==ID_array)
+    if(entry.type.id() == ID_array)
     {
       if(d_op.id()!=ID_index)
       {
@@ -802,11 +787,11 @@ designatort c_typecheck_baset::make_designator(
         throw 0;
       }
 
-      if(to_array_type(full_type).size().is_nil())
+      if(to_array_type(entry.type).size().is_nil())
         size=0;
       else if(
         const auto size_opt =
-          numeric_cast<mp_integer>(to_array_type(full_type).size()))
+          numeric_cast<mp_integer>(to_array_type(entry.type).size()))
         size = *size_opt;
       else
       {
@@ -817,13 +802,14 @@ designatort c_typecheck_baset::make_designator(
 
       entry.index = numeric_cast_v<std::size_t>(index);
       entry.size = numeric_cast_v<std::size_t>(size);
-      entry.subtype = to_array_type(full_type).element_type();
+      entry.subtype = to_array_type(entry.type).element_type();
     }
-    else if(full_type.id()==ID_struct ||
-            full_type.id()==ID_union)
+    else if(
+      auto struct_union_tag_type =
+        type_try_dynamic_cast<struct_or_union_tag_typet>(entry.type))
     {
-      const struct_union_typet &struct_union_type=
-        to_struct_union_type(full_type);
+      const struct_union_typet &struct_union_type =
+        follow_tag(*struct_union_tag_type);
 
       if(d_op.id()!=ID_member)
       {
@@ -854,8 +840,8 @@ designatort c_typecheck_baset::make_designator(
         {
           repeat=false;
           std::size_t number = 0;
-          const struct_union_typet::componentst &components=
-            to_struct_union_type(follow(tmp_type)).components();
+          const struct_union_typet::componentst &components =
+            follow_tag(to_struct_or_union_tag_type(tmp_type)).components();
 
           for(const auto &c : components)
           {
@@ -873,7 +859,9 @@ designatort c_typecheck_baset::make_designator(
                c.type().id() == ID_union_tag) &&
               (config.ansi_c.mode ==
                  configt::ansi_ct::flavourt::VISUAL_STUDIO ||
-               follow(c.type()).find(ID_tag).is_nil()) &&
+               follow_tag(to_struct_or_union_tag_type(c.type()))
+                 .find(ID_tag)
+                 .is_nil()) &&
               has_component_rec(c.type(), component_name, *this))
             {
               entry.index=number;
@@ -905,7 +893,7 @@ designatort c_typecheck_baset::make_designator(
     {
       error().source_location = d_op.source_location();
       error() << "designated initializers cannot initialize '"
-              << to_string(full_type) << "'" << eom;
+              << to_string(entry.type) << "'" << eom;
       throw 0;
     }
 
@@ -925,16 +913,14 @@ exprt c_typecheck_baset::do_initializer_list(
 {
   PRECONDITION(value.id() == ID_initializer_list);
 
-  const typet &full_type=follow(type);
-
   // 6.7.9, 14: An array of character type may be initialized by a character
   // string literal or UTF-8 string literal, optionally enclosed in braces.
   if(
-    full_type.id() == ID_array && value.operands().size() >= 1 &&
+    type.id() == ID_array && value.operands().size() >= 1 &&
     to_multi_ary_expr(value).op0().id() == ID_string_constant &&
-    (to_array_type(full_type).element_type().id() == ID_signedbv ||
-     to_array_type(full_type).element_type().id() == ID_unsignedbv) &&
-    to_bitvector_type(to_array_type(full_type).element_type()).get_width() ==
+    (to_array_type(type).element_type().id() == ID_signedbv ||
+     to_array_type(type).element_type().id() == ID_unsignedbv) &&
+    to_bitvector_type(to_array_type(type).element_type()).get_width() ==
       char_type().get_width())
   {
     if(value.operands().size() > 1)
@@ -948,27 +934,26 @@ exprt c_typecheck_baset::do_initializer_list(
   }
 
   exprt result;
-  if(full_type.id()==ID_struct ||
-     full_type.id()==ID_union ||
-     full_type.id()==ID_vector)
+  if(
+    type.id() == ID_struct_tag || type.id() == ID_union_tag ||
+    type.id() == ID_vector)
   {
     // start with zero everywhere
     const auto zero = zero_initializer(type, value.source_location(), *this);
     if(!zero.has_value())
     {
       error().source_location = value.source_location();
-      error() << "cannot zero-initialize '" << to_string(full_type) << "'"
-              << eom;
+      error() << "cannot zero-initialize '" << to_string(type) << "'" << eom;
       throw 0;
     }
     result = *zero;
   }
-  else if(full_type.id()==ID_array)
+  else if(type.id() == ID_array)
   {
-    if(to_array_type(full_type).size().is_nil())
+    if(to_array_type(type).size().is_nil())
     {
       // start with empty array
-      result = array_exprt({}, to_array_type(full_type));
+      result = array_exprt({}, to_array_type(type));
       result.add_source_location()=value.source_location();
     }
     else
@@ -978,8 +963,7 @@ exprt c_typecheck_baset::do_initializer_list(
       if(!zero.has_value())
       {
         error().source_location = value.source_location();
-        error() << "cannot zero-initialize '" << to_string(full_type) << "'"
-                << eom;
+        error() << "cannot zero-initialize '" << to_string(type) << "'" << eom;
         throw 0;
       }
       result = *zero;
@@ -995,7 +979,7 @@ exprt c_typecheck_baset::do_initializer_list(
         to_unary_expr(value).op(), type, force_constant);
 
     error().source_location = value.source_location();
-    error() << "cannot initialize '" << to_string(full_type)
+    error() << "cannot initialize '" << to_string(type)
             << "' with an initializer list" << eom;
     throw 0;
   }
@@ -1015,9 +999,9 @@ exprt c_typecheck_baset::do_initializer_list(
     increment_designator(current_designator);
   }
 
-  if(full_type.id()==ID_struct)
+  if(auto struct_tag_type = type_try_dynamic_cast<struct_tag_typet>(type))
   {
-    const struct_typet &full_struct_type = to_struct_type(full_type);
+    const struct_typet &full_struct_type = follow_tag(*struct_tag_type);
     const struct_typet::componentst &components = full_struct_type.components();
     // make sure we didn't mess up index computation
     CHECK_RETURN(result.operands().size() == components.size());
@@ -1058,8 +1042,7 @@ exprt c_typecheck_baset::do_initializer_list(
     }
   }
 
-  if(full_type.id()==ID_array &&
-     to_array_type(full_type).size().is_nil())
+  if(type.id() == ID_array && to_array_type(type).size().is_nil())
   {
     // make complete by setting array size
     array_typet &array_type = to_array_type(result.type());

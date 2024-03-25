@@ -387,7 +387,10 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     // check minimum alignment
     if(
       a < config.ansi_c.alignment && !it_type.get_bool(ID_C_packed) &&
-      !ns.follow(it_type).get_bool(ID_C_packed))
+      (it_type.id() != ID_struct_tag ||
+       !ns.follow_tag(to_struct_tag_type(it_type)).get_bool(ID_C_packed)) &&
+      (it_type.id() != ID_union_tag ||
+       !ns.follow_tag(to_union_tag_type(it_type)).get_bool(ID_C_packed)))
     {
       a=config.ansi_c.alignment;
     }
