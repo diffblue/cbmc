@@ -1,0 +1,11 @@
+CORE broken-cprover-smt-backend no-new-smt
+no-upper-bound.c
+--max-field-sensitivity-array-size 0
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+E-matching does not yet handle array expressions (which field sensitivity
+produces for small fixed-size arrays), so we disable field sensitivity.
