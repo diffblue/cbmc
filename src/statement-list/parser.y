@@ -38,6 +38,12 @@ int yystatement_listerror(
 #define YYSTYPE unsigned
 #define YYSTYPE_IS_TRIVIAL 1
 
+/* To avoid LTO -Wodr clashes with ansi-c */
+#define YYTOKENTYPE 1
+#define YYEMPTY -2
+#define YYEOF    0                 /* "end of file"  */
+#define YYerror 256                /* error  */
+#define YYUNDEF 257                /* "invalid token"  */
 #include "statement_list_y.tab.h"
 
 // Visual Studio
@@ -61,99 +67,99 @@ int yystatement_listerror(
 /*** Token declaration *******************************************************/
 
 /*** STL file structure keywords *********************************************/
-%token TOK_VERSION              "VERSION"
-%token TOK_BEGIN                "BEGIN"
-%token TOK_FUNCTION_BLOCK       "FUNCTION_BLOCK"
-%token TOK_END_FUNCTION_BLOCK   "END_FUNCTION_BLOCK"
-%token TOK_FUNCTION             "FUNCTION"
-%token TOK_END_FUNCTION         "END_FUNCTION"
-%token TOK_VAR_INPUT            "VAR_INPUT"
-%token TOK_VAR_INOUT            "VAR_IN_OUT"
-%token TOK_VAR_OUTPUT           "VAR_OUTPUT"
-%token TOK_VAR_STATIC           "VAR"
-%token TOK_VAR_TEMP             "VAR_TEMP"
-%token TOK_VAR_CONSTANT         "VAR CONSTANT"
-%token TOK_END_VAR              "END_VAR"
-%token TOK_NETWORK              "NETWORK"
-%token TOK_TITLE                "TITLE"
-%token TOK_TAG                  "TAG"
-%token TOK_END_TAG              "END_TAG"
+%token STOK_VERSION              "VERSION"
+%token STOK_BEGIN                "BEGIN"
+%token STOK_FUNCTION_BLOCK       "FUNCTION_BLOCK"
+%token STOK_END_FUNCTION_BLOCK   "END_FUNCTION_BLOCK"
+%token STOK_FUNCTION             "FUNCTION"
+%token STOK_END_FUNCTION         "END_FUNCTION"
+%token STOK_VAR_INPUT            "VAR_INPUT"
+%token STOK_VAR_INOUT            "VAR_IN_OUT"
+%token STOK_VAR_OUTPUT           "VAR_OUTPUT"
+%token STOK_VAR_STATIC           "VAR"
+%token STOK_VAR_TEMP             "VAR_TEMP"
+%token STOK_VAR_CONSTANT         "VAR CONSTANT"
+%token STOK_END_VAR              "END_VAR"
+%token STOK_NETWORK              "NETWORK"
+%token STOK_TITLE                "TITLE"
+%token STOK_TAG                  "TAG"
+%token STOK_END_TAG              "END_TAG"
 
 /*** Siemens types ***********************************************************/
-%token TOK_INT                  "Int"
-%token TOK_DINT                 "DInt"
-%token TOK_REAL                 "Real"
-%token TOK_BOOL                 "Bool"
-%token TOK_VOID                 "Void"
+%token STOK_INT                  "Int"
+%token STOK_DINT                 "DInt"
+%token STOK_REAL                 "Real"
+%token STOK_BOOL                 "Bool"
+%token STOK_VOID                 "Void"
 
 /*** Operators ***************************************************************/
-%token TOK_LOAD                 "L"
-%token TOK_TRANSFER             "T"
-%token TOK_CALL                 "CALL"
-%token TOK_NOP                  "NOP"
-%token TOK_SET_RLO              "SET"
-%token TOK_CLR_RLO              "CLR"
-%token TOK_SET                  "S"
-%token TOK_RESET                "R"
-%token TOK_NOT                  "NOT"
-%token TOK_AND                  "A"
-%token TOK_AND_NOT              "AN"
-%token TOK_OR                   "O"
-%token TOK_OR_NOT               "ON"
-%token TOK_XOR                  "X"
-%token TOK_XOR_NOT              "XN"
-%token TOK_AND_NESTED           "A("
-%token TOK_AND_NOT_NESTED       "AN("
-%token TOK_OR_NESTED            "O("
-%token TOK_OR_NOT_NESTED        "ON("
-%token TOK_XOR_NESTED           "X("
-%token TOK_XOR_NOT_NESTED       "XN("
-%token TOK_NESTING_CLOSED       ")"
-%token TOK_ASSIGN               "="
-%token TOK_CONST_ADD            "+"
-%token TOK_ACCU_INT_ADD         "+I"
-%token TOK_ACCU_INT_SUB         "-I"
-%token TOK_ACCU_INT_MUL         "*I"
-%token TOK_ACCU_INT_DIV         "/I"
-%token TOK_ACCU_INT_EQ          "==I"
-%token TOK_ACCU_INT_NEQ         "<>I"
-%token TOK_ACCU_INT_GT          ">I"
-%token TOK_ACCU_INT_LT          "<I"
-%token TOK_ACCU_INT_GTE         ">=I"
-%token TOK_ACCU_INT_LTE         "<=I"
-%token TOK_ACCU_REAL_ADD        "+R"
-%token TOK_ACCU_REAL_SUB        "-R"
-%token TOK_ACCU_REAL_MUL        "*R"
-%token TOK_ACCU_REAL_DIV        "/R"
-%token TOK_ACCU_REAL_EQ         "==R"
-%token TOK_ACCU_REAL_NEQ        "<>R"
-%token TOK_ACCU_REAL_GT         ">R"
-%token TOK_ACCU_REAL_LT         "<R"
-%token TOK_ACCU_REAL_GTE        ">=R"
-%token TOK_ACCU_REAL_LTE        "<=R"
-%token TOK_ACCU_DINT_ADD        "+D"
-%token TOK_ACCU_DINT_SUB        "-D"
-%token TOK_ACCU_DINT_MUL        "*D"
-%token TOK_ACCU_DINT_DIV        "/D"
-%token TOK_ACCU_DINT_EQ         "==D"
-%token TOK_ACCU_DINT_NEQ        "<>D"
-%token TOK_ACCU_DINT_GT         ">D"
-%token TOK_ACCU_DINT_LT         "<D"
-%token TOK_ACCU_DINT_GTE        ">=D"
-%token TOK_ACCU_DINT_LTE        "<=D"
-%token TOK_ASSIGNMENT           ":="
-%token TOK_JUMP_UNCONDITIONAL   "JU"
-%token TOK_JUMP_CONDITIONAL     "JC"
-%token TOK_JUMP_CONDITIONAL_NOT "JCN"
+%token STOK_LOAD                 "L"
+%token STOK_TRANSFER             "T"
+%token STOK_CALL                 "CALL"
+%token STOK_NOP                  "NOP"
+%token STOK_SET_RLO              "SET"
+%token STOK_CLR_RLO              "CLR"
+%token STOK_SET                  "S"
+%token STOK_RESET                "R"
+%token STOK_NOT                  "NOT"
+%token STOK_AND                  "A"
+%token STOK_AND_NOT              "AN"
+%token STOK_OR                   "O"
+%token STOK_OR_NOT               "ON"
+%token STOK_XOR                  "X"
+%token STOK_XOR_NOT              "XN"
+%token STOK_AND_NESTED           "A("
+%token STOK_AND_NOT_NESTED       "AN("
+%token STOK_OR_NESTED            "O("
+%token STOK_OR_NOT_NESTED        "ON("
+%token STOK_XOR_NESTED           "X("
+%token STOK_XOR_NOT_NESTED       "XN("
+%token STOK_NESTING_CLOSED       ")"
+%token STOK_ASSIGN               "="
+%token STOK_CONST_ADD            "+"
+%token STOK_ACCU_INT_ADD         "+I"
+%token STOK_ACCU_INT_SUB         "-I"
+%token STOK_ACCU_INT_MUL         "*I"
+%token STOK_ACCU_INT_DIV         "/I"
+%token STOK_ACCU_INT_EQ          "==I"
+%token STOK_ACCU_INT_NEQ         "<>I"
+%token STOK_ACCU_INT_GT          ">I"
+%token STOK_ACCU_INT_LT          "<I"
+%token STOK_ACCU_INT_GTE         ">=I"
+%token STOK_ACCU_INT_LTE         "<=I"
+%token STOK_ACCU_REAL_ADD        "+R"
+%token STOK_ACCU_REAL_SUB        "-R"
+%token STOK_ACCU_REAL_MUL        "*R"
+%token STOK_ACCU_REAL_DIV        "/R"
+%token STOK_ACCU_REAL_EQ         "==R"
+%token STOK_ACCU_REAL_NEQ        "<>R"
+%token STOK_ACCU_REAL_GT         ">R"
+%token STOK_ACCU_REAL_LT         "<R"
+%token STOK_ACCU_REAL_GTE        ">=R"
+%token STOK_ACCU_REAL_LTE        "<=R"
+%token STOK_ACCU_DINT_ADD        "+D"
+%token STOK_ACCU_DINT_SUB        "-D"
+%token STOK_ACCU_DINT_MUL        "*D"
+%token STOK_ACCU_DINT_DIV        "/D"
+%token STOK_ACCU_DINT_EQ         "==D"
+%token STOK_ACCU_DINT_NEQ        "<>D"
+%token STOK_ACCU_DINT_GT         ">D"
+%token STOK_ACCU_DINT_LT         "<D"
+%token STOK_ACCU_DINT_GTE        ">=D"
+%token STOK_ACCU_DINT_LTE        "<=D"
+%token STOK_ASSIGNMENT           ":="
+%token STOK_JUMP_UNCONDITIONAL   "JU"
+%token STOK_JUMP_CONDITIONAL     "JC"
+%token STOK_JUMP_CONDITIONAL_NOT "JCN"
 
 /*** Value tokens ***/
-%token TOK_INT_LITERAL
-%token TOK_BOOL_LITERAL
-%token TOK_REAL_LITERAL
-%token TOK_IDENTIFIER
-%token TOK_TITLE_VALUE
-%token TOK_VERSION_VALUE
-%token TOK_LABEL
+%token STOK_INT_LITERAL
+%token STOK_BOOL_LITERAL
+%token STOK_REAL_LITERAL
+%token STOK_IDENTIFIER
+%token STOK_TITLE_VALUE
+%token STOK_VERSION_VALUE
+%token STOK_LABEL
 
 /*** Priority, associativity, etc. definitions *******************************/
 
@@ -209,7 +215,7 @@ Zom_Separated_Variable_Name:
     ;
 
 Variable_Name:
-    TOK_IDENTIFIER
+    STOK_IDENTIFIER
     {
       newstack($$);
       parser_stack($$) = 
@@ -241,7 +247,7 @@ Int_Type_Name:
     ;
 
 Sign_Int_Type_Name:
-    TOK_INT
+    STOK_INT
     {
       $$ = $1;
       parser_stack($$).type() = get_int_type();
@@ -253,7 +259,7 @@ DInt_Type_Name:
     ;
 
 Sign_DInt_Type_Name:
-    TOK_DINT
+    STOK_DINT
     {
       $$ = $1;
       parser_stack($$).type() = get_dint_type();
@@ -261,7 +267,7 @@ Sign_DInt_Type_Name:
     ;
 
 Real_Type_Name:
-    TOK_REAL
+    STOK_REAL
     {
       $$ = $1;
       parser_stack($$).type() = get_real_type();
@@ -269,14 +275,14 @@ Real_Type_Name:
     ;
     
 Bool_Type_Name:
-    TOK_BOOL
+    STOK_BOOL
     {
       $$ = $1;
       parser_stack($$).type() = get_bool_type();
     }
     
 Opt_Assignment:
-    TOK_ASSIGNMENT Constant
+    STOK_ASSIGNMENT Constant
     {
       $$ = $2;
     }
@@ -287,12 +293,12 @@ Opt_Assignment:
 
 // Function Block declaration
 Derived_FB_Name:
-    TOK_IDENTIFIER
+    STOK_IDENTIFIER
     ;
 
 FB_Decl:
-    TOK_FUNCTION_BLOCK Derived_FB_Name Version_Label Zom_FB_General_Var_Decls 
-    FB_Body TOK_END_FUNCTION_BLOCK
+    STOK_FUNCTION_BLOCK Derived_FB_Name Version_Label Zom_FB_General_Var_Decls 
+    FB_Body STOK_END_FUNCTION_BLOCK
     {
       newstack($$);
       parser_stack($$).id(ID_statement_list_function_block);
@@ -305,7 +311,7 @@ FB_Decl:
     ;
 
 Version_Label:
-    TOK_VERSION ':' TOK_VERSION_VALUE
+    STOK_VERSION ':' STOK_VERSION_VALUE
     {
       $$ = $3;
     }
@@ -338,7 +344,7 @@ FB_IO_Var_Decls:
     ;
 
 FB_Input_Decls:
-    TOK_VAR_INPUT Zom_FB_Input_Decl TOK_END_VAR
+    STOK_VAR_INPUT Zom_FB_Input_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -366,7 +372,7 @@ FB_Input_Decl:
     ;
 
 FB_Output_Decls:
-    TOK_VAR_OUTPUT Zom_FB_Output_Decl TOK_END_VAR
+    STOK_VAR_OUTPUT Zom_FB_Output_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -394,7 +400,7 @@ FB_Output_Decl:
     ;
     
 FB_Inout_Decls:
-    TOK_VAR_INOUT Zom_FB_Inout_Decl TOK_END_VAR
+    STOK_VAR_INOUT Zom_FB_Inout_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -422,7 +428,7 @@ FB_Inout_Decl:
     ;
     
 FB_Static_Decls:
-    TOK_VAR_STATIC Zom_FB_Static_Decl TOK_END_VAR
+    STOK_VAR_STATIC Zom_FB_Static_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -450,7 +456,7 @@ FB_Static_Decl:
     ;
 
 FB_Body:
-    TOK_BEGIN Zom_IL_Network
+    STOK_BEGIN Zom_IL_Network
     {
       $$ = $2;
     }
@@ -458,8 +464,8 @@ FB_Body:
 
 // Function declaration 
 Func_Decl:
-    TOK_FUNCTION Derived_Func_Name ':' Func_Return_Value Version_Label 
-    Zom_Func_General_Var_Decls Func_Body TOK_END_FUNCTION
+    STOK_FUNCTION Derived_Func_Name ':' Func_Return_Value Version_Label 
+    Zom_Func_General_Var_Decls Func_Body STOK_END_FUNCTION
     {
       newstack($$);
       parser_stack($$).id(ID_statement_list_function);
@@ -472,11 +478,11 @@ Func_Decl:
     ;
     
 Derived_Func_Name:
-    TOK_IDENTIFIER
+    STOK_IDENTIFIER
     ;
     
 Func_Return_Value:
-    TOK_VOID
+    STOK_VOID
     {
       parser_stack($$).set(ID_statement_list_type, ID_statement_list_return);
     }
@@ -512,7 +518,7 @@ IO_Var_Decls:
     ;
 
 Input_Decls:
-    TOK_VAR_INPUT Zom_Input_Decl TOK_END_VAR
+    STOK_VAR_INPUT Zom_Input_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -536,7 +542,7 @@ Input_Decl:
     ;
     
 Inout_Decls:
-    TOK_VAR_INOUT Zom_Inout_Decl TOK_END_VAR
+    STOK_VAR_INOUT Zom_Inout_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -560,7 +566,7 @@ Inout_Decl:
     ;
 
 Output_Decls:
-    TOK_VAR_OUTPUT Zom_Output_Decl TOK_END_VAR
+    STOK_VAR_OUTPUT Zom_Output_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -584,7 +590,7 @@ Output_Decl:
     ;
     
 Temp_Decls:
-    TOK_VAR_TEMP Zom_Temp_Decl TOK_END_VAR
+    STOK_VAR_TEMP Zom_Temp_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -608,7 +614,7 @@ Temp_Decl:
     ;
     
 Constant_Decls:
-    TOK_VAR_CONSTANT Zom_Constant_Decl TOK_END_VAR
+    STOK_VAR_CONSTANT Zom_Constant_Decl STOK_END_VAR
     {
       $$ = $2;
     }
@@ -636,7 +642,7 @@ Constant_Decl:
     ;
     
 Func_Body:
-    TOK_BEGIN Zom_IL_Network
+    STOK_BEGIN Zom_IL_Network
     {
       $$ = $2;
     }
@@ -657,7 +663,7 @@ Zom_IL_Network:
     ;
 
 IL_Network:
-    TOK_NETWORK TOK_TITLE TOK_ASSIGN Opt_TITLE_VALUE Opt_Instruction_List
+    STOK_NETWORK STOK_TITLE STOK_ASSIGN Opt_TITLE_VALUE Opt_Instruction_List
     {
       newstack($$);
       parser_stack($$).id(ID_statement_list_network);
@@ -668,7 +674,7 @@ IL_Network:
     
     
 Opt_TITLE_VALUE:
-    TOK_TITLE_VALUE
+    STOK_TITLE_VALUE
     | /* nothing */
     {
       newstack($$);
@@ -722,7 +728,7 @@ Opt_Label:
     ;
 
 IL_Label:
-    TOK_LABEL
+    STOK_LABEL
     ;
 
 Instruction:
@@ -750,282 +756,282 @@ Opt_Operand:
     ;
 
 IL_Simple_Operator:
-    TOK_LOAD 
+    STOK_LOAD 
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_load);
     }
-    | TOK_TRANSFER
+    | STOK_TRANSFER
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_transfer);
     }
-    | TOK_NOP
+    | STOK_NOP
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_nop);
     }
-    | TOK_CONST_ADD
+    | STOK_CONST_ADD
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_const_add);
     }
-    | TOK_ACCU_INT_ADD
+    | STOK_ACCU_INT_ADD
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_add);
     }
-    | TOK_ACCU_INT_SUB
+    | STOK_ACCU_INT_SUB
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_sub);
     }
-    | TOK_ACCU_INT_MUL
+    | STOK_ACCU_INT_MUL
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_mul);
     }
-    | TOK_ACCU_INT_DIV
+    | STOK_ACCU_INT_DIV
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_div);
     }
-    | TOK_ACCU_INT_EQ
+    | STOK_ACCU_INT_EQ
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_eq);
     }
-    | TOK_ACCU_INT_NEQ
+    | STOK_ACCU_INT_NEQ
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_neq);
     }
-    | TOK_ACCU_INT_GT
+    | STOK_ACCU_INT_GT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_gt);
     }
-    | TOK_ACCU_INT_LT
+    | STOK_ACCU_INT_LT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_lt);
     }
-    | TOK_ACCU_INT_GTE
+    | STOK_ACCU_INT_GTE
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_gte);
     }
-    | TOK_ACCU_INT_LTE
+    | STOK_ACCU_INT_LTE
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_int_lte);
     }
-    | TOK_ACCU_REAL_ADD
+    | STOK_ACCU_REAL_ADD
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_add);
     }
-    | TOK_ACCU_REAL_SUB
+    | STOK_ACCU_REAL_SUB
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_sub);
     }
-    | TOK_ACCU_REAL_MUL
+    | STOK_ACCU_REAL_MUL
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_mul);
     }
-    | TOK_ACCU_REAL_DIV
+    | STOK_ACCU_REAL_DIV
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_div);
     }
-    | TOK_ACCU_REAL_EQ
+    | STOK_ACCU_REAL_EQ
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_eq);
     }
-    | TOK_ACCU_REAL_NEQ
+    | STOK_ACCU_REAL_NEQ
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_neq);
     }
-    | TOK_ACCU_REAL_GT
+    | STOK_ACCU_REAL_GT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_gt);
     }
-    | TOK_ACCU_REAL_LT
+    | STOK_ACCU_REAL_LT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_lt);
     }
-    | TOK_ACCU_REAL_GTE
+    | STOK_ACCU_REAL_GTE
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_gte);
     }
-    | TOK_ACCU_REAL_LTE
+    | STOK_ACCU_REAL_LTE
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_real_lte);
     }
-    | TOK_ACCU_DINT_ADD
+    | STOK_ACCU_DINT_ADD
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_add);
     }
-    | TOK_ACCU_DINT_SUB
+    | STOK_ACCU_DINT_SUB
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_sub);
     }
-    | TOK_ACCU_DINT_MUL
+    | STOK_ACCU_DINT_MUL
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_mul);
     }
-    | TOK_ACCU_DINT_DIV
+    | STOK_ACCU_DINT_DIV
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_div);
     }
-    | TOK_ACCU_DINT_EQ
+    | STOK_ACCU_DINT_EQ
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_eq);
     }
-    | TOK_ACCU_DINT_NEQ
+    | STOK_ACCU_DINT_NEQ
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_neq);
     }
-    | TOK_ACCU_DINT_GT
+    | STOK_ACCU_DINT_GT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_gt);
     }
-    | TOK_ACCU_DINT_LT
+    | STOK_ACCU_DINT_LT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_lt);
     }
-    | TOK_ACCU_DINT_GTE
+    | STOK_ACCU_DINT_GTE
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_gte);
     }
-    | TOK_ACCU_DINT_LTE
+    | STOK_ACCU_DINT_LTE
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_accu_dint_lte);
     }
-    | TOK_AND 
+    | STOK_AND 
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_and);
     }
-    | TOK_AND_NOT
+    | STOK_AND_NOT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_and_not);
     } 
-    | TOK_OR
+    | STOK_OR
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_or);
     } 
-    | TOK_OR_NOT
+    | STOK_OR_NOT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_or_not);
     }  
-    | TOK_XOR 
+    | STOK_XOR 
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor);
     }
-    | TOK_XOR_NOT
+    | STOK_XOR_NOT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor_not);
     }
-    | TOK_AND_NESTED 
+    | STOK_AND_NESTED 
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_and_nested);
     }
-    | TOK_AND_NOT_NESTED
+    | STOK_AND_NOT_NESTED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_and_not_nested);
     }
-    | TOK_OR_NESTED
+    | STOK_OR_NESTED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_or_nested);
     }
-    | TOK_OR_NOT_NESTED
+    | STOK_OR_NOT_NESTED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_or_not_nested);
     }
-    | TOK_XOR_NESTED 
+    | STOK_XOR_NESTED 
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor_nested);
     }
-    | TOK_XOR_NOT_NESTED
+    | STOK_XOR_NOT_NESTED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_xor_not_nested);
     }
-    | TOK_NESTING_CLOSED
+    | STOK_NESTING_CLOSED
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_nesting_closed);
     }
-    | TOK_ASSIGN
+    | STOK_ASSIGN
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_assign);
     }
-    | TOK_SET_RLO
+    | STOK_SET_RLO
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_set_rlo);
     }
-    | TOK_CLR_RLO
+    | STOK_CLR_RLO
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_clr_rlo);
     }
-    | TOK_SET
+    | STOK_SET
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_set);
     }
-    | TOK_RESET
+    | STOK_RESET
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_reset);
     }
-    | TOK_NOT
+    | STOK_NOT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_not);
     }
-    | TOK_JUMP_UNCONDITIONAL
+    | STOK_JUMP_UNCONDITIONAL
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_jump_unconditional);
     }
-    | TOK_JUMP_CONDITIONAL
+    | STOK_JUMP_CONDITIONAL
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_jump_conditional);
     }
-    | TOK_JUMP_CONDITIONAL_NOT
+    | STOK_JUMP_CONDITIONAL_NOT
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_jump_conditional_not);
@@ -1049,9 +1055,9 @@ Variable_Access:
     ;
     
 Constant:
-    TOK_INT_LITERAL
-    | TOK_BOOL_LITERAL
-    | TOK_REAL_LITERAL
+    STOK_INT_LITERAL
+    | STOK_BOOL_LITERAL
+    | STOK_REAL_LITERAL
     ;
     
 IL_Invocation:
@@ -1068,7 +1074,7 @@ IL_Invocation:
     ;
     
 Call:
-    TOK_CALL
+    STOK_CALL
     {
       $$ = $1;
       parser_stack($$).id(ID_statement_list_call);
@@ -1085,7 +1091,7 @@ Callee_Name:
     ;
     
 Opt_Param_List:
-    '(' Oom_Param_Assignment TOK_NESTING_CLOSED
+    '(' Oom_Param_Assignment STOK_NESTING_CLOSED
     {
       $$ = $2;
     }
@@ -1109,7 +1115,7 @@ Oom_Param_Assignment:
     ;
     
 Param_Assignment:
-    Variable_Name TOK_ASSIGNMENT IL_Operand
+    Variable_Name STOK_ASSIGNMENT IL_Operand
     {
       newstack($$);
       parser_stack($$) = code_frontend_assignt(std::move(parser_stack($1)),
@@ -1131,7 +1137,7 @@ Opt_Data_Block:
 
 // Tag declaration
 Tag_Decl:
-    TOK_TAG Opt_Tag_List TOK_END_TAG
+    STOK_TAG Opt_Tag_List STOK_END_TAG
     {
       PARSER.add_tag_list(parser_stack($2));
     }

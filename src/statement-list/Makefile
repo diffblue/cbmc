@@ -31,6 +31,9 @@ all: statement-list$(LIBEXT)
 
 statement_list_y.tab.cpp: parser.y
 	$(YACC) $(YFLAGS) -pyystatement_list parser.y --defines=statement_list_y.tab.h -o $@
+	$(SED) -e's,enum yytokentype,enum yytokentype_stmt,' \
+	  <statement_list_y.tab.h >statement_list_y.tab.h.tmp && \
+	  mv statement_list_y.tab.h.tmp statement_list_y.tab.h
 
 statement_list_y.tab.h: statement_list_y.tab.cpp
 

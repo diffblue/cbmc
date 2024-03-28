@@ -15,6 +15,10 @@ set_target_properties(
     XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
 )
 
+if(ipo_supported)
+    set_property(TARGET glucose-condensed PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     target_compile_options(glucose-condensed PUBLIC /w)
 endif()
