@@ -107,7 +107,7 @@ class symbol_table_baset;
     "set operating system (default: " +                                        \
     id2string(configt::this_operating_system()) +                              \
     ") to one of: {yfreebsd}, {ylinux}, {ymacos}, {ynetbsd}, {yopenbsd}, "     \
-    "{ysolaris}, or {ywindows}\n"                                              \
+    "{ysolaris}, {yhurd}, or {ywindows}\n"                                     \
     " {y--i386-linux}, {y--i386-win32}, {y--i386-macos}, {y--ppc-macos}, "     \
     "{y--win32}, {y--winx64} \t "                                              \
     "set architecture and operating system\n"                                  \
