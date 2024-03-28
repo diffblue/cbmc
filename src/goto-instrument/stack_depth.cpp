@@ -17,9 +17,9 @@ Date: November 2011
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <linking/static_lifetime_init.h>
 
 static symbol_exprt add_stack_depth_symbol(

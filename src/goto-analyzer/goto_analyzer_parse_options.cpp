@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/version.h>
 
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
@@ -29,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/local_may_alias.h>
 #include <ansi-c/cprover_library.h>
 #include <ansi-c/gcc_version.h>
+#include <ansi-c/goto-conversion/link_to_library.h>
 #include <assembler/remove_asm.h>
 #include <cpp/cprover_library.h>
 

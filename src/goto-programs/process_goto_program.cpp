@@ -26,9 +26,9 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <goto-programs/rewrite_rw_ok.h>
 #include <goto-programs/rewrite_union.h>
 #include <goto-programs/string_abstraction.h>
-#include <goto-programs/string_instrumentation.h>
 
-#include <ansi-c/goto_check_c.h>
+#include <ansi-c/goto-conversion/goto_check_c.h>
+#include <ansi-c/goto-conversion/string_instrumentation.h>
 
 #include "goto_check.h"
 

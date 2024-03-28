@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_check.h>
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/remove_returns.h>
@@ -33,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_symbol_table.h>
 
 #include <ansi-c/ansi_c_language.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <goto-checker/all_properties_verifier.h>
 #include <goto-checker/all_properties_verifier_with_fault_localization.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>

@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// String Abstraction
 
-#ifndef CPROVER_GOTO_PROGRAMS_STRING_INSTRUMENTATION_H
-#define CPROVER_GOTO_PROGRAMS_STRING_INSTRUMENTATION_H
+#ifndef CPROVER_ANSI_C_GOTO_CONVERSION_STRING_INSTRUMENTATION_H
+#define CPROVER_ANSI_C_GOTO_CONVERSION_STRING_INSTRUMENTATION_H
 
 class exprt;
 class goto_functionst;
@@ -25,7 +25,7 @@ void string_instrumentation(symbol_table_baset &, goto_functionst &);
 void string_instrumentation(goto_modelt &);
 
 exprt is_zero_string(const exprt &what, bool write = false);
-exprt zero_string_length(const exprt &what, bool write=false);
+exprt zero_string_length(const exprt &what, bool write = false);
 exprt buffer_size(const exprt &what);
 
-#endif // CPROVER_GOTO_PROGRAMS_STRING_INSTRUMENTATION_H
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERSION_STRING_INSTRUMENTATION_H

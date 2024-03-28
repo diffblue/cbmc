@@ -100,7 +100,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
-#include <ansi-c/goto_check_c.h>
+#include <ansi-c/goto-conversion/goto_check_c.h>
 #include <langapi/language.h>
 
 class optionst;

@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Library Linking
 
-#ifndef CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
-#define CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
+#ifndef CPROVER_ANSI_C_GOTO_CONVERSION_LINK_TO_LIBRARY_H
+#define CPROVER_ANSI_C_GOTO_CONVERSION_LINK_TO_LIBRARY_H
+
+#include <util/irep.h>
 
 #include <functional>
 #include <set>
-
-#include <util/irep.h>
 
 class goto_modelt;
 class message_handlert;
@@ -30,4 +30,4 @@ void link_to_library(
     symbol_tablet &,
     message_handlert &)> &);
 
-#endif // CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERSION_LINK_TO_LIBRARY_H

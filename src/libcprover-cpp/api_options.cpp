@@ -5,7 +5,7 @@
 #include <util/cmdline.h>
 #include <util/options.h>
 
-#include <ansi-c/goto_check_c.h>
+#include <ansi-c/goto-conversion/goto_check_c.h>
 #include <goto-checker/solver_factory.h>
 
 api_optionst api_optionst::create()

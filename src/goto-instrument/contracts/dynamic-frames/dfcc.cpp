@@ -23,12 +23,10 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <util/std_expr.h>
 #include <util/string_utils.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/initialize_goto_model.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unused_functions.h>
 
@@ -36,6 +34,8 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <ansi-c/c_expr.h>
 #include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <ansi-c/goto-conversion/link_to_library.h>
 #include <goto-instrument/contracts/cfg_info.h>
 #include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/nondet_static.h>

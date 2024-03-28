@@ -6,11 +6,10 @@ Author: Diffblue Ltd
 
 \*******************************************************************/
 
-#include <goto-programs/allocate_objects.h>
-
 #include <util/c_types.h>
 #include <util/symbol_table.h>
 
+#include <ansi-c/allocate_objects.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE(

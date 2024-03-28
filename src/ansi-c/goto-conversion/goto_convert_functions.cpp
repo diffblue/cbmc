@@ -13,9 +13,9 @@ Date: June 2003
 #include <util/std_code.h>
 #include <util/symbol_table_builder.h>
 
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/goto_model.h>
 
-#include "goto_model.h"
+#include <linking/static_lifetime_init.h>
 
 goto_convert_functionst::goto_convert_functionst(
   symbol_table_baset &_symbol_table,
