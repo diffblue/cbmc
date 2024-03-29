@@ -2063,6 +2063,59 @@ inline code_try_catcht &to_code_try_catch(codet &code)
   return ret;
 }
 
+/// \ref codet representation of a 'havoc_object' statement.
+class code_havoc_objectt : public codet
+{
+public:
+  explicit code_havoc_objectt(exprt op)
+    : codet(ID_havoc_object, {std::move(op)})
+  {
+  }
+
+  const exprt &object() const
+  {
+    return op0();
+  }
+
+  exprt &object()
+  {
+    return op0();
+  }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
+};
+
+template <>
+inline bool can_cast_expr<code_havoc_objectt>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_havoc_object);
+}
+
+inline void validate_expr(const code_havoc_objectt &x)
+{
+  validate_operands(x, 1, "havoc_object must have one operand", true);
+}
+
+inline const code_havoc_objectt &to_code_havoc_object(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_havoc_object);
+  const code_havoc_objectt &ret = static_cast<const code_havoc_objectt &>(code);
+  validate_expr(ret);
+  return ret;
+}
+
+inline code_havoc_objectt &to_code_havoc_object(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_try_catch);
+  code_havoc_objectt &ret = static_cast<code_havoc_objectt &>(code);
+  validate_expr(ret);
+  return ret;
+}
+
 /// This class is used to interface between a language frontend
 /// and goto-convert -- it communicates the identifiers of the parameters
 /// of a function or method

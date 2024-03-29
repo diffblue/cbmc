@@ -1007,9 +1007,8 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    codet havoc(ID_havoc_object);
+    code_havoc_objectt havoc(arguments[0]);
     havoc.add_source_location() = function.source_location();
-    havoc.copy_to_operands(arguments[0]);
 
     dest.add(goto_programt::make_other(havoc, function.source_location()));
   }
