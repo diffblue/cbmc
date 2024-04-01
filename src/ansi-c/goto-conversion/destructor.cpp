@@ -11,22 +11,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "destructor.h"
 
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 
-code_function_callt get_destructor(
-  const namespacet &ns,
-  const typet &type)
+#include <goto-programs/goto_instruction_code.h>
+
+code_function_callt get_destructor(const namespacet &ns, const typet &type)
 {
   if(type.id() == ID_struct_tag)
   {
     return get_destructor(ns, ns.follow_tag(to_struct_tag_type(type)));
   }
-  else if(type.id()==ID_struct)
+  else if(type.id() == ID_struct)
   {
-    const exprt &methods=static_cast<const exprt&>(type.find(ID_methods));
+    const exprt &methods = static_cast<const exprt &>(type.find(ID_methods));
 
     for(const auto &op : methods.operands())
     {
@@ -34,10 +32,11 @@ code_function_callt get_destructor(
       {
         const code_typet &code_type = to_code_type(op.type());
 
-        if(code_type.return_type().id()==ID_destructor &&
-           code_type.parameters().size()==1)
+        if(
+          code_type.return_type().id() == ID_destructor &&
+          code_type.parameters().size() == 1)
         {
-          const typet &arg_type=code_type.parameters().front().type();
+          const typet &arg_type = code_type.parameters().front().type();
 
           if(
             arg_type.id() == ID_pointer &&

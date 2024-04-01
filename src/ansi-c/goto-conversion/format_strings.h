@@ -28,9 +28,9 @@ public:
   {
     UNKNOWN,
     TEXT,
-    INT, // d, i, o, u, x
-    FLOAT, // a, e, f, g
-    CHAR, // c
+    INT,    // d, i, o, u, x
+    FLOAT,  // a, e, f, g
+    CHAR,   // c
     STRING, // s
     POINTER // p
   };
@@ -70,13 +70,14 @@ public:
     : type(_type),
       length_modifier(length_modifierst::LEN_undef),
       representation(representationt::SIGNED_undef)
-    { }
-  format_tokent():
-    type(token_typet::UNKNOWN),
-    length_modifier(length_modifierst::LEN_undef),
-    representation(representationt::SIGNED_undef)
-    { }
-
+  {
+  }
+  format_tokent()
+    : type(token_typet::UNKNOWN),
+      length_modifier(length_modifierst::LEN_undef),
+      representation(representationt::SIGNED_undef)
+  {
+  }
 
   token_typet type;
   std::list<flag_typet> flags;

@@ -17,20 +17,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_expr.h>
 #include <util/std_code.h>
 
+#include <goto-programs/goto_program.h>
+
 #include <ansi-c/allocate_objects.h>
 
-#include <goto-programs/goto_program.h>
+#include "scope_tree.h"
 
 #include <list>
 #include <unordered_set>
 #include <vector>
 
-#include "scope_tree.h"
-
 class side_effect_expr_overflowt;
 struct build_declaration_hops_inputst;
 
-class goto_convertt:public messaget
+class goto_convertt : public messaget
 {
 public:
   void
@@ -38,11 +38,11 @@ public:
 
   goto_convertt(
     symbol_table_baset &_symbol_table,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
-    tmp_symbol_prefix("goto_convertt")
+    message_handlert &_message_handler)
+    : messaget(_message_handler),
+      symbol_table(_symbol_table),
+      ns(_symbol_table),
+      tmp_symbol_prefix("goto_convertt")
   {
   }
 
@@ -141,17 +141,13 @@ protected:
     side_effect_exprt &expr,
     goto_programt &dest,
     bool result_is_used);
-  void remove_cpp_delete(
-    side_effect_exprt &expr,
-    goto_programt &dest);
+  void remove_cpp_delete(side_effect_exprt &expr, goto_programt &dest);
   void remove_malloc(
     side_effect_exprt &expr,
     goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_temporary_object(
-    side_effect_exprt &expr,
-    goto_programt &dest);
+  void remove_temporary_object(side_effect_exprt &expr, goto_programt &dest);
   void remove_statement_expression(
     side_effect_exprt &expr,
     goto_programt &dest,
@@ -182,9 +178,7 @@ protected:
     const side_effect_exprt &rhs,
     goto_programt &dest);
 
-  static void replace_new_object(
-    const exprt &object,
-    exprt &dest);
+  static void replace_new_object(const exprt &object, exprt &dest);
 
   void cpp_new_initializer(
     const exprt &lhs,
@@ -376,14 +370,12 @@ protected:
   void finish_computed_gotos(goto_programt &dest);
   void optimize_guarded_gotos(goto_programt &dest);
 
-  typedef std::map<irep_idt,
-                   std::pair<goto_programt::targett, node_indext>>
+  typedef std::map<irep_idt, std::pair<goto_programt::targett, node_indext>>
     labelst;
-  typedef std::list<std::pair<goto_programt::targett, node_indext>>
-    gotost;
+  typedef std::list<std::pair<goto_programt::targett, node_indext>> gotost;
   typedef std::list<goto_programt::targett> computed_gotost;
   typedef exprt::operandst caset;
-  typedef std::list<std::pair<goto_programt::targett, caset> > casest;
+  typedef std::list<std::pair<goto_programt::targett, caset>> casest;
   typedef std::map<
     goto_programt::targett,
     casest::iterator,
@@ -395,8 +387,8 @@ protected:
     goto_programt *prefix = nullptr;
     goto_programt *suffix = nullptr;
 
-    bool return_set, has_return_value, break_set, continue_set,
-         default_set, throw_set, leave_set;
+    bool return_set, has_return_value, break_set, continue_set, default_set,
+      throw_set, leave_set;
 
     labelst labels;
     gotost gotos;
@@ -410,60 +402,60 @@ protected:
       default_target, throw_target, leave_target;
 
     node_indext break_stack_node, continue_stack_node, throw_stack_node,
-                leave_stack_node;
+      leave_stack_node;
 
-    targetst():
-      return_set(false),
-      has_return_value(false),
-      break_set(false),
-      continue_set(false),
-      default_set(false),
-      throw_set(false),
-      leave_set(false),
-      break_stack_node(),
-      continue_stack_node(),
-      throw_stack_node(),
-      leave_stack_node()
+    targetst()
+      : return_set(false),
+        has_return_value(false),
+        break_set(false),
+        continue_set(false),
+        default_set(false),
+        throw_set(false),
+        leave_set(false),
+        break_stack_node(),
+        continue_stack_node(),
+        throw_stack_node(),
+        leave_stack_node()
     {
     }
 
     void set_break(goto_programt::targett _break_target)
     {
-      break_set=true;
-      break_target=_break_target;
+      break_set = true;
+      break_target = _break_target;
       break_stack_node = scope_stack.get_current_node();
     }
 
     void set_continue(goto_programt::targett _continue_target)
     {
-      continue_set=true;
-      continue_target=_continue_target;
+      continue_set = true;
+      continue_target = _continue_target;
       continue_stack_node = scope_stack.get_current_node();
     }
 
     void set_default(goto_programt::targett _default_target)
     {
-      default_set=true;
-      default_target=_default_target;
+      default_set = true;
+      default_target = _default_target;
     }
 
     void set_return(goto_programt::targett _return_target)
     {
-      return_set=true;
-      return_target=_return_target;
+      return_set = true;
+      return_target = _return_target;
     }
 
     void set_throw(goto_programt::targett _throw_target)
     {
-      throw_set=true;
-      throw_target=_throw_target;
+      throw_set = true;
+      throw_target = _throw_target;
       throw_stack_node = scope_stack.get_current_node();
     }
 
     void set_leave(goto_programt::targett _leave_target)
     {
-      leave_set=true;
-      leave_target=_leave_target;
+      leave_set = true;
+      leave_target = _leave_target;
       leave_stack_node = scope_stack.get_current_node();
     }
   } targets;
@@ -474,18 +466,18 @@ protected:
 
     explicit break_continue_targetst(const targetst &targets)
     {
-      break_set=targets.break_set;
-      continue_set=targets.continue_set;
-      break_target=targets.break_target;
-      continue_target=targets.continue_target;
+      break_set = targets.break_set;
+      continue_set = targets.continue_set;
+      break_target = targets.break_target;
+      continue_target = targets.continue_target;
     }
 
     void restore(targetst &targets)
     {
-      targets.break_set=break_set;
-      targets.continue_set=continue_set;
-      targets.break_target=break_target;
-      targets.continue_target=continue_target;
+      targets.break_set = break_set;
+      targets.continue_set = continue_set;
+      targets.break_target = break_target;
+      targets.continue_target = continue_target;
     }
 
     goto_programt::targett break_target;
@@ -499,23 +491,23 @@ protected:
 
     explicit break_switch_targetst(const targetst &targets)
     {
-      break_set=targets.break_set;
-      default_set=targets.default_set;
-      break_target=targets.break_target;
-      default_target=targets.default_target;
+      break_set = targets.break_set;
+      default_set = targets.default_set;
+      break_target = targets.break_target;
+      default_target = targets.default_target;
       break_stack_node = targets.scope_stack.get_current_node();
-      cases=targets.cases;
-      cases_map=targets.cases_map;
+      cases = targets.cases;
+      cases_map = targets.cases_map;
     }
 
     void restore(targetst &targets)
     {
-      targets.break_set=break_set;
-      targets.default_set=default_set;
-      targets.break_target=break_target;
-      targets.default_target=default_target;
-      targets.cases=cases;
-      targets.cases_map=cases_map;
+      targets.break_set = break_set;
+      targets.default_set = default_set;
+      targets.break_target = break_target;
+      targets.default_target = default_target;
+      targets.cases = cases;
+      targets.cases_map = cases_map;
     }
 
     goto_programt::targett break_target;
@@ -533,15 +525,15 @@ protected:
 
     explicit throw_targett(const targetst &targets)
     {
-      throw_set=targets.throw_set;
-      throw_target=targets.throw_target;
+      throw_set = targets.throw_set;
+      throw_target = targets.throw_target;
       throw_stack_node = targets.scope_stack.get_current_node();
     }
 
     void restore(targetst &targets)
     {
-      targets.throw_set=throw_set;
-      targets.throw_target=throw_target;
+      targets.throw_set = throw_set;
+      targets.throw_target = throw_target;
     }
 
     goto_programt::targett throw_target;
@@ -555,15 +547,15 @@ protected:
 
     explicit leave_targett(const targetst &targets)
     {
-      leave_set=targets.leave_set;
-      leave_target=targets.leave_target;
+      leave_set = targets.leave_set;
+      leave_target = targets.leave_target;
       leave_stack_node = targets.scope_stack.get_current_node();
     }
 
     void restore(targetst &targets)
     {
-      targets.leave_set=leave_set;
-      targets.leave_target=leave_target;
+      targets.leave_set = leave_set;
+      targets.leave_target = leave_target;
     }
 
     goto_programt::targett leave_target;
@@ -571,9 +563,7 @@ protected:
     node_indext leave_stack_node;
   };
 
-  exprt case_guard(
-    const exprt &value,
-    const caset &case_op);
+  exprt case_guard(const exprt &value, const caset &case_op);
 
   // if(cond) { true_case } else { false_case }
   void generate_ifthenelse(

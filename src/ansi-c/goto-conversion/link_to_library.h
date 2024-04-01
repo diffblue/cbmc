@@ -12,10 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
 #define CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
 
+#include <util/irep.h>
+
 #include <functional>
 #include <set>
-
-#include <util/irep.h>
 
 class goto_modelt;
 class message_handlert;

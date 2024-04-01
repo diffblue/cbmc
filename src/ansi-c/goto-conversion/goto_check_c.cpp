@@ -36,10 +36,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 
 #include <analyses/local_bitvector_analysis.h>
+#include <ansi-c/c_expr.h>
 #include <langapi/language.h>
 #include <langapi/mode.h>
-
-#include <ansi-c/c_expr.h>
 
 #include <algorithm>
 
@@ -1169,11 +1168,10 @@ void goto_check_ct::float_overflow_check(const exprt &expr, const guardt &guard)
         isinf_exprt(to_binary_expr(expr).op1()),
         not_exprt(isinf_exprt(expr)));
 
-      std::string kind = expr.id() == ID_plus
-                           ? "addition"
-                           : expr.id() == ID_minus
-                               ? "subtraction"
-                               : expr.id() == ID_mult ? "multiplication" : "";
+      std::string kind = expr.id() == ID_plus    ? "addition"
+                         : expr.id() == ID_minus ? "subtraction"
+                         : expr.id() == ID_mult  ? "multiplication"
+                                                 : "";
 
       add_guarded_property(
         std::move(overflow_check),

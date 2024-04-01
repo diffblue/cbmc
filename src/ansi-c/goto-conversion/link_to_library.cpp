@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "link_to_library.h"
 
-#include <linking/static_lifetime_init.h>
-
 #include <goto-programs/compute_called_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/link_goto_model.h>
+
+#include <linking/static_lifetime_init.h>
 
 #include "goto_convert_functions.h"
 
