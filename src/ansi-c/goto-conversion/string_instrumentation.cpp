@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_instrumentation.h"
 
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -25,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "format_strings.h"
 
+#include <algorithm>
+
 exprt is_zero_string(const exprt &what, bool write)
 {
   unary_exprt result{"is_zero_string", what, c_bool_type()};
@@ -33,9 +33,7 @@ exprt is_zero_string(const exprt &what, bool write)
   return notequal_exprt{result, from_integer(0, c_bool_type())};
 }
 
-exprt zero_string_length(
-  const exprt &what,
-  bool write)
+exprt zero_string_length(const exprt &what, bool write)
 {
   exprt result("zero_string_length", size_type());
   result.copy_to_operands(what);
@@ -171,16 +169,13 @@ void string_instrumentation(
 
 void string_instrumentation(goto_modelt &goto_model)
 {
-  string_instrumentation(
-    goto_model.symbol_table,
-    goto_model.goto_functions);
+  string_instrumentation(goto_model.symbol_table, goto_model.goto_functions);
 }
 
 void string_instrumentationt::operator()(goto_functionst &dest)
 {
-  for(goto_functionst::function_mapt::iterator
-      it=dest.function_map.begin();
-      it!=dest.function_map.end();
+  for(goto_functionst::function_mapt::iterator it = dest.function_map.begin();
+      it != dest.function_map.end();
       it++)
   {
     (*this)(it->second.body);
@@ -209,41 +204,40 @@ void string_instrumentationt::do_function_call(
   const exprt &function = as_const(*target).call_function();
   const auto &arguments = as_const(*target).call_arguments();
 
-  if(function.id()==ID_symbol)
+  if(function.id() == ID_symbol)
   {
-    const irep_idt &identifier=
-      to_symbol_expr(function).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(function).get_identifier();
 
-    if(identifier=="strcoll")
+    if(identifier == "strcoll")
     {
     }
-    else if(identifier=="strncmp")
+    else if(identifier == "strncmp")
       do_strncmp(dest, target, lhs, arguments);
-    else if(identifier=="strxfrm")
+    else if(identifier == "strxfrm")
     {
     }
-    else if(identifier=="strchr")
+    else if(identifier == "strchr")
       do_strchr(dest, target, lhs, arguments);
-    else if(identifier=="strcspn")
+    else if(identifier == "strcspn")
     {
     }
-    else if(identifier=="strpbrk")
+    else if(identifier == "strpbrk")
     {
     }
-    else if(identifier=="strrchr")
+    else if(identifier == "strrchr")
       do_strrchr(dest, target, lhs, arguments);
-    else if(identifier=="strspn")
+    else if(identifier == "strspn")
     {
     }
-    else if(identifier=="strerror")
+    else if(identifier == "strerror")
       do_strerror(dest, target, lhs, arguments);
-    else if(identifier=="strstr")
+    else if(identifier == "strstr")
       do_strstr(dest, target, lhs, arguments);
-    else if(identifier=="strtok")
+    else if(identifier == "strtok")
       do_strtok(dest, target, lhs, arguments);
-    else if(identifier=="sprintf")
+    else if(identifier == "sprintf")
       do_sprintf(dest, target, lhs, arguments);
-    else if(identifier=="snprintf")
+    else if(identifier == "snprintf")
       do_snprintf(dest, target, lhs, arguments);
     else if(identifier == "fscanf" || identifier == "__isoc99_fscanf")
       do_fscanf(dest, target, lhs, arguments);
@@ -258,7 +252,7 @@ void string_instrumentationt::do_sprintf(
   const exprt &lhs,
   const exprt::operandst &arguments)
 {
-  if(arguments.size()<2)
+  if(arguments.size() < 2)
   {
     throw invalid_source_file_exceptiont(
       "sprintf expected to have two or more arguments",
@@ -294,7 +288,7 @@ void string_instrumentationt::do_snprintf(
   const exprt &lhs,
   const exprt::operandst &arguments)
 {
-  if(arguments.size()<3)
+  if(arguments.size() < 3)
   {
     throw invalid_source_file_exceptiont(
       "snprintf expected to have three or more arguments",
@@ -331,7 +325,7 @@ void string_instrumentationt::do_fscanf(
   const exprt &lhs,
   const exprt::operandst &arguments)
 {
-  if(arguments.size()<2)
+  if(arguments.size() < 2)
   {
     throw invalid_source_file_exceptiont(
       "fscanf expected to have two or more arguments",
@@ -362,7 +356,7 @@ void string_instrumentationt::do_format_string_read(
   std::size_t argument_start_inx,
   const std::string &function_name)
 {
-  const exprt &format_arg=arguments[format_string_inx];
+  const exprt &format_arg = arguments[format_string_inx];
 
   if(
     format_arg.id() == ID_address_of &&
@@ -375,22 +369,22 @@ void string_instrumentationt::do_format_string_read(
         to_index_expr(to_address_of_expr(format_arg).object()).array())
         .value()));
 
-    std::size_t args=0;
+    std::size_t args = 0;
 
     for(const auto &token : token_list)
     {
-      if(token.type==format_tokent::token_typet::STRING)
+      if(token.type == format_tokent::token_typet::STRING)
       {
-        const exprt &arg=arguments[argument_start_inx+args];
+        const exprt &arg = arguments[argument_start_inx + args];
 
-        if(arg.id()!=ID_string_constant) // we don't need to check constants
+        if(arg.id() != ID_string_constant) // we don't need to check constants
         {
           exprt temp(arg);
 
           if(arg.type().id() != ID_pointer)
           {
             index_exprt index(temp, from_integer(0, c_index_type()));
-            temp=address_of_exprt(index);
+            temp = address_of_exprt(index);
           }
 
           source_locationt annotated_location = target->source_location();
@@ -403,14 +397,16 @@ void string_instrumentationt::do_format_string_read(
         }
       }
 
-      if(token.type!=format_tokent::token_typet::TEXT &&
-         token.type!=format_tokent::token_typet::UNKNOWN) args++;
+      if(
+        token.type != format_tokent::token_typet::TEXT &&
+        token.type != format_tokent::token_typet::UNKNOWN)
+        args++;
 
-      if(find(
-           token.flags.begin(),
-           token.flags.end(),
-           format_tokent::flag_typet::ASTERISK)!=
-         token.flags.end())
+      if(
+        find(
+          token.flags.begin(),
+          token.flags.end(),
+          format_tokent::flag_typet::ASTERISK) != token.flags.end())
         args++; // just eat the additional argument
     }
   }
@@ -423,9 +419,9 @@ void string_instrumentationt::do_format_string_read(
     dest.add(goto_programt::make_assertion(
       is_zero_string(arguments[1]), annotated_location));
 
-    for(std::size_t i=2; i<arguments.size(); i++)
+    for(std::size_t i = 2; i < arguments.size(); i++)
     {
-      const exprt &arg=arguments[i];
+      const exprt &arg = arguments[i];
 
       if(arguments[i].id() != ID_string_constant && is_string_type(arg.type()))
       {
@@ -434,7 +430,7 @@ void string_instrumentationt::do_format_string_read(
         if(arg.type().id() != ID_pointer)
         {
           index_exprt index(temp, from_integer(0, c_index_type()));
-          temp=address_of_exprt(index);
+          temp = address_of_exprt(index);
         }
 
         source_locationt annotated_location = target->source_location();
@@ -456,7 +452,7 @@ void string_instrumentationt::do_format_string_write(
   std::size_t argument_start_inx,
   const std::string &function_name)
 {
-  const exprt &format_arg=arguments[format_string_inx];
+  const exprt &format_arg = arguments[format_string_inx];
 
   if(
     format_arg.id() == ID_address_of &&
@@ -469,96 +465,94 @@ void string_instrumentationt::do_format_string_write(
         to_index_expr(to_address_of_expr(format_arg).object()).array())
         .value()));
 
-    std::size_t args=0;
+    std::size_t args = 0;
 
     for(const auto &token : token_list)
     {
-      if(find(
-           token.flags.begin(),
-           token.flags.end(),
-           format_tokent::flag_typet::ASTERISK)!=
-         token.flags.end())
+      if(
+        find(
+          token.flags.begin(),
+          token.flags.end(),
+          format_tokent::flag_typet::ASTERISK) != token.flags.end())
         continue; // asterisk means `ignore this'
 
       switch(token.type)
       {
-        case format_tokent::token_typet::STRING:
+      case format_tokent::token_typet::STRING:
+      {
+        const exprt &argument = arguments[argument_start_inx + args];
+        const typet &arg_type = argument.type();
+
+        exprt condition;
+
+        if(token.field_width != 0)
         {
-          const exprt &argument=arguments[argument_start_inx+args];
-          const typet &arg_type = argument.type();
+          exprt fwidth = from_integer(token.field_width, unsigned_int_type());
+          exprt one = from_integer(1, unsigned_int_type());
+          const plus_exprt fw_1(fwidth, one); // +1 for 0-char
 
-          exprt condition;
+          exprt fw_lt_bs;
 
-          if(token.field_width!=0)
-          {
-            exprt fwidth=from_integer(token.field_width, unsigned_int_type());
-            exprt one=from_integer(1, unsigned_int_type());
-            const plus_exprt fw_1(fwidth, one); // +1 for 0-char
-
-            exprt fw_lt_bs;
-
-            if(arg_type.id()==ID_pointer)
-              fw_lt_bs=
-                binary_relation_exprt(fw_1, ID_le, buffer_size(argument));
-            else
-            {
-              const index_exprt index(
-                argument, from_integer(0, unsigned_int_type()));
-              address_of_exprt aof(index);
-              fw_lt_bs=binary_relation_exprt(fw_1, ID_le, buffer_size(aof));
-            }
-
-            condition = fw_lt_bs;
-          }
+          if(arg_type.id() == ID_pointer)
+            fw_lt_bs =
+              binary_relation_exprt(fw_1, ID_le, buffer_size(argument));
           else
           {
-            // this is a possible overflow.
-            condition = false_exprt();
+            const index_exprt index(
+              argument, from_integer(0, unsigned_int_type()));
+            address_of_exprt aof(index);
+            fw_lt_bs = binary_relation_exprt(fw_1, ID_le, buffer_size(aof));
           }
 
-          source_locationt annotated_location = target->source_location();
-          annotated_location.set_property_class("string");
-          std::string comment("format string buffer overflow in ");
-          comment += function_name;
-          annotated_location.set_comment(comment);
-          dest.add(
-            goto_programt::make_assertion(condition, annotated_location));
-
-          // now kill the contents
-          invalidate_buffer(
-            dest, target, argument, arg_type, token.field_width);
-
-          args++;
-          break;
+          condition = fw_lt_bs;
         }
-        case format_tokent::token_typet::TEXT:
-        case format_tokent::token_typet::UNKNOWN:
+        else
         {
-          // nothing
-          break;
+          // this is a possible overflow.
+          condition = false_exprt();
         }
-        case format_tokent::token_typet::POINTER:
-        case format_tokent::token_typet::CHAR:
-        case format_tokent::token_typet::FLOAT:
-        case format_tokent::token_typet::INT:
-        {
-          const exprt &argument=arguments[argument_start_inx+args];
-          const dereference_exprt lhs{argument};
 
-          side_effect_expr_nondett rhs(lhs.type(), target->source_location());
+        source_locationt annotated_location = target->source_location();
+        annotated_location.set_property_class("string");
+        std::string comment("format string buffer overflow in ");
+        comment += function_name;
+        annotated_location.set_comment(comment);
+        dest.add(goto_programt::make_assertion(condition, annotated_location));
 
-          dest.add(goto_programt::make_assignment(
-            lhs, rhs, target->source_location()));
+        // now kill the contents
+        invalidate_buffer(dest, target, argument, arg_type, token.field_width);
 
-          args++;
-          break;
-        }
+        args++;
+        break;
+      }
+      case format_tokent::token_typet::TEXT:
+      case format_tokent::token_typet::UNKNOWN:
+      {
+        // nothing
+        break;
+      }
+      case format_tokent::token_typet::POINTER:
+      case format_tokent::token_typet::CHAR:
+      case format_tokent::token_typet::FLOAT:
+      case format_tokent::token_typet::INT:
+      {
+        const exprt &argument = arguments[argument_start_inx + args];
+        const dereference_exprt lhs{argument};
+
+        side_effect_expr_nondett rhs(lhs.type(), target->source_location());
+
+        dest.add(
+          goto_programt::make_assignment(lhs, rhs, target->source_location()));
+
+        args++;
+        break;
+      }
       }
     }
   }
   else // non-const format string
   {
-    for(std::size_t i=argument_start_inx; i<arguments.size(); i++)
+    for(std::size_t i = argument_start_inx; i < arguments.size(); i++)
     {
       const typet &arg_type = arguments[i].type();
 
@@ -608,7 +602,7 @@ void string_instrumentationt::do_strchr(
   const exprt &lhs,
   const exprt::operandst &arguments)
 {
-  if(arguments.size()!=2)
+  if(arguments.size() != 2)
   {
     throw invalid_source_file_exceptiont(
       "strchr expected to have two arguments", target->source_location());
@@ -631,7 +625,7 @@ void string_instrumentationt::do_strrchr(
   const exprt &lhs,
   const exprt::operandst &arguments)
 {
-  if(arguments.size()!=2)
+  if(arguments.size() != 2)
   {
     throw invalid_source_file_exceptiont(
       "strrchr expected to have two arguments", target->source_location());
@@ -654,7 +648,7 @@ void string_instrumentationt::do_strstr(
   const exprt &lhs,
   const exprt::operandst &arguments)
 {
-  if(arguments.size()!=2)
+  if(arguments.size() != 2)
   {
     throw invalid_source_file_exceptiont(
       "strstr expected to have two arguments", target->source_location());
@@ -685,7 +679,7 @@ void string_instrumentationt::do_strtok(
   const exprt &lhs,
   const exprt::operandst &arguments)
 {
-  if(arguments.size()!=2)
+  if(arguments.size() != 2)
   {
     throw invalid_source_file_exceptiont(
       "strtok expected to have two arguments", target->source_location());
@@ -722,32 +716,32 @@ void string_instrumentationt::do_strerror(
     return;
   }
 
-  irep_idt identifier_buf="__strerror_buffer";
-  irep_idt identifier_size="__strerror_buffer_size";
+  irep_idt identifier_buf = "__strerror_buffer";
+  irep_idt identifier_size = "__strerror_buffer_size";
 
-  if(symbol_table.symbols.find(identifier_buf)==symbol_table.symbols.end())
+  if(symbol_table.symbols.find(identifier_buf) == symbol_table.symbols.end())
   {
     symbolt new_symbol_size{identifier_size, size_type(), ID_C};
     new_symbol_size.base_name = identifier_size;
-    new_symbol_size.pretty_name=new_symbol_size.base_name;
-    new_symbol_size.is_state_var=true;
-    new_symbol_size.is_lvalue=true;
-    new_symbol_size.is_static_lifetime=true;
+    new_symbol_size.pretty_name = new_symbol_size.base_name;
+    new_symbol_size.is_state_var = true;
+    new_symbol_size.is_lvalue = true;
+    new_symbol_size.is_static_lifetime = true;
 
     array_typet type(char_type(), new_symbol_size.symbol_expr());
     symbolt new_symbol_buf{identifier_buf, type, ID_C};
-    new_symbol_buf.is_state_var=true;
-    new_symbol_buf.is_lvalue=true;
-    new_symbol_buf.is_static_lifetime=true;
+    new_symbol_buf.is_state_var = true;
+    new_symbol_buf.is_lvalue = true;
+    new_symbol_buf.is_static_lifetime = true;
     new_symbol_buf.base_name = identifier_buf;
-    new_symbol_buf.pretty_name=new_symbol_buf.base_name;
+    new_symbol_buf.pretty_name = new_symbol_buf.base_name;
 
     symbol_table.insert(std::move(new_symbol_buf));
     symbol_table.insert(std::move(new_symbol_size));
   }
 
-  const symbolt &symbol_size=ns.lookup(identifier_size);
-  const symbolt &symbol_buf=ns.lookup(identifier_buf);
+  const symbolt &symbol_size = ns.lookup(identifier_size);
+  const symbolt &symbol_buf = ns.lookup(identifier_buf);
 
   goto_programt tmp;
 
@@ -796,21 +790,21 @@ void string_instrumentationt::invalidate_buffer(
   const typet &buf_type,
   const mp_integer &limit)
 {
-  irep_idt cntr_id="string_instrumentation::$counter";
+  irep_idt cntr_id = "string_instrumentation::$counter";
 
-  if(symbol_table.symbols.find(cntr_id)==symbol_table.symbols.end())
+  if(symbol_table.symbols.find(cntr_id) == symbol_table.symbols.end())
   {
     symbolt new_symbol{cntr_id, size_type(), ID_C};
-    new_symbol.base_name="$counter";
-    new_symbol.pretty_name=new_symbol.base_name;
-    new_symbol.is_state_var=true;
-    new_symbol.is_lvalue=true;
-    new_symbol.is_static_lifetime=true;
+    new_symbol.base_name = "$counter";
+    new_symbol.pretty_name = new_symbol.base_name;
+    new_symbol.is_state_var = true;
+    new_symbol.is_lvalue = true;
+    new_symbol.is_static_lifetime = true;
 
     symbol_table.insert(std::move(new_symbol));
   }
 
-  const symbolt &cntr_sym=ns.lookup(cntr_id);
+  const symbolt &cntr_sym = ns.lookup(cntr_id);
 
   // create a loop that runs over the buffer
   // and invalidates every element
@@ -822,20 +816,20 @@ void string_instrumentationt::invalidate_buffer(
 
   exprt bufp;
 
-  if(buf_type.id()==ID_pointer)
-    bufp=buffer;
+  if(buf_type.id() == ID_pointer)
+    bufp = buffer;
   else
   {
     index_exprt index(
       buffer,
       from_integer(0, c_index_type()),
       to_type_with_subtype(buf_type).subtype());
-    bufp=address_of_exprt(index);
+    bufp = address_of_exprt(index);
   }
 
   exprt condition;
 
-  if(limit==0)
+  if(limit == 0)
     condition =
       binary_relation_exprt(cntr_sym.symbol_expr(), ID_ge, buffer_size(bufp));
   else
