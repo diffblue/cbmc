@@ -18,13 +18,13 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_function.h>
 #include <goto-programs/goto_model.h>
 
 #include <ansi-c/c_expr.h>
 #include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <goto-instrument/generate_function_bodies.h>
 #include <goto-instrument/unwind.h>
 #include <goto-instrument/unwindset.h>

@@ -16,9 +16,9 @@ Author: Daniel Poetzl
 #include <util/string_utils.h>
 #include <util/symbol_table.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <json-symtab-language/json_symbol_table.h>
 #include <json/json_parser.h>
 

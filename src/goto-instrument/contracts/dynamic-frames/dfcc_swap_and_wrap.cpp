@@ -25,11 +25,11 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_skip.h>
 
 #include <ansi-c/c_expr.h>
 #include <ansi-c/cprover_library.h>
+#include <ansi-c/goto-conversion/link_to_library.h>
 #include <goto-instrument/contracts/cfg_info.h>
 #include <goto-instrument/contracts/utils.h>
 #include <linking/static_lifetime_init.h>

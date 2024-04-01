@@ -16,7 +16,8 @@ Author: Diffblue Ltd.
 #include <util/symbol_table_base.h>
 #include <util/unicode.h>
 
-#include <goto-programs/allocate_objects.h>
+#include <ansi-c/allocate_objects.h>
+
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_instruction_code.h>
 

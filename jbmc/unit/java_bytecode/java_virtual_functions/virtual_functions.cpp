@@ -7,14 +7,16 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include <java-testing-utils/load_java_class.h>
+
+#include <util/config.h>
+#include <util/options.h>
+
+#include <goto-programs/remove_virtual_functions.h>
+
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <goto-instrument/cover.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
-
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/remove_virtual_functions.h>
-#include <util/config.h>
-#include <goto-instrument/cover.h>
-#include <util/options.h>
 
 void check_function_call(
   const equal_exprt &eq_expr,

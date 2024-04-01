@@ -6,18 +6,17 @@ Author:
 
 \*******************************************************************/
 
-#include <iostream>
+#include <util/symbol_table.h>
 
-#include <testing-utils/call_graph_test_utils.h>
-#include <testing-utils/use_catch.h>
+#include <goto-programs/goto_model.h>
 
 #include <analyses/call_graph.h>
 #include <analyses/call_graph_helpers.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <testing-utils/call_graph_test_utils.h>
+#include <testing-utils/use_catch.h>
 
-#include <util/symbol_table.h>
-
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_model.h>
+#include <iostream>
 
 SCENARIO("call_graph",
   "[core][util][call_graph]")

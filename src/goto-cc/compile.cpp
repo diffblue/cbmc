@@ -23,13 +23,13 @@ Date: June 2006
 #include <util/unicode.h>
 #include <util/version.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/name_mangler.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <ansi-c/ansi_c_entry_point.h>
 #include <ansi-c/c_object_factory_parameters.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <langapi/language.h>
 #include <langapi/language_file.h>
 #include <langapi/mode.h>

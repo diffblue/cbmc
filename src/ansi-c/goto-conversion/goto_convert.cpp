@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "destructor.h"
 #include "goto_convert.h"
 #include "goto_convert_class.h"
 
@@ -24,8 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 #include <util/symbol_table_builder.h>
 
-#include "destructor.h"
-#include "remove_skip.h"
+#include <goto-programs/remove_skip.h>
 
 static bool is_empty(const goto_programt &goto_program)
 {

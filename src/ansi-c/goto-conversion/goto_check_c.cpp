@@ -39,7 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language.h>
 #include <langapi/mode.h>
 
-#include "c_expr.h"
+#include <ansi-c/c_expr.h>
 
 #include <algorithm>
 

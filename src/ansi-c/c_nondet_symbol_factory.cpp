@@ -20,10 +20,10 @@ Author: Diffblue Ltd.
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
-#include <goto-programs/allocate_objects.h>
 #include <goto-programs/goto_functions.h>
 
-#include <ansi-c/c_object_factory_parameters.h>
+#include "allocate_objects.h"
+#include "c_object_factory_parameters.h"
 
 /// Creates a nondet for expr, including calling itself recursively to make
 /// appropriate symbols to point to if expr is a pointer.
