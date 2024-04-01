@@ -22,7 +22,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-#include <goto-programs/goto_convert_functions.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 
 #include "dfcc_contract_handler.h"
 #include "dfcc_instrument.h"

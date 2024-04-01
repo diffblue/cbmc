@@ -48,6 +48,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/value_set_pointer_abstract_object/to_predicate.cpp \
        analyses/variable-sensitivity/variable_sensitivity_domain/to_predicate.cpp \
        analyses/variable-sensitivity/variable_sensitivity_test_helpers.cpp \
+       ansi-c/allocate_objects.cpp \
        ansi-c/expr2c.cpp \
        ansi-c/type2name.cpp \
        ansi-c/c_typecheck_base.cpp \
@@ -60,7 +61,6 @@ SRC += analyses/ai/ai.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
        goto-synthesizer/expr_enumerator/expr_enumerator.cpp \
-       goto-programs/allocate_objects.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
        goto-programs/goto_program_declaration.cpp \

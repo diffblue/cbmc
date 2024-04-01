@@ -6,7 +6,7 @@ Author: Diffblue Ltd
 
 \*******************************************************************/
 
-#include <goto-programs/allocate_objects.h>
+#include <ansi-c/allocate_objects.h>
 
 #include <util/c_types.h>
 #include <util/symbol_table.h>

@@ -6,15 +6,16 @@
 #ifndef CPROVER_GOTO_PROGRAMS_LAZY_GOTO_FUNCTIONS_MAP_H
 #define CPROVER_GOTO_PROGRAMS_LAZY_GOTO_FUNCTIONS_MAP_H
 
-#include <unordered_set>
-
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_functions.h>
-
-#include <langapi/language_file.h>
 #include <util/journalling_symbol_table.h>
 #include <util/message.h>
 #include <util/symbol_table_builder.h>
+
+#include <goto-programs/goto_functions.h>
+
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <langapi/language_file.h>
+
+#include <unordered_set>
 
 /// Provides a wrapper for a map of lazily loaded goto_functiont.
 /// This incrementally builds a goto-functions object, while permitting

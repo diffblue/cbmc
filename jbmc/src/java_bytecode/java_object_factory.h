@@ -71,11 +71,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 #define CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 
-#include "nondet.h"
-
-#include <goto-programs/allocate_objects.h>
-
 #include <util/std_code.h>
+
+#include <ansi-c/allocate_objects.h>
+
+#include "nondet.h"
 
 class message_handlert;
 class select_pointer_typet;

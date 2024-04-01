@@ -19,8 +19,9 @@ Author: Peter Schrammel
 #include <util/std_code.h>
 
 #include <goto-programs/class_identifier.h>
-#include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
+
+#include <ansi-c/goto-conversion/goto_convert.h>
 
 #include "java_types.h"
 #include "java_utils.h"

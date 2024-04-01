@@ -1,4 +1,5 @@
-SRC = anonymous_member.cpp \
+SRC = allocate_objects.cpp \
+      anonymous_member.cpp \
       ansi_c_convert_type.cpp \
       ansi_c_declaration.cpp \
       ansi_c_entry_point.cpp \
@@ -11,6 +12,7 @@ SRC = anonymous_member.cpp \
       ansi_c_typecheck.cpp \
       ansi_c_y.tab.cpp \
       builtin_factory.cpp \
+      printf_formatter.cpp \
       c_expr.cpp \
       c_misc.cpp \
       c_nondet_symbol_factory.cpp \
@@ -32,7 +34,20 @@ SRC = anonymous_member.cpp \
       expr2c.cpp \
       gcc_types.cpp \
       gcc_version.cpp \
-      goto_check_c.cpp \
+      goto-conversion/builtin_functions.cpp \
+      goto-conversion/goto_asm.cpp \
+      goto-conversion/destructor.cpp \
+      goto-conversion/format_strings.cpp \
+      goto-conversion/goto_convert.cpp \
+      goto-conversion/goto_check_c.cpp \
+      goto-conversion/goto_convert_exceptions.cpp \
+      goto-conversion/goto_clean_expr.cpp \
+      goto-conversion/goto_convert_functions.cpp \
+      goto-conversion/goto_convert_function_call.cpp \
+      goto-conversion/goto_convert_side_effect.cpp \
+      goto-conversion/link_to_library.cpp \
+      goto-conversion/scope_tree.cpp \
+      goto-conversion/string_instrumentation.cpp \
       literals/convert_character_literal.cpp \
       literals/convert_float_literal.cpp \
       literals/convert_integer_literal.cpp \

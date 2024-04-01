@@ -13,17 +13,17 @@ Author: Malte Mues <mail.mues@gmail.com>
 #ifndef CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H
 #define CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H
 
-#include <map>
-#include <string>
-
-#include "gdb_api.h"
-
 #include <ansi-c/expr2c_class.h>
 
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
-#include <goto-programs/allocate_objects.h>
+#include <ansi-c/allocate_objects.h>
+
+#include "gdb_api.h"
+
+#include <map>
+#include <string>
 
 class pointer_typet;
 class source_locationt;

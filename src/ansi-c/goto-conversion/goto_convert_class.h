@@ -17,13 +17,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_expr.h>
 #include <util/std_code.h>
 
-#include "allocate_objects.h"
-#include "goto_program.h"
-#include "scope_tree.h"
+#include <ansi-c/allocate_objects.h>
+
+#include <goto-programs/goto_program.h>
 
 #include <list>
 #include <unordered_set>
 #include <vector>
+
+#include "scope_tree.h"
 
 class side_effect_expr_overflowt;
 struct build_declaration_hops_inputst;

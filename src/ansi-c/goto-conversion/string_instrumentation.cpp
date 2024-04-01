@@ -20,9 +20,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/string_constant.h>
 
-#include <goto-programs/format_strings.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
+
+#include "format_strings.h"
 
 exprt is_zero_string(const exprt &what, bool write)
 {

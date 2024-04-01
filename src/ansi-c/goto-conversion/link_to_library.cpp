@@ -13,10 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/static_lifetime_init.h>
 
-#include "compute_called_functions.h"
+#include <goto-programs/compute_called_functions.h>
+#include <goto-programs/goto_model.h>
+#include <goto-programs/link_goto_model.h>
+
 #include "goto_convert_functions.h"
-#include "goto_model.h"
-#include "link_goto_model.h"
 
 /// Try to add \p missing_function from \p library to \p goto_model.
 static std::pair<std::optional<replace_symbolt::expr_mapt>, bool>
