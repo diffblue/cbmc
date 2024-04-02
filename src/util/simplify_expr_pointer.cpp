@@ -149,9 +149,9 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
       no_change = false;
     }
 
-    const typet &op_type = ns.follow(new_member_expr.struct_op().type());
+    const typet &op_type = new_member_expr.struct_op().type();
 
-    if(op_type.id() == ID_struct)
+    if(op_type.id() == ID_struct || op_type.id() == ID_struct_tag)
     {
       // rewrite NULL -> member by
       // pushing the member inside
@@ -159,8 +159,12 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
       mp_integer address;
       if(is_dereference_integer_object(new_member_expr.struct_op(), address))
       {
+        const struct_typet &struct_type =
+          op_type.id() == ID_struct_tag
+            ? ns.follow_tag(to_struct_tag_type(op_type))
+            : to_struct_type(op_type);
         const irep_idt &member = to_member_expr(expr).get_component_name();
-        auto offset = member_offset(to_struct_type(op_type), member, ns);
+        auto offset = member_offset(struct_type, member, ns);
         if(offset.has_value())
         {
           pointer_typet pointer_type = to_pointer_type(

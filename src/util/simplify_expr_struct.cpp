@@ -26,15 +26,15 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     to_member_expr(expr).get_component_name();
 
   const exprt &op = expr.compound();
-  const typet &op_type=ns.follow(op.type());
 
   if(op.id()==ID_with)
   {
     // the following optimization only works on structs,
     // and not on unions
 
-    if(op.operands().size()>=3 &&
-       op_type.id()==ID_struct)
+    if(
+      op.operands().size() >= 3 &&
+      (op.type().id() == ID_struct || op.type().id() == ID_struct_tag))
     {
       exprt::operandst new_operands = op.operands();
 
@@ -63,7 +63,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       // do this recursively
       return changed(simplify_member(new_member_expr));
     }
-    else if(op_type.id()==ID_union)
+    else if(op.type().id() == ID_union || op.type().id() == ID_union_tag)
     {
       const with_exprt &with_expr=to_with_expr(op);
 
@@ -76,8 +76,9 @@ simplify_exprt::simplify_member(const member_exprt &expr)
   }
   else if(op.id()==ID_update)
   {
-    if(op.operands().size()==3 &&
-       op_type.id()==ID_struct)
+    if(
+      op.operands().size() == 3 &&
+      (op.type().id() == ID_struct || op.type().id() == ID_struct_tag))
     {
       const update_exprt &update_expr=to_update_expr(op);
       const exprt::operandst &designator=update_expr.designator();
@@ -93,7 +94,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
         }
         // the following optimization only works on structs,
         // and not on unions
-        else if(op_type.id()==ID_struct)
+        else if(op.type().id() == ID_struct || op.type().id() == ID_struct_tag)
         {
           // UPDATE(s, .m1, v).m2 -> s.m2
           auto new_expr = expr;
@@ -108,7 +109,10 @@ simplify_exprt::simplify_member(const member_exprt &expr)
   else if(op.id() == ID_struct)
   {
     // pull out the right member
-    const struct_typet &struct_type = to_struct_type(op_type);
+    const struct_typet &struct_type =
+      op.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(op.type()))
+        : to_struct_type(op.type());
     if(struct_type.has_component(component_name))
     {
       std::size_t number = struct_type.component_number(component_name);
@@ -126,12 +130,15 @@ simplify_exprt::simplify_member(const member_exprt &expr)
   {
     const auto &byte_extract_expr = to_byte_extract_expr(op);
 
-    if(op_type.id()==ID_struct)
+    if(op.type().id() == ID_struct || op.type().id() == ID_struct_tag)
     {
       // This rewrites byte_extract(s, o, struct_type).member
       // to byte_extract(s, o+member_offset, member_type)
 
-      const struct_typet &struct_type=to_struct_type(op_type);
+      const struct_typet &struct_type =
+        op.type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(op.type()))
+          : to_struct_type(op.type());
       const struct_typet::componentt &component=
         struct_type.get_component(component_name);
 
@@ -161,13 +168,16 @@ simplify_exprt::simplify_member(const member_exprt &expr)
 
       return changed(simplify_byte_extract(result)); // recursive call
     }
-    else if(op_type.id() == ID_union)
+    else if(op.type().id() == ID_union || op.type().id() == ID_union_tag)
     {
       // rewrite byte_extract(X, 0).member to X
       // if the type of X is that of the member
       if(byte_extract_expr.offset().is_zero())
       {
-        const union_typet &union_type = to_union_type(op_type);
+        const union_typet &union_type =
+          op.type().id() == ID_union_tag
+            ? ns.follow_tag(to_union_tag_type(op.type()))
+            : to_union_type(op.type());
         const typet &subtype = union_type.component_type(component_name);
 
         if(subtype == byte_extract_expr.op().type())
@@ -175,7 +185,9 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       }
     }
   }
-  else if(op.id()==ID_union && op_type.id()==ID_union)
+  else if(
+    op.id() == ID_union &&
+    (op.type().id() == ID_union || op.type().id() == ID_union_tag))
   {
     // trivial?
     if(to_union_expr(op).op().type() == expr.type())
@@ -208,7 +220,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
 
     // Try to look through member(cast(x)) if the cast is between structurally
     // identical types:
-    if(op_type == typecast_expr.op().type())
+    if(op.type() == typecast_expr.op().type())
     {
       auto new_expr = expr;
       new_expr.struct_op() = typecast_expr.op();
@@ -219,10 +231,14 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     // being cast (for example, this might turn ((struct A)x).field1 into
     // x.substruct.othersubstruct.field2, if field1 and field2 have the same
     // type and offset with respect to x.
-    if(op_type.id() == ID_struct)
+    if(op.type().id() == ID_struct || op.type().id() == ID_struct_tag)
     {
+      const struct_typet &struct_type =
+        op.type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(op.type()))
+          : to_struct_type(op.type());
       std::optional<mp_integer> requested_offset =
-        member_offset(to_struct_type(op_type), component_name, ns);
+        member_offset(struct_type, component_name, ns);
       if(requested_offset.has_value())
       {
         auto equivalent_member = get_subexpression_at_offset(

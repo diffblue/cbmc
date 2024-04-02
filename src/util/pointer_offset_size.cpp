@@ -222,11 +222,17 @@ std::optional<exprt>
 member_offset_expr(const member_exprt &member_expr, const namespacet &ns)
 {
   // need to distinguish structs and unions
-  const typet &type=ns.follow(member_expr.struct_op().type());
-  if(type.id()==ID_struct)
+  const typet &compound_type = member_expr.struct_op().type();
+  if(compound_type.id() == ID_struct || compound_type.id() == ID_struct_tag)
+  {
+    const struct_typet &struct_type =
+      compound_type.id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(compound_type))
+        : to_struct_type(compound_type);
     return member_offset_expr(
-      to_struct_type(type), member_expr.get_component_name(), ns);
-  else if(type.id()==ID_union)
+      struct_type, member_expr.get_component_name(), ns);
+  }
+  else if(compound_type.id() == ID_union || compound_type.id() == ID_union_tag)
     return from_integer(0, size_type());
   else
     return {};
@@ -544,17 +550,20 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
   {
     const member_exprt &member_expr=to_member_expr(expr);
     const exprt &op=member_expr.struct_op();
-    const struct_union_typet &type=to_struct_union_type(ns.follow(op.type()));
 
     auto o = compute_pointer_offset(op, ns);
 
     if(o.has_value())
     {
-      if(type.id()==ID_union)
+      if(op.type().id() == ID_union || op.type().id() == ID_union_tag)
         return *o;
 
-      auto member_offset = ::member_offset(
-        to_struct_type(type), member_expr.get_component_name(), ns);
+      const struct_typet &struct_type =
+        op.type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(op.type()))
+          : to_struct_type(op.type());
+      auto member_offset =
+        ::member_offset(struct_type, member_expr.get_component_name(), ns);
 
       if(member_offset.has_value())
         return *o + *member_offset;
@@ -589,14 +598,16 @@ std::optional<exprt> get_subexpression_at_offset(
     return typecast_exprt(expr, target_type_raw);
   }
 
-  const typet &source_type = ns.follow(expr.type());
   const auto target_size_bits = pointer_offset_bits(target_type_raw, ns);
   if(!target_size_bits.has_value())
     return {};
 
-  if(source_type.id()==ID_struct)
+  if(expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag)
   {
-    const struct_typet &struct_type = to_struct_type(source_type);
+    const struct_typet &struct_type =
+      expr.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(expr.type()))
+        : to_struct_type(expr.type());
 
     mp_integer m_offset_bits = 0;
     for(const auto &component : struct_type.components())
@@ -624,9 +635,9 @@ std::optional<exprt> get_subexpression_at_offset(
       m_offset_bits += *m_size_bits;
     }
   }
-  else if(source_type.id()==ID_array)
+  else if(expr.type().id() == ID_array)
   {
-    const array_typet &array_type = to_array_type(source_type);
+    const array_typet &array_type = to_array_type(expr.type());
 
     const auto elem_size_bits =
       pointer_offset_bits(array_type.element_type(), ns);
@@ -663,9 +674,12 @@ std::optional<exprt> get_subexpression_at_offset(
   }
   else if(
     object_descriptor_exprt(expr).root_object().id() == ID_union &&
-    source_type.id() == ID_union)
+    (expr.type().id() == ID_union || expr.type().id() == ID_union_tag))
   {
-    const union_typet &union_type = to_union_type(source_type);
+    const union_typet &union_type =
+      expr.type().id() == ID_union_tag
+        ? ns.follow_tag(to_union_tag_type(expr.type()))
+        : to_union_type(expr.type());
 
     for(const auto &component : union_type.components())
     {
