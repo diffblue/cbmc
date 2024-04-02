@@ -28,14 +28,6 @@ public:
 
   virtual bool parse() override;
 
-  virtual void clear() override
-  {
-    parsert::clear();
-    parse_tree.clear();
-    token_buffer.clear();
-    asm_block_following=false;
-  }
-
   explicit cpp_parsert(message_handlert &message_handler)
     : parsert(message_handler),
       mode(configt::ansi_ct::flavourt::ANSI),

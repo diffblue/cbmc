@@ -112,9 +112,6 @@ bool cpp_languaget::parse(
   // save result
   cpp_parse_tree.swap(cpp_parser.parse_tree);
 
-  // save some memory
-  cpp_parser.clear();
-
   return result;
 }
 
@@ -259,9 +256,6 @@ bool cpp_languaget::to_expr(
     // typecheck it
     result = cpp_typecheck(expr, message_handler, ns);
   }
-
-  // save some memory
-  cpp_parser.clear();
 
   return result;
 }
