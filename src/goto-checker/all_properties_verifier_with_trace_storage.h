@@ -12,10 +12,12 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_ALL_PROPERTIES_VERIFIER_WITH_TRACE_STORAGE_H
 #define CPROVER_GOTO_CHECKER_ALL_PROPERTIES_VERIFIER_WITH_TRACE_STORAGE_H
 
-#include "goto_verifier.h"
+#include <goto-programs/abstract_goto_model.h>
 
 #include "bmc_util.h"
+#include "fatal_assertions.h"
 #include "goto_trace_storage.h"
+#include "goto_verifier.h"
 #include "incremental_goto_checker.h"
 #include "properties.h"
 #include "report_util.h"
@@ -61,6 +63,8 @@ public:
 
       ++iterations;
     }
+
+    propagate_fatal_assertions(properties, goto_model.get_goto_functions());
 
     return determine_result(properties);
   }

@@ -8,22 +8,22 @@ main.c
 ^\[main\.float-division-by-zero\.\d+\] line 87 floating-point division by zero in x / den: FAILURE
 ^\[main\.overflow\.\d+\] line 87 arithmetic overflow on floating-point division in x / den: FAILURE
 ^\[main\.division-by-zero\.\d+\] line 88 division by zero in 10 / 0: FAILURE$
-^\[main\.enum-range-check\.\d+\] line 89 enum range check in \(ABC\)10: FAILURE
-^\[main\.overflow\.\d+\] line 90 arithmetic overflow on signed (to unsigned )?type conversion in \(char\)\(\(signed int\)i \+ 1\): FAILURE
-^\[main\.overflow\.\d+\] line 91 arithmetic overflow on signed \+ in k \+ 1: FAILURE
+^\[main\.enum-range-check\.\d+\] line 89 enum range check in \(ABC\)10: FAILURE$
+^\[main\.overflow\.\d+\] line 90 arithmetic overflow on signed (to unsigned )?type conversion in \(char\)\(\(signed int\)i \+ 1\): FAILURE$
+^\[main\.overflow\.\d+\] line 91 arithmetic overflow on signed \+ in k \+ 1: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
-^\[main\.pointer_primitives\.\d+\] line 41 pointer invalid in R_OK\(q, \(unsigned (long (long )?)?int\)1\): FAILURE$
-^\[main\.pointer_primitives\.\d+\] line 41 pointer outside object bounds in R_OK\(q, \(unsigned (long (long )?)?int\)1\): FAILURE$
-^\[main\.pointer_arithmetic\.\d+\] line 42 pointer arithmetic: pointer outside object bounds in p \+ .*2000000000000(l|ll): FAILURE
-^\[main\.NaN\.\d+\] line 48 NaN on / in x / den: FAILURE
-^\[main\.float-division-by-zero\.\d+\] line 49 floating-point division by zero in x / den: FAILURE
-^\[main\.overflow\.\d+\] line 48 arithmetic overflow on floating-point division in x / den: FAILURE
-^\[main\.division-by-zero\.\d+\] line 48 division by zero in 10 / 0: FAILURE$
-^\[main\.enum-range-check\.\d+\] line 49 enum range check in \(ABC\)10: FAILURE
-^\[main\.overflow\.\d+\] line 50 arithmetic overflow on signed type conversion in \(char\)\(signed int\)i \+ 1\): FAILURE
-^\[main\.overflow\.\d+\] line 51 arithmetic overflow on signed \+ in k \+ 1: FAILURE
+^\[main\.pointer_primitives\.\d+\] line 41 pointer invalid in R_OK\(q, \(unsigned (long (long )?)?int\)1\):
+^\[main\.pointer_primitives\.\d+\] line 41 pointer outside object bounds in R_OK\(q, \(unsigned (long (long )?)?int\)1\):
+^\[main\.pointer_arithmetic\.\d+\] line 42 pointer arithmetic: pointer outside object bounds in p \+ .*2000000000000(l|ll):
+^\[main\.NaN\.\d+\] line 48 NaN on / in x / den:
+^\[main\.float-division-by-zero\.\d+\] line 49 floating-point division by zero in x / den:
+^\[main\.overflow\.\d+\] line 48 arithmetic overflow on floating-point division in x / den:
+^\[main\.division-by-zero\.\d+\] line 48 division by zero in 10 / 0:
+^\[main\.enum-range-check\.\d+\] line 49 enum range check in \(ABC\)10:
+^\[main\.overflow\.\d+\] line 50 arithmetic overflow on signed type conversion in \(char\)\(signed int\)i \+ 1\):
+^\[main\.overflow\.\d+\] line 51 arithmetic overflow on signed \+ in k \+ 1:
 --
 This test uses all possible named-checks to maximize coverage.
