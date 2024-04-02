@@ -13,7 +13,6 @@ var classansi__c__parsert =
     [ "ansi_c_parsert", "classansi__c__parsert.html#a13075dd171e2a67a6ade3f6b8c8bba71", null ],
     [ "add_declarator", "classansi__c__parsert.html#a4aabcb0a7a92236c098b94f6297f0170", null ],
     [ "add_tag_with_body", "classansi__c__parsert.html#aaf5de687f35d5e4033ce8d62d1ab56b9", null ],
-    [ "clear", "classansi__c__parsert.html#a119951619800efaec7bc277a98d00b37", null ],
     [ "copy_item", "classansi__c__parsert.html#ade3366e548369bc6cac530712f27e977", null ],
     [ "current_scope", "classansi__c__parsert.html#ae321173fb902315736d904bf248ef991", null ],
     [ "get_class", "classansi__c__parsert.html#abba8cde1665a1565fa471716a6fb552c", null ],

@@ -4,7 +4,6 @@ var classparsert =
     [ "parsert", "classparsert.html#a37f5f5b01ce39c520b2fd481f5fdd8cd", null ],
     [ "~parsert", "classparsert.html#a7cf5d06459b05416f2d4e2a349d0c649", null ],
     [ "advance_column", "classparsert.html#a25520152f8aad020816e3eaa569d3f32", null ],
-    [ "clear", "classparsert.html#aea92f9835f9bfe6e665bc84bc44fe436", null ],
     [ "eof", "classparsert.html#a686691e15652dd484364cb1e294680fa", null ],
     [ "get_column", "classparsert.html#af1bf328de7bb3a79159a277d8d6481e0", null ],
     [ "get_file", "classparsert.html#ad173848c309df5e6d22325072f5ef3c0", null ],

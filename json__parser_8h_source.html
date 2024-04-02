@@ -135,26 +135,21 @@ $(document).ready(function(){initNavTree('json__parser_8h_source.html',''); init
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    dest.<a class="code" href="classjsont.html#a53b61ab0dd9eb980565247050050d9e0">swap</a>(<a class="code" href="classjson__parsert.html#ac72ebf9c73685e2c7bb73376409c7cdf">stack</a>.top());</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="classjson__parsert.html#ac72ebf9c73685e2c7bb73376409c7cdf">stack</a>.pop();</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classjson__parsert.html#ac9faece90e29ac13dc1ef27038bf09b2">   45</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classjson__parsert.html#ac9faece90e29ac13dc1ef27038bf09b2">clear</a>()<span class="keyword"> override</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">  </span>{</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="classjson__parsert.html#ac72ebf9c73685e2c7bb73376409c7cdf">stack</a>=<a class="code" href="classjson__parsert.html#a56de1a80b79aa1615eda139f44630160">stackt</a>();</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">// &#39;do it all&#39; functions</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="json__parser_8h.html#a02d54439dc189ccfa00eac45011a9c86">parse_json</a>(</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  std::istream &amp;in,</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">// &#39;do it all&#39; functions</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="json__parser_8h.html#a02d54439dc189ccfa00eac45011a9c86">parse_json</a>(</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  std::istream &amp;in,</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <a class="code" href="classjsont.html">jsont</a> &amp;dest);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="json__parser_8h.html#a02d54439dc189ccfa00eac45011a9c86">parse_json</a>(</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <a class="code" href="classjsont.html">jsont</a> &amp;dest);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="json__parser_8h.html#a02d54439dc189ccfa00eac45011a9c86">parse_json</a>(</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keyword">const</span> std::string &amp;filename,</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <a class="code" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <a class="code" href="classjsont.html">jsont</a> &amp;dest);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_JSON_JSON_PARSER_H</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_JSON_JSON_PARSER_H</span></div>
 <div class="ttc" id="aclassjson__parsert_html"><div class="ttname"><a href="classjson__parsert.html">json_parsert</a></div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8h_source.html#l00018">json_parser.h:19</a></div></div>
 <div class="ttc" id="aclassjson__parsert_html_a00fe8ee431870e0bcb05cf3d9a03831d"><div class="ttname"><a href="classjson__parsert.html#a00fe8ee431870e0bcb05cf3d9a03831d">json_parsert::pop</a></div><div class="ttdeci">void pop(jsont &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8h_source.html#l00038">json_parser.h:38</a></div></div>
 <div class="ttc" id="aclassjson__parsert_html_a56de1a80b79aa1615eda139f44630160"><div class="ttname"><a href="classjson__parsert.html#a56de1a80b79aa1615eda139f44630160">json_parsert::stackt</a></div><div class="ttdeci">std::stack&lt; jsont, std::vector&lt; jsont &gt; &gt; stackt</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8h_source.html#l00026">json_parser.h:26</a></div></div>
@@ -162,7 +157,6 @@ $(document).ready(function(){initNavTree('json__parser_8h_source.html',''); init
 <div class="ttc" id="aclassjson__parsert_html_ab18722922a217d3482016bbd0f5721ab"><div class="ttname"><a href="classjson__parsert.html#ab18722922a217d3482016bbd0f5721ab">json_parsert::top</a></div><div class="ttdeci">jsont &amp; top()</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8h_source.html#l00029">json_parser.h:29</a></div></div>
 <div class="ttc" id="aclassjson__parsert_html_ab50d51c941e3672ba911da74f6e7db01"><div class="ttname"><a href="classjson__parsert.html#ab50d51c941e3672ba911da74f6e7db01">json_parsert::parse</a></div><div class="ttdeci">bool parse() override</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8cpp_source.html#l00017">json_parser.cpp:17</a></div></div>
 <div class="ttc" id="aclassjson__parsert_html_ac72ebf9c73685e2c7bb73376409c7cdf"><div class="ttname"><a href="classjson__parsert.html#ac72ebf9c73685e2c7bb73376409c7cdf">json_parsert::stack</a></div><div class="ttdeci">stackt stack</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8h_source.html#l00027">json_parser.h:27</a></div></div>
-<div class="ttc" id="aclassjson__parsert_html_ac9faece90e29ac13dc1ef27038bf09b2"><div class="ttname"><a href="classjson__parsert.html#ac9faece90e29ac13dc1ef27038bf09b2">json_parsert::clear</a></div><div class="ttdeci">virtual void clear() override</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8h_source.html#l00045">json_parser.h:45</a></div></div>
 <div class="ttc" id="aclassjson__parsert_html_ada4f83f5be1151c1437fe8d5c218f524"><div class="ttname"><a href="classjson__parsert.html#ada4f83f5be1151c1437fe8d5c218f524">json_parsert::json_parsert</a></div><div class="ttdeci">json_parsert(message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition:</b> <a href="json__parser_8h_source.html#l00021">json_parser.h:21</a></div></div>
 <div class="ttc" id="aclassjsont_html"><div class="ttname"><a href="classjsont.html">jsont</a></div><div class="ttdef"><b>Definition:</b> <a href="json_8h_source.html#l00026">json.h:27</a></div></div>
 <div class="ttc" id="aclassjsont_html_a53b61ab0dd9eb980565247050050d9e0"><div class="ttname"><a href="classjsont.html#a53b61ab0dd9eb980565247050050d9e0">jsont::swap</a></div><div class="ttdeci">void swap(jsont &amp;other)</div><div class="ttdef"><b>Definition:</b> <a href="json_8cpp_source.html#l00161">json.cpp:161</a></div></div>

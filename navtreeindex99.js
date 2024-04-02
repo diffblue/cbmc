@@ -1,12 +1,5 @@
 var NAVTREEINDEX99 =
 {
-"gcc__builtin__headers__math_8h.html#a8ef6acac736328ffc3bcae2daf2383fd":[9,0,2,1,0,12,165],
-"gcc__builtin__headers__math_8h.html#a9032fad789cd29b262b18627742f08e8":[9,0,2,1,0,12,366],
-"gcc__builtin__headers__math_8h.html#a907f26796c3aaa4e5f341d0759763e39":[9,0,2,1,0,12,166],
-"gcc__builtin__headers__math_8h.html#a91307e60a6ae488c85a338f3237cd5cc":[9,0,2,1,0,12,216],
-"gcc__builtin__headers__math_8h.html#a9148aade2c41e3ef08d6f08cd09bc0c1":[9,0,2,1,0,12,252],
-"gcc__builtin__headers__math_8h.html#a91b9328189130e8103f2df600d5f04a0":[9,0,2,1,0,12,12],
-"gcc__builtin__headers__math_8h.html#a9217b9dee1f940c737b83ed2e382a120":[9,0,2,1,0,12,39],
 "gcc__builtin__headers__math_8h.html#a926b8230e3b2b3810bdb61d8f7b76635":[9,0,2,1,0,12,69],
 "gcc__builtin__headers__math_8h.html#a92ce5093ee36df5ebdb8b095f0d5dace":[9,0,2,1,0,12,375],
 "gcc__builtin__headers__math_8h.html#a93123fbba667bb8031074908ab4f2e91":[9,0,2,1,0,12,325],
@@ -249,5 +242,12 @@ var NAVTREEINDEX99 =
 "gcc__builtin__headers__mem__string_8h.html#a66595172db5c7967b52bcb4cce6da364":[9,0,2,1,0,13,10],
 "gcc__builtin__headers__mem__string_8h.html#a676553b4881c409323f6abab526ef696":[9,0,2,1,0,13,97],
 "gcc__builtin__headers__mem__string_8h.html#a67d895fd5d999a24fffa438a4deaa361":[9,0,2,1,0,13,141],
-"gcc__builtin__headers__mem__string_8h.html#a690fded7207eb69fe137aee1827f1f44":[9,0,2,1,0,13,80]
+"gcc__builtin__headers__mem__string_8h.html#a690fded7207eb69fe137aee1827f1f44":[9,0,2,1,0,13,80],
+"gcc__builtin__headers__mem__string_8h.html#a69ed7cc981a0ee705989fb49516668df":[9,0,2,1,0,13,153],
+"gcc__builtin__headers__mem__string_8h.html#a6a10c3d0b44200556cbff5aeb9ad3fb7":[9,0,2,1,0,13,60],
+"gcc__builtin__headers__mem__string_8h.html#a6bd813ee84e39d9fd3d71886a5997735":[9,0,2,1,0,13,169],
+"gcc__builtin__headers__mem__string_8h.html#a6dc015d6c0868138991b86b21b334829":[9,0,2,1,0,13,40],
+"gcc__builtin__headers__mem__string_8h.html#a6e33b460e29cb8d11ec77b9af151c4ec":[9,0,2,1,0,13,172],
+"gcc__builtin__headers__mem__string_8h.html#a6fe39f33ea96adc265a24e83e61f8a26":[9,0,2,1,0,13,21],
+"gcc__builtin__headers__mem__string_8h.html#a703f79cf78e55fc1742dfe674f8d3ed9":[9,0,2,1,0,13,131]
 };
