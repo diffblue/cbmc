@@ -82,8 +82,8 @@ Goto Analyzer</h1>
 <h2><a class="anchor" id="quick-start"></a>
 Quick Start</h2>
 <p>As the space of configuration options is quite large and their interactions can sometimes be subtle and complex, here are some possible sets of options for a few common tasks.</p>
-<p>I want to see if I can verify anything with <code>goto-analyzer</code>: </p><pre class="fragment">goto-analyzer --verify --recursive-interprocedural --vsd --vsd-values intervals --vsd-struct every-field --vsd-arrays smash --vsd-pointers value-set program.c
-</pre><p> I want to make a big effort to verify things: </p><pre class="fragment">goto-analyzer  --verify --three-way-merge --vsd --vsd-values set-of-constants --vsd-struct every-field --vsd-arrays up-to-n-elements --vsd-pointers value-set --loop-unwinding-and-branching 17 --one-domain-per-history program.c
+<p>I want to see if I can verify anything with <code>goto-analyzer</code>: </p><pre class="fragment">goto-analyzer --verify --recursive-interprocedural --vsd --vsd-values intervals --vsd-structs every-field --vsd-arrays smash --vsd-pointers value-set program.c
+</pre><p> I want to make a big effort to verify things: </p><pre class="fragment">goto-analyzer  --verify --three-way-merge --vsd --vsd-values set-of-constants --vsd-structs every-field --vsd-arrays up-to-n-elements --vsd-pointers value-set --loop-unwinding-and-branching 17 --one-domain-per-history program.c
 </pre><p> I want to discharge obvious conditions and remove unreachable code: </p><pre class="fragment">goto-analyzer --simplify out.gb --three-way-merge --vsd
 </pre><p> I want to build a dependency graph: </p><pre class="fragment">goto-analyzer --show --dot depgraph.dot --dependence-graph-vs
 </pre> <h2><a class="anchor" id="task"></a>
@@ -150,7 +150,7 @@ Storage</h2>
 Other Options</h2>
 <p><code>goto-analyzer</code> supports a number of other options for the C/C++ frontend, the platform, displaying program representations and instrumentation. These all function exactly the same as CBMC does.</p>
 <p>It also supports specific analyses which do not fit into the configurable scheme above. At the time of writing this is just <code>--taint</code> which performs a configurable taint analysis.</p>
-<p>Last modified: 2024-04-02 07:29:55 -0700 </p>
+<p>Last modified: 2024-04-05 16:32:51 +0200 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
