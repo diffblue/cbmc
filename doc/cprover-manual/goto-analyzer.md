@@ -37,13 +37,13 @@ possible sets of options for a few common tasks.
 
 I want to see if I can verify anything with `goto-analyzer`:
 ```
-goto-analyzer --verify --recursive-interprocedural --vsd --vsd-values intervals --vsd-struct every-field --vsd-arrays smash --vsd-pointers value-set program.c
+goto-analyzer --verify --recursive-interprocedural --vsd --vsd-values intervals --vsd-structs every-field --vsd-arrays smash --vsd-pointers value-set program.c
 ```
 
 
 I want to make a big effort to verify things:
 ```
-goto-analyzer  --verify --three-way-merge --vsd --vsd-values set-of-constants --vsd-struct every-field --vsd-arrays up-to-n-elements --vsd-pointers value-set --loop-unwinding-and-branching 17 --one-domain-per-history program.c
+goto-analyzer  --verify --three-way-merge --vsd --vsd-values set-of-constants --vsd-structs every-field --vsd-arrays up-to-n-elements --vsd-pointers value-set --loop-unwinding-and-branching 17 --one-domain-per-history program.c
 ```
 
 
