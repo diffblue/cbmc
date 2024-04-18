@@ -361,24 +361,22 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
   {
     result["name"] = json_stringt("struct");
 
-    const typet &type = ns.follow(expr.type());
+    const struct_typet &struct_type =
+      expr.type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(expr.type()))
+        : to_struct_type(expr.type());
+    const struct_typet::componentst &components = struct_type.components();
+    DATA_INVARIANT(
+      components.size() == expr.operands().size(),
+      "number of struct components should match with its type");
 
-    // these are expected to have a struct type
-    if(type.id() == ID_struct)
+    json_arrayt &members = result["members"].make_array();
+    for(std::size_t m = 0; m < expr.operands().size(); m++)
     {
-      const struct_typet &struct_type = to_struct_type(type);
-      const struct_typet::componentst &components = struct_type.components();
-      DATA_INVARIANT(
-        components.size() == expr.operands().size(),
-        "number of struct components should match with its type");
-
-      json_arrayt &members = result["members"].make_array();
-      for(std::size_t m = 0; m < expr.operands().size(); m++)
-      {
-        json_objectt e{{"value", json(expr.operands()[m], ns, mode)},
-                       {"name", json_stringt(components[m].get_name())}};
-        members.push_back(std::move(e));
-      }
+      json_objectt e{
+        {"value", json(expr.operands()[m], ns, mode)},
+        {"name", json_stringt(components[m].get_name())}};
+      members.push_back(std::move(e));
     }
   }
   else if(expr.id() == ID_union)

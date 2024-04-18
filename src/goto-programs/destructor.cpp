@@ -38,9 +38,13 @@ code_function_callt get_destructor(
         {
           const typet &arg_type=code_type.parameters().front().type();
 
+          if(arg_type.id() != ID_pointer)
+            continue;
+
+          const typet &base_type = to_pointer_type(arg_type).base_type();
           if(
-            arg_type.id() == ID_pointer &&
-            ns.follow(to_pointer_type(arg_type).base_type()) == type)
+            base_type.id() == ID_struct_tag &&
+            ns.follow_tag(to_struct_tag_type(base_type)) == type)
           {
             const symbol_exprt symbol_expr(op.get(ID_name), op.type());
             return code_function_callt(symbol_expr);

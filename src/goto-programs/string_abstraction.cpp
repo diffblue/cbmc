@@ -353,14 +353,10 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
     symbol.type.id() == ID_union_tag ||
     (symbol.type.id() == ID_struct_tag && symbol.type != string_struct))
   {
-    const struct_union_typet &su_source =
-      to_struct_union_type(ns.follow(source_type));
-    const struct_union_typet::componentst &s_components=
-      su_source.components();
-    const struct_union_typet &struct_union_type =
-      to_struct_union_type(ns.follow(symbol.type));
-    const struct_union_typet::componentst &components=
-      struct_union_type.components();
+    const struct_union_typet::componentst &s_components =
+      ns.follow_tag(to_struct_or_union_tag_type(source_type)).components();
+    const struct_union_typet::componentst &components =
+      ns.follow_tag(to_struct_or_union_tag_type(symbol.type)).components();
     unsigned seen=0;
 
     struct_union_typet::componentst::const_iterator it2=components.begin();
@@ -442,10 +438,9 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
        build_unknown(whatt::LENGTH, false),
        to_array_type(source_type).size().id() == ID_infinity
          ? build_unknown(whatt::SIZE, false)
-         : to_array_type(source_type).size()},
+         : typecast_exprt::conditional_cast(
+             to_array_type(source_type).size(), build_type(whatt::SIZE))},
       string_struct);
-
-    make_type(to_struct_expr(new_symbol.value).op2(), build_type(whatt::SIZE));
   }
   else
     new_symbol.value=
@@ -733,7 +728,10 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
   else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
     const struct_union_typet &struct_union_type =
-      to_struct_union_type(ns.follow(type));
+      type.id() == ID_struct_tag ? static_cast<const struct_union_typet &>(
+                                     ns.follow_tag(to_struct_tag_type(type)))
+                                 : static_cast<const struct_union_typet &>(
+                                     ns.follow_tag(to_union_tag_type(type)));
 
     struct_union_typet::componentst new_comp;
     for(const auto &comp : struct_union_type.components())
@@ -1212,8 +1210,8 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
         i2.is_not_nil(),
         "failed to create length-component for the left-hand-side");
 
-      exprt new_length=i_lhs.index();
-      make_type(new_length, i2.type());
+      exprt new_length =
+        typecast_exprt::conditional_cast(i_lhs.index(), i2.type());
 
       if_exprt min_expr(binary_relation_exprt(new_length, ID_lt, i2),
           new_length, i2);
@@ -1232,16 +1230,14 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
         i2.is_not_nil(),
         "failed to create length-component for the left-hand-side");
 
-      make_type(ptr.offset, build_type(whatt::LENGTH));
-      return
-        char_assign(
-          dest,
-          target,
-          new_lhs,
-          i2,
-          ptr.offset.is_nil()?
-            from_integer(0, build_type(whatt::LENGTH)):
-            ptr.offset);
+      return char_assign(
+        dest,
+        target,
+        new_lhs,
+        i2,
+        ptr.offset.is_nil() ? from_integer(0, build_type(whatt::LENGTH))
+                            : typecast_exprt::conditional_cast(
+                                ptr.offset, build_type(whatt::LENGTH)));
     }
   }
 
