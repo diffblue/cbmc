@@ -17,7 +17,6 @@ var classstring__instrumentationt =
     [ "instrument", "classstring__instrumentationt.html#aa84a9f17dfbce6acb63914518d9bfcf1", null ],
     [ "invalidate_buffer", "classstring__instrumentationt.html#af497bbbf377c031d946c20e1117f11cd", null ],
     [ "is_string_type", "classstring__instrumentationt.html#a412f4ef3883b542f2206e9747e0a9200", null ],
-    [ "make_type", "classstring__instrumentationt.html#a774d06b56a89e01c7da35e8e475fc523", null ],
     [ "operator()", "classstring__instrumentationt.html#a539ad2ea5930a813cd8ff6697e8ca4c9", null ],
     [ "operator()", "classstring__instrumentationt.html#a45f5eb2c9ce6d077d882fa96e03bbd57", null ],
     [ "ns", "classstring__instrumentationt.html#a48ee3c3576a35a3befc34c760cd7f4ad", null ],

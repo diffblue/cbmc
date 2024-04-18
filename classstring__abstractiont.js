@@ -39,7 +39,6 @@ var classstring__abstractiont =
     [ "is_char_type", "classstring__abstractiont.html#af4f45f188b277e39ae8995b54edf4a0c", null ],
     [ "is_ptr_string_struct", "classstring__abstractiont.html#a6c45bfc4d5f7501e47964d5c7b78e565", null ],
     [ "make_decl_and_def", "classstring__abstractiont.html#aec81cd54182700fcad787aad309182fb", null ],
-    [ "make_type", "classstring__abstractiont.html#ae6a260f2cf45c213de54ea1db7174b2a", null ],
     [ "make_val_or_dummy_rec", "classstring__abstractiont.html#a3741ee56e536ce24533e2edde0c3069a", null ],
     [ "member", "classstring__abstractiont.html#adfec5fde96310e9eafb3886ba4c7bfb0", null ],
     [ "move_lhs_arithmetic", "classstring__abstractiont.html#ab732385c499dd85c511ef3c17db69059", null ],
