@@ -1,5 +1,6 @@
 var NAVTREEINDEX137 =
 {
+"structstring__refinementt_1_1configt.html#ae817f056bc86219f500d3cd4cd55b438":[8,0,1206,0,0],
 "structstring__refinementt_1_1infot.html":[8,0,1206,1],
 "structstruct__aggregate__typet.html":[8,0,1213],
 "structstruct__aggregate__typet.html#a06facca37bae8029f8e515b8b95ed728":[8,0,1213,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX137 =
 "structworkt.html":[8,0,1357],
 "structworkt.html#a09688432d8b94b96f926353703bd15d8":[8,0,1357,1],
 "structworkt.html#a603c66046bd5f1eefa03248ce3ec84cd":[8,0,1357,3],
-"structworkt.html#a821972991881d7d61e2793b28d16064f":[8,0,1357,5],
-"structworkt.html#a9e32ea0b879a340734aeec2a6885484c":[8,0,1357,4]
+"structworkt.html#a821972991881d7d61e2793b28d16064f":[8,0,1357,5]
 };
