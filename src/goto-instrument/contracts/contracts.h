@@ -33,6 +33,10 @@ Date: February 2016
 #define HELP_LOOP_CONTRACTS                                                    \
   " {y--apply-loop-contracts} \t check and use loop contracts when provided\n"
 
+#define FLAG_KANI_LOOP_CONTRACTS "apply-kani-loop-contracts"
+#define HELP_KANI_LOOP_CONTRACTS                                               \
+  " {y--apply-kani-loop-contracts} \t check loop contracts from kani\n"
+
 #define FLAG_LOOP_CONTRACTS_NO_UNWIND "loop-contracts-no-unwind"
 #define HELP_LOOP_CONTRACTS_NO_UNWIND                                          \
   " {y--loop-contracts-no-unwind} \t do not unwind transformed loops\n"
@@ -122,6 +126,7 @@ public:
     goto_programt::targett loop_head,
     goto_programt::targett loop_end,
     const loopt &loop,
+    const goto_programt::instructionst &eval_ins,
     exprt assigns_clause,
     exprt invariant,
     exprt decreases_clause,
@@ -143,6 +148,9 @@ public:
 
   // Unwind transformed loops after applying loop contracts or not.
   bool unwind_transformed_loops = true;
+
+  // Unwind transformed loops after applying loop contracts or not.
+  bool apply_kani_loop_contracts = false;
 
 protected:
   goto_modelt &goto_model;

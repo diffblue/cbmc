@@ -1236,9 +1236,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       to_exclude_from_nondet_static,
       log.get_message_handler());
   }
-  else if((cmdline.isset(FLAG_LOOP_CONTRACTS) ||
-           cmdline.isset(FLAG_REPLACE_CALL) ||
-           cmdline.isset(FLAG_ENFORCE_CONTRACT)))
+
+  if(
+    !use_dfcc &&
+    (cmdline.isset(FLAG_LOOP_CONTRACTS) || cmdline.isset(FLAG_REPLACE_CALL) ||
+     cmdline.isset(FLAG_ENFORCE_CONTRACT) ||
+     cmdline.isset(FLAG_KANI_LOOP_CONTRACTS)))
   {
     do_indirect_call_and_rtti_removal();
     log.status() << "Trying to force one backedge per target" << messaget::eom;
@@ -1264,7 +1267,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     contracts.replace_calls(to_replace);
     contracts.enforce_contracts(to_enforce, to_exclude_from_nondet_static);
 
-    if(cmdline.isset(FLAG_LOOP_CONTRACTS))
+    if(
+      cmdline.isset(FLAG_LOOP_CONTRACTS) ||
+      cmdline.isset(FLAG_KANI_LOOP_CONTRACTS))
     {
       if(cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND))
       {
@@ -1280,6 +1285,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
                       << "them at least twice to pass unwinding-assertions."
                       << messaget::eom;
       }
+
+      if(cmdline.isset(FLAG_KANI_LOOP_CONTRACTS))
+        contracts.apply_kani_loop_contracts = true;
+
       contracts.apply_loop_contracts(to_exclude_from_nondet_static);
     }
   }

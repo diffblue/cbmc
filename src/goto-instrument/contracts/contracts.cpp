@@ -42,6 +42,7 @@ Date: February 2016
 #include "instrument_spec_assigns.h"
 #include "memory_predicates.h"
 #include "utils.h"
+#include "utils_kani.h"
 
 #include <algorithm>
 #include <map>
@@ -53,6 +54,7 @@ void code_contractst::check_apply_loop_contracts(
   goto_programt::targett loop_head,
   goto_programt::targett loop_end,
   const loopt &loop,
+  const goto_programt::instructionst &eval_ins,
   exprt assigns_clause,
   exprt invariant,
   exprt decreases_clause,
@@ -165,6 +167,15 @@ void code_contractst::check_apply_loop_contracts(
       .symbol_expr();
   pre_loop_head_instrs.add(
     goto_programt::make_decl(initial_invariant_val, loop_head_location));
+
+  // instrument instructions to evaluate invariants before assert(inv)
+  // or assume(inv)
+  for(const auto &in : eval_ins)
+  {
+    auto new_in = goto_programt::instructiont(in);
+    pre_loop_head_instrs.add(std::move(new_in));
+  }
+
   {
     // Although the invariant at this point will not have side effects,
     // it is still a C expression, and needs to be "goto_convert"ed.
@@ -326,6 +337,14 @@ void code_contractst::check_apply_loop_contracts(
   pre_loop_head_instrs.add(
     goto_programt::make_assignment(in_loop_havoc_block, false_exprt{}));
 
+  // instrument instructions to evaluate invariants before assert(inv)
+  // or assume(inv)
+  for(const auto &in : eval_ins)
+  {
+    auto new_in = goto_programt::instructiont(in);
+    pre_loop_head_instrs.add(std::move(new_in));
+  }
+
   // Insert the second block of pre_loop_head_instrs: the havocing code.
   // We do not `add_pragma_disable_assigns_check`,
   // so that the enclosing scope's assigns clause instrumentation
@@ -336,6 +355,13 @@ void code_contractst::check_apply_loop_contracts(
   // We use a block scope for assumption, since it's immediately goto converted,
   // and doesn't need to be kept around.
   {
+    // instrument instructions to evaluate invariants before assert(inv)
+    // or assume(inv)
+    for(const auto &in : eval_ins)
+    {
+      auto new_in = goto_programt::instructiont(in);
+      pre_loop_head_instrs.add(std::move(new_in));
+    }
     code_assumet assumption{invariant};
     assumption.add_source_location() = loop_head_location;
     converter.goto_convert(assumption, pre_loop_head_instrs, mode);
@@ -437,6 +463,13 @@ void code_contractst::check_apply_loop_contracts(
   // We use a block scope for assertion, since it's immediately goto converted,
   // and doesn't need to be kept around.
   {
+    // instrument instructions to evaluate invariants before assert(inv)
+    // or assume(inv)
+    for(const auto &in : eval_ins)
+    {
+      auto new_in = goto_programt::instructiont(in);
+      pre_loop_end_instrs.add(std::move(new_in));
+    }
     code_assertt assertion{invariant};
     assertion.add_source_location() = loop_head_location;
     assertion.add_source_location().set_comment(
@@ -839,8 +872,15 @@ void code_contractst::apply_loop_contract(
     return;
 
   inlining_decoratort decorated(log.get_message_handler());
-  goto_function_inline(
-    goto_functions, function_name, ns, log.get_message_handler());
+
+  // For kani loop contracts, we postponed the inlining after
+  // get the loop invariants as they are a sequence of instructions
+  // rather than only an expression
+  if(!apply_kani_loop_contracts)
+  {
+    goto_function_inline(
+      goto_functions, function_name, ns, log.get_message_handler());
+  }
 
   INVARIANT(
     decorated.get_recursive_call_set().size() == 0,
@@ -866,18 +906,21 @@ void code_contractst::apply_loop_contract(
   {
     const typename natural_loops_mutablet::loopt &content;
     const goto_programt::targett head_target, end_target;
+    goto_programt::instructionst eval_instrs;
     exprt assigns_clause, invariant, decreases_clause;
 
     loop_graph_nodet(
       const typename natural_loops_mutablet::loopt &loop,
       const goto_programt::targett head,
       const goto_programt::targett end,
+      const goto_programt::instructionst ins,
       const exprt &assigns,
       const exprt &inv,
       const exprt &decreases)
       : content(loop),
         head_target(head),
         end_target(end),
+        eval_instrs(ins),
         assigns_clause(assigns),
         invariant(inv),
         decreases_clause(decreases)
@@ -893,6 +936,12 @@ void code_contractst::apply_loop_contract(
     std::pair<goto_programt::targett, natural_loops_mutablet::loopt>,
     goto_programt::target_less_than>
     loop_head_ends;
+
+  // Preprocess loops from kani
+  if(apply_kani_loop_contracts)
+  {
+    annotate_kani_loop_invariants(goto_function.body, log);
+  }
 
   for(const auto &loop_head_and_content : natural_loops.loop_map)
   {
@@ -966,12 +1015,21 @@ void code_contractst::apply_loop_contract(
       goto_function.body, loop_head, goto_programt::make_skip());
     loop_end->set_target(loop_head);
 
+    goto_programt::instructionst eval_instrs;
+
     exprt assigns_clause =
       static_cast<const exprt &>(loop_end->condition().find(ID_C_spec_assigns));
     exprt invariant = static_cast<const exprt &>(
       loop_end->condition().find(ID_C_spec_loop_invariant));
     exprt decreases_clause = static_cast<const exprt &>(
       loop_end->condition().find(ID_C_spec_decreases));
+
+    // get kani loop invariants and the evaluation instructions.
+    if(apply_kani_loop_contracts)
+    {
+      get_kani_invariants(
+        goto_function, loop_head, invariant.operands(), eval_instrs);
+    }
 
     if(invariant.is_nil())
     {
@@ -1005,6 +1063,7 @@ void code_contractst::apply_loop_contract(
       loop_head_end.second.second,
       loop_head,
       loop_end,
+      eval_instrs,
       assigns_clause,
       invariant,
       decreases_clause);
@@ -1015,6 +1074,13 @@ void code_contractst::apply_loop_contract(
       continue;
 
     to_check_contracts_on_children.push_back(idx);
+  }
+
+  // The postponed inlining
+  if(apply_kani_loop_contracts)
+  {
+    goto_function_inline(
+      goto_functions, function_name, ns, log.get_message_handler());
   }
 
   for(size_t outer = 0; outer < loop_nesting_graph.size(); ++outer)
@@ -1104,6 +1170,7 @@ void code_contractst::apply_loop_contract(
       loop_node.head_target,
       loop_node.end_target,
       updated_loops.loop_map[loop_node.head_target],
+      loop_node.eval_instrs,
       loop_node.assigns_clause,
       loop_node.invariant,
       loop_node.decreases_clause,
