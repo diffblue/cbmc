@@ -1700,114 +1700,305 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01606"></a><span class="lineno"> 1606</span>&#160;  <span class="keywordflow">return</span> i;</div>
 <div class="line"><a name="l01607"></a><span class="lineno"> 1607</span>&#160;}</div>
 <div class="line"><a name="l01608"></a><span class="lineno"> 1608</span>&#160; </div>
-<div class="line"><a name="l01609"></a><span class="lineno"> 1609</span>&#160;<span class="comment">/* FUNCTION: __acrt_iob_func */</span></div>
+<div class="line"><a name="l01609"></a><span class="lineno"> 1609</span>&#160;<span class="comment">/* FUNCTION: snprintf */</span></div>
 <div class="line"><a name="l01610"></a><span class="lineno"> 1610</span>&#160; </div>
-<div class="line"><a name="l01611"></a><span class="lineno"> 1611</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><a name="l01612"></a><span class="lineno"> 1612</span>&#160; </div>
-<div class="line"><a name="l01613"></a><span class="lineno"> 1613</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
-<div class="line"><a name="l01614"></a><span class="lineno"> 1614</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
-<div class="line"><a name="l01615"></a><span class="lineno"> 1615</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
-<div class="line"><a name="l01616"></a><span class="lineno"> 1616</span>&#160;<span class="preprocessor">#  endif</span></div>
-<div class="line"><a name="l01617"></a><span class="lineno"> 1617</span>&#160; </div>
-<div class="line"><a name="l01618"></a><span class="lineno"> 1618</span>&#160;FILE *__acrt_iob_func(<span class="keywordtype">unsigned</span> fd)</div>
-<div class="line"><a name="l01619"></a><span class="lineno"> 1619</span>&#160;{</div>
-<div class="line"><a name="l01620"></a><span class="lineno"> 1620</span>&#160;  <span class="keyword">static</span> FILE stdin_file;</div>
-<div class="line"><a name="l01621"></a><span class="lineno"> 1621</span>&#160;  <span class="keyword">static</span> FILE stdout_file;</div>
-<div class="line"><a name="l01622"></a><span class="lineno"> 1622</span>&#160;  <span class="keyword">static</span> FILE stderr_file;</div>
-<div class="line"><a name="l01623"></a><span class="lineno"> 1623</span>&#160; </div>
-<div class="line"><a name="l01624"></a><span class="lineno"> 1624</span>&#160;  <span class="keywordflow">switch</span>(fd)</div>
-<div class="line"><a name="l01625"></a><span class="lineno"> 1625</span>&#160;  {</div>
-<div class="line"><a name="l01626"></a><span class="lineno"> 1626</span>&#160;  <span class="keywordflow">case</span> 0:</div>
-<div class="line"><a name="l01627"></a><span class="lineno"> 1627</span>&#160;    <span class="keywordflow">return</span> &amp;stdin_file;</div>
-<div class="line"><a name="l01628"></a><span class="lineno"> 1628</span>&#160;  <span class="keywordflow">case</span> 1:</div>
-<div class="line"><a name="l01629"></a><span class="lineno"> 1629</span>&#160;    <span class="keywordflow">return</span> &amp;stdout_file;</div>
-<div class="line"><a name="l01630"></a><span class="lineno"> 1630</span>&#160;  <span class="keywordflow">case</span> 2:</div>
-<div class="line"><a name="l01631"></a><span class="lineno"> 1631</span>&#160;    <span class="keywordflow">return</span> &amp;stderr_file;</div>
-<div class="line"><a name="l01632"></a><span class="lineno"> 1632</span>&#160;  <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l01633"></a><span class="lineno"> 1633</span>&#160;    <span class="keywordflow">return</span> (FILE *)0;</div>
-<div class="line"><a name="l01634"></a><span class="lineno"> 1634</span>&#160;  }</div>
-<div class="line"><a name="l01635"></a><span class="lineno"> 1635</span>&#160;}</div>
-<div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160; </div>
+<div class="line"><a name="l01611"></a><span class="lineno"> 1611</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01612"></a><span class="lineno"> 1612</span>&#160;<span class="preprocessor">#  include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01613"></a><span class="lineno"> 1613</span>&#160;<span class="preprocessor">#  define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01614"></a><span class="lineno"> 1614</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01615"></a><span class="lineno"> 1615</span>&#160; </div>
+<div class="line"><a name="l01616"></a><span class="lineno"> 1616</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01617"></a><span class="lineno"> 1617</span>&#160;<span class="preprocessor">#  include &lt;stdarg.h&gt;</span></div>
+<div class="line"><a name="l01618"></a><span class="lineno"> 1618</span>&#160;<span class="preprocessor">#  define __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01619"></a><span class="lineno"> 1619</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01620"></a><span class="lineno"> 1620</span>&#160; </div>
+<div class="line"><a name="l01621"></a><span class="lineno"> 1621</span>&#160;<span class="preprocessor">#undef snprintf</span></div>
+<div class="line"><a name="l01622"></a><span class="lineno"> 1622</span>&#160; </div>
+<div class="line"><a name="l01623"></a><span class="lineno"><a class="line" href="stdio_8c.html#a37c1e8ce8a2b411fa666dc33972a2cec"> 1623</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a37c1e8ce8a2b411fa666dc33972a2cec">snprintf</a>(<span class="keywordtype">char</span> *str, <span class="keywordtype">size_t</span> size, <span class="keyword">const</span> <span class="keywordtype">char</span> *fmt, ...)</div>
+<div class="line"><a name="l01624"></a><span class="lineno"> 1624</span>&#160;{</div>
+<div class="line"><a name="l01625"></a><span class="lineno"> 1625</span>&#160;  va_list list;</div>
+<div class="line"><a name="l01626"></a><span class="lineno"> 1626</span>&#160;  va_start(list, fmt);</div>
+<div class="line"><a name="l01627"></a><span class="lineno"> 1627</span>&#160;  <span class="keywordtype">int</span> result = <a class="code" href="stdio_8c.html#a154043ea6d83b8616f3148fbf4f24244">vsnprintf</a>(str, size, fmt, list);</div>
+<div class="line"><a name="l01628"></a><span class="lineno"> 1628</span>&#160;  va_end(list);</div>
+<div class="line"><a name="l01629"></a><span class="lineno"> 1629</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01630"></a><span class="lineno"> 1630</span>&#160;}</div>
+<div class="line"><a name="l01631"></a><span class="lineno"> 1631</span>&#160; </div>
+<div class="line"><a name="l01632"></a><span class="lineno"> 1632</span>&#160;<span class="comment">/* FUNCTION: __builtin___snprintf_chk */</span></div>
+<div class="line"><a name="l01633"></a><span class="lineno"> 1633</span>&#160; </div>
+<div class="line"><a name="l01634"></a><span class="lineno"> 1634</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01635"></a><span class="lineno"> 1635</span>&#160;<span class="preprocessor">#  include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160;<span class="preprocessor">#  define __CPROVER_STDIO_H_INCLUDED</span></div>
 <div class="line"><a name="l01637"></a><span class="lineno"> 1637</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160; </div>
-<div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160;<span class="comment">/* FUNCTION: __stdio_common_vfprintf */</span></div>
-<div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160; </div>
-<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160; </div>
-<div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
-<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
-<div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
-<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;<span class="preprocessor">#  endif</span></div>
-<div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160; </div>
-<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDARG_H_INCLUDED</span></div>
-<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160;<span class="preprocessor">#    include &lt;stdarg.h&gt;</span></div>
-<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;<span class="preprocessor">#    define __CPROVER_STDARG_H_INCLUDED</span></div>
-<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160;<span class="preprocessor">#  endif</span></div>
-<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160; </div>
-<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160;<span class="keywordtype">int</span> __stdio_common_vfprintf(</div>
-<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;  <span class="keywordtype">unsigned</span> __int64 options,</div>
-<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;  FILE *stream,</div>
-<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;  <span class="keywordtype">char</span> <span class="keyword">const</span> *<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,</div>
-<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;  _locale_t locale,</div>
-<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;  va_list args)</div>
+<div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160;<span class="preprocessor">#  include &lt;stdarg.h&gt;</span></div>
+<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;<span class="preprocessor">#  define __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160; </div>
+<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;<span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a5d7b4614fd21a3faeeb556598b000aa2">__builtin___vsnprintf_chk</a>(</div>
+<div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;  <span class="keywordtype">char</span> *str,</div>
+<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;  <span class="keywordtype">size_t</span> size,</div>
+<div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160;  <span class="keywordtype">int</span> flag,</div>
+<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;  <span class="keywordtype">size_t</span> bufsize,</div>
+<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span> *fmt,</div>
+<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;  va_list ap);</div>
+<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160; </div>
+<div class="line"><a name="l01652"></a><span class="lineno"><a class="line" href="stdio_8c.html#a61f1e8102ded95d7e691484db1320c66"> 1652</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a61f1e8102ded95d7e691484db1320c66">__builtin___snprintf_chk</a>(</div>
+<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160;  <span class="keywordtype">char</span> *str,</div>
+<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;  <span class="keywordtype">size_t</span> size,</div>
+<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;  <span class="keywordtype">int</span> flag,</div>
+<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;  <span class="keywordtype">size_t</span> bufsize,</div>
+<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span> *fmt,</div>
+<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;  ...)</div>
 <div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;{</div>
-<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;  (void)options;</div>
-<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160;  (void)locale;</div>
-<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160; </div>
-<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;  <span class="keywordflow">if</span>(stream == __acrt_iob_func(1))</div>
-<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;    <a class="code" href="cprover__builtin__headers_8h.html#a0dba738e1f9b5a1842df1e2a5e853ffc">__CPROVER_printf</a>(<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, args);</div>
-<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;}</div>
-<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160; </div>
-<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160; </div>
-<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;<span class="comment">/* FUNCTION: __srget */</span></div>
-<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160; </div>
-<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;<span class="preprocessor">#ifdef __FreeBSD__</span></div>
+<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;  va_list list;</div>
+<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160;  va_start(list, fmt);</div>
+<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160;  <span class="keywordtype">int</span> result = <a class="code" href="stdio_8c.html#a5d7b4614fd21a3faeeb556598b000aa2">__builtin___vsnprintf_chk</a>(str, size, flag, bufsize, fmt, list);</div>
+<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;  va_end(list);</div>
+<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;}</div>
+<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160; </div>
+<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160;<span class="comment">/* FUNCTION: vsnprintf */</span></div>
+<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160; </div>
+<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;<span class="preprocessor">#  include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160;<span class="preprocessor">#  define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160; </div>
-<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
-<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
-<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
-<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;<span class="preprocessor">#  include &lt;stdarg.h&gt;</span></div>
+<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;<span class="preprocessor">#  define __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160; </div>
-<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;<span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;<span class="preprocessor">#undef vsnprintf</span></div>
 <div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160; </div>
-<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;<span class="keywordtype">int</span> __srget(FILE *stream)</div>
-<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;{</div>
-<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;  (void)*stream;</div>
-<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160; </div>
-<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160;  <span class="comment">// FreeBSD&#39;s implementation returns a character or EOF; __VERIFIER_nondet_int</span></div>
-<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;  <span class="comment">// will capture all these options</span></div>
-<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="stdio_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
-<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;}</div>
+<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;<span class="keywordtype">char</span> <a class="code" href="stdio_8c.html#a6159fc790f132e169f40e00b5e9053c6">__VERIFIER_nondet_char</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160; </div>
+<div class="line"><a name="l01683"></a><span class="lineno"><a class="line" href="stdio_8c.html#a154043ea6d83b8616f3148fbf4f24244"> 1683</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a154043ea6d83b8616f3148fbf4f24244">vsnprintf</a>(<span class="keywordtype">char</span> *str, <span class="keywordtype">size_t</span> size, <span class="keyword">const</span> <span class="keywordtype">char</span> *fmt, va_list ap)</div>
+<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160;{</div>
+<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160;  (void)*fmt;</div>
+<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160; </div>
+<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(*(<span class="keywordtype">void</span> **)&amp;ap) &lt;</div>
+<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(ap))</div>
 <div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160; </div>
-<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160; </div>
-<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;<span class="comment">/* FUNCTION: __swbuf */</span></div>
-<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160; </div>
-<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160;<span class="preprocessor">#ifdef __FreeBSD__</span></div>
-<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160; </div>
-<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
-<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
-<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
-<div class="line"><a name="l01699"></a><span class="lineno"> 1699</span>&#160;<span class="preprocessor">#  endif</span></div>
-<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160; </div>
-<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;__CPROVER_bool <a class="code" href="stdio_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160; </div>
-<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;<span class="keywordtype">int</span> __swbuf(<span class="keywordtype">int</span> c, FILE *stream)</div>
-<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;{</div>
-<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;  (void)c;</div>
-<div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;  (void)*stream;</div>
-<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160; </div>
-<div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160;  <span class="comment">// FreeBSD&#39;s implementation returns `c` or or EOF in case writing failed; we</span></div>
-<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;  <span class="comment">// just non-deterministically choose between these</span></div>
-<div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="stdio_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>())</div>
-<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;    <span class="keywordflow">return</span> EOF;</div>
-<div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;    <span class="keywordflow">return</span> c;</div>
-<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;}</div>
+<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;  {</div>
+<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;    (void)va_arg(ap, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;    <a class="code" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
+<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;      <a class="code" href="cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13">__CPROVER_POINTER_OBJECT</a>(str) != <a class="code" href="cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13">__CPROVER_POINTER_OBJECT</a>(ap),</div>
+<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160;      <span class="stringliteral">&quot;vsnprintf object overlap&quot;</span>);</div>
+<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160;  }</div>
+<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160; </div>
+<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160;  <span class="keywordtype">size_t</span> i = 0;</div>
+<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160;  <span class="keywordflow">for</span>(; i &lt; size; ++i)</div>
+<div class="line"><a name="l01699"></a><span class="lineno"> 1699</span>&#160;  {</div>
+<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160;    <span class="keywordtype">char</span> c = <a class="code" href="stdio_8c.html#a6159fc790f132e169f40e00b5e9053c6">__VERIFIER_nondet_char</a>();</div>
+<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;    str[i] = c;</div>
+<div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160;    <span class="keywordflow">if</span>(c == <span class="charliteral">&#39;\0&#39;</span>)</div>
+<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;  }</div>
+<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160; </div>
+<div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;  <span class="keywordflow">return</span> i;</div>
+<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;}</div>
+<div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160; </div>
+<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;<span class="comment">/* FUNCTION: __builtin___vsnprintf_chk */</span></div>
+<div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160; </div>
+<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;<span class="preprocessor">#  include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;<span class="preprocessor">#  define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160; </div>
-<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;<span class="preprocessor">#ifndef __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;<span class="preprocessor">#  include &lt;stdarg.h&gt;</span></div>
+<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160;<span class="preprocessor">#  define __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01719"></a><span class="lineno"> 1719</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01720"></a><span class="lineno"> 1720</span>&#160; </div>
+<div class="line"><a name="l01721"></a><span class="lineno"> 1721</span>&#160;<span class="keywordtype">char</span> <a class="code" href="stdio_8c.html#a6159fc790f132e169f40e00b5e9053c6">__VERIFIER_nondet_char</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l01722"></a><span class="lineno"> 1722</span>&#160; </div>
+<div class="line"><a name="l01723"></a><span class="lineno"><a class="line" href="stdio_8c.html#a5d7b4614fd21a3faeeb556598b000aa2"> 1723</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a5d7b4614fd21a3faeeb556598b000aa2">__builtin___vsnprintf_chk</a>(</div>
+<div class="line"><a name="l01724"></a><span class="lineno"> 1724</span>&#160;  <span class="keywordtype">char</span> *str,</div>
+<div class="line"><a name="l01725"></a><span class="lineno"> 1725</span>&#160;  <span class="keywordtype">size_t</span> size,</div>
+<div class="line"><a name="l01726"></a><span class="lineno"> 1726</span>&#160;  <span class="keywordtype">int</span> flag,</div>
+<div class="line"><a name="l01727"></a><span class="lineno"> 1727</span>&#160;  <span class="keywordtype">size_t</span> bufsize,</div>
+<div class="line"><a name="l01728"></a><span class="lineno"> 1728</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span> *fmt,</div>
+<div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160;  va_list ap)</div>
+<div class="line"><a name="l01730"></a><span class="lineno"> 1730</span>&#160;{</div>
+<div class="line"><a name="l01731"></a><span class="lineno"> 1731</span>&#160;  (void)flag;</div>
+<div class="line"><a name="l01732"></a><span class="lineno"> 1732</span>&#160;  (void)bufsize;</div>
+<div class="line"><a name="l01733"></a><span class="lineno"> 1733</span>&#160;  (void)*fmt;</div>
+<div class="line"><a name="l01734"></a><span class="lineno"> 1734</span>&#160; </div>
+<div class="line"><a name="l01735"></a><span class="lineno"> 1735</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(*(<span class="keywordtype">void</span> **)&amp;ap) &lt;</div>
+<div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(ap))</div>
+<div class="line"><a name="l01737"></a><span class="lineno"> 1737</span>&#160; </div>
+<div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160;  {</div>
+<div class="line"><a name="l01739"></a><span class="lineno"> 1739</span>&#160;    (void)va_arg(ap, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l01740"></a><span class="lineno"> 1740</span>&#160;    <a class="code" href="cprover__builtin__headers_8h.html#a9e05c8aeb35905c38bd7bcdb78145dae">__CPROVER_precondition</a>(</div>
+<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;      <a class="code" href="cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13">__CPROVER_POINTER_OBJECT</a>(str) != <a class="code" href="cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13">__CPROVER_POINTER_OBJECT</a>(ap),</div>
+<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;      <span class="stringliteral">&quot;vsnprintf object overlap&quot;</span>);</div>
+<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;  }</div>
+<div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160; </div>
+<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;  <span class="keywordtype">size_t</span> i = 0;</div>
+<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160;  <span class="keywordflow">for</span>(; i &lt; size; ++i)</div>
+<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;  {</div>
+<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160;    <span class="keywordtype">char</span> c = <a class="code" href="stdio_8c.html#a6159fc790f132e169f40e00b5e9053c6">__VERIFIER_nondet_char</a>();</div>
+<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;    str[i] = c;</div>
+<div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;    <span class="keywordflow">if</span>(c == <span class="charliteral">&#39;\0&#39;</span>)</div>
+<div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160;  }</div>
+<div class="line"><a name="l01753"></a><span class="lineno"> 1753</span>&#160; </div>
+<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;  <span class="keywordflow">return</span> i;</div>
+<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;}</div>
+<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160; </div>
+<div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160;<span class="comment">/* FUNCTION: __acrt_iob_func */</span></div>
+<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160; </div>
+<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160; </div>
+<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01763"></a><span class="lineno"> 1763</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01764"></a><span class="lineno"> 1764</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160; </div>
+<div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;FILE *__acrt_iob_func(<span class="keywordtype">unsigned</span> fd)</div>
+<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;{</div>
+<div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160;  <span class="keyword">static</span> FILE stdin_file;</div>
+<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;  <span class="keyword">static</span> FILE stdout_file;</div>
+<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;  <span class="keyword">static</span> FILE stderr_file;</div>
+<div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160; </div>
+<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160;  <span class="keywordflow">switch</span>(fd)</div>
+<div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160;  {</div>
+<div class="line"><a name="l01774"></a><span class="lineno"> 1774</span>&#160;  <span class="keywordflow">case</span> 0:</div>
+<div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160;    <span class="keywordflow">return</span> &amp;stdin_file;</div>
+<div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;  <span class="keywordflow">case</span> 1:</div>
+<div class="line"><a name="l01777"></a><span class="lineno"> 1777</span>&#160;    <span class="keywordflow">return</span> &amp;stdout_file;</div>
+<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;  <span class="keywordflow">case</span> 2:</div>
+<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160;    <span class="keywordflow">return</span> &amp;stderr_file;</div>
+<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;  <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;    <span class="keywordflow">return</span> (FILE *)0;</div>
+<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;  }</div>
+<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;}</div>
+<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160; </div>
+<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01786"></a><span class="lineno"> 1786</span>&#160; </div>
+<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160;<span class="comment">/* FUNCTION: __stdio_common_vfprintf */</span></div>
+<div class="line"><a name="l01788"></a><span class="lineno"> 1788</span>&#160; </div>
+<div class="line"><a name="l01789"></a><span class="lineno"> 1789</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160; </div>
+<div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160; </div>
+<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;<span class="preprocessor">#    include &lt;stdarg.h&gt;</span></div>
+<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160;<span class="preprocessor">#    define __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01800"></a><span class="lineno"> 1800</span>&#160; </div>
+<div class="line"><a name="l01801"></a><span class="lineno"> 1801</span>&#160;<span class="keywordtype">int</span> __stdio_common_vfprintf(</div>
+<div class="line"><a name="l01802"></a><span class="lineno"> 1802</span>&#160;  <span class="keywordtype">unsigned</span> __int64 options,</div>
+<div class="line"><a name="l01803"></a><span class="lineno"> 1803</span>&#160;  FILE *stream,</div>
+<div class="line"><a name="l01804"></a><span class="lineno"> 1804</span>&#160;  <span class="keywordtype">char</span> <span class="keyword">const</span> *<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>,</div>
+<div class="line"><a name="l01805"></a><span class="lineno"> 1805</span>&#160;  _locale_t locale,</div>
+<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160;  va_list args)</div>
+<div class="line"><a name="l01807"></a><span class="lineno"> 1807</span>&#160;{</div>
+<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;  (void)options;</div>
+<div class="line"><a name="l01809"></a><span class="lineno"> 1809</span>&#160;  (void)locale;</div>
+<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160; </div>
+<div class="line"><a name="l01811"></a><span class="lineno"> 1811</span>&#160;  <span class="keywordflow">if</span>(stream == __acrt_iob_func(1))</div>
+<div class="line"><a name="l01812"></a><span class="lineno"> 1812</span>&#160;    <a class="code" href="cprover__builtin__headers_8h.html#a0dba738e1f9b5a1842df1e2a5e853ffc">__CPROVER_printf</a>(<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>, args);</div>
+<div class="line"><a name="l01813"></a><span class="lineno"> 1813</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l01814"></a><span class="lineno"> 1814</span>&#160;}</div>
+<div class="line"><a name="l01815"></a><span class="lineno"> 1815</span>&#160; </div>
+<div class="line"><a name="l01816"></a><span class="lineno"> 1816</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160; </div>
+<div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;<span class="comment">/* FUNCTION: __stdio_common_vsprintf */</span></div>
+<div class="line"><a name="l01819"></a><span class="lineno"> 1819</span>&#160; </div>
+<div class="line"><a name="l01820"></a><span class="lineno"> 1820</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><a name="l01821"></a><span class="lineno"> 1821</span>&#160; </div>
+<div class="line"><a name="l01822"></a><span class="lineno"> 1822</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01823"></a><span class="lineno"> 1823</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01824"></a><span class="lineno"> 1824</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01825"></a><span class="lineno"> 1825</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01826"></a><span class="lineno"> 1826</span>&#160; </div>
+<div class="line"><a name="l01827"></a><span class="lineno"> 1827</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01828"></a><span class="lineno"> 1828</span>&#160;<span class="preprocessor">#    include &lt;stdarg.h&gt;</span></div>
+<div class="line"><a name="l01829"></a><span class="lineno"> 1829</span>&#160;<span class="preprocessor">#    define __CPROVER_STDARG_H_INCLUDED</span></div>
+<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01831"></a><span class="lineno"> 1831</span>&#160; </div>
+<div class="line"><a name="l01832"></a><span class="lineno"> 1832</span>&#160;<span class="keywordtype">char</span> <a class="code" href="stdio_8c.html#a6159fc790f132e169f40e00b5e9053c6">__VERIFIER_nondet_char</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l01833"></a><span class="lineno"> 1833</span>&#160; </div>
+<div class="line"><a name="l01834"></a><span class="lineno"> 1834</span>&#160;<span class="keywordtype">int</span> __stdio_common_vsprintf(</div>
+<div class="line"><a name="l01835"></a><span class="lineno"> 1835</span>&#160;  <span class="keywordtype">unsigned</span> __int64 options,</div>
+<div class="line"><a name="l01836"></a><span class="lineno"> 1836</span>&#160;  <span class="keywordtype">char</span> *str,</div>
+<div class="line"><a name="l01837"></a><span class="lineno"> 1837</span>&#160;  <span class="keywordtype">size_t</span> size,</div>
+<div class="line"><a name="l01838"></a><span class="lineno"> 1838</span>&#160;  <span class="keywordtype">char</span> <span class="keyword">const</span> *fmt,</div>
+<div class="line"><a name="l01839"></a><span class="lineno"> 1839</span>&#160;  _locale_t locale,</div>
+<div class="line"><a name="l01840"></a><span class="lineno"> 1840</span>&#160;  va_list args)</div>
+<div class="line"><a name="l01841"></a><span class="lineno"> 1841</span>&#160;{</div>
+<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160;  (void)options;</div>
+<div class="line"><a name="l01843"></a><span class="lineno"> 1843</span>&#160;  (void)*fmt;</div>
+<div class="line"><a name="l01844"></a><span class="lineno"> 1844</span>&#160;  (void)locale;</div>
+<div class="line"><a name="l01845"></a><span class="lineno"> 1845</span>&#160;  (void)args;</div>
+<div class="line"><a name="l01846"></a><span class="lineno"> 1846</span>&#160; </div>
+<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160;  <span class="keywordtype">size_t</span> i = 0;</div>
+<div class="line"><a name="l01848"></a><span class="lineno"> 1848</span>&#160;  <span class="keywordflow">for</span>(; i &lt; size; ++i)</div>
+<div class="line"><a name="l01849"></a><span class="lineno"> 1849</span>&#160;  {</div>
+<div class="line"><a name="l01850"></a><span class="lineno"> 1850</span>&#160;    <span class="keywordtype">char</span> c = <a class="code" href="stdio_8c.html#a6159fc790f132e169f40e00b5e9053c6">__VERIFIER_nondet_char</a>();</div>
+<div class="line"><a name="l01851"></a><span class="lineno"> 1851</span>&#160;    str[i] = c;</div>
+<div class="line"><a name="l01852"></a><span class="lineno"> 1852</span>&#160;    <span class="keywordflow">if</span>(c == <span class="charliteral">&#39;\0&#39;</span>)</div>
+<div class="line"><a name="l01853"></a><span class="lineno"> 1853</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l01854"></a><span class="lineno"> 1854</span>&#160;  }</div>
+<div class="line"><a name="l01855"></a><span class="lineno"> 1855</span>&#160; </div>
+<div class="line"><a name="l01856"></a><span class="lineno"> 1856</span>&#160;  <span class="keywordflow">return</span> i;</div>
+<div class="line"><a name="l01857"></a><span class="lineno"> 1857</span>&#160;}</div>
+<div class="line"><a name="l01858"></a><span class="lineno"> 1858</span>&#160; </div>
+<div class="line"><a name="l01859"></a><span class="lineno"> 1859</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01860"></a><span class="lineno"> 1860</span>&#160; </div>
+<div class="line"><a name="l01861"></a><span class="lineno"> 1861</span>&#160;<span class="comment">/* FUNCTION: __srget */</span></div>
+<div class="line"><a name="l01862"></a><span class="lineno"> 1862</span>&#160; </div>
+<div class="line"><a name="l01863"></a><span class="lineno"> 1863</span>&#160;<span class="preprocessor">#ifdef __FreeBSD__</span></div>
+<div class="line"><a name="l01864"></a><span class="lineno"> 1864</span>&#160; </div>
+<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01869"></a><span class="lineno"> 1869</span>&#160; </div>
+<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;<span class="keywordtype">int</span> <a class="code" href="stdio_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160; </div>
+<div class="line"><a name="l01872"></a><span class="lineno"> 1872</span>&#160;<span class="keywordtype">int</span> __srget(FILE *stream)</div>
+<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;{</div>
+<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160;  (void)*stream;</div>
+<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160; </div>
+<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160;  <span class="comment">// FreeBSD&#39;s implementation returns a character or EOF; __VERIFIER_nondet_int</span></div>
+<div class="line"><a name="l01877"></a><span class="lineno"> 1877</span>&#160;  <span class="comment">// will capture all these options</span></div>
+<div class="line"><a name="l01878"></a><span class="lineno"> 1878</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="stdio_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
+<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160;}</div>
+<div class="line"><a name="l01880"></a><span class="lineno"> 1880</span>&#160; </div>
+<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160; </div>
+<div class="line"><a name="l01883"></a><span class="lineno"> 1883</span>&#160;<span class="comment">/* FUNCTION: __swbuf */</span></div>
+<div class="line"><a name="l01884"></a><span class="lineno"> 1884</span>&#160; </div>
+<div class="line"><a name="l01885"></a><span class="lineno"> 1885</span>&#160;<span class="preprocessor">#ifdef __FreeBSD__</span></div>
+<div class="line"><a name="l01886"></a><span class="lineno"> 1886</span>&#160; </div>
+<div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;<span class="preprocessor">#  ifndef __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160;<span class="preprocessor">#    include &lt;stdio.h&gt;</span></div>
+<div class="line"><a name="l01889"></a><span class="lineno"> 1889</span>&#160;<span class="preprocessor">#    define __CPROVER_STDIO_H_INCLUDED</span></div>
+<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;<span class="preprocessor">#  endif</span></div>
+<div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160; </div>
+<div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;__CPROVER_bool <a class="code" href="stdio_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160; </div>
+<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;<span class="keywordtype">int</span> __swbuf(<span class="keywordtype">int</span> c, FILE *stream)</div>
+<div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;{</div>
+<div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;  (void)c;</div>
+<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;  (void)*stream;</div>
+<div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160; </div>
+<div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160;  <span class="comment">// FreeBSD&#39;s implementation returns `c` or or EOF in case writing failed; we</span></div>
+<div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160;  <span class="comment">// just non-deterministically choose between these</span></div>
+<div class="line"><a name="l01901"></a><span class="lineno"> 1901</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="stdio_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a>())</div>
+<div class="line"><a name="l01902"></a><span class="lineno"> 1902</span>&#160;    <span class="keywordflow">return</span> EOF;</div>
+<div class="line"><a name="l01903"></a><span class="lineno"> 1903</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01904"></a><span class="lineno"> 1904</span>&#160;    <span class="keywordflow">return</span> c;</div>
+<div class="line"><a name="l01905"></a><span class="lineno"> 1905</span>&#160;}</div>
+<div class="line"><a name="l01906"></a><span class="lineno"> 1906</span>&#160; </div>
+<div class="line"><a name="l01907"></a><span class="lineno"> 1907</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a4f7c59e6fd6639afe168f4e28eef54f6"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a4f7c59e6fd6639afe168f4e28eef54f6">__CPROVER_w_ok</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_w_ok(const void *,...)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a00109de552d5ffc4e206a729dffb2b58"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a00109de552d5ffc4e206a729dffb2b58">__CPROVER_buffer_size</a></div><div class="ttdeci">__CPROVER_size_t __CPROVER_buffer_size(const void *)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a0dba738e1f9b5a1842df1e2a5e853ffc"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a0dba738e1f9b5a1842df1e2a5e853ffc">__CPROVER_printf</a></div><div class="ttdeci">void __CPROVER_printf(const char *format,...)</div></div>
@@ -1816,6 +2007,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="ttc" id="acprover__builtin__headers_8h_html_a564e8a5a7bebea04fdd5ee1277832478"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a></div><div class="ttdeci">void __CPROVER_assert(__CPROVER_bool assertion, const char *description)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a62b70a7069642dab96b94d834af4c347"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a62b70a7069642dab96b94d834af4c347">__CPROVER_array_replace</a></div><div class="ttdeci">void __CPROVER_array_replace(const void *dest, const void *src)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a829ee4b8c4cdf4a7a3f6f19156aa7bbb"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a></div><div class="ttdeci">__CPROVER_size_t __CPROVER_POINTER_OFFSET(const void *)</div></div>
+<div class="ttc" id="acprover__builtin__headers_8h_html_a84fcea3f7109884566cb6e4e934abf13"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13">__CPROVER_POINTER_OBJECT</a></div><div class="ttdeci">__CPROVER_size_t __CPROVER_POINTER_OBJECT(const void *)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a85d3c5a542e78b671377625ec9e0e42a"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a85d3c5a542e78b671377625ec9e0e42a">__CPROVER_zero_string_length</a></div><div class="ttdeci">__CPROVER_size_t __CPROVER_zero_string_length(const void *)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a8b425c9bbc30684bc01e7e1e4b9ac900"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a8b425c9bbc30684bc01e7e1e4b9ac900">__CPROVER_get_must</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_get_must(const void *, const char *)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a90646711635477fd8451cd0dcbd36aff"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a90646711635477fd8451cd0dcbd36aff">__CPROVER_input</a></div><div class="ttdeci">void __CPROVER_input(const char *id,...)</div></div>
@@ -1831,9 +2023,11 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="ttc" id="astdio_8c_html_a07f3c5b239f8f75401f1894d01d77223"><div class="ttname"><a href="stdio_8c.html#a07f3c5b239f8f75401f1894d01d77223">vscanf</a></div><div class="ttdeci">int vscanf(const char *restrict format, va_list arg)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01226">stdio.c:1226</a></div></div>
 <div class="ttc" id="astdio_8c_html_a0911f39b1bbceb91575cea613e25b884"><div class="ttname"><a href="stdio_8c.html#a0911f39b1bbceb91575cea613e25b884">__isoc99_sscanf</a></div><div class="ttdeci">int __isoc99_sscanf(const char *restrict s, const char *restrict format,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01056">stdio.c:1056</a></div></div>
 <div class="ttc" id="astdio_8c_html_a141a39dcb287be8d93320e2e1247a721"><div class="ttname"><a href="stdio_8c.html#a141a39dcb287be8d93320e2e1247a721">fclose_cleanup</a></div><div class="ttdeci">void fclose_cleanup(void *stream)</div></div>
+<div class="ttc" id="astdio_8c_html_a154043ea6d83b8616f3148fbf4f24244"><div class="ttname"><a href="stdio_8c.html#a154043ea6d83b8616f3148fbf4f24244">vsnprintf</a></div><div class="ttdeci">int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01683">stdio.c:1683</a></div></div>
 <div class="ttc" id="astdio_8c_html_a1556f320cb3c2d5c80a0b725531ee3eb"><div class="ttname"><a href="stdio_8c.html#a1556f320cb3c2d5c80a0b725531ee3eb">vasprintf</a></div><div class="ttdeci">int vasprintf(char **ptr, const char *fmt, va_list ap)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01583">stdio.c:1583</a></div></div>
 <div class="ttc" id="astdio_8c_html_a2ce4709d34f19dc62d29ae3c5e2f0037"><div class="ttname"><a href="stdio_8c.html#a2ce4709d34f19dc62d29ae3c5e2f0037">__isoc99_vscanf</a></div><div class="ttdeci">int __isoc99_vscanf(const char *restrict format, va_list arg)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01246">stdio.c:1246</a></div></div>
 <div class="ttc" id="astdio_8c_html_a31dcd2b8e350dda1d7ca48211172a313"><div class="ttname"><a href="stdio_8c.html#a31dcd2b8e350dda1d7ca48211172a313">scanf</a></div><div class="ttdeci">int scanf(const char *restrict format,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00984">stdio.c:984</a></div></div>
+<div class="ttc" id="astdio_8c_html_a37c1e8ce8a2b411fa666dc33972a2cec"><div class="ttname"><a href="stdio_8c.html#a37c1e8ce8a2b411fa666dc33972a2cec">snprintf</a></div><div class="ttdeci">int snprintf(char *str, size_t size, const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01623">stdio.c:1623</a></div></div>
 <div class="ttc" id="astdio_8c_html_a3e29caa20f7cffe18f410f01278905a8"><div class="ttname"><a href="stdio_8c.html#a3e29caa20f7cffe18f410f01278905a8">getchar</a></div><div class="ttdeci">int getchar(void)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00736">stdio.c:736</a></div></div>
 <div class="ttc" id="astdio_8c_html_a40a6235df7bbfdaac9304d5af6224380"><div class="ttname"><a href="stdio_8c.html#a40a6235df7bbfdaac9304d5af6224380">__fprintf_chk</a></div><div class="ttdeci">int __fprintf_chk(FILE *stream, int flag, const char *restrict format,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01447">stdio.c:1447</a></div></div>
 <div class="ttc" id="astdio_8c_html_a43e2eb12f1a4a1186ac1cee67b2435ad"><div class="ttname"><a href="stdio_8c.html#a43e2eb12f1a4a1186ac1cee67b2435ad">sscanf</a></div><div class="ttdeci">int sscanf(const char *restrict s, const char *restrict format,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01032">stdio.c:1032</a></div></div>
@@ -1848,8 +2042,10 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="ttc" id="astdio_8c_html_a56bcf1806861f553567d6dc8e7ea7095"><div class="ttname"><a href="stdio_8c.html#a56bcf1806861f553567d6dc8e7ea7095">vsscanf</a></div><div class="ttdeci">int vsscanf(const char *restrict s, const char *restrict format, va_list arg)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01268">stdio.c:1268</a></div></div>
 <div class="ttc" id="astdio_8c_html_a5a002ad43f113e8c634d284ee34d1d53"><div class="ttname"><a href="stdio_8c.html#a5a002ad43f113e8c634d284ee34d1d53">ftell</a></div><div class="ttdeci">long ftell(FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00819">stdio.c:819</a></div></div>
 <div class="ttc" id="astdio_8c_html_a5a6cc54b757ba2573c1a1fdc55d8d456"><div class="ttname"><a href="stdio_8c.html#a5a6cc54b757ba2573c1a1fdc55d8d456">__isoc99_vsscanf</a></div><div class="ttdeci">int __isoc99_vsscanf(const char *restrict s, const char *restrict format, va_list arg)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01300">stdio.c:1300</a></div></div>
+<div class="ttc" id="astdio_8c_html_a5d7b4614fd21a3faeeb556598b000aa2"><div class="ttname"><a href="stdio_8c.html#a5d7b4614fd21a3faeeb556598b000aa2">__builtin___vsnprintf_chk</a></div><div class="ttdeci">int __builtin___vsnprintf_chk(char *str, size_t size, int flag, size_t bufsize, const char *fmt, va_list ap)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01723">stdio.c:1723</a></div></div>
 <div class="ttc" id="astdio_8c_html_a5e25775bd8597f839a28125b616bd241"><div class="ttname"><a href="stdio_8c.html#a5e25775bd8597f839a28125b616bd241">fseek</a></div><div class="ttdeci">int fseek(FILE *stream, long offset, int whence)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00789">stdio.c:789</a></div></div>
 <div class="ttc" id="astdio_8c_html_a6159fc790f132e169f40e00b5e9053c6"><div class="ttname"><a href="stdio_8c.html#a6159fc790f132e169f40e00b5e9053c6">__VERIFIER_nondet_char</a></div><div class="ttdeci">char __VERIFIER_nondet_char(void)</div></div>
+<div class="ttc" id="astdio_8c_html_a61f1e8102ded95d7e691484db1320c66"><div class="ttname"><a href="stdio_8c.html#a61f1e8102ded95d7e691484db1320c66">__builtin___snprintf_chk</a></div><div class="ttdeci">int __builtin___snprintf_chk(char *str, size_t size, int flag, size_t bufsize, const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l01652">stdio.c:1652</a></div></div>
 <div class="ttc" id="astdio_8c_html_a68236e664c1f0da049b25fba1c1695f6"><div class="ttname"><a href="stdio_8c.html#a68236e664c1f0da049b25fba1c1695f6">fputs</a></div><div class="ttdeci">int fputs(const char *s, FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00571">stdio.c:571</a></div></div>
 <div class="ttc" id="astdio_8c_html_a6d475ead5d1f35e3f14423a99ef3a992"><div class="ttname"><a href="stdio_8c.html#a6d475ead5d1f35e3f14423a99ef3a992">getw</a></div><div class="ttdeci">int getw(FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00755">stdio.c:755</a></div></div>
 <div class="ttc" id="astdio_8c_html_a76370407f9ab0402564c2bb9bc9664e0"><div class="ttname"><a href="stdio_8c.html#a76370407f9ab0402564c2bb9bc9664e0">fclose</a></div><div class="ttdeci">int fclose(FILE *stream)</div><div class="ttdef"><b>Definition:</b> <a href="stdio_8c_source.html#l00190">stdio.c:190</a></div></div>

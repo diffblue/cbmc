@@ -3,6 +3,8 @@ var stdio_8c =
     [ "__CPROVER_STDARG_H_INCLUDED", "stdio_8c.html#a02659164b04453533e9b855e2d2783f0", null ],
     [ "__CPROVER_STDIO_H_INCLUDED", "stdio_8c.html#af17b9da009da2ac77559d406cc9b2662", null ],
     [ "__CPROVER_STDLIB_H_INCLUDED", "stdio_8c.html#a174ac0f9c9df3af3e5480cbc69b53da8", null ],
+    [ "__builtin___snprintf_chk", "stdio_8c.html#a61f1e8102ded95d7e691484db1320c66", null ],
+    [ "__builtin___vsnprintf_chk", "stdio_8c.html#a5d7b4614fd21a3faeeb556598b000aa2", null ],
     [ "__fgets_chk", "stdio_8c.html#a853aa0ac185a706df6254b361d73f7b5", null ],
     [ "__fprintf_chk", "stdio_8c.html#a40a6235df7bbfdaac9304d5af6224380", null ],
     [ "__fread_chk", "stdio_8c.html#ac2b5fc16a1bd3b3cdc398791d06f5de6", null ],
@@ -48,10 +50,12 @@ var stdio_8c =
     [ "puts", "stdio_8c.html#ad41876f99f190c7488e64ef39c50a23f", null ],
     [ "rewind", "stdio_8c.html#aa0cd401f198d33d9d01a9e8aa4026819", null ],
     [ "scanf", "stdio_8c.html#a31dcd2b8e350dda1d7ca48211172a313", null ],
+    [ "snprintf", "stdio_8c.html#a37c1e8ce8a2b411fa666dc33972a2cec", null ],
     [ "sscanf", "stdio_8c.html#a43e2eb12f1a4a1186ac1cee67b2435ad", null ],
     [ "vasprintf", "stdio_8c.html#a1556f320cb3c2d5c80a0b725531ee3eb", null ],
     [ "vfprintf", "stdio_8c.html#aeb8790f343e7436fb6eddde04ee159e8", null ],
     [ "vfscanf", "stdio_8c.html#a52c12276b96a6a328ccef5c7c9103b3f", null ],
     [ "vscanf", "stdio_8c.html#a07f3c5b239f8f75401f1894d01d77223", null ],
+    [ "vsnprintf", "stdio_8c.html#a154043ea6d83b8616f3148fbf4f24244", null ],
     [ "vsscanf", "stdio_8c.html#a56bcf1806861f553567d6dc8e7ea7095", null ]
 ];
