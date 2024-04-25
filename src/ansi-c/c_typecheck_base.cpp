@@ -375,7 +375,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     if(final_old.id()!=ID_code)
     {
       error().source_location=new_symbol.location;
-      error() << "error: function symbol '" << new_symbol.display_name()
+      error() << "function symbol '" << new_symbol.display_name()
               << "' redefined with a different type:\n"
               << "Original: " << to_string(old_symbol.type) << "\n"
               << "     New: " << to_string(new_symbol.type) << eom;
@@ -679,9 +679,8 @@ void c_typecheck_baset::apply_asm_label(
       if(asm_label_map[orig_name]!=asm_label)
       {
         error().source_location=symbol.location;
-        error() << "error: replacing asm renaming "
-                << asm_label_map[orig_name] << " by "
-                << asm_label << eom;
+        error() << "replacing asm renaming " << asm_label_map[orig_name]
+                << " by " << asm_label << eom;
         throw 0;
       }
     }
