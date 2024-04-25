@@ -147,48 +147,53 @@ $(document).ready(function(){initNavTree('gcc__message__handler_8cpp_source.html
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        out &lt;&lt; column &lt;&lt; <span class="stringliteral">&quot;: &quot;</span>;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="keywordflow">if</span>(level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3ad4f6e1454acb3003dff72b96b4767f41">messaget::M_ERROR</a>)</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        out &lt;&lt; <a class="code" href="classgcc__message__handlert.html#a66a74d5efeeaa55b8c19c62a2f6d3d22">string</a>(<a class="code" href="classmessaget.html#ad8d8fcfdafc01bd9cb7aa8a5eb045c11">messaget::red</a>) &lt;&lt; <span class="stringliteral">&quot;error: &quot;</span>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3adb85055ae3ea2266c17f467c2498c60f">messaget::M_WARNING</a>)</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        out &lt;&lt; <a class="code" href="classgcc__message__handlert.html#a66a74d5efeeaa55b8c19c62a2f6d3d22">string</a>(<a class="code" href="classmessaget.html#a0ebe66fe3938f17d4b4bcfdc5f873230">messaget::bright_magenta</a>) &lt;&lt; <span class="stringliteral">&quot;warning: &quot;</span>;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      out &lt;&lt; <a class="code" href="classgcc__message__handlert.html#a66a74d5efeeaa55b8c19c62a2f6d3d22">string</a>(<a class="code" href="classmessaget.html#a3ab4781c71ad6641fddc140376a667ab">messaget::reset</a>);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    }</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    out &lt;&lt; message &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> file_name = location.<a class="code" href="classsource__locationt.html#afbd0ca82c26310c4ef63d7c0c1c00843">full_path</a>();</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">if</span>(file_name.has_value() &amp;&amp; !line.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    {</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      std::ifstream in(<a class="code" href="unicode_8h.html#a54a797d3af974232b7a83cc83845156e">widen_if_needed</a>(file_name.value()));</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <span class="keywordflow">if</span>(in)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> line_number = std::stoull(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(line));</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        std::string source_line;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordflow">for</span>(std::size_t l = 0; l &lt; line_number; l++)</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;          std::getline(in, source_line);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keywordflow">if</span>(in)</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;          out &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; source_line &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>; <span class="comment">// gcc adds a space, clang doesn&#39;t</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      }</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    out &lt;&lt; std::flush;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  }</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3ad4f6e1454acb3003dff72b96b4767f41">messaget::M_ERROR</a> ||</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        (level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3adb85055ae3ea2266c17f467c2498c60f">messaget::M_WARNING</a> &amp;&amp; <a class="code" href="classgcc__message__handlert.html#aa6e09ac12b95c3cbb76a14a7145f8bb4">warnings_are_errors</a>))</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        out &lt;&lt; <a class="code" href="classgcc__message__handlert.html#a66a74d5efeeaa55b8c19c62a2f6d3d22">string</a>(<a class="code" href="classmessaget.html#ad8d8fcfdafc01bd9cb7aa8a5eb045c11">messaget::red</a>) &lt;&lt; <span class="stringliteral">&quot;error: &quot;</span>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      }</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3adb85055ae3ea2266c17f467c2498c60f">messaget::M_WARNING</a>)</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        out &lt;&lt; <a class="code" href="classgcc__message__handlert.html#a66a74d5efeeaa55b8c19c62a2f6d3d22">string</a>(<a class="code" href="classmessaget.html#a0ebe66fe3938f17d4b4bcfdc5f873230">messaget::bright_magenta</a>) &lt;&lt; <span class="stringliteral">&quot;warning: &quot;</span>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      out &lt;&lt; <a class="code" href="classgcc__message__handlert.html#a66a74d5efeeaa55b8c19c62a2f6d3d22">string</a>(<a class="code" href="classmessaget.html#a3ab4781c71ad6641fddc140376a667ab">messaget::reset</a>);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    out &lt;&lt; message &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> file_name = location.<a class="code" href="classsource__locationt.html#afbd0ca82c26310c4ef63d7c0c1c00843">full_path</a>();</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">if</span>(file_name.has_value() &amp;&amp; !line.<a class="code" href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">empty</a>())</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    {</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      std::ifstream in(<a class="code" href="unicode_8h.html#a54a797d3af974232b7a83cc83845156e">widen_if_needed</a>(file_name.value()));</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <span class="keywordflow">if</span>(in)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> line_number = std::stoull(<a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(line));</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        std::string source_line;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">for</span>(std::size_t l = 0; l &lt; line_number; l++)</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;          std::getline(in, source_line);</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">if</span>(in)</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;          out &lt;&lt; <span class="charliteral">&#39; &#39;</span> &lt;&lt; source_line &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>; <span class="comment">// gcc adds a space, clang doesn&#39;t</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    }</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="classgcc__message__handlert.html#ad41fa535c9dd6e6f3ae6aece30ebe85d">   87</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgcc__message__handlert.html#ad70a7981ffa8d03c3c45c84e72036a89">gcc_message_handlert::print</a>(<span class="keywordtype">unsigned</span> level, <span class="keyword">const</span> std::string &amp;message)</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;{</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <a class="code" href="classmessage__handlert.html#a5cfda5b7399a3c6d3fcce5b9058852ee">message_handlert::print</a>(level, message);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    out &lt;&lt; std::flush;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  }</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;}</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="comment">// gcc appears to send everything to cerr</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classmessage__handlert.html#aec66d57065471091dee72d4aed8f85e2">verbosity</a> &gt;= level)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    std::cerr &lt;&lt; message &lt;&lt; <span class="charliteral">&#39;\n&#39;</span> &lt;&lt; std::flush;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="classgcc__message__handlert.html#ad41fa535c9dd6e6f3ae6aece30ebe85d">   91</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgcc__message__handlert.html#ad70a7981ffa8d03c3c45c84e72036a89">gcc_message_handlert::print</a>(<span class="keywordtype">unsigned</span> level, <span class="keyword">const</span> std::string &amp;message)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;{</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <a class="code" href="classmessage__handlert.html#a5cfda5b7399a3c6d3fcce5b9058852ee">message_handlert::print</a>(level, message);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  <span class="comment">// gcc appears to send everything to cerr</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classmessage__handlert.html#aec66d57065471091dee72d4aed8f85e2">verbosity</a> &gt;= level)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    std::cerr &lt;&lt; message &lt;&lt; <span class="charliteral">&#39;\n&#39;</span> &lt;&lt; std::flush;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00037">dstring.h:38</a></div></div>
 <div class="ttc" id="aclassdstringt_html_a35856c8b02e5d3c87e3ce014c54354f4"><div class="ttname"><a href="classdstringt.html#a35856c8b02e5d3c87e3ce014c54354f4">dstringt::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00089">dstring.h:89</a></div></div>
-<div class="ttc" id="aclassgcc__message__handlert_html_a66a74d5efeeaa55b8c19c62a2f6d3d22"><div class="ttname"><a href="classgcc__message__handlert.html#a66a74d5efeeaa55b8c19c62a2f6d3d22">gcc_message_handlert::string</a></div><div class="ttdeci">std::string string(const messaget::commandt &amp;c) const</div><div class="ttdoc">feed a command into a string</div><div class="ttdef"><b>Definition:</b> <a href="gcc__message__handler_8h_source.html#l00035">gcc_message_handler.h:35</a></div></div>
+<div class="ttc" id="aclassgcc__message__handlert_html_a66a74d5efeeaa55b8c19c62a2f6d3d22"><div class="ttname"><a href="classgcc__message__handlert.html#a66a74d5efeeaa55b8c19c62a2f6d3d22">gcc_message_handlert::string</a></div><div class="ttdeci">std::string string(const messaget::commandt &amp;c) const</div><div class="ttdoc">feed a command into a string</div><div class="ttdef"><b>Definition:</b> <a href="gcc__message__handler_8h_source.html#l00045">gcc_message_handler.h:45</a></div></div>
+<div class="ttc" id="aclassgcc__message__handlert_html_aa6e09ac12b95c3cbb76a14a7145f8bb4"><div class="ttname"><a href="classgcc__message__handlert.html#aa6e09ac12b95c3cbb76a14a7145f8bb4">gcc_message_handlert::warnings_are_errors</a></div><div class="ttdeci">bool warnings_are_errors</div><div class="ttdef"><b>Definition:</b> <a href="gcc__message__handler_8h_source.html#l00042">gcc_message_handler.h:42</a></div></div>
 <div class="ttc" id="aclassgcc__message__handlert_html_ad70a7981ffa8d03c3c45c84e72036a89"><div class="ttname"><a href="classgcc__message__handlert.html#ad70a7981ffa8d03c3c45c84e72036a89">gcc_message_handlert::print</a></div><div class="ttdeci">void print(unsigned, const xmlt &amp;) override</div><div class="ttdef"><b>Definition:</b> <a href="gcc__message__handler_8h_source.html#l00017">gcc_message_handler.h:17</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html_a5cfda5b7399a3c6d3fcce5b9058852ee"><div class="ttname"><a href="classmessage__handlert.html#a5cfda5b7399a3c6d3fcce5b9058852ee">message_handlert::print</a></div><div class="ttdeci">virtual void print(unsigned level, const std::string &amp;message)=0</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8cpp_source.html#l00060">message.cpp:60</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html_aec66d57065471091dee72d4aed8f85e2"><div class="ttname"><a href="classmessage__handlert.html#aec66d57065471091dee72d4aed8f85e2">message_handlert::verbosity</a></div><div class="ttdeci">unsigned verbosity</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2message_8h_source.html#l00072">message.h:72</a></div></div>

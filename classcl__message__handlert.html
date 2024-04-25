@@ -90,6 +90,7 @@ $(document).ready(function(){initNavTree('classcl__message__handlert.html',''); 
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classcl__message__handlert-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">cl_message_handlert Class Reference</div>  </div>
@@ -122,6 +123,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a966078d7067e85072044954493630ddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad78f1b27e7c53e692d80d4d962034e09"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcl__message__handlert.html#ad78f1b27e7c53e692d80d4d962034e09">print</a> (unsigned level, const std::string &amp;message, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location) override</td></tr>
 <tr class="separator:ad78f1b27e7c53e692d80d4d962034e09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7f4f5b6b55bbe1a38ea7added528afd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcl__message__handlert.html#ab7f4f5b6b55bbe1a38ea7added528afd">print_warnings_as_errors</a> (bool yes)</td></tr>
+<tr class="memdesc:ab7f4f5b6b55bbe1a38ea7added528afd"><td class="mdescLeft">&#160;</td><td class="mdescRight">With <code>yes</code> set to <code>true</code>, prefix warnings with an error message.  <a href="classcl__message__handlert.html#ab7f4f5b6b55bbe1a38ea7added528afd">More...</a><br /></td></tr>
+<tr class="separator:ab7f4f5b6b55bbe1a38ea7added528afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2d2e44d8c2d1636ce20fdb685f82e71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcl__message__handlert.html#ae2d2e44d8c2d1636ce20fdb685f82e71">print</a> (unsigned, const <a class="el" href="classxmlt.html">xmlt</a> &amp;) override</td></tr>
 <tr class="separator:ae2d2e44d8c2d1636ce20fdb685f82e71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f1c639e92271251deb0860f8eefec19"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcl__message__handlert.html#a3f1c639e92271251deb0860f8eefec19">print</a> (unsigned, const <a class="el" href="classjsont.html">jsont</a> &amp;) override</td></tr>
@@ -157,6 +161,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:adcfadd749647c670c1c723d946ecfc6c inherit pub_methods_classmessage__handlert"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4aef5d31c95455740d9d3270f89f045 inherit pub_methods_classmessage__handlert"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmessage__handlert.html#ac4aef5d31c95455740d9d3270f89f045">get_message_count</a> (unsigned level) const</td></tr>
 <tr class="separator:ac4aef5d31c95455740d9d3270f89f045 inherit pub_methods_classmessage__handlert"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:ab00a756cb89236b23dad59b0859a940b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcl__message__handlert.html#ab00a756cb89236b23dad59b0859a940b">warnings_are_errors</a> = false</td></tr>
+<tr class="separator:ab00a756cb89236b23dad59b0859a940b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -374,6 +383,67 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="cout__message_8h_source.html#l00032">32</a> of file <a class="el" href="cout__message_8h_source.html">cout_message.h</a>.</p>
+
+</div>
+</div>
+<a id="ab7f4f5b6b55bbe1a38ea7added528afd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7f4f5b6b55bbe1a38ea7added528afd">&#9670;&nbsp;</a></span>print_warnings_as_errors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void cl_message_handlert::print_warnings_as_errors </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>yes</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>With <code>yes</code> set to <code>true</code>, prefix warnings with an error message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">yes</td><td>Whether or not to prefix warnings. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="cl__message__handler_8h_source.html#l00035">35</a> of file <a class="el" href="cl__message__handler_8h_source.html">cl_message_handler.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ab00a756cb89236b23dad59b0859a940b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab00a756cb89236b23dad59b0859a940b">&#9670;&nbsp;</a></span>warnings_are_errors</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool cl_message_handlert::warnings_are_errors = false</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="cl__message__handler_8h_source.html#l00041">41</a> of file <a class="el" href="cl__message__handler_8h_source.html">cl_message_handler.h</a>.</p>
 
 </div>
 </div>

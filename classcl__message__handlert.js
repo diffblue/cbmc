@@ -5,5 +5,7 @@ var classcl__message__handlert =
     [ "print", "classcl__message__handlert.html#a966078d7067e85072044954493630ddd", null ],
     [ "print", "classcl__message__handlert.html#a3f1c639e92271251deb0860f8eefec19", null ],
     [ "print", "classcl__message__handlert.html#ad95258bb08c21ca4195c2f878372a1d9", null ],
-    [ "print", "classcl__message__handlert.html#ae2d2e44d8c2d1636ce20fdb685f82e71", null ]
+    [ "print", "classcl__message__handlert.html#ae2d2e44d8c2d1636ce20fdb685f82e71", null ],
+    [ "print_warnings_as_errors", "classcl__message__handlert.html#ab7f4f5b6b55bbe1a38ea7added528afd", null ],
+    [ "warnings_are_errors", "classcl__message__handlert.html#ab00a756cb89236b23dad59b0859a940b", null ]
 ];

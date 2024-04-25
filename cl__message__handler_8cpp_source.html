@@ -119,41 +119,45 @@ $(document).ready(function(){initNavTree('cl__message__handler_8cpp_source.html'
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  std::ostringstream formatted_message;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> file = location.<a class="code" href="classsource__locationt.html#a9c2d2a4d8fd9c1e251358b00a679f4d3">get_file</a>();</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">const</span> std::string &amp;line = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(location.<a class="code" href="classsource__locationt.html#a987df633b7ca12198ad1201c474a406e">get_line</a>());</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  formatted_message &lt;&lt; file &lt;&lt; <span class="charliteral">&#39;(&#39;</span> &lt;&lt; line &lt;&lt; <span class="stringliteral">&quot;): &quot;</span>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keywordflow">if</span>(level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3ad4f6e1454acb3003dff72b96b4767f41">messaget::M_ERROR</a>)</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    formatted_message &lt;&lt; <span class="stringliteral">&quot;error: &quot;</span>;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3adb85055ae3ea2266c17f467c2498c60f">messaget::M_WARNING</a>)</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    formatted_message &lt;&lt; <span class="stringliteral">&quot;warning: &quot;</span>;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  formatted_message &lt;&lt; message;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> full_path = location.<a class="code" href="classsource__locationt.html#afbd0ca82c26310c4ef63d7c0c1c00843">full_path</a>();</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">if</span>(full_path.has_value() &amp;&amp; !line.empty())</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  {</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    std::ifstream in(<a class="code" href="unicode_8h.html#a54a797d3af974232b7a83cc83845156e">widen_if_needed</a>(full_path.value()));</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">if</span>(in)</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    {</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> line_number = std::stoull(line);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      std::string source_line;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordflow">for</span>(std::size_t l = 0; l &lt; line_number; l++)</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        std::getline(in, source_line);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      <span class="keywordflow">if</span>(in)</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        formatted_message &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        formatted_message &lt;&lt; file &lt;&lt; <span class="charliteral">&#39;(&#39;</span> &lt;&lt; line &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; source_line;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <a class="code" href="classconsole__message__handlert.html#ae2d2e44d8c2d1636ce20fdb685f82e71">console_message_handlert::print</a>(level, formatted_message.str());</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordflow">if</span>(level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3adb85055ae3ea2266c17f467c2498c60f">messaget::M_WARNING</a> &amp;&amp; <a class="code" href="classcl__message__handlert.html#ab00a756cb89236b23dad59b0859a940b">warnings_are_errors</a>)</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    formatted_message &lt;&lt; <span class="stringliteral">&quot;error: warning treated as error\n&quot;</span>;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> file = location.<a class="code" href="classsource__locationt.html#a9c2d2a4d8fd9c1e251358b00a679f4d3">get_file</a>();</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keyword">const</span> std::string &amp;line = <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(location.<a class="code" href="classsource__locationt.html#a987df633b7ca12198ad1201c474a406e">get_line</a>());</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  formatted_message &lt;&lt; file &lt;&lt; <span class="charliteral">&#39;(&#39;</span> &lt;&lt; line &lt;&lt; <span class="stringliteral">&quot;): &quot;</span>;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">if</span>(level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3ad4f6e1454acb3003dff72b96b4767f41">messaget::M_ERROR</a>)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    formatted_message &lt;&lt; <span class="stringliteral">&quot;error: &quot;</span>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(level == <a class="code" href="classmessaget.html#aafd48890242d69e048f60af604a72bd3adb85055ae3ea2266c17f467c2498c60f">messaget::M_WARNING</a>)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    formatted_message &lt;&lt; <span class="stringliteral">&quot;warning: &quot;</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  formatted_message &lt;&lt; message;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> full_path = location.<a class="code" href="classsource__locationt.html#afbd0ca82c26310c4ef63d7c0c1c00843">full_path</a>();</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">if</span>(full_path.has_value() &amp;&amp; !line.empty())</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  {</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    std::ifstream in(<a class="code" href="unicode_8h.html#a54a797d3af974232b7a83cc83845156e">widen_if_needed</a>(full_path.value()));</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">if</span>(in)</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> line_number = std::stoull(line);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      std::string source_line;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      <span class="keywordflow">for</span>(std::size_t l = 0; l &lt; line_number; l++)</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        std::getline(in, source_line);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      <span class="keywordflow">if</span>(in)</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        formatted_message &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        formatted_message &lt;&lt; file &lt;&lt; <span class="charliteral">&#39;(&#39;</span> &lt;&lt; line &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; source_line;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      }</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  }</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <a class="code" href="classconsole__message__handlert.html#ae2d2e44d8c2d1636ce20fdb685f82e71">console_message_handlert::print</a>(level, formatted_message.str());</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
 <div class="ttc" id="acl__message__handler_8h_html"><div class="ttname"><a href="cl__message__handler_8h.html">cl_message_handler.h</a></div></div>
+<div class="ttc" id="aclasscl__message__handlert_html_ab00a756cb89236b23dad59b0859a940b"><div class="ttname"><a href="classcl__message__handlert.html#ab00a756cb89236b23dad59b0859a940b">cl_message_handlert::warnings_are_errors</a></div><div class="ttdeci">bool warnings_are_errors</div><div class="ttdef"><b>Definition:</b> <a href="cl__message__handler_8h_source.html#l00041">cl_message_handler.h:41</a></div></div>
 <div class="ttc" id="aclasscl__message__handlert_html_ae2d2e44d8c2d1636ce20fdb685f82e71"><div class="ttname"><a href="classcl__message__handlert.html#ae2d2e44d8c2d1636ce20fdb685f82e71">cl_message_handlert::print</a></div><div class="ttdeci">void print(unsigned, const xmlt &amp;) override</div><div class="ttdef"><b>Definition:</b> <a href="cout__message_8h_source.html#l00032">cout_message.h:32</a></div></div>
 <div class="ttc" id="aclassconsole__message__handlert_html_ae2d2e44d8c2d1636ce20fdb685f82e71"><div class="ttname"><a href="classconsole__message__handlert.html#ae2d2e44d8c2d1636ce20fdb685f82e71">console_message_handlert::print</a></div><div class="ttdeci">void print(unsigned, const xmlt &amp;) override</div><div class="ttdef"><b>Definition:</b> <a href="cout__message_8h_source.html#l00032">cout_message.h:32</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00037">dstring.h:38</a></div></div>
