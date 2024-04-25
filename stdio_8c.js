@@ -19,6 +19,7 @@ var stdio_8c =
     [ "__VERIFIER_nondet_long", "stdio_8c.html#afdcc836c0043b83bdf4f5fa3005fc649", null ],
     [ "__VERIFIER_nondet_size_t", "stdio_8c.html#a9c5469087c464731b40e587f079e4f16", null ],
     [ "__vfprintf_chk", "stdio_8c.html#aaf28903b3dd861533359483083bb1699", null ],
+    [ "asprintf", "stdio_8c.html#a4415d3b9a3d58a79ec7df1500c6a6449", null ],
     [ "fclose", "stdio_8c.html#a76370407f9ab0402564c2bb9bc9664e0", null ],
     [ "fclose_cleanup", "stdio_8c.html#a141a39dcb287be8d93320e2e1247a721", null ],
     [ "fdopen", "stdio_8c.html#a44c4efdc467f2672636145f559aa0556", null ],
