@@ -1606,6 +1606,154 @@ int vasprintf(char **ptr, const char *fmt, va_list ap)
   return i;
 }
 
+/* FUNCTION: snprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+#undef snprintf
+
+int snprintf(char *str, size_t size, const char *fmt, ...)
+{
+  va_list list;
+  va_start(list, fmt);
+  int result = vsnprintf(str, size, fmt, list);
+  va_end(list);
+  return result;
+}
+
+/* FUNCTION: __builtin___snprintf_chk */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __builtin___vsnprintf_chk(
+  char *str,
+  size_t size,
+  int flag,
+  size_t bufsize,
+  const char *fmt,
+  va_list ap);
+
+int __builtin___snprintf_chk(
+  char *str,
+  size_t size,
+  int flag,
+  size_t bufsize,
+  const char *fmt,
+  ...)
+{
+  va_list list;
+  va_start(list, fmt);
+  int result = __builtin___vsnprintf_chk(str, size, flag, bufsize, fmt, list);
+  va_end(list);
+  return result;
+}
+
+/* FUNCTION: vsnprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+#undef vsnprintf
+
+char __VERIFIER_nondet_char(void);
+
+int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
+{
+  (void)*fmt;
+
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&ap) <
+        __CPROVER_OBJECT_SIZE(ap))
+
+  {
+    (void)va_arg(ap, int);
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap),
+      "vsnprintf object overlap");
+  }
+
+  size_t i = 0;
+  for(; i < size; ++i)
+  {
+    char c = __VERIFIER_nondet_char();
+    str[i] = c;
+    if(c == '\0')
+      break;
+  }
+
+  return i;
+}
+
+/* FUNCTION: __builtin___vsnprintf_chk */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+char __VERIFIER_nondet_char(void);
+
+int __builtin___vsnprintf_chk(
+  char *str,
+  size_t size,
+  int flag,
+  size_t bufsize,
+  const char *fmt,
+  va_list ap)
+{
+  (void)flag;
+  (void)bufsize;
+  (void)*fmt;
+
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&ap) <
+        __CPROVER_OBJECT_SIZE(ap))
+
+  {
+    (void)va_arg(ap, int);
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap),
+      "vsnprintf object overlap");
+  }
+
+  size_t i = 0;
+  for(; i < size; ++i)
+  {
+    char c = __VERIFIER_nondet_char();
+    str[i] = c;
+    if(c == '\0')
+      break;
+  }
+
+  return i;
+}
+
 /* FUNCTION: __acrt_iob_func */
 
 #ifdef _WIN32
@@ -1663,6 +1811,49 @@ int __stdio_common_vfprintf(
   if(stream == __acrt_iob_func(1))
     __CPROVER_printf(format, args);
   return 0;
+}
+
+#endif
+
+/* FUNCTION: __stdio_common_vsprintf */
+
+#ifdef _WIN32
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_STDARG_H_INCLUDED
+#    include <stdarg.h>
+#    define __CPROVER_STDARG_H_INCLUDED
+#  endif
+
+char __VERIFIER_nondet_char(void);
+
+int __stdio_common_vsprintf(
+  unsigned __int64 options,
+  char *str,
+  size_t size,
+  char const *fmt,
+  _locale_t locale,
+  va_list args)
+{
+  (void)options;
+  (void)*fmt;
+  (void)locale;
+  (void)args;
+
+  size_t i = 0;
+  for(; i < size; ++i)
+  {
+    char c = __VERIFIER_nondet_char();
+    str[i] = c;
+    if(c == '\0')
+      break;
+  }
+
+  return i;
 }
 
 #endif
