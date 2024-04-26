@@ -1560,6 +1560,55 @@ int asprintf(char **ptr, const char *fmt, ...)
   return result;
 }
 
+/* FUNCTION: dprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int dprintf(int fd, const char *restrict format, ...)
+{
+__CPROVER_HIDE:;
+  va_list list;
+  va_start(list, format);
+  int result = vdprintf(fd, format, list);
+  va_end(list);
+  return result;
+}
+
+/* FUNCTION: vdprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+
+int vdprintf(int fd, const char *restrict format, va_list arg)
+{
+__CPROVER_HIDE:;
+
+  int result = __VERIFIER_nondet_int();
+
+  (void)fd;
+  (void)*format;
+  (void)arg;
+
+  return result;
+}
+
 /* FUNCTION: vasprintf */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
