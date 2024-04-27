@@ -525,11 +525,11 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   }
 
   // We don't allow incomplete structs or unions as element type.
-  const typet &followed_subtype = follow(type.element_type());
-
   if(
-    (followed_subtype.id() == ID_struct || followed_subtype.id() == ID_union) &&
-    to_struct_union_type(followed_subtype).is_incomplete())
+    (type.element_type().id() == ID_struct_tag &&
+     follow_tag(to_struct_tag_type(type.element_type())).is_incomplete()) ||
+    (type.element_type().id() == ID_union_tag &&
+     follow_tag(to_union_tag_type(type.element_type())).is_incomplete()))
   {
     // ISO/IEC 9899 6.7.5.2
     throw errort().with_location(type.source_location())

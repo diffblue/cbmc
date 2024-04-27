@@ -26,11 +26,10 @@ static member_exprt make_member_expr(
     result.set(ID_C_lvalue, true);
 
   // todo: should to typedef chains properly
-  const typet &type=
-    ns.follow(struct_union.type());
-
+  const auto &tag_type = to_struct_or_union_tag_type(struct_union.type());
   if(
-    type.get_bool(ID_C_constant) || struct_union.type().get_bool(ID_C_constant))
+    ns.follow_tag(tag_type).get_bool(ID_C_constant) ||
+    struct_union.type().get_bool(ID_C_constant))
   {
     result.type().set(ID_C_constant, true);
   }
@@ -43,13 +42,9 @@ exprt get_component_rec(
   const irep_idt &component_name,
   const namespacet &ns)
 {
-  const struct_union_typet &struct_union_type=
-    to_struct_union_type(ns.follow(struct_union.type()));
+  const auto &tag_type = to_struct_or_union_tag_type(struct_union.type());
 
-  const struct_union_typet::componentst &components=
-    struct_union_type.components();
-
-  for(const auto &comp : components)
+  for(const auto &comp : ns.follow_tag(tag_type).components())
   {
     const typet &type = comp.type();
 
@@ -76,13 +71,9 @@ bool has_component_rec(
   const irep_idt &component_name,
   const namespacet &ns)
 {
-  const struct_union_typet &struct_union_type=
-    to_struct_union_type(ns.follow(type));
+  const auto &tag_type = to_struct_or_union_tag_type(type);
 
-  const struct_union_typet::componentst &components=
-    struct_union_type.components();
-
-  for(const auto &comp : components)
+  for(const auto &comp : ns.follow_tag(tag_type).components())
   {
     if(comp.get_name()==component_name)
     {
