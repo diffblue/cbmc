@@ -672,6 +672,35 @@ void configt::ansi_ct::set_arch_spec_sh4()
   }
 }
 
+void configt::ansi_ct::set_arch_spec_loongarch64()
+{
+  set_LP64();
+  endianness = endiannesst::IS_LITTLE_ENDIAN;
+  long_double_width = 16 * 8;
+  char_is_unsigned = false;
+  NULL_is_zero = true;
+
+  switch(mode)
+  {
+  case flavourt::GCC:
+    defines.push_back("__loongarch__");
+    break;
+
+  case flavourt::VISUAL_STUDIO:
+    UNREACHABLE; // not supported by Visual Studio
+    break;
+
+  case flavourt::CODEWARRIOR:
+  case flavourt::CLANG:
+  case flavourt::ARM:
+  case flavourt::ANSI:
+    break;
+
+  case flavourt::NONE:
+    UNREACHABLE;
+  }
+}
+
 configt::ansi_ct::c_standardt configt::ansi_ct::default_c_standard()
 {
 #if defined(__APPLE__)
@@ -756,6 +785,8 @@ void configt::set_arch(const irep_idt &arch)
     ansi_c.set_arch_spec_x86_64();
   else if(arch=="i386")
     ansi_c.set_arch_spec_i386();
+  else if(arch == "loongarch64")
+    ansi_c.set_arch_spec_loongarch64();
   else
   {
     // We run on something new and unknown.
@@ -1433,6 +1464,8 @@ irep_idt configt::this_architecture()
     this_arch = "hppa";
   #elif defined(__sh__)
     this_arch = "sh4";
+  #elif defined(__loongarch__)
+    this_arch = "loongarch64";
   #else
     // something new and unknown!
     this_arch = "unknown";
