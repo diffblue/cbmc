@@ -969,6 +969,32 @@ exprt c_typecheck_baset::do_initializer_list(
       result = *zero;
     }
   }
+  else if(type.id() == ID_complex)
+  {
+    // These may be initialized with an expression, an initializer list
+    // of size two, or an initializer list of size one.
+    if(value.operands().size() == 1)
+    {
+      return do_initializer_rec(
+        to_unary_expr(value).op(), type, force_constant);
+    }
+    else if(value.operands().size() == 2)
+    {
+      auto &complex_type = to_complex_type(type);
+      auto &subtype = complex_type.subtype();
+      auto real = do_initializer_rec(
+        to_binary_expr(value).op0(), subtype, force_constant);
+      auto imag = do_initializer_rec(
+        to_binary_expr(value).op1(), subtype, force_constant);
+      return complex_exprt(real, imag, complex_type)
+        .with_source_location(value.source_location());
+    }
+    else
+    {
+      throw errort().with_location(value.source_location())
+        << "too many initializers for '" << to_string(type) << "'";
+    }
+  }
   else
   {
     // The initializer for a scalar shall be a single expression,
