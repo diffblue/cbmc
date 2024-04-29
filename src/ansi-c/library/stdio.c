@@ -72,35 +72,12 @@ __CPROVER_HIDE:;
 
 void fclose_cleanup(void *stream);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+FILE *fopen64(const char *filename, const char *mode);
 
 FILE *fopen(const char *filename, const char *mode)
 {
-  __CPROVER_HIDE:;
-  (void)*filename;
-  (void)*mode;
-#ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_is_zero_string(filename), "fopen zero-termination of 1st argument");
-  __CPROVER_assert(__CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
-#endif
-
-  FILE *fopen_result;
-
-  __CPROVER_bool fopen_error=__VERIFIER_nondet___CPROVER_bool();
-
-#if !defined(__linux__) || defined(__GLIBC__)
-  fopen_result=fopen_error?NULL:malloc(sizeof(FILE));
-#else
-  // libraries need to expose the definition of FILE; this is the
-  // case for musl
-  fopen_result=fopen_error?NULL:malloc(sizeof(int));
-#endif
-
-#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-  __CPROVER_set_must(fopen_result, "open");
-  __CPROVER_cleanup(fopen_result, fclose_cleanup);
-#endif
-
-  return fopen_result;
+__CPROVER_HIDE:;
+  return fopen64(filename, mode);
 }
 
 /* FUNCTION: _fopen */
@@ -152,6 +129,54 @@ __CPROVER_HIDE:;
 }
 #endif
 
+/* FUNCTION: fopen64 */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#  include <stdlib.h>
+#  define __CPROVER_STDLIB_H_INCLUDED
+#endif
+
+void fclose_cleanup(void *stream);
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+
+FILE *fopen64(const char *filename, const char *mode)
+{
+__CPROVER_HIDE:;
+  (void)*filename;
+  (void)*mode;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(
+    __CPROVER_is_zero_string(filename),
+    "fopen zero-termination of 1st argument");
+  __CPROVER_assert(
+    __CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
+#endif
+
+  FILE *fopen_result;
+
+  __CPROVER_bool fopen_error = __VERIFIER_nondet___CPROVER_bool();
+
+#if !defined(__linux__) || defined(__GLIBC__)
+  fopen_result = fopen_error ? NULL : malloc(sizeof(FILE));
+#else
+  // libraries need to expose the definition of FILE; this is the
+  // case for musl
+  fopen_result = fopen_error ? NULL : malloc(sizeof(int));
+#endif
+
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_set_must(fopen_result, "open");
+  __CPROVER_cleanup(fopen_result, fclose_cleanup);
+#endif
+
+  return fopen_result;
+}
+
 /* FUNCTION: freopen */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
@@ -159,7 +184,22 @@ __CPROVER_HIDE:;
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
+FILE *freopen64(const char *filename, const char *mode, FILE *f);
+
 FILE *freopen(const char *filename, const char *mode, FILE *f)
+{
+__CPROVER_HIDE:;
+  return freopen64(filename, mode, f);
+}
+
+/* FUNCTION: freopen64 */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+FILE *freopen64(const char *filename, const char *mode, FILE *f)
 {
   __CPROVER_HIDE:;
   (void)*filename;
