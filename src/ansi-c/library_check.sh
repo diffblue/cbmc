@@ -63,6 +63,7 @@ perl -p -i -e 's/^__fprintf_chk\n//' __functions # fprintf-01/__fprintf_chk.desc
 perl -p -i -e 's/^__fread_chk\n//' __functions # fread-01/__fread_chk.desc
 perl -p -i -e 's/^__printf_chk\n//' __functions # printf-01/__printf_chk.desc
 perl -p -i -e 's/^__syslog_chk\n//' __functions # syslog-01/__syslog_chk.desc
+perl -p -i -e 's/^__time64\n//' __functions # time
 perl -p -i -e 's/^__vfprintf_chk\n//' __functions # vfprintf-01/__vfprintf_chk.desc
 
 # Some functions are covered by tests in other folders:
