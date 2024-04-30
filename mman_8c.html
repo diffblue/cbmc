@@ -122,6 +122,8 @@ Macros</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a8cb534abb228896759dded0be6ac4351"><td class="memItemLeft" align="right" valign="top">__CPROVER_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mman_8c.html#a8cb534abb228896759dded0be6ac4351">__VERIFIER_nondet___CPROVER_bool</a> (void)</td></tr>
 <tr class="separator:a8cb534abb228896759dded0be6ac4351"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7dca6b44eb7b7dc9c88e5284a2b10f3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mman_8c.html#ab7dca6b44eb7b7dc9c88e5284a2b10f3">mmap64</a> (void *, __CPROVER_size_t, int, int, int, off_t)</td></tr>
+<tr class="separator:ab7dca6b44eb7b7dc9c88e5284a2b10f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbc20b23ca29ad301fa83b3efc180de2"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mman_8c.html#afbc20b23ca29ad301fa83b3efc180de2">mmap</a> (void *addr, __CPROVER_size_t length, int prot, int flags, int fd, off_t offset)</td></tr>
 <tr class="separator:afbc20b23ca29ad301fa83b3efc180de2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac3eeed8c6ce6e16ec428cd43381e137"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mman_8c.html#aac3eeed8c6ce6e16ec428cd43381e137">_mmap</a> (void *addr, __CPROVER_size_t length, int prot, int flags, int fd, off_t offset)</td></tr>
@@ -265,7 +267,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00077">77</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00062">62</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
 
 </div>
 </div>
@@ -295,7 +297,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00124">124</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00145">145</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
 
 </div>
 </div>
@@ -349,7 +351,61 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00024">24</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00025">25</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
+
+</div>
+</div>
+<a id="ab7dca6b44eb7b7dc9c88e5284a2b10f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7dca6b44eb7b7dc9c88e5284a2b10f3">&#9670;&nbsp;</a></span>mmap64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * mmap64 </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>addr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">__CPROVER_size_t&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>prot</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">off_t&#160;</td>
+          <td class="paramname"><em>offset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00098">98</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
 
 </div>
 </div>
@@ -379,7 +435,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00111">111</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mman_8c_source.html#l00132">132</a> of file <a class="el" href="mman_8c_source.html">mman.c</a>.</p>
 
 </div>
 </div>
