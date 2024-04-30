@@ -31,10 +31,14 @@ perl -p -i -e 's/^__CPROVER_contracts_library\n//' __functions
 
 # Some functions are implicitly covered by running on different operating
 # systems:
+perl -p -i -e 's/^_creat\n//' __functions # creat, macOS
+perl -p -i -e 's/^_fcntl\n//' __functions # fcntl, macOS
 perl -p -i -e 's/^_fopen\n//' __functions # fopen, macOS
 perl -p -i -e 's/^_getopt\n//' __functions # getopt, macOS
 perl -p -i -e 's/^_mmap\n//' __functions # mmap, macOS
 perl -p -i -e 's/^_munmap\n//' __functions # mumap, macOS
+perl -p -i -e 's/^_open\n//' __functions # open, macOS
+perl -p -i -e 's/^_openat\n//' __functions # openat, macOS
 perl -p -i -e 's/^_pipe\n//' __functions # pipe, macOS
 perl -p -i -e 's/^_setjmp\n//' __functions # pipe, macOS
 perl -p -i -e 's/^_time(32|64)\n//' __functions # time, Windows
@@ -52,6 +56,8 @@ perl -p -i -e 's/^__srget\n//' __functions # gets, FreeBSD
 perl -p -i -e 's/^__swbuf\n//' __functions # putc, FreeBSD
 
 # Some functions are covered by existing tests:
+perl -p -i -e 's/^__CPROVER_(creat|fcntl|open|openat)\n//' __functions # creat, fcntl, open, openat
+perl -p -i -e 's/^(creat|fcntl|open|openat)64\n//' __functions # same as creat, fcntl, open, openat
 perl -p -i -e 's/^__CPROVER_deallocate\n//' __functions # free-01
 perl -p -i -e 's/^__builtin_alloca\n//' __functions # alloca-01
 perl -p -i -e 's/^fclose_cleanup\n//' __functions # fopen
