@@ -8,8 +8,23 @@
 #undef time
 
 time_t __VERIFIER_nondet_time_t(void);
+time_t __time64(time_t *);
 
 time_t time(time_t *tloc)
+{
+  return __time64(tloc);
+}
+
+/* FUNCTION: __time64 */
+
+#ifndef __CPROVER_TIME_H_INCLUDED
+#  include <time.h>
+#  define __CPROVER_TIME_H_INCLUDED
+#endif
+
+time_t __VERIFIER_nondet_time_t(void);
+
+time_t __time64(time_t *tloc)
 {
   time_t res=__VERIFIER_nondet_time_t();
   if(tloc)
