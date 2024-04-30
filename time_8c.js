@@ -1,6 +1,7 @@
 var time_8c =
 [
     [ "__CPROVER_TIME_H_INCLUDED", "time_8c.html#adebaf8632e9832a927e701626da8b2c2", null ],
+    [ "__time64", "time_8c.html#ac40082accb2b6bbee27214b71cf3e5e1", null ],
     [ "__VERIFIER_nondet_size_t", "time_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7", null ],
     [ "__VERIFIER_nondet_time_t", "time_8c.html#a1de3ee87d6aca904fcc300736bc4814f", null ],
     [ "_strftime", "time_8c.html#adb76906b468e8401a3c78d3e1b0d2fdb", null ],
