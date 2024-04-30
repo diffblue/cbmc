@@ -23,6 +23,8 @@ var classsource__locationt =
     [ "is_built_in", "classsource__locationt.html#acad1144ce8906af632e5d86916e91221", null ],
     [ "merge", "classsource__locationt.html#a009ab1a4a63a2b4a8acf53bbf8f1a45d", null ],
     [ "nil", "classsource__locationt.html#a43686475504702e9ea7989cf833464aa", null ],
+    [ "property_fatal", "classsource__locationt.html#a2cab444a0cc64b4d08d0fba0a8f23b5e", null ],
+    [ "property_fatal", "classsource__locationt.html#a1714197a4b229ef3666b713bd58a27e8", null ],
     [ "set_basic_block_source_lines", "classsource__locationt.html#a2ed7df360532053990b3bfe8cf24386d", null ],
     [ "set_case_number", "classsource__locationt.html#a8050cf4d336ffe0c28cccdf74efd35e3", null ],
     [ "set_column", "classsource__locationt.html#a0ab8f3dbe30f278557972c875e900130", null ],

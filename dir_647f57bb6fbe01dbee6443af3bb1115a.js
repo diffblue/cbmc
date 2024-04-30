@@ -20,6 +20,8 @@ var dir_647f57bb6fbe01dbee6443af3bb1115a =
     [ "cover_goals_verifier_with_trace_storage.h", "cover__goals__verifier__with__trace__storage_8h.html", [
       [ "cover_goals_verifier_with_trace_storaget", "classcover__goals__verifier__with__trace__storaget.html", "classcover__goals__verifier__with__trace__storaget" ]
     ] ],
+    [ "fatal_assertions.cpp", "fatal__assertions_8cpp.html", "fatal__assertions_8cpp" ],
+    [ "fatal_assertions.h", "fatal__assertions_8h.html", "fatal__assertions_8h" ],
     [ "fault_localization_provider.h", "fault__localization__provider_8h.html", [
       [ "fault_location_infot", "structfault__location__infot.html", "structfault__location__infot" ],
       [ "fault_localization_providert", "classfault__localization__providert.html", "classfault__localization__providert" ]
