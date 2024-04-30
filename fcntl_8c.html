@@ -96,6 +96,7 @@ $(document).ready(function(){initNavTree('fcntl_8c.html',''); initResizable(); }
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;fcntl.h&gt;</code><br />
+<code>#include &lt;errno.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for fcntl.c:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -111,15 +112,65 @@ $(document).ready(function(){initNavTree('fcntl_8c.html',''); initResizable(); }
 Macros</h2></td></tr>
 <tr class="memitem:a04f97db4bba488068a620afdbb452e51"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a04f97db4bba488068a620afdbb452e51">__CPROVER_FCNTL_H_INCLUDED</a></td></tr>
 <tr class="separator:a04f97db4bba488068a620afdbb452e51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40c164fa2b2bf09a2ec154c97be511cc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a40c164fa2b2bf09a2ec154c97be511cc">__CPROVER_ERRNO_H_INCLUDED</a></td></tr>
+<tr class="separator:a40c164fa2b2bf09a2ec154c97be511cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91535c53b73a26e64792b1e6d5b4a030"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a91535c53b73a26e64792b1e6d5b4a030">MODE_T</a>&#160;&#160;&#160;mode_t</td></tr>
+<tr class="separator:a91535c53b73a26e64792b1e6d5b4a030"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a04daf060736c4b84b8132b745409c7cf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a> (void)</td></tr>
 <tr class="separator:a04daf060736c4b84b8132b745409c7cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad23b9ff1b55a47c771319b9c915dd220"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#ad23b9ff1b55a47c771319b9c915dd220">__CPROVER_fcntl</a> (int fd, int cmd)</td></tr>
+<tr class="separator:ad23b9ff1b55a47c771319b9c915dd220"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad39ebe4c4767eaa9a680777400cfaafe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#ad39ebe4c4767eaa9a680777400cfaafe">fcntl</a> (int fd, int cmd,...)</td></tr>
 <tr class="separator:ad39ebe4c4767eaa9a680777400cfaafe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7396d2845fde04b857dbf6ba5f89cb19"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a7396d2845fde04b857dbf6ba5f89cb19">_fcntl</a> (int fd, int cmd,...)</td></tr>
+<tr class="separator:a7396d2845fde04b857dbf6ba5f89cb19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a523ccf4dd9ae521d01b812d60292ad54"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a523ccf4dd9ae521d01b812d60292ad54">fcntl64</a> (int fd, int cmd,...)</td></tr>
+<tr class="separator:a523ccf4dd9ae521d01b812d60292ad54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad36a4f53a4c3d382ec3dc176bdeccb0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#aad36a4f53a4c3d382ec3dc176bdeccb0">__CPROVER_open</a> (const char *pathname, int flags)</td></tr>
+<tr class="separator:aad36a4f53a4c3d382ec3dc176bdeccb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a079d60801c18155ac2ec1707b56867fb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a079d60801c18155ac2ec1707b56867fb">open</a> (const char *pathname, int flags,...)</td></tr>
+<tr class="separator:a079d60801c18155ac2ec1707b56867fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a106069d47781bad599df89a86392dfce"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a106069d47781bad599df89a86392dfce">_open</a> (const char *pathname, int flags,...)</td></tr>
+<tr class="separator:a106069d47781bad599df89a86392dfce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45cc28e869dbfa141c2c678c6114fb9c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a45cc28e869dbfa141c2c678c6114fb9c">open64</a> (const char *pathname, int flags,...)</td></tr>
+<tr class="separator:a45cc28e869dbfa141c2c678c6114fb9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2df2b1c4f69b338de7cdbb4e7c48165b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a2df2b1c4f69b338de7cdbb4e7c48165b">__CPROVER_creat</a> (const char *pathname, mode_t mode)</td></tr>
+<tr class="separator:a2df2b1c4f69b338de7cdbb4e7c48165b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c7518235c1384debeb9e38b04623417"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a0c7518235c1384debeb9e38b04623417">creat</a> (const char *pathname, mode_t mode)</td></tr>
+<tr class="separator:a0c7518235c1384debeb9e38b04623417"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ee1cfa1f0caa2ab8868b0babaad0f58"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a2ee1cfa1f0caa2ab8868b0babaad0f58">_creat</a> (const char *pathname, mode_t mode)</td></tr>
+<tr class="separator:a2ee1cfa1f0caa2ab8868b0babaad0f58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaa3f45dca115a8df19c21b95ca9f65b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#aeaa3f45dca115a8df19c21b95ca9f65b">creat64</a> (const char *pathname, mode_t mode)</td></tr>
+<tr class="separator:aeaa3f45dca115a8df19c21b95ca9f65b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af819c6f53c180cc5b48265918008f41e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#af819c6f53c180cc5b48265918008f41e">__CPROVER_openat</a> (int dirfd, const char *pathname, int flags)</td></tr>
+<tr class="separator:af819c6f53c180cc5b48265918008f41e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17d44d955aa2afafbfd74e2537101109"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a17d44d955aa2afafbfd74e2537101109">openat</a> (int dirfd, const char *pathname, int flags,...)</td></tr>
+<tr class="separator:a17d44d955aa2afafbfd74e2537101109"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad43c10511d59f4df1b2d8ffcf1ce6957"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#ad43c10511d59f4df1b2d8ffcf1ce6957">_openat</a> (int dirfd, const char *pathname, int flags,...)</td></tr>
+<tr class="separator:ad43c10511d59f4df1b2d8ffcf1ce6957"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a353089eb64ec3d7e08d6a2b120772e4e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fcntl_8c.html#a353089eb64ec3d7e08d6a2b120772e4e">openat64</a> (int dirfd, const char *pathname, int flags,...)</td></tr>
+<tr class="separator:a353089eb64ec3d7e08d6a2b120772e4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a40c164fa2b2bf09a2ec154c97be511cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40c164fa2b2bf09a2ec154c97be511cc">&#9670;&nbsp;</a></span>__CPROVER_ERRNO_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define __CPROVER_ERRNO_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00010">10</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
 <a id="a04f97db4bba488068a620afdbb452e51"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a04f97db4bba488068a620afdbb452e51">&#9670;&nbsp;</a></span>__CPROVER_FCNTL_H_INCLUDED</h2>
 
@@ -136,7 +187,149 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a91535c53b73a26e64792b1e6d5b4a030"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91535c53b73a26e64792b1e6d5b4a030">&#9670;&nbsp;</a></span>MODE_T</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MODE_T&#160;&#160;&#160;mode_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00114">114</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a2df2b1c4f69b338de7cdbb4e7c48165b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2df2b1c4f69b338de7cdbb4e7c48165b">&#9670;&nbsp;</a></span>__CPROVER_creat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int __CPROVER_creat </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mode_t&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00120">120</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="ad23b9ff1b55a47c771319b9c915dd220"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad23b9ff1b55a47c771319b9c915dd220">&#9670;&nbsp;</a></span>__CPROVER_fcntl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int __CPROVER_fcntl </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>cmd</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00015">15</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="aad36a4f53a4c3d382ec3dc176bdeccb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad36a4f53a4c3d382ec3dc176bdeccb0">&#9670;&nbsp;</a></span>__CPROVER_open()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int __CPROVER_open </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00066">66</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="af819c6f53c180cc5b48265918008f41e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af819c6f53c180cc5b48265918008f41e">&#9670;&nbsp;</a></span>__CPROVER_openat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int __CPROVER_openat </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dirfd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00210">210</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
 <a id="a04daf060736c4b84b8132b745409c7cf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a04daf060736c4b84b8132b745409c7cf">&#9670;&nbsp;</a></span>__VERIFIER_nondet_int()</h2>
 
@@ -152,6 +345,210 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2ee1cfa1f0caa2ab8868b0babaad0f58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ee1cfa1f0caa2ab8868b0babaad0f58">&#9670;&nbsp;</a></span>_creat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int _creat </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mode_t&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00169">169</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="a7396d2845fde04b857dbf6ba5f89cb19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7396d2845fde04b857dbf6ba5f89cb19">&#9670;&nbsp;</a></span>_fcntl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int _fcntl </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>cmd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00043">43</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="a106069d47781bad599df89a86392dfce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a106069d47781bad599df89a86392dfce">&#9670;&nbsp;</a></span>_open()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int _open </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00089">89</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="ad43c10511d59f4df1b2d8ffcf1ce6957"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad43c10511d59f4df1b2d8ffcf1ce6957">&#9670;&nbsp;</a></span>_openat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int _openat </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dirfd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00240">240</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="a0c7518235c1384debeb9e38b04623417"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c7518235c1384debeb9e38b04623417">&#9670;&nbsp;</a></span>creat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int creat </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mode_t&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00147">147</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="aeaa3f45dca115a8df19c21b95ca9f65b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaa3f45dca115a8df19c21b95ca9f65b">&#9670;&nbsp;</a></span>creat64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int creat64 </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mode_t&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00191">191</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
 
 </div>
 </div>
@@ -187,7 +584,199 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00010">10</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00034">34</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="a523ccf4dd9ae521d01b812d60292ad54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a523ccf4dd9ae521d01b812d60292ad54">&#9670;&nbsp;</a></span>fcntl64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int fcntl64 </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>cmd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00052">52</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="a079d60801c18155ac2ec1707b56867fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a079d60801c18155ac2ec1707b56867fb">&#9670;&nbsp;</a></span>open()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int open </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00080">80</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="a45cc28e869dbfa141c2c678c6114fb9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45cc28e869dbfa141c2c678c6114fb9c">&#9670;&nbsp;</a></span>open64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int open64 </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00098">98</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="a17d44d955aa2afafbfd74e2537101109"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17d44d955aa2afafbfd74e2537101109">&#9670;&nbsp;</a></span>openat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int openat </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dirfd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00231">231</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
+
+</div>
+</div>
+<a id="a353089eb64ec3d7e08d6a2b120772e4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a353089eb64ec3d7e08d6a2b120772e4e">&#9670;&nbsp;</a></span>openat64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int openat64 </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dirfd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="fcntl_8c_source.html#l00249">249</a> of file <a class="el" href="fcntl_8c_source.html">fcntl.c</a>.</p>
 
 </div>
 </div>
