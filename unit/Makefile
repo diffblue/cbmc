@@ -49,7 +49,6 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/variable_sensitivity_domain/to_predicate.cpp \
        analyses/variable-sensitivity/variable_sensitivity_test_helpers.cpp \
        ansi-c/expr2c.cpp \
-       ansi-c/max_malloc_size.cpp \
        ansi-c/type2name.cpp \
        ansi-c/c_typecheck_base.cpp \
        big-int/big-int.cpp \
@@ -168,6 +167,7 @@ SRC += analyses/ai/ai.cpp \
        util/json_object.cpp \
        util/lazy.cpp \
        util/lower_byte_operators.cpp \
+       util/max_malloc_size.cpp \
        util/memory_info.cpp \
        util/message.cpp \
        util/optional_utils.cpp \

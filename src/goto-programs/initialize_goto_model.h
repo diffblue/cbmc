@@ -56,4 +56,8 @@ void set_up_custom_entry_point(
   bool try_mode_lookup,
   message_handlert &message_handler);
 
+/// Update the initial value of `__CPROVER_max_malloc_size` in case the number
+/// of object bits has changed.
+void update_max_malloc_size(goto_modelt &, message_handlert &);
+
 #endif // CPROVER_GOTO_PROGRAMS_INITIALIZE_GOTO_MODEL_H

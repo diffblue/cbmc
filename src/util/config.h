@@ -364,6 +364,7 @@ public:
 
   void set_object_bits_from_symbol_table(const symbol_table_baset &);
   std::string object_bits_info();
+  mp_integer max_malloc_size() const;
 
   static irep_idt this_architecture();
   static irep_idt this_operating_system();

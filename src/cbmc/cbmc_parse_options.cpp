@@ -808,6 +808,8 @@ int cbmc_parse_optionst::get_goto_program(
 
   goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
 
+  update_max_malloc_size(goto_model, ui_message_handler);
+
   if(cmdline.isset("show-symbol-table"))
   {
     show_symbol_table(goto_model, ui_message_handler);

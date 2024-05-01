@@ -124,34 +124,6 @@ static std::string architecture_string(T value, const char *s)
          std::string(s) + "=" + std::to_string(value) + ";\n";
 }
 
-/// The maximum allocation size is determined by the number of bits that
-/// are left in the pointer of width \p pointer_width.
-///
-/// The allocation size cannot exceed the number represented by the (signed)
-/// offset, otherwise it would not be possible to store a pointer into a
-/// valid bit of memory. Therefore, the max allocation size is
-/// 2^(offset_bits - 1), where the offset bits is the number of bits left in the
-/// pointer after the object bits.
-///
-/// The offset must be signed, as a pointer can point to the end of the memory
-/// block, and needs to be able to point back to the start.
-/// \param pointer_width: The width of the pointer
-/// \param object_bits : The number of bits used to represent the ID
-/// \return The size in bytes of the maximum allocation supported.
-static mp_integer
-max_malloc_size(std::size_t pointer_width, std::size_t object_bits)
-{
-  PRECONDITION(pointer_width >= 1);
-  PRECONDITION(object_bits < pointer_width);
-  PRECONDITION(object_bits >= 1);
-  const auto offset_bits = pointer_width - object_bits;
-  // We require the offset to be able to express upto allocation_size - 1,
-  // but also down to -allocation_size, therefore the size is allowable
-  // is number of bits, less the signed bit.
-  const auto bits_for_positive_offset = offset_bits - 1;
-  return ((mp_integer)1) << (mp_integer)bits_for_positive_offset;
-}
-
 void ansi_c_internal_additions(std::string &code, bool support_float16_type)
 {
   // clang-format off
@@ -175,9 +147,9 @@ void ansi_c_internal_additions(std::string &code, bool support_float16_type)
       CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);\n"
     "void " CPROVER_PREFIX "deallocate(void *);\n"
 
-    CPROVER_PREFIX "size_t " CPROVER_PREFIX "max_malloc_size="+
-    integer2string(max_malloc_size(config.ansi_c.pointer_width, config
-    .bv_encoding.object_bits));
+    CPROVER_PREFIX "thread_local " CPROVER_PREFIX "size_t "
+      CPROVER_PREFIX "max_malloc_size="+
+      integer2string(config.max_malloc_size());
   if(config.ansi_c.pointer_width==config.ansi_c.long_int_width)
     code += "UL;\n";
   else if(config.ansi_c.pointer_width==config.ansi_c.long_long_int_width)

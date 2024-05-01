@@ -1515,3 +1515,28 @@ irep_idt configt::this_operating_system()
 
   return this_os;
 }
+
+/// The maximum allocation size is determined by the number of bits that
+/// are left in the pointer of width `ansi_c.pointer_width`.
+///
+/// The allocation size cannot exceed the number represented by the (signed)
+/// offset, otherwise it would not be possible to store a pointer into a
+/// valid bit of memory. Therefore, the max allocation size is
+/// 2^(offset_bits - 1), where the offset bits is the number of bits left in the
+/// pointer after the object bits.
+///
+/// The offset must be signed, as a pointer can point to the end of the memory
+/// block, and needs to be able to point back to the start.
+/// \return The size in bytes of the maximum allocation supported.
+mp_integer configt::max_malloc_size() const
+{
+  PRECONDITION(ansi_c.pointer_width >= 1);
+  PRECONDITION(bv_encoding.object_bits < ansi_c.pointer_width);
+  PRECONDITION(bv_encoding.object_bits >= 1);
+  const auto offset_bits = ansi_c.pointer_width - bv_encoding.object_bits;
+  // We require the offset to be able to express upto allocation_size - 1,
+  // but also down to -allocation_size, therefore the size is allowable
+  // is number of bits, less the signed bit.
+  const auto bits_for_positive_offset = offset_bits - 1;
+  return ((mp_integer)1) << (mp_integer)bits_for_positive_offset;
+}
