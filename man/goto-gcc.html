@@ -52,10 +52,9 @@ static int bar();</code></pre>
 <dt><strong>--print-rejected-preprocessed-source</strong> <em>file</em></dt>
 <dd><p>Copy failing (preprocessed) source to <em>file</em>.</p>
 </dd>
-<dt><strong>--object-bits</strong> <em>N</em></dt>
-<dd><p>Configure the number of bits used for object numbering in CBMC's pointer encoding.</p>
-</dd>
 </dl>
+<h1>BACKWARD COMPATIBILITY</h1>
+<p><strong>goto-cc</strong> will warn and ignore the use of <strong>--object-bits</strong>, which previous versions processed. This option now instead needs to be passed to <strong>cbmc</strong>(1).</p>
 <h1>ENVIRONMENT</h1>
 <p>All tools honor the TMPDIR environment variable when generating temporary files and directories. <strong>goto-cc</strong> aims to accept all environment variables that <strong>gcc</strong>(1) does.</p>
 <h1>BUGS</h1>

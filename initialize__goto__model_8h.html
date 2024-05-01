@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('initialize__goto__model_8h.html',''); 
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="initialize__goto__model_8h__dep__incl.svg" width="2006" height="186"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="initialize__goto__model_8h__dep__incl.svg" width="2292" height="186"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -127,6 +127,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a49087c8d0e38099cdba0099eef5b940d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="initialize__goto__model_8h.html#a49087c8d0e38099cdba0099eef5b940d">set_up_custom_entry_point</a> (<a class="el" href="classlanguage__filest.html">language_filest</a> &amp;language_files, <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, const std::function&lt; std::size_t(const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)&gt; &amp;unload, const <a class="el" href="classoptionst.html">optionst</a> &amp;options, bool try_mode_lookup, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:a49087c8d0e38099cdba0099eef5b940d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the "function" option in <code>options</code> to prepare a custom entry point to replace <code>__CPROVER_start</code>.  <a href="initialize__goto__model_8h.html#a49087c8d0e38099cdba0099eef5b940d">More...</a><br /></td></tr>
 <tr class="separator:a49087c8d0e38099cdba0099eef5b940d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e662d2572d65f6864d9825be7473596"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="initialize__goto__model_8h.html#a7e662d2572d65f6864d9825be7473596">update_max_malloc_size</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)</td></tr>
+<tr class="memdesc:a7e662d2572d65f6864d9825be7473596"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the initial value of <code>__CPROVER_max_malloc_size</code> in case the number of object bits has changed.  <a href="initialize__goto__model_8h.html#a7e662d2572d65f6864d9825be7473596">More...</a><br /></td></tr>
+<tr class="separator:a7e662d2572d65f6864d9825be7473596"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Initialize a Goto Program. </p>
@@ -189,7 +192,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="initialize__goto__model_8cpp_source.html#l00060">60</a> of file <a class="el" href="initialize__goto__model_8cpp_source.html">initialize_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="initialize__goto__model_8cpp_source.html#l00063">63</a> of file <a class="el" href="initialize__goto__model_8cpp_source.html">initialize_goto_model.cpp</a>.</p>
 
 </div>
 </div>
@@ -225,7 +228,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="initialize__goto__model_8cpp_source.html#l00172">172</a> of file <a class="el" href="initialize__goto__model_8cpp_source.html">initialize_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="initialize__goto__model_8cpp_source.html#l00175">175</a> of file <a class="el" href="initialize__goto__model_8cpp_source.html">initialize_goto_model.cpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +295,39 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="initialize__goto__model_8cpp_source.html#l00111">111</a> of file <a class="el" href="initialize__goto__model_8cpp_source.html">initialize_goto_model.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="initialize__goto__model_8cpp_source.html#l00114">114</a> of file <a class="el" href="initialize__goto__model_8cpp_source.html">initialize_goto_model.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a7e662d2572d65f6864d9825be7473596"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e662d2572d65f6864d9825be7473596">&#9670;&nbsp;</a></span>update_max_malloc_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void update_max_malloc_size </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Update the initial value of <code>__CPROVER_max_malloc_size</code> in case the number of object bits has changed. </p>
+
+<p class="definition">Definition at line <a class="el" href="initialize__goto__model_8cpp_source.html#l00243">243</a> of file <a class="el" href="initialize__goto__model_8cpp_source.html">initialize_goto_model.cpp</a>.</p>
 
 </div>
 </div>

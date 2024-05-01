@@ -129,7 +129,6 @@ Architectural Settings</h2>
 <ul>
 <li>The width of the various scalar types; for example, compare the value of <code>sizeof(long int)</code> on various machines.</li>
 <li>The width of pointers; for example, compare the value of <code>sizeof(int *)</code> on various machines.</li>
-<li>The number of bits in a pointer which are used to differentiate between different objects. The remaining bits of a pointer are used for offsets within objects.</li>
 <li>The <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> of the architecture.</li>
 </ul>
 <p>In general, the CPROVER tools attempt to adopt the settings of the particular architecture the tool itself was compiled for. For example, when running a 64-bit binary of CBMC on Linux, the program will be processed assuming that <code>sizeof(long int)==8</code>.</p>
@@ -137,7 +136,6 @@ Architectural Settings</h2>
 <ul>
 <li>The word-width can be set with <code>--16</code>, <code>--32</code>, <code>--64</code>.</li>
 <li>The endianness can be defined with <code>--little-endian</code> and <code>--big-endian</code>.</li>
-<li>The number of bits in a pointer used to differentiate between different objects can be set using <code>--object-bits x</code>. Where <code>x</code> is the number of bits.</li>
 </ul>
 <p>When using a goto binary, CBMC and the other tools read the configuration from the binary. The setting when running goto-cc is the one that matters; the option given to the model checker is ignored in this case.</p>
 <p>In order to see the effect of the options <code>--16</code>, <code>--32</code> and <code>--64</code>, pass the following program to CBMC:</p>
@@ -160,7 +158,7 @@ Architectural Settings</h2>
 <div class="line">  printf(<span class="stringliteral">&quot;Bytes of i: %d, %d, %d, %d\n&quot;</span>, p[0], p[1], p[2], p[3]);</div>
 <div class="line">  assert(0);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Last modified: 2024-04-30 16:06:48 +0200 </p>
+</div><!-- fragment --><p>Last modified: 2024-05-01 13:08:25 -0400 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

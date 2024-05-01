@@ -139,6 +139,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a02edde10c26fc92da8d3641a94768323"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67eb5a80f10aec480ac30f2dfb81a34d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconfigt.html#a67eb5a80f10aec480ac30f2dfb81a34d">object_bits_info</a> ()</td></tr>
 <tr class="separator:a67eb5a80f10aec480ac30f2dfb81a34d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabd629509cf78655135bd5c47866e647"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconfigt.html#aabd629509cf78655135bd5c47866e647">max_malloc_size</a> () const</td></tr>
+<tr class="memdesc:aabd629509cf78655135bd5c47866e647"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum allocation size is determined by the number of bits that are left in the pointer of width <code>ansi_c.pointer_width</code>.  <a href="classconfigt.html#aabd629509cf78655135bd5c47866e647">More...</a><br /></td></tr>
+<tr class="separator:aabd629509cf78655135bd5c47866e647"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -172,6 +175,29 @@ Private Member Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00131">131</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aabd629509cf78655135bd5c47866e647"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabd629509cf78655135bd5c47866e647">&#9670;&nbsp;</a></span>max_malloc_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> configt::max_malloc_size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The maximum allocation size is determined by the number of bits that are left in the pointer of width <code>ansi_c.pointer_width</code>. </p>
+<p>The allocation size cannot exceed the number represented by the (signed) offset, otherwise it would not be possible to store a pointer into a valid bit of memory. Therefore, the max allocation size is 2^(offset_bits - 1), where the offset bits is the number of bits left in the pointer after the object bits.</p>
+<p>The offset must be signed, as a pointer can point to the end of the memory block, and needs to be able to point back to the start. </p><dl class="section return"><dt>Returns</dt><dd>The size in bytes of the maximum allocation supported. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l01531">1531</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a67eb5a80f10aec480ac30f2dfb81a34d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a67eb5a80f10aec480ac30f2dfb81a34d">&#9670;&nbsp;</a></span>object_bits_info()</h2>
 

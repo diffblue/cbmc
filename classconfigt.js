@@ -5,6 +5,7 @@ var classconfigt =
     [ "cppt", "structconfigt_1_1cppt.html", "structconfigt_1_1cppt" ],
     [ "javat", "structconfigt_1_1javat.html", "structconfigt_1_1javat" ],
     [ "verilogt", "structconfigt_1_1verilogt.html", "structconfigt_1_1verilogt" ],
+    [ "max_malloc_size", "classconfigt.html#aabd629509cf78655135bd5c47866e647", null ],
     [ "object_bits_info", "classconfigt.html#a67eb5a80f10aec480ac30f2dfb81a34d", null ],
     [ "set", "classconfigt.html#a40a799302a1c539d1e2cc232dbf7ac27", null ],
     [ "set_arch", "classconfigt.html#a2e57e31f2c6225eb4baef887b9248def", null ],

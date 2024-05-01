@@ -21,6 +21,6 @@ var ansi_c_2library_2cprover_8h =
     [ "__CPROVER_malloc_failure_mode_assert_then_assume", "ansi-c_2library_2cprover_8h.html#ac5b02b8ed2e29dc1a6af72fe31a3e508", null ],
     [ "__CPROVER_malloc_failure_mode_return_null", "ansi-c_2library_2cprover_8h.html#a2849fee8ae7da21b11fcca6c7a1c325c", null ],
     [ "__CPROVER_malloc_may_fail", "ansi-c_2library_2cprover_8h.html#ac5a7fecfa743e72e4b414332c74f235a", null ],
-    [ "__CPROVER_max_malloc_size", "ansi-c_2library_2cprover_8h.html#a8a490f53013892ebd1868b40ceec2855", null ],
+    [ "__CPROVER_max_malloc_size", "ansi-c_2library_2cprover_8h.html#a25b90c5c09c162016f22649dad66811a", null ],
     [ "__CPROVER_memory_leak", "ansi-c_2library_2cprover_8h.html#aa558c53640fe7cc910b049da86d9a9f2", null ]
 ];

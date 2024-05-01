@@ -62,7 +62,6 @@ var cprover__contracts_8c =
     [ "__CPROVER_alloca_object", "cprover__contracts_8c.html#abb7438cb1797ea7bbc250a78445eca28", null ],
     [ "__CPROVER_deallocated", "cprover__contracts_8c.html#a62443eebddd4033552d58dcf25c77c8f", null ],
     [ "__CPROVER_malloc_is_new_array", "cprover__contracts_8c.html#ab74981b452a29fe3b2ae0af47fb7f309", null ],
-    [ "__CPROVER_max_malloc_size", "cprover__contracts_8c.html#a8a490f53013892ebd1868b40ceec2855", null ],
     [ "__CPROVER_memory_leak", "cprover__contracts_8c.html#aa558c53640fe7cc910b049da86d9a9f2", null ],
     [ "__CPROVER_new_object", "cprover__contracts_8c.html#ae7e739bdcdd3b0cfea772deefb3cbc48", null ]
 ];
