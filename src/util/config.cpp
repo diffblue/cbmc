@@ -985,7 +985,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode = ansi_ct::flavourt::CLANG;
     ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
   }
-  else if(os == "linux" || os == "solaris" || os == "netbsd")
+  else if(os == "linux" || os == "solaris" || os == "netbsd" || os == "hurd")
   {
     ansi_c.lib=configt::ansi_ct::libt::LIB_FULL;
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
@@ -1509,6 +1509,8 @@ irep_idt configt::this_operating_system()
   this_os="linux";
 #elif __SVR4
   this_os="solaris";
+#elif __gnu_hurd__
+  this_os = "hurd";
 #else
   this_os="unknown";
 #endif
