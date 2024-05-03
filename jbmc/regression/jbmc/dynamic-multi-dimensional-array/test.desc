@@ -1,6 +1,6 @@
 CORE
 TestClass
---function TestClass.f --unwind 2
+--function TestClass.f --unwind 2 --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 --

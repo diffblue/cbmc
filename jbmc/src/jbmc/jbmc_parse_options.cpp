@@ -205,10 +205,16 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     }
   }
 
+  // generate unwinding assertions
+  options.set_option(
+    "unwinding-assertions",
+    cmdline.isset("unwinding-assertions") ||
+      !cmdline.isset("no-unwinding-assertions"));
+
   if(cmdline.isset("unwind"))
   {
     options.set_option("unwind", cmdline.get_value("unwind"));
-    if(!cmdline.isset("unwinding-assertions"))
+    if(!options.get_bool_option("unwinding-assertions"))
     {
       log.warning() << "**** WARNING: Use --unwinding-assertions to obtain "
                        "sound verification results"
@@ -229,7 +235,7 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option(
       "unwindset", cmdline.get_comma_separated_values("unwindset"));
-    if(!cmdline.isset("unwinding-assertions"))
+    if(!options.get_bool_option("unwinding-assertions"))
     {
       log.warning() << "**** WARNING: Use --unwinding-assertions to obtain "
                        "sound verification results"
@@ -257,10 +263,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   // use assumptions
   if(cmdline.isset("no-assumptions"))
     options.set_option("assumptions", false);
-
-  // generate unwinding assertions
-  if(cmdline.isset("unwinding-assertions"))
-    options.set_option("unwinding-assertions", true);
 
   // generate unwinding assumptions otherwise
   if(cmdline.isset("partial-loops"))

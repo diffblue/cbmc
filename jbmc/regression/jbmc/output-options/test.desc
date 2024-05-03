@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Main
---verbosity 10 --unwind 2 --disable-uncaught-exception-check --throw-assertion-error
+--verbosity 10 --unwind 2 --no-unwinding-assertions --disable-uncaught-exception-check --throw-assertion-error
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

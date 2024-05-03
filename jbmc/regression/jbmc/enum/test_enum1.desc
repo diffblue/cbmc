@@ -1,6 +1,6 @@
 CORE
 Enum1
---java-unwind-enum-static --unwind 3
+--java-unwind-enum-static --unwind 3 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
