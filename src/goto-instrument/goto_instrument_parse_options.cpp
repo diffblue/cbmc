@@ -201,9 +201,11 @@ int goto_instrument_parse_optionst::doit()
             ui_message_handler);
         }
 
-        bool unwinding_assertions=cmdline.isset("unwinding-assertions");
-        bool partial_loops=cmdline.isset("partial-loops");
         bool continue_as_loops=cmdline.isset("continue-as-loops");
+        bool partial_loops = cmdline.isset("partial-loops");
+        bool unwinding_assertions = cmdline.isset("unwinding-assertions") ||
+                                    (!continue_as_loops && !partial_loops &&
+                                     !cmdline.isset("no-unwinding-assertions"));
         if(continue_as_loops)
         {
           if(unwinding_assertions)
@@ -1996,7 +1998,9 @@ void goto_instrument_parse_optionst::help()
     HELP_UNWINDSET
     " {y--unwindset-file_<file>} \t read unwindset from file\n"
     " {y--partial-loops} \t permit paths with partial loops\n"
-    " {y--unwinding-assertions} \t generate unwinding assertions\n"
+    " {y--unwinding-assertions} \t generate unwinding assertions"
+    " (enabled by default)\n"
+    " {y--no-unwinding-assertions} \t do not generate unwinding assertions\n"
     " {y--continue-as-loops} \t add loop for remaining iterations after"
     " unwound part\n"
     " {y--k-induction} {uk} \t check loops with k-induction\n"

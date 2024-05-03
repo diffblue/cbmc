@@ -1,6 +1,6 @@
 CORE
 main.c
---full-slice --unwind 1
+--full-slice --unwind 1 --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
