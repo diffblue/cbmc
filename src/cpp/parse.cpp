@@ -1207,14 +1207,11 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     declarator.type().make_nil();
     set_location(declarator, tk1);
 
-    bool has_ellipsis=false;
-
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
       cpp_tokent tk2;
       lex.get_token(tk2);
-
-      has_ellipsis=true;
+      declarator.set_has_ellipsis();
     }
 
     if(is_identifier(lex.LookAhead(0)))
@@ -1226,16 +1223,11 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       set_location(declarator.name(), tk2);
 
       add_id(declarator.name(), new_scopet::kindt::TYPE_TEMPLATE_PARAMETER);
-
-      if(has_ellipsis)
-      {
-        // TODO
-      }
     }
 
     if(lex.LookAhead(0)=='=')
     {
-      if(has_ellipsis)
+      if(declarator.get_has_ellipsis())
         return false;
 
       typet default_type;
@@ -1308,18 +1300,15 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
               << "Parser::rTempArgDeclaration 3\n";
 #endif
 
-    bool has_ellipsis=false;
+    declaration.declarators().resize(1);
+    cpp_declaratort &declarator = declaration.declarators().front();
 
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
       cpp_tokent tk2;
       lex.get_token(tk2);
-
-      has_ellipsis=true;
+      declarator.set_has_ellipsis();
     }
-
-    declaration.declarators().resize(1);
-    cpp_declaratort &declarator=declaration.declarators().front();
 
     if(!rDeclarator(declarator, kArgDeclarator, true, false))
       return false;
@@ -1331,16 +1320,11 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     add_id(declarator.name(), new_scopet::kindt::NON_TYPE_TEMPLATE_PARAMETER);
 
-    if(has_ellipsis)
-    {
-      // TODO
-    }
-
     exprt &value=declarator.value();
 
     if(lex.LookAhead(0)=='=')
     {
-      if(has_ellipsis)
+      if(declarator.get_has_ellipsis())
         return false;
 
       cpp_tokent tk;
@@ -4006,8 +3990,7 @@ bool Parser::rTemplateArgs(irept &template_args)
       if(lex.LookAhead(0)==TOK_ELLIPSIS)
       {
         lex.get_token(tk1);
-
-        // TODO
+        exp.set(ID_ellipsis, true);
       }
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.2\n";
@@ -4025,13 +4008,6 @@ bool Parser::rTemplateArgs(irept &template_args)
 
       if(!rConditionalExpr(exp, true))
         return false;
-
-      if(lex.LookAhead(0)==TOK_ELLIPSIS)
-      {
-        lex.get_token(tk1);
-
-        // TODO
-      }
     }
 
 #ifdef DEBUG
@@ -5684,18 +5660,21 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
       type.parameters().push_back(parameter);
 
       t=lex.LookAhead(0);
-      if(t==',')
+      if(t == TOK_ELLIPSIS)
       {
         cpp_tokent tk;
         lex.get_token(tk);
+        to_cpp_declaration(type.parameters().back())
+          .declarators()
+          .back()
+          .set_has_ellipsis();
+        t = lex.LookAhead(0);
       }
-      else if(t==TOK_ELLIPSIS)
+
+      if(t == ',')
       {
-        // TODO -- this is actually ambiguous as it could refer to a
-        // template parameter pack or declare a variadic function
         cpp_tokent tk;
         lex.get_token(tk);
-        type.make_ellipsis();
       }
       else if(t==')')
         break;
