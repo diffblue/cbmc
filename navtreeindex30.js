@@ -1,6 +1,5 @@
 var NAVTREEINDEX30 =
 {
-"classexternal__satt.html#ac764a7fbdc6acb2d0cd454652719304d":[8,0,459,6],
 "classexternal__satt.html#ad16d23fff750a1437dc04db8ed0c9e54":[8,0,459,3],
 "classextractbit__exprt.html":[8,0,460],
 "classextractbit__exprt.html#a19572b5a76045fc10be567a57dbe6fa5":[8,0,460,0],
@@ -10,13 +9,11 @@ var NAVTREEINDEX30 =
 "classextractbit__exprt.html#a718a7c91092531dd8739591866df02f5":[8,0,460,1],
 "classextractbit__exprt.html#a86d9d191409fc0c5281003868392a3d2":[8,0,460,2],
 "classextractbits__exprt.html":[8,0,461],
-"classextractbits__exprt.html#a35f5a7ab436e7df5d54d335484dac40e":[8,0,461,6],
+"classextractbits__exprt.html#a20eae71f09ca39feb9d44bb078c8ec16":[8,0,461,3],
+"classextractbits__exprt.html#a4ad893b6a614966a1d617201d875d281":[8,0,461,2],
 "classextractbits__exprt.html#a534825adabc7515716b2e9d6d7f22516":[8,0,461,4],
-"classextractbits__exprt.html#a64fdbe65f11524ecde8690d2cad541c6":[8,0,461,1],
-"classextractbits__exprt.html#a721ba6efa5de599bb90a0fe2e93194e8":[8,0,461,3],
-"classextractbits__exprt.html#ab9f88461a51600a5ff72e3f1f0ece3a0":[8,0,461,7],
-"classextractbits__exprt.html#ac8a827e16c10787c80e00384e6558c20":[8,0,461,0],
-"classextractbits__exprt.html#ad480274be532341cf5ae12763410dcfc":[8,0,461,2],
+"classextractbits__exprt.html#a9f078c727fe7824a8597182efcde4f36":[8,0,461,1],
+"classextractbits__exprt.html#abb8d947b1490ab94b29eac7408b3fb1a":[8,0,461,0],
 "classextractbits__exprt.html#afc1faae04823d2189aed3181ef1ed0a1":[8,0,461,5],
 "classfactorial__power__exprt.html":[8,0,462],
 "classfactorial__power__exprt.html#a9d66b7466a4df09a53c2a358e02e1580":[8,0,462,0],
@@ -249,5 +246,8 @@ var NAVTREEINDEX30 =
 "classfloat__utilst.html#a6c9550d24b74dcf4c5f13de3df6ce1fd":[8,0,483,10],
 "classfloat__utilst.html#a79ccf9830908871f794509a493a3a261":[8,0,483,49],
 "classfloat__utilst.html#a8a4bc2620c8a7178283468e237735fe8":[8,0,483,27],
-"classfloat__utilst.html#a8a57eb71c4f0288e6286cadef830d793":[8,0,483,29]
+"classfloat__utilst.html#a8a57eb71c4f0288e6286cadef830d793":[8,0,483,29],
+"classfloat__utilst.html#a8af7b30d2e7f8f5f1f9a3bff2f6a0042":[8,0,483,22],
+"classfloat__utilst.html#a92d3fb11bc0a638c6ab67d780f1a8f4b":[8,0,483,26],
+"classfloat__utilst.html#a958e832eb3682a634175c155667eb4e5":[8,0,483,17]
 };

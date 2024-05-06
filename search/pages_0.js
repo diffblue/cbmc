@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['assigns_20clauses_45783',['Assigns Clauses',['../contracts-assigns.html',1,'contracts-user']]]
+  ['assigns_20clauses_45786',['Assigns Clauses',['../contracts-assigns.html',1,'contracts-user']]]
 ];

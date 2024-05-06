@@ -111,48 +111,33 @@ $(document).ready(function(){initNavTree('boolbv__extractbits_8cpp_source.html',
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> &amp;src_bv = <a class="code" href="classboolbvt.html#a14d25478f6b405c78cbbf3574ab0b03e">convert_bv</a>(expr.<a class="code" href="classextractbits__exprt.html#a534825adabc7515716b2e9d6d7f22516">src</a>());</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> maybe_upper_as_int = numeric_cast&lt;mp_integer&gt;(expr.<a class="code" href="classextractbits__exprt.html#a35f5a7ab436e7df5d54d335484dac40e">upper</a>());</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> maybe_lower_as_int = numeric_cast&lt;mp_integer&gt;(expr.<a class="code" href="classextractbits__exprt.html#ad480274be532341cf5ae12763410dcfc">lower</a>());</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="comment">// We only do constants for now.</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="comment">// Should implement a shift here.</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keywordflow">if</span>(!maybe_upper_as_int.has_value() || !maybe_lower_as_int.has_value())</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">conversion_failed</a>(expr);</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keyword">auto</span> upper_as_int = maybe_upper_as_int.value();</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">auto</span> lower_as_int = maybe_lower_as_int.value();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">DATA_INVARIANT_WITH_DIAGNOSTICS</a>(</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    upper_as_int &gt;= 0 &amp;&amp; upper_as_int &lt; src_bv.size(),</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="stringliteral">&quot;upper end of extracted bits must be within the bitvector&quot;</span>,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>(),</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="structirep__pretty__diagnosticst.html">irep_pretty_diagnosticst</a>{expr});</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">DATA_INVARIANT_WITH_DIAGNOSTICS</a>(</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    lower_as_int &gt;= 0 &amp;&amp; lower_as_int &lt; src_bv.size(),</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="stringliteral">&quot;lower end of extracted bits must be within the bitvector&quot;</span>,</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>(),</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="structirep__pretty__diagnosticst.html">irep_pretty_diagnosticst</a>{expr});</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">auto</span> <span class="keyword">const</span> maybe_index_as_int = numeric_cast&lt;mp_integer&gt;(expr.<a class="code" href="classextractbits__exprt.html#a4ad893b6a614966a1d617201d875d281">index</a>());</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="comment">// We only do constants for now.</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="comment">// Should implement a shift here.</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordflow">if</span>(!maybe_index_as_int.has_value())</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classboolbvt.html#ac8296cf364960234058f1a489ffa5a8d">conversion_failed</a>(expr);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">auto</span> index_as_int = maybe_index_as_int.value();</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">DATA_INVARIANT_WITH_DIAGNOSTICS</a>(</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    index_as_int &gt;= 0 &amp;&amp; index_as_int &lt; src_bv.size(),</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="stringliteral">&quot;index of extractbits must be within the bitvector&quot;</span>,</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>(),</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="structirep__pretty__diagnosticst.html">irep_pretty_diagnosticst</a>{expr});</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">DATA_INVARIANT_WITH_DIAGNOSTICS</a>(</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    index_as_int + <a class="code" href="classboolbvt.html#a7ef9c52b4cff850ba00e11a799d1db65">bv_width</a> - 1 &lt; src_bv.size(),</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="stringliteral">&quot;index+width-1 of extractbits must be within the bitvector&quot;</span>,</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>(),</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="structirep__pretty__diagnosticst.html">irep_pretty_diagnosticst</a>{expr});</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keyword">const</span> std::size_t offset = numeric_cast_v&lt;std::size_t&gt;(index_as_int);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a>(</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    lower_as_int &lt;= upper_as_int,</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="stringliteral">&quot;upper bound must be greater or equal to lower bound&quot;</span>);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="comment">// now lower_as_int &lt;= upper_as_int</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">DATA_INVARIANT_WITH_DIAGNOSTICS</a>(</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    (upper_as_int - lower_as_int + 1) == <a class="code" href="classboolbvt.html#a7ef9c52b4cff850ba00e11a799d1db65">bv_width</a>,</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="stringliteral">&quot;the difference between upper and lower end of the range must have the &quot;</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="stringliteral">&quot;same width as the resulting bitvector type&quot;</span>,</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    expr.<a class="code" href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">find_source_location</a>(),</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <a class="code" href="structirep__pretty__diagnosticst.html">irep_pretty_diagnosticst</a>{expr});</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keyword">const</span> std::size_t offset = numeric_cast_v&lt;std::size_t&gt;(lower_as_int);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> result_bv(src_bv.begin() + offset, src_bv.begin() + offset + <a class="code" href="classboolbvt.html#a7ef9c52b4cff850ba00e11a799d1db65">bv_width</a>);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">return</span> result_bv;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a> result_bv(src_bv.begin() + offset, src_bv.begin() + offset + <a class="code" href="classboolbvt.html#a7ef9c52b4cff850ba00e11a799d1db65">bv_width</a>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">return</span> result_bv;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
 <div class="ttc" id="abitvector__expr_8h_html"><div class="ttname"><a href="bitvector__expr_8h.html">bitvector_expr.h</a></div><div class="ttdoc">API to expression classes for bitvectors.</div></div>
 <div class="ttc" id="aboolbv_8h_html"><div class="ttname"><a href="boolbv_8h.html">boolbv.h</a></div></div>
@@ -164,11 +149,9 @@ $(document).ready(function(){initNavTree('boolbv__extractbits_8cpp_source.html',
 <div class="ttc" id="aclassexprt_html_a0c920fda0345f73fb24df50e61ac463b"><div class="ttname"><a href="classexprt.html#a0c920fda0345f73fb24df50e61ac463b">exprt::find_source_location</a></div><div class="ttdeci">const source_locationt &amp; find_source_location() const</div><div class="ttdoc">Get a source_locationt from the expression or from its operands (non-recursively).</div><div class="ttdef"><b>Definition:</b> <a href="expr_8cpp_source.html#l00147">expr.cpp:147</a></div></div>
 <div class="ttc" id="aclassexprt_html_a8e0d0b67e8a12ebaef06daad7175d8d7"><div class="ttname"><a href="classexprt.html#a8e0d0b67e8a12ebaef06daad7175d8d7">exprt::type</a></div><div class="ttdeci">typet &amp; type()</div><div class="ttdoc">Return the type of the expression.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00084">expr.h:84</a></div></div>
 <div class="ttc" id="aclassextractbits__exprt_html"><div class="ttname"><a href="classextractbits__exprt.html">extractbits_exprt</a></div><div class="ttdoc">Extracts a sub-range of a bit-vector operand.</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00447">bitvector_expr.h:448</a></div></div>
-<div class="ttc" id="aclassextractbits__exprt_html_a35f5a7ab436e7df5d54d335484dac40e"><div class="ttname"><a href="classextractbits__exprt.html#a35f5a7ab436e7df5d54d335484dac40e">extractbits_exprt::upper</a></div><div class="ttdeci">exprt &amp; upper()</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00474">bitvector_expr.h:474</a></div></div>
-<div class="ttc" id="aclassextractbits__exprt_html_a534825adabc7515716b2e9d6d7f22516"><div class="ttname"><a href="classextractbits__exprt.html#a534825adabc7515716b2e9d6d7f22516">extractbits_exprt::src</a></div><div class="ttdeci">exprt &amp; src()</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00469">bitvector_expr.h:469</a></div></div>
-<div class="ttc" id="aclassextractbits__exprt_html_ad480274be532341cf5ae12763410dcfc"><div class="ttname"><a href="classextractbits__exprt.html#ad480274be532341cf5ae12763410dcfc">extractbits_exprt::lower</a></div><div class="ttdeci">exprt &amp; lower()</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00479">bitvector_expr.h:479</a></div></div>
+<div class="ttc" id="aclassextractbits__exprt_html_a4ad893b6a614966a1d617201d875d281"><div class="ttname"><a href="classextractbits__exprt.html#a4ad893b6a614966a1d617201d875d281">extractbits_exprt::index</a></div><div class="ttdeci">exprt &amp; index()</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00470">bitvector_expr.h:470</a></div></div>
+<div class="ttc" id="aclassextractbits__exprt_html_a534825adabc7515716b2e9d6d7f22516"><div class="ttname"><a href="classextractbits__exprt.html#a534825adabc7515716b2e9d6d7f22516">extractbits_exprt::src</a></div><div class="ttdeci">exprt &amp; src()</div><div class="ttdef"><b>Definition:</b> <a href="bitvector__expr_8h_source.html#l00465">bitvector_expr.h:465</a></div></div>
 <div class="ttc" id="aliteral_8h_html_aa86e912c029391c43aeffc6402b57e33"><div class="ttname"><a href="literal_8h.html#aa86e912c029391c43aeffc6402b57e33">bvt</a></div><div class="ttdeci">std::vector&lt; literalt &gt; bvt</div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00201">literal.h:201</a></div></div>
-<div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00534">invariant.h:534</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ad2f8f636b117b529e2660a3e0c05293c"><div class="ttname"><a href="src_2util_2invariant_8h.html#ad2f8f636b117b529e2660a3e0c05293c">DATA_INVARIANT_WITH_DIAGNOSTICS</a></div><div class="ttdeci">#define DATA_INVARIANT_WITH_DIAGNOSTICS(CONDITION, REASON,...)</div><div class="ttdef"><b>Definition:</b> <a href="src_2util_2invariant_8h_source.html#l00535">invariant.h:535</a></div></div>
 <div class="ttc" id="astructirep__pretty__diagnosticst_html"><div class="ttname"><a href="structirep__pretty__diagnosticst.html">irep_pretty_diagnosticst</a></div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00490">irep.h:491</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
