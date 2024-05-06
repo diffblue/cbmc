@@ -79,7 +79,7 @@ allow malloc calls to return a null pointer
 \fB\-\-malloc\-fail\-null\fR
 set malloc failure mode to return null
 .TP
-\fB\-\-unwinding\-assertions\fR (\fBcbmc\fR\-only)
+\fB\-\-unwinding\-assertions\fR
 generate unwinding assertions (cannot be
 used with \fB\-\-cover\fR)
 .PP
@@ -108,9 +108,8 @@ disable signed arithmetic over\- and underflow checks
 \fB\-\-no\-malloc\-may\-fail\fR
 do not allow malloc calls to fail by default
 .TP
-\fB\-\-no\-unwinding\-assertions\fR (\fBcbmc\fR\-only)
-do not generate unwinding assertions (cannot be
-used with \fB\-\-cover\fR)
+\fB\-\-no\-unwinding\-assertions\fR
+do not generate unwinding assertions
 .PP
 If an already set flag is re-set, like calling \fB\-\-pointer\-check\fR
 when default checks are already on, the flag is simply ignored.

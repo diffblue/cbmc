@@ -60,6 +60,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_UNWINDSET \
   "(unwindset-file):" \
   "(unwinding-assertions)(partial-loops)(continue-as-loops)" \
+  "(no-unwinding-assertions)" \
   "(log):" \
   "(call-graph)(reachable-call-graph)" \
   OPT_INSERT_FINAL_ASSERT_FALSE \

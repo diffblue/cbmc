@@ -862,8 +862,12 @@ read unwindset from file
 \fB\-\-partial\-loops\fR
 permit paths with partial loops
 .TP
+\fB\-\-no\-unwinding\-assertions\fR
+do not generate unwinding assertions
+.TP
 \fB\-\-unwinding\-assertions\fR
-generate unwinding assertions
+generate unwinding assertions (enabled by default; overrides
+\fB\-\-no\-unwinding\-assertions\fR when both of these are given)
 .TP
 \fB\-\-continue\-as\-loops\fR
 add loop for remaining iterations after unwound part
