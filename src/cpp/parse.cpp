@@ -243,6 +243,7 @@ protected:
   bool rLinkageSpec(cpp_linkage_spect &);
   bool rNamespaceSpec(cpp_namespace_spect &);
   bool rUsing(cpp_usingt &);
+  bool rUsingOrTypedef(cpp_itemt &);
   bool rStaticAssert(cpp_static_assertt &);
   bool rLinkageBody(cpp_linkage_spect::itemst &);
   bool rTemplateDecl(cpp_declarationt &);
@@ -581,14 +582,8 @@ bool Parser::rDefinition(cpp_itemt &item)
     return rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_INLINE && lex.LookAhead(1)==TOK_NAMESPACE)
     return rNamespaceSpec(item.make_namespace_spec());
-  else if(
-    t == TOK_USING && is_identifier(lex.LookAhead(1)) &&
-    lex.LookAhead(2) == '=')
-  {
-    return rTypedefUsing(item.make_declaration());
-  }
   else if(t==TOK_USING)
-    return rUsing(item.make_using());
+    return rUsingOrTypedef(item);
   else if(t==TOK_STATIC_ASSERT)
     return rStaticAssert(item.make_static_assert());
   else
@@ -667,6 +662,9 @@ bool Parser::rTypedefUsing(cpp_declarationt &declaration)
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rTypedefUsing 2\n";
 #endif
+
+  if(!optAttribute(declaration.type()))
+    return false;
 
   if(lex.get_token(tk)!='=')
     return false;
@@ -901,10 +899,41 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
   if(!rName(cpp_using.name()))
     return false;
 
+  // We will eventually need to record this attribute as Clang's
+  // __using_if_exists__ affects type checking.
+  typet discard;
+  if(!optAttribute(discard))
+    return false;
+
   if(lex.get_token(tk)!=';')
     return false;
 
   return true;
+}
+
+/*
+  USING Identifier '=' type.specifier ';'
+  | using.declaration
+*/
+bool Parser::rUsingOrTypedef(cpp_itemt &item)
+{
+  cpp_token_buffert::post pos = lex.Save();
+
+  cpp_tokent tk;
+  if(lex.get_token(tk) != TOK_USING)
+    return false;
+
+  typet discard;
+  if(
+    is_identifier(lex.get_token(tk)) && optAttribute(discard) &&
+    lex.LookAhead(0) == '=')
+  {
+    lex.Restore(pos);
+    return rTypedefUsing(item.make_declaration());
+  }
+
+  lex.Restore(pos);
+  return rUsing(item.make_using());
 }
 
 /*
@@ -4731,14 +4760,8 @@ bool Parser::rClassMember(cpp_itemt &member)
     return rTypedef(member.make_declaration());
   else if(t==TOK_TEMPLATE)
     return rTemplateDecl(member.make_declaration());
-  else if(
-    t == TOK_USING && is_identifier(lex.LookAhead(1)) &&
-    lex.LookAhead(2) == '=')
-  {
-    return rTypedefUsing(member.make_declaration());
-  }
   else if(t==TOK_USING)
-    return rUsing(member.make_using());
+    return rUsingOrTypedef(member);
   else if(t==TOK_STATIC_ASSERT)
     return rStaticAssert(member.make_static_assert());
   else
