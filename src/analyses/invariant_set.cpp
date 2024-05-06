@@ -474,7 +474,9 @@ void invariant_sett::strengthen_rec(const exprt &expr)
 
     if(op_type.id() == ID_struct || op_type.id() == ID_struct_tag)
     {
-      const struct_typet &struct_type = to_struct_type(ns.follow(op_type));
+      const struct_typet &struct_type =
+        op_type.id() == ID_struct ? to_struct_type(op_type)
+                                  : ns.follow_tag(to_struct_tag_type(op_type));
 
       for(const auto &comp : struct_type.components())
       {

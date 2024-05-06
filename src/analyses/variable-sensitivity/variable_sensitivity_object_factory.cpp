@@ -8,8 +8,6 @@
 
 #include "variable_sensitivity_object_factory.h"
 
-#include <util/namespace.h>
-
 #include "constant_abstract_value.h"
 #include "constant_pointer_abstract_object.h"
 #include "data_dependency_context.h"
@@ -44,7 +42,7 @@ abstract_object_pointert create_abstract_object(
   if(top || bottom)
     return std::make_shared<abstract_object_classt>(type, top, bottom);
 
-  PRECONDITION(type == ns.follow(e.type()));
+  PRECONDITION(type == e.type());
   return std::make_shared<abstract_object_classt>(e, environment, ns);
 }
 
@@ -124,11 +122,11 @@ variable_sensitivity_object_factoryt::get_abstract_object_type(
   {
     return configuration.pointer_abstract_type;
   }
-  else if(type.id() == ID_struct)
+  else if(type.id() == ID_struct || type.id() == ID_struct_tag)
   {
     return configuration.struct_abstract_type;
   }
-  else if(type.id() == ID_union)
+  else if(type.id() == ID_union || type.id() == ID_union_tag)
   {
     return configuration.union_abstract_type;
   }
@@ -149,52 +147,50 @@ variable_sensitivity_object_factoryt::get_abstract_object(
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  const typet &followed_type = ns.follow(type);
-  ABSTRACT_OBJECT_TYPET abstract_object_type =
-    get_abstract_object_type(followed_type);
+  ABSTRACT_OBJECT_TYPET abstract_object_type = get_abstract_object_type(type);
 
   switch(abstract_object_type)
   {
   case TWO_VALUE:
     return initialize_abstract_object<abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
   case CONSTANT:
     return initialize_abstract_object<constant_abstract_valuet>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
   case INTERVAL:
     return initialize_abstract_object<interval_abstract_valuet>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
   case VALUE_SET:
     return initialize_abstract_object<value_set_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
 
   case ARRAY_INSENSITIVE:
     return initialize_abstract_object<two_value_array_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
   case ARRAY_SENSITIVE:
     return initialize_abstract_object<full_array_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
 
   case POINTER_INSENSITIVE:
     return initialize_abstract_object<two_value_pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
   case POINTER_SENSITIVE:
     return initialize_abstract_object<constant_pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
   case VALUE_SET_OF_POINTERS:
     return initialize_abstract_object<value_set_pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
 
   case STRUCT_INSENSITIVE:
     return initialize_abstract_object<two_value_struct_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
   case STRUCT_SENSITIVE:
     return initialize_abstract_object<full_struct_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
 
   case UNION_INSENSITIVE:
     return initialize_abstract_object<two_value_union_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
 
   case HEAP_ALLOCATION:
   {
@@ -210,7 +206,7 @@ variable_sensitivity_object_factoryt::get_abstract_object(
   default:
     UNREACHABLE;
     return initialize_abstract_object<abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns, configuration);
+      type, top, bottom, e, environment, ns, configuration);
   }
 }
 
