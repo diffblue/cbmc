@@ -637,8 +637,11 @@ void call(fptr_t fptr) {
 <dt><strong>--partial-loops</strong></dt>
 <dd><p>permit paths with partial loops</p>
 </dd>
+<dt><strong>--no-unwinding-assertions</strong></dt>
+<dd><p>do not generate unwinding assertions</p>
+</dd>
 <dt><strong>--unwinding-assertions</strong></dt>
-<dd><p>generate unwinding assertions</p>
+<dd><p>generate unwinding assertions (enabled by default; overrides <strong>--no-unwinding-assertions</strong> when both of these are given)</p>
 </dd>
 <dt><strong>--continue-as-loops</strong></dt>
 <dd><p>add loop for remaining iterations after unwound part</p>
