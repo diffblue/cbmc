@@ -222,148 +222,153 @@ $(document).ready(function(){initNavTree('invariant__propagation_8cpp_source.htm
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    t.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || t.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union || t.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag ||</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    t.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html">struct_union_typet</a> &amp;struct_type = <a class="code" href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a>(<a class="code" href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(t));</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : struct_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    {</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <span class="keyword">const</span> <a class="code" href="classmember__exprt.html">member_exprt</a> member_expr(</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        src, <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_name(), <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type());</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      <span class="comment">// recursive call</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <a class="code" href="classinvariant__propagationt.html#ac7967c13577a9c5d33b9bce19c3c9b88">get_objects_rec</a>(member_expr, dest);</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    }</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  }</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  {</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="comment">// get_objects_rec(identifier, suffix+&quot;[]&quot;, t.subtype(), dest);</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">// we don&#39;t track these</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  }</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="classinvariant__propagationt.html#ae6d2e98dd3d0ceba92bab5e827475dd5">check_type</a>(t))</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    dest.push_back(src);</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  }</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;}</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
-<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#a194dc391bd4d718c88db58804296efac">  155</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#a4c1492577892b62ec7caea467408102e">invariant_propagationt::add_objects</a>(</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;{</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <span class="comment">// get the globals</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <a class="code" href="classinvariant__propagationt.html#ac8d380e5b9bc88a627054743993eb7dc">object_listt</a> globals;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <a class="code" href="classinvariant__propagationt.html#ae8c59359756f77e15fb4ece2799d2c09">get_globals</a>(globals);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  {</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">// get the locals</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    std::set&lt;irep_idt&gt; locals;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <a class="code" href="goto__function_8cpp.html#afddd68b9cdf786f0dc15beac7eb393a4">get_local_identifiers</a>(gf_entry.second, locals);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program = gf_entry.second.body;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="comment">// cache the list for the locals to speed things up</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keyword">typedef</span> std::unordered_map&lt;irep_idt, object_listt&gt; object_cachet;</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    object_cachet object_cache;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <a class="code" href="goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728">forall_goto_program_instructions</a>(i_it, goto_program)</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    {</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="preprocessor">      #if 0</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <a class="code" href="classinvariant__sett.html">invariant_sett</a> &amp;is=(*this)[i_it].invariant_set;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      is.add_objects(globals);</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="preprocessor">      #endif</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html">struct_union_typet</a> &amp;struct_type =</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      (t.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag || t.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        ? <a class="code" href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="std__types_8h.html#aabb8b155eb508af80fbcc8b83559f4c2">to_struct_or_union_tag_type</a>(t))</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        : <a class="code" href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a>(t);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> : struct_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>())</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keyword">const</span> <a class="code" href="classmember__exprt.html">member_exprt</a> member_expr(</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        src, <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.get_name(), <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type());</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="comment">// recursive call</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <a class="code" href="classinvariant__propagationt.html#ac7967c13577a9c5d33b9bce19c3c9b88">get_objects_rec</a>(member_expr, dest);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="comment">// get_objects_rec(identifier, suffix+&quot;[]&quot;, t.subtype(), dest);</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="comment">// we don&#39;t track these</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  }</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="classinvariant__propagationt.html#ae6d2e98dd3d0ceba92bab5e827475dd5">check_type</a>(t))</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  {</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    dest.push_back(src);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  }</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;}</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00158"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#a194dc391bd4d718c88db58804296efac">  158</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#a4c1492577892b62ec7caea467408102e">invariant_propagationt::add_objects</a>(</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;{</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="comment">// get the globals</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <a class="code" href="classinvariant__propagationt.html#ac8d380e5b9bc88a627054743993eb7dc">object_listt</a> globals;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <a class="code" href="classinvariant__propagationt.html#ae8c59359756f77e15fb4ece2799d2c09">get_globals</a>(globals);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="comment">// get the locals</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    std::set&lt;irep_idt&gt; locals;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <a class="code" href="goto__function_8cpp.html#afddd68b9cdf786f0dc15beac7eb393a4">get_local_identifiers</a>(gf_entry.second, locals);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program = gf_entry.second.body;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">// cache the list for the locals to speed things up</span></div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keyword">typedef</span> std::unordered_map&lt;irep_idt, object_listt&gt; object_cachet;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    object_cachet object_cache;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <a class="code" href="goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728">forall_goto_program_instructions</a>(i_it, goto_program)</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    {</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="preprocessor">      #if 0</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <a class="code" href="classinvariant__sett.html">invariant_sett</a> &amp;is=(*this)[i_it].invariant_set;</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;local : locals)</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      {</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="comment">// cache hit?</span></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        object_cachet::const_iterator e_it=object_cache.find(local);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <span class="keywordflow">if</span>(e_it==object_cache.end())</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        {</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;          <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=<a class="code" href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">ns</a>.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(local);</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;          <a class="code" href="classinvariant__propagationt.html#ac8d380e5b9bc88a627054743993eb7dc">object_listt</a> &amp;objects=object_cache[local];</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;          <a class="code" href="classinvariant__propagationt.html#a6aa96e57e52acfdef994d1000c9c657d">get_objects</a>(symbol, objects);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="preprocessor">          #if 0</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;          is.add_objects(objects);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="preprocessor">          #endif</span></div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        }</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="preprocessor">        #if 0</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;          is.add_objects(e_it-&gt;second);</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="preprocessor">        #endif</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    }</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  }</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;}</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00206"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#ae8c59359756f77e15fb4ece2799d2c09">  206</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#ae8c59359756f77e15fb4ece2799d2c09">invariant_propagationt::get_globals</a>(</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <a class="code" href="classinvariant__propagationt.html#ac8d380e5b9bc88a627054743993eb7dc">object_listt</a> &amp;dest)</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;{</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  <span class="comment">// static ones</span></div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;symbol_pair : <a class="code" href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">ns</a>.<a class="code" href="classnamespacet.html#ae672c84ace27771c869d1b78b0293a7b">get_symbol_table</a>().<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>)</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  {</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordflow">if</span>(symbol_pair.second.is_lvalue &amp;&amp; symbol_pair.second.is_static_lifetime)</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    {</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;      <a class="code" href="classinvariant__propagationt.html#a6aa96e57e52acfdef994d1000c9c657d">get_objects</a>(symbol_pair.second, dest);</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    }</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  }</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;}</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
-<div class="line"><a name="l00219"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#ae6d2e98dd3d0ceba92bab5e827475dd5">  219</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classinvariant__propagationt.html#ae6d2e98dd3d0ceba92bab5e827475dd5">invariant_propagationt::check_type</a>(<span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer)</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union ||</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_unsignedbv ||</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_signedbv)</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool)</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;}</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#abdaf1a5a72909b04ecf9530e883393be">  238</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#abdaf1a5a72909b04ecf9530e883393be">invariant_propagationt::initialize</a>(</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keyword">function</span>,</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;{</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  <a class="code" href="classai__baset.html#a7dc441fc77d3f580c311581242a97e3d">baset::initialize</a>(<span class="keyword">function</span>, goto_program);</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <a class="code" href="classinvariant__propagationt.html#a4c1492577892b62ec7caea467408102e">add_objects</a>(goto_program);</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;}</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00247"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#a8472cce28c346687d2be75a6e8985cc4">  247</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">invariant_propagationt::simplify</a>(<a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;{</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <a class="code" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">simplify</a>(gf_entry.second.body);</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;}</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
-<div class="line"><a name="l00253"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">  253</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">invariant_propagationt::simplify</a>(<a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;{</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(i_it, goto_program)</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  {</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordflow">if</span>(!i_it-&gt;is_assert())</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="comment">// find invariant set</span></div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;d = (*this)[i_it];</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keywordflow">if</span>(d.is_bottom())</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      is.add_objects(globals);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="preprocessor">      #endif</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;local : locals)</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      {</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <span class="comment">// cache hit?</span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        object_cachet::const_iterator e_it=object_cache.find(local);</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        <span class="keywordflow">if</span>(e_it==object_cache.end())</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        {</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;          <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol=<a class="code" href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">ns</a>.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(local);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;          <a class="code" href="classinvariant__propagationt.html#ac8d380e5b9bc88a627054743993eb7dc">object_listt</a> &amp;objects=object_cache[local];</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;          <a class="code" href="classinvariant__propagationt.html#a6aa96e57e52acfdef994d1000c9c657d">get_objects</a>(symbol, objects);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="preprocessor">          #if 0</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;          is.add_objects(objects);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="preprocessor">          #endif</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        }</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="preprocessor">        #if 0</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;          is.add_objects(e_it-&gt;second);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor">        #endif</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      }</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  }</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;}</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#ae8c59359756f77e15fb4ece2799d2c09">  209</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#ae8c59359756f77e15fb4ece2799d2c09">invariant_propagationt::get_globals</a>(</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <a class="code" href="classinvariant__propagationt.html#ac8d380e5b9bc88a627054743993eb7dc">object_listt</a> &amp;dest)</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;{</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="comment">// static ones</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;symbol_pair : <a class="code" href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">ns</a>.<a class="code" href="classnamespacet.html#ae672c84ace27771c869d1b78b0293a7b">get_symbol_table</a>().<a class="code" href="classsymbol__table__baset.html#a985bf4985be5dc7fcf9a8a092f105beb">symbols</a>)</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  {</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">if</span>(symbol_pair.second.is_lvalue &amp;&amp; symbol_pair.second.is_static_lifetime)</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <a class="code" href="classinvariant__propagationt.html#a6aa96e57e52acfdef994d1000c9c657d">get_objects</a>(symbol_pair.second, dest);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    }</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  }</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#ae6d2e98dd3d0ceba92bab5e827475dd5">  222</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classinvariant__propagationt.html#ae6d2e98dd3d0ceba92bab5e827475dd5">invariant_propagationt::check_type</a>(<span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_pointer)</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union ||</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  {</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  }</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_array)</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_unsignedbv ||</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;          type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_signedbv)</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_bool)</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;}</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
+<div class="line"><a name="l00243"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#abdaf1a5a72909b04ecf9530e883393be">  243</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#abdaf1a5a72909b04ecf9530e883393be">invariant_propagationt::initialize</a>(</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<span class="keyword">function</span>,</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  <span class="keyword">const</span> <a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;{</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  <a class="code" href="classai__baset.html#a7dc441fc77d3f580c311581242a97e3d">baset::initialize</a>(<span class="keyword">function</span>, goto_program);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <a class="code" href="classinvariant__propagationt.html#a4c1492577892b62ec7caea467408102e">add_objects</a>(goto_program);</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;}</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
+<div class="line"><a name="l00252"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#a8472cce28c346687d2be75a6e8985cc4">  252</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">invariant_propagationt::simplify</a>(<a class="code" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;{</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;gf_entry : goto_functions.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <a class="code" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">simplify</a>(gf_entry.second.body);</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;}</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
+<div class="line"><a name="l00258"></a><span class="lineno"><a class="line" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">  258</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">invariant_propagationt::simplify</a>(<a class="code" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;{</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <a class="code" href="goto__program_8h.html#a70232dd124bfcc17855c337bac57477f">Forall_goto_program_instructions</a>(i_it, goto_program)</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  {</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keywordflow">if</span>(!i_it-&gt;is_assert())</div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keyword">const</span> <a class="code" href="classinvariant__sett.html">invariant_sett</a> &amp;invariant_set = d.invariant_set;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <a class="code" href="classexprt.html">exprt</a> simplified_guard(i_it-&gt;condition());</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    invariant_set.<a class="code" href="classinvariant__sett.html#a41ba994614d2e208f908d0bcfcbea2fe">simplify</a>(simplified_guard);</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <a class="code" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">::simplify</a>(simplified_guard, <a class="code" href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">ns</a>);</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="comment">// find invariant set</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;d = (*this)[i_it];</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keywordflow">if</span>(d.is_bottom())</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keyword">const</span> <a class="code" href="classinvariant__sett.html">invariant_sett</a> &amp;invariant_set = d.invariant_set;</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="keywordflow">if</span>(invariant_set.<a class="code" href="classinvariant__sett.html#aa0075685a31add507003d11691612ff0">implies</a>(simplified_guard).<a class="code" href="classtvt.html#ad6dadd01efde5b03f98a8b5d7553a107">is_true</a>())</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      i_it-&gt;condition_nonconst() = <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  }</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;}</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <a class="code" href="classexprt.html">exprt</a> simplified_guard(i_it-&gt;condition());</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160; </div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    invariant_set.<a class="code" href="classinvariant__sett.html#a41ba994614d2e208f908d0bcfcbea2fe">simplify</a>(simplified_guard);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <a class="code" href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">::simplify</a>(simplified_guard, <a class="code" href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">ns</a>);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">if</span>(invariant_set.<a class="code" href="classinvariant__sett.html#aa0075685a31add507003d11691612ff0">implies</a>(simplified_guard).<a class="code" href="classtvt.html#ad6dadd01efde5b03f98a8b5d7553a107">is_true</a>())</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      i_it-&gt;condition_nonconst() = <a class="code" href="classtrue__exprt.html">true_exprt</a>();</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  }</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;}</div>
 <div class="ttc" id="aclassai__baset_html_a7dc441fc77d3f580c311581242a97e3d"><div class="ttname"><a href="classai__baset.html#a7dc441fc77d3f580c311581242a97e3d">ai_baset::initialize</a></div><div class="ttdeci">virtual void initialize(const irep_idt &amp;function_id, const goto_programt &amp;goto_program)</div><div class="ttdoc">Initialize all the abstract states for a single function.</div><div class="ttdef"><b>Definition:</b> <a href="ai_8cpp_source.html#l00194">ai.cpp:194</a></div></div>
 <div class="ttc" id="aclassai__domain__factory__baset_html_a88d549309f86ab37adc07fdc2c4e0d80"><div class="ttname"><a href="classai__domain__factory__baset.html#a88d549309f86ab37adc07fdc2c4e0d80">ai_domain_factory_baset::locationt</a></div><div class="ttdeci">ai_domain_baset::locationt locationt</div><div class="ttdef"><b>Definition:</b> <a href="ai__domain_8h_source.html#l00174">ai_domain.h:174</a></div></div>
 <div class="ttc" id="aclassai__domain__factoryt_html"><div class="ttname"><a href="classai__domain__factoryt.html">ai_domain_factoryt</a></div><div class="ttdef"><b>Definition:</b> <a href="ai__domain_8h_source.html#l00199">ai_domain.h:200</a></div></div>
@@ -381,16 +386,16 @@ $(document).ready(function(){initNavTree('invariant__propagation_8cpp_source.htm
 <div class="ttc" id="aclassinvariant__propagationt_html_a21550e9f6d4df02aeb2f861788862fd8"><div class="ttname"><a href="classinvariant__propagationt.html#a21550e9f6d4df02aeb2f861788862fd8">invariant_propagationt::value_sets</a></div><div class="ttdeci">value_setst &amp; value_sets</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8h_source.html#l00053">invariant_propagation.h:53</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_a31f815a4ecfd562036b741cd8f66cdbf"><div class="ttname"><a href="classinvariant__propagationt.html#a31f815a4ecfd562036b741cd8f66cdbf">invariant_propagationt::ns</a></div><div class="ttdeci">const namespacet &amp; ns</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8h_source.html#l00052">invariant_propagation.h:52</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_a4c1492577892b62ec7caea467408102e"><div class="ttname"><a href="classinvariant__propagationt.html#a4c1492577892b62ec7caea467408102e">invariant_propagationt::add_objects</a></div><div class="ttdeci">void add_objects(const goto_programt &amp;goto_program)</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00066">invariant_propagation.cpp:66</a></div></div>
-<div class="ttc" id="aclassinvariant__propagationt_html_a4eb8cf17e0abf25a1e6167e61377d446"><div class="ttname"><a href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">invariant_propagationt::simplify</a></div><div class="ttdeci">void simplify(goto_programt &amp;goto_program)</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00253">invariant_propagation.cpp:253</a></div></div>
+<div class="ttc" id="aclassinvariant__propagationt_html_a4eb8cf17e0abf25a1e6167e61377d446"><div class="ttname"><a href="classinvariant__propagationt.html#a4eb8cf17e0abf25a1e6167e61377d446">invariant_propagationt::simplify</a></div><div class="ttdeci">void simplify(goto_programt &amp;goto_program)</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00258">invariant_propagation.cpp:258</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_a531bd844d7668e61f6e3b8e7e948f222"><div class="ttname"><a href="classinvariant__propagationt.html#a531bd844d7668e61f6e3b8e7e948f222">invariant_propagationt::make_all_true</a></div><div class="ttdeci">void make_all_true()</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00050">invariant_propagation.cpp:50</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_a54d2f7ccefbcf63ca1504399cdae5b89"><div class="ttname"><a href="classinvariant__propagationt.html#a54d2f7ccefbcf63ca1504399cdae5b89">invariant_propagationt::make_all_false</a></div><div class="ttdeci">void make_all_false()</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00058">invariant_propagation.cpp:58</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_a6aa96e57e52acfdef994d1000c9c657d"><div class="ttname"><a href="classinvariant__propagationt.html#a6aa96e57e52acfdef994d1000c9c657d">invariant_propagationt::get_objects</a></div><div class="ttdeci">void get_objects(const symbolt &amp;symbol, object_listt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00112">invariant_propagation.cpp:112</a></div></div>
-<div class="ttc" id="aclassinvariant__propagationt_html_abdaf1a5a72909b04ecf9530e883393be"><div class="ttname"><a href="classinvariant__propagationt.html#abdaf1a5a72909b04ecf9530e883393be">invariant_propagationt::initialize</a></div><div class="ttdeci">void initialize(const irep_idt &amp;function, const goto_programt &amp;goto_program) override</div><div class="ttdoc">Initialize all the abstract states for a single function.</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00238">invariant_propagation.cpp:238</a></div></div>
+<div class="ttc" id="aclassinvariant__propagationt_html_abdaf1a5a72909b04ecf9530e883393be"><div class="ttname"><a href="classinvariant__propagationt.html#abdaf1a5a72909b04ecf9530e883393be">invariant_propagationt::initialize</a></div><div class="ttdeci">void initialize(const irep_idt &amp;function, const goto_programt &amp;goto_program) override</div><div class="ttdoc">Initialize all the abstract states for a single function.</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00243">invariant_propagation.cpp:243</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_ac7967c13577a9c5d33b9bce19c3c9b88"><div class="ttname"><a href="classinvariant__propagationt.html#ac7967c13577a9c5d33b9bce19c3c9b88">invariant_propagationt::get_objects_rec</a></div><div class="ttdeci">void get_objects_rec(const exprt &amp;src, std::list&lt; exprt &gt; &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00124">invariant_propagation.cpp:124</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_ac8d380e5b9bc88a627054743993eb7dc"><div class="ttname"><a href="classinvariant__propagationt.html#ac8d380e5b9bc88a627054743993eb7dc">invariant_propagationt::object_listt</a></div><div class="ttdeci">std::list&lt; unsigned &gt; object_listt</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8h_source.html#l00057">invariant_propagation.h:57</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_ae02e535fbaa3bfa84cf45ad09a9e9ed3"><div class="ttname"><a href="classinvariant__propagationt.html#ae02e535fbaa3bfa84cf45ad09a9e9ed3">invariant_propagationt::object_store</a></div><div class="ttdeci">inv_object_storet object_store</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8h_source.html#l00055">invariant_propagation.h:55</a></div></div>
-<div class="ttc" id="aclassinvariant__propagationt_html_ae6d2e98dd3d0ceba92bab5e827475dd5"><div class="ttname"><a href="classinvariant__propagationt.html#ae6d2e98dd3d0ceba92bab5e827475dd5">invariant_propagationt::check_type</a></div><div class="ttdeci">bool check_type(const typet &amp;type) const</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00219">invariant_propagation.cpp:219</a></div></div>
-<div class="ttc" id="aclassinvariant__propagationt_html_ae8c59359756f77e15fb4ece2799d2c09"><div class="ttname"><a href="classinvariant__propagationt.html#ae8c59359756f77e15fb4ece2799d2c09">invariant_propagationt::get_globals</a></div><div class="ttdeci">void get_globals(object_listt &amp;globals)</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00206">invariant_propagation.cpp:206</a></div></div>
+<div class="ttc" id="aclassinvariant__propagationt_html_ae6d2e98dd3d0ceba92bab5e827475dd5"><div class="ttname"><a href="classinvariant__propagationt.html#ae6d2e98dd3d0ceba92bab5e827475dd5">invariant_propagationt::check_type</a></div><div class="ttdeci">bool check_type(const typet &amp;type) const</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00222">invariant_propagation.cpp:222</a></div></div>
+<div class="ttc" id="aclassinvariant__propagationt_html_ae8c59359756f77e15fb4ece2799d2c09"><div class="ttname"><a href="classinvariant__propagationt.html#ae8c59359756f77e15fb4ece2799d2c09">invariant_propagationt::get_globals</a></div><div class="ttdeci">void get_globals(object_listt &amp;globals)</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00209">invariant_propagation.cpp:209</a></div></div>
 <div class="ttc" id="aclassinvariant__propagationt_html_aedd0b2edacb1f1f2279f4885e941e089"><div class="ttname"><a href="classinvariant__propagationt.html#aedd0b2edacb1f1f2279f4885e941e089">invariant_propagationt::invariant_propagationt</a></div><div class="ttdeci">invariant_propagationt(const namespacet &amp;_ns, value_setst &amp;_value_sets)</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00039">invariant_propagation.cpp:39</a></div></div>
 <div class="ttc" id="aclassinvariant__set__domain__factoryt_html"><div class="ttname"><a href="classinvariant__set__domain__factoryt.html">invariant_set_domain_factoryt</a></div><div class="ttdoc">Pass the necessary arguments to the invariant_set_domaint's when constructed.</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00018">invariant_propagation.cpp:20</a></div></div>
 <div class="ttc" id="aclassinvariant__set__domain__factoryt_html_a0e43a33ae3f6d9886a6197c77fe8bb63"><div class="ttname"><a href="classinvariant__set__domain__factoryt.html#a0e43a33ae3f6d9886a6197c77fe8bb63">invariant_set_domain_factoryt::make</a></div><div class="ttdeci">std::unique_ptr&lt; statet &gt; make(locationt l) const override</div><div class="ttdef"><b>Definition:</b> <a href="invariant__propagation_8cpp_source.html#l00026">invariant_propagation.cpp:26</a></div></div>
@@ -400,14 +405,14 @@ $(document).ready(function(){initNavTree('invariant__propagation_8cpp_source.htm
 <div class="ttc" id="aclassinvariant__set__domaint_html_a2f3e674a67726e5976214f4450772802"><div class="ttname"><a href="classinvariant__set__domaint.html#a2f3e674a67726e5976214f4450772802">invariant_set_domaint::invariant_set</a></div><div class="ttdeci">invariant_sett invariant_set</div><div class="ttdef"><b>Definition:</b> <a href="invariant__set__domain_8h_source.html#l00032">invariant_set_domain.h:32</a></div></div>
 <div class="ttc" id="aclassinvariant__sett_html"><div class="ttname"><a href="classinvariant__sett.html">invariant_sett</a></div><div class="ttdef"><b>Definition:</b> <a href="invariant__set_8h_source.html#l00079">invariant_set.h:80</a></div></div>
 <div class="ttc" id="aclassinvariant__sett_html_a2158fe1f8a5f8f2c6625f6039a81cb68"><div class="ttname"><a href="classinvariant__sett.html#a2158fe1f8a5f8f2c6625f6039a81cb68">invariant_sett::make_false</a></div><div class="ttdeci">void make_false()</div><div class="ttdef"><b>Definition:</b> <a href="invariant__set_8h_source.html#l00127">invariant_set.h:127</a></div></div>
-<div class="ttc" id="aclassinvariant__sett_html_a41ba994614d2e208f908d0bcfcbea2fe"><div class="ttname"><a href="classinvariant__sett.html#a41ba994614d2e208f908d0bcfcbea2fe">invariant_sett::simplify</a></div><div class="ttdeci">void simplify(exprt &amp;expr) const</div><div class="ttdef"><b>Definition:</b> <a href="invariant__set_8cpp_source.html#l00811">invariant_set.cpp:811</a></div></div>
+<div class="ttc" id="aclassinvariant__sett_html_a41ba994614d2e208f908d0bcfcbea2fe"><div class="ttname"><a href="classinvariant__sett.html#a41ba994614d2e208f908d0bcfcbea2fe">invariant_sett::simplify</a></div><div class="ttdeci">void simplify(exprt &amp;expr) const</div><div class="ttdef"><b>Definition:</b> <a href="invariant__set_8cpp_source.html#l00813">invariant_set.cpp:813</a></div></div>
 <div class="ttc" id="aclassinvariant__sett_html_a7944606195fcd3bce0e8e32289f1c7b1"><div class="ttname"><a href="classinvariant__sett.html#a7944606195fcd3bce0e8e32289f1c7b1">invariant_sett::make_true</a></div><div class="ttdeci">void make_true()</div><div class="ttdef"><b>Definition:</b> <a href="invariant__set_8h_source.html#l00119">invariant_set.h:119</a></div></div>
-<div class="ttc" id="aclassinvariant__sett_html_aa0075685a31add507003d11691612ff0"><div class="ttname"><a href="classinvariant__sett.html#aa0075685a31add507003d11691612ff0">invariant_sett::implies</a></div><div class="ttdeci">tvt implies(const exprt &amp;expr) const</div><div class="ttdef"><b>Definition:</b> <a href="invariant__set_8cpp_source.html#l00578">invariant_set.cpp:578</a></div></div>
+<div class="ttc" id="aclassinvariant__sett_html_aa0075685a31add507003d11691612ff0"><div class="ttname"><a href="classinvariant__sett.html#aa0075685a31add507003d11691612ff0">invariant_sett::implies</a></div><div class="ttdeci">tvt implies(const exprt &amp;expr) const</div><div class="ttdef"><b>Definition:</b> <a href="invariant__set_8cpp_source.html#l00580">invariant_set.cpp:580</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00384">irep.h:384</a></div></div>
 <div class="ttc" id="aclasslocation__sensitive__storaget_html"><div class="ttname"><a href="classlocation__sensitive__storaget.html">location_sensitive_storaget</a></div><div class="ttdoc">The most conventional storage; one domain per location.</div><div class="ttdef"><b>Definition:</b> <a href="ai__storage_8h_source.html#l00153">ai_storage.h:154</a></div></div>
 <div class="ttc" id="aclasslocation__sensitive__storaget_html_ad938ab46f7428bc573b073c0ce6dd160"><div class="ttname"><a href="classlocation__sensitive__storaget.html#ad938ab46f7428bc573b073c0ce6dd160">location_sensitive_storaget::internal</a></div><div class="ttdeci">state_mapt &amp; internal(void)</div><div class="ttdef"><b>Definition:</b> <a href="ai__storage_8h_source.html#l00169">ai_storage.h:169</a></div></div>
 <div class="ttc" id="aclassmember__exprt_html"><div class="ttname"><a href="classmember__exprt.html">member_exprt</a></div><div class="ttdoc">Extract member of struct or union.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l02840">std_expr.h:2841</a></div></div>
-<div class="ttc" id="aclassnamespace__baset_html_a08ff1828dbaf894a44a23f50a700255a"><div class="ttname"><a href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">namespace_baset::follow</a></div><div class="ttdeci">const typet &amp; follow(const typet &amp;) const</div><div class="ttdoc">Resolve type symbol to the type it points to.</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00049">namespace.cpp:49</a></div></div>
+<div class="ttc" id="aclassnamespace__baset_html_a9a5ad94024723d598ae0b8b67e7a3710"><div class="ttname"><a href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">namespace_baset::follow_tag</a></div><div class="ttdeci">const union_typet &amp; follow_tag(const union_tag_typet &amp;) const</div><div class="ttdoc">Follow type tag of union type.</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00063">namespace.cpp:63</a></div></div>
 <div class="ttc" id="aclassnamespacet_html"><div class="ttname"><a href="classnamespacet.html">namespacet</a></div><div class="ttdoc">A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t...</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00093">namespace.h:94</a></div></div>
 <div class="ttc" id="aclassnamespacet_html_a564f54a32d91e10781812a6681e62c39"><div class="ttname"><a href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">namespacet::lookup</a></div><div class="ttdeci">bool lookup(const irep_idt &amp;name, const symbolt *&amp;symbol) const override</div><div class="ttdoc">See documentation for namespace_baset::lookup().</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00148">namespace.cpp:148</a></div></div>
 <div class="ttc" id="aclassnamespacet_html_ae672c84ace27771c869d1b78b0293a7b"><div class="ttname"><a href="classnamespacet.html#ae672c84ace27771c869d1b78b0293a7b">namespacet::get_symbol_table</a></div><div class="ttdeci">const symbol_table_baset &amp; get_symbol_table() const</div><div class="ttdoc">Return first symbol table registered with the namespace.</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8h_source.html#l00126">namespace.h:126</a></div></div>
@@ -429,6 +434,7 @@ $(document).ready(function(){initNavTree('invariant__propagation_8cpp_source.htm
 <div class="ttc" id="astd__expr_8cpp_html_ac90ae77b82997e0b8d1091b112e694b4"><div class="ttname"><a href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a></div><div class="ttdeci">auto component(T &amp;struct_expr, const irep_idt &amp;name, const namespacet &amp;ns) -&gt; decltype(struct_expr.op0())</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8cpp_source.html#l00080">std_expr.cpp:80</a></div></div>
 <div class="ttc" id="astd__expr_8h_html"><div class="ttname"><a href="std__expr_8h.html">std_expr.h</a></div><div class="ttdoc">API to expression classes.</div></div>
 <div class="ttc" id="astd__types_8h_html_a87428d539e489cce31742459e3ed3206"><div class="ttname"><a href="std__types_8h.html#a87428d539e489cce31742459e3ed3206">to_struct_union_type</a></div><div class="ttdeci">const struct_union_typet &amp; to_struct_union_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a struct_union_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00214">std_types.h:214</a></div></div>
+<div class="ttc" id="astd__types_8h_html_aabb8b155eb508af80fbcc8b83559f4c2"><div class="ttname"><a href="std__types_8h.html#aabb8b155eb508af80fbcc8b83559f4c2">to_struct_or_union_tag_type</a></div><div class="ttdeci">const struct_or_union_tag_typet &amp; to_struct_or_union_tag_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a struct_or_union_tag_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00478">std_types.h:478</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
