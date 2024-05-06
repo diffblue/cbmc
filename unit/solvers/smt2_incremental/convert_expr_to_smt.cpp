@@ -1329,13 +1329,12 @@ TEST_CASE(
       "Bit vector typed bounds",
       extractbits_exprt{
         symbol_exprt{"foo", operand_type},
-        from_integer(4, operand_type),
         from_integer(2, operand_type),
         unsignedbv_typet{3}}},
     rowt{
       "Constant integer bounds",
       extractbits_exprt{
-        symbol_exprt{"foo", operand_type}, 4, 2, unsignedbv_typet{3}}});
+        symbol_exprt{"foo", operand_type}, 2, unsignedbv_typet{3}}});
   const smt_termt expected_result = smt_bit_vector_theoryt::extract(4, 2)(
     smt_identifier_termt{"foo", smt_bit_vector_sortt{8}});
   SECTION(description)
@@ -1345,7 +1344,6 @@ TEST_CASE(
     const cbmc_invariants_should_throwt invariants_throw;
     CHECK_THROWS(test.convert(extractbits_exprt{
       symbol_exprt{"foo", operand_type},
-      symbol_exprt{"bar", operand_type},
       symbol_exprt{"bar", operand_type},
       unsignedbv_typet{3}}));
   }

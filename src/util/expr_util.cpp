@@ -276,24 +276,25 @@ bool can_forward_propagatet::is_constant(const exprt &expr) const
   }
   else if(auto eb = expr_try_dynamic_cast<extractbits_exprt>(expr))
   {
-    if(
-      !is_constant(eb->src()) || !eb->lower().is_constant() ||
-      !eb->upper().is_constant())
+    if(!is_constant(eb->src()) || !eb->index().is_constant())
     {
       return false;
     }
+
+    const auto eb_bits = pointer_offset_bits(eb->type(), ns);
+    if(!eb_bits.has_value())
+      return false;
 
     const auto src_bits = pointer_offset_bits(eb->src().type(), ns);
     if(!src_bits.has_value())
       return false;
 
     const mp_integer lower_bound =
-      numeric_cast_v<mp_integer>(to_constant_expr(eb->lower()));
-    const mp_integer upper_bound =
-      numeric_cast_v<mp_integer>(to_constant_expr(eb->upper()));
+      numeric_cast_v<mp_integer>(to_constant_expr(eb->index()));
+    const mp_integer upper_bound = lower_bound + eb_bits.value() - 1;
 
     return lower_bound >= 0 && lower_bound <= upper_bound &&
-           upper_bound < src_bits;
+           upper_bound < src_bits.value();
   }
   else
   {

@@ -110,7 +110,7 @@ static struct_exprt bv_to_struct_expr(
     bitvector_typet type = adjust_width(bitvector_expr.type(), component_bits);
     PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
     operands.push_back(bv_to_expr(
-      extractbits_exprt{bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
+      extractbits_exprt{bitvector_expr, bounds.lb, std::move(type)},
       comp.type(),
       endianness_map,
       ns));
@@ -163,7 +163,7 @@ static exprt bv_to_union_expr(
   return union_exprt{
     component_name,
     bv_to_expr(
-      extractbits_exprt{bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
+      extractbits_exprt{bitvector_expr, bounds.lb, std::move(type)},
       component_type,
       endianness_map,
       ns),
@@ -209,8 +209,7 @@ static array_exprt bv_to_array_expr(
         adjust_width(bitvector_expr.type(), subtype_bits_int);
       PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
       operands.push_back(bv_to_expr(
-        extractbits_exprt{
-          bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
+        extractbits_exprt{bitvector_expr, bounds.lb, std::move(type)},
         array_type.element_type(),
         endianness_map,
         ns));
@@ -256,8 +255,7 @@ static vector_exprt bv_to_vector_expr(
         adjust_width(bitvector_expr.type(), subtype_bits_int);
       PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
       operands.push_back(bv_to_expr(
-        extractbits_exprt{
-          bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
+        extractbits_exprt{bitvector_expr, bounds.lb, std::move(type)},
         vector_type.element_type(),
         endianness_map,
         ns));
@@ -304,12 +302,12 @@ static complex_exprt bv_to_complex_expr(
   PRECONDITION(pointer_offset_bits(bitvector_expr.type(), ns).has_value());
   return complex_exprt{
     bv_to_expr(
-      extractbits_exprt{bitvector_expr, bounds_real.ub, bounds_real.lb, type},
+      extractbits_exprt{bitvector_expr, bounds_real.lb, type},
       complex_type.subtype(),
       endianness_map,
       ns),
     bv_to_expr(
-      extractbits_exprt{bitvector_expr, bounds_imag.ub, bounds_imag.lb, type},
+      extractbits_exprt{bitvector_expr, bounds_imag.lb, type},
       complex_type.subtype(),
       endianness_map,
       ns),
@@ -1069,7 +1067,6 @@ static exprt unpack_rec(
         pointer_offset_bits(src_as_bitvector.type(), ns).has_value());
       extractbits_exprt extractbits(
         src_as_bitvector,
-        from_integer(bit_offset + bits_per_byte - 1, array_type.index_type()),
         from_integer(bit_offset, array_type.index_type()),
         byte_type);
 
@@ -2018,7 +2015,6 @@ static exprt lower_byte_update_single_element(
 
       extractbits_exprt bits_to_keep{
         element_to_update,
-        subtype_bits_int - 1,
         subtype_bits_int - offset_bits_int,
         bv_typet{offset_bits_int}};
       new_value = concatenation_exprt{
@@ -2026,7 +2022,6 @@ static exprt lower_byte_update_single_element(
         extractbits_exprt{
           concatenation_exprt{
             update_values, bv_typet{update_size * src.get_bits_per_byte()}},
-          update_size * src.get_bits_per_byte() - 1,
           offset_bits_int,
           bv_typet{update_size * src.get_bits_per_byte() - offset_bits_int}},
         bv_typet{update_size * src.get_bits_per_byte()}};
@@ -2533,8 +2528,7 @@ static exprt lower_byte_update(
       PRECONDITION(pointer_offset_bits(bitor_expr.type(), ns).has_value());
       return simplify_expr(
         typecast_exprt::conditional_cast(
-          extractbits_exprt{
-            bitor_expr, bounds.ub, bounds.lb, bv_typet{type_bits}},
+          extractbits_exprt{bitor_expr, bounds.lb, bv_typet{type_bits}},
           src.type()),
         ns);
     }
@@ -2613,8 +2607,7 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
         lower_byte_extract(overlapping_byte_extract, ns);
 
       size_t n_extra_bits = bits_per_byte - update_bits_int % bits_per_byte;
-      extractbits_exprt extra_bits{
-        overlapping_byte, n_extra_bits - 1, 0, bv_typet{n_extra_bits}};
+      extractbits_exprt extra_bits{overlapping_byte, 0, bv_typet{n_extra_bits}};
 
       update_value = concatenation_exprt{
         typecast_exprt::conditional_cast(

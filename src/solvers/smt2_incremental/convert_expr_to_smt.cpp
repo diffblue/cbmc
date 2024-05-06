@@ -1111,10 +1111,14 @@ static smt_termt convert_expr_to_smt(
   const sub_expression_mapt &converted)
 {
   const smt_termt &from = converted.at(extract_bits.src());
-  const auto upper_value = numeric_cast<std::size_t>(extract_bits.upper());
-  const auto lower_value = numeric_cast<std::size_t>(extract_bits.lower());
-  if(upper_value && lower_value)
-    return smt_bit_vector_theoryt::extract(*upper_value, *lower_value)(from);
+  const auto bit_vector_sort =
+    convert_type_to_smt_sort(extract_bits.type()).cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    bit_vector_sort, "Extract can only be applied to bit vector terms.");
+  const auto index_value = numeric_cast<std::size_t>(extract_bits.index());
+  if(index_value)
+    return smt_bit_vector_theoryt::extract(
+      *index_value + bit_vector_sort->bit_width() - 1, *index_value)(from);
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for extract bits expression: " +
     extract_bits.pretty());

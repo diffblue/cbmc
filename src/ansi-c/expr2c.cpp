@@ -3497,9 +3497,18 @@ expr2ct::convert_extractbits(const extractbits_exprt &src, unsigned precedence)
 {
   std::string dest = convert_with_precedence(src.src(), precedence);
   dest+='[';
-  dest += convert_with_precedence(src.upper(), precedence);
+  auto expr_width_opt = pointer_offset_bits(src.type(), ns);
+  if(expr_width_opt.has_value())
+  {
+    auto upper = plus_exprt{
+      src.index(),
+      from_integer(expr_width_opt.value() - 1, src.index().type())};
+    dest += convert_with_precedence(upper, precedence);
+  }
+  else
+    dest += "?";
   dest+=", ";
-  dest += convert_with_precedence(src.lower(), precedence);
+  dest += convert_with_precedence(src.index(), precedence);
   dest+=']';
 
   return dest;

@@ -28,8 +28,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   in octuple precision.
 exprt get_exponent(const exprt &src, const ieee_float_spect &spec)
 {
-  const extractbits_exprt exp_bits(
-    src, spec.f + spec.e - 1, spec.f, unsignedbv_typet(spec.e));
+  const extractbits_exprt exp_bits(src, spec.f, unsignedbv_typet(spec.e));
 
   // Exponent is in biased form (numbers from -128 to 127 are encoded with
   // integer from 0 to 255) we have to remove the bias.
@@ -44,7 +43,7 @@ exprt get_exponent(const exprt &src, const ieee_float_spect &spec)
 /// \return An unsigned value representing the fractional part.
 exprt get_fraction(const exprt &src, const ieee_float_spect &spec)
 {
-  return extractbits_exprt(src, spec.f - 1, 0, unsignedbv_typet(spec.f));
+  return extractbits_exprt(src, 0, unsignedbv_typet(spec.f));
 }
 
 /// Gets the significand as a java integer, looking for the hidden bit.
