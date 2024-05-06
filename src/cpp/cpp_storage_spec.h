@@ -47,6 +47,10 @@ public:
   {
     return get_bool(ID_weak);
   }
+  bool is_constexpr() const
+  {
+    return get_bool(ID_constexpr);
+  }
 
   void set_static()       { set(ID_static, true); }
   void set_extern()       { set(ID_extern, true); }
@@ -59,11 +63,16 @@ public:
   {
     set(ID_weak, true);
   }
+  void set_constexpr()
+  {
+    set(ID_constexpr, true);
+  }
 
   bool is_empty() const
   {
     return !is_static() && !is_extern() && !is_auto() && !is_register() &&
-           !is_mutable() && !is_thread_local() && !is_asm() && !is_weak();
+           !is_mutable() && !is_thread_local() && !is_asm() && !is_weak() &&
+           !is_constexpr();
   }
 
   cpp_storage_spect &operator|=(const cpp_storage_spect &other)
@@ -84,6 +93,8 @@ public:
       set_asm();
     if(other.is_weak())
       set_weak();
+    if(other.is_constexpr())
+      set_constexpr();
 
     return *this;
   }

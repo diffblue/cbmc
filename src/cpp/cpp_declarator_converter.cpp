@@ -456,7 +456,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.is_weak = storage_spec.is_weak();
   symbol.module=cpp_typecheck.module;
   symbol.is_type=is_typedef;
-  symbol.is_macro=is_typedef && !is_template_parameter;
+  symbol.is_macro =
+    (is_typedef && !is_template_parameter) || storage_spec.is_constexpr();
   symbol.pretty_name=pretty_name;
 
   if(is_code && !symbol.is_type)
@@ -493,7 +494,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       storage_spec.is_thread_local();
 
     symbol.is_file_local =
-      symbol.is_macro ||
+      (symbol.is_macro && !storage_spec.is_constexpr()) ||
       (!cpp_typecheck.cpp_scopes.current_scope().is_global_scope() &&
        !storage_spec.is_extern()) ||
       (cpp_typecheck.cpp_scopes.current_scope().is_global_scope() &&
@@ -553,10 +554,14 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   // do the value
   if(!new_symbol->is_type)
   {
-    if(is_code && declarator.type().id()!=ID_template)
-      cpp_typecheck.add_method_body(new_symbol);
-
-    if(!is_code)
+    if(is_code)
+    {
+      if(new_symbol->is_macro)
+        cpp_typecheck.convert_function(*new_symbol);
+      else if(declarator.type().id() != ID_template)
+        cpp_typecheck.add_method_body(new_symbol);
+    }
+    else
       cpp_typecheck.convert_initializer(*new_symbol);
   }
 
