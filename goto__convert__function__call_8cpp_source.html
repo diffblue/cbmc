@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CBMC: /home/runner/work/cbmc/cbmc/src/goto-programs/goto_convert_function_call.cpp Source File</title>
+<title>CBMC: /home/runner/work/cbmc/cbmc/src/ansi-c/goto-conversion/goto_convert_function_call.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -129,36 +129,36 @@ $(document).ready(function(){initNavTree('goto__convert__function__call_8cpp_sou
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="comment">// make it all side effect free</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <a class="code" href="classexprt.html">exprt</a> new_lhs=lhs,</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        new_function=<span class="keyword">function</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> new_arguments=arguments;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">if</span>(!new_lhs.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(new_lhs, dest, mode);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(new_function, dest, mode);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;new_argument : new_arguments)</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(new_argument, dest, mode);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="comment">// split on the function</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">if</span>(new_function.id()==ID_if)</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="classgoto__convertt.html#a16b1c025c576872c4f4f341e1cf22a1b">do_function_call_if</a>(</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      new_lhs, <a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(new_function), new_arguments, dest, mode);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  }</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(new_function.id()==ID_symbol)</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="classgoto__convertt.html#a734c3e7a0c005e53166fe98fa2b08add">do_function_call_symbol</a>(</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      new_lhs, <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(new_function), new_arguments, dest, mode);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(new_function.id() == ID_null_object)</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  }</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(new_function.id()==ID_dereference ||</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;          new_function.id()==<span class="stringliteral">&quot;virtual_function&quot;</span>)</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <a class="code" href="classexprt.html">exprt</a> new_lhs = lhs, new_function = <span class="keyword">function</span>;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> new_arguments = arguments;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">if</span>(!new_lhs.<a class="code" href="classirept.html#afa2098e6870bd6fb415025781a3a5db1">is_nil</a>())</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(new_lhs, dest, mode);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(new_function, dest, mode);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;new_argument : new_arguments)</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">clean_expr</a>(new_argument, dest, mode);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="comment">// split on the function</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordflow">if</span>(new_function.id() == ID_if)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  {</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="classgoto__convertt.html#a16b1c025c576872c4f4f341e1cf22a1b">do_function_call_if</a>(</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      new_lhs, <a class="code" href="std__expr_8h.html#a12b435d4696cdc708b3c69e958544ae4">to_if_expr</a>(new_function), new_arguments, dest, mode);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(new_function.id() == ID_symbol)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="classgoto__convertt.html#a734c3e7a0c005e53166fe98fa2b08add">do_function_call_symbol</a>(</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      new_lhs, <a class="code" href="std__expr_8h.html#a25f1967a7eef63b269c6ed43faee88ab">to_symbol_expr</a>(new_function), new_arguments, dest, mode);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  }</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(new_function.id() == ID_null_object)</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  {</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    new_function.id() == ID_dereference ||</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    new_function.id() == <span class="stringliteral">&quot;virtual_function&quot;</span>)</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  {</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="classgoto__convertt.html#abcdddd63b6f3e64a80c69922e84aac45">do_function_call_other</a>(new_lhs, new_function, new_arguments, dest);</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  }</div>
@@ -212,7 +212,7 @@ $(document).ready(function(){initNavTree('goto__convert__function__call_8cpp_sou
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="keywordflow">if</span>(tmp_y.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.empty())</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    y = tmp_y.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a979ac997ce319778c0754d196ae66d03">goto_programt::make_skip</a>());</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    y=tmp_y.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    y = tmp_y.<a class="code" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin();</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <span class="comment">// v: if(!c) goto y;</span></div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  v-&gt;complete_goto(y);</div>
@@ -243,7 +243,7 @@ $(document).ready(function(){initNavTree('goto__convert__function__call_8cpp_sou
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;{</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="comment">// don&#39;t know what to do with it</span></div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <a class="code" href="classcode__function__callt.html">code_function_callt</a> function_call(lhs, <span class="keyword">function</span>, arguments);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  function_call.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>()=<span class="keyword">function</span>.source_location();</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  function_call.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = <span class="keyword">function</span>.source_location();</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  dest.<a class="code" href="classgoto__programt.html#ae29aea105d5cfc359c78900df8e3741f">add</a>(<a class="code" href="classgoto__programt.html#a9b8a5b000ff480dcb197f52cee96bd8d">goto_programt::make_function_call</a>(</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    function_call, <span class="keyword">function</span>.source_location()));</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;}</div>
@@ -258,8 +258,8 @@ $(document).ready(function(){initNavTree('goto__convert__function__call_8cpp_sou
 <div class="ttc" id="aclassgoto__convertt_html_a16b1c025c576872c4f4f341e1cf22a1b"><div class="ttname"><a href="classgoto__convertt.html#a16b1c025c576872c4f4f341e1cf22a1b">goto_convertt::do_function_call_if</a></div><div class="ttdeci">virtual void do_function_call_if(const exprt &amp;lhs, const if_exprt &amp;function, const exprt::operandst &amp;arguments, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__function__call_8cpp_source.html#l00083">goto_convert_function_call.cpp:83</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a1eeb4d806573c2eeae6306260889ae9d"><div class="ttname"><a href="classgoto__convertt.html#a1eeb4d806573c2eeae6306260889ae9d">goto_convertt::do_function_call</a></div><div class="ttdeci">virtual void do_function_call(const exprt &amp;lhs, const exprt &amp;function, const exprt::operandst &amp;arguments, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__function__call_8cpp_source.html#l00031">goto_convert_function_call.cpp:31</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_a495021a8ea619df1559bd904ff7746dd"><div class="ttname"><a href="classgoto__convertt.html#a495021a8ea619df1559bd904ff7746dd">goto_convertt::convert_function_call</a></div><div class="ttdeci">void convert_function_call(const code_function_callt &amp;code, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__function__call_8cpp_source.html#l00018">goto_convert_function_call.cpp:18</a></div></div>
-<div class="ttc" id="aclassgoto__convertt_html_a734c3e7a0c005e53166fe98fa2b08add"><div class="ttname"><a href="classgoto__convertt.html#a734c3e7a0c005e53166fe98fa2b08add">goto_convertt::do_function_call_symbol</a></div><div class="ttdeci">virtual void do_function_call_symbol(const exprt &amp;lhs, const symbol_exprt &amp;function, const exprt::operandst &amp;arguments, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdoc">add function calls to function queue for later processing</div><div class="ttdef"><b>Definition:</b> <a href="builtin__functions_8cpp_source.html#l00804">builtin_functions.cpp:804</a></div></div>
-<div class="ttc" id="aclassgoto__convertt_html_a74adee3be1eda9342d4ff5502260584a"><div class="ttname"><a href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">goto_convertt::clean_expr</a></div><div class="ttdeci">void clean_expr(exprt &amp;expr, goto_programt &amp;dest, const irep_idt &amp;mode, bool result_is_used=true)</div><div class="ttdef"><b>Definition:</b> <a href="goto__clean__expr_8cpp_source.html#l00168">goto_clean_expr.cpp:168</a></div></div>
+<div class="ttc" id="aclassgoto__convertt_html_a734c3e7a0c005e53166fe98fa2b08add"><div class="ttname"><a href="classgoto__convertt.html#a734c3e7a0c005e53166fe98fa2b08add">goto_convertt::do_function_call_symbol</a></div><div class="ttdeci">virtual void do_function_call_symbol(const exprt &amp;lhs, const symbol_exprt &amp;function, const exprt::operandst &amp;arguments, goto_programt &amp;dest, const irep_idt &amp;mode)</div><div class="ttdoc">add function calls to function queue for later processing</div><div class="ttdef"><b>Definition:</b> <a href="builtin__functions_8cpp_source.html#l00798">builtin_functions.cpp:798</a></div></div>
+<div class="ttc" id="aclassgoto__convertt_html_a74adee3be1eda9342d4ff5502260584a"><div class="ttname"><a href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">goto_convertt::clean_expr</a></div><div class="ttdeci">void clean_expr(exprt &amp;expr, goto_programt &amp;dest, const irep_idt &amp;mode, bool result_is_used=true)</div><div class="ttdef"><b>Definition:</b> <a href="goto__clean__expr_8cpp_source.html#l00167">goto_clean_expr.cpp:167</a></div></div>
 <div class="ttc" id="aclassgoto__convertt_html_abcdddd63b6f3e64a80c69922e84aac45"><div class="ttname"><a href="classgoto__convertt.html#abcdddd63b6f3e64a80c69922e84aac45">goto_convertt::do_function_call_other</a></div><div class="ttdeci">virtual void do_function_call_other(const exprt &amp;lhs, const exprt &amp;function, const exprt::operandst &amp;arguments, goto_programt &amp;dest)</div><div class="ttdef"><b>Definition:</b> <a href="goto__convert__function__call_8cpp_source.html#l00146">goto_convert_function_call.cpp:146</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00072">goto_program.h:73</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00622">goto_program.h:622</a></div></div>
@@ -285,7 +285,7 @@ $(document).ready(function(){initNavTree('goto__convert__function__call_8cpp_sou
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_807c5b2c83e0c14a10083f60cf67ca05.html">goto-programs</a></li><li class="navelem"><a class="el" href="goto__convert__function__call_8cpp.html">goto_convert_function_call.cpp</a></li>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_f88182c44268ef6b082d02d66ccc5f99.html">ansi-c</a></li><li class="navelem"><a class="el" href="dir_0ea4c3d6b179c025c29bf4f50d04840d.html">goto-conversion</a></li><li class="navelem"><a class="el" href="goto__convert__function__call_8cpp.html">goto_convert_function_call.cpp</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

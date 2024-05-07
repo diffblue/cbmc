@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CBMC: /home/runner/work/cbmc/cbmc/src/goto-programs/destructor.cpp Source File</title>
+<title>CBMC: /home/runner/work/cbmc/cbmc/src/ansi-c/goto-conversion/destructor.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -102,33 +102,33 @@ $(document).ready(function(){initNavTree('destructor_8cpp_source.html',''); init
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="destructor_8h.html">destructor.h</a>&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="goto__instruction__code_8h.html">goto_instruction_code.h</a>&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="namespace_8h.html">util/namespace.h</a>&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer__expr_8h.html">util/pointer_expr.h</a>&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7">   18</a></span>&#160;<a class="code" href="classcode__function__callt.html">code_function_callt</a> <a class="code" href="destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7">get_destructor</a>(</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns,</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag)</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  {</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7">get_destructor</a>(ns, ns.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="std__types_8h.html#aa35ea2a7438d5541e95f4bd50f4e0006">to_struct_tag_type</a>(type)));</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  }</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_struct)</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;methods=<span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a>&amp;<span class="keyword">&gt;</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_methods));</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : methods.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="keywordflow">if</span>(op.type().id() == ID_code)</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;      {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;code_type = <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(op.type());</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <span class="keywordflow">if</span>(code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>()==ID_destructor &amp;&amp;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;           code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>().size()==1)</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="namespace_8h.html">util/namespace.h</a>&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer__expr_8h.html">util/pointer_expr.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="goto__instruction__code_8h.html">goto-programs/goto_instruction_code.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7">   19</a></span>&#160;<a class="code" href="classcode__function__callt.html">code_function_callt</a> <a class="code" href="destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7">get_destructor</a>(<span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns, <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type)</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag)</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7">get_destructor</a>(ns, ns.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="std__types_8h.html#aa35ea2a7438d5541e95f4bd50f4e0006">to_struct_tag_type</a>(type)));</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  }</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct)</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  {</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;methods = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(type.<a class="code" href="classirept.html#a292bcd2cd3f022dc7896b6dc9ee154f9">find</a>(ID_methods));</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;op : methods.<a class="code" href="classexprt.html#ab33453726d7cb050fc23fb9b9d2375ac">operands</a>())</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      <span class="keywordflow">if</span>(op.type().id() == ID_code)</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;code_type = <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(op.type());</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <span class="keywordflow">if</span>(</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;          code_type.<a class="code" href="classcode__typet.html#a3fa9f93c4ebc68c5828d2305e995ba3f">return_type</a>().<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_destructor &amp;&amp;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;          code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>().size() == 1)</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;          <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;arg_type=code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>().front().type();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;          <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;arg_type = code_type.<a class="code" href="classcode__typet.html#aea0614e764b785c9a71b217eea487e4a">parameters</a>().front().type();</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;          <span class="keywordflow">if</span>(arg_type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() != ID_pointer)</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;            <span class="keywordflow">continue</span>;</div>
@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('destructor_8cpp_source.html',''); init
 <div class="ttc" id="aclasspointer__typet_html_a8670ac230937c81124d9a84965f27717"><div class="ttname"><a href="classpointer__typet.html#a8670ac230937c81124d9a84965f27717">pointer_typet::base_type</a></div><div class="ttdeci">const typet &amp; base_type() const</div><div class="ttdoc">The type of the data what we point to.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00035">pointer_expr.h:35</a></div></div>
 <div class="ttc" id="aclasssymbol__exprt_html"><div class="ttname"><a href="classsymbol__exprt.html">symbol_exprt</a></div><div class="ttdoc">Expression to hold a symbol (variable)</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l00130">std_expr.h:131</a></div></div>
 <div class="ttc" id="aclasstypet_html"><div class="ttname"><a href="classtypet.html">typet</a></div><div class="ttdoc">The type of an expression, extends irept.</div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.html#l00028">type.h:29</a></div></div>
-<div class="ttc" id="adestructor_8cpp_html_a5926579c8aae217b2d45fe5a419c34f7"><div class="ttname"><a href="destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7">get_destructor</a></div><div class="ttdeci">code_function_callt get_destructor(const namespacet &amp;ns, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="destructor_8cpp_source.html#l00018">destructor.cpp:18</a></div></div>
+<div class="ttc" id="adestructor_8cpp_html_a5926579c8aae217b2d45fe5a419c34f7"><div class="ttname"><a href="destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7">get_destructor</a></div><div class="ttdeci">code_function_callt get_destructor(const namespacet &amp;ns, const typet &amp;type)</div><div class="ttdef"><b>Definition:</b> <a href="destructor_8cpp_source.html#l00019">destructor.cpp:19</a></div></div>
 <div class="ttc" id="adestructor_8h_html"><div class="ttname"><a href="destructor_8h.html">destructor.h</a></div><div class="ttdoc">Destructor Calls.</div></div>
 <div class="ttc" id="agoto__instruction__code_8h_html"><div class="ttname"><a href="goto__instruction__code_8h.html">goto_instruction_code.h</a></div></div>
 <div class="ttc" id="airep_8cpp_html_a420828b4903d7d8fcf25a91bb60a6c4c"><div class="ttname"><a href="irep_8cpp.html#a420828b4903d7d8fcf25a91bb60a6c4c">get_nil_irep</a></div><div class="ttdeci">const irept &amp; get_nil_irep()</div><div class="ttdef"><b>Definition:</b> <a href="irep_8cpp_source.html#l00019">irep.cpp:19</a></div></div>
@@ -175,7 +175,7 @@ $(document).ready(function(){initNavTree('destructor_8cpp_source.html',''); init
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_807c5b2c83e0c14a10083f60cf67ca05.html">goto-programs</a></li><li class="navelem"><a class="el" href="destructor_8cpp.html">destructor.cpp</a></li>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_f88182c44268ef6b082d02d66ccc5f99.html">ansi-c</a></li><li class="navelem"><a class="el" href="dir_0ea4c3d6b179c025c29bf4f50d04840d.html">goto-conversion</a></li><li class="navelem"><a class="el" href="destructor_8cpp.html">destructor.cpp</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
