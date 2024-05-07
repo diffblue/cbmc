@@ -11,7 +11,7 @@ Date: April 2023
 \*******************************************************************/
 
 #include "dfcc_instrument_loop.h"
-#include <goto-programs/goto_convert_class.h>
+#include <ansi-c/goto-conversion/goto_convert_class.h>
 
 #include <util/format_expr.h>
 #include <util/fresh_symbol.h>

@@ -15,7 +15,7 @@ Date: June 2022
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_CFG_INFO_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_CFG_INFO_H
 
-#include <goto-programs/goto_convert_class.h>
+#include <ansi-c/goto-conversion/goto_convert_class.h>
 
 #include <util/byte_operators.h>
 #include <util/expr_cast.h>

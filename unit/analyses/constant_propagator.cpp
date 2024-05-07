@@ -6,17 +6,15 @@ Author: Diffblue Ltd
 
 \*******************************************************************/
 
-#include <testing-utils/message.h>
-#include <testing-utils/use_catch.h>
-
-#include <analyses/constant_propagator.h>
-
-#include <goto-programs/goto_convert_functions.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
 #include <util/prefix.h>
+
+#include <analyses/constant_propagator.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 static bool starts_with_x(const exprt &e, const namespacet &)
 {

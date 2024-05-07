@@ -19,7 +19,7 @@ Author: Peter Schrammel
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include <ansi-c/goto_check_c.h>
+#include <ansi-c/goto-conversion/goto_check_c.h>
 #include <goto-instrument/cover.h>
 
 class goto_modelt;

@@ -29,8 +29,9 @@ Date:   April 2017
 #include <util/string_expr.h>
 #include <util/symbol_table_base.h>
 
-#include <goto-programs/allocate_objects.h>
 #include <goto-programs/class_identifier.h>
+
+#include <ansi-c/allocate_objects.h>
 
 #include "java_types.h"
 #include "java_utils.h"

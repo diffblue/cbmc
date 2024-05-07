@@ -17,10 +17,10 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 #include <util/run.h>
 #include <util/tempfile.h>
 
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <json/json_parser.h>
 #include <linking/static_lifetime_init.h>
 

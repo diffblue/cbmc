@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 
 #include <ansi-c/ansi_c_language.h>
-#include <ansi-c/goto_check_c.h>
+#include <ansi-c/goto-conversion/goto_check_c.h>
 #include <pointer-analysis/goto_program_dereference.h>
 
 #include "aggressive_slicer.h"

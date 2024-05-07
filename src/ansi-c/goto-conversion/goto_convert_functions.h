@@ -15,7 +15,8 @@ Date: June 2003
 #define CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_FUNCTIONS_H
 
 #include "goto_convert_class.h"
-#include "goto_functions.h"
+
+#include <goto-programs/goto_functions.h>
 
 class goto_modelt;
 
@@ -26,9 +27,7 @@ void goto_convert(
   message_handlert &);
 
 // convert it all!
-void goto_convert(
-  goto_modelt &,
-  message_handlert &);
+void goto_convert(goto_modelt &, message_handlert &);
 
 // just convert a specific function
 void goto_convert(
@@ -37,7 +36,7 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &);
 
-class goto_convert_functionst:public goto_convertt
+class goto_convert_functionst : public goto_convertt
 {
 public:
   void goto_convert(goto_functionst &functions);

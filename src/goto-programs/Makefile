@@ -1,21 +1,10 @@
-SRC = allocate_objects.cpp \
-      adjust_float_expressions.cpp \
-      builtin_functions.cpp \
+SRC = adjust_float_expressions.cpp \
       class_hierarchy.cpp \
       class_identifier.cpp \
       compute_called_functions.cpp \
-      destructor.cpp \
       elf_reader.cpp \
       ensure_one_backedge_per_target.cpp \
-      format_strings.cpp \
-      goto_asm.cpp \
       goto_check.cpp \
-      goto_clean_expr.cpp \
-      goto_convert.cpp \
-      goto_convert_exceptions.cpp \
-      goto_convert_function_call.cpp \
-      goto_convert_functions.cpp \
-      goto_convert_side_effect.cpp \
       goto_function.cpp \
       goto_functions.cpp \
       goto_inline_class.cpp \
@@ -32,14 +21,12 @@ SRC = allocate_objects.cpp \
       json_goto_trace.cpp \
       label_function_pointer_call_sites.cpp \
       link_goto_model.cpp \
-      link_to_library.cpp \
       loop_ids.cpp \
       mm_io.cpp \
       name_mangler.cpp \
       osx_fat_reader.cpp \
       parameter_assignments.cpp \
       pointer_arithmetic.cpp \
-      printf_formatter.cpp \
       process_goto_program.cpp \
       read_bin_goto_object.cpp \
       read_goto_binary.cpp \
@@ -59,7 +46,6 @@ SRC = allocate_objects.cpp \
       rewrite_union.cpp \
       resolve_inherited_component.cpp \
       safety_checker.cpp \
-      scope_tree.cpp \
       set_properties.cpp \
       show_goto_functions.cpp \
       show_goto_functions_json.cpp \
@@ -68,7 +54,6 @@ SRC = allocate_objects.cpp \
       show_symbol_table.cpp \
       slice_global_inits.cpp \
       string_abstraction.cpp \
-      string_instrumentation.cpp \
       structured_trace_util.cpp \
       system_library_symbols.cpp \
       validate_code.cpp \

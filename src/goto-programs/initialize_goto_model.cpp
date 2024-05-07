@@ -21,12 +21,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/rebuild_goto_start_function.h>
 
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <langapi/language.h>
 #include <langapi/language_file.h>
 #include <langapi/mode.h>
 #include <linking/static_lifetime_init.h>
 
-#include "goto_convert_functions.h"
 #include "read_goto_binary.h"
 
 #include <fstream>

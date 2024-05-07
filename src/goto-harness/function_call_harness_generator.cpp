@@ -16,9 +16,10 @@ Author: Diffblue Ltd.
 #include <util/string_utils.h>
 #include <util/ui_message.h>
 
-#include <goto-programs/allocate_objects.h>
-#include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
+
+#include <ansi-c/allocate_objects.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 
 #include "function_harness_generator_options.h"
 #include "goto_harness_generator_factory.h"

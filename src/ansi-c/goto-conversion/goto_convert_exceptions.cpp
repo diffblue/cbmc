@@ -101,7 +101,7 @@ void goto_convertt::convert_try_catch(
 
   // the CATCH-push instruction is annotated with a list of IDs,
   // one per target
-  code_push_catcht::exception_listt &exception_list=
+  code_push_catcht::exception_listt &exception_list =
     push_catch_code.exception_list();
 
   // add a SKIP target for the end of everything
@@ -119,9 +119,9 @@ void goto_convertt::convert_try_catch(
   // add a goto to the end of the 'try' block
   dest.add(goto_programt::make_goto(end_target));
 
-  for(std::size_t i=1; i<code.operands().size(); i++)
+  for(std::size_t i = 1; i < code.operands().size(); i++)
   {
-    const codet &block=to_code(code.operands()[i]);
+    const codet &block = to_code(code.operands()[i]);
 
     // grab the ID and add to CATCH instruction
     exception_list.push_back(
@@ -162,7 +162,7 @@ void goto_convertt::convert_CPROVER_try_catch(
 
   // now put 'catch' code onto destructor stack
   code_ifthenelset catch_code(exception_flag(mode), to_code(code.op1()));
-  catch_code.add_source_location()=code.source_location();
+  catch_code.add_source_location() = code.source_location();
 
   // Store the point before the temp catch code.
   node_indext old_stack_top = targets.scope_stack.get_current_node();
@@ -235,17 +235,17 @@ void goto_convertt::convert_CPROVER_try_finally(
 
 symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
 {
-  irep_idt id="$exception_flag";
+  irep_idt id = "$exception_flag";
 
   symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(id);
 
-  if(s_it==symbol_table.symbols.end())
+  if(s_it == symbol_table.symbols.end())
   {
     symbolt new_symbol{id, bool_typet{}, mode};
-    new_symbol.base_name="$exception_flag";
-    new_symbol.is_lvalue=true;
-    new_symbol.is_thread_local=true;
+    new_symbol.base_name = "$exception_flag";
+    new_symbol.is_lvalue = true;
+    new_symbol.is_thread_local = true;
     symbol_table.insert(std::move(new_symbol));
   }
 

@@ -6,10 +6,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
-#include <testing-utils/call_graph_test_utils.h>
-#include <testing-utils/message.h>
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_code.h>
@@ -17,8 +13,11 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <analyses/dependence_graph.h>
 #include <ansi-c/ansi_c_language.h>
-#include <goto-programs/goto_convert_functions.h>
+#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <langapi/mode.h>
+#include <testing-utils/call_graph_test_utils.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 const std::set<goto_programt::const_targett, goto_programt::target_less_than> &
 dependence_graph_test_get_control_deps(const dep_graph_domaint &domain)

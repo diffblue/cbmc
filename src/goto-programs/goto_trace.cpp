@@ -24,9 +24,8 @@ Author: Daniel Kroening
 #include <util/string_utils.h>
 #include <util/symbol.h>
 
+#include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
-
-#include "printf_formatter.h"
 
 #include <ostream>
 
