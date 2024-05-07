@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_member_spec.h"
 #include "cpp_enum_type.h"
 
+#define DEBUG
 #ifdef DEBUG
 #include <iostream>
 
@@ -1030,6 +1031,11 @@ bool Parser::rLinkageBody(cpp_linkage_spect::itemst &items)
 */
 bool Parser::rTemplateDecl(cpp_declarationt &decl)
 {
+#ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl 1\n";
+#endif
+
   TemplateDeclKind kind=tdk_unknown;
 
   make_sub_scope("#template", new_scopet::kindt::TEMPLATE);
@@ -1038,6 +1044,10 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   typet template_type;
   if(!rTemplateDecl2(template_type, kind))
     return false;
+
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl 2\n";
+#endif
 
   cpp_declarationt body;
   if(lex.LookAhead(0)==TOK_USING)
@@ -1086,10 +1096,19 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
 
 bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
 {
+#ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl2 1\n";
+#endif
+
   cpp_tokent tk;
 
   if(lex.get_token(tk)!=TOK_TEMPLATE)
     return false;
+
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl2 2\n";
+#endif
 
   decl=typet(ID_template);
   set_location(decl, tk);
@@ -1101,16 +1120,32 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
     return true;        // ignore TEMPLATE
   }
 
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl2 3\n";
+#endif
+
   if(lex.get_token(tk)!='<')
     return false;
 
   irept &template_parameters=decl.add(ID_template_parameters);
 
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl2 4\n";
+#endif
+
   if(!rTempArgList(template_parameters))
     return false;
 
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl2 5\n";
+#endif
+
   if(lex.get_token(tk)!='>')
     return false;
+
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl2 6\n";
+#endif
 
   // ignore nested TEMPLATE
   while(lex.LookAhead(0)==TOK_TEMPLATE)
@@ -1127,6 +1162,10 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
     if(lex.get_token(tk)!='>')
       return false;
   }
+
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTemplateDecl2 7\n";
+#endif
 
   if(template_parameters.get_sub().empty())
     // template < > declaration
@@ -1188,6 +1227,10 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
   if((t0==TOK_CLASS || t0==TOK_TYPENAME))
   {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTempArgDeclaration 0.1\n";
+#endif
+
     cpp_token_buffert::post pos=lex.Save();
 
     cpp_tokent tk1;
@@ -1227,6 +1270,10 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     if(lex.LookAhead(0)=='=')
     {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTempArgDeclaration 0.2\n";
+#endif
+
       if(declarator.get_has_ellipsis())
         return false;
 
@@ -1239,10 +1286,38 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       declarator.value()=exprt(ID_type);
       declarator.value().type().swap(default_type);
     }
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTempArgDeclaration 0.3\n";
+#endif
 
     if(lex.LookAhead(0)==',' ||
        lex.LookAhead(0)=='>')
       return true;
+#if 0
+    else if(lex.LookAhead(0) == TOK_SHIFTRIGHT)
+    {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTempArgDeclaration 0.4\n";
+#endif
+
+      // turn >> into > >
+      cpp_token_buffert::post pos=lex.Save();
+      cpp_tokent tk;
+      lex.get_token(tk);
+      lex.Restore(pos);
+      tk.kind='>';
+      tk.text='>';
+      lex.Replace(tk);
+      lex.Insert(tk);
+      DATA_INVARIANT(lex.LookAhead(0) == '>', "should be >");
+      DATA_INVARIANT(lex.LookAhead(1) == '>', "should be >");
+      return true;
+    }
+#endif
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rTempArgDeclaration 0.5\n";
+#endif
+
 
     lex.Restore(pos);
   }
@@ -3968,7 +4043,8 @@ bool Parser::rTemplateArgs(irept &template_args)
         )
     {
 #ifdef DEBUG
-      std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4\n";
+      std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4 " <<
+        lex.LookAhead(0) << "\n";
 #endif
 
       // ok
@@ -3980,20 +4056,30 @@ bool Parser::rTemplateArgs(irept &template_args)
       lex.Restore(pos);
       exprt tmp;
       if(rConditionalExpr(tmp, true))
+      {
+#ifdef DEBUG
+      std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.0\n";
+#endif
         exp.id(ID_ambiguous);
+      }
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.1\n";
 #endif
       lex.Restore(pos);
       rTypeNameOrFunctionType(a);
 
+#ifdef DEBUG
+      std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.1a " <<
+        lex.LookAhead(0) << "\n";
+#endif
       if(lex.LookAhead(0)==TOK_ELLIPSIS)
       {
         lex.get_token(tk1);
         exp.set(ID_ellipsis, true);
       }
 #ifdef DEBUG
-      std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.2\n";
+      std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.2 " <<
+        lex.LookAhead(0) << "\n";
 #endif
     }
     else
