@@ -279,6 +279,10 @@ int yyansi_cerror(const std::string &error);
 %token TOK_MSC_IF_EXISTS "__if_exists"
 %token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
 %token TOK_UNDERLYING_TYPE "__underlying_type"
+%token TOK_DYNAMIC_CAST "dynamic_cast"
+%token TOK_STATIC_CAST "static_cast"
+%token TOK_REINTERPRET_CAST "reinterpret_cast"
+%token TOK_CONST_CAST "const_cast"
 
 /*** priority, associativity, etc. definitions **************************/
 
