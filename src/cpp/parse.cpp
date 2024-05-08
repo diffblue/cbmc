@@ -341,6 +341,7 @@ protected:
   bool rAllocateType(exprt &, typet &, exprt &);
   bool rNewDeclarator(typet &);
   bool rAllocateInitializer(exprt &);
+  bool rCppCastExpr(exprt &);
   bool rPostfixExpr(exprt &);
   bool rPrimaryExpr(exprt &);
   bool rVarName(exprt &);
@@ -4196,10 +4197,22 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
 */
 bool Parser::rInitializeExpr(exprt &expr)
 {
+#ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rInitializeExpr 0 "
+              << lex.LookAhead(0)
+              << ' ' << lex.current_token().text
+              << '\n';
+#endif
+
   if(lex.LookAhead(0)!='{')
     return rExpression(expr, false);
 
   // we want { initialize_expr, ... }
+
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rInitializeExpr 1\n";
+#endif
 
   cpp_tokent tk;
   lex.get_token(tk);
@@ -4278,7 +4291,7 @@ bool Parser::rInitializeExpr(exprt &expr)
 /*
   function.arguments
   : empty
-  | expression (',' expression)*
+  | initializer.expr (',' initializer.expr)*
 
   This assumes that the next token following function.arguments is ')'.
 */
@@ -4293,7 +4306,7 @@ bool Parser::rFunctionArguments(exprt &args)
 
   for(;;)
   {
-    if(!rExpression(exp, false))
+    if(!rInitializeExpr(exp))
       return false;
 
     args.add_to_operands(std::move(exp));
@@ -4832,7 +4845,9 @@ bool Parser::rCommaExpression(exprt &exp)
 
 /*
   expression
-  : conditional.expr {(AssignOp | '=') expression}        right-to-left
+  : conditional.expr
+  | logical.or.expr (AssignOp | '=') initialize.expr
+  | throw.expression
 */
 bool Parser::rExpression(exprt &exp, bool template_args)
 {
@@ -4843,7 +4858,30 @@ bool Parser::rExpression(exprt &exp, bool template_args)
   std::cout << std::string(__indent, ' ') << "Parser::rExpression 0\n";
 #endif
 
-  if(!rConditionalExpr(exp, template_args))
+  if(lex.LookAhead(0) == TOK_THROW)
+    return rThrowExpr(exp);
+
+  cpp_token_buffert::post pos=lex.Save();
+
+  // see whether we have logical.or.expr followed by '?'; the parsed expression
+  // will be discarded and be parsed again, below
+  exprt tmp;
+  if(!rLogicalOrExpr(tmp, template_args))
+    return false;
+
+  if(lex.LookAhead(0) == '?')
+  {
+    lex.Restore(pos);
+    return rConditionalExpr(exp, template_args);
+  }
+
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rExpression 0.1\n";
+#endif
+
+  lex.Restore(pos);
+
+  if(!rLogicalOrExpr(exp, template_args))
     return false;
 
 #ifdef DEBUG
@@ -4865,7 +4903,7 @@ bool Parser::rExpression(exprt &exp, bool template_args)
 #endif
 
     exprt right;
-    if(!rExpression(right, template_args))
+    if(!rInitializeExpr(right))
       return false;
 
 #ifdef DEBUG
@@ -4913,7 +4951,7 @@ bool Parser::rExpression(exprt &exp, bool template_args)
 
 /*
   conditional.expr
-  : logical.or.expr {'?' comma.expression ':' conditional.expr}  right-to-left
+  : logical.or.expr {'?' comma.expression ':' expression}  right-to-left
 */
 bool Parser::rConditionalExpr(exprt &exp, bool template_args)
 {
@@ -5434,6 +5472,7 @@ bool Parser::rPmExpr(exprt &exp)
   cast.expr
   : unary.expr
   | '(' type.name ')' cast.expr
+  | '(' type.name ')' initializer.expr  -- GCC/Clang extension
 */
 bool Parser::rCastExpr(exprt &exp)
 {
@@ -5470,6 +5509,20 @@ bool Parser::rCastExpr(exprt &exp)
         {
           // we have (x) & 123
           // This is likely a binary bit-wise 'and'
+        }
+        else if(lex.LookAhead(0)=='{')
+        {
+          // this is a GCC/Clang extension
+          exprt exp2;
+          if(!rInitializeExpr(exp2))
+            return false;
+
+          exp=exprt("explicit-typecast");
+          exp.type().swap(tname);
+          exp.add_to_operands(std::move(exp2));
+          set_location(exp, tk1);
+
+          return true;
         }
         else if(rCastExpr(exp))
         {
@@ -5717,9 +5770,9 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   : postfix.expr
   | ('*' | '&' | '+' | '-' | '!' | '~' | IncOp) cast.expr
   | sizeof.expr
-  | allocate.expr
-  | throw.expression
+  | alignof.expr
   | noexcept.expr
+  | allocate.expr
 */
 
 bool Parser::rUnaryExpr(exprt &exp)
@@ -5799,8 +5852,6 @@ bool Parser::rUnaryExpr(exprt &exp)
     return rSizeofExpr(exp);
   else if(t==TOK_ALIGNOF)
     return rAlignofExpr(exp);
-  else if(t==TOK_THROW)
-    return rThrowExpr(exp);
   else if(t==TOK_NOEXCEPT)
     return rNoexceptExpr(exp);
   else if(t==TOK_REAL || t==TOK_IMAG)
@@ -6032,7 +6083,7 @@ bool Parser::rAlignofExpr(exprt &exp)
 
 /*
   noexcept.expr
-  : NOEXCEPT '(' expression ')'
+  : NOEXCEPT '(' comma.expression ')'
 */
 bool Parser::rNoexceptExpr(exprt &exp)
 {
@@ -6046,29 +6097,24 @@ bool Parser::rNoexceptExpr(exprt &exp)
   if(lex.get_token(tk)!=TOK_NOEXCEPT)
     return false;
 
-  if(lex.LookAhead(0)=='(')
-  {
-    exprt subexp;
-    cpp_tokent op, cp;
+  if(lex.LookAhead(0)!='(')
+    return false;
 
-    lex.get_token(op);
+  exprt subexp;
+  cpp_tokent op, cp;
 
-    if(rExpression(subexp, false))
-    {
-      if(lex.get_token(cp)==')')
-      {
-        // TODO
-        exp=exprt(ID_noexcept);
-        exp.add_to_operands(std::move(subexp));
-        set_location(exp, tk);
-        return true;
-      }
-    }
-  }
-  else
-    return true;
+  lex.get_token(op);
 
-  return false;
+  if(!rCommaExpression(subexp))
+    return false;
+
+  if(lex.get_token(cp)!=')')
+    return false;
+
+  exp=exprt(ID_noexcept);
+  exp.add_to_operands(std::move(subexp));
+  set_location(exp, tk);
+  return true;
 }
 
 bool Parser::isAllocateExpr(int t)
@@ -6081,7 +6127,7 @@ bool Parser::isAllocateExpr(int t)
 
 /*
   allocate.expr
-  : {Scope | userdef.keyword} NEW allocate.type
+  : {Scope} NEW allocate.type
   | {Scope} DELETE {'[' ']'} cast.expr
 */
 bool Parser::rAllocateExpr(exprt &exp)
@@ -6342,21 +6388,26 @@ bool Parser::rAllocateInitializer(exprt &init)
   return true;
 }
 
+static bool isCppCastExpr(int t)
+{
+  return t == TOK_DYNAMIC_CAST || t == TOK_STATIC_CAST || t == TOK_REINTERPRET_CAST || t == TOK_CONST_CAST;
+}
+
 /*
-  postfix.exp
-  : primary.exp
+  postfix.expr
+  : primary.expr
   | postfix.expr '[' comma.expression ']'
+  | postfix.expr '[' initializer.expr ']'
   | postfix.expr '(' function.arguments ')'
+  | integral.or.class.spec '(' function.arguments ')'
+  | integral.or.class.spec initializer.expr
+  | postfix.expr '.' userdef.statement
+  | postfix.expr ArrowOp userdef.statement
   | postfix.expr '.' var.name
   | postfix.expr ArrowOp var.name
   | postfix.expr IncOp
-  | openc++.postfix.expr
-
-  openc++.postfix.expr
-  : postfix.expr '.' userdef.statement
-  | postfix.expr ArrowOp userdef.statement
-
-  Note: function-style casts are accepted as function calls.
+  | c++cast.expr
+  | typeid.expr
 */
 bool Parser::rPostfixExpr(exprt &exp)
 {
@@ -6365,8 +6416,102 @@ bool Parser::rPostfixExpr(exprt &exp)
   std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0\n";
 #endif
 
-  if(!rPrimaryExpr(exp))
-    return false;
+  typet type;
+
+  cpp_token_buffert::post pos=lex.Save();
+
+  if(isCppCastExpr(lex.LookAhead(0)))
+  {
+    if(!rCppCastExpr(exp))
+      return false;
+  }
+  else if(lex.LookAhead(0) == TOK_TYPEID)
+  {
+    if(!rTypeidExpr(exp))
+      return false;
+  }
+  // try to see whether this is explicit type conversion, else it has to be
+  // a primary-expression
+  else if(optIntegralTypeOrClassSpec(type) &&
+     type.is_not_nil() &&
+     (lex.LookAhead(0) == '(' || lex.LookAhead(0) == '{'))
+  {
+#ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0.1\n";
+#endif
+
+    cpp_tokent tk;
+    lex.LookAhead(0, tk);
+    exprt exp2;
+    if(tk.kind == '{')
+    {
+      if(!rInitializeExpr(exp2))
+        return false;
+    }
+    else
+    {
+      // tk.kind == '('
+      lex.get_token(tk);
+
+      if(!rFunctionArguments(exp2))
+        return false;
+
+      cpp_tokent tk2;
+      if(lex.get_token(tk2)!=')')
+        return false;
+    }
+
+    exp=exprt("explicit-constructor-call");
+    exp.type().swap(type);
+    exp.operands().swap(exp2.operands());
+    set_location(exp, tk);
+  }
+  else
+  {
+    lex.Restore(pos);
+
+    exprt type_or_function_name;
+    if(rName(type_or_function_name) &&
+       (lex.LookAhead(0) == '(' || lex.LookAhead(0) == '{'))
+    {
+#ifdef DEBUG
+      std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0.2\n";
+#endif
+
+      cpp_tokent tk;
+      lex.LookAhead(0, tk);
+      exprt exp2;
+      if(lex.LookAhead(0)=='{')
+      {
+        if(!rInitializeExpr(exp2))
+          return false;
+      }
+      else
+      {
+        // lex.LookAhead(0)=='('
+        lex.get_token(tk);
+
+        if(!rFunctionArguments(exp2))
+          return false;
+
+        cpp_tokent tk2;
+        if(lex.get_token(tk2)!=')')
+          return false;
+      }
+
+      side_effect_expr_function_callt fc(
+        std::move(type_or_function_name), exp2.operands(), typet{}, source_locationt{});
+      set_location(fc, tk);
+
+      exp.swap(fc);
+    }
+    else
+    {
+      lex.Restore(pos);
+      if(!rPrimaryExpr(exp))
+        return false;
+    }
+  }
 
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 1\n";
@@ -6382,7 +6527,14 @@ bool Parser::rPostfixExpr(exprt &exp)
     {
     case '[':
       lex.get_token(op);
-      if(!rCommaExpression(e))
+
+      if(lex.LookAhead(0) == '{')
+      {
+        // C++11 initialisation expression
+        if(!rInitializeExpr(e))
+          return false;
+      }
+      else if(!rCommaExpression(e))
         return false;
 
 #ifdef DEBUG
@@ -6403,11 +6555,11 @@ bool Parser::rPostfixExpr(exprt &exp)
       break;
 
     case '(':
+      lex.get_token(op);
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 3\n";
 #endif
 
-      lex.get_token(op);
       if(!rFunctionArguments(e))
         return false;
 
@@ -6489,6 +6641,48 @@ bool Parser::rPostfixExpr(exprt &exp)
       return true;
     }
   }
+}
+
+/*
+  c++cast.expr
+  : castOp '<' type.name '>' '(' comma.expression ')'
+*/
+bool Parser::rCppCastExpr(exprt &expr)
+{
+  cpp_tokent tk;
+
+  lex.get_token(tk);
+
+  expr.id(irep_idt(tk.text));
+  set_location(expr, tk);
+
+  if(!isCppCastExpr(tk.kind))
+    return false;
+
+  if(lex.get_token(tk) != '<')
+    return false;
+
+  typet tname;
+  if(!rTypeName(tname))
+    return false;
+
+  if(lex.get_token(tk) != '>')
+    return false;
+
+  if(lex.get_token(tk) != '(')
+    return false;
+
+  exprt op;
+  if(!rCommaExpression(op))
+    return false;
+
+  if(lex.get_token(tk) != ')')
+    return false;
+
+  expr.type().swap(tname);
+  expr.add_to_operands(std::move(op));
+
+  return true;
 }
 
 /*
@@ -6701,9 +6895,6 @@ bool Parser::rTypePredicate(exprt &expr)
   | THIS
   | var.name
   | '(' comma.expression ')'
-  | integral.or.class.spec '(' function.arguments ')'
-  | integral.or.class.spec initializer
-  | typeid.expr
   | true
   | false
   | nullptr
@@ -6820,15 +7011,6 @@ bool Parser::rPrimaryExpr(exprt &exp)
 #endif
     return true;
 
-  case '{': // C++11 initialisation expression
-#ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 10\n";
-#endif
-    return rInitializeExpr(exp);
-
-  case TOK_TYPEID:
-    return rTypeidExpr(exp);
-
   case TOK_UNARY_TYPE_PREDICATE:
   case TOK_BINARY_TYPE_PREDICATE:
 #ifdef DEBUG
@@ -6855,74 +7037,16 @@ bool Parser::rPrimaryExpr(exprt &exp)
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 14\n";
 #endif
+    if(!rVarName(exp))
+      return false;
+
+    if(lex.LookAhead(0)==TOK_SCOPE)
     {
-      typet type;
+      lex.get_token(tk);
 
-      if(!optIntegralTypeOrClassSpec(type))
-        return false;
-
-#ifdef DEBUG
-      std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 15\n";
-#endif
-
-      if(type.is_not_nil() && lex.LookAhead(0)==TOK_SCOPE)
-      {
-        lex.get_token(tk);
-        lex.get_token(tk);
-
-        // TODO
-      }
-      else if(type.is_not_nil())
-      {
-#ifdef DEBUG
-        std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 16\n";
-#endif
-        if(lex.LookAhead(0)=='{')
-        {
-          lex.LookAhead(0, tk);
-
-          exprt exp2;
-          if(!rInitializeExpr(exp2))
-            return false;
-
-          exp=exprt("explicit-constructor-call");
-          exp.type().swap(type);
-          exp.add_to_operands(std::move(exp2));
-          set_location(exp, tk);
-        }
-        else if(lex.LookAhead(0)=='(')
-        {
-          lex.get_token(tk);
-
-          exprt exp2;
-          if(!rFunctionArguments(exp2))
-            return false;
-
-          if(lex.get_token(tk2)!=')')
-            return false;
-
-          exp=exprt("explicit-constructor-call");
-          exp.type().swap(type);
-          exp.operands().swap(exp2.operands());
-          set_location(exp, tk);
-        }
-        else
-          return false;
-      }
-      else
-      {
-        if(!rVarName(exp))
-          return false;
-
-        if(lex.LookAhead(0)==TOK_SCOPE)
-        {
-          lex.get_token(tk);
-
-          // exp=new PtreeStaticUserStatementExpr(exp,
-          //                        Ptree::Cons(new Leaf(tk), exp2));
-          // TODO
-        }
-      }
+      // exp=new PtreeStaticUserStatementExpr(exp,
+      //                        Ptree::Cons(new Leaf(tk), exp2));
+      // TODO
     }
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 17\n";
@@ -7388,6 +7512,14 @@ std::optional<codet> Parser::rStatement()
                 << "Parser::rStatement RETURN 1\n";
 #endif
       lex.get_token(tk2);
+    }
+    else if(lex.LookAhead(0) == '{')
+    {
+      if(!rInitializeExpr(statement.return_value()))
+        return {};
+
+      if(lex.get_token(tk2)!=';')
+        return {};
     }
     else
     {

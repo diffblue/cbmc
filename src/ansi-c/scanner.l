@@ -1244,6 +1244,11 @@ enable_or_disable ("enable"|"disable")
                          TOK_BIT_CAST);
                      }
 
+"dynamic_cast"  { return cpp98_keyword(TOK_DYNAMIC_CAST); }
+"static_cast"   { return cpp98_keyword(TOK_STATIC_CAST); }
+"reinterpret_cast"   { return cpp98_keyword(TOK_REINTERPRET_CAST); }
+"const_cast"    { return cpp98_keyword(TOK_CONST_CAST); }
+
 {CPROVER_PREFIX}"atomic"       { loc(); return TOK_CPROVER_ATOMIC; }
 {CPROVER_PREFIX}"forall"       { loc(); return TOK_FORALL; }
 {CPROVER_PREFIX}"exists"       { loc(); return TOK_EXISTS; }

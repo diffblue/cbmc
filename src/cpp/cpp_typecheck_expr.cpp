@@ -127,6 +127,13 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   {
     expr.type().id(ID_initializer_list);
   }
+  else if(expr.id() == ID_const_cast ||
+     expr.id() == ID_dynamic_cast ||
+     expr.id() == ID_reinterpret_cast ||
+     expr.id() == ID_static_cast)
+  {
+    typecheck_cast_expr(expr);
+  }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
 }
@@ -967,13 +974,8 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   }
   else
   {
-    CHECK_RETURN(expr.type().id() == ID_struct);
-
-    struct_tag_typet tag(expr.type().get(ID_name));
-    tag.add_source_location() = expr.source_location();
-
     exprt e=expr;
-    new_temporary(e.source_location(), tag, e.operands(), expr);
+    new_temporary(e.source_location(), e.type(), e.operands(), expr);
   }
 }
 
@@ -1275,53 +1277,20 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
 
 void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
 {
-  side_effect_expr_function_callt e =
-    to_side_effect_expr_function_call(expr);
-
-  if(e.arguments().size() != 1)
+  if(expr.operands().size() != 1)
   {
     error().source_location=expr.find_source_location();
     error() << "cast expressions expect one operand" << eom;
     throw 0;
   }
 
-  exprt &f_op=e.function();
-  exprt &cast_op=e.arguments().front();
+  exprt &cast_op = to_unary_expr(expr).op();
 
   add_implicit_dereference(cast_op);
 
-  const irep_idt &id=
-  f_op.get_sub().front().get(ID_identifier);
+  const irep_idt &id = expr.id();
 
-  if(f_op.get_sub().size()!=2 ||
-     f_op.get_sub()[1].id()!=ID_template_args)
-  {
-    error().source_location=expr.find_source_location();
-    error() << id << " expects template argument" << eom;
-    throw 0;
-  }
-
-  irept &template_arguments=f_op.get_sub()[1].add(ID_arguments);
-
-  if(template_arguments.get_sub().size()!=1)
-  {
-    error().source_location=expr.find_source_location();
-    error() << id << " expects one template argument" << eom;
-    throw 0;
-  }
-
-  irept &template_arg=template_arguments.get_sub().front();
-
-  if(template_arg.id() != ID_type && template_arg.id() != ID_ambiguous)
-  {
-    error().source_location=expr.find_source_location();
-    error() << id << " expects a type as template argument" << eom;
-    throw 0;
-  }
-
-  typet &type=static_cast<typet &>(
-    template_arguments.get_sub().front().add(ID_type));
-
+  typet &type = expr.type();
   typecheck_type(type);
 
   source_locationt source_location=expr.source_location();
@@ -1412,21 +1381,6 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       name.add_source_location()=source_location;
 
       type=name;
-    }
-  }
-
-  if(expr.get_sub().size()>=1 &&
-     expr.get_sub().front().id()==ID_name)
-  {
-    const irep_idt &id=expr.get_sub().front().get(ID_identifier);
-
-    if(id==ID_const_cast ||
-       id==ID_dynamic_cast ||
-       id==ID_reinterpret_cast ||
-       id==ID_static_cast)
-    {
-      expr.id(ID_cast_expression);
-      return;
     }
   }
 
@@ -1554,14 +1508,6 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       throw 0;
     }
 
-    return;
-  }
-  else if(expr.function().id() == ID_cast_expression)
-  {
-    // These are not really function calls,
-    // but usually just type adjustments.
-    typecheck_cast_expr(expr);
-    add_implicit_dereference(expr);
     return;
   }
   else if(expr.function().id() == ID_cpp_dummy_destructor)
