@@ -201,70 +201,75 @@ $(document).ready(function(){initNavTree('boolbv__update_8cpp_source.html',''); 
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  {</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;component_name=designator.<a class="code" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(ID_component_name);</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(type).<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag)</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__typet.html">struct_typet</a> &amp;struct_type = <a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(<a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(type));</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      std::size_t struct_offset=0;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__typet.html">struct_typet</a> &amp;struct_type =</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_struct_tag ? <a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="std__types_8h.html#aa35ea2a7438d5541e95f4bd50f4e0006">to_struct_tag_type</a>(type))</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                                   : <a class="code" href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a>(type);</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <a class="code" href="classstruct__union__typet_1_1componentt.html">struct_typet::componentt</a> <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.make_nil();</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_typet::componentst</a> &amp;components=</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        struct_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;c : components)</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      {</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype = c.type();</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        std::size_t sub_width=<a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(subtype);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="keywordflow">if</span>(c.get_name() == component_name)</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        {</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;          <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> = c;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;          <span class="keywordflow">break</span>; <span class="comment">// done</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        struct_offset+=sub_width;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      }</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.is_nil())</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <span class="keywordflow">throw</span> <span class="stringliteral">&quot;update: failed to find struct component&quot;</span>;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;new_type = <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type();</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      std::size_t struct_offset=0;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <a class="code" href="classstruct__union__typet_1_1componentt.html">struct_typet::componentt</a> <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.make_nil();</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__union__typet.html#afd9bdc7172dc3626ca2b9633a20830cf">struct_typet::componentst</a> &amp;components=</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        struct_type.<a class="code" href="classstruct__union__typet.html#ade06a6cf374b926cb0fdb3f6ca81dbcf">components</a>();</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;c : components)</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;subtype = c.type();</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        std::size_t sub_width=<a class="code" href="classboolbvt.html#acdc06ffa22509ba146eea7ecbcbe0b49">boolbv_width</a>(subtype);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <span class="keywordflow">if</span>(c.get_name() == component_name)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        {</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;          <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a> = c;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;          <span class="keywordflow">break</span>; <span class="comment">// done</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        }</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        struct_offset+=sub_width;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      }</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.is_nil())</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <span class="keywordflow">throw</span> <span class="stringliteral">&quot;update: failed to find struct component&quot;</span>;</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      std::size_t new_offset=offset+struct_offset;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;new_type = <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type();</div>
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <span class="comment">// recursive call</span></div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <a class="code" href="classboolbvt.html#a1e0ebc52d234aafaa34cf803dd9683da">convert_update_rec</a>(</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        designators, d+1, new_type, new_offset, new_value, bv);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    }</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(type).<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union)</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    {</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      <span class="keyword">const</span> <a class="code" href="classunion__typet.html">union_typet</a> &amp;union_type = <a class="code" href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a>(<a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>.<a class="code" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a>(type));</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__union__typet_1_1componentt.html">union_typet::componentt</a> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>=</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        union_type.<a class="code" href="classstruct__union__typet.html#aa4d97744163d87515d75598fb31412e1">get_component</a>(component_name);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.is_nil())</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <span class="keywordflow">throw</span> <span class="stringliteral">&quot;update: failed to find union component&quot;</span>;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      <span class="comment">// this only adjusts the type, the offset stays as-is</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;new_type = <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type();</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      std::size_t new_offset=offset+struct_offset;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="comment">// recursive call</span></div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;      <a class="code" href="classboolbvt.html#a1e0ebc52d234aafaa34cf803dd9683da">convert_update_rec</a>(</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        designators, d+1, new_type, new_offset, new_value, bv);</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    }</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union || type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag)</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    {</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;      <span class="keyword">const</span> <a class="code" href="classunion__typet.html">union_typet</a> &amp;union_type = type.<a class="code" href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">id</a>() == ID_union_tag</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;                                        ? <a class="code" href="classarrayst.html#a218964ded2d9d313b4f7427cfee03d0e">ns</a>.<a class="code" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a>(<a class="code" href="c__types_8h.html#a6558000ad89576ccc4c7b92d6de5432c">to_union_tag_type</a>(type))</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;                                        : <a class="code" href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a>(type);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <span class="keyword">const</span> <a class="code" href="classstruct__union__typet_1_1componentt.html">union_typet::componentt</a> &amp;<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>=</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        union_type.<a class="code" href="classstruct__union__typet.html#aa4d97744163d87515d75598fb31412e1">get_component</a>(component_name);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.is_nil())</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="keywordflow">throw</span> <span class="stringliteral">&quot;update: failed to find union component&quot;</span>;</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      <span class="comment">// recursive call</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <a class="code" href="classboolbvt.html#a1e0ebc52d234aafaa34cf803dd9683da">convert_update_rec</a>(</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        designators, d+1, new_type, offset, new_value, bv);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    }</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;update: member designator needs struct or union&quot;</span>;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  }</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;update: unexpected designator&quot;</span>;</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;}</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      <span class="comment">// this only adjusts the type, the offset stays as-is</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;new_type = <a class="code" href="std__expr_8cpp.html#ac90ae77b82997e0b8d1091b112e694b4">component</a>.type();</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="comment">// recursive call</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <a class="code" href="classboolbvt.html#a1e0ebc52d234aafaa34cf803dd9683da">convert_update_rec</a>(</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        designators, d+1, new_type, offset, new_value, bv);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    }</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">throw</span> <span class="stringliteral">&quot;update: member designator needs struct or union&quot;</span>;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  }</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;update: unexpected designator&quot;</span>;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;}</div>
 <div class="ttc" id="aarith__tools_8h_html"><div class="ttname"><a href="arith__tools_8h.html">arith_tools.h</a></div></div>
 <div class="ttc" id="aboolbv_8h_html"><div class="ttname"><a href="boolbv_8h.html">boolbv.h</a></div></div>
 <div class="ttc" id="ac__types_8h_html"><div class="ttname"><a href="c__types_8h.html">c_types.h</a></div></div>
+<div class="ttc" id="ac__types_8h_html_a6558000ad89576ccc4c7b92d6de5432c"><div class="ttname"><a href="c__types_8h.html#a6558000ad89576ccc4c7b92d6de5432c">to_union_tag_type</a></div><div class="ttdeci">const union_tag_typet &amp; to_union_tag_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a union_tag_typet.</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8h_source.html#l00224">c_types.h:224</a></div></div>
 <div class="ttc" id="ac__types_8h_html_a91a4cb1dbb461f28e08ebdd89a35beb0"><div class="ttname"><a href="c__types_8h.html#a91a4cb1dbb461f28e08ebdd89a35beb0">to_union_type</a></div><div class="ttdeci">const union_typet &amp; to_union_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a union_typet.</div><div class="ttdef"><b>Definition:</b> <a href="c__types_8h_source.html#l00184">c_types.h:184</a></div></div>
 <div class="ttc" id="aclassarray__typet_html"><div class="ttname"><a href="classarray__typet.html">array_typet</a></div><div class="ttdoc">Arrays with given size.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00806">std_types.h:807</a></div></div>
 <div class="ttc" id="aclassarray__typet_html_a5bfec0edb101127e2bad971906b3c3b1"><div class="ttname"><a href="classarray__typet.html#a5bfec0edb101127e2bad971906b3c3b1">array_typet::element_type</a></div><div class="ttdeci">const typet &amp; element_type() const</div><div class="ttdoc">The type of the elements of the array.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00827">std_types.h:827</a></div></div>
@@ -286,7 +291,7 @@ $(document).ready(function(){initNavTree('boolbv__update_8cpp_source.html',''); 
 <div class="ttc" id="aclassirept_html_a419293b53104ea25f073e5d8fc452b07"><div class="ttname"><a href="classirept.html#a419293b53104ea25f073e5d8fc452b07">irept::get</a></div><div class="ttdeci">const irep_idt &amp; get(const irep_idt &amp;name) const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8cpp_source.html#l00044">irep.cpp:44</a></div></div>
 <div class="ttc" id="aclassirept_html_a88dd1ba1e91afeed54416f80969e9140"><div class="ttname"><a href="classirept.html#a88dd1ba1e91afeed54416f80969e9140">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition:</b> <a href="irep_8h_source.html#l00384">irep.h:384</a></div></div>
 <div class="ttc" id="aclassliteralt_html"><div class="ttname"><a href="classliteralt.html">literalt</a></div><div class="ttdef"><b>Definition:</b> <a href="literal_8h_source.html#l00025">literal.h:26</a></div></div>
-<div class="ttc" id="aclassnamespace__baset_html_a08ff1828dbaf894a44a23f50a700255a"><div class="ttname"><a href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">namespace_baset::follow</a></div><div class="ttdeci">const typet &amp; follow(const typet &amp;) const</div><div class="ttdoc">Resolve type symbol to the type it points to.</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00049">namespace.cpp:49</a></div></div>
+<div class="ttc" id="aclassnamespace__baset_html_a9a5ad94024723d598ae0b8b67e7a3710"><div class="ttname"><a href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">namespace_baset::follow_tag</a></div><div class="ttdeci">const union_typet &amp; follow_tag(const union_tag_typet &amp;) const</div><div class="ttdoc">Follow type tag of union type.</div><div class="ttdef"><b>Definition:</b> <a href="namespace_8cpp_source.html#l00063">namespace.cpp:63</a></div></div>
 <div class="ttc" id="aclassprop__conv__solvert_html_aff16ff06df449a0c982d40d17d5b06e1"><div class="ttname"><a href="classprop__conv__solvert.html#aff16ff06df449a0c982d40d17d5b06e1">prop_conv_solvert::prop</a></div><div class="ttdeci">propt &amp; prop</div><div class="ttdef"><b>Definition:</b> <a href="prop__conv__solver_8h_source.html#l00130">prop_conv_solver.h:130</a></div></div>
 <div class="ttc" id="aclasspropt_html_a4de2b26ac13f43030627a89d8d53970c"><div class="ttname"><a href="classpropt.html#a4de2b26ac13f43030627a89d8d53970c">propt::lselect</a></div><div class="ttdeci">virtual literalt lselect(literalt a, literalt b, literalt c)=0</div></div>
 <div class="ttc" id="aclassstruct__typet_html"><div class="ttname"><a href="classstruct__typet.html">struct_typet</a></div><div class="ttdoc">Structure type, corresponds to C style structs.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00230">std_types.h:231</a></div></div>
@@ -307,6 +312,7 @@ $(document).ready(function(){initNavTree('boolbv__update_8cpp_source.html',''); 
 <div class="ttc" id="astd__expr_8h_html_a25c3c0106fabc2f698ac279e2b8f93e6"><div class="ttname"><a href="std__expr_8h.html#a25c3c0106fabc2f698ac279e2b8f93e6">to_constant_expr</a></div><div class="ttdeci">const constant_exprt &amp; to_constant_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a constant_exprt.</div><div class="ttdef"><b>Definition:</b> <a href="std__expr_8h_source.html#l03037">std_expr.h:3037</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a447364e31f4a2d52b37e5922fc6565e5"><div class="ttname"><a href="std__types_8h.html#a447364e31f4a2d52b37e5922fc6565e5">to_struct_type</a></div><div class="ttdeci">const struct_typet &amp; to_struct_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a struct_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00308">std_types.h:308</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a6ceae55cfc16506fda77e87c30d4bd68"><div class="ttname"><a href="std__types_8h.html#a6ceae55cfc16506fda77e87c30d4bd68">to_array_type</a></div><div class="ttdeci">const array_typet &amp; to_array_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to an array_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00888">std_types.h:888</a></div></div>
+<div class="ttc" id="astd__types_8h_html_aa35ea2a7438d5541e95f4bd50f4e0006"><div class="ttname"><a href="std__types_8h.html#aa35ea2a7438d5541e95f4bd50f4e0006">to_struct_tag_type</a></div><div class="ttdeci">const struct_tag_typet &amp; to_struct_tag_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a struct_tag_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00518">std_types.h:518</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
