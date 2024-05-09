@@ -68,9 +68,8 @@ static java_class_typet
 followed_class_type(const exprt &expr, const symbol_table_baset &symbol_table)
 {
   const pointer_typet &pointer_type = to_pointer_type(expr.type());
-  const java_class_typet &java_class_type = to_java_class_type(
-    namespacet{symbol_table}.follow(pointer_type.base_type()));
-  return java_class_type;
+  return to_java_class_type(namespacet{symbol_table}.follow_tag(
+    to_struct_tag_type(pointer_type.base_type())));
 }
 
 static bool
@@ -531,8 +530,8 @@ static code_with_references_listt assign_struct_components_from_json(
   const jsont &json,
   object_creation_infot &info)
 {
-  const java_class_typet &java_class_type =
-    to_java_class_type(namespacet{info.symbol_table}.follow(expr.type()));
+  const java_class_typet &java_class_type = to_java_class_type(
+    namespacet{info.symbol_table}.follow_tag(to_struct_tag_type(expr.type())));
   code_with_references_listt result;
   for(const auto &component : java_class_type.components())
   {
@@ -577,7 +576,7 @@ static code_with_references_listt assign_struct_from_json(
 {
   const namespacet ns{info.symbol_table};
   const java_class_typet &java_class_type =
-    to_java_class_type(ns.follow(expr.type()));
+    to_java_class_type(ns.follow_tag(to_struct_tag_type(expr.type())));
   code_with_references_listt result;
   if(is_java_string_type(java_class_type))
   {
@@ -642,8 +641,8 @@ static code_with_references_listt assign_enum_from_json(
 
   dereference_exprt values_struct{
     info.symbol_table.lookup_ref(values_name).symbol_expr()};
-  const auto &values_struct_type =
-    to_struct_type(namespacet{info.symbol_table}.follow(values_struct.type()));
+  const auto &values_struct_type = namespacet{info.symbol_table}.follow_tag(
+    to_struct_tag_type(values_struct.type()));
   PRECONDITION(is_valid_java_array(values_struct_type));
   const member_exprt values_data = member_exprt{
     values_struct, "data", values_struct_type.components()[2].type()};

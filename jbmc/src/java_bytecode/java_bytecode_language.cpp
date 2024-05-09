@@ -507,7 +507,8 @@ static void infer_opaque_type_fields(
                 "') should have an opaque superclass");
             const auto &superclass_type = class_type->bases().front().type();
             class_symbol_id = superclass_type.get_identifier();
-            class_type = &to_java_class_type(ns.follow(superclass_type));
+            class_type = &to_java_class_type(
+              ns.follow_tag(to_struct_tag_type(superclass_type)));
           }
         }
       }
@@ -1502,8 +1503,8 @@ bool java_bytecode_languaget::convert_single_method_code(
       // TODO(tkiley): ci_lazy_methods_neededt, but this needs further
       // TODO(tkiley): investigation
       namespacet ns{symbol_table};
-      const java_class_typet &underlying_type =
-        to_java_class_type(ns.follow(pointer_return_type->base_type()));
+      const java_class_typet &underlying_type = to_java_class_type(
+        ns.follow_tag(to_struct_tag_type(pointer_return_type->base_type())));
 
       if(!underlying_type.is_abstract())
         needed_lazy_methods->add_all_needed_classes(*pointer_return_type);

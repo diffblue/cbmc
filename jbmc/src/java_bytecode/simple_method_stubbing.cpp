@@ -97,13 +97,10 @@ void java_simple_method_stubst::create_method_stub_at(
     "Nondet initializer result type: expected a pointer",
     expected_type);
 
-  namespacet ns(symbol_table);
-
-  const auto &expected_base =
-    ns.follow(to_pointer_type(expected_type).base_type());
-  if(expected_base.id() != ID_struct)
+  if(to_pointer_type(expected_type).base_type().id() != ID_struct_tag)
     return;
 
+  namespacet ns(symbol_table);
   const exprt cast_ptr =
     make_clean_pointer_cast(ptr, to_pointer_type(expected_type), ns);
 
