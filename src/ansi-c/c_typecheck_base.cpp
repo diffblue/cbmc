@@ -142,7 +142,8 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     {
       if(
         (!old_it->second.is_static_lifetime || !symbol.is_static_lifetime) &&
-        symbol.type.id() != ID_code)
+        (symbol.type.id() != ID_code &&
+         symbol.type.id() != ID_mathematical_function))
       {
         error().source_location = symbol.location;
         error() << "redeclaration of '" << symbol.display_name()
@@ -346,8 +347,12 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   }
 
   // do initializer, this may change the type
-  if(new_symbol.type.id() != ID_code && !new_symbol.is_macro)
+  if(
+    new_symbol.type.id() != ID_code &&
+    new_symbol.type.id() != ID_mathematical_function && !new_symbol.is_macro)
+  {
     do_initializer(new_symbol);
+  }
 
   const typet &final_new = new_symbol.type;
 
@@ -870,6 +875,18 @@ void c_typecheck_baset::typecheck_declaration(
 
       irep_idt identifier=symbol.name;
       declarator.set_name(identifier);
+
+      if(
+        symbol.type.id() == ID_code &&
+        identifier.starts_with(CPROVER_PREFIX "uninterpreted_"))
+      {
+        const code_typet &function_call_type = to_code_type(symbol.type);
+        mathematical_function_typet::domaint domain;
+        for(const auto &parameter : function_call_type.parameters())
+          domain.push_back(parameter.type());
+        symbol.type =
+          mathematical_function_typet{domain, function_call_type.return_type()};
+      }
 
       typecheck_symbol(symbol);
 

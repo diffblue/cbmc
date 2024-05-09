@@ -2424,6 +2424,16 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       }
       else
       {
+        if(identifier.starts_with(CPROVER_PREFIX "uninterpreted_"))
+        {
+          throw invalid_source_file_exceptiont{
+            "'" + id2string(identifier) +
+              "' is not declared, "
+              "missing type information required to construct call to "
+              "uninterpreted function",
+            expr.source_location()};
+        }
+
         // This is an undeclared function that's not a builtin.
         // Let's just add it.
         // We do a bit of return-type guessing, but just a bit.
@@ -2480,13 +2490,14 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     for(auto &p :
         make_range(expr.arguments()).zip(mathematical_function_type.domain()))
     {
-      if(p.first.type() != p.second)
-      {
-        error().source_location = p.first.source_location();
-        error() << "expected argument of type " << to_string(p.second)
-                << " but got " << to_string(p.first.type()) << eom;
-        throw 0;
-      }
+      implicit_typecast(p.first, p.second);
+    }
+
+    if(f_op.id() != ID_lambda && f_op.id() != ID_symbol)
+    {
+      throw invalid_source_file_exceptiont{
+        "expected function symbol or lambda, but got " + id2string(f_op.id()),
+        f_op.source_location()};
     }
 
     function_application_exprt function_application(f_op, expr.arguments());
