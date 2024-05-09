@@ -12,7 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_struct(const struct_exprt &expr)
 {
-  const struct_typet &struct_type=to_struct_type(ns.follow(expr.type()));
+  const struct_typet &struct_type =
+    expr.type().id() == ID_struct_tag
+      ? ns.follow_tag(to_struct_tag_type(expr.type()))
+      : to_struct_type(expr.type());
 
   std::size_t width=boolbv_width(struct_type);
 
