@@ -79,85 +79,85 @@ static int isatty(int) { return 0; }
 <GRAMMAR>{
   [\(:\.,;#]          { loc(); return yytext[0]; }
   [\t\r\n ]           ;
-  :=                  { loc(); return TOK_ASSIGNMENT; }
-  TAG                 { loc(); BEGIN(TAG_NAME); return TOK_TAG; }
-  BEGIN               { loc(); return TOK_BEGIN; }
-  VERSION             { loc(); BEGIN(VERSION_ANNOTATION); return TOK_VERSION; }
-  FUNCTION_BLOCK      { loc(); BEGIN(MODULE_NAME); return TOK_FUNCTION_BLOCK; }
-  END_FUNCTION_BLOCK  { loc(); return TOK_END_FUNCTION_BLOCK; }
-  FUNCTION            { loc(); BEGIN(MODULE_NAME); return TOK_FUNCTION; }
-  END_FUNCTION        { loc(); return TOK_END_FUNCTION; }
-  VAR_INPUT           { loc(); return TOK_VAR_INPUT; }
-  VAR_OUTPUT          { loc(); return TOK_VAR_OUTPUT; }
-  VAR_IN_OUT          { loc(); return TOK_VAR_INOUT; }
-  VAR                 { loc(); return TOK_VAR_STATIC; }
-  VAR[ ]CONSTANT      { loc(); return TOK_VAR_CONSTANT; }
-  VAR_TEMP            { loc(); return TOK_VAR_TEMP; }
-  END_VAR             { loc(); return TOK_END_VAR; }
-  NETWORK             { loc(); return TOK_NETWORK; }
-  TITLE               { loc(); return TOK_TITLE; }
-  Int                 { loc(); return TOK_INT; }
-  DInt                { loc(); return TOK_DINT; }
-  Bool                { loc(); return TOK_BOOL; }
-  Real                { loc(); return TOK_REAL; }
-  Void                { loc(); return TOK_VOID; }
-  L                   { loc(); return TOK_LOAD; }
-  T                   { loc(); return TOK_TRANSFER; }
-  CALL                { loc(); BEGIN(MODULE_NAME); return TOK_CALL; }
-  NOP                 { loc(); return TOK_NOP; }
-  SET                 { loc(); return TOK_SET_RLO; }
-  CLR                 { loc(); return TOK_CLR_RLO; }
-  S                   { loc(); return TOK_SET; }
-  R                   { loc(); return TOK_RESET; }
-  NOT                 { loc(); return TOK_NOT; }
-  A                   { loc(); return TOK_AND; }
-  AN                  { loc(); return TOK_AND_NOT; }
-  O                   { loc(); return TOK_OR; }
-  ON                  { loc(); return TOK_OR_NOT; }
-  X                   { loc(); return TOK_XOR; }
-  XN                  { loc(); return TOK_XOR_NOT; }
-  A\(                 { loc(); return TOK_AND_NESTED; }
-  AN\(                { loc(); return TOK_AND_NOT_NESTED; }
-  O\(                 { loc(); return TOK_OR_NESTED; }
-  ON\(                { loc(); return TOK_OR_NOT_NESTED; }
-  X\(                 { loc(); return TOK_XOR_NESTED; }
-  XN\(                { loc(); return TOK_XOR_NOT_NESTED; }
-  \)                  { loc(); return TOK_NESTING_CLOSED; }
-  =                   { loc(); return TOK_ASSIGN; }
-  \+                  { loc(); return TOK_CONST_ADD; }
-  \+I                 { loc(); return TOK_ACCU_INT_ADD; }
-  \-I                 { loc(); return TOK_ACCU_INT_SUB; }
-  \*I                 { loc(); return TOK_ACCU_INT_MUL; }
-  \/I                 { loc(); return TOK_ACCU_INT_DIV; }
-  ==I                 { loc(); return TOK_ACCU_INT_EQ; }
-  \<\>I               { loc(); return TOK_ACCU_INT_NEQ; }
-  \>I                 { loc(); return TOK_ACCU_INT_GT; }
-  \<I                 { loc(); return TOK_ACCU_INT_LT; }
-  \>=I                { loc(); return TOK_ACCU_INT_GTE; }
-  \<=I                { loc(); return TOK_ACCU_INT_LTE; }
-  \+R                 { loc(); return TOK_ACCU_REAL_ADD; }
-  \-R                 { loc(); return TOK_ACCU_REAL_SUB; }
-  \*R                 { loc(); return TOK_ACCU_REAL_MUL; }
-  \/R                 { loc(); return TOK_ACCU_REAL_DIV; }
-  ==R                 { loc(); return TOK_ACCU_REAL_EQ; }
-  \<\>R               { loc(); return TOK_ACCU_REAL_NEQ; }
-  \>R                 { loc(); return TOK_ACCU_REAL_GT; }
-  \<R                 { loc(); return TOK_ACCU_REAL_LT; }
-  \>=R                { loc(); return TOK_ACCU_REAL_GTE; }
-  \<=R                { loc(); return TOK_ACCU_REAL_LTE; }
-  \+D                 { loc(); return TOK_ACCU_DINT_ADD; }
-  \-D                 { loc(); return TOK_ACCU_DINT_SUB; }
-  \*D                 { loc(); return TOK_ACCU_DINT_MUL; }
-  \/D                 { loc(); return TOK_ACCU_DINT_DIV; }
-  ==D                 { loc(); return TOK_ACCU_DINT_EQ; }
-  \<\>D               { loc(); return TOK_ACCU_DINT_NEQ; }
-  \>D                 { loc(); return TOK_ACCU_DINT_GT; }
-  \<D                 { loc(); return TOK_ACCU_DINT_LT; }
-  \>=D                { loc(); return TOK_ACCU_DINT_GTE; }
-  \<=D                { loc(); return TOK_ACCU_DINT_LTE; }
-  JU                  { loc(); return TOK_JUMP_UNCONDITIONAL; }
-  JC                  { loc(); return TOK_JUMP_CONDITIONAL; }
-  JCN                 { loc(); return TOK_JUMP_CONDITIONAL_NOT; }
+  :=                  { loc(); return STOK_ASSIGNMENT; }
+  TAG                 { loc(); BEGIN(TAG_NAME); return STOK_TAG; }
+  BEGIN               { loc(); return STOK_BEGIN; }
+  VERSION             { loc(); BEGIN(VERSION_ANNOTATION); return STOK_VERSION; }
+  FUNCTION_BLOCK      { loc(); BEGIN(MODULE_NAME); return STOK_FUNCTION_BLOCK; }
+  END_FUNCTION_BLOCK  { loc(); return STOK_END_FUNCTION_BLOCK; }
+  FUNCTION            { loc(); BEGIN(MODULE_NAME); return STOK_FUNCTION; }
+  END_FUNCTION        { loc(); return STOK_END_FUNCTION; }
+  VAR_INPUT           { loc(); return STOK_VAR_INPUT; }
+  VAR_OUTPUT          { loc(); return STOK_VAR_OUTPUT; }
+  VAR_IN_OUT          { loc(); return STOK_VAR_INOUT; }
+  VAR                 { loc(); return STOK_VAR_STATIC; }
+  VAR[ ]CONSTANT      { loc(); return STOK_VAR_CONSTANT; }
+  VAR_TEMP            { loc(); return STOK_VAR_TEMP; }
+  END_VAR             { loc(); return STOK_END_VAR; }
+  NETWORK             { loc(); return STOK_NETWORK; }
+  TITLE               { loc(); return STOK_TITLE; }
+  Int                 { loc(); return STOK_INT; }
+  DInt                { loc(); return STOK_DINT; }
+  Bool                { loc(); return STOK_BOOL; }
+  Real                { loc(); return STOK_REAL; }
+  Void                { loc(); return STOK_VOID; }
+  L                   { loc(); return STOK_LOAD; }
+  T                   { loc(); return STOK_TRANSFER; }
+  CALL                { loc(); BEGIN(MODULE_NAME); return STOK_CALL; }
+  NOP                 { loc(); return STOK_NOP; }
+  SET                 { loc(); return STOK_SET_RLO; }
+  CLR                 { loc(); return STOK_CLR_RLO; }
+  S                   { loc(); return STOK_SET; }
+  R                   { loc(); return STOK_RESET; }
+  NOT                 { loc(); return STOK_NOT; }
+  A                   { loc(); return STOK_AND; }
+  AN                  { loc(); return STOK_AND_NOT; }
+  O                   { loc(); return STOK_OR; }
+  ON                  { loc(); return STOK_OR_NOT; }
+  X                   { loc(); return STOK_XOR; }
+  XN                  { loc(); return STOK_XOR_NOT; }
+  A\(                 { loc(); return STOK_AND_NESTED; }
+  AN\(                { loc(); return STOK_AND_NOT_NESTED; }
+  O\(                 { loc(); return STOK_OR_NESTED; }
+  ON\(                { loc(); return STOK_OR_NOT_NESTED; }
+  X\(                 { loc(); return STOK_XOR_NESTED; }
+  XN\(                { loc(); return STOK_XOR_NOT_NESTED; }
+  \)                  { loc(); return STOK_NESTING_CLOSED; }
+  =                   { loc(); return STOK_ASSIGN; }
+  \+                  { loc(); return STOK_CONST_ADD; }
+  \+I                 { loc(); return STOK_ACCU_INT_ADD; }
+  \-I                 { loc(); return STOK_ACCU_INT_SUB; }
+  \*I                 { loc(); return STOK_ACCU_INT_MUL; }
+  \/I                 { loc(); return STOK_ACCU_INT_DIV; }
+  ==I                 { loc(); return STOK_ACCU_INT_EQ; }
+  \<\>I               { loc(); return STOK_ACCU_INT_NEQ; }
+  \>I                 { loc(); return STOK_ACCU_INT_GT; }
+  \<I                 { loc(); return STOK_ACCU_INT_LT; }
+  \>=I                { loc(); return STOK_ACCU_INT_GTE; }
+  \<=I                { loc(); return STOK_ACCU_INT_LTE; }
+  \+R                 { loc(); return STOK_ACCU_REAL_ADD; }
+  \-R                 { loc(); return STOK_ACCU_REAL_SUB; }
+  \*R                 { loc(); return STOK_ACCU_REAL_MUL; }
+  \/R                 { loc(); return STOK_ACCU_REAL_DIV; }
+  ==R                 { loc(); return STOK_ACCU_REAL_EQ; }
+  \<\>R               { loc(); return STOK_ACCU_REAL_NEQ; }
+  \>R                 { loc(); return STOK_ACCU_REAL_GT; }
+  \<R                 { loc(); return STOK_ACCU_REAL_LT; }
+  \>=R                { loc(); return STOK_ACCU_REAL_GTE; }
+  \<=R                { loc(); return STOK_ACCU_REAL_LTE; }
+  \+D                 { loc(); return STOK_ACCU_DINT_ADD; }
+  \-D                 { loc(); return STOK_ACCU_DINT_SUB; }
+  \*D                 { loc(); return STOK_ACCU_DINT_MUL; }
+  \/D                 { loc(); return STOK_ACCU_DINT_DIV; }
+  ==D                 { loc(); return STOK_ACCU_DINT_EQ; }
+  \<\>D               { loc(); return STOK_ACCU_DINT_NEQ; }
+  \>D                 { loc(); return STOK_ACCU_DINT_GT; }
+  \<D                 { loc(); return STOK_ACCU_DINT_LT; }
+  \>=D                { loc(); return STOK_ACCU_DINT_GTE; }
+  \<=D                { loc(); return STOK_ACCU_DINT_LTE; }
+  JU                  { loc(); return STOK_JUMP_UNCONDITIONAL; }
+  JC                  { loc(); return STOK_JUMP_CONDITIONAL; }
+  JCN                 { loc(); return STOK_JUMP_CONDITIONAL_NOT; }
 
   (10#)?[\+-]?[0-9]+ { 
                         newstack(yystatement_listlval);
@@ -165,7 +165,7 @@ static int isatty(int) { return 0; }
                           convert_int_dec_literal(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
   INT#(10#)?[\+-]?[0-9]+ { 
                         newstack(yystatement_listlval);
@@ -173,7 +173,7 @@ static int isatty(int) { return 0; }
                           convert_int_dec_literal_value(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
                       
   ((DINT#(10#)?)|(L#))[\+-]?[0-9]+ { 
@@ -182,7 +182,7 @@ static int isatty(int) { return 0; }
                           convert_dint_dec_literal_value(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
                     
   16#[0-9A-Fa-f]+     { 
@@ -191,7 +191,7 @@ static int isatty(int) { return 0; }
                           convert_int_hex_literal(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
   INT#16#[0-9A-Fa-f]+ { 
                         newstack(yystatement_listlval);
@@ -199,7 +199,7 @@ static int isatty(int) { return 0; }
                           convert_int_hex_literal_value(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
                       
   DINT#16#[0-9A-Fa-f]+ { 
@@ -208,7 +208,7 @@ static int isatty(int) { return 0; }
                           convert_dint_hex_literal_value(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
                     
   2#[0|1]+            { 
@@ -217,7 +217,7 @@ static int isatty(int) { return 0; }
                           convert_int_bit_literal(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
                         
   INT#2#[0|1]+        {
@@ -226,7 +226,7 @@ static int isatty(int) { return 0; }
                           convert_int_bit_literal_value(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
                       
   DINT#2#[0|1]+       {
@@ -235,7 +235,7 @@ static int isatty(int) { return 0; }
                           convert_dint_bit_literal_value(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_INT_LITERAL; 
+                        return STOK_INT_LITERAL; 
                       }
                       
   ([Tt][Rr][Uu][Ee])|([Ff][Aa][Ll][Ss][Ee]) { 
@@ -244,7 +244,7 @@ static int isatty(int) { return 0; }
                           convert_bool_literal(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_BOOL_LITERAL; 
+                        return STOK_BOOL_LITERAL; 
                       }
 
   (\+|-)?[0-9]+\.[0-9]+ {
@@ -253,7 +253,7 @@ static int isatty(int) { return 0; }
                           convert_real_literal(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_REAL_LITERAL; 
+                        return STOK_REAL_LITERAL; 
                       }
 
   (\"[^\"\r\t\n]+\")|([a-zA-Z][a-zA-Z0-9_]*) {
@@ -262,7 +262,7 @@ static int isatty(int) { return 0; }
                           convert_identifier(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_IDENTIFIER; 
+                        return STOK_IDENTIFIER; 
                       }
 
   [a-zA-Z_][a-zA-Z0-9_]*: {
@@ -271,7 +271,7 @@ static int isatty(int) { return 0; }
                           convert_label(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_LABEL;
+                        return STOK_LABEL;
                       }
 }
 
@@ -284,9 +284,9 @@ static int isatty(int) { return 0; }
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
                         BEGIN(TAG_ATTRIBUTES);
-                        return TOK_IDENTIFIER; 
+                        return STOK_IDENTIFIER; 
                       }
-  END_TAG             { loc(); BEGIN(GRAMMAR); return TOK_END_TAG; }
+  END_TAG             { loc(); BEGIN(GRAMMAR); return STOK_END_TAG; }
 }
 
 <MODULE_NAME>{
@@ -302,7 +302,7 @@ static int isatty(int) { return 0; }
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
                         BEGIN(GRAMMAR);
-                        return TOK_IDENTIFIER; 
+                        return STOK_IDENTIFIER; 
                       }
 }
 
@@ -310,10 +310,10 @@ static int isatty(int) { return 0; }
   [\t\r," ]           ;
   ([t|T][R|r][u|U][e|E])|([f|F][a|A][l|L][s|S][e|E]) ;
   %[A-Za-z][0-9\.]+   ;
-  Int                 { loc(); return TOK_INT; }
-  DInt                { loc(); return TOK_DINT; }
-  Bool                { loc(); return TOK_BOOL; }
-  Real                { loc(); return TOK_REAL; }
+  Int                 { loc(); return STOK_INT; }
+  DInt                { loc(); return STOK_DINT; }
+  Bool                { loc(); return STOK_BOOL; }
+  Real                { loc(); return STOK_REAL; }
   \n                  { BEGIN(TAG_NAME); } 
 }
 
@@ -326,7 +326,7 @@ static int isatty(int) { return 0; }
                           convert_version(yytext);
                         PARSER.set_source_location(
                           parser_stack(yystatement_listlval));
-                        return TOK_VERSION_VALUE;
+                        return STOK_VERSION_VALUE;
                       }
   \n                  { BEGIN(GRAMMAR); }
 }
