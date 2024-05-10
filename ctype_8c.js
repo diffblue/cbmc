@@ -1,5 +1,9 @@
 var ctype_8c =
 [
+    [ "__CPROVER_tolower", "ctype_8c.html#ad4f05eabe9765faae87862e35dcf236c", null ],
+    [ "__CPROVER_toupper", "ctype_8c.html#a41c91a3975cffc8d564cbb1ec45d3a7f", null ],
+    [ "__tolower", "ctype_8c.html#a64d5004046aa16826ba02e645fffe8ee", null ],
+    [ "__toupper", "ctype_8c.html#a7ba2d98817a5aa04e096648803618144", null ],
     [ "isalnum", "ctype_8c.html#adf38e126f73a010f30af76db2a28c6e1", null ],
     [ "isalpha", "ctype_8c.html#a25908ae63aac2df990634e1ae5bd14d9", null ],
     [ "isblank", "ctype_8c.html#aea4929b1b41f1a6d723e0312b1f050ed", null ],
