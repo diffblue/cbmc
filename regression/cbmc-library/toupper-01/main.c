@@ -3,7 +3,8 @@
 
 int main()
 {
-  toupper();
-  assert(0);
+  int x;
+  int r = toupper(x);
+  assert(r <= x);
   return 0;
 }

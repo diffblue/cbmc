@@ -54,9 +54,12 @@ perl -p -i -e 's/^__stdio_common_vsprintf\n//' __functions # snprintf, Windows
 perl -p -i -e 's/^__stdio_common_vsscanf\n//' __functions # sscanf, Windows
 perl -p -i -e 's/^__srget\n//' __functions # gets, FreeBSD
 perl -p -i -e 's/^__swbuf\n//' __functions # putc, FreeBSD
+perl -p -i -e 's/^__tolower\n//' __functions # tolower, macOS
+perl -p -i -e 's/^__toupper\n//' __functions # toupper, macOS
 
 # Some functions are covered by existing tests:
 perl -p -i -e 's/^__CPROVER_(creat|fcntl|open|openat)\n//' __functions # creat, fcntl, open, openat
+perl -p -i -e 's/^__CPROVER_(tolower|toupper)\n//' __functions # tolower, toupper
 perl -p -i -e 's/^(creat|fcntl|open|openat)64\n//' __functions # same as creat, fcntl, open, openat
 perl -p -i -e 's/^__CPROVER_deallocate\n//' __functions # free-01
 perl -p -i -e 's/^__builtin_alloca\n//' __functions # alloca-01
