@@ -95,12 +95,52 @@ int isupper(int c)
 int isxdigit(int c)
 { return (c>='A' && c<='F') || (c>='a' && c<='f') || (c>='0' && c<='9'); }
 
+/* FUNCTION: __CPROVER_tolower */
+
+int __CPROVER_tolower(int c)
+{
+  return (c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c;
+}
+
 /* FUNCTION: tolower */
 
+int __CPROVER_tolower(int c);
+
 int tolower(int c)
-{ return (c>='A' && c<='Z')?c+('a'-'A'):c; }
+{
+  return __CPROVER_tolower(c);
+}
+
+/* FUNCTION: __tolower */
+
+int __CPROVER_tolower(int c);
+
+int __tolower(int c)
+{
+  return __CPROVER_tolower(c);
+}
+
+/* FUNCTION: __CPROVER_toupper */
+
+int __CPROVER_toupper(int c)
+{
+  return (c >= 'a' && c <= 'z') ? c - ('a' - 'A') : c;
+}
 
 /* FUNCTION: toupper */
 
+int __CPROVER_toupper(int c);
+
 int toupper(int c)
-{ return (c>='a' && c<='z')?c-('a'-'A'):c; }
+{
+  return __CPROVER_toupper(c);
+}
+
+/* FUNCTION: __toupper */
+
+int __CPROVER_toupper(int c);
+
+int __toupper(int c)
+{
+  return __CPROVER_toupper(c);
+}
