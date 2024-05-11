@@ -85,11 +85,13 @@ public:
     is_atomic=false;
     is_ptr32=is_ptr64=false;
     is_transparent_union=false;
+    is_nodiscard = false;
     is_noreturn=false;
   }
 
   // standard ones
-  bool is_constant, is_volatile, is_restricted, is_atomic, is_noreturn;
+  bool is_constant, is_volatile, is_restricted, is_atomic, is_noreturn,
+    is_nodiscard;
 
   // MS Visual Studio extension
   bool is_ptr32, is_ptr64;
@@ -108,14 +110,12 @@ public:
   virtual bool is_subset_of(const qualifierst &other) const override
   {
     const c_qualifierst *cq = dynamic_cast<const c_qualifierst *>(&other);
-    return
-      (!is_constant || cq->is_constant) &&
-      (!is_volatile || cq->is_volatile) &&
-      (!is_restricted || cq->is_restricted) &&
-      (!is_atomic || cq->is_atomic) &&
-      (!is_ptr32 || cq->is_ptr32) &&
-      (!is_ptr64 || cq->is_ptr64) &&
-      (!is_noreturn || cq->is_noreturn);
+    return (!is_constant || cq->is_constant) &&
+           (!is_volatile || cq->is_volatile) &&
+           (!is_restricted || cq->is_restricted) &&
+           (!is_atomic || cq->is_atomic) && (!is_ptr32 || cq->is_ptr32) &&
+           (!is_ptr64 || cq->is_ptr64) && (!is_nodiscard || cq->is_nodiscard) &&
+           (!is_noreturn || cq->is_noreturn);
 
     // is_transparent_union isn't checked
   }
@@ -123,15 +123,11 @@ public:
   virtual bool operator==(const qualifierst &other) const override
   {
     const c_qualifierst *cq = dynamic_cast<const c_qualifierst *>(&other);
-    return
-      is_constant == cq->is_constant &&
-      is_volatile == cq->is_volatile &&
-      is_restricted == cq->is_restricted &&
-      is_atomic == cq->is_atomic &&
-      is_ptr32 == cq->is_ptr32 &&
-      is_ptr64 == cq->is_ptr64 &&
-      is_transparent_union == cq->is_transparent_union &&
-      is_noreturn == cq->is_noreturn;
+    return is_constant == cq->is_constant && is_volatile == cq->is_volatile &&
+           is_restricted == cq->is_restricted && is_atomic == cq->is_atomic &&
+           is_ptr32 == cq->is_ptr32 && is_ptr64 == cq->is_ptr64 &&
+           is_transparent_union == cq->is_transparent_union &&
+           is_nodiscard == cq->is_nodiscard && is_noreturn == cq->is_noreturn;
   }
 
   virtual qualifierst &operator+=(const qualifierst &other) override
@@ -144,14 +140,15 @@ public:
     is_ptr32 |= cq->is_ptr32;
     is_ptr64 |= cq->is_ptr64;
     is_transparent_union |= cq->is_transparent_union;
+    is_nodiscard |= cq->is_nodiscard;
     is_noreturn |= cq->is_noreturn;
     return *this;
   }
 
   virtual std::size_t count() const override
   {
-    return is_constant+is_volatile+is_restricted+is_atomic+
-           is_ptr32+is_ptr64+is_noreturn;
+    return is_constant + is_volatile + is_restricted + is_atomic + is_ptr32 +
+           is_ptr64 + is_nodiscard + is_noreturn;
   }
 };
 

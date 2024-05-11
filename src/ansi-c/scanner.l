@@ -864,6 +864,7 @@ friend              { return cpp98_keyword(TOK_FRIEND); }
 mutable             { return cpp98_keyword(TOK_MUTABLE); }
 namespace           { return cpp98_keyword(TOK_NAMESPACE); }
 new                 { return cpp98_keyword(TOK_NEW); }
+nodiscard           { return cpp11_keyword(TOK_NODISCARD); } // C++11
 noexcept            { return cpp11_keyword(TOK_NOEXCEPT); } // C++11
 noreturn            { return cpp11_keyword(TOK_NORETURN); } // C++11
 not                 { return cpp98_keyword('!'); }
@@ -1287,6 +1288,14 @@ __decltype          { if(PARSER.cpp98 &&
 
 "__leave"       { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
                     { loc(); return TOK_MSC_LEAVE; }
+                  else
+                    return make_identifier();
+                }
+
+"__nodiscard__" { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
+                     PARSER.mode==configt::ansi_ct::flavourt::ARM)
+                    { loc(); return TOK_NODISCARD; }
                   else
                     return make_identifier();
                 }

@@ -255,6 +255,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_MUTABLE     "mutable"
 %token TOK_NAMESPACE   "namespace"
 %token TOK_NEW         "new"
+%token TOK_NODISCARD   "nodiscard"
 %token TOK_NOEXCEPT    "noexcept"
 %token TOK_OPERATOR    "operator"
 %token TOK_PRIVATE     "private"
