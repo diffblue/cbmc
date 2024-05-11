@@ -15,6 +15,7 @@ var classc__qualifierst =
     [ "write", "classc__qualifierst.html#a42142eb06f861600220d6456a3cc6979", null ],
     [ "is_atomic", "classc__qualifierst.html#aa07930eaf9944e03b594373e2c98c05d", null ],
     [ "is_constant", "classc__qualifierst.html#af5abad257849a2644a0e9d7cbe1c3644", null ],
+    [ "is_nodiscard", "classc__qualifierst.html#a9231bf0b9aad64f470bb79d930e7017a", null ],
     [ "is_noreturn", "classc__qualifierst.html#a86cb875bba4e1a00b4c0f37d974203e9", null ],
     [ "is_ptr32", "classc__qualifierst.html#ae0fa0c43a4e4b980e418e0e12ca1767d", null ],
     [ "is_ptr64", "classc__qualifierst.html#ac165eea8608c21d59023d0e476a2d9cb", null ],
