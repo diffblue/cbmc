@@ -133,6 +133,7 @@ var class_parser =
     [ "rTypeSpecifier", "class_parser.html#a76782792d490306fc50b3c24e8cb54c4", null ],
     [ "rUnaryExpr", "class_parser.html#af0a7b6753ce6fffdbeda7365c7818672", null ],
     [ "rUsing", "class_parser.html#ae3ccdc82e73ae52df00bc0db72db05c2", null ],
+    [ "rUsingOrTypedef", "class_parser.html#ac59e3005d65701ca1296320e74cb8a67", null ],
     [ "rVarName", "class_parser.html#a83e3de8ec3ff70666f9ce2ab1226c119", null ],
     [ "rVarNameCore", "class_parser.html#a7004d56e1bfe11a61e695e2ca4f51bf3", null ],
     [ "rWhileStatement", "class_parser.html#ac7eac509128ed65e5e3e97a0d11b5c3a", null ],
