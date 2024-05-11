@@ -16,6 +16,7 @@ c_qualifierst &c_qualifierst::operator=(const c_qualifierst &other)
   is_volatile = other.is_volatile;
   is_restricted = other.is_restricted;
   is_atomic = other.is_atomic;
+  is_nodiscard = other.is_nodiscard;
   is_noreturn = other.is_noreturn;
   is_ptr32 = other.is_ptr32;
   is_ptr64 = other.is_ptr64;
@@ -52,6 +53,9 @@ std::string c_qualifierst::as_string() const
   if(is_ptr64)
     qualifiers+="__ptr64 ";
 
+  if(is_nodiscard)
+    qualifiers += "[[nodiscard]] ";
+
   if(is_noreturn)
     qualifiers+="_Noreturn ";
 
@@ -80,6 +84,9 @@ void c_qualifierst::read(const typet &src)
 
   if(src.get_bool(ID_C_transparent_union))
     is_transparent_union=true;
+
+  if(src.get_bool(ID_C_nodiscard))
+    is_nodiscard = true;
 
   if(src.get_bool(ID_C_noreturn))
     is_noreturn=true;
@@ -122,6 +129,11 @@ void c_qualifierst::write(typet &dest) const
   else
     dest.remove(ID_C_transparent_union);
 
+  if(is_nodiscard)
+    dest.set(ID_C_nodiscard, true);
+  else
+    dest.remove(ID_C_nodiscard);
+
   if(is_noreturn)
     dest.set(ID_C_noreturn, true);
   else
@@ -136,6 +148,7 @@ void c_qualifierst::clear(typet &dest)
   dest.remove(ID_C_ptr32);
   dest.remove(ID_C_ptr64);
   dest.remove(ID_C_transparent_union);
+  dest.remove(ID_C_nodiscard);
   dest.remove(ID_C_noreturn);
 }
 

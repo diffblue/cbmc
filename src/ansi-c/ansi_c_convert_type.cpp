@@ -216,6 +216,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       }
     }
   }
+  else if(type.id() == ID_nodiscard)
+    c_qualifiers.is_nodiscard = true;
   else if(type.id()==ID_noreturn)
     c_qualifiers.is_noreturn=true;
   else if(type.id()==ID_constructor)

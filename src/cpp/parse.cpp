@@ -2391,6 +2391,8 @@ bool Parser::optAttribute(typet &t)
     switch(tk.kind)
     {
     case ']':
+      if(lex.LookAhead(0) != ']')
+        return false;
       lex.get_token();
       return true;
 
@@ -2402,7 +2404,17 @@ bool Parser::optAttribute(typet &t)
         break;
       }
 
+      case TOK_NODISCARD:
+      {
+        typet attr(ID_nodiscard);
+        set_location(attr, tk);
+        merge_types(attr, t);
+        break;
+      }
+
     default:
+      // TODO: way may wish to change this: GCC, Clang, Visual Studio merely
+      // warn when they see an attribute that they don't recognize
       return false;
     }
   }
