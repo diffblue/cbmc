@@ -4486,6 +4486,12 @@ bool Parser::rClassSpec(typet &spec)
   std::cout << std::string(__indent, ' ') << "Parser::rClassSpec 3\n";
 #endif
 
+  if(!optAlignas(spec))
+    return false;
+
+  if(!optAttribute(spec))
+    return false;
+
   if(lex.LookAhead(0)=='{')
   {
     // no tag
@@ -4495,12 +4501,6 @@ bool Parser::rClassSpec(typet &spec)
   }
   else
   {
-    if(!optAlignas(spec))
-      return false;
-
-    if(!optAttribute(spec))
-      return false;
-
     irept name;
 
     if(!rName(name))
