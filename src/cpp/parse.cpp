@@ -2151,9 +2151,8 @@ bool Parser::optAlignas(typet &cv)
 
   typet tname;
   cpp_tokent op, cp;
-
-  cpp_token_buffert::post pos=lex.Save();
   lex.get_token(op);
+  cpp_token_buffert::post pos = lex.Save();
 
   if(rTypeName(tname))
   {
