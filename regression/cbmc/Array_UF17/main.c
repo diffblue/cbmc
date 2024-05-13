@@ -31,7 +31,9 @@ int istrchr(const char *s, int c);
 int istrrchr(const char *s, int c);
 int istrncmp(const char *s1, int start, const char *s2, size_t n);
 int istrstr(const char *haystack, const char *needle);
-char *r_strncpy(char *dest, const char *src, size_t n);
+char *r_strncpy(char *dest, const char *src, size_t n)
+{
+}
 char *r_strcpy(char *dest, const char *src);
 char *r_strcat(char *dest, const char *src);
 char *r_strncat(char *dest, const char *src, size_t n);

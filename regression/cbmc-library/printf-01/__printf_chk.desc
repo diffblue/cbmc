@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --pointer-check --bounds-check -D_FORTIFY_SOURCE=2 -D__OPTIMIZE__=2
 ^EXIT=10$
@@ -8,3 +8,5 @@ main.c
 --
 ^\*\*\*\* WARNING: no body for function __printf_chk
 ^warning: ignoring
+--
+We are missing __builtin_va_arg_pack

@@ -1,9 +1,11 @@
 CORE
 main.c
 --remove-function-body foo --remove-function-body bar
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^\[main\.no-body\.foo\] line 19 no body for callee foo: FAILURE$
+^\[main\.no-body\.bar\] line 20 no body for callee bar: FAILURE$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring
 ^bar

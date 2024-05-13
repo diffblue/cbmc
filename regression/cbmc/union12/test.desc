@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+KNOWNBUG broken-smt-backend
 main.c
 
 ^EXIT=10$
@@ -15,3 +15,5 @@ possible. With 77236cc34 (Avoid nesting of ID_with/byte_update by rewriting
 byte_extract to use the root object) the test already is trivial, however.
 
 This test only fails when using SMT solvers as back-end on Windows.
+
+No body for __CPROVER_allocated_memory

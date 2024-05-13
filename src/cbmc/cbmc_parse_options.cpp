@@ -285,9 +285,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("drop-unused-functions"))
     options.set_option("drop-unused-functions", true);
 
-  if(cmdline.isset("havoc-undefined-functions"))
-    options.set_option("havoc-undefined-functions", true);
-
   if(cmdline.isset("string-abstraction"))
     options.set_option("string-abstraction", true);
 
@@ -1061,9 +1058,6 @@ void cbmc_parse_optionst::help()
     " {y--full-slice} \t run full slicer (experimental)\n"
     " {y--drop-unused-functions} \t drop functions trivially unreachable from"
     " main function\n"
-    " {y--havoc-undefined-functions} \t for any function that has no body,"
-    " assign non-deterministic values to any parameters passed as non-const"
-    " pointers and the return value\n"
     "\n"
     "Semantic transformations:\n"
     " {y--nondet-static} \t add nondeterministic initialization of variables"

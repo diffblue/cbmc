@@ -15,6 +15,7 @@ for f in "$@"; do
     $CC -std=gnu11 -E -include library/cprover.h -D__CPROVER_bool=_Bool -D__CPROVER_thread_local=__thread -DLIBRARY_CHECK -o __libcheck.i __libcheck.c
     $CC -S -Wall -Werror -pedantic -Wextra -std=gnu11 __libcheck.i \
       -o __libcheck.s -Wno-unused-label -Wno-unknown-pragmas \
+      -Wno-dollar-in-identifier-extension \
       -Wno-gnu-line-marker -Wno-unknown-warning-option -Wno-psabi
     ec="${?}"
     rm __libcheck.s __libcheck.i __libcheck.c
@@ -73,6 +74,7 @@ perl -p -i -e 's/^__fprintf_chk\n//' __functions # fprintf-01/__fprintf_chk.desc
 perl -p -i -e 's/^__fread_chk\n//' __functions # fread-01/__fread_chk.desc
 perl -p -i -e 's/^__printf_chk\n//' __functions # printf-01/__printf_chk.desc
 perl -p -i -e 's/^__syslog_chk\n//' __functions # syslog-01/__syslog_chk.desc
+perl -p -i -e 's/^_syslog\$DARWIN_EXTSN\n//' __functions # syslog-01/test.desc
 perl -p -i -e 's/^__time64\n//' __functions # time
 perl -p -i -e 's/^__vfprintf_chk\n//' __functions # vfprintf-01/__vfprintf_chk.desc
 

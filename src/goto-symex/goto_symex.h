@@ -444,12 +444,6 @@ protected:
 
   virtual void loop_bound_exceeded(statet &state, const exprt &guard);
 
-  /// Log a warning that a function has no body
-  /// \param identifier: The name of the function with no body
-  virtual void no_body(const irep_idt &identifier)
-  {
-  }
-
   /// Symbolically execute a FUNCTION_CALL instruction.
   /// Only functions that are symbols are supported, see
   /// \ref goto_symext::symex_function_call_symbol.

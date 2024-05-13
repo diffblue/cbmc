@@ -288,7 +288,19 @@ void goto_symext::symex_function_call_post_clean(
 
   if(!goto_function.body_available())
   {
-    no_body(identifier);
+    // create a fatal assertion
+    if(symex_config.unwinding_assertions)
+    {
+      const auto &symbol = ns.lookup(identifier);
+      const std::string property_id =
+        id2string(state.source.pc->source_location().get_function()) +
+        ".no-body." + id2string(identifier);
+      vcc(
+        false_exprt(),
+        property_id,
+        "no body for callee " + id2string(symbol.display_name()),
+        state);
+    }
 
     // record the return
     target.function_return(
@@ -299,26 +311,6 @@ void goto_symext::symex_function_call_post_clean(
       const auto rhs = side_effect_expr_nondett(
         cleaned_lhs.type(), state.source.pc->source_location());
       symex_assign(state, cleaned_lhs, rhs);
-    }
-
-    if(symex_config.havoc_undefined_functions)
-    {
-      // assign non det to function arguments if pointers
-      // are not const
-      for(const auto &arg : cleaned_arguments)
-      {
-        if(
-          arg.type().id() == ID_pointer &&
-          !to_pointer_type(arg.type()).base_type().get_bool(ID_C_constant) &&
-          to_pointer_type(arg.type()).base_type().id() != ID_code)
-        {
-          exprt object =
-            dereference_exprt(arg, to_pointer_type(arg.type()).base_type());
-          exprt cleaned_object = clean_expr(object, state, true);
-          const guardt guard(true_exprt(), state.guard_manager);
-          havoc_rec(state, guard, cleaned_object);
-        }
-      }
     }
 
     symex_transition(state);

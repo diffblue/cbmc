@@ -21,6 +21,14 @@ void syslog(int priority, const char *format, ...)
   (void)*format;
 }
 
+/* FUNCTION: _syslog$DARWIN_EXTSN */
+
+void _syslog$DARWIN_EXTSN(int priority, const char *format, ...)
+{
+  (void)priority;
+  (void)*format;
+}
+
 /* FUNCTION: __syslog_chk */
 
 void __syslog_chk(int priority, int flag, const char *format, ...)

@@ -1,4 +1,4 @@
-CORE no-new-smt
+KNOWNBUG no-new-smt
 main.c
 --little-endian
 ^EXIT=0$

@@ -1,12 +1,12 @@
 CORE
 main.c
 --inline
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 func1\(\)
 ret.*=.*func2\(\)
-no body for function.*func1
-no body for function.*func2
+^\[\.no-body\.func1\] file main.c line 3 no body for callee func1: FAILURE$
+^\[\.no-body\.func2\] file main.c line 3 no body for callee func2: FAILURE$
 --
 ^warning: ignoring

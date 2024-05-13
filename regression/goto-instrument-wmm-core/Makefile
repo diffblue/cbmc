@@ -1,15 +1,21 @@
+# These tests do not run with Visual Studio since they use
+# gcc's asm syntax.
+
 default: tests.log
 
 include ../../src/config.inc
 include ../../src/common
 
 ifeq ($(BUILD_ENV_),MSVC)
-	exe=../../../src/goto-cc/goto-cl
-	is_windows=true
+
+test:
+
+tests.log: ../test.pl
+
 else
-	exe=../../../src/goto-cc/goto-cc
-	is_windows=false
-endif
+
+exe=../../../src/goto-cc/goto-cc
+is_windows=false
 
 testalpha:
 	@../test.pl -C -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument ../../../src/cbmc/cbmc $(is_windows)' -X glpk
@@ -28,6 +34,8 @@ test:
 
 tests.log:
 	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument ../../../src/cbmc/cbmc $(is_windows)' -X glpk
+
+endif
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;

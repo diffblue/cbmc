@@ -1,5 +1,9 @@
 #include <assert.h>
 
+void bar(int *)
+{
+}
+
 void foo(int *x, int *y) __CPROVER_assigns(*x)
 {
   *x = 7;
