@@ -7,10 +7,6 @@ struct S0
   int x;
 };
 
-#ifdef _MSC_VER
-#  define _Static_assert static_assert
-#endif
-
 int main()
 {
   struct S0 g = {0};

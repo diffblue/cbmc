@@ -8,10 +8,6 @@ struct S
 };
 #pragma pack(pop)
 
-#ifdef _MSC_VER
-#  define _Static_assert(x, m) static_assert(x, m)
-#endif
-
 int main()
 {
   int A[3];
