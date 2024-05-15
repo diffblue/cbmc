@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#  define _Static_assert static_assert
-#endif
-
 int main()
 {
   _Static_assert(!__CPROVER_overflow_plus(1, 2), "");

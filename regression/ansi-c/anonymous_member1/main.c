@@ -1,8 +1,3 @@
-#ifdef _MSC_VER
-// No _Static_assert in Visual Studio
-#  define _Static_assert(condition, message) static_assert(condition, message)
-#endif
-
 struct S
 {
   struct

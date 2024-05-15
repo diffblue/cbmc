@@ -876,8 +876,9 @@ or_eq               { return cpp98_keyword(TOK_ORASSIGN); }
 private             { return cpp98_keyword(TOK_PRIVATE); }
 protected           { return cpp98_keyword(TOK_PROTECTED); }
 public              { return cpp98_keyword(TOK_PUBLIC); }
-static_assert       { // C++11, but Visual Studio supports it in all modes (and
-                      // doesn't support _Static_assert)
+static_assert       { // C++11, but Visual Studio supports it in all modes
+                      // as a keyword, even though the documentation claims
+                      // it's a macro.
                       if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
                       {
                         loc(); return TOK_STATIC_ASSERT;
@@ -1490,10 +1491,7 @@ __decltype          { if(PARSER.cpp98 &&
 
   /* This is a C11 keyword */
 
-"_Static_assert" { if(!PARSER.cpp98 &&
-                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
-                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
+"_Static_assert" { if(!PARSER.cpp98)
                     { loc(); return TOK_STATIC_ASSERT; }
                   else
                     return make_identifier();
