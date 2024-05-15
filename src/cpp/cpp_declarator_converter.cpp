@@ -163,7 +163,9 @@ symbolt &cpp_declarator_convertert::convert(
 
     // If it is a constructor, we take care of the
     // object initialization
-    if(to_code_type(final_type).return_type().id() == ID_constructor)
+    if(
+      final_type.id() == ID_code &&
+      to_code_type(final_type).return_type().id() == ID_constructor)
     {
       const cpp_namet &name=declarator.name();
 
