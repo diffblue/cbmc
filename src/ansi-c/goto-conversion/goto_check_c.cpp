@@ -237,6 +237,7 @@ protected:
   /// \param asserted_expr: expression to be asserted
   /// \param comment: human readable comment
   /// \param property_class: classification of the property
+  /// \param is_fatal: property checks for undefined behavior
   /// \param source_location: the source location of the original expression
   /// \param src_expr: the original expression to be included in the comment
   /// \param guard: the condition under which the asserted expression should be
@@ -245,6 +246,7 @@ protected:
     const exprt &asserted_expr,
     const std::string &comment,
     const std::string &property_class,
+    bool is_fatal,
     const source_locationt &source_location,
     const exprt &src_expr,
     const guardt &guard);
@@ -507,6 +509,7 @@ void goto_check_ct::div_by_zero_check(
     inequality,
     "division by zero",
     "division-by-zero",
+    true, // fatal
     expr.find_source_location(),
     expr,
     guard);
@@ -528,6 +531,7 @@ void goto_check_ct::float_div_by_zero_check(
     inequality,
     "floating-point division by zero",
     "float-division-by-zero",
+    false, // fatal
     expr.find_source_location(),
     expr,
     guard);
@@ -552,6 +556,7 @@ void goto_check_ct::enum_range_check(const exprt &expr, const guardt &guard)
     check,
     "enum range check",
     "enum-range-check",
+    false, // fatal
     expr.find_source_location(),
     expr,
     guard);
@@ -578,6 +583,7 @@ void goto_check_ct::undefined_shift_check(
       inequality,
       "shift distance is negative",
       "undefined-shift",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -594,6 +600,7 @@ void goto_check_ct::undefined_shift_check(
       binary_relation_exprt(expr.distance(), ID_lt, std::move(width_expr)),
       "shift distance too large",
       "undefined-shift",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -607,6 +614,7 @@ void goto_check_ct::undefined_shift_check(
         inequality,
         "shift operand is negative",
         "undefined-shift",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -618,6 +626,7 @@ void goto_check_ct::undefined_shift_check(
       false_exprt(),
       "shift of non-integer type",
       "undefined-shift",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -640,6 +649,7 @@ void goto_check_ct::mod_by_zero_check(
     inequality,
     "division by zero",
     "division-by-zero",
+    false, // fatal
     expr.find_source_location(),
     expr,
     guard);
@@ -672,6 +682,7 @@ void goto_check_ct::mod_overflow_check(
       or_exprt(int_min_neq, minus_one_neq),
       "result of signed mod is not representable",
       "overflow",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -716,6 +727,7 @@ void goto_check_ct::conversion_check(const exprt &expr, const guardt &guard)
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on signed type conversion",
           "overflow",
+          false, // fatal
           expr.find_source_location(),
           expr,
           guard);
@@ -733,6 +745,7 @@ void goto_check_ct::conversion_check(const exprt &expr, const guardt &guard)
           no_overflow_upper,
           "arithmetic overflow on unsigned to signed type conversion",
           "overflow",
+          false, // fatal
           expr.find_source_location(),
           expr,
           guard);
@@ -754,6 +767,7 @@ void goto_check_ct::conversion_check(const exprt &expr, const guardt &guard)
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on float to signed integer type conversion",
           "overflow",
+          false, // fatal
           expr.find_source_location(),
           expr,
           guard);
@@ -777,6 +791,7 @@ void goto_check_ct::conversion_check(const exprt &expr, const guardt &guard)
             no_overflow_lower,
             "arithmetic overflow on signed to unsigned type conversion",
             "overflow",
+            false, // fatal
             expr.find_source_location(),
             expr,
             guard);
@@ -794,6 +809,7 @@ void goto_check_ct::conversion_check(const exprt &expr, const guardt &guard)
             and_exprt(no_overflow_lower, no_overflow_upper),
             "arithmetic overflow on signed to unsigned type conversion",
             "overflow",
+            false, // fatal
             expr.find_source_location(),
             expr,
             guard);
@@ -812,6 +828,7 @@ void goto_check_ct::conversion_check(const exprt &expr, const guardt &guard)
           no_overflow_upper,
           "arithmetic overflow on unsigned to unsigned type conversion",
           "overflow",
+          false, // fatal
           expr.find_source_location(),
           expr,
           guard);
@@ -833,6 +850,7 @@ void goto_check_ct::conversion_check(const exprt &expr, const guardt &guard)
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on float to unsigned integer type conversion",
           "overflow",
+          false, // fatal
           expr.find_source_location(),
           expr,
           guard);
@@ -875,6 +893,7 @@ void goto_check_ct::integer_overflow_check(
         not_exprt(and_exprt(int_min_eq, minus_one_eq)),
         "arithmetic overflow on signed division",
         "overflow",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -896,6 +915,7 @@ void goto_check_ct::integer_overflow_check(
         not_exprt(int_min_eq),
         "arithmetic overflow on signed unary minus",
         "overflow",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -912,6 +932,7 @@ void goto_check_ct::integer_overflow_check(
         not_eq_zero,
         "arithmetic overflow on unsigned unary minus",
         "overflow",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -1018,6 +1039,7 @@ void goto_check_ct::integer_overflow_check(
            top_bits_zero}),
         "arithmetic overflow on signed shl",
         "overflow",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -1052,6 +1074,7 @@ void goto_check_ct::integer_overflow_check(
         not_exprt{binary_overflow_exprt{tmp, expr.id(), expr.operands()[i]}},
         "arithmetic overflow on " + kind + " " + expr.id_string(),
         "overflow",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -1066,6 +1089,7 @@ void goto_check_ct::integer_overflow_check(
       not_exprt{binary_overflow_exprt{bexpr.lhs(), expr.id(), bexpr.rhs()}},
       "arithmetic overflow on " + kind + " " + expr.id_string(),
       "overflow",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1080,6 +1104,7 @@ void goto_check_ct::integer_overflow_check(
       not_exprt{unary_minus_overflow_exprt{to_unary_expr(expr).op()}},
       "arithmetic overflow on " + kind + " " + expr.id_string(),
       "overflow",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1113,6 +1138,7 @@ void goto_check_ct::float_overflow_check(const exprt &expr, const guardt &guard)
         std::move(overflow_check),
         "arithmetic overflow on floating-point typecast",
         "overflow",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -1124,6 +1150,7 @@ void goto_check_ct::float_overflow_check(const exprt &expr, const guardt &guard)
         not_exprt(isinf_exprt(expr)),
         "arithmetic overflow on floating-point typecast",
         "overflow",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -1141,6 +1168,7 @@ void goto_check_ct::float_overflow_check(const exprt &expr, const guardt &guard)
       std::move(overflow_check),
       "arithmetic overflow on floating-point division",
       "overflow",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1176,6 +1204,7 @@ void goto_check_ct::float_overflow_check(const exprt &expr, const guardt &guard)
         std::move(overflow_check),
         "arithmetic overflow on floating-point " + kind,
         "overflow",
+        false, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -1296,6 +1325,7 @@ void goto_check_ct::nan_check(const exprt &expr, const guardt &guard)
     boolean_negate(isnan),
     "NaN on " + expr.id_string(),
     "NaN",
+    false, // fatal
     expr.find_source_location(),
     expr,
     guard);
@@ -1320,6 +1350,7 @@ void goto_check_ct::pointer_rel_check(
       same_object,
       "same object violation",
       "pointer",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1337,6 +1368,7 @@ void goto_check_ct::pointer_rel_check(
           c.assertion,
           "pointer relation: " + c.description,
           "pointer arithmetic",
+          false, // fatal
           expr.find_source_location(),
           pointer,
           guard);
@@ -1395,6 +1427,7 @@ void goto_check_ct::pointer_overflow_check(
       c.assertion,
       "pointer arithmetic: " + c.description,
       "pointer arithmetic",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1436,6 +1469,7 @@ void goto_check_ct::pointer_validity_check(
       c.assertion,
       "dereference failure: " + c.description,
       "pointer dereference",
+      false, // fatal
       src_expr.find_source_location(),
       src_expr,
       guard);
@@ -1477,6 +1511,7 @@ void goto_check_ct::pointer_primitive_check(
       or_exprt{null_object(pointer), c.assertion},
       c.description,
       "pointer primitives",
+      false, // fatal
       expr.source_location(),
       expr,
       guard);
@@ -1593,6 +1628,7 @@ void goto_check_ct::bounds_check_index(
           inequality,
           name + " lower bound",
           "array bounds",
+          false, // fatal
           expr.find_source_location(),
           expr,
           guard);
@@ -1627,6 +1663,7 @@ void goto_check_ct::bounds_check_index(
       precond,
       name + " dynamic object upper bound",
       "array bounds",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1671,6 +1708,7 @@ void goto_check_ct::bounds_check_index(
       inequality,
       name + " upper bound",
       "array bounds",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1684,6 +1722,7 @@ void goto_check_ct::bounds_check_index(
       inequality,
       name + " upper bound",
       "array bounds",
+      false, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1707,6 +1746,7 @@ void goto_check_ct::bounds_check_bit_count(
     notequal_exprt{expr.op(), from_integer(0, expr.op().type())},
     "count " + name + " zeros is undefined for value zero",
     "bit count",
+    false, // fatal
     expr.find_source_location(),
     expr,
     guard);
@@ -1716,6 +1756,7 @@ void goto_check_ct::add_guarded_property(
   const exprt &asserted_expr,
   const std::string &comment,
   const std::string &property_class,
+  bool is_fatal,
   const source_locationt &source_location,
   const exprt &src_expr,
   const guardt &guard)
@@ -1749,7 +1790,7 @@ void goto_check_ct::add_guarded_property(
     }
     else
     {
-      if(property_class == "division-by-zero")
+      if(is_fatal)
         annotated_location.property_fatal(true);
 
       new_code.add(goto_programt::make_assertion(
@@ -2040,6 +2081,7 @@ void goto_check_ct::memory_leak_check(const irep_idt &function_id)
     eq,
     "dynamically allocated memory never freed",
     "memory-leak",
+    false, // fatal
     source_location,
     eq,
     identity);
