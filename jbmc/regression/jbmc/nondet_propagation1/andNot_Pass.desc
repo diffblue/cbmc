@@ -1,6 +1,6 @@
 CORE
 andNot_Pass
---depth 1600 --java-unwind-enum-static --java-max-vla-length 48 --unwind 4 --max-nondet-string-length 100 --function andNot_Pass.main
+--depth 1600 --java-unwind-enum-static --java-max-vla-length 48 --unwind 4 --no-unwinding-assertions --max-nondet-string-length 100 --function andNot_Pass.main
 ^\[java::andNot_Pass\.main:\(\[Ljava/lang/String;\)V.assertion\.3\] line 40 assertion at file andNot_Pass\.java line 40 function java::andNot_Pass.main:\(\[Ljava/lang/String;\)V bytecode-index 52: FAILURE$
 ^\*\* 1 of \d+ failed
 VERIFICATION FAILED

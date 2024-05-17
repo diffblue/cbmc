@@ -1,6 +1,6 @@
 CORE
 NondetArray2
---function NondetArray2.main --unwind 5
+--function NondetArray2.main --unwind 5 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
