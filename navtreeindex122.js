@@ -1,5 +1,6 @@
 var NAVTREEINDEX122 =
 {
+"show__locations_8cpp_source.html":[9,0,2,15,90],
 "show__locations_8h.html":[9,0,2,15,91],
 "show__locations_8h.html#ac887d5b8b35f6421397dd450daed957b":[9,0,2,15,91,0],
 "show__locations_8h_source.html":[9,0,2,15,91],
@@ -248,6 +249,5 @@ var NAVTREEINDEX122 =
 "slice__global__inits_8h_source.html":[9,0,2,16,112],
 "small__map_8h.html":[9,0,2,30,201],
 "small__map_8h_source.html":[9,0,2,30,201],
-"small__shared__n__way__ptr_8h.html":[9,0,2,30,202],
-"small__shared__n__way__ptr_8h.html#a3fed2b6734ebd1cb4edc1d67efa32d58":[9,0,2,30,202,8]
+"small__shared__n__way__ptr_8h.html":[9,0,2,30,202]
 };
