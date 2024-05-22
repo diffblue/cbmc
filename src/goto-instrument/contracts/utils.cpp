@@ -369,46 +369,13 @@ void add_quantified_variable(
   exprt &expression,
   const irep_idt &mode)
 {
-  if(expression.id() == ID_not || expression.id() == ID_typecast)
-  {
-    // For unary connectives, recursively check for
-    // nested quantified formulae in the term
-    auto &unary_expression = to_unary_expr(expression);
-    add_quantified_variable(symbol_table, unary_expression.op(), mode);
-  }
-  if(expression.id() == ID_notequal || expression.id() == ID_implies)
-  {
-    // For binary connectives, recursively check for
-    // nested quantified formulae in the left and right terms
-    auto &binary_expression = to_binary_expr(expression);
-    add_quantified_variable(symbol_table, binary_expression.lhs(), mode);
-    add_quantified_variable(symbol_table, binary_expression.rhs(), mode);
-  }
-  if(expression.id() == ID_if)
-  {
-    // For ternary connectives, recursively check for
-    // nested quantified formulae in all three terms
-    auto &if_expression = to_if_expr(expression);
-    add_quantified_variable(symbol_table, if_expression.cond(), mode);
-    add_quantified_variable(symbol_table, if_expression.true_case(), mode);
-    add_quantified_variable(symbol_table, if_expression.false_case(), mode);
-  }
-  if(expression.id() == ID_and || expression.id() == ID_or)
-  {
-    // For multi-ary connectives, recursively check for
-    // nested quantified formulae in all terms
-    auto &multi_ary_expression = to_multi_ary_expr(expression);
-    for(auto &operand : multi_ary_expression.operands())
-    {
-      add_quantified_variable(symbol_table, operand, mode);
-    }
-  }
-  else if(expression.id() == ID_exists || expression.id() == ID_forall)
-  {
+  auto visitor = [&symbol_table, &mode](exprt &expr) {
+    if(expr.id() != ID_exists && expr.id() != ID_forall)
+      return;
     // When a quantifier expression is found, create a fresh symbol for each
     // quantified variable and rewrite the expression to use those fresh
     // symbols.
-    auto &quantifier_expression = to_quantifier_expr(expression);
+    auto &quantifier_expression = to_quantifier_expr(expr);
     std::vector<symbol_exprt> fresh_variables;
     fresh_variables.reserve(quantifier_expression.variables().size());
     for(const auto &quantified_variable : quantifier_expression.variables())
@@ -435,7 +402,8 @@ void add_quantified_variable(
     // replace previous variables and body
     quantifier_expression.variables() = fresh_variables;
     quantifier_expression.where() = std::move(where);
-  }
+  };
+  expression.visit_pre(visitor);
 }
 
 static void replace_history_parameter_rec(
