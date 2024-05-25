@@ -4618,21 +4618,21 @@ $(document).ready(function(){initNavTree('parse_8cpp_source.html',''); initResiz
 <div class="line"><a name="l04526"></a><span class="lineno"> 4526</span>&#160;  std::cout &lt;&lt; std::string(__indent, <span class="charliteral">&#39; &#39;</span>) &lt;&lt; <span class="stringliteral">&quot;Parser::rClassSpec 3\n&quot;</span>;</div>
 <div class="line"><a name="l04527"></a><span class="lineno"> 4527</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l04528"></a><span class="lineno"> 4528</span>&#160; </div>
-<div class="line"><a name="l04529"></a><span class="lineno"> 4529</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="class_parser.html#a5f60b827c61c71f01df042a656d310a1">lex</a>.<a class="code" href="classcpp__token__buffert.html#a021ac8005a1c6120be82fdd7ec2ef1bf">LookAhead</a>(0)==<span class="charliteral">&#39;{&#39;</span>)</div>
-<div class="line"><a name="l04530"></a><span class="lineno"> 4530</span>&#160;  {</div>
-<div class="line"><a name="l04531"></a><span class="lineno"> 4531</span>&#160;    <span class="comment">// no tag</span></div>
-<div class="line"><a name="l04532"></a><span class="lineno"> 4532</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
-<div class="line"><a name="l04533"></a><span class="lineno"> 4533</span>&#160;    std::cout &lt;&lt; std::string(__indent, <span class="charliteral">&#39; &#39;</span>) &lt;&lt; <span class="stringliteral">&quot;Parser::rClassSpec 4\n&quot;</span>;</div>
-<div class="line"><a name="l04534"></a><span class="lineno"> 4534</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l04535"></a><span class="lineno"> 4535</span>&#160;  }</div>
-<div class="line"><a name="l04536"></a><span class="lineno"> 4536</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l04537"></a><span class="lineno"> 4537</span>&#160;  {</div>
-<div class="line"><a name="l04538"></a><span class="lineno"> 4538</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_parser.html#ac4b65cd3b9313637a12b507c22211fc8">optAlignas</a>(spec))</div>
-<div class="line"><a name="l04539"></a><span class="lineno"> 4539</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l04540"></a><span class="lineno"> 4540</span>&#160; </div>
-<div class="line"><a name="l04541"></a><span class="lineno"> 4541</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_parser.html#a3eddc43f7c84e4f560fac1fafd0a4bdd">optAttribute</a>(spec))</div>
-<div class="line"><a name="l04542"></a><span class="lineno"> 4542</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l04543"></a><span class="lineno"> 4543</span>&#160; </div>
+<div class="line"><a name="l04529"></a><span class="lineno"> 4529</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="class_parser.html#ac4b65cd3b9313637a12b507c22211fc8">optAlignas</a>(spec))</div>
+<div class="line"><a name="l04530"></a><span class="lineno"> 4530</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l04531"></a><span class="lineno"> 4531</span>&#160; </div>
+<div class="line"><a name="l04532"></a><span class="lineno"> 4532</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="class_parser.html#a3eddc43f7c84e4f560fac1fafd0a4bdd">optAttribute</a>(spec))</div>
+<div class="line"><a name="l04533"></a><span class="lineno"> 4533</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l04534"></a><span class="lineno"> 4534</span>&#160; </div>
+<div class="line"><a name="l04535"></a><span class="lineno"> 4535</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="class_parser.html#a5f60b827c61c71f01df042a656d310a1">lex</a>.<a class="code" href="classcpp__token__buffert.html#a021ac8005a1c6120be82fdd7ec2ef1bf">LookAhead</a>(0)==<span class="charliteral">&#39;{&#39;</span>)</div>
+<div class="line"><a name="l04536"></a><span class="lineno"> 4536</span>&#160;  {</div>
+<div class="line"><a name="l04537"></a><span class="lineno"> 4537</span>&#160;    <span class="comment">// no tag</span></div>
+<div class="line"><a name="l04538"></a><span class="lineno"> 4538</span>&#160;<span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a name="l04539"></a><span class="lineno"> 4539</span>&#160;    std::cout &lt;&lt; std::string(__indent, <span class="charliteral">&#39; &#39;</span>) &lt;&lt; <span class="stringliteral">&quot;Parser::rClassSpec 4\n&quot;</span>;</div>
+<div class="line"><a name="l04540"></a><span class="lineno"> 4540</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04541"></a><span class="lineno"> 4541</span>&#160;  }</div>
+<div class="line"><a name="l04542"></a><span class="lineno"> 4542</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l04543"></a><span class="lineno"> 4543</span>&#160;  {</div>
 <div class="line"><a name="l04544"></a><span class="lineno"> 4544</span>&#160;    <a class="code" href="classirept.html">irept</a> name;</div>
 <div class="line"><a name="l04545"></a><span class="lineno"> 4545</span>&#160; </div>
 <div class="line"><a name="l04546"></a><span class="lineno"> 4546</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_parser.html#abcb8a6f8755340d3c3578f288571a969">rName</a>(name))</div>
