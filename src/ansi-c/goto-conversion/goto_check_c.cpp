@@ -583,7 +583,7 @@ void goto_check_ct::undefined_shift_check(
       inequality,
       "shift distance is negative",
       "undefined-shift",
-      false, // fatal
+      true, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -600,7 +600,7 @@ void goto_check_ct::undefined_shift_check(
       binary_relation_exprt(expr.distance(), ID_lt, std::move(width_expr)),
       "shift distance too large",
       "undefined-shift",
-      false, // fatal
+      true, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -614,7 +614,7 @@ void goto_check_ct::undefined_shift_check(
         inequality,
         "shift operand is negative",
         "undefined-shift",
-        false, // fatal
+        true, // fatal
         expr.find_source_location(),
         expr,
         guard);
@@ -626,7 +626,7 @@ void goto_check_ct::undefined_shift_check(
       false_exprt(),
       "shift of non-integer type",
       "undefined-shift",
-      false, // fatal
+      true, // fatal
       expr.find_source_location(),
       expr,
       guard);
