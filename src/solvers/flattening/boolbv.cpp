@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
@@ -23,6 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 
 #include <solvers/floatbv/float_utils.h>
+
+#include "literal_vector_expr.h"
+
+#include <algorithm>
 
 endianness_mapt boolbvt::endianness_map(const typet &type) const
 {
@@ -76,6 +78,15 @@ const bvt &boolbvt::convert_bv(
   }
 
   return cache_entry;
+}
+
+exprt boolbvt::handle(const exprt &expr)
+{
+  if(expr.type().id() == ID_bool)
+    return prop_conv_solvert::handle(expr);
+  auto bv = convert_bv(expr);
+  set_frozen(bv); // for incremental usage
+  return literal_vector_exprt{bv, expr.type()};
 }
 
 /// Print that the expression of x has failed conversion,
@@ -242,6 +253,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   }
   else if(expr.id() == ID_find_first_set)
     return convert_bv(simplify_expr(to_find_first_set_expr(expr).lower(), ns));
+  else if(expr.id() == ID_literal_vector)
+    return to_literal_vector_expr(expr).bv();
 
   return conversion_failed(expr);
 }
