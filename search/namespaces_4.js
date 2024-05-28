@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['minisat_23920',['Minisat',['../namespace_minisat.html',1,'']]]
+  ['minisat_23927',['Minisat',['../namespace_minisat.html',1,'']]]
 ];

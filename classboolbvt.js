@@ -98,6 +98,7 @@ var classboolbvt =
     [ "get_map", "classboolbvt.html#a3900e98f16540d0071e20e1e9ac9524f", null ],
     [ "get_value", "classboolbvt.html#aef28c240526a8d9d5c9f24265c9483f2", null ],
     [ "get_value", "classboolbvt.html#a04c4f06ddb5cc56b57bb753b8d7092bd", null ],
+    [ "handle", "classboolbvt.html#a713988a7c5457ec2d9aefd1452fd56f0", null ],
     [ "is_unbounded_array", "classboolbvt.html#a41b09c6669f8dff27a80583b335fd212", null ],
     [ "print_assignment", "classboolbvt.html#a914b84b11ff4f95bb6d53444cb78e985", null ],
     [ "set_to", "classboolbvt.html#a7dcec20e6bf578ca76f667c819a53e57", null ],

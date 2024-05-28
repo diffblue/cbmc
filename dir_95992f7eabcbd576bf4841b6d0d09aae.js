@@ -92,6 +92,7 @@ var dir_95992f7eabcbd576bf4841b6d0d09aae =
       [ "equalityt", "classequalityt.html", "classequalityt" ],
       [ "typestructt", "structequalityt_1_1typestructt.html", "structequalityt_1_1typestructt" ]
     ] ],
+    [ "literal_vector_expr.h", "literal__vector__expr_8h.html", "literal__vector__expr_8h" ],
     [ "pointer_logic.cpp", "pointer__logic_8cpp.html", null ],
     [ "pointer_logic.h", "pointer__logic_8h.html", [
       [ "pointer_logict", "classpointer__logict.html", "classpointer__logict" ],

@@ -138,39 +138,39 @@
 <path fill="none" stroke="midnightblue" d="M740.5,-337C756.59,-337 773.78,-337 788.65,-337"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="740.12,-333.5 730.12,-337 740.12,-340.5 740.12,-333.5"/>
 </g>
-<!-- Node117 -->
+<!-- Node118 -->
 <g id="node51" class="node">
-<title>Node117</title>
+<title>Node118</title>
 <g id="a_node51"><a xlink:href="classoverflow__result__exprt.html" target="_top" xlink:title="An expression returning both the result of the arithmetic operation under wrap&#45;around semantics as we...">
 <polygon fill="none" stroke="black" points="768.5,-289.5 768.5,-308.5 890.5,-308.5 890.5,-289.5 768.5,-289.5"/>
 <text text-anchor="middle" x="829.5" y="-296.5" font-family="Helvetica,sans-Serif" font-size="10.00">overflow_result_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node117 -->
+<!-- Node1&#45;&gt;Node118 -->
 <g id="edge51" class="edge">
-<title>Node1&#45;&gt;Node117</title>
+<title>Node1&#45;&gt;Node118</title>
 <path fill="none" stroke="midnightblue" d="M730.33,-324.82C750.39,-319.54 773.53,-313.46 792.3,-308.52"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="729.24,-321.48 720.46,-327.41 731.02,-328.25 729.24,-321.48"/>
 </g>
-<!-- Node118 -->
+<!-- Node119 -->
 <g id="node52" class="node">
-<title>Node118</title>
+<title>Node119</title>
 <g id="a_node52"><a xlink:href="classpredicate__exprt.html" target="_top" xlink:title="A base class for expressions that are predicates, i.e., Boolean&#45;typed.">
 <polygon fill="none" stroke="red" points="783,-251.5 783,-270.5 876,-270.5 876,-251.5 783,-251.5"/>
 <text text-anchor="middle" x="829.5" y="-258.5" font-family="Helvetica,sans-Serif" font-size="10.00">predicate_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node118 -->
+<!-- Node1&#45;&gt;Node119 -->
 <g id="edge52" class="edge">
-<title>Node1&#45;&gt;Node118</title>
+<title>Node1&#45;&gt;Node119</title>
 <path fill="none" stroke="midnightblue" d="M703.53,-321.05C719.72,-308.48 743.77,-291.24 767,-280 774.54,-276.35 782.95,-273.21 791.06,-270.59"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="701.07,-318.54 695.4,-327.49 705.41,-324.03 701.07,-318.54"/>
 </g>
-<!-- Node120 -->
+<!-- Node121 -->
 <g id="node53" class="node">
-<title>Node120</title>
+<title>Node121</title>
 <g id="a_node53"><a xlink:href="classprophecy__pointer__in__range__exprt.html" target="_top" xlink:title="pointer_in_range (see pointer_in_range_exprt) with prophecy expressions to encode whether a pointer r...">
 <polygon fill="none" stroke="black" points="771.5,-202 771.5,-232 887.5,-232 887.5,-202 771.5,-202"/>
 <text text-anchor="start" x="779.5" y="-220" font-family="Helvetica,sans-Serif" font-size="10.00">prophecy_pointer_in</text>
@@ -178,15 +178,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node120 -->
+<!-- Node1&#45;&gt;Node121 -->
 <g id="edge53" class="edge">
-<title>Node1&#45;&gt;Node120</title>
+<title>Node1&#45;&gt;Node121</title>
 <path fill="none" stroke="midnightblue" d="M695.8,-318.98C710.35,-298 736.86,-263.49 767,-242 772.26,-238.25 778.15,-234.95 784.16,-232.07"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="692.87,-317.08 690.16,-327.32 698.66,-321 692.87,-317.08"/>
 </g>
-<!-- Node121 -->
+<!-- Node122 -->
 <g id="node54" class="node">
-<title>Node121</title>
+<title>Node122</title>
 <g id="a_node54"><a xlink:href="classprophecy__r__or__w__ok__exprt.html" target="_top" xlink:title="A base class for a predicate that indicates that an address range is ok to read or write or both.">
 <polygon fill="none" stroke="red" points="771.5,-153 771.5,-183 887.5,-183 887.5,-153 771.5,-153"/>
 <text text-anchor="start" x="779.5" y="-171" font-family="Helvetica,sans-Serif" font-size="10.00">prophecy_r_or_w_ok</text>
@@ -194,84 +194,84 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node121 -->
+<!-- Node1&#45;&gt;Node122 -->
 <g id="edge54" class="edge">
-<title>Node1&#45;&gt;Node121</title>
+<title>Node1&#45;&gt;Node122</title>
 <path fill="none" stroke="midnightblue" d="M690.2,-317.9C701.07,-287.27 726.32,-227.07 767,-192 770.99,-188.56 775.54,-185.58 780.3,-183"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="686.88,-316.81 686.96,-327.41 693.5,-319.07 686.88,-316.81"/>
 </g>
-<!-- Node124 -->
+<!-- Node125 -->
 <g id="node55" class="node">
-<title>Node124</title>
+<title>Node125</title>
 <g id="a_node55"><a xlink:href="classternary__exprt.html" target="_top" xlink:title="An expression with three operands.">
 <polygon fill="none" stroke="red" points="788,-852.5 788,-871.5 871,-871.5 871,-852.5 788,-852.5"/>
 <text text-anchor="middle" x="829.5" y="-859.5" font-family="Helvetica,sans-Serif" font-size="10.00">ternary_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node124 -->
+<!-- Node1&#45;&gt;Node125 -->
 <g id="edge55" class="edge">
-<title>Node1&#45;&gt;Node124</title>
+<title>Node1&#45;&gt;Node125</title>
 <path fill="none" stroke="midnightblue" d="M684.55,-356.85C687.27,-441.13 701.92,-768.33 767,-843 772.43,-849.23 779.86,-853.45 787.68,-856.3"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="688.04,-356.52 684.24,-346.63 681.04,-356.73 688.04,-356.52"/>
 </g>
-<!-- Node135 -->
+<!-- Node136 -->
 <g id="node56" class="node">
-<title>Node135</title>
+<title>Node136</title>
 <g id="a_node56"><a xlink:href="classunary__exprt.html" target="_top" xlink:title="Generic base class for unary expressions.">
 <polygon fill="none" stroke="red" points="792,-114.5 792,-133.5 867,-133.5 867,-114.5 792,-114.5"/>
 <text text-anchor="middle" x="829.5" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">unary_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node135 -->
+<!-- Node1&#45;&gt;Node136 -->
 <g id="edge57" class="edge">
-<title>Node1&#45;&gt;Node135</title>
+<title>Node1&#45;&gt;Node136</title>
 <path fill="none" stroke="midnightblue" d="M686.87,-317.21C693.59,-278.14 713.98,-190.75 767,-143 773.98,-136.72 782.99,-132.51 791.97,-129.7"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="683.39,-316.86 685.26,-327.28 690.3,-317.96 683.39,-316.86"/>
 </g>
-<!-- Node177 -->
+<!-- Node178 -->
 <g id="node57" class="node">
-<title>Node177</title>
+<title>Node178</title>
 <g id="a_node57"><a xlink:href="classupdate__bit__exprt.html" target="_top" xlink:title="Replaces a sub&#45;range of a bit&#45;vector operand.">
 <polygon fill="none" stroke="black" points="780,-76.5 780,-95.5 879,-95.5 879,-76.5 780,-76.5"/>
 <text text-anchor="middle" x="829.5" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">update_bit_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node177 -->
+<!-- Node1&#45;&gt;Node178 -->
 <g id="edge58" class="edge">
-<title>Node1&#45;&gt;Node177</title>
+<title>Node1&#45;&gt;Node178</title>
 <path fill="none" stroke="midnightblue" d="M685.27,-317.41C689.21,-273.07 705.02,-164.31 767,-105 771.04,-101.14 775.84,-98.06 780.96,-95.6"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="681.78,-317.2 684.49,-327.44 688.76,-317.75 681.78,-317.2"/>
 </g>
-<!-- Node178 -->
+<!-- Node179 -->
 <g id="node58" class="node">
-<title>Node178</title>
+<title>Node179</title>
 <g id="a_node58"><a xlink:href="classupdate__bits__exprt.html" target="_top" xlink:title="Replaces a sub&#45;range of a bit&#45;vector operand.">
 <polygon fill="none" stroke="black" points="777.5,-38.5 777.5,-57.5 881.5,-57.5 881.5,-38.5 777.5,-38.5"/>
 <text text-anchor="middle" x="829.5" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">update_bits_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node178 -->
+<!-- Node1&#45;&gt;Node179 -->
 <g id="edge59" class="edge">
-<title>Node1&#45;&gt;Node178</title>
+<title>Node1&#45;&gt;Node179</title>
 <path fill="none" stroke="midnightblue" d="M683.97,-317.15C685.03,-267.48 694.89,-136.77 767,-67 771.02,-63.11 775.81,-60.02 780.92,-57.56"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="680.47,-317.43 683.86,-327.47 687.47,-317.5 680.47,-317.43"/>
 </g>
-<!-- Node179 -->
+<!-- Node180 -->
 <g id="node59" class="node">
-<title>Node179</title>
+<title>Node180</title>
 <g id="a_node59"><a xlink:href="classwith__exprt.html" target="_top" xlink:title="Operator to update elements in structs and arrays.">
 <polygon fill="none" stroke="black" points="795.5,-0.5 795.5,-19.5 863.5,-19.5 863.5,-0.5 795.5,-0.5"/>
 <text text-anchor="middle" x="829.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">with_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node179 -->
+<!-- Node1&#45;&gt;Node180 -->
 <g id="edge60" class="edge">
-<title>Node1&#45;&gt;Node179</title>
+<title>Node1&#45;&gt;Node180</title>
 <path fill="none" stroke="midnightblue" d="M686.69,-317.15C695.4,-255.66 724.77,-70.09 767,-29 774.69,-21.52 785.26,-16.98 795.47,-14.22"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="683.17,-317.03 685.26,-327.42 690.1,-317.99 683.17,-317.03"/>
 </g>
@@ -903,9 +903,9 @@
 <path fill="none" stroke="midnightblue" d="M885.51,-400.28C887.91,-398.45 890.1,-396.37 892,-394 933.62,-342.13 882.67,-144.72 929,-97 934.94,-90.89 942.67,-86.7 950.78,-83.83"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="883.47,-397.42 876.68,-405.56 887.06,-403.43 883.47,-397.42"/>
 </g>
-<!-- Node124&#45;&gt;Node8 -->
+<!-- Node125&#45;&gt;Node8 -->
 <g id="edge56" class="edge">
-<title>Node124&#45;&gt;Node8</title>
+<title>Node125&#45;&gt;Node8</title>
 <path fill="none" stroke="midnightblue" d="M880.23,-871.8C884.77,-874.45 888.84,-877.79 892,-882 930.3,-933.03 867.88,-1408.06 910,-1456 920.84,-1468.34 937.93,-1472.76 954.07,-1473.75"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="881.59,-868.57 871.04,-867.52 878.63,-874.91 881.59,-868.57"/>
 </g>

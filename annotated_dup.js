@@ -781,6 +781,7 @@ var annotated_dup =
     [ "lispexprt", "classlispexprt.html", "classlispexprt" ],
     [ "lispsymbolt", "classlispsymbolt.html", "classlispsymbolt" ],
     [ "literal_exprt", "classliteral__exprt.html", "classliteral__exprt" ],
+    [ "literal_vector_exprt", "classliteral__vector__exprt.html", "classliteral__vector__exprt" ],
     [ "literalt", "classliteralt.html", "classliteralt" ],
     [ "live_object_exprt", "classlive__object__exprt.html", "classlive__object__exprt" ],
     [ "liveness_contextt", "classliveness__contextt.html", "classliveness__contextt" ],

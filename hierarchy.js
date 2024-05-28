@@ -1614,6 +1614,7 @@ var hierarchy =
               ] ],
               [ "empty_union_exprt", "classempty__union__exprt.html", null ],
               [ "infinity_exprt", "classinfinity__exprt.html", null ],
+              [ "literal_vector_exprt", "classliteral__vector__exprt.html", null ],
               [ "max_value_exprt", "classmax__value__exprt.html", null ],
               [ "min_value_exprt", "classmin__value__exprt.html", null ],
               [ "nil_exprt", "classnil__exprt.html", null ],
