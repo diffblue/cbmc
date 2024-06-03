@@ -1,5 +1,6 @@
 var NAVTREEINDEX111 =
 {
+"local__safe__pointers_8h.html":[9,0,2,0,60],
 "local__safe__pointers_8h_source.html":[9,0,2,0,60],
 "locale_8c.html":[9,0,2,1,2,16],
 "locale_8c.html#a451492de9c0572caa55ea24a56ff9162":[9,0,2,1,2,16,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX111 =
 "math_8c.html#af7eb976cc28d0a9a6f0827d01611f979":[9,0,2,1,2,17,77],
 "math_8c.html#af8375111d664d7b4b7ceeec9108868fc":[9,0,2,1,2,17,17],
 "math_8c.html#af9c42b36944fcd82a5e0ba189909822f":[9,0,2,1,2,17,60],
-"math_8c.html#afa865c5b70c9311f0f8701a1af60c715":[9,0,2,1,2,17,137],
-"math_8c.html#afcd627002145cbcbe9e00845cf744da2":[9,0,2,1,2,17,22]
+"math_8c.html#afa865c5b70c9311f0f8701a1af60c715":[9,0,2,1,2,17,137]
 };
