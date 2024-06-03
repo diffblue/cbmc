@@ -55,7 +55,7 @@ void goto_check_c(
 
 // clang-format off
 #define HELP_GOTO_CHECK \
-  " {y--no-standard-checks} \t disable default checks (more information in manpage)" /* NOLINT(whitespace/line_length) */ \
+  " {y--no-standard-checks} \t disable default checks (more information in manpage)\n" /* NOLINT(whitespace/line_length) */ \
   " {y--bounds-check} \t enable array bounds checks (default on)\n"            \
   " {y--no-bounds-check} \t disable array bounds checks\n"                     \
   " {y--pointer-check} \t enable pointer checks (default on)\n"                \
