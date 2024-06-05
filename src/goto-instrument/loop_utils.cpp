@@ -42,9 +42,24 @@ void get_assigns_lhs(
   const exprt &lhs,
   assignst &assigns)
 {
-  if(lhs.id() == ID_symbol || lhs.id() == ID_member || lhs.id() == ID_index)
+  get_assigns_lhs(
+    local_may_alias, t, lhs, assigns, [](const exprt &e) { return true; });
+}
+
+void get_assigns_lhs(
+  const local_may_aliast &local_may_alias,
+  goto_programt::const_targett t,
+  const exprt &lhs,
+  assignst &assigns,
+  std::function<bool(const exprt &)> predicate)
+{
+  if(
+    (lhs.id() == ID_symbol || lhs.id() == ID_member || lhs.id() == ID_index) &&
+    predicate(lhs))
+  {
     assigns.insert(lhs);
-  else if(lhs.id()==ID_dereference)
+  }
+  else if(lhs.id() == ID_dereference)
   {
     const pointer_arithmetict ptr(to_dereference_expr(lhs).pointer());
     for(const auto &mod : local_may_alias.get(t, ptr.pointer))
@@ -54,15 +69,18 @@ void get_assigns_lhs(
       {
         continue;
       }
+      exprt to_insert;
       if(ptr.offset.is_nil())
-        assigns.insert(dereference_exprt{typed_mod});
+        to_insert = dereference_exprt{typed_mod};
       else
-        assigns.insert(dereference_exprt{plus_exprt{typed_mod, ptr.offset}});
+        to_insert = dereference_exprt{plus_exprt{typed_mod, ptr.offset}};
+      if(predicate(to_insert))
+        assigns.insert(std::move(to_insert));
     }
   }
-  else if(lhs.id()==ID_if)
+  else if(lhs.id() == ID_if)
   {
-    const if_exprt &if_expr=to_if_expr(lhs);
+    const if_exprt &if_expr = to_if_expr(lhs);
 
     get_assigns_lhs(local_may_alias, t, if_expr.true_case(), assigns);
     get_assigns_lhs(local_may_alias, t, if_expr.false_case(), assigns);
@@ -74,20 +92,29 @@ void get_assigns(
   const loopt &loop,
   assignst &assigns)
 {
-  for(loopt::const_iterator
-      i_it=loop.begin(); i_it!=loop.end(); i_it++)
+  get_assigns(
+    local_may_alias, loop, assigns, [](const exprt &e) { return true; });
+}
+
+void get_assigns(
+  const local_may_aliast &local_may_alias,
+  const loopt &loop,
+  assignst &assigns,
+  std::function<bool(const exprt &)> predicate)
+{
+  for(loopt::const_iterator i_it = loop.begin(); i_it != loop.end(); i_it++)
   {
-    const goto_programt::instructiont &instruction=**i_it;
+    const goto_programt::instructiont &instruction = **i_it;
 
     if(instruction.is_assign())
     {
       const exprt &lhs = instruction.assign_lhs();
-      get_assigns_lhs(local_may_alias, *i_it, lhs, assigns);
+      get_assigns_lhs(local_may_alias, *i_it, lhs, assigns, predicate);
     }
     else if(instruction.is_function_call())
     {
       const exprt &lhs = instruction.call_lhs();
-      get_assigns_lhs(local_may_alias, *i_it, lhs, assigns);
+      get_assigns_lhs(local_may_alias, *i_it, lhs, assigns, predicate);
     }
   }
 }

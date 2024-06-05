@@ -13,6 +13,7 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 
+#include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/havoc_utils.h>
 
 #include "dfcc_root_object.h"
@@ -53,7 +54,7 @@ assignst dfcc_infer_loop_assigns(
 {
   // infer
   assignst assigns;
-  get_assigns(local_may_alias, loop_instructions, assigns);
+  infer_loop_assigns(local_may_alias, loop_instructions, assigns);
 
   // compute locals
   std::unordered_set<irep_idt> loop_locals;

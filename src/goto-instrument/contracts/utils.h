@@ -16,7 +16,9 @@ Date: September 2021
 #include <goto-programs/goto_model.h>
 #include <goto-programs/loop_ids.h>
 
+#include <analyses/local_may_alias.h>
 #include <goto-instrument/havoc_utils.h>
+#include <goto-instrument/loop_utils.h>
 
 #include <vector>
 
@@ -213,6 +215,12 @@ irep_idt make_assigns_clause_replacement_tracking_comment(
 /// Returns true if the given comment matches the type of comments created by
 /// \ref make_assigns_clause_replacement_tracking_comment.
 bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment);
+
+/// Infer loop assigns using alias analysis result `local_may_alias`.
+void infer_loop_assigns(
+  const local_may_aliast &local_may_alias,
+  const loopt &loop,
+  assignst &assigns);
 
 /// Widen expressions in \p assigns with the following strategy.
 /// If an expression is an array index or object dereference expression,

@@ -24,11 +24,26 @@ void get_assigns(
   const loopt &loop,
   assignst &assigns);
 
+/// get all assign targets that satisfy `predicate` within the loops.
+void get_assigns(
+  const local_may_aliast &local_may_alias,
+  const loopt &loop,
+  assignst &assigns,
+  std::function<bool(const exprt &)> predicate);
+
 void get_assigns_lhs(
   const local_may_aliast &local_may_alias,
   goto_programt::const_targett t,
   const exprt &lhs,
   assignst &assigns);
+
+/// get all assign targets that satisfy `predicate` from `lhs`.
+void get_assigns_lhs(
+  const local_may_aliast &local_may_alias,
+  goto_programt::const_targett t,
+  const exprt &lhs,
+  assignst &assigns,
+  std::function<bool(const exprt &)> predicate);
 
 goto_programt::targett get_loop_exit(const loopt &);
 

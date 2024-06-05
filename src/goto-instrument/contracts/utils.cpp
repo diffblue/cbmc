@@ -18,6 +18,7 @@ Date: September 2021
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
 
@@ -336,6 +337,22 @@ bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment)
 {
   return id2string(comment).find(ASSIGNS_CLAUSE_REPLACEMENT_TRACKING) !=
          std::string::npos;
+}
+
+void infer_loop_assigns(
+  const local_may_aliast &local_may_alias,
+  const loopt &loop,
+  assignst &assigns)
+{
+  // Assign targets should not include cprover symbols.
+  get_assigns(local_may_alias, loop, assigns, [](const exprt &e) {
+    if(e.id() == ID_symbol)
+    {
+      const auto &s = expr_try_dynamic_cast<symbol_exprt>(e);
+      return !has_prefix(id2string(s->get_identifier()), CPROVER_PREFIX);
+    }
+    return true;
+  });
 }
 
 void widen_assigns(assignst &assigns, const namespacet &ns)
