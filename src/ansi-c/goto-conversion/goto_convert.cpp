@@ -127,27 +127,27 @@ void goto_convertt::build_declaration_hops(
   //   }
   // to code which looks like -
   //   {
-  //     __CPROVER_bool going_to::user_label;
-  //     going_to::user_label = false;
+  //     __CPROVER_bool __CPROVER_going_to::user_label;
+  //     __CPROVER_going_to::user_label = false;
   //     statement_block_a();
   //     if(...)
   //     {
-  //       going_to::user_label = true;
+  //       __CPROVER_going_to::user_label = true;
   //       goto scope_x_label;
   //     }
   //     statement_block_b();
   //   scope_x_label:
   //     int x;
-  //     if going_to::user_label goto scope_y_label:
+  //     if __CPROVER_going_to::user_label goto scope_y_label:
   //     x = 0;
   //     statement_block_c();
   //   scope_y_label:
   //     int y;
-  //     if going_to::user_label goto user_label:
+  //     if __CPROVER_going_to::user_label goto user_label:
   //     y = 0;
   //     statement_block_d();
   //   user_label:
-  //     going_to::user_label = false;
+  //     __CPROVER_going_to::user_label = false;
   //     statement_block_e();
   //   }
 
@@ -162,7 +162,7 @@ void goto_convertt::build_declaration_hops(
     label_location.set_hide();
     const symbolt &new_flag = get_fresh_aux_symbol(
       bool_typet{},
-      "going_to",
+      CPROVER_PREFIX "going_to",
       id2string(inputs.label),
       label_location,
       inputs.mode,
