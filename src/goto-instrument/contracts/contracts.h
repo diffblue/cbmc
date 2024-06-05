@@ -14,8 +14,6 @@ Date: February 2016
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_CONTRACTS_H
 
-#include <ansi-c/goto-conversion/goto_convert_class.h>
-
 #include <util/message.h>
 #include <util/namespace.h>
 
@@ -62,8 +60,7 @@ public:
       goto_model(goto_model),
       symbol_table(goto_model.symbol_table),
       goto_functions(goto_model.goto_functions),
-      log(log),
-      converter(symbol_table, log.get_message_handler())
+      log(log)
   {
   }
 
@@ -150,7 +147,6 @@ protected:
   goto_functionst &goto_functions;
 
   messaget &log;
-  goto_convertt converter;
 
   std::unordered_set<irep_idt> summarized;
 

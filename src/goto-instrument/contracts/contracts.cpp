@@ -173,6 +173,8 @@ void code_contractst::check_apply_loop_contracts(
       initial_invariant_val, invariant};
     initial_invariant_value_assignment.add_source_location() =
       loop_head_location;
+
+    goto_convertt converter(symbol_table, log.get_message_handler());
     converter.goto_convert(
       initial_invariant_value_assignment, pre_loop_head_instrs, mode);
   }
@@ -293,6 +295,8 @@ void code_contractst::check_apply_loop_contracts(
     assertion.add_source_location() = loop_head_location;
     assertion.add_source_location().set_comment(
       "Check loop invariant before entry");
+
+    goto_convertt converter(symbol_table, log.get_message_handler());
     converter.goto_convert(assertion, pre_loop_head_instrs, mode);
   }
 
@@ -338,6 +342,8 @@ void code_contractst::check_apply_loop_contracts(
   {
     code_assumet assumption{invariant};
     assumption.add_source_location() = loop_head_location;
+
+    goto_convertt converter(symbol_table, log.get_message_handler());
     converter.goto_convert(assumption, pre_loop_head_instrs, mode);
   }
 
@@ -393,6 +399,8 @@ void code_contractst::check_apply_loop_contracts(
       code_assignt old_decreases_assignment{
         old_decreases_vars[i], decreases_clause_exprs[i]};
       old_decreases_assignment.add_source_location() = loop_head_location;
+
+      goto_convertt converter(symbol_table, log.get_message_handler());
       converter.goto_convert(
         old_decreases_assignment, pre_loop_head_instrs, mode);
     }
@@ -441,6 +449,8 @@ void code_contractst::check_apply_loop_contracts(
     assertion.add_source_location() = loop_head_location;
     assertion.add_source_location().set_comment(
       "Check that loop invariant is preserved");
+
+    goto_convertt converter(symbol_table, log.get_message_handler());
     converter.goto_convert(assertion, pre_loop_end_instrs, mode);
   }
 
@@ -453,6 +463,8 @@ void code_contractst::check_apply_loop_contracts(
       code_assignt new_decreases_assignment{
         new_decreases_vars[i], decreases_clause_exprs[i]};
       new_decreases_assignment.add_source_location() = loop_head_location;
+
+      goto_convertt converter(symbol_table, log.get_message_handler());
       converter.goto_convert(
         new_decreases_assignment, pre_loop_end_instrs, mode);
     }
@@ -465,6 +477,8 @@ void code_contractst::check_apply_loop_contracts(
     monotonic_decreasing_assertion.add_source_location() = loop_head_location;
     monotonic_decreasing_assertion.add_source_location().set_comment(
       "Check decreases clause on loop iteration");
+
+    goto_convertt converter(symbol_table, log.get_message_handler());
     converter.goto_convert(
       monotonic_decreasing_assertion, pre_loop_end_instrs, mode);
 
@@ -706,6 +720,7 @@ void code_contractst::apply_function_contract(
                             .append(" in ")
                             .append(function.c_str()));
     _location.set_property_class(ID_precondition);
+    goto_convertt converter(symbol_table, log.get_message_handler());
     generate_contract_constraints(
       symbol_table,
       converter,
@@ -785,6 +800,8 @@ void code_contractst::apply_function_contract(
     source_locationt _location = clause.source_location();
     _location.set_comment("Assume ensures clause");
     _location.set_property_class(ID_assume);
+
+    goto_convertt converter(symbol_table, log.get_message_handler());
     generate_contract_constraints(
       symbol_table,
       converter,
@@ -1355,6 +1372,7 @@ void code_contractst::add_contract_check(
     source_locationt _location = clause.source_location();
     _location.set_comment("Assume requires clause");
     _location.set_property_class(ID_assume);
+    goto_convertt converter(symbol_table, log.get_message_handler());
     generate_contract_constraints(
       symbol_table,
       converter,
@@ -1388,6 +1406,7 @@ void code_contractst::add_contract_check(
     source_locationt _location = clause.source_location();
     _location.set_comment("Check ensures clause");
     _location.set_property_class(ID_postcondition);
+    goto_convertt converter(symbol_table, log.get_message_handler());
     generate_contract_constraints(
       symbol_table,
       converter,
