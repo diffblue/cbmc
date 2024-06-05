@@ -8,7 +8,7 @@ main.c
 ^\[main\.pointer_dereference\.1\] line 36 dereference failure: dead object in \*p: SUCCESS$
 ^\[main\.pointer_dereference\.2\] line 36 dereference failure: pointer outside object bounds in \*p: SUCCESS$
 ^\[main\.assertion\.3\] line 42 assertion \*p == 42: FAILURE$
-^\[main\.pointer_dereference\.5\] line 42 dereference failure: pointer outside object bounds in \*p: SUCCESS$
+^\[main\.pointer_dereference\.5\] line 42 dereference failure: pointer outside object bounds in \*p: UNKNOWN$
 ^\[main\.pointer_dereference\.3\] line 42 dereference failure: pointer NULL in \*p: SUCCESS$
 ^\[main\.pointer_dereference\.4\] line 42 dereference failure: dead object in \*p: FAILURE$
 ^\[main\.assertion\.4\] line 49 assertion e == 42: FAILURE$

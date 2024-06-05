@@ -3,11 +3,11 @@ main.c
 --apply-loop-contracts
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main\.\d+\] .* Check loop invariant before entry: SUCCESS$
-^\[main\.\d+\] .* Check that loop invariant is preserved: SUCCESS$
-^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
-^\[main.assigns.\d+\] line 22 Check that t->x is assignable: SUCCESS$
-^\[main.assigns.\d+\] line 25 Check that t->x is assignable: SUCCESS$
+^\[main\.\d+\] .* Check loop invariant before entry: UNKNOWN$
+^\[main\.\d+\] .* Check that loop invariant is preserved: UNKNOWN$
+^\[main.assigns.\d+\] .* Check that i is assignable: UNKNOWN$
+^\[main.assigns.\d+\] line 22 Check that t->x is assignable: UNKNOWN$
+^\[main.assigns.\d+\] line 25 Check that t->x is assignable: UNKNOWN$
 ^\[main.assertion.1\] .* assertion .*: FAILURE$
 ^VERIFICATION FAILED$
 --

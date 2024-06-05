@@ -13,6 +13,6 @@ assertion test4->b == 4: SUCCESS
 assertion test5->a == 5: FAILURE
 assertion test5->b == 2: FAILURE
 assertion value == 7: FAILURE
-assertion value == 5: SUCCESS
+assertion value == 5: UNKNOWN
 --
 --

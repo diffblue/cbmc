@@ -1,6 +1,6 @@
 CORE
 pointer_subtraction.c
---no-signed-overflow-check --trace
+--no-signed-overflow-check --trace --no-pointer-check
 \[main\.assertion\.1\] line \d+ expected failure after pointer manipulation: FAILURE
 \[main\.assertion\.2\] line \d+ expected successful after pointer manipulation: SUCCESS
 \[main\.assertion\.3\] line \d+ expected failure after pointer manipulation: FAILURE

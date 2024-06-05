@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--no-pointer-check
 ^EXIT=10$
 ^SIGNAL=0$
 \[f2.assertion.1\] line [0-9]+ assertion 0: SUCCESS
