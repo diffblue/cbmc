@@ -13,7 +13,6 @@ var classcode__contractst =
     [ "get_loop_havoc_set", "classcode__contractst.html#a4d4d990fa744c9116a1fe5395b502138", null ],
     [ "get_original_loop_number_map", "classcode__contractst.html#a1ceb590513994843b3b44cc150e3b66f", null ],
     [ "replace_calls", "classcode__contractst.html#a86c7502b5654b520dd357cb4703442ee", null ],
-    [ "converter", "classcode__contractst.html#aa92c6f4fc952ee70a0466f837b250c0b", null ],
     [ "goto_functions", "classcode__contractst.html#ad0398cb77a366c365d783a2f2afc3dd2", null ],
     [ "goto_model", "classcode__contractst.html#a2e5815107621ad091ce54e5cd47d4168", null ],
     [ "log", "classcode__contractst.html#a3d86532be9a926aa43ad05b6a0526154", null ],

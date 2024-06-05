@@ -1,58 +1,46 @@
 <map id="code_contractst" name="code_contractst">
-<area shape="rect" id="node1" title=" " alt="" coords="2804,389,2929,415"/>
-<area shape="rect" id="node2" title=" " alt="" coords="1425,393,1567,435"/>
-<area shape="rect" id="node3" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="575,502,647,529"/>
-<area shape="rect" id="node12" title=" " alt="" coords="1419,236,1573,277"/>
-<area shape="rect" id="node45" title=" " alt="" coords="1400,623,1592,679"/>
-<area shape="rect" id="node51" title=" " alt="" coords="1831,504,1978,545"/>
-<area shape="rect" id="node53" title=" " alt="" coords="946,923,1117,950"/>
-<area shape="rect" id="node4" title=" " alt="" coords="940,239,1123,266"/>
-<area shape="rect" id="node31" title=" " alt="" coords="1408,5,1584,76"/>
-<area shape="rect" id="node5" title=" " alt="" coords="591,262,630,289"/>
-<area shape="rect" id="node8" title=" " alt="" coords="955,291,1107,332"/>
-<area shape="rect" id="node13" title=" " alt="" coords="947,189,1115,215"/>
-<area shape="rect" id="node46" title=" " alt="" coords="964,558,1099,585"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1405,100,1587,171"/>
-<area shape="rect" id="node7" title=" " alt="" coords="956,23,1107,64"/>
-<area shape="rect" id="node11" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1828,299,1981,326"/>
-<area shape="rect" id="node9" title=" " alt="" coords="5,558,44,585"/>
-<area shape="rect" id="node17" title=" " alt="" coords="157,1091,287,1118"/>
-<area shape="rect" id="node41" title=" " alt="" coords="168,898,276,925"/>
-<area shape="rect" id="node10" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="2181,210,2296,237"/>
-<area shape="rect" id="node54" href="$classgoto__modelt.html" title=" " alt="" coords="2537,294,2641,321"/>
-<area shape="rect" id="node29" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="2187,374,2290,401"/>
-<area shape="rect" id="node32" href="$classgoto__convertt.html" title=" " alt="" coords="2533,690,2645,717"/>
-<area shape="rect" id="node14" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="2195,1357,2282,1383"/>
-<area shape="rect" id="node19" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="2510,1437,2669,1463"/>
-<area shape="rect" id="node15" href="$classmessage__handlert.html" title=" " alt="" coords="1647,1362,1789,1389"/>
-<area shape="rect" id="node16" title=" " alt="" coords="728,1275,915,1302"/>
-<area shape="rect" id="node38" title=" " alt="" coords="531,1138,690,1165"/>
-<area shape="rect" id="node49" title=" " alt="" coords="523,974,698,1001"/>
-<area shape="rect" id="node18" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1823,1302,1987,1329"/>
-<area shape="rect" id="node20" title=" " alt="" coords="2168,1462,2309,1489"/>
-<area shape="rect" id="node21" title=" " alt="" coords="1813,1467,1996,1508"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1423,1464,1569,1505"/>
-<area shape="rect" id="node23" title=" " alt="" coords="946,1471,1117,1498"/>
-<area shape="rect" id="node24" href="$classsource__locationt.html" title=" " alt="" coords="2174,1514,2303,1541"/>
-<area shape="rect" id="node25" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1879,1537,1931,1563"/>
-<area shape="rect" id="node26" href="$classsharing__treet.html" title=" " alt="" coords="1413,1530,1579,1586"/>
-<area shape="rect" id="node27" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="941,1537,1122,1579"/>
-<area shape="rect" id="node28" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1841,1353,1969,1379"/>
-<area shape="rect" id="node30" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1835,375,1975,402"/>
-<area shape="rect" id="node33" title=" " alt="" coords="2195,1138,2282,1165"/>
-<area shape="rect" id="node56" title=" " alt="" coords="2507,1087,2672,1114"/>
-<area shape="rect" id="node34" title=" " alt="" coords="1835,1139,1974,1180"/>
-<area shape="rect" id="node35" href="$structgoto__convertt_1_1targetst.html" title=" " alt="" coords="2153,819,2324,846"/>
-<area shape="rect" id="node36" href="$classscope__treet.html" title="Tree to keep track of the destructors generated along each branch of a function." alt="" coords="1855,1037,1954,1063"/>
-<area shape="rect" id="node37" href="$classgrapht.html" title=" " alt="" coords="1419,1149,1573,1191"/>
-<area shape="rect" id="node39" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="979,1138,1083,1165"/>
-<area shape="rect" id="node40" title=" " alt="" coords="727,931,916,987"/>
-<area shape="rect" id="node42" title=" " alt="" coords="1151,719,1341,775"/>
-<area shape="rect" id="node43" title=" " alt="" coords="1405,849,1587,891"/>
-<area shape="rect" id="node44" title=" " alt="" coords="949,815,1113,842"/>
-<area shape="rect" id="node47" title=" " alt="" coords="1369,769,1623,825"/>
-<area shape="rect" id="node48" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="972,1037,1091,1063"/>
-<area shape="rect" id="node52" href="$classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="1438,915,1554,942"/>
-<area shape="rect" id="node50" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="2177,511,2300,538"/>
-<area shape="rect" id="node55" href="$classabstract__goto__modelt.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="2157,261,2321,287"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2663,643,2788,669"/>
+<area shape="rect" id="node2" title=" " alt="" coords="1437,985,1580,1026"/>
+<area shape="rect" id="node3" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="740,929,812,956"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1432,671,1585,713"/>
+<area shape="rect" id="node33" title=" " alt="" coords="1797,802,1943,843"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1030,876,1201,903"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1024,647,1207,673"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1421,577,1597,647"/>
+<area shape="rect" id="node5" title=" " alt="" coords="757,616,795,643"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1039,463,1191,505"/>
+<area shape="rect" id="node13" title=" " alt="" coords="1031,595,1199,621"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1048,697,1183,724"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1417,410,1600,481"/>
+<area shape="rect" id="node7" title=" " alt="" coords="1040,529,1191,570"/>
+<area shape="rect" id="node11" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1793,561,1947,588"/>
+<area shape="rect" id="node9" title=" " alt="" coords="55,720,94,747"/>
+<area shape="rect" id="node17" title=" " alt="" coords="283,771,413,797"/>
+<area shape="rect" id="node38" title=" " alt="" coords="294,821,402,848"/>
+<area shape="rect" id="node10" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="2132,577,2247,604"/>
+<area shape="rect" id="node40" href="$classgoto__modelt.html" title=" " alt="" coords="2429,643,2533,669"/>
+<area shape="rect" id="node29" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="2138,721,2241,748"/>
+<area shape="rect" id="node14" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1465,303,1552,329"/>
+<area shape="rect" id="node19" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1791,200,1949,227"/>
+<area shape="rect" id="node15" href="$classmessage__handlert.html" title=" " alt="" coords="1044,363,1187,389"/>
+<area shape="rect" id="node16" title=" " alt="" coords="683,389,869,416"/>
+<area shape="rect" id="node37" title=" " alt="" coords="689,771,863,797"/>
+<area shape="rect" id="node18" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1033,257,1197,284"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1438,156,1579,183"/>
+<area shape="rect" id="node21" title=" " alt="" coords="1024,79,1207,121"/>
+<area shape="rect" id="node22" title=" " alt="" coords="703,87,849,129"/>
+<area shape="rect" id="node23" title=" " alt="" coords="263,95,433,121"/>
+<area shape="rect" id="node24" href="$classsource__locationt.html" title=" " alt="" coords="1444,33,1573,60"/>
+<area shape="rect" id="node25" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1089,24,1141,51"/>
+<area shape="rect" id="node26" href="$classsharing__treet.html" title=" " alt="" coords="693,7,859,63"/>
+<area shape="rect" id="node27" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="257,14,439,55"/>
+<area shape="rect" id="node28" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1051,308,1179,335"/>
+<area shape="rect" id="node30" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1800,751,1940,777"/>
+<area shape="rect" id="node32" href="$classgoto__functionst.html" title="A collection of goto functions." alt="" coords="2128,784,2251,811"/>
+<area shape="rect" id="node34" href="$classgoto__functiont.html" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="1451,809,1567,836"/>
+<area shape="rect" id="node36" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="1056,748,1175,775"/>
+<area shape="rect" id="node42" title=" " alt="" coords="693,1020,859,1047"/>
+<area shape="rect" id="node41" href="$classabstract__goto__modelt.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="2107,643,2271,669"/>
+<area shape="rect" id="node43" title=" " alt="" coords="305,1020,391,1047"/>
+<area shape="rect" id="node44" title=" " alt="" coords="5,1013,144,1054"/>
 </map>
