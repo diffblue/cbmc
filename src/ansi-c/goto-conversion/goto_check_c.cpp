@@ -1628,7 +1628,7 @@ void goto_check_ct::bounds_check_index(
           inequality,
           name + " lower bound",
           "array bounds",
-          false, // fatal
+          true, // fatal
           expr.find_source_location(),
           expr,
           guard);
@@ -1708,7 +1708,7 @@ void goto_check_ct::bounds_check_index(
       inequality,
       name + " upper bound",
       "array bounds",
-      false, // fatal
+      true, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1722,7 +1722,7 @@ void goto_check_ct::bounds_check_index(
       inequality,
       name + " upper bound",
       "array bounds",
-      false, // fatal
+      true, // fatal
       expr.find_source_location(),
       expr,
       guard);
