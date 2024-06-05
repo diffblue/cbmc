@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/prefix.h" name="/home/runner/work/cbmc/cbmc/src/util/prefix.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5048,5,5232,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5271,5,5455,47"/>
 <area shape="rect" id="node2" href="$builtin__factory_8cpp.html" title=" " alt="" coords="5,102,189,158"/>
 <area shape="rect" id="node3" href="$c__preprocess_8cpp.html" title=" " alt="" coords="213,109,456,151"/>
 <area shape="rect" id="node4" href="$expr2c_8cpp.html" title=" " alt="" coords="480,109,683,151"/>
@@ -21,32 +21,34 @@
 <area shape="rect" id="node24" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="3877,95,4075,165"/>
 <area shape="rect" id="node25" href="$dfcc__is__cprover__symbol_8cpp.html" title=" " alt="" coords="4099,95,4309,165"/>
 <area shape="rect" id="node26" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="4333,95,4531,165"/>
-<area shape="rect" id="node27" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="4555,102,4802,158"/>
-<area shape="rect" id="node28" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="4826,102,5019,158"/>
-<area shape="rect" id="node29" href="$cover__filter_8cpp.html" title="Filters for the Coverage Instrumentation." alt="" coords="5043,102,5237,158"/>
-<area shape="rect" id="node30" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="5261,102,5454,158"/>
-<area shape="rect" id="node31" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="5479,102,5700,158"/>
-<area shape="rect" id="node32" href="$goto__program2code_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="5725,102,5918,158"/>
-<area shape="rect" id="node33" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="5942,102,6135,158"/>
-<area shape="rect" id="node34" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="6159,102,6353,158"/>
-<area shape="rect" id="node35" href="$nondet__static_8cpp.html" title="Nondeterministically initializes global scope variables, except for constants (such as string literal..." alt="" coords="6377,102,6570,158"/>
-<area shape="rect" id="node36" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="6594,102,6787,158"/>
-<area shape="rect" id="node37" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="6812,102,6996,158"/>
-<area shape="rect" id="node38" href="$rebuild__goto__start__function_8cpp.html" title="Goto Programs Author: Thomas Kiley, thomas@diffblue.com." alt="" coords="7021,102,7251,158"/>
-<area shape="rect" id="node39" href="$system__library__symbols_8cpp.html" title="Goto Programs." alt="" coords="7275,102,7487,158"/>
-<area shape="rect" id="node40" href="$static__lifetime__init_8cpp.html" title=" " alt="" coords="7512,102,7696,158"/>
-<area shape="rect" id="node41" href="$gdb__api_8cpp.html" title="Low&#45;level interface to gdb." alt="" coords="7721,102,7925,158"/>
-<area shape="rect" id="node42" href="$value__set_8cpp.html" title="Value Set." alt="" coords="7949,102,8142,158"/>
-<area shape="rect" id="node43" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="8166,102,8367,158"/>
-<area shape="rect" id="node44" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="8392,102,8576,158"/>
-<area shape="rect" id="node45" href="$smt2__parser_8cpp.html" title=" " alt="" coords="8600,102,8784,158"/>
-<area shape="rect" id="node46" href="$prefix__filter_8cpp.html" title="Prefix Filtering." alt="" coords="8808,102,8992,158"/>
-<area shape="rect" id="node47" href="$source__location_8cpp.html" title=" " alt="" coords="9016,102,9200,158"/>
-<area shape="rect" id="node48" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="9225,102,9469,158"/>
-<area shape="rect" id="node49" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="9493,102,9755,158"/>
-<area shape="rect" id="node50" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="9779,102,9997,158"/>
-<area shape="rect" id="node51" href="$java__utils_8cpp.html" title=" " alt="" coords="10021,102,10240,158"/>
-<area shape="rect" id="node52" href="$load__method__by__regex_8cpp.html" title=" " alt="" coords="10264,102,10483,158"/>
+<area shape="rect" id="node27" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="4555,95,4754,165"/>
+<area shape="rect" id="node28" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="4778,102,5025,158"/>
+<area shape="rect" id="node29" href="$utils_8cpp.html" title=" " alt="" coords="5049,102,5242,158"/>
+<area shape="rect" id="node30" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="5266,102,5459,158"/>
+<area shape="rect" id="node31" href="$cover__filter_8cpp.html" title="Filters for the Coverage Instrumentation." alt="" coords="5483,102,5677,158"/>
+<area shape="rect" id="node32" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="5701,102,5894,158"/>
+<area shape="rect" id="node33" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="5919,102,6140,158"/>
+<area shape="rect" id="node34" href="$goto__program2code_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="6165,102,6358,158"/>
+<area shape="rect" id="node35" href="$horn__encoding_8cpp.html" title="Horn&#45;clause Encoding." alt="" coords="6382,102,6575,158"/>
+<area shape="rect" id="node36" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="6599,102,6793,158"/>
+<area shape="rect" id="node37" href="$nondet__static_8cpp.html" title="Nondeterministically initializes global scope variables, except for constants (such as string literal..." alt="" coords="6817,102,7010,158"/>
+<area shape="rect" id="node38" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="7034,102,7227,158"/>
+<area shape="rect" id="node39" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="7252,102,7436,158"/>
+<area shape="rect" id="node40" href="$rebuild__goto__start__function_8cpp.html" title="Goto Programs Author: Thomas Kiley, thomas@diffblue.com." alt="" coords="7461,102,7691,158"/>
+<area shape="rect" id="node41" href="$system__library__symbols_8cpp.html" title="Goto Programs." alt="" coords="7715,102,7927,158"/>
+<area shape="rect" id="node42" href="$static__lifetime__init_8cpp.html" title=" " alt="" coords="7952,102,8136,158"/>
+<area shape="rect" id="node43" href="$gdb__api_8cpp.html" title="Low&#45;level interface to gdb." alt="" coords="8161,102,8365,158"/>
+<area shape="rect" id="node44" href="$value__set_8cpp.html" title="Value Set." alt="" coords="8389,102,8582,158"/>
+<area shape="rect" id="node45" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="8606,102,8807,158"/>
+<area shape="rect" id="node46" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="8832,102,9016,158"/>
+<area shape="rect" id="node47" href="$smt2__parser_8cpp.html" title=" " alt="" coords="9040,102,9224,158"/>
+<area shape="rect" id="node48" href="$prefix__filter_8cpp.html" title="Prefix Filtering." alt="" coords="9248,102,9432,158"/>
+<area shape="rect" id="node49" href="$source__location_8cpp.html" title=" " alt="" coords="9456,102,9640,158"/>
+<area shape="rect" id="node50" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="9665,102,9909,158"/>
+<area shape="rect" id="node51" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="9933,102,10195,158"/>
+<area shape="rect" id="node52" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="10219,102,10437,158"/>
+<area shape="rect" id="node53" href="$java__utils_8cpp.html" title=" " alt="" coords="10461,102,10680,158"/>
+<area shape="rect" id="node54" href="$load__method__by__regex_8cpp.html" title=" " alt="" coords="10704,102,10923,158"/>
 <area shape="rect" id="node19" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="3480,213,3685,284"/>
 <area shape="rect" id="node22" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="3710,221,3911,277"/>
 <area shape="rect" id="node20" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="3339,339,3578,395"/>

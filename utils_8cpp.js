@@ -15,6 +15,7 @@ var utils_8cpp =
     [ "get_loop_head", "utils_8cpp.html#a4b21d66b7d3f8e1c90243bfb0e30a23c", null ],
     [ "get_loop_head_or_end", "utils_8cpp.html#a7330365cdd84d9b1d8503a299c7b309c", null ],
     [ "get_suffix_unsigned", "utils_8cpp.html#aee6f5807b16202ac30acc0e9f1c419f8", null ],
+    [ "infer_loop_assigns", "utils_8cpp.html#a2b040a282aa48c89e8738cbc128e3822", null ],
     [ "insert_before_and_update_jumps", "utils_8cpp.html#a2636321c60f87bb1a79d8e8ba0d59dac", null ],
     [ "insert_before_swap_and_advance", "utils_8cpp.html#a7d81c043b086199641b0e686cdd27234", null ],
     [ "is_assignment_to_instrumented_variable", "utils_8cpp.html#a11be635da37bb659aab648c67bc8c6ca", null ],

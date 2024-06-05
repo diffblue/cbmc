@@ -107,94 +107,95 @@ $(document).ready(function(){initNavTree('dfcc__infer__loop__assigns_8cpp_source
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="pointer__expr_8h.html">util/pointer_expr.h</a>&gt;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="std__code_8h.html">util/std_code.h</a>&gt;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="havoc__utils_8h.html">goto-instrument/havoc_utils.h</a>&gt;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="dfcc__root__object_8h.html">dfcc_root_object.h</a>&quot;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a></div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">   22</a></span>&#160;<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">make_object_whole_call_expr</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr, <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;object_whole_sym = ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;object_whole&quot;</span>);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;object_whole_code_type =</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(object_whole_sym.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classside__effect__expr__function__callt.html">side_effect_expr_function_callt</a>(</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    object_whole_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    {{expr}},</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    object_whole_code_type.return_type(),</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>());</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">   37</a></span>&#160;<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">depends_on</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr, std::unordered_set&lt;irep_idt&gt; identifiers)</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;irep_idt&gt; ids = <a class="code" href="find__symbols_8h.html#a05f2dae11de7edac6496370342cc664e">find_symbol_identifiers</a>(expr);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<span class="keywordtype">id</span> : ids)</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">if</span>(identifiers.find(<span class="keywordtype">id</span>) != identifiers.end())</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;}</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="dfcc__infer__loop__assigns_8cpp.html#a5d6d3dee17a9b651a1690a77e3bf29fb">   48</a></span>&#160;<a class="code" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> <a class="code" href="dfcc__infer__loop__assigns_8cpp.html#a5d6d3dee17a9b651a1690a77e3bf29fb">dfcc_infer_loop_assigns</a>(</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keyword">const</span> <a class="code" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;local_may_alias,</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">const</span> <a class="code" href="loop__utils_8h.html#a1b7ef608962ab556c4d637991d616023">loopt</a> &amp;loop_instructions,</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;loop_head_location,</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;{</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="comment">// infer</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <a class="code" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> assigns;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <a class="code" href="dfcc__cfg__info_8cpp.html#a6e3fdf15618ceb3a7ba01823230395f8">get_assigns</a>(local_may_alias, loop_instructions, assigns);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="comment">// compute locals</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  std::unordered_set&lt;irep_idt&gt; loop_locals;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;target : loop_instructions)</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">if</span>(target-&gt;is_decl())</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      loop_locals.insert(target-&gt;decl_symbol().get_identifier());</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="comment">// widen or drop targets that depend on loop-locals or are non-constant,</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="comment">// ie. depend on other locations assigned by the loop.</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="comment">// e.g: if the loop assigns {i, a[i]}, then a[i] is non-constant.</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <a class="code" href="classhavoc__utils__can__forward__propagatet.html">havoc_utils_can_forward_propagatet</a> <a class="code" href="std__types_8h.html#a54d3d021c927d453b518f11032cccb6a">is_constant</a>(assigns, ns);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <a class="code" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> result;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : assigns)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">depends_on</a>(expr, loop_locals))</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <span class="comment">// Target depends on loop locals, attempt widening to the root object</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      <span class="keyword">auto</span> root_objects = <a class="code" href="dfcc__root__object_8cpp.html#af601af98e4324ada2d4c731879e7c6ce">dfcc_root_objects</a>(expr);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;root_object : root_objects)</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">depends_on</a>(root_object, loop_locals))</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;          <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a> address_of_root_object(root_object);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;          address_of_root_object.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() =</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;            root_object.source_location();</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;          result.emplace(</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            <a class="code" href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">make_object_whole_call_expr</a>(address_of_root_object, ns));</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        }</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      }</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    }</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    {</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a> address_of_expr(expr);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      address_of_expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = expr.source_location();</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="keywordflow">if</span>(!<a class="code" href="std__types_8h.html#a54d3d021c927d453b518f11032cccb6a">is_constant</a>(address_of_expr))</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="comment">// Target address is not constant, widening to the whole object</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        result.emplace(<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">make_object_whole_call_expr</a>(address_of_expr, ns));</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      }</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        result.emplace(expr);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  }</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="utils_8h.html">goto-instrument/contracts/utils.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="havoc__utils_8h.html">goto-instrument/havoc_utils.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="dfcc__root__object_8h.html">dfcc_root_object.h</a>&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">static</span> <a class="code" href="classexprt.html">exprt</a></div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">   23</a></span>&#160;<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">make_object_whole_call_expr</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr, <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;object_whole_sym = ns.<a class="code" href="classnamespacet.html#a564f54a32d91e10781812a6681e62c39">lookup</a>(<a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;object_whole&quot;</span>);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcode__typet.html">code_typet</a> &amp;object_whole_code_type =</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a>(object_whole_sym.<a class="code" href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">type</a>);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classside__effect__expr__function__callt.html">side_effect_expr_function_callt</a>(</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    object_whole_sym.<a class="code" href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbol_expr</a>(),</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    {{expr}},</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    object_whole_code_type.return_type(),</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    expr.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>());</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;}</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">   38</a></span>&#160;<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">depends_on</a>(<span class="keyword">const</span> <a class="code" href="classexprt.html">exprt</a> &amp;expr, std::unordered_set&lt;irep_idt&gt; identifiers)</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">const</span> std::unordered_set&lt;irep_idt&gt; ids = <a class="code" href="find__symbols_8h.html#a05f2dae11de7edac6496370342cc664e">find_symbol_identifiers</a>(expr);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<span class="keywordtype">id</span> : ids)</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  {</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">if</span>(identifiers.find(<span class="keywordtype">id</span>) != identifiers.end())</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  }</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;}</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="dfcc__infer__loop__assigns_8cpp.html#a5d6d3dee17a9b651a1690a77e3bf29fb">   49</a></span>&#160;<a class="code" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> <a class="code" href="dfcc__infer__loop__assigns_8cpp.html#a5d6d3dee17a9b651a1690a77e3bf29fb">dfcc_infer_loop_assigns</a>(</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">const</span> <a class="code" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;local_may_alias,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keyword">const</span> <a class="code" href="loop__utils_8h.html#a1b7ef608962ab556c4d637991d616023">loopt</a> &amp;loop_instructions,</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;loop_head_location,</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keyword">const</span> <a class="code" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="comment">// infer</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <a class="code" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> assigns;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="utils_8cpp.html#a2b040a282aa48c89e8738cbc128e3822">infer_loop_assigns</a>(local_may_alias, loop_instructions, assigns);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="comment">// compute locals</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  std::unordered_set&lt;irep_idt&gt; loop_locals;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;target : loop_instructions)</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">if</span>(target-&gt;is_decl())</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      loop_locals.insert(target-&gt;decl_symbol().get_identifier());</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="comment">// widen or drop targets that depend on loop-locals or are non-constant,</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <span class="comment">// ie. depend on other locations assigned by the loop.</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="comment">// e.g: if the loop assigns {i, a[i]}, then a[i] is non-constant.</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <a class="code" href="classhavoc__utils__can__forward__propagatet.html">havoc_utils_can_forward_propagatet</a> <a class="code" href="std__types_8h.html#a54d3d021c927d453b518f11032cccb6a">is_constant</a>(assigns, ns);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <a class="code" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> result;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;expr : assigns)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">depends_on</a>(expr, loop_locals))</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    {</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      <span class="comment">// Target depends on loop locals, attempt widening to the root object</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <span class="keyword">auto</span> root_objects = <a class="code" href="dfcc__root__object_8cpp.html#af601af98e4324ada2d4c731879e7c6ce">dfcc_root_objects</a>(expr);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;root_object : root_objects)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;      {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordflow">if</span>(!<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">depends_on</a>(root_object, loop_locals))</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;          <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a> address_of_root_object(root_object);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;          address_of_root_object.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() =</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            root_object.source_location();</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;          result.emplace(</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            <a class="code" href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">make_object_whole_call_expr</a>(address_of_root_object, ns));</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        }</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;      }</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    }</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    {</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <a class="code" href="classaddress__of__exprt.html">address_of_exprt</a> address_of_expr(expr);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      address_of_expr.<a class="code" href="classexprt.html#a4f28296a5ed6b9fa5f2a40c57b3ac4b8">add_source_location</a>() = expr.source_location();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      <span class="keywordflow">if</span>(!<a class="code" href="std__types_8h.html#a54d3d021c927d453b518f11032cccb6a">is_constant</a>(address_of_expr))</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="comment">// Target address is not constant, widening to the whole object</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        result.emplace(<a class="code" href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">make_object_whole_call_expr</a>(address_of_expr, ns));</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      }</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      {</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        result.emplace(expr);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;}</div>
 <div class="ttc" id="aclassaddress__of__exprt_html"><div class="ttname"><a href="classaddress__of__exprt.html">address_of_exprt</a></div><div class="ttdoc">Operator to return the address of an object.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00539">pointer_expr.h:540</a></div></div>
 <div class="ttc" id="aclasscode__typet_html"><div class="ttname"><a href="classcode__typet.html">code_typet</a></div><div class="ttdoc">Base type of functions.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00582">std_types.h:583</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
@@ -210,10 +211,9 @@ $(document).ready(function(){initNavTree('dfcc__infer__loop__assigns_8cpp_source
 <div class="ttc" id="aclasssymbolt_html_a9de2ce93a8d7b742d0d057110832c432"><div class="ttname"><a href="classsymbolt.html#a9de2ce93a8d7b742d0d057110832c432">symbolt::symbol_expr</a></div><div class="ttdeci">class symbol_exprt symbol_expr() const</div><div class="ttdoc">Produces a symbol_exprt for a symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8cpp_source.html#l00121">symbol.cpp:121</a></div></div>
 <div class="ttc" id="aclasssymbolt_html_ab2a27b105ccbeb19c64265c09198bb17"><div class="ttname"><a href="classsymbolt.html#ab2a27b105ccbeb19c64265c09198bb17">symbolt::type</a></div><div class="ttdeci">typet type</div><div class="ttdoc">Type of symbol.</div><div class="ttdef"><b>Definition:</b> <a href="symbol_8h_source.html#l00031">symbol.h:31</a></div></div>
 <div class="ttc" id="acprover__prefix_8h_html_a5f537726f4fcb4d977cbd151c99a39df"><div class="ttname"><a href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a></div><div class="ttdeci">#define CPROVER_PREFIX</div><div class="ttdef"><b>Definition:</b> <a href="cprover__prefix_8h_source.html#l00014">cprover_prefix.h:14</a></div></div>
-<div class="ttc" id="adfcc__cfg__info_8cpp_html_a6e3fdf15618ceb3a7ba01823230395f8"><div class="ttname"><a href="dfcc__cfg__info_8cpp.html#a6e3fdf15618ceb3a7ba01823230395f8">get_assigns</a></div><div class="ttdeci">static const exprt::operandst &amp; get_assigns(const goto_programt::const_targett &amp;latch_target)</div><div class="ttdoc">Extracts the assigns clause expression from the latch condition.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__cfg__info_8cpp_source.html#l00034">dfcc_cfg_info.cpp:34</a></div></div>
-<div class="ttc" id="adfcc__infer__loop__assigns_8cpp_html_a5d6d3dee17a9b651a1690a77e3bf29fb"><div class="ttname"><a href="dfcc__infer__loop__assigns_8cpp.html#a5d6d3dee17a9b651a1690a77e3bf29fb">dfcc_infer_loop_assigns</a></div><div class="ttdeci">assignst dfcc_infer_loop_assigns(const local_may_aliast &amp;local_may_alias, const loopt &amp;loop_instructions, const source_locationt &amp;loop_head_location, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__infer__loop__assigns_8cpp_source.html#l00048">dfcc_infer_loop_assigns.cpp:48</a></div></div>
-<div class="ttc" id="adfcc__infer__loop__assigns_8cpp_html_a7eed1e168b54fb8148b99ee552c620f1"><div class="ttname"><a href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">make_object_whole_call_expr</a></div><div class="ttdeci">static exprt make_object_whole_call_expr(const exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdoc">Builds a call expression object_whole(expr)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__infer__loop__assigns_8cpp_source.html#l00022">dfcc_infer_loop_assigns.cpp:22</a></div></div>
-<div class="ttc" id="adfcc__infer__loop__assigns_8cpp_html_adf8a94a7b4960b7c35b3783b48c3d16d"><div class="ttname"><a href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">depends_on</a></div><div class="ttdeci">static bool depends_on(const exprt &amp;expr, std::unordered_set&lt; irep_idt &gt; identifiers)</div><div class="ttdoc">Returns true iff expr contains at least one identifier found in identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__infer__loop__assigns_8cpp_source.html#l00037">dfcc_infer_loop_assigns.cpp:37</a></div></div>
+<div class="ttc" id="adfcc__infer__loop__assigns_8cpp_html_a5d6d3dee17a9b651a1690a77e3bf29fb"><div class="ttname"><a href="dfcc__infer__loop__assigns_8cpp.html#a5d6d3dee17a9b651a1690a77e3bf29fb">dfcc_infer_loop_assigns</a></div><div class="ttdeci">assignst dfcc_infer_loop_assigns(const local_may_aliast &amp;local_may_alias, const loopt &amp;loop_instructions, const source_locationt &amp;loop_head_location, const namespacet &amp;ns)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__infer__loop__assigns_8cpp_source.html#l00049">dfcc_infer_loop_assigns.cpp:49</a></div></div>
+<div class="ttc" id="adfcc__infer__loop__assigns_8cpp_html_a7eed1e168b54fb8148b99ee552c620f1"><div class="ttname"><a href="dfcc__infer__loop__assigns_8cpp.html#a7eed1e168b54fb8148b99ee552c620f1">make_object_whole_call_expr</a></div><div class="ttdeci">static exprt make_object_whole_call_expr(const exprt &amp;expr, const namespacet &amp;ns)</div><div class="ttdoc">Builds a call expression object_whole(expr)</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__infer__loop__assigns_8cpp_source.html#l00023">dfcc_infer_loop_assigns.cpp:23</a></div></div>
+<div class="ttc" id="adfcc__infer__loop__assigns_8cpp_html_adf8a94a7b4960b7c35b3783b48c3d16d"><div class="ttname"><a href="dfcc__infer__loop__assigns_8cpp.html#adf8a94a7b4960b7c35b3783b48c3d16d">depends_on</a></div><div class="ttdeci">static bool depends_on(const exprt &amp;expr, std::unordered_set&lt; irep_idt &gt; identifiers)</div><div class="ttdoc">Returns true iff expr contains at least one identifier found in identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__infer__loop__assigns_8cpp_source.html#l00038">dfcc_infer_loop_assigns.cpp:38</a></div></div>
 <div class="ttc" id="adfcc__infer__loop__assigns_8h_html"><div class="ttname"><a href="dfcc__infer__loop__assigns_8h.html">dfcc_infer_loop_assigns.h</a></div><div class="ttdoc">Infer a set of assigns clause targets for a natural loop.</div></div>
 <div class="ttc" id="adfcc__root__object_8cpp_html_af601af98e4324ada2d4c731879e7c6ce"><div class="ttname"><a href="dfcc__root__object_8cpp.html#af601af98e4324ada2d4c731879e7c6ce">dfcc_root_objects</a></div><div class="ttdeci">std::unordered_set&lt; exprt, irep_hash &gt; dfcc_root_objects(const exprt &amp;expr)</div><div class="ttdoc">Computes a set of root object expressions from an lvalue or assigns clause target expression.</div><div class="ttdef"><b>Definition:</b> <a href="dfcc__root__object_8cpp_source.html#l00133">dfcc_root_object.cpp:133</a></div></div>
 <div class="ttc" id="adfcc__root__object_8h_html"><div class="ttname"><a href="dfcc__root__object_8h.html">dfcc_root_object.h</a></div><div class="ttdoc">Utility functions that compute root object expressions for assigns clause targets and LHS expressions...</div></div>
@@ -228,6 +228,8 @@ $(document).ready(function(){initNavTree('dfcc__infer__loop__assigns_8cpp_source
 <div class="ttc" id="astd__code_8h_html"><div class="ttname"><a href="std__code_8h.html">std_code.h</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a528308f263b96302993893c926e7d666"><div class="ttname"><a href="std__types_8h.html#a528308f263b96302993893c926e7d666">to_code_type</a></div><div class="ttdeci">const code_typet &amp; to_code_type(const typet &amp;type)</div><div class="ttdoc">Cast a typet to a code_typet.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00788">std_types.h:788</a></div></div>
 <div class="ttc" id="astd__types_8h_html_a54d3d021c927d453b518f11032cccb6a"><div class="ttname"><a href="std__types_8h.html#a54d3d021c927d453b518f11032cccb6a">is_constant</a></div><div class="ttdeci">bool is_constant(const typet &amp;type)</div><div class="ttdoc">This method tests, if the given typet is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="std__types_8h_source.html#l00029">std_types.h:29</a></div></div>
+<div class="ttc" id="autils_8cpp_html_a2b040a282aa48c89e8738cbc128e3822"><div class="ttname"><a href="utils_8cpp.html#a2b040a282aa48c89e8738cbc128e3822">infer_loop_assigns</a></div><div class="ttdeci">void infer_loop_assigns(const local_may_aliast &amp;local_may_alias, const loopt &amp;loop, assignst &amp;assigns)</div><div class="ttdoc">Infer loop assigns using alias analysis result local_may_alias.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8cpp_source.html#l00342">utils.cpp:342</a></div></div>
+<div class="ttc" id="autils_8h_html"><div class="ttname"><a href="utils_8h.html">utils.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
