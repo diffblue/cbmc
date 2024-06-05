@@ -649,7 +649,7 @@ void goto_check_ct::mod_by_zero_check(
     inequality,
     "division by zero",
     "division-by-zero",
-    false, // fatal
+    true, // fatal
     expr.find_source_location(),
     expr,
     guard);
