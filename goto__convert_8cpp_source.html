@@ -217,27 +217,27 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="comment">//   }</span></div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="comment">// to code which looks like -</span></div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="comment">//   {</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="comment">//     __CPROVER_bool going_to::user_label;</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="comment">//     going_to::user_label = false;</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="comment">//     __CPROVER_bool __CPROVER_going_to::user_label;</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="comment">//     __CPROVER_going_to::user_label = false;</span></div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="comment">//     statement_block_a();</span></div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="comment">//     if(...)</span></div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="comment">//     {</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="comment">//       going_to::user_label = true;</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="comment">//       __CPROVER_going_to::user_label = true;</span></div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="comment">//       goto scope_x_label;</span></div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <span class="comment">//     }</span></div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <span class="comment">//     statement_block_b();</span></div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <span class="comment">//   scope_x_label:</span></div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;  <span class="comment">//     int x;</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  <span class="comment">//     if going_to::user_label goto scope_y_label:</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;  <span class="comment">//     if __CPROVER_going_to::user_label goto scope_y_label:</span></div>
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;  <span class="comment">//     x = 0;</span></div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="comment">//     statement_block_c();</span></div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="comment">//   scope_y_label:</span></div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="comment">//     int y;</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="comment">//     if going_to::user_label goto user_label:</span></div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="comment">//     if __CPROVER_going_to::user_label goto user_label:</span></div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="comment">//     y = 0;</span></div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <span class="comment">//     statement_block_d();</span></div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="comment">//   user_label:</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="comment">//     going_to::user_label = false;</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="comment">//     __CPROVER_going_to::user_label = false;</span></div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="comment">//     statement_block_e();</span></div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <span class="comment">//   }</span></div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
@@ -252,7 +252,7 @@ $(document).ready(function(){initNavTree('goto__convert_8cpp_source.html',''); i
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    label_location.set_hide();</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;new_flag = <a class="code" href="fresh__symbol_8cpp.html#a1baa36294c4d640a926d615062a20feb">get_fresh_aux_symbol</a>(</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      <a class="code" href="classbool__typet.html">bool_typet</a>{},</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="stringliteral">&quot;going_to&quot;</span>,</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <a class="code" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;going_to&quot;</span>,</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <a class="code" href="irep_8h.html#aec473a7cdee5da3223f587aa2c1c4132">id2string</a>(inputs.<a class="code" href="structbuild__declaration__hops__inputst.html#afa22054b139d3c5a9ecd066f0bb674c5">label</a>),</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      label_location,</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      inputs.<a class="code" href="structbuild__declaration__hops__inputst.html#a70d6df918b82b7438fd6688b3b97eacb">mode</a>,</div>
