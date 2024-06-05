@@ -151,5 +151,7 @@ bool dfcc_is_cprover_static_symbol(const irep_idt &id)
   init_static_symbols(static_symbols);
   return static_symbols.find(id) != static_symbols.end() ||
          // auto objects from pointer derefs
-         has_suffix(id2string(id), "$object");
+         has_suffix(id2string(id), "$object") ||
+         // going_to variables converted from goto statements
+         has_prefix(id2string(id), CPROVER_PREFIX "going_to");
 }

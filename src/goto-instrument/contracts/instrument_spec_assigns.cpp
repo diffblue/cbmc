@@ -19,6 +19,7 @@ Date: January 2022
 #include <util/fresh_symbol.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 
 #include <ansi-c/c_expr.h>
@@ -147,6 +148,13 @@ void instrument_spec_assignst::check_inclusion_assignment(
   const exprt &lhs,
   goto_programt &dest) const
 {
+  // Don't check assignable for CPROVER symbol
+  if(
+    lhs.id() == ID_symbol &&
+    has_prefix(id2string(to_symbol_expr(lhs).get_identifier()), CPROVER_PREFIX))
+  {
+    return;
+  }
   // create temporary car but do not track
   const auto car = create_car_expr(true_exprt{}, lhs);
   create_snapshot(car, dest);

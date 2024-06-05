@@ -220,7 +220,7 @@ void code_contractst::check_apply_loop_contracts(
     // and the inferred aliasing relation.
     try
     {
-      get_assigns(local_may_alias, loop, to_havoc);
+      infer_loop_assigns(local_may_alias, loop, to_havoc);
 
       // remove loop-local symbols from the inferred set
       cfg_info.erase_locals(to_havoc);
