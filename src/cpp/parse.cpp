@@ -4057,8 +4057,8 @@ bool Parser::rTemplateArgs(irept &template_args)
       tk2.text='>';
       lex.Replace(tk2);
       lex.Insert(tk2);
+      lex.get_token();
       DATA_INVARIANT(lex.LookAhead(0) == '>', "should be >");
-      DATA_INVARIANT(lex.LookAhead(1) == '>', "should be >");
       return true;
 
     default:
