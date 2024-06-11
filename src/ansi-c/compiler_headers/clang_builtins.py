@@ -115,6 +115,11 @@ vector_map = {
             2: '__gcc_v2df',
             4: '__gcc_v4df',
             8: '__gcc_v8df'
+            },
+        '__bf16': {
+            8: '__gcc_v8hf',
+            16: '__gcc_v16hf',
+            32: '__gcc_v32hf'
             }
         }
 

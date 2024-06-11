@@ -77,6 +77,9 @@ BUILTIN_FILES = \
   compiler_headers/gcc_builtin_headers_ia32-4.inc \
   compiler_headers/gcc_builtin_headers_ia32-5.inc \
   compiler_headers/gcc_builtin_headers_ia32-6.inc \
+  compiler_headers/gcc_builtin_headers_ia32-7.inc \
+  compiler_headers/gcc_builtin_headers_ia32-8.inc \
+  compiler_headers/gcc_builtin_headers_ia32-9.inc \
   compiler_headers/gcc_builtin_headers_ia32.inc \
   compiler_headers/gcc_builtin_headers_math.inc \
   compiler_headers/gcc_builtin_headers_mem_string.inc \

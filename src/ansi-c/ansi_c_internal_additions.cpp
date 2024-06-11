@@ -70,6 +70,15 @@ const char gcc_builtin_headers_ia32_5[] =
 const char gcc_builtin_headers_ia32_6[] =
 #include "compiler_headers/gcc_builtin_headers_ia32-6.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_7[] =
+#include "compiler_headers/gcc_builtin_headers_ia32-7.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_8[] =
+#include "compiler_headers/gcc_builtin_headers_ia32-8.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_9[] =
+#include "compiler_headers/gcc_builtin_headers_ia32-9.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[] =
   "#line 1 \"gcc_builtin_headers_alpha.h\"\n"
