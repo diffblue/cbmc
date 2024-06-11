@@ -43,6 +43,7 @@ int main(int argc, const char *argv[])
   ansi_c_parser.ts_18661_3_Floatn_types = false;
   ansi_c_parser.float16_type = false;
   ansi_c_parser.bf16_type = false;
+  ansi_c_parser.fp16_type = false;
   ansi_c_parser.in=&in;
   cpp_parser.in=&in;
 

@@ -147,6 +147,7 @@ void contracts_wranglert::mangle(
   ansi_c_parser.ts_18661_3_Floatn_types = config.ansi_c.ts_18661_3_Floatn_types;
   ansi_c_parser.float16_type = config.ansi_c.float16_type;
   ansi_c_parser.bf16_type = config.ansi_c.bf16_type;
+  ansi_c_parser.fp16_type = config.ansi_c.fp16_type;
   ansi_c_parser.cpp98 = false; // it's not C++
   ansi_c_parser.cpp11 = false; // it's not C++
   ansi_c_parser.mode = config.ansi_c.mode;

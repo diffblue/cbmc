@@ -174,4 +174,11 @@ void configure_gcc(const gcc_versiont &gcc_version)
      gcc_version.is_at_least(13u)) ||
     (gcc_version.flavor == gcc_versiont::flavort::CLANG &&
      gcc_version.is_at_least(15u));
+
+  config.ansi_c.fp16_type =
+    (gcc_version.flavor == gcc_versiont::flavort::GCC &&
+     gcc_version.is_at_least(4u, 5u) &&
+     (config.ansi_c.arch == "arm" || config.ansi_c.arch == "arm64")) ||
+    (gcc_version.flavor == gcc_versiont::flavort::CLANG &&
+     gcc_version.is_at_least(6u));
 }

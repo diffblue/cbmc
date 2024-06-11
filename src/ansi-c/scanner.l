@@ -546,6 +546,12 @@ enable_or_disable ("enable"|"disable")
                     return make_identifier();
                 }
 
+"__fp16"        { if(PARSER.fp16_type)
+                  { loc(); return TOK_GCC_FLOAT16; }
+                  else
+                    return make_identifier();
+                }
+
 "_Float32"      { if(PARSER.ts_18661_3_Floatn_types)
                   { loc(); return TOK_GCC_FLOAT32; }
                   else
