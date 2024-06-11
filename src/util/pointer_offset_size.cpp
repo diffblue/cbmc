@@ -290,17 +290,6 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
   {
     const auto &array_type = to_array_type(type);
 
-    // special-case arrays of bits
-    if(array_type.element_type().id() == ID_bool)
-    {
-      auto bits = pointer_offset_bits(array_type, ns);
-
-      if(bits.has_value())
-        return from_integer(
-          (*bits + config.ansi_c.char_width - 1) / config.ansi_c.char_width,
-          size_type());
-    }
-
     auto sub = size_of_expr(array_type.element_type(), ns);
     if(!sub.has_value())
       return {};
@@ -366,14 +355,6 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
       {
         std::size_t w = to_c_bit_field_type(c.type()).get_width();
         bit_field_bits += w;
-        const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
-        bit_field_bits %= config.ansi_c.char_width;
-        if(bytes > 0)
-          result = plus_exprt(result, from_integer(bytes, result.type()));
-      }
-      else if(c.is_boolean())
-      {
-        ++bit_field_bits;
         const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
         bit_field_bits %= config.ansi_c.char_width;
         if(bytes > 0)
@@ -476,7 +457,8 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_bool)
   {
-    return from_integer(1, size_type());
+    // bool is a mathematical type, and has no memory layout
+    return {};
   }
   else if(type.id()==ID_pointer)
   {

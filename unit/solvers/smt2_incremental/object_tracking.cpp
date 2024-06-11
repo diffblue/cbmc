@@ -220,8 +220,8 @@ TEST_CASE("Tracking dynamic object status.", "[core][smt2_incremental]")
     std::pair<decltype(base_object), decltype(expected_dynamic_status)>;
   std::tie(base_object, expected_dynamic_status) = GENERATE_REF(
     rowt{from_integer(0, unsignedbv_typet{(8)}), false},
-    rowt{symbol_exprt{"foo", bool_typet{}}, false},
-    rowt{symbol_exprt{SYMEX_DYNAMIC_PREFIX "bar", bool_typet{}}, true},
+    rowt{symbol_exprt{"foo", unsignedbv_typet{8}}, false},
+    rowt{symbol_exprt{SYMEX_DYNAMIC_PREFIX "bar", unsignedbv_typet{8}}, true},
     rowt{from_integer(42, make_type_dynamic(signedbv_typet{16})), true});
   INFO("base_object is - " + base_object.pretty(1, 0));
   track_expression_objects(address_of_exprt{base_object}, ns, object_map);
