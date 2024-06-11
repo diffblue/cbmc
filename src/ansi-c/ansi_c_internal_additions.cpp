@@ -268,6 +268,18 @@ void ansi_c_internal_additions(std::string &code, bool support_float16_type)
         code+="typedef long double __float128;\n";
       }
     }
+    else if(
+      config.ansi_c.arch == "arm64" &&
+      config.ansi_c.os == configt::ansi_ct::ost::OS_MACOS &&
+      config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG &&
+      config.ansi_c.gcc__float128_type)
+    {
+      // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html doesn't say so,
+      // but GCC on macOS supports __float128 also for Apple Silicon. It really
+      // appears to be a keyword, but we don't handle GCC version+platform
+      // specifics in the scanner.
+      code += "typedef " CPROVER_PREFIX "Float128 __float128;\n";
+    }
 
     if(
       config.ansi_c.arch == "i386" || config.ansi_c.arch == "x86_64" ||
