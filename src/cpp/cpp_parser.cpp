@@ -42,6 +42,7 @@ bool cpp_parsert::parse()
     false; // these are still typedefs
   token_buffer.ansi_c_parser.float16_type = *support_float16;
   token_buffer.ansi_c_parser.bf16_type = *support_float16;
+  token_buffer.ansi_c_parser.fp16_type = *support_float16;
   token_buffer.ansi_c_parser.in = in;
   token_buffer.ansi_c_parser.mode = mode;
   token_buffer.ansi_c_parser.set_file(get_file());

@@ -37,7 +37,8 @@ public:
       for_has_scope(false),
       ts_18661_3_Floatn_types(false),
       float16_type(false),
-      bf16_type(false)
+      bf16_type(false),
+      fp16_type(false)
   {
     // set up global scope
     scopes.clear();
@@ -69,6 +70,7 @@ public:
   bool ts_18661_3_Floatn_types;
   bool float16_type;
   bool bf16_type;
+  bool fp16_type;
 
   typedef ansi_c_identifiert identifiert;
   typedef ansi_c_scopet scopet;
