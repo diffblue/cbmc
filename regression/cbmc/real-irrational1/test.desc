@@ -1,0 +1,11 @@
+KNOWNBUG
+main.c
+--trace --smt2
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This currently fails an invariant in parse_literal, but really requires
+adjusting the implementation of realt to be coefficients of a polynomial. We can
+then parse, e.g., (root-obj (+ (^ x 2) (- 2)) 1), which Z3 returns as part of
+the model.

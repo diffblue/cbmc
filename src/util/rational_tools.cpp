@@ -11,18 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "rational_tools.h"
 
+#include "arith_tools.h"
 #include "mathematical_types.h"
 #include "rational.h"
-
-static mp_integer power10(size_t i)
-{
-  mp_integer result=1;
-
-  for(; i!=0; i--)
-    result*=10;
-
-  return result;
-}
 
 bool to_rational(const exprt &expr, rationalt &rational_value)
 {
@@ -74,8 +65,14 @@ bool to_rational(const exprt &expr, rationalt &rational_value)
     break;
 
   case '.':
-    rational_value+=
-      rationalt(string2integer(no2))/rationalt(power10(no2.size()));
+    DATA_INVARIANT(!no2.empty(), "decimal suffix should not be empty");
+    if(no2 != "0")
+    {
+      DATA_INVARIANT(
+        no2.back() != '0', "decimal suffix should not have trailing zeros");
+      rational_value +=
+        rationalt(string2integer(no2)) / rationalt(power(10, no2.size()));
+    }
     break;
 
   case '/':

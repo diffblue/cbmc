@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/range.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
+#include <util/real.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -435,7 +436,7 @@ constant_exprt smt2_convt::parse_literal(
       std::size_t pos = s.find(".");
       if(pos != std::string::npos)
       {
-        // Decimal, return as rational
+        // Decimal, return as rational or real
         if(type.id() == ID_rational)
         {
           rationalt rational_value;
@@ -443,6 +444,13 @@ constant_exprt smt2_convt::parse_literal(
             constant_exprt{src.id(), rational_typet{}}, rational_value);
           CHECK_RETURN(!failed);
           return from_rational(rational_value);
+        }
+        else if(type.id() == ID_real)
+        {
+          mp_integer first = string2integer(s.substr(0, pos));
+          mp_integer second = string2integer(s.substr(pos, std::string::npos));
+          realt real{first, second};
+          return real.as_expr();
         }
         else
         {
@@ -467,6 +475,18 @@ constant_exprt smt2_convt::parse_literal(
           src.get_sub()[1].id_string().substr(0, 2)=="bv")
   {
     value=string2integer(src.get_sub()[1].id_string().substr(2));
+  }
+  else if(
+    type.id() == ID_rational && src.get_sub().size() == 3 &&
+    src.get_sub()[0].id() == "/")
+  {
+    rationalt numerator;
+    rationalt denominator;
+    bool failed =
+      to_rational(parse_literal(src.get_sub()[1], type), numerator) ||
+      to_rational(parse_literal(src.get_sub()[2], type), denominator);
+    CHECK_RETURN(!failed);
+    return from_rational(numerator / denominator);
   }
   else if(src.get_sub().size()==4 &&
           src.get_sub()[0].id()=="fp") // (fp signbv exponentbv significandbv)
@@ -541,18 +561,15 @@ constant_exprt smt2_convt::parse_literal(
     std::size_t width=boolbv_width(type);
     return constant_exprt(integer2bvrep(value, width), type);
   }
-  else if(type.id() == ID_integer)
+  else if(
+    type.id() == ID_integer || type.id() == ID_natural ||
+    type.id() == ID_rational || type.id() == ID_real)
   {
     return from_integer(value, type);
   }
   else if(type.id() == ID_range)
   {
     return from_integer(value + to_range_type(type).get_from(), type);
-  }
-  else if(type.id() == ID_rational)
-  {
-    // TODO parse this literal back correctly.
-    return from_integer(value, type);
   }
   else
     UNREACHABLE_BECAUSE(
@@ -753,7 +770,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
   if(
     type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
     type.id() == ID_integer || type.id() == ID_rational ||
-    type.id() == ID_real || type.id() == ID_c_enum ||
+    type.id() == ID_natural || type.id() == ID_real || type.id() == ID_c_enum ||
     type.id() == ID_c_enum_tag || type.id() == ID_fixedbv ||
     type.id() == ID_floatbv || type.id() == ID_c_bool || type.id() == ID_range)
   {
@@ -1386,6 +1403,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else
     {
+      PRECONDITION(type.id() != ID_natural);
       out << "(bvneg ";
       convert_expr(unary_minus_expr.op());
       out << ")";
@@ -2672,12 +2690,12 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   if(dest_type.id()==ID_bool)
   {
     // this is comparison with zero
-    if(src_type.id()==ID_signedbv ||
-       src_type.id()==ID_unsignedbv ||
-       src_type.id()==ID_c_bool ||
-       src_type.id()==ID_fixedbv ||
-       src_type.id()==ID_pointer ||
-       src_type.id()==ID_integer)
+    if(
+      src_type.id() == ID_signedbv || src_type.id() == ID_unsignedbv ||
+      src_type.id() == ID_c_bool || src_type.id() == ID_fixedbv ||
+      src_type.id() == ID_pointer || src_type.id() == ID_integer ||
+      src_type.id() == ID_natural || src_type.id() == ID_rational ||
+      src_type.id() == ID_real)
     {
       out << "(not (= ";
       convert_expr(src);
@@ -2874,9 +2892,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         out << ")";
       }
     }
-    else if(src_type.id()==ID_integer) // from integer to bit-vector
+    else if(src_type.id() == ID_integer || src_type.id() == ID_natural)
     {
-      // must be constant
+      // from integer to bit-vector, must be constant
       if(src.is_constant())
       {
         mp_integer i = numeric_cast_v<mp_integer>(to_constant_expr(src));
@@ -3169,7 +3187,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
   }
-  else if(dest_type.id()==ID_integer)
+  else if(dest_type.id() == ID_integer || dest_type.id() == ID_natural)
   {
     if(src_type.id()==ID_bool)
     {
@@ -3646,6 +3664,13 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     if(negative)
       out << ')';
   }
+  else if(expr_type.id() == ID_real)
+  {
+    const std::string &value = id2string(expr.get_value());
+    out << value;
+    if(value.find('.') == std::string::npos)
+      out << ".0";
+  }
   else if(expr_type.id()==ID_integer)
   {
     const auto value = id2string(expr.get_value());
@@ -3655,6 +3680,10 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       out << "(- " << value.substr(1, std::string::npos) << ')';
     else
       out << value;
+  }
+  else if(expr_type.id() == ID_natural)
+  {
+    out << expr.get_value();
   }
   else if(expr_type.id() == ID_range)
   {
@@ -3807,8 +3836,9 @@ void smt2_convt::convert_relation(const binary_relation_exprt &expr)
     else
       convert_floatbv(expr);
   }
-  else if(op_type.id()==ID_rational ||
-          op_type.id()==ID_integer)
+  else if(
+    op_type.id() == ID_rational || op_type.id() == ID_integer ||
+    op_type.id() == ID_natural || op_type.id() == ID_real)
   {
     out << "(";
     out << expr.id();
@@ -3853,7 +3883,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 {
   if(
     expr.type().id() == ID_rational || expr.type().id() == ID_integer ||
-    expr.type().id() == ID_real)
+    expr.type().id() == ID_natural || expr.type().id() == ID_real)
   {
     // these are multi-ary in SMT-LIB2
     out << "(+";
@@ -4080,7 +4110,9 @@ void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
 
 void smt2_convt::convert_minus(const minus_exprt &expr)
 {
-  if(expr.type().id()==ID_integer)
+  if(
+    expr.type().id() == ID_integer || expr.type().id() == ID_natural ||
+    expr.type().id() == ID_rational || expr.type().id() == ID_real)
   {
     out << "(- ";
     convert_expr(expr.op0());
@@ -4235,7 +4267,7 @@ void smt2_convt::convert_div(const div_exprt &expr)
   }
   else if(
     expr.type().id() == ID_rational || expr.type().id() == ID_integer ||
-    expr.type().id() == ID_real)
+    expr.type().id() == ID_natural || expr.type().id() == ID_real)
   {
     out << "(/ ";
     convert_expr(expr.op0());
@@ -4324,9 +4356,9 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
 
     out << "))"; // bvmul, extract
   }
-  else if(expr.type().id()==ID_rational ||
-          expr.type().id()==ID_integer ||
-          expr.type().id()==ID_real)
+  else if(
+    expr.type().id() == ID_rational || expr.type().id() == ID_integer ||
+    expr.type().id() == ID_natural || expr.type().id() == ID_real)
   {
     out << "(*";
 
@@ -5859,6 +5891,8 @@ void smt2_convt::convert_type(const typet &type)
     out << "Real";
   else if(type.id()==ID_integer)
     out << "Int";
+  else if(type.id() == ID_natural)
+    out << "Nat";
   else if(type.id()==ID_complex)
   {
     if(use_datatypes)

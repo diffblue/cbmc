@@ -104,30 +104,28 @@ bool check_c_implicit_typecast(
 
   if(src_type_id==ID_natural)
   {
-    if(dest_type.id()==ID_bool ||
-       dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_integer ||
-       dest_type.id()==ID_real ||
-       dest_type.id()==ID_complex ||
-       dest_type.id()==ID_unsignedbv ||
-       dest_type.id()==ID_signedbv ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_bool || dest_type.id() == ID_c_bool ||
+      dest_type.id() == ID_integer || dest_type.id() == ID_rational ||
+      dest_type.id() == ID_real || dest_type.id() == ID_complex ||
+      dest_type.id() == ID_unsignedbv || dest_type.id() == ID_signedbv ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_integer)
   {
-    if(dest_type.id()==ID_bool ||
-       dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_real ||
-       dest_type.id()==ID_complex ||
-       dest_type.id()==ID_unsignedbv ||
-       dest_type.id()==ID_signedbv ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_fixedbv ||
-       dest_type.id()==ID_pointer ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_bool || dest_type.id() == ID_c_bool ||
+      dest_type.id() == ID_natural || dest_type.id() == ID_rational ||
+      dest_type.id() == ID_real || dest_type.id() == ID_complex ||
+      dest_type.id() == ID_unsignedbv || dest_type.id() == ID_signedbv ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_fixedbv ||
+      dest_type.id() == ID_pointer || dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_real)
   {
@@ -141,28 +139,28 @@ bool check_c_implicit_typecast(
   }
   else if(src_type_id==ID_rational)
   {
-    if(dest_type.id()==ID_bool ||
-       dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_complex ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_fixedbv ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_bool || dest_type.id() == ID_c_bool ||
+      dest_type.id() == ID_real || dest_type.id() == ID_complex ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_fixedbv ||
+      dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_bool)
   {
-    if(dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_integer ||
-       dest_type.id()==ID_real ||
-       dest_type.id()==ID_unsignedbv ||
-       dest_type.id()==ID_signedbv ||
-       dest_type.id()==ID_pointer ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_fixedbv ||
-       dest_type.id()==ID_c_enum ||
-       dest_type.id()==ID_c_enum_tag ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_c_bool || dest_type.id() == ID_integer ||
+      dest_type.id() == ID_natural || dest_type.id() == ID_rational ||
+      dest_type.id() == ID_real || dest_type.id() == ID_unsignedbv ||
+      dest_type.id() == ID_signedbv || dest_type.id() == ID_pointer ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_fixedbv ||
+      dest_type.id() == ID_c_enum || dest_type.id() == ID_c_enum_tag ||
+      dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_unsignedbv ||
           src_type_id==ID_signedbv ||
@@ -170,20 +168,17 @@ bool check_c_implicit_typecast(
           src_type_id==ID_c_enum_tag ||
           src_type_id==ID_c_bool)
   {
-    if(dest_type.id()==ID_unsignedbv ||
-       dest_type.id()==ID_bool ||
-       dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_integer ||
-       dest_type.id()==ID_real ||
-       dest_type.id()==ID_rational ||
-       dest_type.id()==ID_signedbv ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_fixedbv ||
-       dest_type.id()==ID_pointer ||
-       dest_type.id()==ID_c_enum ||
-       dest_type.id()==ID_c_enum_tag ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_unsignedbv || dest_type.id() == ID_bool ||
+      dest_type.id() == ID_c_bool || dest_type.id() == ID_integer ||
+      dest_type.id() == ID_natural || dest_type.id() == ID_rational ||
+      dest_type.id() == ID_real || dest_type.id() == ID_signedbv ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_fixedbv ||
+      dest_type.id() == ID_pointer || dest_type.id() == ID_c_enum ||
+      dest_type.id() == ID_c_enum_tag || dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_floatbv ||
           src_type_id==ID_fixedbv)
@@ -417,6 +412,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   }
   else if(type.id() == ID_integer)
     return INTEGER;
+  else if(type.id() == ID_natural)
+    return NATURAL;
 
   return OTHER;
 }
@@ -456,6 +453,9 @@ void c_typecastt::implicit_typecast_arithmetic(
   case RATIONAL:   new_type=rational_typet(); break;
   case REAL:       new_type=real_typet(); break;
   case INTEGER:    new_type=integer_typet(); break;
+  case NATURAL:
+    new_type = natural_typet();
+    break;
   case COMPLEX:
   case OTHER:
   case VOIDPTR:

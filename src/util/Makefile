@@ -66,6 +66,7 @@ SRC = arith_tools.cpp \
       prefix_filter.cpp \
       rational.cpp \
       rational_tools.cpp \
+      real.cpp \
       ref_expr_set.cpp \
       refined_string_type.cpp \
       rename.cpp \

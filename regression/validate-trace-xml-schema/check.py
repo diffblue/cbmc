@@ -31,6 +31,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['r_w_ok9', 'simplify.desc'],
     ['rational1', 'typecheck.desc'],
     ['reachability-slice-interproc2', 'test.desc'],
+    ['real-assignments1', 'typecheck.desc'],
     ['saturating_arithmetric', 'output-goto.desc'],
     # this one wants show-properties instead producing a trace
     ['show_properties1', 'test.desc'],
