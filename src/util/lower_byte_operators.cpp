@@ -346,13 +346,14 @@ static exprt bv_to_expr(
   else if(
     can_cast_type<bitvector_typet>(target_type) ||
     target_type.id() == ID_c_enum || target_type.id() == ID_c_enum_tag ||
-    target_type.id() == ID_string)
+    target_type.id() == ID_string ||
+    (target_type.id() == ID_bool &&
+     to_bitvector_type(bitvector_expr.type()).get_width() == 1))
   {
     return simplify_expr(
       typecast_exprt::conditional_cast(bitvector_expr, target_type), ns);
   }
-
-  if(target_type.id() == ID_struct)
+  else if(target_type.id() == ID_struct)
   {
     return bv_to_struct_expr(
       bitvector_expr, to_struct_type(target_type), endianness_map, ns);
