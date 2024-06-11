@@ -1,5 +1,8 @@
 var NAVTREEINDEX134 =
 {
+"structlevenshtein__automatont.html#a21b9fe937c616c76cf810639a94e17e7":[8,0,756,0],
+"structlevenshtein__automatont.html#a72c0ac6b9cb9e6c5cd5e85919b4be486":[8,0,756,3],
+"structlevenshtein__automatont.html#a76e89c8b969088e90d7df4393c65ef32":[8,0,756,2],
 "structlevenshtein__automatont.html#a79a77a3a2dbda6ab5dadff8a95637033":[8,0,756,4],
 "structlevenshtein__automatont.html#aa4d9685993780c0fd887995425302239":[8,0,756,5],
 "structlevenshtein__automatont.html#aa8e655c3e8f3d77dd362c68289676cba":[8,0,756,6],
@@ -246,8 +249,5 @@ var NAVTREEINDEX134 =
 "structobject__factory__parameterst.html#a56fabd016b414693956b2063c4bafd21":[8,0,880,10],
 "structobject__factory__parameterst.html#a61642ee9609c06a8f3500223d753ed9d":[8,0,880,7],
 "structobject__factory__parameterst.html#a6373be83c45207eb138647185805f5c8":[8,0,880,9],
-"structobject__factory__parameterst.html#a827a9fe76dac1d5751830e5858447e35":[8,0,880,11],
-"structobject__factory__parameterst.html#a85e83e6c799563fefb5a8def70e8193b":[8,0,880,0],
-"structobject__factory__parameterst.html#a8d3b1e416cb9277a22f5ee2d319410b6":[8,0,880,6],
-"structobject__factory__parameterst.html#ab7ae39b4b634c5b1cb00905e3537593c":[8,0,880,3]
+"structobject__factory__parameterst.html#a827a9fe76dac1d5751830e5858447e35":[8,0,880,11]
 };

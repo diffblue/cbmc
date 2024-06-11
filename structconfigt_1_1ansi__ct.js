@@ -85,6 +85,7 @@ var structconfigt_1_1ansi__ct =
     [ "endianness", "structconfigt_1_1ansi__ct.html#a221dc8f0d2a57ad2915dbf12b9d12aa7", null ],
     [ "float16_type", "structconfigt_1_1ansi__ct.html#a233b038233f3ef4e0ae30993609cd9c7", null ],
     [ "for_has_scope", "structconfigt_1_1ansi__ct.html#a08117d57b0b85d2f5a37ebe0cf1a8c69", null ],
+    [ "fp16_type", "structconfigt_1_1ansi__ct.html#ad6a2538f21877253155e88f5526ea6b1", null ],
     [ "gcc__float128_type", "structconfigt_1_1ansi__ct.html#a59ea1814570eace6717a235013349097", null ],
     [ "include_files", "structconfigt_1_1ansi__ct.html#a5bcf3e8eda22dcccc9fab0691d88319c", null ],
     [ "include_paths", "structconfigt_1_1ansi__ct.html#a06de8c4a84d2cafdba3b5b01f9fde20d", null ],

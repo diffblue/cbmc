@@ -35,6 +35,7 @@ var classansi__c__parsert =
     [ "cpp98", "classansi__c__parsert.html#a8f4cd91a8834a9355e8fe8b5d147586e", null ],
     [ "float16_type", "classansi__c__parsert.html#a0cbe3a0662bdcb3d111d2bb9f97a3ac8", null ],
     [ "for_has_scope", "classansi__c__parsert.html#a67b2cf8d9bcd68852030f8e5b84a44e4", null ],
+    [ "fp16_type", "classansi__c__parsert.html#a6bf40ef98bf8325794333ed6fea22d14", null ],
     [ "mode", "classansi__c__parsert.html#a4518139f658265a9ce120bf5833cccbc", null ],
     [ "parenthesis_counter", "classansi__c__parsert.html#a867aaee6d4da8d46c11c710d1413f893", null ],
     [ "parse_tree", "classansi__c__parsert.html#a75a6dd29450a7b887e5516e0d5a87d08", null ],
