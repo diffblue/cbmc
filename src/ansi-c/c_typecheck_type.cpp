@@ -1626,6 +1626,14 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
   {
     type=integer_typet();
   }
+  else if(symbol.base_name == CPROVER_PREFIX "natural")
+  {
+    type = natural_typet();
+  }
+  else if(symbol.base_name == CPROVER_PREFIX "real")
+  {
+    type = real_typet();
+  }
 }
 
 void c_typecheck_baset::adjust_function_parameter(typet &type) const

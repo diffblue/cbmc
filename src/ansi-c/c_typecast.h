@@ -75,19 +75,35 @@ protected:
 
   // these are in promotion order
 
-  enum c_typet { BOOL,
-                 CHAR, UCHAR,
-                 SHORT, USHORT,
-                 INT, UINT,
-                 LONG, ULONG,
-                 LONGLONG, ULONGLONG,
-                 LARGE_SIGNED_INT, LARGE_UNSIGNED_INT,
-                 INTEGER, // these are unbounded integers, non-standard
-                 FIXEDBV, // fixed-point, non-standard
-                 SINGLE, DOUBLE, LONGDOUBLE, FLOAT128, // float
-                 RATIONAL, REAL, // infinite precision, non-standard
-                 COMPLEX,
-                 VOIDPTR, PTR, OTHER };
+  enum c_typet
+  {
+    BOOL,
+    CHAR,
+    UCHAR,
+    SHORT,
+    USHORT,
+    INT,
+    UINT,
+    LONG,
+    ULONG,
+    LONGLONG,
+    ULONGLONG,
+    LARGE_SIGNED_INT,
+    LARGE_UNSIGNED_INT,
+    INTEGER, // these are unbounded integers, non-standard
+    NATURAL, // these are unbounded natural numbers, non-standard
+    FIXEDBV, // fixed-point, non-standard
+    SINGLE,
+    DOUBLE,
+    LONGDOUBLE,
+    FLOAT128, // float
+    RATIONAL,
+    REAL, // infinite precision, non-standard
+    COMPLEX,
+    VOIDPTR,
+    PTR,
+    OTHER
+  };
 
   c_typet get_c_type(const typet &type) const;
 

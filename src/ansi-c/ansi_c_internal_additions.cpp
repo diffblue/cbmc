@@ -135,7 +135,9 @@ void ansi_c_internal_additions(std::string &code, bool support_float16_type)
       " " CPROVER_PREFIX "ssize_t;\n"
     "const unsigned " CPROVER_PREFIX "constant_infinity_uint;\n"
     "typedef void " CPROVER_PREFIX "integer;\n"
+    "typedef void " CPROVER_PREFIX "natural;\n"
     "typedef void " CPROVER_PREFIX "rational;\n"
+    "typedef void " CPROVER_PREFIX "real;\n"
     "extern unsigned char " CPROVER_PREFIX "memory["
       CPROVER_PREFIX "constant_infinity_uint];\n"
 

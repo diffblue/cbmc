@@ -246,11 +246,11 @@ std::string expr2ct::convert_rec(
   {
     return q + CPROVER_PREFIX + "string" + d;
   }
-  else if(src.id()==ID_natural ||
-          src.id()==ID_integer ||
-          src.id()==ID_rational)
+  else if(
+    src.id() == ID_natural || src.id() == ID_integer ||
+    src.id() == ID_rational || src.id() == ID_real)
   {
-    return q+src.id_string()+d;
+    return q + CPROVER_PREFIX + src.id_string() + d;
   }
   else if(src.id()==ID_empty)
   {
@@ -1780,9 +1780,9 @@ std::string expr2ct::convert_constant(
   const irep_idt value=src.get_value();
   std::string dest;
 
-  if(type.id()==ID_integer ||
-     type.id()==ID_natural ||
-     type.id()==ID_rational)
+  if(
+    type.id() == ID_integer || type.id() == ID_natural ||
+    type.id() == ID_rational || type.id() == ID_real)
   {
     dest=id2string(value);
   }
@@ -1821,8 +1821,6 @@ std::string expr2ct::convert_constant(
     else
       return "/*enum*/" + value_as_string;
   }
-  else if(type.id()==ID_rational)
-    return convert_norep(src, precedence);
   else if(type.id()==ID_bv)
   {
     // not C
