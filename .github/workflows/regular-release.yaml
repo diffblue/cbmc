@@ -13,15 +13,15 @@ jobs:
       version: ${{ steps.split-version.outputs._1 }}
     steps:
       - uses: jungwinter/split@v2
-        id: split
+        id: split-ref
         with:
           msg: ${{ github.ref }}
-          seperator: '/'
+          separator: '/'
       - uses: jungwinter/split@v2
         id: split-version
         with:
-          msg: ${{ steps.split.outputs._2 }}
-          seperator: '-'
+          msg: ${{ steps.split-ref.outputs._2 }}
+          separator: '-'
   perform-release:
     name: Perform Release
     runs-on: ubuntu-20.04
