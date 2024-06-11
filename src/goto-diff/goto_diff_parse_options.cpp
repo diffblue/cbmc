@@ -107,6 +107,12 @@ int goto_diff_parse_optionst::doit()
     gcc_version.get("gcc");
     configure_gcc(gcc_version);
   }
+  else if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("clang");
+    configure_gcc(gcc_version);
+  }
 
   if(process_goto_program(options, goto_model1))
     return CPROVER_EXIT_INTERNAL_ERROR;

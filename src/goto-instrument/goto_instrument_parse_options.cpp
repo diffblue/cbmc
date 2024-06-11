@@ -139,6 +139,13 @@ int goto_instrument_parse_optionst::doit()
       gcc_version.get("gcc");
       configure_gcc(gcc_version);
     }
+    else if(
+      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+    {
+      gcc_versiont gcc_version;
+      gcc_version.get("clang");
+      configure_gcc(gcc_version);
+    }
 
     {
       const bool validate_only = cmdline.isset("validate-goto-binary");

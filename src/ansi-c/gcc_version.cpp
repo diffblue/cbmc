@@ -162,6 +162,12 @@ void configure_gcc(const gcc_versiont &gcc_version)
   config.ansi_c.gcc__float128_type =
     gcc_version.flavor == gcc_versiont::flavort::GCC &&
     gcc_version.is_at_least(4u, gcc_float128_minor_version);
+  config.ansi_c.__float128_is_keyword =
+    gcc_version.flavor == gcc_versiont::flavort::CLANG ||
+    (gcc_version.flavor == gcc_versiont::flavort::GCC &&
+     config.ansi_c.arch == "arm64" &&
+     config.ansi_c.os == configt::ansi_ct::ost::OS_MACOS &&
+     config.ansi_c.gcc__float128_type);
 
   config.ansi_c.float16_type =
     (gcc_version.flavor == gcc_versiont::flavort::GCC &&

@@ -69,6 +69,12 @@ api_sessiont::api_sessiont(const api_optionst &options)
     gcc_version.get("gcc");
     configure_gcc(gcc_version);
   }
+  else if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("clang");
+    configure_gcc(gcc_version);
+  }
 }
 
 api_sessiont::~api_sessiont() = default;

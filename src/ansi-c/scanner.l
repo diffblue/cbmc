@@ -584,9 +584,7 @@ enable_or_disable ("enable"|"disable")
                   loc(); return TOK_GCC_FLOAT80;
                 }
 
-"__float128"    { // This is a keyword for CLANG,
-                  // but a typedef for GCC
-                  if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+"__float128"    { if(PARSER.__float128_is_keyword)
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
