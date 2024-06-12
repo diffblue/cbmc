@@ -248,6 +248,6 @@ var NAVTREEINDEX32 =
 "classgcc__versiont.html#aecdc3e65542f03636803efb4aaa14797":[8,0,526,6],
 "classgdb__apit.html":[8,0,527],
 "classgdb__apit.html#a0b517a791a753d1584bdede7a8d96d17":[8,0,527,21],
-"classgdb__apit.html#a144c73385a6661d8b417424c1882112a":[8,0,527,7],
-"classgdb__apit.html#a17bdcb9bc80c520ba9889dd5636b35df":[8,0,527,26]
+"classgdb__apit.html#a0c77a6e6d05cf78efadfc40def842f63":[8,0,527,27],
+"classgdb__apit.html#a144c73385a6661d8b417424c1882112a":[8,0,527,7]
 };

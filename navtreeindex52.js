@@ -1,6 +1,5 @@
 var NAVTREEINDEX52 =
 {
-"classpoints__tot.html#af3b291bc5c72f15f14058fe511afac23":[8,0,916,10],
 "classpoints__tot.html#af78e6be6481721782ef509ad79f3e943":[8,0,916,2],
 "classpoints__tot.html#aff5723ea49cd014125760f714da625a1":[8,0,916,6],
 "classpolynomial__acceleratort.html":[8,0,917],
@@ -249,5 +248,6 @@ var NAVTREEINDEX52 =
 "classpropt.html#abc5dd44f95571105f68cc1724b5fa06c":[8,0,940,0],
 "classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca202ae688865d6a63a00ec10972ff4bc4":[8,0,940,0,1],
 "classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca27ccb7b2b3e57bbdd3c5c5a621a7da88":[8,0,940,0,0],
-"classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca841d0c19495a16ef6b381a7e1d793f9e":[8,0,940,0,2]
+"classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca841d0c19495a16ef6b381a7e1d793f9e":[8,0,940,0,2],
+"classpropt.html#accdc65578977abd9765c2e59a7e2aec0":[8,0,940,33]
 };
