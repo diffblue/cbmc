@@ -1,54 +1,54 @@
 <map id="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/c_typecheck_initializer.cpp" name="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/c_typecheck_initializer.cpp">
-<area shape="rect" id="node1" title="ANSI&#45;C Conversion / Type Checking." alt="" coords="933,5,1145,61"/>
-<area shape="rect" id="node2" href="$arith__tools_8h.html" title=" " alt="" coords="187,184,315,211"/>
-<area shape="rect" id="node27" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="517,333,614,360"/>
-<area shape="rect" id="node30" href="$byte__operators_8h.html" title="Expression classes for byte&#45;level operators." alt="" coords="5,184,163,211"/>
-<area shape="rect" id="node31" href="$c__types_8h.html" title=" " alt="" coords="720,109,829,136"/>
-<area shape="rect" id="node34" href="$config_8h.html" title=" " alt="" coords="1776,333,1875,360"/>
-<area shape="rect" id="node38" href="$cprover__prefix_8h.html" title=" " alt="" coords="2168,109,2320,136"/>
-<area shape="rect" id="node39" href="$expr__initializer_8h.html" title="Expression Initialization." alt="" coords="1892,259,2047,285"/>
+<area shape="rect" id="node1" title="ANSI&#45;C Conversion / Type Checking." alt="" coords="922,5,1134,61"/>
+<area shape="rect" id="node2" href="$arith__tools_8h.html" title=" " alt="" coords="5,184,133,211"/>
+<area shape="rect" id="node27" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="347,333,445,360"/>
+<area shape="rect" id="node30" href="$byte__operators_8h.html" title="Expression classes for byte&#45;level operators." alt="" coords="157,184,315,211"/>
+<area shape="rect" id="node31" href="$c__types_8h.html" title=" " alt="" coords="760,109,869,136"/>
+<area shape="rect" id="node34" href="$config_8h.html" title=" " alt="" coords="1716,333,1815,360"/>
+<area shape="rect" id="node38" href="$cprover__prefix_8h.html" title=" " alt="" coords="2144,109,2296,136"/>
+<area shape="rect" id="node39" href="$expr__initializer_8h.html" title="Expression Initialization." alt="" coords="1861,259,2016,285"/>
 <area shape="rect" id="node40" href="$string__constant_8h.html" title=" " alt="" coords="339,184,498,211"/>
-<area shape="rect" id="node41" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="1465,333,1650,360"/>
-<area shape="rect" id="node44" href="$anonymous__member_8h.html" title="C Language Type Checking." alt="" coords="779,333,949,360"/>
-<area shape="rect" id="node45" href="$c__typecheck__base_8h.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1147,109,1301,136"/>
-<area shape="rect" id="node52" href="$type2name_8h.html" title="Type Naming for C." alt="" coords="1990,781,2098,808"/>
-<area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="406,781,498,808"/>
-<area shape="rect" id="node8" href="$mp__arith_8h.html" title=" " alt="" coords="1659,483,1751,509"/>
-<area shape="rect" id="node11" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="374,259,463,285"/>
-<area shape="rect" id="node29" title=" " alt="" coords="221,259,280,285"/>
-<area shape="rect" id="node4" title=" " alt="" coords="419,856,485,883"/>
-<area shape="rect" id="node5" title=" " alt="" coords="947,856,1021,883"/>
-<area shape="rect" id="node6" title=" " alt="" coords="1563,856,1621,883"/>
-<area shape="rect" id="node7" title=" " alt="" coords="102,856,194,883"/>
-<area shape="rect" id="node9" title=" " alt="" coords="1616,557,1680,584"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1704,557,1829,584"/>
-<area shape="rect" id="node12" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="411,408,509,435"/>
-<area shape="rect" id="node13" title=" " alt="" coords="338,483,414,509"/>
-<area shape="rect" id="node14" title=" " alt="" coords="686,557,773,584"/>
-<area shape="rect" id="node15" href="$expr_8h.html" title=" " alt="" coords="822,483,885,509"/>
-<area shape="rect" id="node16" href="$as__const_8h.html" title=" " alt="" coords="797,557,888,584"/>
-<area shape="rect" id="node17" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="1014,557,1077,584"/>
-<area shape="rect" id="node24" href="$validation__mode_8h.html" title=" " alt="" coords="737,707,879,733"/>
-<area shape="rect" id="node25" href="$validate__types_8h.html" title=" " alt="" coords="845,632,976,659"/>
-<area shape="rect" id="node26" href="$validate__expressions_8h.html" title=" " alt="" coords="490,557,662,584"/>
-<area shape="rect" id="node18" href="$source__location_8h.html" title=" " alt="" coords="1464,632,1600,659"/>
-<area shape="rect" id="node23" href="$validate_8h.html" title=" " alt="" coords="226,632,313,659"/>
-<area shape="rect" id="node19" href="$deprecate_8h.html" title=" " alt="" coords="1277,707,1376,733"/>
-<area shape="rect" id="node20" href="$irep_8h.html" title=" " alt="" coords="1509,707,1568,733"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1992,707,2067,733"/>
-<area shape="rect" id="node21" title=" " alt="" coords="1561,781,1623,808"/>
-<area shape="rect" id="node28" title=" " alt="" coords="695,408,819,435"/>
+<area shape="rect" id="node41" href="$symbol__table__base_8h.html" title="Author: Diffblue Ltd." alt="" coords="1078,333,1263,360"/>
+<area shape="rect" id="node44" href="$anonymous__member_8h.html" title="C Language Type Checking." alt="" coords="749,333,920,360"/>
+<area shape="rect" id="node45" href="$c__typecheck__base_8h.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1225,109,1378,136"/>
+<area shape="rect" id="node52" href="$type2name_8h.html" title="Type Naming for C." alt="" coords="2010,781,2118,808"/>
+<area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="386,781,478,808"/>
+<area shape="rect" id="node8" href="$mp__arith_8h.html" title=" " alt="" coords="1457,483,1549,509"/>
+<area shape="rect" id="node11" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="201,259,290,285"/>
+<area shape="rect" id="node29" title=" " alt="" coords="53,259,112,285"/>
+<area shape="rect" id="node4" title=" " alt="" coords="399,856,465,883"/>
+<area shape="rect" id="node5" title=" " alt="" coords="920,856,995,883"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1540,856,1599,883"/>
+<area shape="rect" id="node7" title=" " alt="" coords="203,856,295,883"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1727,557,1791,584"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1527,557,1652,584"/>
+<area shape="rect" id="node12" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="378,408,475,435"/>
+<area shape="rect" id="node13" title=" " alt="" coords="369,483,445,509"/>
+<area shape="rect" id="node14" title=" " alt="" coords="470,557,557,584"/>
+<area shape="rect" id="node15" href="$expr_8h.html" title=" " alt="" coords="714,483,777,509"/>
+<area shape="rect" id="node16" href="$as__const_8h.html" title=" " alt="" coords="777,557,868,584"/>
+<area shape="rect" id="node17" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="994,557,1057,584"/>
+<area shape="rect" id="node24" href="$validation__mode_8h.html" title=" " alt="" coords="749,707,891,733"/>
+<area shape="rect" id="node25" href="$validate__types_8h.html" title=" " alt="" coords="857,632,988,659"/>
+<area shape="rect" id="node26" href="$validate__expressions_8h.html" title=" " alt="" coords="581,557,753,584"/>
+<area shape="rect" id="node18" href="$source__location_8h.html" title=" " alt="" coords="1425,632,1561,659"/>
+<area shape="rect" id="node23" href="$validate_8h.html" title=" " alt="" coords="206,632,293,659"/>
+<area shape="rect" id="node19" href="$deprecate_8h.html" title=" " alt="" coords="1113,707,1212,733"/>
+<area shape="rect" id="node20" href="$irep_8h.html" title=" " alt="" coords="1503,707,1561,733"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1968,707,2043,733"/>
+<area shape="rect" id="node21" title=" " alt="" coords="1717,781,1779,808"/>
+<area shape="rect" id="node28" title=" " alt="" coords="993,408,1117,435"/>
 <area shape="rect" id="node32" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="573,184,688,211"/>
-<area shape="rect" id="node33" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="539,259,674,285"/>
-<area shape="rect" id="node35" href="$ieee__float_8h.html" title=" " alt="" coords="1831,408,1929,435"/>
-<area shape="rect" id="node37" title=" " alt="" coords="1659,408,1701,435"/>
-<area shape="rect" id="node36" href="$format__spec_8h.html" title=" " alt="" coords="1827,483,1941,509"/>
-<area shape="rect" id="node42" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="1096,408,1179,435"/>
-<area shape="rect" id="node43" title=" " alt="" coords="1476,408,1527,435"/>
-<area shape="rect" id="node46" href="$namespace_8h.html" title=" " alt="" coords="1203,632,1338,659"/>
-<area shape="rect" id="node47" href="$std__code_8h.html" title=" " alt="" coords="904,184,1021,211"/>
-<area shape="rect" id="node49" href="$typecheck_8h.html" title=" " alt="" coords="1262,333,1389,360"/>
-<area shape="rect" id="node51" href="$designator_8h.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1481,483,1583,509"/>
-<area shape="rect" id="node48" href="$std__code__base_8h.html" title=" " alt="" coords="699,259,829,285"/>
-<area shape="rect" id="node50" href="$src_2util_2message_8h.html" title=" " alt="" coords="1353,483,1447,509"/>
+<area shape="rect" id="node33" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="385,259,519,285"/>
+<area shape="rect" id="node35" href="$ieee__float_8h.html" title=" " alt="" coords="1807,408,1905,435"/>
+<area shape="rect" id="node37" title=" " alt="" coords="1323,408,1365,435"/>
+<area shape="rect" id="node36" href="$format__spec_8h.html" title=" " alt="" coords="1803,483,1917,509"/>
+<area shape="rect" id="node42" href="$symbol_8h.html" title="Symbol table entry." alt="" coords="1141,408,1224,435"/>
+<area shape="rect" id="node43" title=" " alt="" coords="1248,408,1299,435"/>
+<area shape="rect" id="node46" href="$namespace_8h.html" title=" " alt="" coords="1165,632,1299,659"/>
+<area shape="rect" id="node47" href="$std__code_8h.html" title=" " alt="" coords="995,184,1112,211"/>
+<area shape="rect" id="node49" href="$typecheck_8h.html" title=" " alt="" coords="1441,333,1567,360"/>
+<area shape="rect" id="node51" href="$designator_8h.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1625,483,1727,509"/>
+<area shape="rect" id="node48" href="$std__code__base_8h.html" title=" " alt="" coords="544,259,675,285"/>
+<area shape="rect" id="node50" href="$src_2util_2message_8h.html" title=" " alt="" coords="1339,483,1432,509"/>
 </map>

@@ -1,6 +1,5 @@
 var classcomplexity__limitert =
 [
-    [ "complexity_limitert", "classcomplexity__limitert.html#aba32ddd235c5e1a1b9c9c92e46b81b1b", null ],
     [ "complexity_limitert", "classcomplexity__limitert.html#a00c4abfba1bc18fc5f3a071b424f2cc6", null ],
     [ "are_loop_children_too_complicated", "classcomplexity__limitert.html#afd412dba3d3cca7d8743aaa70aef696a", null ],
     [ "bounded_expr_size", "classcomplexity__limitert.html#a159412040bc5f38f99cbd8f29fed1b9f", null ],
