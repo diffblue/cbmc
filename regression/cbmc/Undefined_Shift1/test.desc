@@ -7,7 +7,7 @@ main.c
 ^\[.*\] line 5 shift operand is negative in .*: SUCCESS$
 ^\[.*\] line 7 shift distance too large in .*: FAILURE$
 ^\[.*\] line 15 shift distance is negative in .*: FAILURE$
-^\[.*\] line 15 shift distance too large in .*: SUCCESS$
+^\[.*\] line 15 shift distance too large in .*: UNKNOWN$
 ^\[.*\] line 20 shift operand is negative in .*: FAILURE$
 ^\*\* 4 of 9 failed
 ^VERIFICATION FAILED$

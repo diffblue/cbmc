@@ -20,9 +20,20 @@ void negative_operand()
   int s = -1 << ((sizeof(int) - 1) * 8); // negative operand
 }
 
+int nondet_int();
+
 int main()
 {
-  shift_distance_too_large();
-  shift_distance_negative();
-  negative_operand();
+  switch(nondet_int())
+  {
+  case 0:
+    shift_distance_too_large();
+    break;
+  case 1:
+    shift_distance_negative();
+    break;
+  case 2:
+    negative_operand();
+    break;
+  }
 }
