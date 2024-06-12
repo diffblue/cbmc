@@ -1,6 +1,5 @@
 var NAVTREEINDEX64 =
 {
-"classstring__builtin__function__with__no__evalt.html":[8,0,1190],
 "classstring__builtin__function__with__no__evalt.html#a233a5935faa0f5d6cae3e2ce3c180e9e":[8,0,1190,9],
 "classstring__builtin__function__with__no__evalt.html#a23b0ef6f2a8330157f949fa1107f51f0":[8,0,1190,2],
 "classstring__builtin__function__with__no__evalt.html#a466d6c67e9a464906681696df2aca739":[8,0,1190,7],
@@ -40,13 +39,11 @@ var NAVTREEINDEX64 =
 "classstring__concatenation__builtin__functiont.html#a8ebe947ad16ce8800165e9b0b4efbe07":[8,0,1193,4],
 "classstring__concatenation__builtin__functiont.html#af0a664ebf676c688ad93c779f405c42f":[8,0,1193,3],
 "classstring__constantt.html":[8,0,1194],
-"classstring__constantt.html#a33fb65cf316435c41baa66781bf64cc9":[8,0,1194,7],
-"classstring__constantt.html#a34a521f68f7a8ee194dc084fa7cde060":[8,0,1194,6],
-"classstring__constantt.html#a68d5c40c22c92dc84f02daadecf2ed46":[8,0,1194,2],
-"classstring__constantt.html#a87ae4b3809d96986daa7fdd2f34ad8ee":[8,0,1194,5],
-"classstring__constantt.html#a8d9b25026ecc9f37ecb055aa1f0469bd":[8,0,1194,3],
-"classstring__constantt.html#aab1988bfa2241269063537dfb2afdef6":[8,0,1194,4],
-"classstring__constantt.html#aacf54266511edecf54c966ce7fa9dec5":[8,0,1194,8],
+"classstring__constantt.html#a33fb65cf316435c41baa66781bf64cc9":[8,0,1194,5],
+"classstring__constantt.html#a34a521f68f7a8ee194dc084fa7cde060":[8,0,1194,4],
+"classstring__constantt.html#a87ae4b3809d96986daa7fdd2f34ad8ee":[8,0,1194,3],
+"classstring__constantt.html#aab1988bfa2241269063537dfb2afdef6":[8,0,1194,2],
+"classstring__constantt.html#aacf54266511edecf54c966ce7fa9dec5":[8,0,1194,6],
 "classstring__constantt.html#ab22293fc19e423e3a8b6eb9bb770be50":[8,0,1194,0],
 "classstring__constantt.html#ac6d7905ad736d9b688667b518e490ff0":[8,0,1194,1],
 "classstring__constraint__generatort.html":[8,0,1195],
@@ -249,5 +246,8 @@ var NAVTREEINDEX64 =
 "classstring__of__int__builtin__functiont.html#a1651744b55092b4b9b62c18ad4790c61":[8,0,1207,0],
 "classstring__of__int__builtin__functiont.html#a1b2171a70191550ed5c935ff2921d9aa":[8,0,1207,1],
 "classstring__of__int__builtin__functiont.html#a26724b5b14584644c34961db03c8f3f2":[8,0,1207,3],
-"classstring__of__int__builtin__functiont.html#a9e88af25f07795fe8d277d45c298e1be":[8,0,1207,4]
+"classstring__of__int__builtin__functiont.html#a9e88af25f07795fe8d277d45c298e1be":[8,0,1207,4],
+"classstring__of__int__builtin__functiont.html#aaec83a4f292cfc09555e45ffff2bbbcc":[8,0,1207,2],
+"classstring__ptr__hash.html":[8,0,1208],
+"classstring__ptr__hash.html#aa55c879aa6e941f35e80cc141787c590":[8,0,1208,0]
 };
