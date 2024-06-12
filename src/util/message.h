@@ -10,14 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_MESSAGE_H
 #define CPROVER_UTIL_MESSAGE_H
 
+#include "invariant.h"
+#include "source_location.h"
+
 #include <functional>
 #include <iosfwd>
 #include <sstream>
 #include <string>
-
-#include "deprecate.h"
-#include "invariant.h"
-#include "source_location.h"
 
 class json_objectt;
 class jsont;
@@ -190,13 +189,6 @@ public:
   }
 
   // constructors, destructor
-
-  DEPRECATED(SINCE(2019, 1, 7, "use messaget(message_handler) instead"))
-  messaget():
-    message_handler(nullptr),
-    mstream(M_DEBUG, *this)
-  {
-  }
 
   messaget(const messaget &other):
     message_handler(other.message_handler),
