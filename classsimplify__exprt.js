@@ -4,7 +4,6 @@ var classsimplify__exprt =
     [ "simplify_exprt", "classsimplify__exprt.html#a8c8c1f39f317c70bdbe281af3ac5103b", null ],
     [ "~simplify_exprt", "classsimplify__exprt.html#aa444b7069d731ff599c8931bb643e990", null ],
     [ "changed", "classsimplify__exprt.html#a4891492541975b0557b78cbbd73bbed1", null ],
-    [ "is_bitvector_type", "classsimplify__exprt.html#a04d0444a8114c66481ccb2d7132aa500", null ],
     [ "simplify", "classsimplify__exprt.html#acc99ab3b39ccee8109412b8b7c198bbc", null ],
     [ "simplify_abs", "classsimplify__exprt.html#a1eb7394775bf3f7012ca2c20821a71de", null ],
     [ "simplify_address_of", "classsimplify__exprt.html#a4cc3f6c3f3572573eebaa1044b5c8303", null ],
