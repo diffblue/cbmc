@@ -24,7 +24,7 @@ __CPROVER_size_t __VERIFIER_nondet_size(void);
 typedef struct
 {
   /// \brief  True iff __CPROVER_w_ok(lb, size) holds at creation
-  __CPROVER_bool is_writable;
+  unsigned char is_writable;
   /// \brief Size of the range in bytes
   __CPROVER_size_t size;
   /// \brief Lower bound address of the range
@@ -56,9 +56,9 @@ typedef struct
   /// \brief Number of elements currently in the elems array
   __CPROVER_size_t nof_elems;
   /// \brief True iff nof_elems is 0
-  __CPROVER_bool is_empty;
+  unsigned char is_empty;
   /// \brief True iff elems is indexed by the object id of the pointers
-  __CPROVER_bool indexed_by_object_id;
+  unsigned char indexed_by_object_id;
   /// \brief Array of void *pointers, indexed by their object ID
   /// or some other order
   void **elems;
@@ -90,17 +90,17 @@ typedef struct
   /// \brief Object set recording the deallocations (used by was_freed)
   __CPROVER_contracts_obj_set_ptr_t linked_deallocated;
   /// \brief True iff the write set checks requires clauses in an assumption ctx
-  __CPROVER_bool assume_requires_ctx;
+  unsigned char assume_requires_ctx;
   /// \brief True iff the write set checks requires clauses in an assertion ctx
-  __CPROVER_bool assert_requires_ctx;
+  unsigned char assert_requires_ctx;
   /// \brief True iff the write set checks ensures clauses in an assumption ctx
-  __CPROVER_bool assume_ensures_ctx;
+  unsigned char assume_ensures_ctx;
   /// \brief True iff this write set checks ensures clauses in an assertion ctx
-  __CPROVER_bool assert_ensures_ctx;
+  unsigned char assert_ensures_ctx;
   /// \brief True iff dynamic allocation is allowed (default: true)
-  __CPROVER_bool allow_allocate;
+  unsigned char allow_allocate;
   /// \brief True iff dynamic deallocation is allowed (default: true)
-  __CPROVER_bool allow_deallocate;
+  unsigned char allow_deallocate;
 } __CPROVER_contracts_write_set_t;
 
 /// \brief Type of pointers to \ref __CPROVER_contracts_write_set_t.

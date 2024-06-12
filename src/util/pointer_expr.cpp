@@ -39,13 +39,19 @@ static void build_object_descriptor_rec(
     build_object_descriptor_rec(ns, index.array(), dest);
 
     auto sub_size = size_of_expr(expr.type(), ns);
-    CHECK_RETURN(sub_size.has_value());
 
-    dest.offset() = plus_exprt(
-      dest.offset(),
-      mult_exprt(
-        typecast_exprt::conditional_cast(index.index(), c_index_type()),
-        typecast_exprt::conditional_cast(sub_size.value(), c_index_type())));
+    if(sub_size.has_value())
+    {
+      dest.offset() = plus_exprt(
+        dest.offset(),
+        mult_exprt(
+          typecast_exprt::conditional_cast(index.index(), c_index_type()),
+          typecast_exprt::conditional_cast(sub_size.value(), c_index_type())));
+    }
+    else
+    {
+      dest.offset() = exprt(ID_unknown);
+    }
   }
   else if(expr.id() == ID_member)
   {
