@@ -662,7 +662,7 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
 {
-  if(!is_bitvector_type(expr.type()))
+  if(!can_cast_type<bitvector_typet>(expr.type()))
     return unchanged(expr);
 
   // check if these are really boolean
@@ -838,7 +838,7 @@ simplify_exprt::simplify_extractbit(const extractbit_exprt &expr)
 {
   const typet &src_type = expr.src().type();
 
-  if(!is_bitvector_type(src_type))
+  if(!can_cast_type<bitvector_typet>(src_type))
     return unchanged(expr);
 
   const std::size_t src_bit_width = to_bitvector_type(src_type).get_width();
@@ -869,7 +869,7 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
 
   concatenation_exprt new_expr = expr;
 
-  if(is_bitvector_type(new_expr.type()))
+  if(can_cast_type<bitvector_typet>(new_expr.type()))
   {
     // first, turn bool into bvec[1]
     Forall_operands(it, new_expr)
@@ -891,10 +891,10 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
       exprt &opi = new_expr.operands()[i];
       exprt &opn = new_expr.operands()[i + 1];
 
-      if(opi.is_constant() &&
-         opn.is_constant() &&
-         is_bitvector_type(opi.type()) &&
-         is_bitvector_type(opn.type()))
+      if(
+        opi.is_constant() && opn.is_constant() &&
+        can_cast_type<bitvector_typet>(opi.type()) &&
+        can_cast_type<bitvector_typet>(opn.type()))
       {
         // merge!
         const auto &value_i = to_constant_expr(opi).get_value();
@@ -964,12 +964,10 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
       exprt &opi = new_expr.operands()[i];
       exprt &opn = new_expr.operands()[i + 1];
 
-      if(opi.is_constant() &&
-         opn.is_constant() &&
-         (opi.type().id()==ID_verilog_unsignedbv ||
-          is_bitvector_type(opi.type())) &&
-         (opn.type().id()==ID_verilog_unsignedbv ||
-          is_bitvector_type(opn.type())))
+      if(
+        opi.is_constant() && opn.is_constant() &&
+        can_cast_type<bitvector_typet>(opi.type()) &&
+        can_cast_type<bitvector_typet>(opn.type()))
       {
         // merge!
         const std::string new_value=
@@ -1002,7 +1000,7 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
 simplify_exprt::resultt<>
 simplify_exprt::simplify_shifts(const shift_exprt &expr)
 {
-  if(!is_bitvector_type(expr.type()))
+  if(!can_cast_type<bitvector_typet>(expr.type()))
     return unchanged(expr);
 
   const auto distance = numeric_cast<mp_integer>(expr.distance());
@@ -1133,8 +1131,9 @@ simplify_exprt::simplify_extractbits(const extractbits_exprt &expr)
 {
   const typet &op0_type = expr.src().type();
 
-  if(!is_bitvector_type(op0_type) &&
-     !is_bitvector_type(expr.type()))
+  if(
+    !can_cast_type<bitvector_typet>(op0_type) &&
+    !can_cast_type<bitvector_typet>(expr.type()))
   {
     return unchanged(expr);
   }
