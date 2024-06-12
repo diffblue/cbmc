@@ -45,7 +45,6 @@ var classgoto__symext =
     [ "make_auto_object", "classgoto__symext.html#aae10d1a9173dd069eaa66c029c1ed5e5", null ],
     [ "merge_goto", "classgoto__symext.html#a9a742ff98f05db5a3352828b64368c77", null ],
     [ "merge_gotos", "classgoto__symext.html#adbac422db113178b04ff903c0f1a75f2", null ],
-    [ "no_body", "classgoto__symext.html#a231663084d1f03e5ea2639d06f40dd97", null ],
     [ "parameter_assignments", "classgoto__symext.html#a90d470833e11a0e3a7dd8fc7968f7176", null ],
     [ "phi_function", "classgoto__symext.html#a4cd505a37141ca033b2ffa202956e489", null ],
     [ "print_callstack_entry", "classgoto__symext.html#ae24a829d1a624c81e5e90a7361e93fb0", null ],

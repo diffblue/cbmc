@@ -1,6 +1,5 @@
 var NAVTREEINDEX133 =
 {
-"structjava__bytecode__convert__methodt_1_1holet.html#a0b75805a4fb8c6a37265b817f57aae59":[8,0,687,2,0],
 "structjava__bytecode__convert__methodt_1_1holet.html#aa44d72cd49163049a49c59c45ffa5b97":[8,0,687,2,1],
 "structjava__bytecode__convert__methodt_1_1local__variable__with__holest.html":[8,0,687,3],
 "structjava__bytecode__convert__methodt_1_1local__variable__with__holest.html#a287ee21640425289bb0390f7e3e32e91":[8,0,687,3,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX133 =
 "structlevenshtein__automatont.html#a79a77a3a2dbda6ab5dadff8a95637033":[8,0,756,4],
 "structlevenshtein__automatont.html#aa4d9685993780c0fd887995425302239":[8,0,756,5],
 "structlevenshtein__automatont.html#aa8e655c3e8f3d77dd362c68289676cba":[8,0,756,6],
-"structlinkingt_1_1adjust__type__infot.html":[8,0,761,0]
+"structlinkingt_1_1adjust__type__infot.html":[8,0,761,0],
+"structlinkingt_1_1adjust__type__infot.html#a0606e234b57e9477df1fd9745603983a":[8,0,761,0,4]
 };
