@@ -1,9 +1,10 @@
 CORE
 main.c
 
+^\[main\.no-body\.f\] line 9 no body for callee f: FAILURE$
+^\[main\.assertion\.1] line 10 assertion i==1: FAILURE$
+^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-^\*\*\*\* WARNING: no body for function f$
-^VERIFICATION FAILED$
 --
 ^warning: ignoring

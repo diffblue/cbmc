@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --dump-c
 ^EXIT=0$
@@ -6,3 +6,5 @@ main.c
 va_list
 --
 ^warning: ignoring
+--
+We are missing __CPROVER_va_start

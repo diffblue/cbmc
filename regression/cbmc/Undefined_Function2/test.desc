@@ -1,9 +1,10 @@
 CORE
 main.c
 
+^\[main\.no-body\.asd\] line 7 no body for callee asd: FAILURE$
+^\[main\.assertion\.1\] line 8 assertion v1==v2: FAILURE$
+^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-^\*\*\*\* WARNING: no body for function asd$
-^VERIFICATION FAILED$
 --
 ^warning: ignoring

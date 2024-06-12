@@ -38,8 +38,6 @@ symex_configt::symex_configt(const optionst &options)
     simplify_opt(options.get_bool_option("simplify")),
     unwinding_assertions(options.get_bool_option("unwinding-assertions")),
     partial_loops(options.get_bool_option("partial-loops")),
-    havoc_undefined_functions(
-      options.get_bool_option("havoc-undefined-functions")),
     run_validation_checks(options.get_bool_option("validate-ssa-equation")),
     show_symex_steps(options.get_bool_option("show-goto-symex-steps")),
     show_points_to_sets(options.get_bool_option("show-points-to-sets")),

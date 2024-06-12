@@ -1,4 +1,4 @@
-typedef unsigned int size_t;
+typedef __CPROVER_size_t size_t;
 typedef int ssize_t;
 typedef int atomic_t;
 typedef unsigned gfp_t;
