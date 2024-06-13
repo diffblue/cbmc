@@ -397,8 +397,8 @@ jobs:
         run: cd build; ctest . -V -L CORE -j2
 
   # This job takes approximately 26 to 46 minutes
-  check-ubuntu-22_04-cmake-gcc-13:
-    runs-on: ubuntu-22.04
+  check-ubuntu-24_04-cmake-gcc-13:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -430,10 +430,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-22.04-Release-gcc-13-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-Release-gcc-13-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-22.04-Release-gcc-13-${{ github.ref }}
-            ${{ runner.os }}-22.04-Release-gcc-13
+            ${{ runner.os }}-24.04-Release-gcc-13-${{ github.ref }}
+            ${{ runner.os }}-24.04-Release-gcc-13
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
