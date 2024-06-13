@@ -36,6 +36,8 @@ void local_bitvector_analysist::flagst::print(std::ostream &out) const
     out << "+static_lifetime";
   if(is_integer_address())
     out << "+integer_address";
+  if(is_maybe_alive())
+    out << "+maybe_alive";
 }
 
 bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
@@ -55,8 +57,7 @@ bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
 bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 {
   localst::locals_sett::const_iterator it = locals.locals.find(identifier);
-  return it != locals.locals.end() && ns.lookup(*it).type.id() == ID_pointer &&
-         !dirty(identifier);
+  return it != locals.locals.end() && !dirty(identifier);
 }
 
 void local_bitvector_analysist::assign_lhs(
@@ -230,6 +231,14 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     else
       return flagst::mk_unknown();
   }
+  else if(rhs.id() == ID_decl)
+  {
+    return flagst::mk_uninitialized() | flagst::mk_maybe_alive();
+  }
+  else if(rhs.id() == ID_dead)
+  {
+    return flagst::mk_uninitialized();
+  }
   else
     return flagst::mk_unknown();
 }
@@ -275,18 +284,12 @@ void local_bitvector_analysist::build()
 
     case DECL:
       assign_lhs(
-        instruction.decl_symbol(),
-        exprt(ID_uninitialized),
-        loc_info_src,
-        loc_info_dest);
+        instruction.decl_symbol(), exprt(ID_decl), loc_info_src, loc_info_dest);
       break;
 
     case DEAD:
       assign_lhs(
-        instruction.dead_symbol(),
-        exprt(ID_uninitialized),
-        loc_info_src,
-        loc_info_dest);
+        instruction.dead_symbol(), exprt(ID_dead), loc_info_src, loc_info_dest);
       break;
 
     case FUNCTION_CALL:
