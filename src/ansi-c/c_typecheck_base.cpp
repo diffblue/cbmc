@@ -77,8 +77,9 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
       // versions of Visual Studio insist to use this in their C library, and
       // GCC just warns as well.
       warning().source_location = symbol.value.find_source_location();
-      warning() << "'extern' symbol '" << new_name
-                << "' should not have an initializer" << eom;
+      warning() << quote_begin << "extern" << quote_end << " symbol "
+                << quote_begin << new_name << quote_end
+                << " should not have an initializer " << eom;
     }
   }
   else if(!is_function && symbol.value.id()==ID_code)

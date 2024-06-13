@@ -1,7 +1,7 @@
 CORE symex-driven-lazy-loading-expected-failure
 org.symphonyoss.symphony.clients.model.SymStream
 --show-goto-functions --verbosity 10
-lambda function reference toSymUser in class "org\.symphonyoss\.symphony\.clients\.model\.SymStream"
+lambda function reference toSymUser in class 'org\.symphonyoss\.symphony\.clients\.model\.SymStream'
 ^EXIT=0$
 ^SIGNAL=0$
 --

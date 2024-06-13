@@ -95,6 +95,8 @@ const messaget::commandt messaget::bright_yellow(93);
 const messaget::commandt messaget::bright_blue(94);
 const messaget::commandt messaget::bright_magenta(95);
 const messaget::commandt messaget::bright_cyan(96);
+const messaget::commandt messaget::quote_begin('<');
+const messaget::commandt messaget::quote_end('>');
 
 /// Parse a (user-)provided string as a verbosity level and set it as the
 /// verbosity of dest.

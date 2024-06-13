@@ -3,7 +3,7 @@ Test
 --classpath `../../../../scripts/format_classpath.sh ./NotHere .`
 ^EXIT=0$
 ^SIGNAL=0$
-Warning: failed to access directory `./NotHere'
+Warning: failed to access directory './NotHere'
 --
 --
 Note: 'java' does not emit such a warning.

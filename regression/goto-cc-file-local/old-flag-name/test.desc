@@ -4,7 +4,7 @@ final-link assertion-check old-flag
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-^The `--export-function-local-symbols` flag is deprecated. Please use `--export-file-local-symbols` instead.$
+^The '--export-function-local-symbols' flag is deprecated. Please use '--export-file-local-symbols' instead.$
 --
 ^warning: ignoring
 ^\*\*\*\* WARNING: no body for function
