@@ -757,19 +757,21 @@ dfcc_instrumentt::is_dead_object_update(const exprt &lhs, const exprt &rhs)
 {
   if(
     lhs.id() == ID_symbol &&
-    to_symbol_expr(lhs).get_identifier() == CPROVER_PREFIX "dead_object")
+    to_symbol_expr(lhs).get_identifier() == CPROVER_PREFIX "dead_object" &&
+    rhs.id() == ID_if)
   {
-    // error out if rhs is different from `if_exprt(nondet, ptr, dead_object)`
-    PRECONDITION(rhs.id() == ID_if);
+    // only handle `if_exprt(nondet, ptr, dead_object)`
     auto &if_expr = to_if_expr(rhs);
-    PRECONDITION(can_cast_expr<side_effect_expr_nondett>(if_expr.cond()));
-    PRECONDITION(if_expr.false_case() == lhs);
-    return if_expr.true_case();
+    if(
+      if_expr.cond().id() == ID_side_effect &&
+      to_side_effect_expr(if_expr.cond()).get_statement() == ID_nondet &&
+      if_expr.false_case() == lhs)
+    {
+      return if_expr.true_case();
+    }
   }
-  else
-  {
-    return {};
-  }
+
+  return {};
 }
 
 void dfcc_instrumentt::instrument_assign(
