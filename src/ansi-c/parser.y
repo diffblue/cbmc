@@ -1006,7 +1006,7 @@ post_declarator_attribute:
           parser_stack($$).set(ID_flavor, ID_gcc);
           parser_stack($$).operands().swap(parser_stack($4).operands());
         }
-        | gcc_attribute_specifier
+        | attribute_specifier
         ;
 
 post_declarator_attributes:
@@ -1112,8 +1112,8 @@ declaration_qualifier_list:
         {
           $$=merge($1, $2);
         }
-        | gcc_attribute_specifier
-        | declaration_qualifier_list gcc_attribute_specifier
+        | attribute_specifier
+        | declaration_qualifier_list attribute_specifier
         {
           $$=merge($1, $2);
         }
@@ -1132,7 +1132,7 @@ type_qualifier_list:
         /* The following is to allow mixing of type attributes with
            type qualifiers, but the list has to start with a
            proper type qualifier. */
-        | type_qualifier_list gcc_attribute_specifier
+        | type_qualifier_list attribute_specifier
         {
           $$=merge($1, $2);
         }
@@ -1178,12 +1178,12 @@ alignas_specifier:
 
 attribute_or_type_qualifier:
           type_qualifier
-        | gcc_attribute_specifier
+        | attribute_specifier
         ;
 
 attribute_or_type_qualifier_or_storage_class:
           type_qualifier
-        | gcc_attribute_specifier
+        | attribute_specifier
         | storage_class
         ;
 
@@ -1669,11 +1669,15 @@ gcc_attribute_list:
         }
         ;          
 
+attribute_specifier:
+          gcc_attribute_specifier
+        | TOK_NORETURN
+        { $$=$1; set($$, ID_noreturn); }
+        ;
+
 gcc_attribute_specifier:
           TOK_GCC_ATTRIBUTE '(' '(' gcc_attribute_list ')' ')'
         { $$=$4; }
-        | TOK_NORETURN
-        { $$=$1; set($$, ID_noreturn); }
         ;
 
 gcc_type_attribute_opt:
