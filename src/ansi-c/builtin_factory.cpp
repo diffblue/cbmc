@@ -186,6 +186,15 @@ bool builtin_factory(
 
       if(find_pattern(pattern, gcc_builtin_headers_ia32_6, s))
         return convert(identifier, s, symbol_table, mh);
+
+      if(find_pattern(pattern, gcc_builtin_headers_ia32_7, s))
+        return convert(identifier, s, symbol_table, mh);
+
+      if(find_pattern(pattern, gcc_builtin_headers_ia32_8, s))
+        return convert(identifier, s, symbol_table, mh);
+
+      if(find_pattern(pattern, gcc_builtin_headers_ia32_9, s))
+        return convert(identifier, s, symbol_table, mh);
     }
     else if(config.ansi_c.arch=="arm64" ||
             config.ansi_c.arch=="armel" ||
