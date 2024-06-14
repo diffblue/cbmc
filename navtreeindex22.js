@@ -1,6 +1,5 @@
 var NAVTREEINDEX22 =
 {
-"classcpp__languaget.html#a51a0a5dc952f7def5c3af47cb6e481a6":[8,0,311,13],
 "classcpp__languaget.html#a5a545b097cfbf4a2677862ecee8513c4":[8,0,311,2],
 "classcpp__languaget.html#a5d7258f5eed40cd7a339e7e552272ca0":[8,0,311,9],
 "classcpp__languaget.html#a66c6a8ca531115a048e4079a569e69ac":[8,0,311,16],
@@ -162,10 +161,8 @@ var NAVTREEINDEX22 =
 "classcpp__storage__spect.html#ab70860a3d8e5e0a2e7b7fda3445d80b9":[8,0,324,5],
 "classcpp__storage__spect.html#abfa14a05440e9e0cc10d42ce7e526ff3":[8,0,324,20],
 "classcpp__storage__spect.html#ac00d14a06d2f916b493ad1462c5e7df7":[8,0,324,18],
-"classcpp__storage__spect.html#ac875a8fc262e10398158116e1a0f0d36":[8,0,324,16],
 "classcpp__storage__spect.html#ac90bba24dab6baabd408aa46dc191eb9":[8,0,324,12],
 "classcpp__storage__spect.html#ad5fd2e2a0be433a5438fb43a3b1ef5c6":[8,0,324,21],
-"classcpp__storage__spect.html#ae0b2b15ea3a0248dc3de28baeb69aa23":[8,0,324,15],
 "classcpp__storage__spect.html#aee2bb06e425b56b28cde11051cefc5c4":[8,0,324,2],
 "classcpp__storage__spect.html#af5da1c4f9740eda0be789e50fc113e24":[8,0,324,22],
 "classcpp__storage__spect.html#af77f4d2a3a7ac78da24db00a86588544":[8,0,324,10],
@@ -249,5 +246,8 @@ var NAVTREEINDEX22 =
 "classcpp__typecheck__resolvet.html#a8a94d3793c0faa944904eb9ac117d3be":[8,0,332,4],
 "classcpp__typecheck__resolvet.html#a8b6497a942dac2e65b1b739bc7ab1263":[8,0,332,15],
 "classcpp__typecheck__resolvet.html#a956dd4d3abdaa6e4631600e9796abed5":[8,0,332,21],
-"classcpp__typecheck__resolvet.html#a9d625d0942ab73c4ddc101bb76ccb53c":[8,0,332,18]
+"classcpp__typecheck__resolvet.html#a9d625d0942ab73c4ddc101bb76ccb53c":[8,0,332,18],
+"classcpp__typecheck__resolvet.html#aa5672d6418bb35d4cb228cec9a5d7000":[8,0,332,7],
+"classcpp__typecheck__resolvet.html#ab671c860eea39195afc3679f1eff3bd9":[8,0,332,32],
+"classcpp__typecheck__resolvet.html#ab6abc06de7da23143cf36e2fdddd0c68":[8,0,332,10]
 };
