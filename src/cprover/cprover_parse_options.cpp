@@ -131,13 +131,6 @@ int cprover_parse_optionst::main()
       gcc_version.get("gcc");
       configure_gcc(gcc_version);
     }
-    else if(
-      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
-    {
-      gcc_versiont gcc_version;
-      gcc_version.get("clang");
-      configure_gcc(gcc_version);
-    }
 
     console_message_handlert message_handler;
     null_message_handlert null_message_handler;

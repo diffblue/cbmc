@@ -73,12 +73,6 @@ int goto_synthesizer_parse_optionst::doit()
     gcc_version.get("gcc");
     configure_gcc(gcc_version);
   }
-  else if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
-  {
-    gcc_versiont gcc_version;
-    gcc_version.get("clang");
-    configure_gcc(gcc_version);
-  }
 
   update_max_malloc_size(goto_model, ui_message_handler);
 

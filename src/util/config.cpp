@@ -986,6 +986,13 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.os=configt::ansi_ct::ost::OS_MACOS;
     ansi_c.mode = ansi_ct::flavourt::CLANG;
     ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
+    // configure_gcc sets these with additional version-of-clang level of
+    // detail, but the below are reasonable defaults for modern clang
+    // installations
+    ansi_c.__float128_is_keyword = true;
+    ansi_c.float16_type = true;
+    ansi_c.bf16_type = true;
+    ansi_c.fp16_type = true;
   }
   else if(os == "linux" || os == "solaris" || os == "netbsd" || os == "hurd")
   {
@@ -1000,6 +1007,13 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
     ansi_c.mode=ansi_ct::flavourt::CLANG;
     ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
+    // configure_gcc sets these with additional version-of-clang level of
+    // detail, but the below are reasonable defaults for modern clang
+    // installations
+    ansi_c.__float128_is_keyword = true;
+    ansi_c.float16_type = true;
+    ansi_c.bf16_type = true;
+    ansi_c.fp16_type = true;
   }
   else
   {
