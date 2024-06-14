@@ -10,7 +10,7 @@ env:
   windows-vcpus: 4
 
 jobs:
-  # This job takes approximately 21 to 40 minutes
+  # This job takes approximately 15 to 40 minutes
   check-ubuntu-20_04-make-gcc:
     runs-on: ubuntu-20.04
     steps:
@@ -164,7 +164,7 @@ jobs:
   # to be run by the job above, which is basically the same, but more comprehensive.
   # The reason we opted for a new job is that adding a `test-z3` step to the current
   # jobs increases the job runtime to unacceptable levels (over 2hrs).
-  # This job takes approximately 5 to 18 minutes
+  # This job takes approximately 3 to 18 minutes
   check-ubuntu-20_04-make-clang-smt-z3:
     runs-on: ubuntu-20.04
     env:
@@ -206,7 +206,7 @@ jobs:
       - name: Run regression/cbmc tests with z3 as the backend
         run: make -C regression/cbmc test-z3
 
-  # This job takes approximately 29 to 42 minutes
+  # This job takes approximately 17 to 42 minutes
   check-ubuntu-20_04-cmake-gcc:
     runs-on: ubuntu-20.04
     steps:
@@ -273,7 +273,7 @@ jobs:
             exit 1
           fi
 
-  # This job takes approximately 34 to 38 minutes
+  # This job takes approximately 20 to 38 minutes
   check-ubuntu-22_04-make-clang:
     runs-on: ubuntu-22.04
     env:
@@ -344,7 +344,7 @@ jobs:
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
-  # This job takes approximately 22 to 41 minutes
+  # This job takes approximately 17 to 41 minutes
   check-ubuntu-22_04-cmake-gcc:
     runs-on: ubuntu-22.04
     steps:
@@ -398,7 +398,7 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
-  # This job takes approximately 26 to 46 minutes
+  # This job takes approximately 14 to 46 minutes
   check-ubuntu-24_04-cmake-gcc-13:
     runs-on: ubuntu-24.04
     steps:
@@ -451,7 +451,7 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
-  # This job takes approximately 30 to 60 minutes
+  # This job takes approximately 14 to 60 minutes
   check-ubuntu-22_04-cmake-gcc-32bit:
     runs-on: ubuntu-22.04
     steps:
@@ -498,7 +498,7 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
-  # This job takes approximately 5 to 24 minutes
+  # This job takes approximately 2 to 24 minutes
   check-ubuntu-20_04-cmake-gcc-KNOWNBUG:
     runs-on: ubuntu-20.04
     steps:
@@ -545,7 +545,7 @@ jobs:
           git checkout -- memory_allocation1 printf1 printf3 union12 va_list3
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
 
-  # This job takes approximately 8 to 30 minutes
+  # This job takes approximately 7 to 30 minutes
   check-ubuntu-20_04-cmake-gcc-THOROUGH:
     runs-on: ubuntu-20.04
     steps:
@@ -636,7 +636,7 @@ jobs:
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=4
 
-  # This job takes approximately 66 to 85 minutes
+  # This job takes approximately 36 to 85 minutes
   check-macos-12-cmake-clang:
     runs-on: macos-12
     steps:
@@ -889,7 +889,7 @@ jobs:
       - name: Smoke test goto-analyzer
         run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-analyzer /mnt/smoke/test.goto --unreachable-functions
 
-  # This job takes approximately 39 to 41 minutes
+  # This job takes approximately 22 to 41 minutes
   include-what-you-use:
     runs-on: ubuntu-22.04
     steps:
@@ -914,7 +914,7 @@ jobs:
             exit 1
           fi
 
-  # This job takes approximately 45 to 75 minutes
+  # This job takes approximately 40 to 75 minutes
   codecov-coverage-report:
     runs-on: ubuntu-20.04
     steps:
