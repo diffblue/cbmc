@@ -4,8 +4,8 @@ smt_missing_range_check.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-\[main\.assertion\.1\] line \d assertion __CPROVER_exists \{ int i; a\[i\] == i \*i \}: SUCCESS
-\[main\.pointer_dereference\.11\] line \d dereference failure: pointer outside object bounds in a\[(\(signed (long|long long) int\))?i\]: FAILURE
+^\[main\.assertion\.1\] line \d assertion __CPROVER_exists \{ int i; a\[i\] == i \*i \}: UNKNOWN$
+^\[main\.pointer_dereference\.11\] line \d dereference failure: pointer outside object bounds in a\[(\(signed (long|long long) int\))?i\]: FAILURE$
 --
 --
 Check that memory checks fail for pointer dereferences inside an existential

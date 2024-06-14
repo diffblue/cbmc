@@ -3,9 +3,9 @@ main.c
 --apply-loop-contracts
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assigns.\d+\] .* Check that i is assignable: SUCCESS$
-^\[main.assigns.\d+\] .* Check that j is assignable: SUCCESS$
-^\[main.assigns.\d+\] .* Check that b->data\[(.*)i\] is assignable: SUCCESS$
+^\[main.assigns.\d+\] .* Check that i is assignable: UNKNOWN$
+^\[main.assigns.\d+\] .* Check that j is assignable: UNKNOWN$
+^\[main.assigns.\d+\] .* Check that b->data\[(.*)i\] is assignable: UNKNOWN$
 ^\[main.assigns.\d+\] .* Check that y is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --

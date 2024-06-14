@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 typedef struct test
 {
   int x;
@@ -6,6 +8,8 @@ typedef struct test
 void main()
 {
   struct test *t = malloc(sizeof(test));
+  if(t == NULL)
+    return;
   t->x = 0;
 
   unsigned n;

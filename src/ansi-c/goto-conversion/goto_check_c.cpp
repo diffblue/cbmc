@@ -1368,7 +1368,7 @@ void goto_check_ct::pointer_rel_check(
           c.assertion,
           "pointer relation: " + c.description,
           "pointer arithmetic",
-          false, // fatal
+          true, // fatal
           expr.find_source_location(),
           pointer,
           guard);
@@ -1427,7 +1427,7 @@ void goto_check_ct::pointer_overflow_check(
       c.assertion,
       "pointer arithmetic: " + c.description,
       "pointer arithmetic",
-      false, // fatal
+      true, // fatal
       expr.find_source_location(),
       expr,
       guard);
@@ -1469,7 +1469,7 @@ void goto_check_ct::pointer_validity_check(
       c.assertion,
       "dereference failure: " + c.description,
       "pointer dereference",
-      false, // fatal
+      true, // fatal
       src_expr.find_source_location(),
       src_expr,
       guard);

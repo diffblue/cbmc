@@ -4,10 +4,10 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.pointer_dereference.1\] .* dereference failure: pointer NULL in \*p: FAILURE$
-^\[main.pointer_dereference.2\] .* dereference failure: dead object in \*q: SUCCESS$
-^\[main.pointer_dereference.3\] .* dereference failure: pointer outside object bounds in \*q: SUCCESS$
-^\[main.pointer_dereference.4\] .* dereference failure: deallocated dynamic object in \*r: SUCCESS$
-^\[main.pointer_dereference.5\] .* dereference failure: pointer outside dynamic object bounds in \*r: SUCCESS$
+^\[main.pointer_dereference.2\] .* dereference failure: dead object in \*q: UNKNOWN$
+^\[main.pointer_dereference.3\] .* dereference failure: pointer outside object bounds in \*q: UNKNOWN$
+^\[main.pointer_dereference.4\] .* dereference failure: deallocated dynamic object in \*r: UNKNOWN$
+^\[main.pointer_dereference.5\] .* dereference failure: pointer outside dynamic object bounds in \*r: UNKNOWN$
 ^\[main.pointer_dereference.6\] .* dereference failure: pointer NULL in \*s: FAILURE$
 ^\[main.pointer_dereference.7\] .* dereference failure: pointer invalid in \*s: FAILURE$
 ^\[main.pointer_dereference.8\] .* dereference failure: deallocated dynamic object in \*s: FAILURE$

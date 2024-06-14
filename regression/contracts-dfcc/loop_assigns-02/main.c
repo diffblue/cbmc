@@ -11,7 +11,11 @@ struct blob
 void main()
 {
   struct blob *b = malloc(sizeof(struct blob));
+  if(b == NULL)
+    return;
   b->data = malloc(SIZE);
+  if(b->data == NULL)
+    return;
 
   b->data[5] = 0;
   for(unsigned i = 0; i < SIZE; i++)

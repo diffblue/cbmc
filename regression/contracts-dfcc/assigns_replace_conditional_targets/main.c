@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdlib.h>
 
 bool nz(int x)
 {
@@ -46,6 +47,9 @@ int main()
   old_y = y;
 
   char *z = malloc(1);
+  if(z == NULL)
+    return;
+
   *z = '0';
 
   foo(a, &x, &y, z);
