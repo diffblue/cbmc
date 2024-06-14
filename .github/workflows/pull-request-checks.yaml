@@ -50,13 +50,13 @@ jobs:
         run: |
           git clone https://github.com/conp-solutions/riss riss.git
           cmake -Hriss.git -Briss.git/release -DCMAKE_BUILD_TYPE=Release
-          make -C riss.git/release riss-coprocessor-lib-static -j2
-          make -C src -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
-          make -C jbmc/src -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
+          make -C riss.git/release riss-coprocessor-lib-static -j4
+          make -C src -j4 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
+          make -C jbmc/src -j4 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
 
-          make -C unit -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
+          make -C unit -j4 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
 
-          make -C jbmc/unit -j2 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
+          make -C jbmc/unit -j4 CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
       - name: Print ccache stats
         run: ccache -s
       - name: Checking completeness of help output
@@ -70,10 +70,10 @@ jobs:
           make TAGS="[!shouldfail]" -C jbmc/unit test IPASIR=$PWD/riss.git/riss
       - name: Run regression tests
         run: |
-          make -C regression test-parallel JOBS=2 LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
+          make -C regression test-parallel JOBS=4 LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
           make -C regression/cbmc test-paths-lifo
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
-          make -C jbmc/regression test-parallel JOBS=2
+          make -C jbmc/regression test-parallel JOBS=4
       - name: Check cleanup
         run: |
           make -C src clean IPASIR=$PWD/riss.git/riss
@@ -134,10 +134,10 @@ jobs:
         run: ccache -z --max-size=500M
       - name: Build with make
         run: |
-          make -C src       -j2 MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
-          make -C unit      -j2
-          make -C jbmc/src  -j2
-          make -C jbmc/unit -j2
+          make -C src       -j4 MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
+          make -C unit      -j4
+          make -C jbmc/src  -j4
+          make -C jbmc/unit -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run unit tests
@@ -151,10 +151,10 @@ jobs:
           make TAGS="[!shouldfail]" -C jbmc/unit test
       - name: Run regression tests
         run: |
-          make -C regression test-parallel JOBS=2
+          make -C regression test-parallel JOBS=4
           make -C regression/cbmc test-paths-lifo
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
-          make -C jbmc/regression test-parallel JOBS=2
+          make -C jbmc/regression test-parallel JOBS=4
 
   # This job has been copied from the one above it, and modified to only build CBMC
   # and run the `regression/cbmc/` regression tests against Z3. The rest of the tests
@@ -198,7 +198,7 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with make
-        run: make -C src -j2
+        run: make -C src -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run regression/cbmc tests with z3 as the backend
@@ -247,7 +247,7 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: ninja -C build -j2
+        run: ninja -C build -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Checking completeness of help output
@@ -258,7 +258,7 @@ jobs:
           ninja package
           ls *.deb
       - name: Run tests
-        run: cd build; ctest . -V -L CORE -j2
+        run: cd build; ctest . -V -L CORE -j4
       - name: Check cleanup
         run: |
           rm -r build
@@ -320,10 +320,10 @@ jobs:
           make -C src/cpp library_check
       - name: Build with make
         run: |
-          make -C src       -j2 MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
-          make -C unit      -j2
-          make -C jbmc/src  -j2
-          make -C jbmc/unit -j2
+          make -C src       -j4 MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
+          make -C unit      -j4
+          make -C jbmc/src  -j4
+          make -C jbmc/unit -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run unit tests
@@ -337,10 +337,10 @@ jobs:
           make TAGS="[!shouldfail]" -C jbmc/unit test
       - name: Run regression tests
         run: |
-          make -C regression test-parallel JOBS=2
+          make -C regression test-parallel JOBS=4
           make -C regression/cbmc test-paths-lifo
           env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
-          make -C jbmc/regression test-parallel JOBS=2
+          make -C jbmc/regression test-parallel JOBS=4
 
   # This job takes approximately 22 to 41 minutes
   check-ubuntu-22_04-cmake-gcc:
@@ -385,7 +385,7 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: ninja -C build -j2
+        run: ninja -C build -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Check if package building works
@@ -394,7 +394,7 @@ jobs:
           ninja package
           ls *.deb
       - name: Run tests
-        run: cd build; ctest . -V -L CORE -j2
+        run: cd build; ctest . -V -L CORE -j4
 
   # This job takes approximately 26 to 46 minutes
   check-ubuntu-24_04-cmake-gcc-13:
@@ -443,11 +443,11 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: ninja -C build -j2
+        run: ninja -C build -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run tests
-        run: cd build; ctest . -V -L CORE -j2
+        run: cd build; ctest . -V -L CORE -j4
 
   # This job takes approximately 30 to 60 minutes
   check-ubuntu-22_04-cmake-gcc-32bit:
@@ -490,11 +490,11 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: ninja -C build -j2
+        run: ninja -C build -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run tests
-        run: cd build; ctest . -V -L CORE -j2
+        run: cd build; ctest . -V -L CORE -j4
 
   # This job takes approximately 5 to 24 minutes
   check-ubuntu-20_04-cmake-gcc-KNOWNBUG:
@@ -529,13 +529,13 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: ninja -C build -j2
+        run: ninja -C build -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run tests
         run: |
           cd build
-          ctest . -V -L KNOWNBUG -j2
+          ctest . -V -L KNOWNBUG -j4
           export PATH=$PWD/bin:$PATH
           cd ../regression/cbmc
           sed -i '1s/^CORE\(.*\)broken-smt-backend/KNOWNBUG\1broken-smt-backend/' */*.desc
@@ -576,11 +576,11 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
-        run: ninja -C build -j2
+        run: ninja -C build -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run tests
-        run: cd build; ctest . -V -L THOROUGH -j2
+        run: cd build; ctest . -V -L THOROUGH -j4
 
   # This job takes approximately 39 to 69 minutes
   check-macos-13-make-clang:
@@ -732,7 +732,7 @@ jobs:
       - name: Test cbmc
         run: |
           Set-Location build
-          ctest -V -L CORE -C Release . -j2
+          ctest -V -L CORE -C Release . -j4
 
   # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
@@ -784,15 +784,15 @@ jobs:
       - name: Download minisat with make
         run: make -C src minisat2-download
       - name: Build CBMC with make
-        run: make CXX=clcache BUILD_ENV=MSVC -j2 -C src
+        run: make CXX=clcache BUILD_ENV=MSVC -j4 -C src
       - name: Build unit tests with make
-        run: make CXX=clcache BUILD_ENV=MSVC -j2 -C unit all
+        run: make CXX=clcache BUILD_ENV=MSVC -j4 -C unit all
       - name: Build jbmc with make
         run: |
-          make CXX=clcache -j2 -C jbmc/src setup-submodules
-          make CXX=clcache BUILD_ENV=MSVC -j2 -C jbmc/src
+          make CXX=clcache -j4 -C jbmc/src setup-submodules
+          make CXX=clcache BUILD_ENV=MSVC -j4 -C jbmc/src
       - name: Build JBMC unit tests
-        run: make CXX=clcache BUILD_ENV=MSVC -j2 -C jbmc/unit all
+        run: make CXX=clcache BUILD_ENV=MSVC -j4 -C jbmc/unit all
       - name: Print ccache stats
         run: clcache -s
       - name: Run CBMC and JBMC unit tests
@@ -906,7 +906,7 @@ jobs:
         run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
       - name: Run include-what-you-use
         run: |
-          iwyu_tool -p build/compile_commands.json -j2 | tee includes.txt
+          iwyu_tool -p build/compile_commands.json -j4 | tee includes.txt
           if sed '/minisat2-src/,/^--$/d' includes.txt | grep '^- ' -B1 ; then
             echo "Unnecessary includes found. Use '// IWYU pragma: keep' to override this."
             exit 1
@@ -960,13 +960,13 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=7G
       - name: Execute CMake CBMC build
-        run: cmake --build build -- -j2
+        run: cmake --build build -- -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run CTest and collect coverage statistics
         run: |
           echo "lcov_excl_line = UNREACHABLE" > ~/.lcovrc
-          cmake --build build --target coverage -- -j2
+          cmake --build build --target coverage -- -j4
       - name: Upload coverage statistics to Codecov
         uses: codecov/codecov-action@v4
         with:
