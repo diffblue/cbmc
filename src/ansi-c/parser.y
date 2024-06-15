@@ -236,6 +236,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_THREAD_LOCAL "_Thread_local"
 %token TOK_NULLPTR     "nullptr"
 %token TOK_CONSTEXPR   "constexpr"
+%token TOK_BIT_CAST    "__builtin_bit_cast"
 
 /*** special scanner reports ***/
 
@@ -714,6 +715,12 @@ unary_expression:
           $$=$1;
           parser_stack($$).id(ID_alignof);
           parser_stack($$).add(ID_type_arg).swap(parser_stack($3));
+        }
+        | TOK_BIT_CAST '(' type_name ',' unary_expression ')'
+        { $$=$1;
+          set($$, ID_bit_cast);
+          mto($$, $5);
+          parser_stack($$).type().swap(parser_stack($3));
         }
         ;
 

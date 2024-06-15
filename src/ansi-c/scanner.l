@@ -1305,6 +1305,13 @@ __decltype          { if(PARSER.cpp98 &&
                     return make_identifier();
                 }
 
+"__builtin_bit_cast" { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                          PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+                         { loc(); return TOK_BIT_CAST; }
+                       else
+                         return make_identifier();
+                     }
+
 {CPROVER_PREFIX}"atomic"       { loc(); return TOK_CPROVER_ATOMIC; }
 {CPROVER_PREFIX}"forall"       { loc(); return TOK_FORALL; }
 {CPROVER_PREFIX}"exists"       { loc(); return TOK_EXISTS; }

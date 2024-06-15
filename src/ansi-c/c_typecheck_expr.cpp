@@ -497,6 +497,24 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // already type checked
   }
+  else if(auto bit_cast_expr = expr_try_dynamic_cast<bit_cast_exprt>(expr))
+  {
+    typecheck_type(expr.type());
+    if(
+      pointer_offset_bits(bit_cast_expr->type(), *this) ==
+      pointer_offset_bits(bit_cast_expr->op().type(), *this))
+    {
+      exprt tmp = bit_cast_expr->lower();
+      expr.swap(tmp);
+    }
+    else
+    {
+      error().source_location = expr.source_location();
+      error() << "bit cast from '" << to_string(bit_cast_expr->op().type())
+              << "' to '" << to_string(expr.type()) << "' not permitted" << eom;
+      throw 0;
+    }
+  }
   else
   {
     error().source_location = expr.source_location();

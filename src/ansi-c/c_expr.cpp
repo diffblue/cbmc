@@ -83,3 +83,8 @@ exprt enum_is_in_range_exprt::lower(const namespacet &ns) const
 
   return simplify_expr(disjunction(disjuncts), ns);
 }
+
+byte_extract_exprt bit_cast_exprt::lower() const
+{
+  return make_byte_extract(op(), from_integer(0, c_index_type()), type());
+}
