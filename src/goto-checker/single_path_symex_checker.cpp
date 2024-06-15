@@ -82,8 +82,8 @@ operator()(propertiest &properties)
     worklist->pop();
   }
 
-  log.status() << "Runtime Symex: " << symex_runtime.count() << "s"
-               << messaget::eom;
+  log.statistics() << "Runtime Symex: " << symex_runtime.count() << "s"
+                   << messaget::eom;
 
   final_update_properties(properties, result.updated_properties);
 

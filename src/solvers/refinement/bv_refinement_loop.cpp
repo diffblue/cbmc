@@ -24,7 +24,7 @@ bv_refinementt::bv_refinementt(const infot &info)
 decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
 {
   // do the usual post-processing
-  log.status() << "BV-Refinement: post-processing" << messaget::eom;
+  log.progress() << "BV-Refinement: post-processing" << messaget::eom;
   finish_eager_conversion();
 
   log.debug() << "Solving with " << prop.solver_text() << messaget::eom;
@@ -36,7 +36,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
   {
     iteration++;
 
-    log.status() << "BV-Refinement: iteration " << iteration << messaget::eom;
+    log.progress() << "BV-Refinement: iteration " << iteration << messaget::eom;
 
     // output the very same information in a structured fashion
     if(config_.output_xml)
@@ -54,12 +54,12 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
       {
         log.status() << "BV-Refinement: got SAT, and it simulates => SAT"
                      << messaget::eom;
-        log.status() << "Total iterations: " << iteration << messaget::eom;
+        log.statistics() << "Total iterations: " << iteration << messaget::eom;
         return resultt::D_SATISFIABLE;
       }
       else
-        log.status() << "BV-Refinement: got SAT, and it is spurious, refining"
-                     << messaget::eom;
+        log.progress() << "BV-Refinement: got SAT, and it is spurious, refining"
+                       << messaget::eom;
       break;
 
     case resultt::D_UNSATISFIABLE:
@@ -69,11 +69,11 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
         log.status()
           << "BV-Refinement: got UNSAT, and the proof passes => UNSAT"
           << messaget::eom;
-        log.status() << "Total iterations: " << iteration << messaget::eom;
+        log.statistics() << "Total iterations: " << iteration << messaget::eom;
         return resultt::D_UNSATISFIABLE;
       }
       else
-        log.status()
+        log.progress()
           << "BV-Refinement: got UNSAT, and the proof fails, refining"
           << messaget::eom;
       break;

@@ -93,7 +93,7 @@ void initialize_from_source_files(
     languaget &language = *lf.language;
     language.set_language_options(options, message_handler);
 
-    msg.status() << "Parsing " << filename << messaget::eom;
+    msg.progress() << "Parsing " << filename << messaget::eom;
 
     if(language.parse(infile, filename, message_handler))
     {
@@ -103,7 +103,7 @@ void initialize_from_source_files(
     lf.get_modules();
   }
 
-  msg.status() << "Converting" << messaget::eom;
+  msg.progress() << "Converting" << messaget::eom;
 
   if(language_files.typecheck(symbol_table, message_handler))
   {
