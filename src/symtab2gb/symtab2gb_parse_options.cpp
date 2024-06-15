@@ -66,7 +66,7 @@ static void run_symtab2gb(
 
   stream_message_handlert message_handler{std::cerr};
   messaget::eval_verbosity(
-    cmdline_verbosity, messaget::M_STATISTICS, message_handler);
+    cmdline_verbosity, messaget::M_STATUS, message_handler);
 
   auto const symtab_language = new_json_symtab_language();
 

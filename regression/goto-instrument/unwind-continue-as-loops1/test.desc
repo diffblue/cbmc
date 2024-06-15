@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 5 --continue-as-loops
+--verbosity 10 --unwind 5 --continue-as-loops _ --verbosity 8
 ^Unwinding loop.*iteration 5
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---incremental-loop main.0 --unwind-min 5 --unwind-max 10 --json-ui
+--incremental-loop main.0 --unwind-min 5 --unwind-max 10 --json-ui --verbosity 8
 ^EXIT=10$
 ^SIGNAL=0$
 "messageText": "VERIFICATION FAILED"

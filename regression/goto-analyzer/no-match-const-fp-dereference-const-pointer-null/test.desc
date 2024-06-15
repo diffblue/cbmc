@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --pointer-check
+--show-goto-functions --pointer-check --verbosity 8
 ^Removal of function pointers and virtual functions$
 ^\s*ASSERT false // dereferenced function pointer must be one of \[(f[1-9], ){8}f[1-9]\]$
 replacing function pointer by 9 possible targets

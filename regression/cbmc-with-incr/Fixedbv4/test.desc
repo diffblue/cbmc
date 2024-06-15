@@ -1,6 +1,6 @@
 FUTURE
 main.c
---fixedbv
+--fixedbv --verbosity 8
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
