@@ -2471,8 +2471,18 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         symbolt *symbol_ptr;
         move_symbol(new_symbol, symbol_ptr);
 
-        warning().source_location=f_op.find_source_location();
-        warning() << "function '" << identifier << "' is not declared" << eom;
+        // We increase the verbosity level of the warning
+        // for gcc/clang __builtin_ functions, since there are too many.
+        if(identifier.starts_with("__builtin_"))
+        {
+          debug().source_location = f_op.find_source_location();
+          debug() << "builtin '" << identifier << "' is unknown" << eom;
+        }
+        else
+        {
+          warning().source_location = f_op.find_source_location();
+          warning() << "function '" << identifier << "' is not declared" << eom;
+        }
       }
     }
   }
