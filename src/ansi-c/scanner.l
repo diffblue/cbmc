@@ -540,6 +540,10 @@ enable_or_disable ("enable"|"disable")
                     return make_identifier();
                 }
 
+{CPROVER_PREFIX}"Float16" {
+                  loc(); return TOK_GCC_FLOAT16;
+                }
+
 "__bf16"        { if(PARSER.bf16_type)
                   { loc(); return TOK_GCC_FLOAT16; }
                   else
