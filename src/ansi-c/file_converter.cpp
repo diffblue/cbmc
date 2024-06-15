@@ -1,46 +1,25 @@
 /*******************************************************************\
 
-Module: Convert file contents to C strings
+Module: Convert file contents to a C array
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// Convert file contents to C strings
+/// Convert file contents to a C array
 
 #include <fstream> // IWYU pragma: keep
+#include <iomanip>
 #include <iostream>
 #include <string>
 
-static void convert_line(const std::string &line)
-{
-  std::cout << "\"";
-
-  for(std::size_t i = 0; i < line.size(); i++)
-  {
-    const char ch = line[i];
-    if(ch == '\\')
-      std::cout << "\\\\";
-    else if(ch == '"')
-      std::cout << "\\\"";
-    else if(ch == '\r' || ch == '\n')
-    {
-    }
-    else if((ch & 0x80) != 0)
-    {
-      std::cout << "\\x" << std::hex << (unsigned(ch) & 0xff) << std::dec;
-    }
-    else
-      std::cout << ch;
-  }
-
-  std::cout << "\\n\"\n";
-}
-
 int main(int argc, char *argv[])
 {
-  std::string line;
+  std::size_t counter = 0;
+  bool first = true;
+
+  std::cout << "{";
 
   for(int i = 1; i < argc; ++i)
   {
@@ -52,9 +31,31 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    while(getline(input_file, line))
-      convert_line(line);
+    char ch;
+    while(input_file.get(ch))
+    {
+      if(first)
+        first = false;
+      else
+        std::cout << ',';
+
+      if(counter == 15)
+      {
+        std::cout << '\n';
+        counter = 0;
+      }
+      else
+      {
+        counter++;
+        std::cout << ' ';
+      }
+
+      std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0')
+                << int(ch);
+    }
   }
+
+  std::cout << " }\n";
 
   return 0;
 }
