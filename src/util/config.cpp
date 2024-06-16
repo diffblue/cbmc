@@ -701,6 +701,35 @@ void configt::ansi_ct::set_arch_spec_loongarch64()
   }
 }
 
+void configt::ansi_ct::set_arch_spec_emscripten()
+{
+  set_ILP32();
+  endianness = endiannesst::IS_LITTLE_ENDIAN;
+  long_double_width = 16 * 8;
+  char_is_unsigned = false;
+  NULL_is_zero = true;
+
+  switch(mode)
+  {
+  case flavourt::CLANG:
+    defines.push_back("__EMSCRIPTEN__");
+    break;
+
+  case flavourt::VISUAL_STUDIO:
+    UNREACHABLE; // not supported by Visual Studio
+    break;
+
+  case flavourt::GCC:
+  case flavourt::CODEWARRIOR:
+  case flavourt::ARM:
+  case flavourt::ANSI:
+    break;
+
+  case flavourt::NONE:
+    UNREACHABLE;
+  }
+}
+
 configt::ansi_ct::c_standardt configt::ansi_ct::default_c_standard()
 {
 #if defined(__APPLE__)
@@ -787,6 +816,8 @@ void configt::set_arch(const irep_idt &arch)
     ansi_c.set_arch_spec_i386();
   else if(arch == "loongarch64")
     ansi_c.set_arch_spec_loongarch64();
+  else if(arch == "emscripten")
+    ansi_c.set_arch_spec_emscripten();
   else
   {
     // We run on something new and unknown.
@@ -1482,6 +1513,8 @@ irep_idt configt::this_architecture()
     this_arch = "sh4";
   #elif defined(__loongarch__)
     this_arch = "loongarch64";
+  #elif defined(__EMSCRIPTEN__)
+    this_arch = "emscripten";
   #else
     // something new and unknown!
     this_arch = "unknown";
@@ -1527,6 +1560,8 @@ irep_idt configt::this_operating_system()
   this_os="solaris";
 #elif __gnu_hurd__
   this_os = "hurd";
+#elif __EMSCRIPTEN__
+  this_os = "emscripten";
 #else
   this_os="unknown";
 #endif
