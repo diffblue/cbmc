@@ -49,6 +49,7 @@ var structconfigt_1_1ansi__ct =
     [ "set_64", "structconfigt_1_1ansi__ct.html#a843c38a477bfe5a86b63f2d09ee46db5", null ],
     [ "set_arch_spec_alpha", "structconfigt_1_1ansi__ct.html#ababde253d2ae6c7cbf890f193c5f54c0", null ],
     [ "set_arch_spec_arm", "structconfigt_1_1ansi__ct.html#aa5c9f4ce7098f786c11bc387a233a01b", null ],
+    [ "set_arch_spec_emscripten", "structconfigt_1_1ansi__ct.html#afe21d3d7527d2cff80d0e4847fd6fe0a", null ],
     [ "set_arch_spec_hppa", "structconfigt_1_1ansi__ct.html#a501bfc07c9e8b10f0c0e8e45d409a729", null ],
     [ "set_arch_spec_i386", "structconfigt_1_1ansi__ct.html#ae53a2f3faa9a444814fb8ec6028382fb", null ],
     [ "set_arch_spec_ia64", "structconfigt_1_1ansi__ct.html#af99b387514e0ddd836e51215554c886c", null ],
