@@ -2169,7 +2169,9 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       }
       else if(
         identifier == CPROVER_PREFIX "saturating_minus" ||
-        identifier == CPROVER_PREFIX "saturating_plus")
+        identifier == CPROVER_PREFIX "saturating_plus" ||
+        identifier == "__builtin_elementwise_add_sat" ||
+        identifier == "__builtin_elementwise_sub_sat")
       {
         exprt result = typecheck_saturating_arithmetic(expr);
         expr.swap(result);
@@ -3842,10 +3844,18 @@ exprt c_typecheck_baset::typecheck_saturating_arithmetic(
   }
 
   exprt result;
-  if(identifier == CPROVER_PREFIX "saturating_minus")
+  if(
+    identifier == CPROVER_PREFIX "saturating_minus" ||
+    identifier == "__builtin_elementwise_sub_sat")
+  {
     result = saturating_minus_exprt{expr.arguments()[0], expr.arguments()[1]};
-  else if(identifier == CPROVER_PREFIX "saturating_plus")
+  }
+  else if(
+    identifier == CPROVER_PREFIX "saturating_plus" ||
+    identifier == "__builtin_elementwise_add_sat")
+  {
     result = saturating_plus_exprt{expr.arguments()[0], expr.arguments()[1]};
+  }
   else
     UNREACHABLE;
 
