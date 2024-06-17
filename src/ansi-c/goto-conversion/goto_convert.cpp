@@ -1597,6 +1597,9 @@ void goto_convertt::convert_ifthenelse(
     return convert_ifthenelse(new_if0, dest, mode);
   }
 
+  exprt tmp_guard = code.cond();
+  clean_expr(tmp_guard, dest, mode);
+
   // convert 'then'-branch
   goto_programt tmp_then;
   convert(code.then_case(), tmp_then, mode);
@@ -1615,9 +1618,6 @@ void goto_convertt::convert_ifthenelse(
                           ? to_code_block(code.else_case()).end_location()
                           : code.else_case().source_location();
   }
-
-  exprt tmp_guard = code.cond();
-  clean_expr(tmp_guard, dest, mode);
 
   generate_ifthenelse(
     tmp_guard,
