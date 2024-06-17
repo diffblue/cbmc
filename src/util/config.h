@@ -241,6 +241,7 @@ public:
     void set_arch_spec_hppa();
     void set_arch_spec_sh4();
     void set_arch_spec_loongarch64();
+    void set_arch_spec_emscripten();
 
     enum class flavourt
     {
