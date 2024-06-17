@@ -1004,13 +1004,12 @@ void goto_convertt::convert_assume(
 
 void goto_convertt::convert_loop_contracts(
   const codet &code,
-  goto_programt::targett loop,
-  const irep_idt &mode)
+  goto_programt::targett loop)
 {
   auto assigns = static_cast<const unary_exprt &>(code.find(ID_C_spec_assigns));
   if(assigns.is_not_nil())
   {
-    PRECONDITION(loop->is_goto());
+    PRECONDITION(loop->is_goto() || loop->is_incomplete_goto());
     loop->condition_nonconst().add(ID_C_spec_assigns).swap(assigns.op());
   }
 
@@ -1024,7 +1023,7 @@ void goto_convertt::convert_loop_contracts(
         "Loop invariant is not side-effect free.", code.find_source_location());
     }
 
-    PRECONDITION(loop->is_goto());
+    PRECONDITION(loop->is_goto() || loop->is_incomplete_goto());
     loop->condition_nonconst().add(ID_C_spec_loop_invariant).swap(invariant);
   }
 
@@ -1039,7 +1038,7 @@ void goto_convertt::convert_loop_contracts(
         code.find_source_location());
     }
 
-    PRECONDITION(loop->is_goto());
+    PRECONDITION(loop->is_goto() || loop->is_incomplete_goto());
     loop->condition_nonconst().add(ID_C_spec_decreases).swap(decreases_clause);
   }
 }
@@ -1123,7 +1122,7 @@ void goto_convertt::convert_for(
     goto_programt::make_goto(u, true_exprt(), code.source_location()));
 
   // assigns clause, loop invariant and decreases clause
-  convert_loop_contracts(code, y, mode);
+  convert_loop_contracts(code, y);
 
   dest.destructive_append(sideeffects);
   dest.destructive_append(tmp_v);
@@ -1181,7 +1180,7 @@ void goto_convertt::convert_while(
   convert(code.body(), tmp_x, mode);
 
   // assigns clause, loop invariant and decreases clause
-  convert_loop_contracts(code, y, mode);
+  convert_loop_contracts(code, y);
 
   dest.destructive_append(tmp_branch);
   dest.destructive_append(tmp_x);
@@ -1250,7 +1249,7 @@ void goto_convertt::convert_dowhile(
   y->complete_goto(w);
 
   // assigns_clause, loop invariant and decreases clause
-  convert_loop_contracts(code, y, mode);
+  convert_loop_contracts(code, y);
 
   dest.destructive_append(tmp_w);
   dest.destructive_append(sideeffects);
@@ -1511,6 +1510,9 @@ void goto_convertt::convert_goto(const code_gotot &code, goto_programt &dest)
   // this instruction will be completed during post-processing
   goto_programt::targett t =
     dest.add(goto_programt::make_incomplete_goto(code, code.source_location()));
+
+  // Loop contracts annotated in GOTO
+  convert_loop_contracts(code, t);
 
   // remember it to do the target later
   targets.gotos.emplace_back(t, targets.scope_stack.get_current_node());
