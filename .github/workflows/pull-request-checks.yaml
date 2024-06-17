@@ -592,7 +592,10 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: brew install maven flex bison parallel ccache z3
+        run: |
+          # maven is already installed and upgrading to a newer version yields
+          # symlink conflicts as previously reported in https://github.com/actions/runner-images/issues/4020
+          brew install flex bison parallel ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc5 binary and make sure it can be deployed
