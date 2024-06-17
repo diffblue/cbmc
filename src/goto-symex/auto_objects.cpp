@@ -34,11 +34,14 @@ exprt goto_symext::make_auto_object(const typet &type, statet &state)
 
 void goto_symext::initialize_auto_object(const exprt &expr, statet &state)
 {
-  const typet &type=ns.follow(expr.type());
+  DATA_INVARIANT(
+    expr.type().id() != ID_struct,
+    "no L2-renamed expression expected, all struct-like types should be tags");
 
-  if(type.id()==ID_struct)
+  if(
+    auto struct_tag_type = type_try_dynamic_cast<struct_tag_typet>(expr.type()))
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet &struct_type = ns.follow_tag(*struct_tag_type);
 
     for(const auto &comp : struct_type.components())
     {
@@ -47,10 +50,9 @@ void goto_symext::initialize_auto_object(const exprt &expr, statet &state)
       initialize_auto_object(member_expr, state);
     }
   }
-  else if(type.id()==ID_pointer)
+  else if(auto pointer_type = type_try_dynamic_cast<pointer_typet>(expr.type()))
   {
-    const pointer_typet &pointer_type=to_pointer_type(type);
-    const typet &base_type = pointer_type.base_type();
+    const typet &base_type = pointer_type->base_type();
 
     // we don't like function pointers and
     // we don't like void *
@@ -59,11 +61,11 @@ void goto_symext::initialize_auto_object(const exprt &expr, statet &state)
       // could be NULL nondeterministically
 
       address_of_exprt address_of_expr(
-        make_auto_object(base_type, state), pointer_type);
+        make_auto_object(base_type, state), *pointer_type);
 
       if_exprt rhs(
         side_effect_expr_nondett(bool_typet(), expr.source_location()),
-        null_pointer_exprt(pointer_type),
+        null_pointer_exprt(*pointer_type),
         address_of_expr);
 
       symex_assign(state, expr, rhs);

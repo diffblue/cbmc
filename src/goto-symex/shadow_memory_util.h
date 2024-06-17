@@ -75,8 +75,7 @@ irep_idt extract_field_name(const exprt &string_expr);
 /// L2 symbols and string constants not having char-pointer type.
 /// \param expr The pointer to the original memory, e.g. as passed to
 ///    __CPROVER_field_get.
-/// \param type The followed type of expr.
-void clean_pointer_expr(exprt &expr, const typet &type);
+void clean_pointer_expr(exprt &expr);
 
 /// Wraps a given expression into a `dereference_exprt` unless it is an
 /// `address_of_exprt` in which case it just unboxes it and returns its content.
