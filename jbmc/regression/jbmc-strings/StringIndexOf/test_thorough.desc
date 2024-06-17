@@ -1,7 +1,13 @@
-CORE
+THOROUGH
 Test
---function Test.check --unwind 10 --no-unwinding-assertions --max-nondet-string-length 10 --java-assume-inputs-non-null
+--function Test.check --unwind 10 --no-unwinding-assertions --max-nondet-string-length 10 --java-assume-inputs-non-null --sat-solver cadical
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+--
+This test completes in less than 3 seconds with CaDiCaL
+--
+This test completes in less than 3 seconds with CaDiCaL, but may flip between
+seconds and several minutes with MiniSat even just changing the order of
+equations.
