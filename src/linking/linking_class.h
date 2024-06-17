@@ -14,22 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/rename_symbol.h>
-#include <util/replace_symbol.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
+
+#include "casting_replace_symbol.h"
 
 #include <unordered_set>
 
 class message_handlert;
-
-class casting_replace_symbolt : public replace_symbolt
-{
-public:
-  bool replace(exprt &dest) const override;
-
-private:
-  bool replace_symbol_expr(symbol_exprt &dest) const override;
-};
 
 class linkingt
 {
@@ -123,65 +115,6 @@ protected:
   void duplicate_type_symbol(
     symbolt &old_symbol,
     const symbolt &new_symbol);
-
-  std::string expr_to_string(
-    const irep_idt &identifier,
-    const exprt &expr) const;
-
-  std::string type_to_string(
-    const irep_idt &identifier,
-    const typet &type) const;
-
-  std::string type_to_string_verbose(
-    const symbolt &symbol,
-    const typet &type) const;
-
-  std::string type_to_string_verbose(
-    const symbolt &symbol) const
-  {
-    return type_to_string_verbose(symbol, symbol.type);
-  }
-
-  /// Returns true iff the conflict report on a particular branch of the tree of
-  /// types was a definitive result, and not contingent on conflicts within a
-  /// tag type.
-  bool detailed_conflict_report_rec(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol,
-    const typet &type1,
-    const typet &type2,
-    unsigned depth,
-    exprt &conflict_path);
-
-  void detailed_conflict_report(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol,
-    const typet &type1,
-    const typet &type2)
-  {
-    symbol_exprt conflict_path = symbol_exprt::typeless(ID_C_this);
-    detailed_conflict_report_rec(
-      old_symbol,
-      new_symbol,
-      type1,
-      type2,
-      10, // somewhat arbitrary limit
-      conflict_path);
-  }
-
-  void link_error(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol,
-    const std::string &msg);
-
-  void link_warning(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol,
-    const std::string &msg);
-
-  void show_struct_diff(
-    const struct_typet &old_type,
-    const struct_typet &new_type);
 
   symbol_table_baset &main_symbol_table;
   namespacet ns;

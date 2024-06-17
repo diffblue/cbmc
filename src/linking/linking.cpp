@@ -14,122 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/find_symbols.h>
-#include <util/mathematical_types.h>
 #include <util/message.h>
-#include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
-#include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
 #include <langapi/language_util.h>
 
+#include "linking_diagnostics.h"
+
 #include <deque>
-
-bool casting_replace_symbolt::replace(exprt &dest) const
-{
-  bool result = true; // unchanged
-
-  // first look at type
-
-  const exprt &const_dest(dest);
-  if(have_to_replace(const_dest.type()))
-    if(!replace_symbolt::replace(dest.type()))
-      result = false;
-
-  // now do expression itself
-
-  if(!have_to_replace(dest))
-    return result;
-
-  if(dest.id() == ID_side_effect)
-  {
-    if(auto call = expr_try_dynamic_cast<side_effect_expr_function_callt>(dest))
-    {
-      if(!have_to_replace(call->function()))
-        return replace_symbolt::replace(dest);
-
-      exprt before = dest;
-      code_typet type = to_code_type(call->function().type());
-
-      result &= replace_symbolt::replace(call->function());
-
-      // maybe add type casts here?
-      for(auto &arg : call->arguments())
-        result &= replace_symbolt::replace(arg);
-
-      if(
-        type.return_type() !=
-        to_code_type(call->function().type()).return_type())
-      {
-        call->type() = to_code_type(call->function().type()).return_type();
-        dest = typecast_exprt(*call, type.return_type());
-        result = true;
-      }
-
-      return result;
-    }
-  }
-  else if(dest.id() == ID_address_of)
-  {
-    pointer_typet ptr_type = to_pointer_type(dest.type());
-
-    result &= replace_symbolt::replace(dest);
-
-    address_of_exprt address_of = to_address_of_expr(dest);
-    if(address_of.object().type() != ptr_type.base_type())
-    {
-      to_pointer_type(address_of.type()).base_type() =
-        address_of.object().type();
-      dest = typecast_exprt{address_of, std::move(ptr_type)};
-      result = true;
-    }
-
-    return result;
-  }
-
-  return replace_symbolt::replace(dest);
-}
-
-bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
-{
-  expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
-
-  if(it == expr_map.end())
-    return true;
-
-  const exprt &e = it->second;
-
-  source_locationt previous_source_location{s.source_location()};
-  DATA_INVARIANT_WITH_DIAGNOSTICS(
-    previous_source_location.is_not_nil(),
-    "front-ends should construct symbol expressions with source locations",
-    s.pretty());
-  if(e.type().id() != ID_array && e.type().id() != ID_code)
-  {
-    typet type = s.type();
-    static_cast<exprt &>(s) = typecast_exprt::conditional_cast(e, type);
-  }
-  else
-    static_cast<exprt &>(s) = e;
-  s.add_source_location() = std::move(previous_source_location);
-
-  return false;
-}
-
-std::string linkingt::expr_to_string(
-  const irep_idt &identifier,
-  const exprt &expr) const
-{
-  return from_expr(ns, identifier, expr);
-}
-
-std::string linkingt::type_to_string(
-  const irep_idt &identifier,
-  const typet &type) const
-{
-  return from_type(ns, identifier, type);
-}
 
 static const typet &follow_tags_symbols(
   const namespacet &ns,
@@ -143,379 +37,6 @@ static const typet &follow_tags_symbols(
     return ns.follow_tag(to_union_tag_type(type));
   else
     return type;
-}
-
-std::string linkingt::type_to_string_verbose(
-  const symbolt &symbol,
-  const typet &type) const
-{
-  const typet &followed=follow_tags_symbols(ns, type);
-
-  if(followed.id()==ID_struct || followed.id()==ID_union)
-  {
-    std::string result=followed.id_string();
-
-    const std::string &tag=followed.get_string(ID_tag);
-    if(!tag.empty())
-      result+=" "+tag;
-
-    if(to_struct_union_type(followed).is_incomplete())
-    {
-      result += "   (incomplete)";
-    }
-    else
-    {
-      result += " {\n";
-
-      for(const auto &c : to_struct_union_type(followed).components())
-      {
-        const typet &subtype = c.type();
-        result += "  ";
-        result += type_to_string(symbol.name, subtype);
-        result += ' ';
-
-        if(!c.get_base_name().empty())
-          result += id2string(c.get_base_name());
-        else
-          result += id2string(c.get_name());
-
-        result += ";\n";
-      }
-
-      result += '}';
-    }
-
-    return result;
-  }
-  else if(followed.id()==ID_pointer)
-  {
-    return type_to_string_verbose(
-             symbol, to_pointer_type(followed).base_type()) +
-           " *";
-  }
-
-  return type_to_string(symbol.name, type);
-}
-
-bool linkingt::detailed_conflict_report_rec(
-  const symbolt &old_symbol,
-  const symbolt &new_symbol,
-  const typet &type1,
-  const typet &type2,
-  unsigned depth,
-  exprt &conflict_path)
-{
-  bool conclusive = false;
-
-#ifdef DEBUG
-  messaget log{message_handler};
-  log.debug() << "<BEGIN DEPTH " << depth << ">" << messaget::eom;
-#endif
-
-  std::string msg;
-
-  const typet &t1=follow_tags_symbols(ns, type1);
-  const typet &t2=follow_tags_symbols(ns, type2);
-
-  if(t1.id()!=t2.id())
-  {
-    msg="type classes differ";
-    conclusive = true;
-  }
-  else if(t1.id()==ID_pointer ||
-          t1.id()==ID_array)
-  {
-    if(
-      depth > 0 &&
-      to_type_with_subtype(t1).subtype() != to_type_with_subtype(t2).subtype())
-    {
-      if(conflict_path.type().id() == ID_pointer)
-        conflict_path = dereference_exprt(conflict_path);
-
-      conclusive = detailed_conflict_report_rec(
-        old_symbol,
-        new_symbol,
-        to_type_with_subtype(t1).subtype(),
-        to_type_with_subtype(t2).subtype(),
-        depth - 1,
-        conflict_path);
-    }
-    else if(t1.id()==ID_pointer)
-      msg="pointer types differ";
-    else
-      msg="array types differ";
-  }
-  else if(t1.id()==ID_struct ||
-          t1.id()==ID_union)
-  {
-    const struct_union_typet::componentst &components1=
-      to_struct_union_type(t1).components();
-
-    const struct_union_typet::componentst &components2=
-      to_struct_union_type(t2).components();
-
-    exprt conflict_path_before=conflict_path;
-
-    if(components1.size()!=components2.size())
-    {
-      msg="number of members is different (";
-      msg+=std::to_string(components1.size())+'/';
-      msg+=std::to_string(components2.size())+')';
-      conclusive = true;
-    }
-    else
-    {
-      for(std::size_t i=0; i<components1.size(); ++i)
-      {
-        const typet &subtype1=components1[i].type();
-        const typet &subtype2=components2[i].type();
-
-        if(components1[i].get_name()!=components2[i].get_name())
-        {
-          msg="names of member "+std::to_string(i)+" differ (";
-          msg+=id2string(components1[i].get_name())+'/';
-          msg+=id2string(components2[i].get_name())+')';
-          conclusive = true;
-        }
-        else if(subtype1 != subtype2)
-        {
-          typedef std::unordered_set<typet, irep_hash> type_sett;
-          type_sett parent_types;
-
-          exprt e=conflict_path_before;
-          while(e.id()==ID_dereference ||
-                e.id()==ID_member ||
-                e.id()==ID_index)
-          {
-            parent_types.insert(e.type());
-            parent_types.insert(follow_tags_symbols(ns, e.type()));
-            if(e.id() == ID_dereference)
-              e = to_dereference_expr(e).pointer();
-            else if(e.id() == ID_member)
-              e = to_member_expr(e).compound();
-            else if(e.id() == ID_index)
-              e = to_index_expr(e).array();
-            else
-              UNREACHABLE;
-          }
-
-          if(parent_types.find(subtype1) == parent_types.end())
-          {
-            conflict_path = conflict_path_before;
-            conflict_path.type() = t1;
-            conflict_path = member_exprt(conflict_path, components1[i]);
-
-            if(depth > 0)
-            {
-              conclusive = detailed_conflict_report_rec(
-                old_symbol,
-                new_symbol,
-                subtype1,
-                subtype2,
-                depth - 1,
-                conflict_path);
-            }
-          }
-          else
-          {
-            msg = "type of member " + id2string(components1[i].get_name()) +
-                  " differs (recursive)";
-          }
-        }
-
-        if(conclusive)
-          break;
-      }
-    }
-  }
-  else if(t1.id()==ID_c_enum)
-  {
-    const c_enum_typet::memberst &members1=
-      to_c_enum_type(t1).members();
-
-    const c_enum_typet::memberst &members2=
-      to_c_enum_type(t2).members();
-
-    if(
-      to_c_enum_type(t1).underlying_type() !=
-      to_c_enum_type(t2).underlying_type())
-    {
-      msg="enum value types are different (";
-      msg +=
-        type_to_string(old_symbol.name, to_c_enum_type(t1).underlying_type()) +
-        '/';
-      msg +=
-        type_to_string(new_symbol.name, to_c_enum_type(t2).underlying_type()) +
-        ')';
-      conclusive = true;
-    }
-    else if(members1.size()!=members2.size())
-    {
-      msg="number of enum members is different (";
-      msg+=std::to_string(members1.size())+'/';
-      msg+=std::to_string(members2.size())+')';
-      conclusive = true;
-    }
-    else
-    {
-      for(std::size_t i=0; i<members1.size(); ++i)
-      {
-        if(members1[i].get_base_name()!=members2[i].get_base_name())
-        {
-          msg="names of member "+std::to_string(i)+" differ (";
-          msg+=id2string(members1[i].get_base_name())+'/';
-          msg+=id2string(members2[i].get_base_name())+')';
-          conclusive = true;
-        }
-        else if(members1[i].get_value()!=members2[i].get_value())
-        {
-          msg="values of member "+std::to_string(i)+" differ (";
-          msg+=id2string(members1[i].get_value())+'/';
-          msg+=id2string(members2[i].get_value())+')';
-          conclusive = true;
-        }
-
-        if(conclusive)
-          break;
-      }
-    }
-
-    msg+="\nenum declarations at\n";
-    msg+=t1.source_location().as_string()+" and\n";
-    msg+=t1.source_location().as_string();
-  }
-  else if(t1.id()==ID_code)
-  {
-    const code_typet::parameterst &parameters1=
-      to_code_type(t1).parameters();
-
-    const code_typet::parameterst &parameters2=
-      to_code_type(t2).parameters();
-
-    const typet &return_type1=to_code_type(t1).return_type();
-    const typet &return_type2=to_code_type(t2).return_type();
-
-    if(parameters1.size()!=parameters2.size())
-    {
-      msg="parameter counts differ (";
-      msg+=std::to_string(parameters1.size())+'/';
-      msg+=std::to_string(parameters2.size())+')';
-      conclusive = true;
-    }
-    else if(return_type1 != return_type2)
-    {
-      conflict_path.type() = array_typet{void_type(), nil_exprt{}};
-      conflict_path=
-        index_exprt(conflict_path,
-                    constant_exprt(std::to_string(-1), integer_typet()));
-
-      if(depth>0)
-      {
-        conclusive = detailed_conflict_report_rec(
-          old_symbol,
-          new_symbol,
-          return_type1,
-          return_type2,
-          depth - 1,
-          conflict_path);
-      }
-      else
-        msg="return types differ";
-    }
-    else
-    {
-      for(std::size_t i=0; i<parameters1.size(); i++)
-      {
-        const typet &subtype1=parameters1[i].type();
-        const typet &subtype2=parameters2[i].type();
-
-        if(subtype1 != subtype2)
-        {
-          conflict_path.type() = array_typet{void_type(), nil_exprt{}};
-          conflict_path=
-            index_exprt(conflict_path,
-                        constant_exprt(std::to_string(i), integer_typet()));
-
-          if(depth>0)
-          {
-            conclusive = detailed_conflict_report_rec(
-              old_symbol,
-              new_symbol,
-              subtype1,
-              subtype2,
-              depth - 1,
-              conflict_path);
-          }
-          else
-            msg="parameter types differ";
-        }
-
-        if(conclusive)
-          break;
-      }
-    }
-  }
-  else
-  {
-    msg="conflict on POD";
-    conclusive = true;
-  }
-
-  if(conclusive && !msg.empty())
-  {
-#ifndef DEBUG
-    messaget log{message_handler};
-#endif
-    log.error() << '\n';
-    log.error() << "reason for conflict at "
-                << expr_to_string(irep_idt(), conflict_path) << ": " << msg
-                << '\n';
-
-    log.error() << '\n';
-    log.error() << type_to_string_verbose(old_symbol, t1) << '\n';
-    log.error() << type_to_string_verbose(new_symbol, t2) << '\n'
-                << messaget::eom;
-  }
-
-  #ifdef DEBUG
-  log.debug() << "<END DEPTH " << depth << ">" << messaget::eom;
-#endif
-
-  return conclusive;
-}
-
-void linkingt::link_error(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol,
-    const std::string &msg)
-{
-  messaget log{message_handler};
-  log.error().source_location = new_symbol.location;
-
-  log.error() << msg << " '" << old_symbol.display_name() << "'" << '\n';
-  log.error() << "old definition in module '" << old_symbol.module << "' "
-              << old_symbol.location << '\n'
-              << type_to_string_verbose(old_symbol) << '\n';
-  log.error() << "new definition in module '" << new_symbol.module << "' "
-              << new_symbol.location << '\n'
-              << type_to_string_verbose(new_symbol) << messaget::eom;
-}
-
-void linkingt::link_warning(
-    const symbolt &old_symbol,
-    const symbolt &new_symbol,
-    const std::string &msg)
-{
-  messaget log{message_handler};
-  log.warning().source_location = new_symbol.location;
-
-  log.warning() << msg << " '" << old_symbol.display_name() << "'\n";
-  log.warning() << "old definition in module " << old_symbol.module << " "
-                << old_symbol.location << '\n'
-                << type_to_string_verbose(old_symbol) << '\n';
-  log.warning() << "new definition in module " << new_symbol.module << " "
-                << new_symbol.location << '\n'
-                << type_to_string_verbose(new_symbol) << messaget::eom;
 }
 
 irep_idt
@@ -562,6 +83,8 @@ void linkingt::duplicate_code_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
+  linking_diagnosticst diag{message_handler, ns};
+
   // Both are functions.
   if(old_symbol.type != new_symbol.type)
   {
@@ -570,7 +93,7 @@ void linkingt::duplicate_code_symbol(
 
     if(old_symbol.type.get_bool(ID_C_incomplete) && old_symbol.value.is_nil())
     {
-      link_warning(old_symbol, new_symbol, "implicit function declaration");
+      diag.warning(old_symbol, new_symbol, "implicit function declaration");
 
       old_symbol.type=new_symbol.type;
       old_symbol.location=new_symbol.location;
@@ -579,7 +102,7 @@ void linkingt::duplicate_code_symbol(
     else if(
       new_symbol.type.get_bool(ID_C_incomplete) && new_symbol.value.is_nil())
     {
-      link_warning(
+      diag.warning(
         old_symbol,
         new_symbol,
         "ignoring conflicting implicit function declaration");
@@ -603,10 +126,12 @@ void linkingt::duplicate_code_symbol(
     else if(old_symbol.is_weak)
     {
       if(new_symbol.value.is_nil())
-        link_warning(
+      {
+        diag.warning(
           old_symbol,
           new_symbol,
           "function declaration conflicts with with weak definition");
+      }
       else
         old_symbol.value.make_nil();
     }
@@ -617,7 +142,7 @@ void linkingt::duplicate_code_symbol(
       {
         new_symbol.value.make_nil();
 
-        link_warning(
+        diag.warning(
           old_symbol,
           new_symbol,
           "ignoring conflicting weak function declaration");
@@ -631,7 +156,7 @@ void linkingt::duplicate_code_symbol(
              old_symbol.value.is_not_nil() &&
              new_symbol.value.is_nil()))
     {
-      link_warning(
+      diag.warning(
         old_symbol,
         new_symbol,
         "ignoring conflicting function alias declaration");
@@ -640,10 +165,8 @@ void linkingt::duplicate_code_symbol(
     // types
     else if(old_symbol.value.is_nil() && new_symbol.value.is_nil())
     {
-      link_warning(
-        old_symbol,
-        new_symbol,
-        "ignoring conflicting function declarations");
+      diag.warning(
+        old_symbol, new_symbol, "ignoring conflicting function declarations");
 
       if(old_t.parameters().size()<new_t.parameters().size())
       {
@@ -660,7 +183,7 @@ void linkingt::duplicate_code_symbol(
              old_symbol.value.is_not_nil() &&
              !new_t.has_ellipsis()))
     {
-      link_error(
+      diag.error(
         old_symbol,
         new_symbol,
         "conflicting parameter counts of function declarations");
@@ -679,7 +202,7 @@ void linkingt::duplicate_code_symbol(
 
       if(old_t.return_type() != new_t.return_type())
       {
-        link_warning(old_symbol, new_symbol, "conflicting return types");
+        diag.warning(old_symbol, new_symbol, "conflicting return types");
 
         conflicts.emplace_back(old_t.return_type(), new_t.return_type());
       }
@@ -700,7 +223,7 @@ void linkingt::duplicate_code_symbol(
       {
         if(!new_t.has_ellipsis() && old_symbol.value.is_not_nil())
         {
-          link_error(
+          diag.error(
             old_symbol,
             new_symbol,
             "conflicting parameter counts of function declarations");
@@ -715,7 +238,7 @@ void linkingt::duplicate_code_symbol(
       {
         if(!old_t.has_ellipsis() && new_symbol.value.is_not_nil())
         {
-          link_error(
+          diag.error(
             old_symbol,
             new_symbol,
             "conflicting parameter counts of function declarations");
@@ -808,16 +331,13 @@ void linkingt::duplicate_code_symbol(
 
       if(!conflicts.empty())
       {
-        detailed_conflict_report(
+        diag.detailed_conflict_report(
           old_symbol,
           new_symbol,
           conflicts.front().first,
           conflicts.front().second);
 
-        link_error(
-          old_symbol,
-          new_symbol,
-          "conflicting function declarations");
+        diag.error(old_symbol, new_symbol, "conflicting function declarations");
 
         // error logged, continue typechecking other symbols
         return;
@@ -825,7 +345,7 @@ void linkingt::duplicate_code_symbol(
       else
       {
         // warns about the first inconsistency
-        link_warning(old_symbol, new_symbol, warn_msg);
+        diag.warning(old_symbol, new_symbol, warn_msg);
 
         if(replace)
         {
@@ -872,10 +392,9 @@ void linkingt::duplicate_code_symbol(
                   << old_symbol.module << "'" << messaget::eom;
     }
     else
-      link_error(
-        old_symbol,
-        new_symbol,
-        "duplicate definition of function");
+    {
+      diag.error(old_symbol, new_symbol, "duplicate definition of function");
+    }
   }
 }
 
@@ -970,22 +489,23 @@ bool linkingt::adjust_object_type_rec(
 
   if(t1.id()==ID_pointer)
   {
-    #if 0
+    linking_diagnosticst diag{message_handler, ns};
+#if 0
     bool s=info.set_to_new;
     if(adjust_object_type_rec(t1.subtype(), t2.subtype(), info))
     {
-      link_warning(
+      diag.warning(
         info.old_symbol,
         info.new_symbol,
         "conflicting pointer types for variable");
       info.set_to_new=s;
     }
-    #else
-    link_warning(
+#else
+    diag.warning(
       info.old_symbol,
       info.new_symbol,
       "conflicting pointer types for variable");
-    #endif
+#endif
 
     if(info.old_symbol.is_extern && !info.new_symbol.is_extern)
     {
@@ -1019,7 +539,8 @@ bool linkingt::adjust_object_type_rec(
     {
       if(new_size.type() != old_size.type())
       {
-        link_error(
+        linking_diagnosticst diag{message_handler, ns};
+        diag.error(
           info.old_symbol,
           info.new_symbol,
           "conflicting array sizes for variable");
@@ -1032,7 +553,8 @@ bool linkingt::adjust_object_type_rec(
 
       if(!simplify_expr(eq, ns).is_true())
       {
-        link_error(
+        linking_diagnosticst diag{message_handler, ns};
+        diag.error(
           info.old_symbol,
           info.new_symbol,
           "conflicting array sizes for variable");
@@ -1102,22 +624,20 @@ void linkingt::duplicate_object_symbol(
     {
       const typet &old_type=follow_tags_symbols(ns, old_symbol.type);
 
+      linking_diagnosticst diag{message_handler, ns};
+
       // provide additional diagnostic output for
       // struct/union/array/enum
       if(old_type.id()==ID_struct ||
          old_type.id()==ID_union ||
          old_type.id()==ID_array ||
          old_type.id()==ID_c_enum)
-        detailed_conflict_report(
-          old_symbol,
-          new_symbol,
-          old_symbol.type,
-          new_symbol.type);
+      {
+        diag.detailed_conflict_report(
+          old_symbol, new_symbol, old_symbol.type, new_symbol.type);
+      }
 
-      link_error(
-        old_symbol,
-        new_symbol,
-        "conflicting types for variable");
+      diag.error(old_symbol, new_symbol, "conflicting types for variable");
 
       // error logged, continue typechecking other symbols
       return;
@@ -1162,10 +682,10 @@ void linkingt::duplicate_object_symbol(
                       << " variable '" << old_symbol.name << "'\n";
         log.warning() << "using old value in module " << old_symbol.module
                       << " " << old_symbol.value.find_source_location() << '\n'
-                      << expr_to_string(old_symbol.name, tmp_old) << '\n';
+                      << from_expr(ns, old_symbol.name, tmp_old) << '\n';
         log.warning() << "ignoring new value in module " << new_symbol.module
                       << " " << new_symbol.value.find_source_location() << '\n'
-                      << expr_to_string(new_symbol.name, tmp_new)
+                      << from_expr(ns, new_symbol.name, tmp_new)
                       << messaget::eom;
       }
     }
@@ -1189,7 +709,8 @@ void linkingt::duplicate_non_type_symbol(
     (old_symbol.is_property && new_symbol.is_property &&
      old_symbol.type != new_symbol.type))
   {
-    link_error(old_symbol, new_symbol, "conflict on code contract");
+    linking_diagnosticst diag{message_handler, ns};
+    diag.error(old_symbol, new_symbol, "conflict on code contract");
   }
 
   // see if it is a function or a variable
@@ -1199,10 +720,8 @@ void linkingt::duplicate_non_type_symbol(
 
   if(is_code_old_symbol!=is_code_new_symbol)
   {
-    link_error(
-      old_symbol,
-      new_symbol,
-      "conflicting definition for symbol");
+    linking_diagnosticst diag{message_handler, ns};
+    diag.error(old_symbol, new_symbol, "conflicting definition for symbol");
 
     // error logged, continue typechecking other symbols
     return;
@@ -1230,10 +749,8 @@ void linkingt::duplicate_type_symbol(
 
   if(!old_symbol.is_type)
   {
-    link_error(
-      old_symbol,
-      new_symbol,
-      "conflicting definition for symbol");
+    linking_diagnosticst diag{message_handler, ns};
+    diag.error(old_symbol, new_symbol, "conflicting definition for symbol");
 
     // error logged, continue typechecking other symbols
     return;
@@ -1305,16 +822,13 @@ void linkingt::duplicate_type_symbol(
     }
   }
 
-  detailed_conflict_report(
-    old_symbol,
-    new_symbol,
-    old_symbol.type,
-    new_symbol.type);
+  linking_diagnosticst diag{message_handler, ns};
 
-  link_error(
-    old_symbol,
-    new_symbol,
-    "unexpected difference between type symbols");
+  diag.detailed_conflict_report(
+    old_symbol, new_symbol, old_symbol.type, new_symbol.type);
+
+  diag.error(
+    old_symbol, new_symbol, "unexpected difference between type symbols");
 }
 
 linkingt::renamingt linkingt::needs_renaming_type(
