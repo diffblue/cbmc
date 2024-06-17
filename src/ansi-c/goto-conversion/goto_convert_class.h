@@ -241,10 +241,7 @@ protected:
     goto_programt &dest,
     const irep_idt &mode);
   void convert_cpp_delete(const codet &code, goto_programt &dest);
-  void convert_loop_contracts(
-    const codet &code,
-    goto_programt::targett loop,
-    const irep_idt &mode);
+  void convert_loop_contracts(const codet &code, goto_programt::targett loop);
   void
   convert_for(const code_fort &code, goto_programt &dest, const irep_idt &mode);
   void convert_while(
