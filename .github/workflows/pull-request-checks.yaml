@@ -583,8 +583,8 @@ jobs:
         run: cd build; ctest . -V -L THOROUGH -j2
 
   # This job takes approximately 39 to 69 minutes
-  check-macos-11-make-clang:
-    runs-on: macos-11
+  check-macos-13-make-clang:
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
         with:
@@ -617,8 +617,8 @@ jobs:
       - name: Build using Make
         run: |
           make -C src minisat2-download cadical-download
-          make -C src -j3 CXX="ccache clang++" MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
-          make -C jbmc/src -j3 CXX="ccache clang++"
+          make -C src -j4 CXX="ccache clang++" MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
+          make -C jbmc/src -j4 CXX="ccache clang++"
           make -C unit "CXX=ccache clang++"
           make -C jbmc/unit "CXX=ccache clang++"
       - name: Print ccache stats
@@ -630,9 +630,9 @@ jobs:
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
       - name: Run regression tests
-        run: make -C regression test-parallel JOBS=3
+        run: make -C regression test-parallel JOBS=4
       - name: Run JBMC regression tests
-        run: make -C jbmc/regression test-parallel JOBS=3
+        run: make -C jbmc/regression test-parallel JOBS=4
 
   # This job takes approximately 66 to 85 minutes
   check-macos-12-cmake-clang:

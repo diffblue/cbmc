@@ -914,6 +914,7 @@ IREP_ID_ONE(prophecy_rw_ok)
 IREP_ID_ONE(prophecy_r_ok)
 IREP_ID_ONE(prophecy_w_ok)
 IREP_ID_ONE(prophecy_pointer_in_range)
+IREP_ID_ONE(bit_cast)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree

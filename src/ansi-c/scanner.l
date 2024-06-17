@@ -540,6 +540,10 @@ enable_or_disable ("enable"|"disable")
                     return make_identifier();
                 }
 
+{CPROVER_PREFIX}"Float16" {
+                  loc(); return TOK_GCC_FLOAT16;
+                }
+
 "__bf16"        { if(PARSER.bf16_type)
                   { loc(); return TOK_GCC_FLOAT16; }
                   else
@@ -584,9 +588,7 @@ enable_or_disable ("enable"|"disable")
                   loc(); return TOK_GCC_FLOAT80;
                 }
 
-"__float128"    { // This is a keyword for CLANG,
-                  // but a typedef for GCC
-                  if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+"__float128"    { if(PARSER.__float128_is_keyword)
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
@@ -1306,6 +1308,13 @@ __decltype          { if(PARSER.cpp98 &&
                   else
                     return make_identifier();
                 }
+
+"__builtin_bit_cast" { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                          PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+                         { loc(); return TOK_BIT_CAST; }
+                       else
+                         return make_identifier();
+                     }
 
 {CPROVER_PREFIX}"atomic"       { loc(); return TOK_CPROVER_ATOMIC; }
 {CPROVER_PREFIX}"forall"       { loc(); return TOK_FORALL; }

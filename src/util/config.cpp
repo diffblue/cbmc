@@ -835,6 +835,7 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
   ansi_c.ts_18661_3_Floatn_types=false;
+  ansi_c.__float128_is_keyword = false;
   ansi_c.float16_type = false;
   ansi_c.bf16_type = false;
   ansi_c.fp16_type = false;
@@ -985,6 +986,13 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.os=configt::ansi_ct::ost::OS_MACOS;
     ansi_c.mode = ansi_ct::flavourt::CLANG;
     ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
+    // configure_gcc sets these with additional version-of-clang level of
+    // detail, but the below are reasonable defaults for modern clang
+    // installations
+    ansi_c.__float128_is_keyword = true;
+    ansi_c.float16_type = true;
+    ansi_c.bf16_type = true;
+    ansi_c.fp16_type = true;
   }
   else if(os == "linux" || os == "solaris" || os == "netbsd" || os == "hurd")
   {
@@ -999,6 +1007,13 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.os=configt::ansi_ct::ost::OS_LINUX;
     ansi_c.mode=ansi_ct::flavourt::CLANG;
     ansi_c.preprocessor=ansi_ct::preprocessort::CLANG;
+    // configure_gcc sets these with additional version-of-clang level of
+    // detail, but the below are reasonable defaults for modern clang
+    // installations
+    ansi_c.__float128_is_keyword = true;
+    ansi_c.float16_type = true;
+    ansi_c.bf16_type = true;
+    ansi_c.fp16_type = true;
   }
   else
   {
@@ -1329,8 +1344,8 @@ void configt::set_from_symbol_table(const symbol_table_baset &symbol_table)
   ansi_c.char_is_unsigned=unsigned_from_ns(ns, "char_is_unsigned")!=0;
   ansi_c.wchar_t_is_unsigned=unsigned_from_ns(ns, "wchar_t_is_unsigned")!=0;
   // for_has_scope, single_precision_constant, rounding_mode,
-  // ts_18661_3_Floatn_types, float16_type, bf16_type, fp16_type are not
-  // architectural features, and thus not stored in namespace
+  // ts_18661_3_Floatn_types, __float128_is_keyword, float16_type, bf16_type,
+  // fp16_type are not architectural features, and thus not stored in namespace
 
   ansi_c.alignment=unsigned_from_ns(ns, "alignment");
 

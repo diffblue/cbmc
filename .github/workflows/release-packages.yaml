@@ -152,7 +152,7 @@ jobs:
           SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 20.04 package built and uploaded successfully' || 'Ubuntu 20.04 package build failed' }}"
 
   homebrew-pr:
-    runs-on: macos-11
+    runs-on: macos-13
     steps:
       - name: Get release tag name
         # The GITHUB_REF we get has refs/tags/ in front of the tag name so we

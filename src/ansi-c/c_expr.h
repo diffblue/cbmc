@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file ansi-c/c_expr.h
 /// API to expression classes that are internal to the C frontend
 
+#include <util/byte_operators.h>
 #include <util/std_code.h>
 
 /// \brief Shuffle elements of one or two vectors, modelled after Clang's
@@ -366,6 +367,53 @@ inline enum_is_in_range_exprt &to_enum_is_in_range_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_enum_is_in_range);
   enum_is_in_range_exprt &ret = static_cast<enum_is_in_range_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \brief Reinterpret the bits of an expression of type `S` as an expression of
+/// type `T` where `S` and `T` have the same size.
+class bit_cast_exprt : public unary_exprt
+{
+public:
+  bit_cast_exprt(exprt expr, typet type)
+    : unary_exprt(ID_bit_cast, std::move(expr), std::move(type))
+  {
+  }
+
+  byte_extract_exprt lower() const;
+};
+
+template <>
+inline bool can_cast_expr<bit_cast_exprt>(const exprt &base)
+{
+  return base.id() == ID_bit_cast;
+}
+
+inline void validate_expr(const bit_cast_exprt &value)
+{
+  validate_operands(value, 1, "bit_cast must have one operand");
+}
+
+/// \brief Cast an exprt to a \ref bit_cast_exprt
+///
+/// \a expr must be known to be \ref bit_cast_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref bit_cast_exprt
+inline const bit_cast_exprt &to_bit_cast_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_bit_cast);
+  const bit_cast_exprt &ret = static_cast<const bit_cast_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_bit_cast_expr(const exprt &)
+inline bit_cast_exprt &to_bit_cast_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_bit_cast);
+  bit_cast_exprt &ret = static_cast<bit_cast_exprt &>(expr);
   validate_expr(ret);
   return ret;
 }
