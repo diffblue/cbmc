@@ -4,7 +4,7 @@ var shadow__memory__util_8cpp =
     [ "are_types_compatible", "shadow__memory__util_8cpp.html#a3938f88acd850e5a8317f962c0a0e922", null ],
     [ "build_if_else_expr", "shadow__memory__util_8cpp.html#a0380d6d898750c64eefae4f0e306bf3d", null ],
     [ "check_value_set_contains_only_null_ptr", "shadow__memory__util_8cpp.html#a3f5d116fd22aefdde6a6bd259e7d1167", null ],
-    [ "clean_pointer_expr", "shadow__memory__util_8cpp.html#ac7c04fbb203b47a5ce29a4b76fbcf880", null ],
+    [ "clean_pointer_expr", "shadow__memory__util_8cpp.html#a6166b115b303c89c1977b3ef1e8c9146", null ],
     [ "clean_string_constant", "shadow__memory__util_8cpp.html#a1e7997b6b193ba69598a8dd3f851cdd1", null ],
     [ "combine_condition_and_max_values", "shadow__memory__util_8cpp.html#af026a61f31c0d39ca427e1bfb5a0d10a", null ],
     [ "compare_to_collection", "shadow__memory__util_8cpp.html#a5f36fbb1962a8165f893f7fa04954672", null ],

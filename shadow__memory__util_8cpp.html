@@ -165,9 +165,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a2452eaf7cfa3f9d3d3e3182b48db9505"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8cpp.html#a2452eaf7cfa3f9d3d3e3182b48db9505">deref_expr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a2452eaf7cfa3f9d3d3e3182b48db9505"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wraps a given expression into a <code><a class="el" href="classdereference__exprt.html" title="Operator to dereference a pointer.">dereference_exprt</a></code> unless it is an <code><a class="el" href="classaddress__of__exprt.html" title="Operator to return the address of an object.">address_of_exprt</a></code> in which case it just unboxes it and returns its content.  <a href="shadow__memory__util_8cpp.html#a2452eaf7cfa3f9d3d3e3182b48db9505">More...</a><br /></td></tr>
 <tr class="separator:a2452eaf7cfa3f9d3d3e3182b48db9505"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7c04fbb203b47a5ce29a4b76fbcf880"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8cpp.html#ac7c04fbb203b47a5ce29a4b76fbcf880">clean_pointer_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
-<tr class="memdesc:ac7c04fbb203b47a5ce29a4b76fbcf880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean the given pointer expression so that it has the right shape for being used for identifying shadow memory.  <a href="shadow__memory__util_8cpp.html#ac7c04fbb203b47a5ce29a4b76fbcf880">More...</a><br /></td></tr>
-<tr class="separator:ac7c04fbb203b47a5ce29a4b76fbcf880"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6166b115b303c89c1977b3ef1e8c9146"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8cpp.html#a6166b115b303c89c1977b3ef1e8c9146">clean_pointer_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a6166b115b303c89c1977b3ef1e8c9146"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean the given pointer expression so that it has the right shape for being used for identifying shadow memory.  <a href="shadow__memory__util_8cpp.html#a6166b115b303c89c1977b3ef1e8c9146">More...</a><br /></td></tr>
+<tr class="separator:a6166b115b303c89c1977b3ef1e8c9146"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0986423d84e9da56454bc5ab418f68f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="shadow__memory__util_8cpp.html#a0986423d84e9da56454bc5ab418f68f7">replace_invalid_object_by_null</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a0986423d84e9da56454bc5ab418f68f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace an invalid object by a null pointer.  <a href="shadow__memory__util_8cpp.html#a0986423d84e9da56454bc5ab418f68f7">More...</a><br /></td></tr>
 <tr class="separator:a0986423d84e9da56454bc5ab418f68f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -275,7 +275,7 @@ Functions</h2></td></tr>
 <p>Flattens type of the form <code>pointer_type(array_type(element_type))</code> to <code>pointer_type(element_type)</code> and <code>pointer_type(string_constant_type)</code> to <code>pointer_type(char)</code>. </p>
 <dl class="section note"><dt>Note</dt><dd>type <code>type</code> will be changed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00697">697</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00706">706</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -323,7 +323,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if types equal, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00651">651</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00660">660</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -353,7 +353,7 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classif__exprt.html" title="The trinary if-then-else operator.">if_exprt</a> of the form <code>if e1 then e2 else if e3 then e4 else ...</code> </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>the expression created will not have the first condition as the first element will serve fallback if all the other conditions are <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00624">624</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00633">633</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -407,12 +407,12 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if value_set contains only a <code>NULL</code> pointer expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l01017">1017</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l01029">1029</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ac7c04fbb203b47a5ce29a4b76fbcf880"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7c04fbb203b47a5ce29a4b76fbcf880">&#9670;&nbsp;</a></span>clean_pointer_expr()</h2>
+<a id="a6166b115b303c89c1977b3ef1e8c9146"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6166b115b303c89c1977b3ef1e8c9146">&#9670;&nbsp;</a></span>clean_pointer_expr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -421,18 +421,8 @@ Functions</h2></td></tr>
           <td class="memname">void clean_pointer_expr </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>expr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
-          <td class="paramname"><em>type</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -441,7 +431,6 @@ Functions</h2></td></tr>
 <p>This handles some quirks regarding array sizes containing L2 symbols and string constants not having char-pointer type. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">expr</td><td>The pointer to the original memory, e.g. as passed to __CPROVER_field_get. </td></tr>
-    <tr><td class="paramname">type</td><td>The followed type of expr. </td></tr>
   </table>
   </dd>
 </dl>
@@ -477,7 +466,7 @@ Functions</h2></td></tr>
 <p>Simplify &amp;string_constant[0] to &amp;string_constant to facilitate expression equality for exact matching. </p>
 <dl class="section note"><dt>Note</dt><dd>expression expr will be changed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00682">682</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00691">691</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -514,7 +503,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the combined max expression </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00549">549</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00558">558</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -554,7 +543,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pair (cond, elem) containing the condition and the max element. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00516">516</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00525">525</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -601,7 +590,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the aggregated max byte-sized value contained in expr Note that the expr type size must be known at compile time. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00593">593</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00602">602</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -662,7 +651,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the aggregated <code>or</code> byte-sized value contained in expr </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00440">440</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00441">441</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -699,7 +688,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An unsigned bitvector expression if eligible - <code>id</code> otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00348">348</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00349">349</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -739,7 +728,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the object can be null or invalid in the value set, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00317">317</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00318">318</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -776,7 +765,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>an <code>exprt</code> encoding the max operation over the collection <code>values</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00579">579</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00588">588</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -859,7 +848,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00367">367</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00368">368</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -934,7 +923,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00396">396</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00397">397</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1003,7 +992,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The expression the field was initialised with. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00298">298</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00299">299</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1043,7 +1032,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The type of the value the field was initialised with (actually, the type of the value the field currently is associated with, but it's invariant since the declaration). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00311">311</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00312">312</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1096,7 +1085,7 @@ Functions</h2></td></tr>
 <p>Function that compares the two arguments shadowed_address and matched_base_address, simplifies the comparison expression and if the lhs and rhs are structurally identical returns true, otherwise returns the comparison. </p>
 <dl class="section return"><dt>Returns</dt><dd>the comparison expression of shadowed_address and matched_base_address (or a <a class="el" href="classtrue__exprt.html" title="The Boolean constant true.">true_exprt</a> if identical modulo simplification). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00722">722</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00731">731</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1149,7 +1138,7 @@ Functions</h2></td></tr>
 <p>Function that compares the two arguments dereference_pointer and expr, simplifies the comparison expression and if the lhs and rhs are structurally identical returns true, otherwise returns the comparison. </p>
 <dl class="section return"><dt>Returns</dt><dd>the comparison expression of dereference_pointer and expr (or a <a class="el" href="classtrue__exprt.html" title="The Boolean constant true.">true_exprt</a> if identical modulo simplification). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00761">761</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00770">770</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1218,7 +1207,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <code>valuet</code> object denoting the dereferenced object within shadow memory, guarded by a appropriate condition (of the form pointer == &amp;shadow_object). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00804">804</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00813">813</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1287,7 +1276,7 @@ Functions</h2></td></tr>
 <p>Get a list of <code>(condition, value)</code> pairs for a certain pointer from the shadow memory, where each pair denotes the <code>value</code> of the pointer expression if the <code>condition</code> evaluates to <code>true</code>. </p>
 <dl class="section return"><dt>Returns</dt><dd>A vector of pair&lt;expr, expr&gt; corresponding to a condition and value. (See above for explanation). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00843">843</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00852">852</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1344,7 +1333,7 @@ Functions</h2></td></tr>
 <p>Get shadow memory values for a given expression within a specified value set. </p>
 <dl class="section return"><dt>Returns</dt><dd>if potential values are present for that object inside the value set, then we get back an <code>if e1 then e2 else (if e3 else e4...</code> expression, where <code>e1</code>, <code>e3</code>, ... are guards (conditions) and <code>e2</code>, <code>e4</code>, etc are the possible values of the object within the value set. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l01130">1130</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l01142">1142</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1408,7 +1397,7 @@ Functions</h2></td></tr>
 
 <p>Used for set_field and shadow memory copy. </p>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l01038">1038</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l01050">1050</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1753,7 +1742,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00971">971</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00980">980</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1801,7 +1790,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly constructed <a class="el" href="classor__exprt.html" title="Boolean OR.">or_exprt</a> over the possible values given. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00431">431</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00432">432</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -1865,7 +1854,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00279">279</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="shadow__memory__util_8cpp_source.html#l00280">280</a> of file <a class="el" href="shadow__memory__util_8cpp_source.html">shadow_memory_util.cpp</a>.</p>
 
 </div>
 </div>

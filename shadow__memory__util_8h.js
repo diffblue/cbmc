@@ -2,7 +2,7 @@ var shadow__memory__util_8h =
 [
     [ "build_if_else_expr", "shadow__memory__util_8h.html#a0380d6d898750c64eefae4f0e306bf3d", null ],
     [ "check_value_set_contains_only_null_ptr", "shadow__memory__util_8h.html#a3f5d116fd22aefdde6a6bd259e7d1167", null ],
-    [ "clean_pointer_expr", "shadow__memory__util_8h.html#ac7c04fbb203b47a5ce29a4b76fbcf880", null ],
+    [ "clean_pointer_expr", "shadow__memory__util_8h.html#a6166b115b303c89c1977b3ef1e8c9146", null ],
     [ "compute_max_over_bytes", "shadow__memory__util_8h.html#a78e33ce50f4cec769dc062e6b367cdf1", null ],
     [ "compute_or_over_bytes", "shadow__memory__util_8h.html#a35f3c4f9630820408ef9a3c091ac9b08", null ],
     [ "contains_null_or_invalid", "shadow__memory__util_8h.html#a2909c4734476f16c5091a0b767ebc6fc", null ],
