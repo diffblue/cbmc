@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/byte_operators.h" name="/home/runner/work/cbmc/cbmc/src/util/byte_operators.h">
-<area shape="rect" id="node1" title="Expression classes for byte&#45;level operators." alt="" coords="5197,5,5419,47"/>
-<area shape="rect" id="node2" href="$goto__rw_8cpp.html" title=" " alt="" coords="5,102,189,158"/>
-<area shape="rect" id="node3" href="$invariant__set_8cpp.html" title="Invariant Set." alt="" coords="213,102,421,158"/>
-<area shape="rect" id="node4" href="$c__typecheck__initializer_8cpp.html" title="ANSI&#45;C Conversion / Type Checking." alt="" coords="446,102,658,158"/>
-<area shape="rect" id="node5" href="$expr2c__class_8h.html" title=" " alt="" coords="683,102,867,158"/>
-<area shape="rect" id="node13" href="$bv__pointers__wide_8cpp.html" title=" " alt="" coords="891,102,1109,158"/>
-<area shape="rect" id="node14" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="1133,102,1326,158"/>
-<area shape="rect" id="node20" href="$dfcc__root__object_8cpp.html" title=" " alt="" coords="1351,95,1548,165"/>
-<area shape="rect" id="node21" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="1573,102,1766,158"/>
-<area shape="rect" id="node22" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="1791,102,1975,158"/>
-<area shape="rect" id="node23" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="1999,102,2183,158"/>
-<area shape="rect" id="node24" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="2207,102,2393,158"/>
-<area shape="rect" id="node25" href="$remove__function__pointers_8cpp.html" title="Program Transformation." alt="" coords="2418,102,2641,158"/>
-<area shape="rect" id="node26" href="$rewrite__union_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="2665,102,2849,158"/>
-<area shape="rect" id="node27" href="$build__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="2873,102,3076,158"/>
-<area shape="rect" id="node28" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="3101,102,3299,158"/>
-<area shape="rect" id="node29" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="3323,102,3522,158"/>
-<area shape="rect" id="node30" href="$shadow__memory__util_8cpp.html" title="Symex Shadow Memory Instrumentation Utilities." alt="" coords="3546,102,3766,158"/>
-<area shape="rect" id="node31" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="3790,102,3994,158"/>
-<area shape="rect" id="node32" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="4018,102,4233,158"/>
-<area shape="rect" id="node33" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4257,102,4471,158"/>
-<area shape="rect" id="node34" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4495,102,4710,158"/>
-<area shape="rect" id="node35" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4734,102,4949,158"/>
-<area shape="rect" id="node36" href="$symex__other_8cpp.html" title="Symbolic Execution." alt="" coords="4973,102,5187,158"/>
-<area shape="rect" id="node37" href="$value__set_8cpp.html" title="Value Set." alt="" coords="5211,102,5405,158"/>
-<area shape="rect" id="node38" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="5429,102,5630,158"/>
-<area shape="rect" id="node39" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="5654,102,5847,158"/>
-<area shape="rect" id="node40" href="$boolbv_8cpp.html" title=" " alt="" coords="5871,102,6073,158"/>
-<area shape="rect" id="node41" href="$boolbv__byte__extract_8cpp.html" title=" " alt="" coords="6097,102,6298,158"/>
-<area shape="rect" id="node42" href="$boolbv__byte__update_8cpp.html" title=" " alt="" coords="6322,102,6523,158"/>
-<area shape="rect" id="node43" href="$boolbv__equality_8cpp.html" title=" " alt="" coords="6547,102,6749,158"/>
-<area shape="rect" id="node44" href="$boolbv__index_8cpp.html" title=" " alt="" coords="6773,102,6974,158"/>
-<area shape="rect" id="node45" href="$bv__pointers_8cpp.html" title=" " alt="" coords="6998,102,7199,158"/>
-<area shape="rect" id="node46" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="7223,102,7425,158"/>
-<area shape="rect" id="node47" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="7449,102,7633,158"/>
-<area shape="rect" id="node48" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="7658,95,7854,165"/>
-<area shape="rect" id="node49" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="7879,95,8108,165"/>
-<area shape="rect" id="node50" href="$byte__operators_8cpp.html" title=" " alt="" coords="8133,109,8371,151"/>
-<area shape="rect" id="node51" href="$expr__initializer_8cpp.html" title="Expression Initialization." alt="" coords="8395,109,8631,151"/>
-<area shape="rect" id="node52" href="$expr__util_8cpp.html" title=" " alt="" coords="8656,109,8853,151"/>
-<area shape="rect" id="node53" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="8877,102,9061,158"/>
-<area shape="rect" id="node54" href="$lower__byte__operators_8cpp.html" title=" " alt="" coords="9086,102,9271,158"/>
-<area shape="rect" id="node55" href="$pointer__expr_8cpp.html" title=" " alt="" coords="9296,102,9480,158"/>
-<area shape="rect" id="node56" href="$pointer__offset__size_8cpp.html" title="Pointer Logic." alt="" coords="9504,102,9688,158"/>
-<area shape="rect" id="node57" href="$simplify__expr_8cpp.html" title=" " alt="" coords="9712,102,9896,158"/>
-<area shape="rect" id="node58" href="$simplify__expr__array_8cpp.html" title=" " alt="" coords="9920,102,10104,158"/>
-<area shape="rect" id="node59" href="$simplify__expr__struct_8cpp.html" title=" " alt="" coords="10128,102,10312,158"/>
-<area shape="rect" id="node60" href="$java__trace__validation_8cpp.html" title=" " alt="" coords="10336,102,10555,158"/>
-<area shape="rect" id="node6" href="$expr2c_8cpp.html" title=" " alt="" coords="8,228,211,269"/>
-<area shape="rect" id="node7" href="$expr2cpp_8cpp.html" title=" " alt="" coords="235,228,437,269"/>
-<area shape="rect" id="node8" href="$analyze__symbol_8h.html" title="High&#45;level interface to gdb." alt="" coords="462,221,666,277"/>
-<area shape="rect" id="node11" href="$expr2java_8cpp.html" title=" " alt="" coords="737,332,956,388"/>
-<area shape="rect" id="node12" href="$expr2java_8h.html" title=" " alt="" coords="741,221,960,277"/>
-<area shape="rect" id="node9" href="$analyze__symbol_8cpp.html" title=" " alt="" coords="206,332,410,388"/>
-<area shape="rect" id="node10" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="435,332,704,388"/>
-<area shape="rect" id="node15" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="985,221,1178,277"/>
-<area shape="rect" id="node16" href="$dfcc_8cpp.html" title=" " alt="" coords="1203,213,1400,284"/>
-<area shape="rect" id="node17" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="1424,213,1621,284"/>
-<area shape="rect" id="node18" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="1646,213,1845,284"/>
-<area shape="rect" id="node19" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="1868,213,2079,284"/>
+<area shape="rect" id="node1" title="Expression classes for byte&#45;level operators." alt="" coords="6301,5,6523,47"/>
+<area shape="rect" id="node2" href="$goto__rw_8cpp.html" title=" " alt="" coords="1015,102,1199,158"/>
+<area shape="rect" id="node3" href="$invariant__set_8cpp.html" title="Invariant Set." alt="" coords="1223,102,1431,158"/>
+<area shape="rect" id="node4" href="$c__expr_8h.html" title="API to expression classes that are internal to the C frontend." alt="" coords="1455,109,1641,151"/>
+<area shape="rect" id="node16" href="$c__typecheck__initializer_8cpp.html" title="ANSI&#45;C Conversion / Type Checking." alt="" coords="1882,102,2094,158"/>
+<area shape="rect" id="node17" href="$expr2c__class_8h.html" title=" " alt="" coords="2119,102,2303,158"/>
+<area shape="rect" id="node18" href="$bv__pointers__wide_8cpp.html" title=" " alt="" coords="2327,102,2545,158"/>
+<area shape="rect" id="node19" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="1665,102,1858,158"/>
+<area shape="rect" id="node20" href="$dfcc__root__object_8cpp.html" title=" " alt="" coords="2569,95,2767,165"/>
+<area shape="rect" id="node21" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="2791,102,2985,158"/>
+<area shape="rect" id="node22" href="$goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="3009,102,3193,158"/>
+<area shape="rect" id="node23" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="3217,102,3401,158"/>
+<area shape="rect" id="node24" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="3425,102,3612,158"/>
+<area shape="rect" id="node25" href="$remove__function__pointers_8cpp.html" title="Program Transformation." alt="" coords="3637,102,3859,158"/>
+<area shape="rect" id="node26" href="$rewrite__union_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="3884,102,4068,158"/>
+<area shape="rect" id="node27" href="$build__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="4092,102,4295,158"/>
+<area shape="rect" id="node28" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="4319,102,4518,158"/>
+<area shape="rect" id="node29" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="4542,102,4741,158"/>
+<area shape="rect" id="node30" href="$shadow__memory__util_8cpp.html" title="Symex Shadow Memory Instrumentation Utilities." alt="" coords="4765,102,4985,158"/>
+<area shape="rect" id="node31" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="5009,102,5213,158"/>
+<area shape="rect" id="node32" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="5237,102,5451,158"/>
+<area shape="rect" id="node33" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="5475,102,5690,158"/>
+<area shape="rect" id="node34" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="5714,102,5929,158"/>
+<area shape="rect" id="node35" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="5953,102,6167,158"/>
+<area shape="rect" id="node36" href="$symex__other_8cpp.html" title="Symbolic Execution." alt="" coords="6191,102,6406,158"/>
+<area shape="rect" id="node37" href="$value__set_8cpp.html" title="Value Set." alt="" coords="6430,102,6623,158"/>
+<area shape="rect" id="node38" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="6647,102,6849,158"/>
+<area shape="rect" id="node39" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="6873,102,7066,158"/>
+<area shape="rect" id="node40" href="$boolbv_8cpp.html" title=" " alt="" coords="7090,102,7291,158"/>
+<area shape="rect" id="node41" href="$boolbv__byte__extract_8cpp.html" title=" " alt="" coords="7315,102,7517,158"/>
+<area shape="rect" id="node42" href="$boolbv__byte__update_8cpp.html" title=" " alt="" coords="7541,102,7742,158"/>
+<area shape="rect" id="node43" href="$boolbv__equality_8cpp.html" title=" " alt="" coords="7766,102,7967,158"/>
+<area shape="rect" id="node44" href="$boolbv__index_8cpp.html" title=" " alt="" coords="7991,102,8193,158"/>
+<area shape="rect" id="node45" href="$bv__pointers_8cpp.html" title=" " alt="" coords="8217,102,8418,158"/>
+<area shape="rect" id="node46" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="8442,102,8643,158"/>
+<area shape="rect" id="node47" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="8668,102,8852,158"/>
+<area shape="rect" id="node48" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="8877,95,9073,165"/>
+<area shape="rect" id="node49" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="9097,95,9327,165"/>
+<area shape="rect" id="node50" href="$byte__operators_8cpp.html" title=" " alt="" coords="9351,109,9590,151"/>
+<area shape="rect" id="node51" href="$expr__initializer_8cpp.html" title="Expression Initialization." alt="" coords="9614,109,9850,151"/>
+<area shape="rect" id="node52" href="$expr__util_8cpp.html" title=" " alt="" coords="9875,109,10072,151"/>
+<area shape="rect" id="node53" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="10096,102,10280,158"/>
+<area shape="rect" id="node54" href="$lower__byte__operators_8cpp.html" title=" " alt="" coords="10305,102,10490,158"/>
+<area shape="rect" id="node55" href="$pointer__expr_8cpp.html" title=" " alt="" coords="10515,102,10699,158"/>
+<area shape="rect" id="node56" href="$pointer__offset__size_8cpp.html" title="Pointer Logic." alt="" coords="10723,102,10907,158"/>
+<area shape="rect" id="node57" href="$simplify__expr_8cpp.html" title=" " alt="" coords="10931,102,11115,158"/>
+<area shape="rect" id="node58" href="$simplify__expr__array_8cpp.html" title=" " alt="" coords="11139,102,11323,158"/>
+<area shape="rect" id="node59" href="$simplify__expr__struct_8cpp.html" title=" " alt="" coords="11347,102,11531,158"/>
+<area shape="rect" id="node60" href="$java__trace__validation_8cpp.html" title=" " alt="" coords="11555,102,11773,158"/>
+<area shape="rect" id="node5" href="$c__expr_8cpp.html" title=" " alt="" coords="741,228,941,269"/>
+<area shape="rect" id="node6" href="$c__typecheck__code_8cpp.html" title="C Language Type Checking." alt="" coords="965,221,1177,277"/>
+<area shape="rect" id="node7" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1201,221,1413,277"/>
+<area shape="rect" id="node8" href="$c__typecheck__gcc__polymorphic__builtins_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="1437,221,1659,277"/>
+<area shape="rect" id="node9" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="1683,221,1901,277"/>
+<area shape="rect" id="node10" href="$goto__convert__side__effect_8cpp.html" title="Program Transformation." alt="" coords="1925,213,2112,284"/>
+<area shape="rect" id="node11" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="2358,221,2551,277"/>
+<area shape="rect" id="node12" href="$dfcc_8cpp.html" title=" " alt="" coords="2136,213,2333,284"/>
+<area shape="rect" id="node13" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="5,213,264,284"/>
+<area shape="rect" id="node14" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="289,213,495,284"/>
+<area shape="rect" id="node15" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="520,213,717,284"/>
 </map>

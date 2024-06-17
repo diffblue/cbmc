@@ -135,6 +135,7 @@ var annotated_dup =
     [ "binary_predicate_exprt", "classbinary__predicate__exprt.html", "classbinary__predicate__exprt" ],
     [ "binary_relation_exprt", "classbinary__relation__exprt.html", "classbinary__relation__exprt" ],
     [ "binding_exprt", "classbinding__exprt.html", "classbinding__exprt" ],
+    [ "bit_cast_exprt", "classbit__cast__exprt.html", "classbit__cast__exprt" ],
     [ "bitand_exprt", "classbitand__exprt.html", "classbitand__exprt" ],
     [ "bitnot_exprt", "classbitnot__exprt.html", "classbitnot__exprt" ],
     [ "bitor_exprt", "classbitor__exprt.html", "classbitor__exprt" ],

@@ -98,13 +98,14 @@ $(document).ready(function(){initNavTree('c__expr_8h.html',''); initResizable();
 
 <p>API to expression classes that are internal to the C frontend.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="std__code_8h_source.html">util/std_code.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="byte__operators_8h_source.html">util/byte_operators.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="std__code_8h_source.html">util/std_code.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for c_expr.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="c__expr_8h__incl.svg" width="1022" height="650"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="c__expr_8h__incl.svg" width="995" height="650"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -134,6 +135,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classenum__is__in__range__exprt.html">enum_is_in_range_exprt</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A Boolean expression returning true, iff the value of an enum-typed symbol equals one of the enum's declared values.  <a href="classenum__is__in__range__exprt.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reinterpret the bits of an expression of type <code>S</code> as an expression of type <code>T</code> where <code>S</code> and <code>T</code> have the same size.  <a href="classbit__cast__exprt.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -182,12 +186,53 @@ Functions</h2></td></tr>
 <tr class="memitem:a2edd02a8db19b5d926cec6a294303b17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classenum__is__in__range__exprt.html">enum_is_in_range_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__expr_8h.html#a2edd02a8db19b5d926cec6a294303b17">to_enum_is_in_range_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a2edd02a8db19b5d926cec6a294303b17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classside__effect__expr__overflowt.html">side_effect_expr_overflowt</a>.  <a href="c__expr_8h.html#a2edd02a8db19b5d926cec6a294303b17">More...</a><br /></td></tr>
 <tr class="separator:a2edd02a8db19b5d926cec6a294303b17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae84cb5e19c08bd8962648c0db2fe611c"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:ae84cb5e19c08bd8962648c0db2fe611c"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="c__expr_8h.html#ae84cb5e19c08bd8962648c0db2fe611c">can_cast_expr&lt; bit_cast_exprt &gt;</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;base)</td></tr>
+<tr class="separator:ae84cb5e19c08bd8962648c0db2fe611c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfcbfb43f810dcf7a5170b4105d85534"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__expr_8h.html#abfcbfb43f810dcf7a5170b4105d85534">validate_expr</a> (const <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a> &amp;value)</td></tr>
+<tr class="separator:abfcbfb43f810dcf7a5170b4105d85534"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a970a5f4cd12d79851993244a9b8891"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__expr_8h.html#a4a970a5f4cd12d79851993244a9b8891">to_bit_cast_expr</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a4a970a5f4cd12d79851993244a9b8891"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a>.  <a href="c__expr_8h.html#a4a970a5f4cd12d79851993244a9b8891">More...</a><br /></td></tr>
+<tr class="separator:a4a970a5f4cd12d79851993244a9b8891"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae23917a11783f5edf70040a193566b6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__expr_8h.html#ae23917a11783f5edf70040a193566b6a">to_bit_cast_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:ae23917a11783f5edf70040a193566b6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a>.  <a href="c__expr_8h.html#ae23917a11783f5edf70040a193566b6a">More...</a><br /></td></tr>
+<tr class="separator:ae23917a11783f5edf70040a193566b6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>API to expression classes that are internal to the C frontend. </p>
 
 <p class="definition">Definition in file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="ae84cb5e19c08bd8962648c0db2fe611c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae84cb5e19c08bd8962648c0db2fe611c">&#9670;&nbsp;</a></span>can_cast_expr&lt; bit_cast_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00388">388</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+
+</div>
+</div>
 <a id="a6cf5e7866a16a4bf59097c92a8935dde"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6cf5e7866a16a4bf59097c92a8935dde">&#9670;&nbsp;</a></span>can_cast_expr&lt; conditional_target_group_exprt &gt;()</h2>
 
@@ -214,7 +259,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00293">293</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00294">294</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -244,7 +289,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00338">338</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00339">339</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -274,7 +319,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00076">76</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00077">77</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -304,7 +349,83 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00165">165</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00166">166</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a4a970a5f4cd12d79851993244a9b8891"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a970a5f4cd12d79851993244a9b8891">&#9670;&nbsp;</a></span>to_bit_cast_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a>&amp; to_bit_cast_expr </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00404">404</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="ae23917a11783f5edf70040a193566b6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae23917a11783f5edf70040a193566b6a">&#9670;&nbsp;</a></span>to_bit_cast_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a>&amp; to_bit_cast_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00413">413</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -342,7 +463,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classconditional__target__group__exprt.html">conditional_target_group_exprt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00305">305</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00306">306</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -380,7 +501,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classconditional__target__group__exprt.html">conditional_target_group_exprt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00315">315</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00316">316</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -418,7 +539,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classenum__is__in__range__exprt.html">enum_is_in_range_exprt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00355">355</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00356">356</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -456,7 +577,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classside__effect__expr__overflowt.html">side_effect_expr_overflowt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00365">365</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00366">366</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -494,7 +615,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00219">219</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00220">220</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -532,7 +653,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classshuffle__vector__exprt.html">shuffle_vector_exprt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00092">92</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00093">93</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -570,7 +691,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classshuffle__vector__exprt.html">shuffle_vector_exprt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00102">102</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00103">103</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -608,7 +729,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classside__effect__expr__overflowt.html">side_effect_expr_overflowt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00182">182</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00183">183</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
@@ -646,12 +767,40 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classside__effect__expr__overflowt.html">side_effect_expr_overflowt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00193">193</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00194">194</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="abfcbfb43f810dcf7a5170b4105d85534"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfcbfb43f810dcf7a5170b4105d85534">&#9670;&nbsp;</a></span>validate_expr() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void validate_expr </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classbit__cast__exprt.html">bit_cast_exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00393">393</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
 <a id="aa2f882b7cc4b0917d1e928a3e9fc7b48"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2f882b7cc4b0917d1e928a3e9fc7b48">&#9670;&nbsp;</a></span>validate_expr() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2f882b7cc4b0917d1e928a3e9fc7b48">&#9670;&nbsp;</a></span>validate_expr() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -674,12 +823,12 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00287">287</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00288">288</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
 <a id="a41d8a01736892268966d1045d8b8a498"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a41d8a01736892268966d1045d8b8a498">&#9670;&nbsp;</a></span>validate_expr() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a41d8a01736892268966d1045d8b8a498">&#9670;&nbsp;</a></span>validate_expr() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -702,12 +851,12 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00343">343</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00344">344</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>
 <a id="ab8cbb7602bde56fb051e965f7e1a3661"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab8cbb7602bde56fb051e965f7e1a3661">&#9670;&nbsp;</a></span>validate_expr() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8cbb7602bde56fb051e965f7e1a3661">&#9670;&nbsp;</a></span>validate_expr() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -730,7 +879,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00081">81</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__expr_8h_source.html#l00082">82</a> of file <a class="el" href="c__expr_8h_source.html">c_expr.h</a>.</p>
 
 </div>
 </div>

@@ -1656,6 +1656,7 @@ var hierarchy =
               [ "address_of_exprt", "classaddress__of__exprt.html", null ],
               [ "annotated_pointer_constant_exprt", "classannotated__pointer__constant__exprt.html", null ],
               [ "array_of_exprt", "classarray__of__exprt.html", null ],
+              [ "bit_cast_exprt", "classbit__cast__exprt.html", null ],
               [ "bitnot_exprt", "classbitnot__exprt.html", null ],
               [ "bitreverse_exprt", "classbitreverse__exprt.html", null ],
               [ "bswap_exprt", "classbswap__exprt.html", null ],
