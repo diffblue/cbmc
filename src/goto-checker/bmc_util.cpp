@@ -350,8 +350,9 @@ void postprocess_equation(
   std::chrono::duration<double> postprocess_equation_runtime =
     std::chrono::duration<double>(
       postprocess_equation_stop - postprocess_equation_start);
-  log.status() << "Runtime Postprocess Equation: "
-               << postprocess_equation_runtime.count() << "s" << messaget::eom;
+  log.statistics() << "Runtime Postprocess Equation: "
+                   << postprocess_equation_runtime.count() << "s"
+                   << messaget::eom;
 }
 
 std::chrono::duration<double> prepare_property_decider(

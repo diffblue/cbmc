@@ -838,7 +838,7 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_SUCCESS;
   }
 
-  log.status() << config.object_bits_info() << messaget::eom;
+  log.statistics() << config.object_bits_info() << messaget::eom;
 
   return -1; // no error, continue
 }

@@ -1,6 +1,6 @@
 CORE
 test.c
---export-symex-ready-goto exported.symex.ready.goto
+--export-symex-ready-goto exported.symex.ready.goto --verbosity 10
 ^Parsing test.c$
 ^Converting$
 ^Type-checking test$

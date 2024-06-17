@@ -85,8 +85,8 @@ void multi_path_symex_only_checkert::generate_equation()
   const auto symex_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> symex_runtime =
     std::chrono::duration<double>(symex_stop - symex_start);
-  log.status() << "Runtime Symex: " << symex_runtime.count() << "s"
-               << messaget::eom;
+  log.statistics() << "Runtime Symex: " << symex_runtime.count() << "s"
+                   << messaget::eom;
 
   postprocess_equation(symex, equation, options, ns, ui_message_handler);
 }

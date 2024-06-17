@@ -1,6 +1,6 @@
 CORE
 main.c
---json-ui --stop-on-fail
+--json-ui --stop-on-fail --verbosity 10
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$
