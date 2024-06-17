@@ -56,7 +56,7 @@ jobs:
       - name: Configure using CMake
         run: cmake -S. -B${{env.default_build_dir}} -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_COMPILER=/usr/bin/clang-13 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-13 -DWITH_JBMC=OFF
       - name: Build with CMake
-        run: cmake --build ${{env.default_build_dir}} -j2 --target cprover-api-cpp
+        run: cmake --build ${{env.default_build_dir}} -j4 --target cprover-api-cpp
       - name: Print ccache stats
         run: ccache -s
       # We won't be running any of the regular regression tests, as these are covered
@@ -97,7 +97,7 @@ jobs:
       - name: Configure using CMake
         run: cmake -S. -B${{env.default_build_dir}} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DWITH_JBMC=OFF
       - name: Build with Ninja
-        run: cd ${{env.default_build_dir}}; ninja -j3 cprover-api-cpp
+        run: cd ${{env.default_build_dir}}; ninja -j4 cprover-api-cpp
       - name: Print ccache stats
         run: ccache -s
       # We won't be running any of the regular regression tests, as these are covered

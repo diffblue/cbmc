@@ -44,11 +44,11 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build using Ninja
-        run: ninja -C build -j2
+        run: ninja -C build -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run CTest
-        run: cd build; ctest . -V -L CORE -C Release -j2
+        run: cd build; ctest . -V -L CORE -C Release -j4
       - name: Create packages
         id: create_packages
         run: |
@@ -118,11 +118,11 @@ jobs:
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build using Ninja
-        run: ninja -C build -j2
+        run: ninja -C build -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run CTest
-        run: cd build; ctest . -V -L CORE -C Release -j2
+        run: cd build; ctest . -V -L CORE -C Release -j4
       - name: Create packages
         id: create_packages
         run: |

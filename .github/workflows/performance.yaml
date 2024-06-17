@@ -65,7 +65,7 @@ jobs:
       - name: ccache environment (new variant)
         run: echo "CCACHE_BASEDIR=$PWD/new" >> $GITHUB_ENV
       - name: Build with Ninja (new variant)
-        run: ninja -C new/build -j2
+        run: ninja -C new/build -j4
       - name: Print ccache stats (new variant)
         run: ccache -s
 
@@ -74,7 +74,7 @@ jobs:
       - name: ccache environment (old variant)
         run: echo "CCACHE_BASEDIR=$PWD/old" >> $GITHUB_ENV
       - name: Build with Ninja (old variant)
-        run: ninja -C old/build -j2
+        run: ninja -C old/build -j4
       - name: Print ccache stats (old variant)
         run: ccache -s
 

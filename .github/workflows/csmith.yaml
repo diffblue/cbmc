@@ -39,7 +39,7 @@ jobs:
         run: ccache -z --max-size=500M
       - name: Build with make
         run: |
-          make -C src CXX='ccache /usr/bin/clang++' cbmc.dir goto-cc.dir goto-instrument.dir -j2
+          make -C src CXX='ccache /usr/bin/clang++' cbmc.dir goto-cc.dir goto-instrument.dir -j4
       - name: Print ccache stats
         run: ccache -s
       - name: Run 10 randomly-generated CSmith tests

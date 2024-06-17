@@ -45,10 +45,10 @@ jobs:
     - name: Build
       run: |
         make -C src minisat2-download
-        make -C src       -j2
-        make -C unit      -j2
-        make -C jbmc/src  -j2
-        make -C jbmc/unit -j2
+        make -C src       -j4
+        make -C unit      -j4
+        make -C jbmc/src  -j4
+        make -C jbmc/unit -j4
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
