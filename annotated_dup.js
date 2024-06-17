@@ -778,6 +778,7 @@ var annotated_dup =
     [ "linear_functiont", "classlinear__functiont.html", "classlinear__functiont" ],
     [ "linked_loop_analysist", "classlinked__loop__analysist.html", "classlinked__loop__analysist" ],
     [ "linker_script_merget", "classlinker__script__merget.html", "classlinker__script__merget" ],
+    [ "linking_diagnosticst", "classlinking__diagnosticst.html", "classlinking__diagnosticst" ],
     [ "linkingt", "classlinkingt.html", "classlinkingt" ],
     [ "lispexprt", "classlispexprt.html", "classlispexprt" ],
     [ "lispsymbolt", "classlispsymbolt.html", "classlispsymbolt" ],
