@@ -46,7 +46,7 @@ var classgoto__convertt =
     [ "convert_goto", "classgoto__convertt.html#a4d8231f2d8d7cbee4ada9a746cdb34e7", null ],
     [ "convert_ifthenelse", "classgoto__convertt.html#a3d4866852d09067781ed5c13a4b681dd", null ],
     [ "convert_label", "classgoto__convertt.html#a21e6f78631c7fd4e7f8bf92bdc18ddac", null ],
-    [ "convert_loop_contracts", "classgoto__convertt.html#a7a0650d1d796c891c9bbe2c7a0bdc4c9", null ],
+    [ "convert_loop_contracts", "classgoto__convertt.html#a0f37f4ef37ea67982321907395c2f490", null ],
     [ "convert_msc_leave", "classgoto__convertt.html#ae309f73cb1977d0fd88b90c0887587c9", null ],
     [ "convert_msc_try_except", "classgoto__convertt.html#a9ace6a6a25b9a7f396343dd4c09f5e3a", null ],
     [ "convert_msc_try_finally", "classgoto__convertt.html#a1a03ce5e403c8ae8c0efb2a042c4e93b", null ],
