@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --pointer-check
+--show-goto-functions --pointer-check --verbosity 8
 ^Removal of function pointers and virtual functions$
 ^\s*ASSERT false // no candidates for dereferenced function pointer
 function func: replacing function pointer by 0 possible targets

@@ -1,6 +1,6 @@
 CORE
 test.c
-
+--verbosity 8
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

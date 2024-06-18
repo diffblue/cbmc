@@ -1,6 +1,6 @@
 CORE no-new-smt
 main.c
-
+--verbosity 8
 ^Generated \d+ VCC\(s\), \d remaining after simplification$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --pointer-check
+--show-goto-functions --pointer-check --verbosity 8
 ^Removal of function pointers and virtual functions$
 ^\s*IF .*::fp = address_of\(f2\) THEN GOTO [0-9]$
 ^\s*IF .*::fp = address_of\(f3\) THEN GOTO [0-9]$

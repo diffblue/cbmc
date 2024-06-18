@@ -1,6 +1,6 @@
 CORE
 --xml-interface
-< test.xml
+--verbosity 8 < test.xml
 ^EXIT=10$
 ^SIGNAL=0$
 Not unwinding loop foo\.0 iteration 3 file main\.c line 5 function foo thread 0

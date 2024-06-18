@@ -1,6 +1,6 @@
 CORE
 --json-interface
-< test.json
+--verbosity 8 < test.json
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$

@@ -58,7 +58,7 @@ int goto_synthesizer_parse_optionst::doit()
   }
 
   messaget::eval_verbosity(
-    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
+    cmdline.get_value("verbosity"), messaget::M_STATUS, ui_message_handler);
 
   register_languages();
 
