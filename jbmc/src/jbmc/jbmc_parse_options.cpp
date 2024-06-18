@@ -250,7 +250,8 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   // transform self loops to assumptions
   options.set_option(
     "self-loops-to-assumptions",
-    !cmdline.isset("no-self-loops-to-assumptions"));
+    !options.get_bool_option("unwinding-assertions") &&
+      !cmdline.isset("no-self-loops-to-assumptions"));
 
   // unwind loops in java enum static initialization
   if(cmdline.isset("java-unwind-enum-static"))

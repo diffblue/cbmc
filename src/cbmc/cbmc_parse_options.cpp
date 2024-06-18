@@ -379,7 +379,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // transform self loops to assumptions
   options.set_option(
     "self-loops-to-assumptions",
-    !cmdline.isset("no-self-loops-to-assumptions"));
+    !options.get_bool_option("unwinding-assertions") &&
+      !cmdline.isset("no-self-loops-to-assumptions"));
 
   // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
