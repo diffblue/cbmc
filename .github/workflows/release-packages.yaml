@@ -159,7 +159,7 @@ jobs:
         # strip that here
         run: echo "RELEASE_TAG=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
       - name: Configure git user name and email
-        uses: Homebrew/actions/git-user-config@07da0794847043a11761f14c97cc682577c74d5d
+        uses: Homebrew/actions/git-user-config@c62170a03ff2bcb9ab097fd7d6acbc905618e42a
         with:
           username: db-ci-cprover
       - name: Create homebrew PR
