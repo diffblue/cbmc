@@ -1,3 +1,232 @@
+# CBMC 6.0.0
+
+## Major Changes
+* Change C++ version to C++17 by @esteffin in https://github.com/diffblue/cbmc/pull/7989
+* Enable default analysis flags for CBMC version 6.0+ by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8093
+* Add support for a `--no-unwinding-assertions` flag by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8109
+* Use malloc fail null by default by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8101
+* introduce 'fatal assertions' by @kroening in https://github.com/diffblue/cbmc/pull/8226
+* Permit re-setting --object-bits by @tautschnig in https://github.com/diffblue/cbmc/pull/7858
+* goto-instrument/unwinding: enable unwinding assertions by default by @tautschnig in https://github.com/diffblue/cbmc/pull/8274
+* JBMC: enable unwinding assertions by default by @tautschnig in https://github.com/diffblue/cbmc/pull/8273
+* generate assert(false) when calling undefined function by @kroening in https://github.com/diffblue/cbmc/pull/8292
+* change default verbosity to M_STATUS by @kroening in https://github.com/diffblue/cbmc/pull/8331
+
+## What's Changed
+* Add support for union values in traces for incremental smt2 decision procedure by @thomasspriggs in https://github.com/diffblue/cbmc/pull/7990
+* Variables leaving scope on jumping should always be marked dead by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8092
+* Define coverage blocks so as to be terminated by assumptions by @thomasspriggs in https://github.com/diffblue/cbmc/pull/7810
+* Build and infrastructure fixes for FreeBSD by @tautschnig in https://github.com/diffblue/cbmc/pull/7924
+* Add support for variables entering scope via a goto by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8091
+* Remove JSIL front-end by @tautschnig in https://github.com/diffblue/cbmc/pull/8158
+* Compact propositional encoding of OBJECT_SIZE(ptr) by @tautschnig in https://github.com/diffblue/cbmc/pull/7702
+* C front-end: refuse duplicate declaration of local variable by @tautschnig in https://github.com/diffblue/cbmc/pull/8160
+* CMake builds: support system-installed CaDiCaL by @tautschnig in https://github.com/diffblue/cbmc/pull/8159
+* division-by-zero on float by @kroening in https://github.com/diffblue/cbmc/pull/8233
+* Avoid duplicate "warning:" or "error:" output by @tautschnig in https://github.com/diffblue/cbmc/pull/1359
+* add support for loongarch64 by @wuruilong01 in https://github.com/diffblue/cbmc/pull/8266
+* Add support for GNU Hurd by @tautschnig in https://github.com/diffblue/cbmc/pull/8211
+* `__CPROVER_bool` should not have a memory layout by @kroening in https://github.com/diffblue/cbmc/pull/8325
+* add `emscripten` architecture by @kroening in https://github.com/diffblue/cbmc/pull/8334
+* increase verbosity of warning about missing `__builtin_` declaration by @kroening in https://github.com/diffblue/cbmc/pull/8333
+* increase verbosity level of various messages by @kroening in https://github.com/diffblue/cbmc/pull/8330
+
+## Bug Fixes
+* Add CODEOWNERS for CHANGELOG by @TGWDB in https://github.com/diffblue/cbmc/pull/7988
+* typecheckt::errort by @kroening in https://github.com/diffblue/cbmc/pull/7982
+* string_constantt typing by @kroening in https://github.com/diffblue/cbmc/pull/7965
+* remove index_type() by @kroening in https://github.com/diffblue/cbmc/pull/7992
+* add a 'language feature' detection facility for goto programs by @kroening in https://github.com/diffblue/cbmc/pull/7771
+* Fix line-number output in document-properties-* by @tautschnig in https://github.com/diffblue/cbmc/pull/7994
+* CODING_STANDARD.md: fix references to clang-format by @kroening in https://github.com/diffblue/cbmc/pull/7995
+* Use simplify_exprtt::resultt in pre-order simplification steps by @tautschnig in https://github.com/diffblue/cbmc/pull/6118
+* CBMC version 6 release process changes by @NlightNFotis in https://github.com/diffblue/cbmc/pull/7987
+* Remove useless steps from Rust CI pipeline by @esteffin in https://github.com/diffblue/cbmc/pull/8030
+* Replace `new-smt-backend` tag with inverted `no-new-smt` tag by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8002
+* Remove local declaration of void_t by @tautschnig in https://github.com/diffblue/cbmc/pull/8031
+* [CI] Minor fixes to CI accompanying C++17 version change by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8028
+* Refactor `smt_function_application_termt::indices` using C++17 feature by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8035
+* Restore post-order simplification of byte_extract(c ? a : b, ...) by @tautschnig in https://github.com/diffblue/cbmc/pull/8005
+* Replace usage of `std::result_of` with `std::invoke_result` by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8037
+* Fix the invariant message for unimplemented SMT count trailing zeros conversion. by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8044
+* Fix test_struct_union_c regression test by @esteffin in https://github.com/diffblue/cbmc/pull/8046
+* DFCC instrumentation: ensure programs are well-formed by @tautschnig in https://github.com/diffblue/cbmc/pull/8045
+* Fix failed coverage in if then else with return statements by @esteffin in https://github.com/diffblue/cbmc/pull/8001
+* Make -Wno-maybe-uninitialized the default with GCC by @tautschnig in https://github.com/diffblue/cbmc/pull/8047
+* Enable all `cbmc` regression tests that are passing to run with new SMT backend by @esteffin in https://github.com/diffblue/cbmc/pull/8051
+* C library check: do not warn about the need for MMX by @tautschnig in https://github.com/diffblue/cbmc/pull/8050
+* Use the C++17 standard `[[nodiscard]]` attribute directly by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8036
+* SYNTHESIZER: Add quick filter into goto-synthesizer by @qinheping in https://github.com/diffblue/cbmc/pull/7973
+* fix conversions between long and long long by @kroening in https://github.com/diffblue/cbmc/pull/8086
+* The emscripten compiler has alloca.h by @kroening in https://github.com/diffblue/cbmc/pull/8085
+* Add default codeowners to `/src/symtab2gb/` and `/src/json-symtab-language/` by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8087
+* Remove util_make_unique by @tautschnig in https://github.com/diffblue/cbmc/pull/8032
+* Run additional regressions with new SMT solver by @esteffin in https://github.com/diffblue/cbmc/pull/8084
+* Use the STL versions of `variant` and `optional` in incremental smt2 decision procedure by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8089
+* Remove usages of the deprecated `std::iterator` by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8088
+* Replace nonstd::optional by C++17 std::optional by @tautschnig in https://github.com/diffblue/cbmc/pull/8034
+* [CI] Perform apt update to sync repo sources before trying to install from them. by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8090
+* Dynamic frames: don't instrument __CPROVER_allocated_memory by @tautschnig in https://github.com/diffblue/cbmc/pull/8094
+* languaget is not a messaget [blocks: #3800] by @tautschnig in https://github.com/diffblue/cbmc/pull/4050
+* Name `-paths-lifo` test profiles uniquely by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8097
+* Keep symbols as nondet rather than using their symbol table values in SMT decision procedure. by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8104
+* CSmith test script: avoid a need for argv modelling by @tautschnig in https://github.com/diffblue/cbmc/pull/8105
+* Assignments to bit-fields yield results of bit-field type by @tautschnig in https://github.com/diffblue/cbmc/pull/8082
+* Make componentt::{base,pretty}_name comments by @tautschnig in https://github.com/diffblue/cbmc/pull/5815
+* Refactor `string_constantt::get_value` and `string_constantt::set_value` call sites. by @NlightNFotis in https://github.com/diffblue/cbmc/pull/7999
+* Remove all references to optionalt by @tautschnig in https://github.com/diffblue/cbmc/pull/8099
+* Remove default messaget value from goto_program_dereferencet by @tautschnig in https://github.com/diffblue/cbmc/pull/8100
+* Replace file_util.{h,cpp} by std::filesystem by @tautschnig in https://github.com/diffblue/cbmc/pull/8033
+* Cleanup USE_STD_STRING/USE_DSTRING configuration option by @tautschnig in https://github.com/diffblue/cbmc/pull/8040
+* Enable dependabot to update GitHub actions by @tautschnig in https://github.com/diffblue/cbmc/pull/8115
+* fix nondeterministic hex_trace test by @kroening in https://github.com/diffblue/cbmc/pull/8121
+* Add Michael and Peter to Repository CI codeowners. by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8114
+* Bump actions/checkout from 3 to 4 by @dependabot in https://github.com/diffblue/cbmc/pull/8117
+* Bump actions/upload-artifact from 3 to 4 by @dependabot in https://github.com/diffblue/cbmc/pull/8119
+* Bump github/codeql-action from 2 to 3 by @dependabot in https://github.com/diffblue/cbmc/pull/8120
+* decision_proceduret API with assumptions by @kroening in https://github.com/diffblue/cbmc/pull/7979
+* simplify prop_conv_solvert::push by @kroening in https://github.com/diffblue/cbmc/pull/8122
+* JSIL: create messaget with a message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8125
+* Remove unused `log` member from dfcc_is_freeablet by @tautschnig in https://github.com/diffblue/cbmc/pull/8124
+* Remove unused safety_checkert constructor by @tautschnig in https://github.com/diffblue/cbmc/pull/8126
+* Permit constructing parsert with a message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8134
+* jsil_parsert: construct with message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8136
+* Add a document outlining the current release process by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8130
+* java_bytecode_parsert: construct with message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8140
+* [CI] Bring back core release processes by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8108
+* Run again tests with new default checks by @esteffin in https://github.com/diffblue/cbmc/pull/8106
+* cbmc preprocessing: call set_language_options after checking for null by @kroening in https://github.com/diffblue/cbmc/pull/8149
+* dstringt::starts_with can be const by @kroening in https://github.com/diffblue/cbmc/pull/8148
+* unary_exprt::check and nullary_exprt::check by @kroening in https://github.com/diffblue/cbmc/pull/8151
+* Bump jungwinter/split from 1 to 2 by @dependabot in https://github.com/diffblue/cbmc/pull/8118
+* json_parsert: construct with message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8137
+* Fix document publishing GitHub Action by @tautschnig in https://github.com/diffblue/cbmc/pull/8152
+* CSmith GitHub action: run apt-get update by @tautschnig in https://github.com/diffblue/cbmc/pull/8155
+* C++ front-end: configure C++11+ syntax without ansi_c_parser object by @tautschnig in https://github.com/diffblue/cbmc/pull/8132
+* JSIL front-end: no need for parser reentrancy by @tautschnig in https://github.com/diffblue/cbmc/pull/8153
+* Conversion check: fix off-by-one error for float-to-unsigned by @tautschnig in https://github.com/diffblue/cbmc/pull/8157
+* Reduce Thomas and Fotis code ownership by @thomasspriggs in https://github.com/diffblue/cbmc/pull/8162
+* Bump actions/cache from 3 to 4 by @dependabot in https://github.com/diffblue/cbmc/pull/8164
+* Remove non-existent user from CODEOWNERS by @tautschnig in https://github.com/diffblue/cbmc/pull/8166
+* Code contracts: do not interleave checking and instrumenting by @tautschnig in https://github.com/diffblue/cbmc/pull/8095
+* Linking: only rename file-local symbols by @tautschnig in https://github.com/diffblue/cbmc/pull/8167
+* C front-end: GCC >= 12 support __builtin_shufflevector by @tautschnig in https://github.com/diffblue/cbmc/pull/8170
+* Make ansi_c_internal_additions independent of the parser object by @tautschnig in https://github.com/diffblue/cbmc/pull/8133
+* cbmc-cover/pointer-function-parameters test: negative numbers are ok by @tautschnig in https://github.com/diffblue/cbmc/pull/8177
+* remove_returns: do not lose location numbers by @tautschnig in https://github.com/diffblue/cbmc/pull/8178
+* MMIO instrumentation cleanup by @tautschnig in https://github.com/diffblue/cbmc/pull/8175
+* argc/argv modelling: argument string must remain in scope by @tautschnig in https://github.com/diffblue/cbmc/pull/8174
+* Bump microsoft/setup-msbuild from 1 to 2 by @dependabot in https://github.com/diffblue/cbmc/pull/8184
+* update_bits_exprt by @kroening in https://github.com/diffblue/cbmc/pull/8182
+* SMT2: fix extractbit with non-const index by @kroening in https://github.com/diffblue/cbmc/pull/8180
+* Support Minisat source variants where l_False/l_True are not macros by @tautschnig in https://github.com/diffblue/cbmc/pull/8107
+* Full slicing always requires consistent location numbers by @tautschnig in https://github.com/diffblue/cbmc/pull/8179
+* Remove support for irep_idt-as-std::string by @tautschnig in https://github.com/diffblue/cbmc/pull/8154
+* Scope tree: fix and clarify comment by @tautschnig in https://github.com/diffblue/cbmc/pull/8188
+* Scope tree: add dot output by @tautschnig in https://github.com/diffblue/cbmc/pull/8189
+* assembler_parsert: construct with message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8139
+* relax bitvector constant check for Verilog bitvectors by @kroening in https://github.com/diffblue/cbmc/pull/8191
+* Use dstringt::starts_with by @kroening in https://github.com/diffblue/cbmc/pull/8150
+* add a fluent-style typet::with_source_location by @kroening in https://github.com/diffblue/cbmc/pull/8194
+* SMT2: simplify interface by @kroening in https://github.com/diffblue/cbmc/pull/8123
+* introduce `update_bit_exprt` by @kroening in https://github.com/diffblue/cbmc/pull/8190
+* Fix gitignore of goto-bmc by @tautschnig in https://github.com/diffblue/cbmc/pull/8197
+* Fix `missing braces around initializer` GCC warning by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8198
+* C library: ASM functions take void* pointers by @tautschnig in https://github.com/diffblue/cbmc/pull/7932
+* C library: additional floating-point functions and cleanup by @tautschnig in https://github.com/diffblue/cbmc/pull/8195
+* array_set: do not fail upon an invalid (void) pointer by @tautschnig in https://github.com/diffblue/cbmc/pull/8202
+* Avoid cross-platform preprocessor need from test by @tautschnig in https://github.com/diffblue/cbmc/pull/8206
+* Make tests pass when char is unsigned by @tautschnig in https://github.com/diffblue/cbmc/pull/8212
+* Deprecate namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8209
+* C library: model __builtin_powi{,f,l} by @tautschnig in https://github.com/diffblue/cbmc/pull/8192
+* Avoid 64-bit platform support requirement for running tests by @tautschnig in https://github.com/diffblue/cbmc/pull/8213
+* Make exprt::with_source_location type safe by @tautschnig in https://github.com/diffblue/cbmc/pull/8216
+* Remove unused goto_convertt::has_function_call by @tautschnig in https://github.com/diffblue/cbmc/pull/8201
+* C++ front-end: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8227
+* Add missing source locations by @tautschnig in https://github.com/diffblue/cbmc/pull/7856
+* Static initialisation: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8221
+* miniBDD test: support lselect by @tautschnig in https://github.com/diffblue/cbmc/pull/8240
+* nondet-volatile: fix handling of enum types by @tautschnig in https://github.com/diffblue/cbmc/pull/8203
+* C/C++ front-end: accept all floating-point extensions that GCC and Clang support by @tautschnig in https://github.com/diffblue/cbmc/pull/8169
+* statement_list_parsert: construct with message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8138
+* Support __builtin_dynamic_object_size by @tautschnig in https://github.com/diffblue/cbmc/pull/8156
+* xml_parsert: construct with message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8135
+* ansi_c_parsert: construct with message handler by @tautschnig in https://github.com/diffblue/cbmc/pull/8141
+* C/C++ front-end: Revert scanner re-entrancy by @tautschnig in https://github.com/diffblue/cbmc/pull/8245
+* Improve printf formatter by @tautschnig in https://github.com/diffblue/cbmc/pull/8205
+* Run performance comparison in CI using Kani's Benchcomp by @tautschnig in https://github.com/diffblue/cbmc/pull/8171
+* Add namespacet::follow_struct_union_tag to simplify follow_tag uses by @tautschnig in https://github.com/diffblue/cbmc/pull/8248
+* Rename follow_struct_or_union_tag to follow_tag by @tautschnig in https://github.com/diffblue/cbmc/pull/8251
+* Visual Studio: fix feraiseexcept test failure by @kroening in https://github.com/diffblue/cbmc/pull/8232
+* Move benchcomp YAML file to avoid spurious GitHub errors by @tautschnig in https://github.com/diffblue/cbmc/pull/8250
+* test.pl now reports both directory and descriptor file name by @kroening in https://github.com/diffblue/cbmc/pull/8252
+* Remove parsert::clear and all of its overrides by @tautschnig in https://github.com/diffblue/cbmc/pull/8244
+* util: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8236
+* goto-analyzer.md: fix typos in examples by @rurban in https://github.com/diffblue/cbmc/pull/8255
+* goto-programs: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8230
+* goto-instrument: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8229
+* Add invariant that multiplication uses operands of the same size by @tautschnig in https://github.com/diffblue/cbmc/pull/8241
+* `format_expr` can now print range-typed constants by @kroening in https://github.com/diffblue/cbmc/pull/8259
+* Bump codecov/codecov-action from 3 to 4 by @dependabot in https://github.com/diffblue/cbmc/pull/8183
+* C library: model asprintf, test {v,}asprintf by @tautschnig in https://github.com/diffblue/cbmc/pull/8237
+* C library: implement {v,}snprintf by @tautschnig in https://github.com/diffblue/cbmc/pull/8239
+* C library: implement {v,}dprintf by @tautschnig in https://github.com/diffblue/cbmc/pull/8238
+* C front-end: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8218
+* initialisation of `_Complex` with an initializer list by @kroening in https://github.com/diffblue/cbmc/pull/8265
+* C library: provide implementations of fopen64, freopen64 by @tautschnig in https://github.com/diffblue/cbmc/pull/8267
+* C library: add __time64 by @tautschnig in https://github.com/diffblue/cbmc/pull/8268
+* C library: add mmap64 by @tautschnig in https://github.com/diffblue/cbmc/pull/8269
+* Remove unanchored "error" string from symtab2gb test specs by @tautschnig in https://github.com/diffblue/cbmc/pull/8270
+* C library: add creat, open, openat by @tautschnig in https://github.com/diffblue/cbmc/pull/8271
+* simplify `extractbits_exprt` representation by @kroening in https://github.com/diffblue/cbmc/pull/8246
+* analyses: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8215
+* goto-harness: remove use of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8220
+* Pointer analysis: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8231
+* Move goto_convert files by @kroening in https://github.com/diffblue/cbmc/pull/8253
+* JBMC: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8210
+* Solvers: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8235
+* C library: add __to{lower,upper} as alternative names for {tolower,toupper} by @tautschnig in https://github.com/diffblue/cbmc/pull/8283
+* C++ front-end: permit GCC attributes in using declarations by @tautschnig in https://github.com/diffblue/cbmc/pull/8286
+* C++ front-end: support [[__nodiscard__]] and [[nodiscard]] by @tautschnig in https://github.com/diffblue/cbmc/pull/8287
+* C++ front-end: fix parentheses matching for alignas parsing by @tautschnig in https://github.com/diffblue/cbmc/pull/8288
+* cbmc-cpp/Array4 test now works by @kroening in https://github.com/diffblue/cbmc/pull/8293
+* Visual Studio has added _Static_assert by @kroening in https://github.com/diffblue/cbmc/pull/8294
+* C++ front-end: not all declarators are code-typed by @tautschnig in https://github.com/diffblue/cbmc/pull/8290
+* [CONTRACTS] Refactor quantified symbol detection for loop contracts by @qinheping in https://github.com/diffblue/cbmc/pull/8299
+* C++ front-end: support attributes with tag-less structs by @tautschnig in https://github.com/diffblue/cbmc/pull/8289
+* introduce `literal_vector_exprt` by @kroening in https://github.com/diffblue/cbmc/pull/8307
+* help: add missing newline by @kroening in https://github.com/diffblue/cbmc/pull/8306
+* `goto_check_ct::add_guarded_property` now has `is_fatal` parameter by @kroening in https://github.com/diffblue/cbmc/pull/8297
+* Make `going_to` variable cprover-prefixed by @qinheping in https://github.com/diffblue/cbmc/pull/8312
+* [CONTRACTS] Use fresh converter in loop contracts instrumentation by @qinheping in https://github.com/diffblue/cbmc/pull/8282
+* [CONTRACTS] Ignore cprover symbols in loop assigns inference by @qinheping in https://github.com/diffblue/cbmc/pull/8313
+* C++ front-end: fix parsing of >> as closing template args by @tautschnig in https://github.com/diffblue/cbmc/pull/8291
+* Lower-byte-operators: bv_to_expr should support bool target type by @tautschnig in https://github.com/diffblue/cbmc/pull/8318
+* Add support for __fp16 where appropriate by @tautschnig in https://github.com/diffblue/cbmc/pull/8323
+* Fix typos in release workflow by @tautschnig in https://github.com/diffblue/cbmc/pull/8322
+* mod-by-zero is now fatal by @kroening in https://github.com/diffblue/cbmc/pull/8315
+* Undefined shifts are now fatal by @kroening in https://github.com/diffblue/cbmc/pull/8304
+* array-bounds checks are now fatal by @kroening in https://github.com/diffblue/cbmc/pull/8314
+* Simplifier: c_bool (and others) are also bitvector types by @tautschnig in https://github.com/diffblue/cbmc/pull/8247
+* Delete `string_constantt::get_value` and  `string_constantt::set_value` functions by @NlightNFotis in https://github.com/diffblue/cbmc/pull/8003
+* Remove deprecated messaget() constructor by @tautschnig in https://github.com/diffblue/cbmc/pull/8143
+* Move GCC-13 CI job to Ubuntu 24.04 by @tautschnig in https://github.com/diffblue/cbmc/pull/8320
+* Make DFCC is_dead_object_update less restrictive by @tautschnig in https://github.com/diffblue/cbmc/pull/8261
+* pointer checks are now fatal by @kroening in https://github.com/diffblue/cbmc/pull/8316
+* Expand list of known compiler built-ins by @tautschnig in https://github.com/diffblue/cbmc/pull/8321
+* CMake: use find_program() to look for bash by @guijan in https://github.com/diffblue/cbmc/pull/8285
+* Switch GitHub CI jobs from macos-11 to macos-13 by @tautschnig in https://github.com/diffblue/cbmc/pull/8328
+* Use all 4 vCPUs on GitHub-hosted runners by @tautschnig in https://github.com/diffblue/cbmc/pull/8327
+* Goto crossing scopes: fix scope tree entry of conditions by @tautschnig in https://github.com/diffblue/cbmc/pull/8187
+* Declutter linking implementation by @tautschnig in https://github.com/diffblue/cbmc/pull/8168
+* Avoid brew symlink conflict in macos-13 by @tautschnig in https://github.com/diffblue/cbmc/pull/8338
+* [CONTRACTS] Allow loop contracts annotated to goto statement by @qinheping in https://github.com/diffblue/cbmc/pull/8281
+* cprover: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8219
+* goto-symex: Replace uses of namespacet::follow by @tautschnig in https://github.com/diffblue/cbmc/pull/8222
+* C front-end: typecheck conditional operator over string literal and 0 by @tautschnig in https://github.com/diffblue/cbmc/pull/7946
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.95.1...cbmc-6.0.0
+
 # CBMC 5.95.1
 
 ## What's Changed
