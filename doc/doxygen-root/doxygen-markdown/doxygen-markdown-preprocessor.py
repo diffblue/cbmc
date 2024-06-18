@@ -55,7 +55,7 @@ def parse_arguments():
 def pandoc(path, pandoc_write, pandoc_wrap, pandoc_filter=None):
     args = {
         '--write': pandoc_write,
-        '--wrap', pandoc_wrap
+        '--wrap': pandoc_wrap
     }
     if pandoc_filter:
         args['--filter'] = Path(pandoc_filter).resolve()
