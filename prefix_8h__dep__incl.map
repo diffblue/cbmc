@@ -1,5 +1,5 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/prefix.h" name="/home/runner/work/cbmc/cbmc/src/util/prefix.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5271,5,5455,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5379,5,5563,47"/>
 <area shape="rect" id="node2" href="$builtin__factory_8cpp.html" title=" " alt="" coords="5,102,189,158"/>
 <area shape="rect" id="node3" href="$c__preprocess_8cpp.html" title=" " alt="" coords="213,109,456,151"/>
 <area shape="rect" id="node4" href="$expr2c_8cpp.html" title=" " alt="" coords="480,109,683,151"/>
@@ -36,19 +36,20 @@
 <area shape="rect" id="node39" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="7252,102,7436,158"/>
 <area shape="rect" id="node40" href="$rebuild__goto__start__function_8cpp.html" title="Goto Programs Author: Thomas Kiley, thomas@diffblue.com." alt="" coords="7461,102,7691,158"/>
 <area shape="rect" id="node41" href="$system__library__symbols_8cpp.html" title="Goto Programs." alt="" coords="7715,102,7927,158"/>
-<area shape="rect" id="node42" href="$static__lifetime__init_8cpp.html" title=" " alt="" coords="7952,102,8136,158"/>
-<area shape="rect" id="node43" href="$gdb__api_8cpp.html" title="Low&#45;level interface to gdb." alt="" coords="8161,102,8365,158"/>
-<area shape="rect" id="node44" href="$value__set_8cpp.html" title="Value Set." alt="" coords="8389,102,8582,158"/>
-<area shape="rect" id="node45" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="8606,102,8807,158"/>
-<area shape="rect" id="node46" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="8832,102,9016,158"/>
-<area shape="rect" id="node47" href="$smt2__parser_8cpp.html" title=" " alt="" coords="9040,102,9224,158"/>
-<area shape="rect" id="node48" href="$prefix__filter_8cpp.html" title="Prefix Filtering." alt="" coords="9248,102,9432,158"/>
-<area shape="rect" id="node49" href="$source__location_8cpp.html" title=" " alt="" coords="9456,102,9640,158"/>
-<area shape="rect" id="node50" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="9665,102,9909,158"/>
-<area shape="rect" id="node51" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="9933,102,10195,158"/>
-<area shape="rect" id="node52" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="10219,102,10437,158"/>
-<area shape="rect" id="node53" href="$java__utils_8cpp.html" title=" " alt="" coords="10461,102,10680,158"/>
-<area shape="rect" id="node54" href="$load__method__by__regex_8cpp.html" title=" " alt="" coords="10704,102,10923,158"/>
+<area shape="rect" id="node42" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="7951,95,8161,165"/>
+<area shape="rect" id="node43" href="$static__lifetime__init_8cpp.html" title=" " alt="" coords="8185,102,8369,158"/>
+<area shape="rect" id="node44" href="$gdb__api_8cpp.html" title="Low&#45;level interface to gdb." alt="" coords="8394,102,8598,158"/>
+<area shape="rect" id="node45" href="$value__set_8cpp.html" title="Value Set." alt="" coords="8622,102,8815,158"/>
+<area shape="rect" id="node46" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="8839,102,9041,158"/>
+<area shape="rect" id="node47" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="9065,102,9249,158"/>
+<area shape="rect" id="node48" href="$smt2__parser_8cpp.html" title=" " alt="" coords="9273,102,9457,158"/>
+<area shape="rect" id="node49" href="$prefix__filter_8cpp.html" title="Prefix Filtering." alt="" coords="9481,102,9665,158"/>
+<area shape="rect" id="node50" href="$source__location_8cpp.html" title=" " alt="" coords="9689,102,9873,158"/>
+<area shape="rect" id="node51" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="9898,102,10142,158"/>
+<area shape="rect" id="node52" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="10167,102,10428,158"/>
+<area shape="rect" id="node53" href="$java__class__loader__base_8cpp.html" title=" " alt="" coords="10452,102,10671,158"/>
+<area shape="rect" id="node54" href="$java__utils_8cpp.html" title=" " alt="" coords="10695,102,10913,158"/>
+<area shape="rect" id="node55" href="$load__method__by__regex_8cpp.html" title=" " alt="" coords="10937,102,11156,158"/>
 <area shape="rect" id="node19" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="3480,213,3685,284"/>
 <area shape="rect" id="node22" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="3710,221,3911,277"/>
 <area shape="rect" id="node20" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="3339,339,3578,395"/>

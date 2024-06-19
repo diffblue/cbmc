@@ -1,6 +1,5 @@
 var NAVTREEINDEX27 =
 {
-"classdisjunctive__polynomial__accelerationt.html#a645a642ff6b6a340f23367a1eef9e1f6":[8,0,403,11],
 "classdisjunctive__polynomial__accelerationt.html#a7035927c7d42f5eaaeea8ce81e6fa8d2":[8,0,403,3],
 "classdisjunctive__polynomial__accelerationt.html#a73c48d5dad1ae1f1926e84c4b2be73de":[8,0,403,16],
 "classdisjunctive__polynomial__accelerationt.html#a785669db6352f9c0784a797b7403cc72":[8,0,403,10],
@@ -249,5 +248,6 @@ var NAVTREEINDEX27 =
 "classenumerative__loop__contracts__synthesizert.html":[8,0,434],
 "classenumerative__loop__contracts__synthesizert.html#a208b492dcd628dc7f04fe8166a337306":[8,0,434,11],
 "classenumerative__loop__contracts__synthesizert.html#a354306e9bec3c6b7e74aa36ba985d15c":[8,0,434,6],
-"classenumerative__loop__contracts__synthesizert.html#a374b1b085b15b9bd9b12d377c180ab74":[8,0,434,5]
+"classenumerative__loop__contracts__synthesizert.html#a374b1b085b15b9bd9b12d377c180ab74":[8,0,434,5],
+"classenumerative__loop__contracts__synthesizert.html#a3b950e8564b787b461b8c2329cb74c5a":[8,0,434,8]
 };
