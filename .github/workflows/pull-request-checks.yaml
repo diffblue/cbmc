@@ -729,6 +729,10 @@ jobs:
           echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
       - name: Configure with cmake
         run: cmake -S . -B build
+      - name: Zero ccache stats and limit in size (2 GB)
+        run: |
+          clcache -z
+          clcache -M 2147483648
       - name: Build Release
         run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
       - name: Print ccache stats
@@ -789,6 +793,10 @@ jobs:
         run: |
           echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
           echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
+      - name: Zero ccache stats and limit in size (2 GB)
+        run: |
+          clcache -z
+          clcache -M 2147483648
       - name: Download minisat with make
         run: make -C src minisat2-download
       - name: Build CBMC with make
