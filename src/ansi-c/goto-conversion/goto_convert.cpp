@@ -103,13 +103,14 @@ struct build_declaration_hops_inputst
   node_indext end_scope_index = 0;
 };
 
-void goto_convertt::build_declaration_hops(
+goto_convertt::declaration_hop_instrumentationt
+goto_convertt::build_declaration_hops(
   goto_programt &program,
   std::unordered_map<irep_idt, symbolt, irep_id_hash> &label_flags,
   const build_declaration_hops_inputst &inputs)
 {
   // In the case of a goto jumping into a scope, the declarations (but not the
-  // initialisations) need to be executed. This function performs a
+  // initialisations) need to be executed. This function prepares a
   // transformation from code that looks like -
   //   {
   //     statement_block_a();
@@ -150,8 +151,13 @@ void goto_convertt::build_declaration_hops(
   //     __CPROVER_going_to::user_label = false;
   //     statement_block_e();
   //   }
+  //
+  // The actual insertion of instructions needs to be performed by the caller,
+  // which needs to use the result of this method.
 
   PRECONDITION(inputs.label_scope_index != inputs.end_scope_index);
+
+  declaration_hop_instrumentationt instructions_to_add;
 
   const auto flag = [&]() -> symbolt {
     const auto existing_flag = label_flags.find(inputs.label);
@@ -170,19 +176,20 @@ void goto_convertt::build_declaration_hops(
     label_flags.emplace(inputs.label, new_flag);
 
     // Create and initialise flag.
-    goto_programt flag_creation;
-    flag_creation.instructions.push_back(
+    instructions_to_add.emplace_back(
+      program.instructions.begin(),
       goto_programt::make_decl(new_flag.symbol_expr(), label_location));
     const auto make_clear_flag = [&]() -> goto_programt::instructiont {
       return goto_programt::make_assignment(
         new_flag.symbol_expr(), false_exprt{}, label_location);
     };
-    flag_creation.instructions.push_back(make_clear_flag());
-    program.destructive_insert(program.instructions.begin(), flag_creation);
+    instructions_to_add.emplace_back(
+      program.instructions.begin(), make_clear_flag());
 
     // Clear flag on arrival at label.
     auto clear_on_arrival = make_clear_flag();
-    program.insert_before_swap(inputs.label_instruction, clear_on_arrival);
+    instructions_to_add.emplace_back(
+      inputs.label_instruction, clear_on_arrival);
     return new_flag;
   }();
 
@@ -193,9 +200,7 @@ void goto_convertt::build_declaration_hops(
     goto_location.set_hide();
     auto set_flag = goto_programt::make_assignment(
       flag.symbol_expr(), true_exprt{}, goto_location);
-    program.insert_before_swap(goto_instruction, set_flag);
-    // Keep this iterator referring to the goto instruction, not the assignment.
-    ++goto_instruction;
+    instructions_to_add.emplace_back(goto_instruction, set_flag);
   }
 
   auto target = inputs.label_instruction;
@@ -216,6 +221,8 @@ void goto_convertt::build_declaration_hops(
       declaration_location.set_hide();
       auto if_goto = goto_programt::make_goto(
         target, flag.symbol_expr(), declaration_location);
+      // this isn't changing any previously existing instruction so we insert
+      // directly rather than going through instructions_to_add
       program.instructions.insert(
         std::next(declaration->instruction), std::move(if_goto));
       declaration->accounted_flags.insert(flag.name);
@@ -226,6 +233,8 @@ void goto_convertt::build_declaration_hops(
   // Update the goto so that it goes to the first declaration rather than its
   // original/final destination.
   goto_instruction->set_target(target);
+
+  return instructions_to_add;
 }
 
 /*******************************************************************	\
@@ -243,6 +252,7 @@ Function: goto_convertt::finish_gotos
 void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
 {
   std::unordered_map<irep_idt, symbolt, irep_id_hash> label_flags;
+  declaration_hop_instrumentationt instructions_to_insert;
 
   for(const auto &g_it : targets.gotos)
   {
@@ -331,13 +341,22 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         inputs.label_instruction = l_it->second.first;
         inputs.label_scope_index = label_target;
         inputs.end_scope_index = intersection_result.common_ancestor;
-        build_declaration_hops(dest, label_flags, inputs);
+        instructions_to_insert.splice(
+          instructions_to_insert.end(),
+          build_declaration_hops(dest, label_flags, inputs));
       }
     }
     else
     {
       UNREACHABLE;
     }
+  }
+
+  for(auto r_it = instructions_to_insert.rbegin();
+      r_it != instructions_to_insert.rend();
+      ++r_it)
+  {
+    dest.insert_before_swap(r_it->first, r_it->second);
   }
 
   targets.gotos.clear();

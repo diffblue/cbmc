@@ -354,7 +354,10 @@ protected:
     std::optional<node_indext> destructor_end_point = {},
     std::optional<node_indext> destructor_start_point = {});
 
-  void build_declaration_hops(
+  typedef std::list<
+    std::pair<goto_programt::targett, goto_programt::instructiont>>
+    declaration_hop_instrumentationt;
+  [[nodiscard]] declaration_hop_instrumentationt build_declaration_hops(
     goto_programt &dest,
     std::unordered_map<irep_idt, symbolt, irep_id_hash> &label_flags,
     const build_declaration_hops_inputst &inputs);
