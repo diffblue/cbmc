@@ -18,8 +18,11 @@ static bvt convert_member_union(
   const namespacet &ns)
 {
   const exprt &union_op = expr.compound();
+
   const union_typet &union_op_type =
-    ns.follow_tag(to_union_tag_type(union_op.type()));
+    union_op.type().id() == ID_union_tag
+      ? ns.follow_tag(to_union_tag_type(union_op.type()))
+      : to_union_type(union_op.type());
 
   const irep_idt &component_name = expr.get_component_name();
   const union_typet::componentt &component =
