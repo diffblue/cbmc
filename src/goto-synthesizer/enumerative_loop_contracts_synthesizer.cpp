@@ -16,6 +16,7 @@ Author: Qinheping Hu
 #include <util/find_symbols.h>
 #include <util/format_expr.h>
 #include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 
@@ -157,6 +158,23 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
           // Infer loop assigns using alias analysis.
           get_assigns(
             local_may_alias, loop_head_and_content.second, assigns_map[new_id]);
+
+          // Don't check assignable for CPROVER symbol
+          for(auto it = assigns_map[new_id].begin();
+              it != assigns_map[new_id].end();) // no ++it
+          {
+            if(auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(*it))
+            {
+              if(has_prefix(
+                   id2string(symbol_expr->get_identifier()), CPROVER_PREFIX))
+              {
+                it = assigns_map[new_id].erase(it);
+                continue;
+              }
+            }
+
+            ++it;
+          };
 
           // remove loop-local symbols from the inferred set
           cfg_info.erase_locals(assigns_map[new_id]);
