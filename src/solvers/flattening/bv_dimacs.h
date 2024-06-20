@@ -12,7 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_DIMACS_H
 #define CPROVER_SOLVERS_FLATTENING_BV_DIMACS_H
 
+#include <util/exit_codes.h>
+
 #include "bv_pointers.h"
+
+#include <cstdlib>
 
 class bv_dimacst : public bv_pointerst
 {
@@ -28,7 +32,8 @@ public:
 
   virtual ~bv_dimacst()
   {
-    write_dimacs();
+    if(write_dimacs())
+      exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
 protected:
