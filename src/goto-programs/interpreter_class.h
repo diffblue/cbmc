@@ -287,13 +287,13 @@ protected:
 
   bool byte_offset_to_memory_offset(
     const typet &source_type,
-    const mp_integer &byte_offset,
+    const bytest &byte_offset,
     mp_integer &result);
 
   bool memory_offset_to_byte_offset(
     const typet &source_type,
     const mp_integer &cell_offset,
-    mp_integer &result);
+    bytest &result);
 
   mp_vectort evaluate(const exprt &);
 

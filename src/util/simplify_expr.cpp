@@ -917,7 +917,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
           simplify_typecast(typecast_exprt(op_plus_expr.op1(), size_type()));
 
         // void*
-        if(*sub_size == 0 || *sub_size == 1)
+        if(*sub_size == bytest{0} || *sub_size == bytest{1})
           new_expr.op() = offset_expr;
         else
         {
@@ -987,7 +987,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     const auto step =
       pointer_offset_size(to_pointer_type(op_type).base_type(), ns);
 
-    if(step.has_value() && *step != 0)
+    if(step.has_value() && *step != bytest{0})
     {
       const typet size_t_type(size_type());
       auto new_expr = expr;
@@ -997,7 +997,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       for(auto &op : new_expr.op().operands())
       {
         exprt new_op = simplify_typecast(typecast_exprt(op, size_t_type));
-        if(op.type().id() != ID_pointer && *step > 1)
+        if(op.type().id() != ID_pointer && *step > bytest{1})
         {
           new_op =
             simplify_mult(mult_exprt(from_integer(*step, size_t_type), new_op));
@@ -1664,7 +1664,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   }
 
   const auto el_size = pointer_offset_bits(expr.type(), ns);
-  if(el_size.has_value() && *el_size < 0)
+  if(el_size.has_value() && *el_size < bitst{0})
     return unchanged(expr);
 
   // byte_extract(byte_extract(root, offset1), offset2) =>
@@ -1714,15 +1714,15 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   }
 
   // the following require a constant offset
-  auto offset = numeric_cast<mp_integer>(expr.offset());
-  if(!offset.has_value() || *offset < 0)
+  auto offset = numeric_cast<bytest>(expr.offset());
+  if(!offset.has_value() || *offset < bytest{0})
     return unchanged(expr);
 
   // try to simplify byte_extract(byte_update(...))
   auto const bu = expr_try_dynamic_cast<byte_update_exprt>(expr.op());
-  std::optional<mp_integer> update_offset;
+  std::optional<bytest> update_offset;
   if(bu)
-    update_offset = numeric_cast<mp_integer>(bu->offset());
+    update_offset = numeric_cast<bytest>(bu->offset());
   if(bu && el_size.has_value() && update_offset.has_value())
   {
     // byte_extract(byte_update(root, offset_u, value), offset_e) so that the
@@ -1733,8 +1733,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     // extracted range fully lies within the update value simplifies to
     // byte_extract(value, offset_e - offset_u)
     if(
-      *offset * expr.get_bits_per_byte() + *el_size <=
-      *update_offset * bu->get_bits_per_byte())
+      bytes_to_bits(*offset, expr.get_bits_per_byte()) + *el_size <=
+      bytes_to_bits(*update_offset, bu->get_bits_per_byte()))
     {
       // extracting before the update
       auto tmp = expr;
@@ -1745,8 +1745,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       const auto update_size = pointer_offset_bits(bu->value().type(), ns))
     {
       if(
-        *offset * expr.get_bits_per_byte() >=
-        *update_offset * bu->get_bits_per_byte() + *update_size)
+        bytes_to_bits(*offset, expr.get_bits_per_byte()) >=
+        bytes_to_bits(*update_offset, bu->get_bits_per_byte()) + *update_size)
       {
         // extracting after the update
         auto tmp = expr;
@@ -1755,8 +1755,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       }
       else if(
         *offset >= *update_offset &&
-        *offset * expr.get_bits_per_byte() + *el_size <=
-          *update_offset * bu->get_bits_per_byte() + *update_size)
+        bytes_to_bits(*offset, expr.get_bits_per_byte()) + *el_size <=
+          bytes_to_bits(*update_offset, bu->get_bits_per_byte()) + *update_size)
       {
         // extracting from the update
         auto tmp = expr;
@@ -1771,12 +1771,13 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   // don't do any of the following if endianness doesn't match, as
   // bytes need to be swapped
   if(
-    *offset == 0 && ((expr.id() == ID_byte_extract_little_endian &&
-                      config.ansi_c.endianness ==
-                        configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN) ||
-                     (expr.id() == ID_byte_extract_big_endian &&
-                      config.ansi_c.endianness ==
-                        configt::ansi_ct::endiannesst::IS_BIG_ENDIAN)))
+    *offset == bytest{0} &&
+    ((expr.id() == ID_byte_extract_little_endian &&
+      config.ansi_c.endianness ==
+        configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN) ||
+     (expr.id() == ID_byte_extract_big_endian &&
+      config.ansi_c.endianness ==
+        configt::ansi_ct::endiannesst::IS_BIG_ENDIAN)))
   {
     // byte extract of full object is object
     if(expr.type() == expr.op().type())
@@ -1809,7 +1810,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 
   // no proper simplification for expr.type()==void
   // or types of unknown size
-  if(!el_size.has_value() || *el_size == 0)
+  if(!el_size.has_value() || *el_size == bitst{0})
     return unchanged(expr);
 
   if(
@@ -1830,15 +1831,16 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     DATA_INVARIANT(!const_bits.empty(), "bit representation must be non-empty");
 
     // double the string until we have sufficiently many bits
-    while(mp_integer(const_bits.size()) <
-          *offset * expr.get_bits_per_byte() + *el_size)
+    while(bitst{const_bits.size()} <
+          bytes_to_bits(*offset, expr.get_bits_per_byte()) + *el_size)
     {
       const_bits+=const_bits;
     }
 
     std::string el_bits = std::string(
       const_bits,
-      numeric_cast_v<std::size_t>(*offset * expr.get_bits_per_byte()),
+      numeric_cast_v<std::size_t>(
+        bytes_to_bits(*offset, expr.get_bits_per_byte())),
       numeric_cast_v<std::size_t>(*el_size));
 
     auto tmp = bits2expr(
@@ -1851,7 +1853,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
   // in some cases we even handle non-const array_of
   if(
     expr.op().id() == ID_array_of &&
-    (*offset * expr.get_bits_per_byte()) % (*el_size) == 0 &&
+    bytes_to_bits(*offset, expr.get_bits_per_byte()) % (*el_size) == bitst{0} &&
     *el_size <=
       pointer_offset_bits(to_array_of_expr(expr.op()).what().type(), ns))
   {
@@ -1867,7 +1869,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 
   if(
     bits.has_value() &&
-    mp_integer(bits->size()) >= *el_size + *offset * expr.get_bits_per_byte())
+    bitst{bits->size()} >=
+      *el_size + bytes_to_bits(*offset, expr.get_bits_per_byte()))
   {
     // make sure we don't lose bits with structs containing flexible array
     // members
@@ -1896,7 +1899,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     {
       std::string bits_cut = std::string(
         bits.value(),
-        numeric_cast_v<std::size_t>(*offset * expr.get_bits_per_byte()),
+        numeric_cast_v<std::size_t>(
+          bytes_to_bits(*offset, expr.get_bits_per_byte())),
         numeric_cast_v<std::size_t>(*el_size));
 
       auto tmp = bits2expr(
@@ -1929,8 +1933,8 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
 
         // the next member would be misaligned, abort
         if(
-          !component_bits.has_value() || *component_bits == 0 ||
-          *component_bits % expr.get_bits_per_byte() != 0)
+          !component_bits.has_value() || *component_bits == bitst{0} ||
+          *component_bits % bitst{expr.get_bits_per_byte()} != bitst{0})
         {
           failed = true;
           break;
@@ -1982,14 +1986,16 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
     const array_typet &array_type = to_array_type(expr.op().type());
     const auto &element_bit_width =
       pointer_offset_bits(array_type.element_type(), ns);
-    if(element_bit_width.has_value() && *element_bit_width > 0)
+    if(element_bit_width.has_value() && *element_bit_width > bitst{0})
     {
       if(
-        *offset > 0 &&
-        *offset * expr.get_bits_per_byte() % *element_bit_width == 0)
+        *offset > bytest{0} &&
+        bytes_to_bits(*offset, expr.get_bits_per_byte()) % *element_bit_width ==
+          bitst{0})
       {
         const auto elements_to_erase = numeric_cast_v<std::size_t>(
-          (*offset * expr.get_bits_per_byte()) / *element_bit_width);
+          bytes_to_bits(*offset, expr.get_bits_per_byte()) /
+          *element_bit_width);
         array_exprt slice = to_array_expr(expr.op());
         slice.operands().erase(
           slice.operands().begin(),
@@ -2002,7 +2008,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
         be.offset() = from_integer(0, expr.offset().type());
         return changed(simplify_byte_extract(be));
       }
-      else if(*offset == 0 && *el_size % *element_bit_width == 0)
+      else if(*offset == bytest{0} && *el_size % *element_bit_width == bitst{0})
       {
         const auto elements_to_keep =
           numeric_cast_v<std::size_t>(*el_size / *element_bit_width);
@@ -2094,8 +2100,8 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
 
   // byte update of full object is byte_extract(new value)
   if(
-    offset.is_zero() && val_size.has_value() && *val_size > 0 &&
-    root_size.has_value() && *root_size > 0 && *val_size >= *root_size)
+    offset.is_zero() && val_size.has_value() && *val_size > bitst{0} &&
+    root_size.has_value() && *root_size > bitst{0} && *val_size >= *root_size)
   {
     byte_extract_exprt be(
       matching_byte_extract_id,
@@ -2108,11 +2114,13 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   }
 
   // update bits in a constant
-  const auto offset_int = numeric_cast<mp_integer>(offset);
+  const auto offset_int = numeric_cast<bytest>(offset);
   if(
-    root_size.has_value() && *root_size >= 0 && val_size.has_value() &&
-    *val_size >= 0 && offset_int.has_value() && *offset_int >= 0 &&
-    *offset_int * expr.get_bits_per_byte() + *val_size <= *root_size)
+    root_size.has_value() && *root_size >= bitst{0} && val_size.has_value() &&
+    *val_size >= bitst{0} && offset_int.has_value() &&
+    *offset_int >= bytest{0} &&
+    bytes_to_bits(*offset_int, expr.get_bits_per_byte()) + *val_size <=
+      *root_size)
   {
     auto root_bits =
       expr2bits(root, expr.id() == ID_byte_update_little_endian, ns);
@@ -2224,11 +2232,11 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   }
 
   // the following require a constant offset
-  if(!offset_int.has_value() || *offset_int < 0)
+  if(!offset_int.has_value() || *offset_int < bytest{0})
     return unchanged(expr);
 
   // size must be known
-  if(!val_size.has_value() || *val_size == 0)
+  if(!val_size.has_value() || *val_size == bitst{0})
     return unchanged(expr);
 
   // Are we updating (parts of) a struct? Do individual member updates
@@ -2262,21 +2270,22 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
 
       // is it a byte-sized member?
       if(
-        !m_size_bits.has_value() || *m_size_bits == 0 ||
-        (*m_size_bits) % expr.get_bits_per_byte() != 0)
+        !m_size_bits.has_value() || *m_size_bits == bitst{0} ||
+        (*m_size_bits) % bitst{expr.get_bits_per_byte()} != bitst{0})
       {
         result_expr.make_nil();
         break;
       }
 
-      mp_integer m_size_bytes = (*m_size_bits) / expr.get_bits_per_byte();
+      bytest m_size_bytes =
+        bits_to_bytes_trunc(*m_size_bits, expr.get_bits_per_byte());
 
       // is that member part of the update?
       if(*m_offset + m_size_bytes <= *offset_int)
         continue;
       // are we done updating?
       else if(
-        update_size.has_value() && *update_size > 0 &&
+        update_size.has_value() && *update_size > bytest{0} &&
         *m_offset >= *offset_int + *update_size)
       {
         break;
@@ -2293,7 +2302,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
       if(
         *m_offset < *offset_int ||
         (*m_offset == *offset_int && update_size.has_value() &&
-         *update_size > 0 && m_size_bytes > *update_size))
+         *update_size > bytest{0} && m_size_bytes > *update_size))
       {
         byte_update_exprt v(
           expr.id(),
@@ -2305,7 +2314,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
         to_with_expr(result_expr).new_value().swap(v);
       }
       else if(
-        update_size.has_value() && *update_size > 0 &&
+        update_size.has_value() && *update_size > bytest{0} &&
         *m_offset + m_size_bytes > *offset_int + *update_size)
       {
         // we don't handle this for the moment
@@ -2337,28 +2346,42 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
       pointer_offset_bits(to_type_with_subtype(root.type()).subtype(), ns);
 
     if(
-      !el_size.has_value() || *el_size == 0 ||
-      (*el_size) % expr.get_bits_per_byte() != 0 ||
-      (*val_size) % expr.get_bits_per_byte() != 0)
+      !el_size.has_value() || *el_size == bitst{0} ||
+      (*el_size) % bitst{expr.get_bits_per_byte()} != bitst{0} ||
+      (*val_size) % bitst{expr.get_bits_per_byte()} != bitst{0})
     {
       return unchanged(expr);
     }
 
     exprt result=root;
 
-    mp_integer m_offset_bits=0, val_offset=0;
+    bitst m_offset_bits{0};
+    bytest val_offset{0};
     Forall_operands(it, result)
     {
-      if(*offset_int * expr.get_bits_per_byte() + (*val_size) <= m_offset_bits)
-        break;
-
-      if(*offset_int * expr.get_bits_per_byte() < m_offset_bits + *el_size)
+      if(
+        bytes_to_bits(*offset_int, expr.get_bits_per_byte()) + (*val_size) <=
+        m_offset_bits)
       {
-        mp_integer bytes_req =
-          (m_offset_bits + *el_size) / expr.get_bits_per_byte() - *offset_int;
+        break;
+      }
+
+      if(
+        bytes_to_bits(*offset_int, expr.get_bits_per_byte()) <
+        m_offset_bits + *el_size)
+      {
+        bytest bytes_req =
+          bits_to_bytes_trunc(
+            m_offset_bits + *el_size, expr.get_bits_per_byte()) -
+          *offset_int;
         bytes_req-=val_offset;
-        if(val_offset + bytes_req > (*val_size) / expr.get_bits_per_byte())
-          bytes_req = (*val_size) / expr.get_bits_per_byte() - val_offset;
+        if(
+          val_offset + bytes_req >
+          bits_to_bytes_trunc(*val_size, expr.get_bits_per_byte()))
+        {
+          bytes_req = bits_to_bytes_trunc(*val_size, expr.get_bits_per_byte()) -
+                      val_offset;
+        }
 
         byte_extract_exprt new_val(
           matching_byte_extract_id,
@@ -2373,7 +2396,8 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
           expr.id(),
           *it,
           from_integer(
-            *offset_int + val_offset - m_offset_bits / expr.get_bits_per_byte(),
+            *offset_int + val_offset -
+              bytest{m_offset_bits / bitst{expr.get_bits_per_byte()}},
             offset.type()),
           new_val,
           expr.get_bits_per_byte());

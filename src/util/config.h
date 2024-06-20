@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ieee_float.h"
 #include "irep.h"
+#include "mp_arith.h"
 
 #include <list>
 #include <optional>
@@ -133,7 +134,7 @@ class configt
 public:
   struct ansi_ct
   {
-    // for ANSI-C
+    // for ANSI-C, measured in bits (using bitst would add some type safety)
     std::size_t int_width;
     std::size_t long_int_width;
     std::size_t bool_width;
@@ -194,11 +195,11 @@ public:
     void set_LP32();  // int=16, long=32, pointer=32
 
     // minimum alignment (in structs) measured in bytes
-    std::size_t alignment;
+    bytest alignment = bytest{0};
 
     // maximum minimum size of the operands for a machine
     // instruction (in bytes)
-    std::size_t memory_operand_size;
+    bytest memory_operand_size = bytest{0};
 
     enum class endiannesst
     {

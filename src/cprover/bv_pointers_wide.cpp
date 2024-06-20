@@ -209,7 +209,7 @@ std::optional<bvt> bv_pointers_widet::convert_address_of_rec(const exprt &expr)
 
     // get size
     auto size = pointer_offset_size(array_type.element_type(), ns);
-    CHECK_RETURN(size.has_value() && *size >= 0);
+    CHECK_RETURN(size.has_value() && *size >= bytest{0});
 
     bv = offset_arithmetic(type, bv, *size, index);
     CHECK_RETURN(bv.size() == bits);
@@ -231,7 +231,8 @@ std::optional<bvt> bv_pointers_widet::convert_address_of_rec(const exprt &expr)
     const std::size_t bits = boolbv_width(type);
     CHECK_RETURN(bv_opt->size() == bits);
 
-    bvt bv = offset_arithmetic(type, *bv_opt, 1, byte_extract_expr.offset());
+    bvt bv =
+      offset_arithmetic(type, *bv_opt, bytest{1}, byte_extract_expr.offset());
     CHECK_RETURN(bv.size() == bits);
     return std::move(bv);
   }
@@ -403,14 +404,12 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
 
     bvt bv;
 
-    mp_integer size = 0;
-    std::size_t count = 0;
+    std::optional<bytest> size;
 
     for(const auto &op : plus_expr.operands())
     {
       if(op.type().id() == ID_pointer)
       {
-        count++;
         bv = convert_bv(op);
         CHECK_RETURN(bv.size() == bits);
 
@@ -419,13 +418,17 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
           pointer_base_type.id() != ID_empty,
           "no pointer arithmetic over void pointers");
         auto size_opt = pointer_offset_size(pointer_base_type, ns);
-        CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
-        size = *size_opt;
+        CHECK_RETURN(size_opt.has_value() && *size_opt >= bytest{0});
+        INVARIANT(
+          !size.has_value(),
+          "there should be exactly one pointer-type operand in a pointer-type "
+          "sum");
+        size = std::move(size_opt);
       }
     }
 
     INVARIANT(
-      count == 1,
+      size.has_value(),
       "there should be exactly one pointer-type operand in a pointer-type sum");
 
     const std::size_t offset_bits = get_offset_width(type);
@@ -453,7 +456,7 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
       sum = bv_utils.add(sum, op_bv);
     }
 
-    return offset_arithmetic(type, bv, size, sum);
+    return offset_arithmetic(type, bv, *size, sum);
   }
   else if(expr.id() == ID_minus)
   {
@@ -482,7 +485,7 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
       pointer_base_type.id() != ID_empty,
       "no pointer arithmetic over void pointers");
     auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
-    CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+    CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > bytest{0});
     return offset_arithmetic(type, bv, *element_size_opt, neg_op1);
   }
   else if(
@@ -535,7 +538,7 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
 
     // get element size
     auto size = pointer_offset_size(element_address_expr.element_type(), ns);
-    CHECK_RETURN(size.has_value() && *size >= 0);
+    CHECK_RETURN(size.has_value() && *size >= bytest{0});
 
     // add offset
     bv = offset_arithmetic(
@@ -620,11 +623,13 @@ bvt bv_pointers_widet::convert_bitvector(const exprt &expr)
         lhs_pt.base_type().id() != ID_empty,
         "no pointer arithmetic over void pointers");
       auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+      CHECK_RETURN(
+        element_size_opt.has_value() && *element_size_opt > bytest{0});
 
-      if(*element_size_opt != 1)
+      if(*element_size_opt != bytest{1})
       {
-        bvt element_size_bv = bv_utils.build_constant(*element_size_opt, width);
+        bvt element_size_bv =
+          bv_utils.build_constant(element_size_opt->get(), width);
         difference = bv_utils.divider(
           difference, element_size_bv, bv_utilst::representationt::SIGNED);
       }
@@ -771,7 +776,7 @@ exprt bv_pointers_widet::bv_get_rec(
 
   pointer_logict::pointert pointer{
     numeric_cast_v<std::size_t>(binary2integer(value_addr, false)),
-    binary2integer(value_offset, false)};
+    bytest{binary2integer(value_offset, false)}};
 
   return annotated_pointer_constant_exprt{
     bvrep, pointer_logic.pointer_expr(pointer, pt)};
@@ -792,18 +797,18 @@ bvt bv_pointers_widet::encode(const mp_integer &addr, const pointer_typet &type)
 bvt bv_pointers_widet::offset_arithmetic(
   const pointer_typet &type,
   const bvt &bv,
-  const mp_integer &x)
+  const bytest &x)
 {
   const std::size_t offset_bits = get_offset_width(type);
 
   return offset_arithmetic(
-    type, bv, 1, bv_utils.build_constant(x, offset_bits));
+    type, bv, bytest{1}, bv_utils.build_constant(x.get(), offset_bits));
 }
 
 bvt bv_pointers_widet::offset_arithmetic(
   const pointer_typet &type,
   const bvt &bv,
-  const mp_integer &factor,
+  const bytest &factor,
   const exprt &index)
 {
   bvt bv_index = convert_bv(index);
@@ -821,16 +826,16 @@ bvt bv_pointers_widet::offset_arithmetic(
 bvt bv_pointers_widet::offset_arithmetic(
   const pointer_typet &type,
   const bvt &bv,
-  const mp_integer &factor,
+  const bytest &factor,
   const bvt &index)
 {
   bvt bv_index;
 
-  if(factor == 1)
+  if(factor == bytest{1})
     bv_index = index;
   else
   {
-    bvt bv_factor = bv_utils.build_constant(factor, index.size());
+    bvt bv_factor = bv_utils.build_constant(factor.get(), index.size());
     bv_index = bv_utils.signed_multiplier(index, bv_factor);
   }
 

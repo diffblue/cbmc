@@ -1102,7 +1102,7 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
   }
 
   // we only care about the type
-  mp_integer a=alignment(argument_type, *this);
+  bytest a = alignment(argument_type, *this);
 
   exprt tmp=from_integer(a, size_type());
   tmp.add_source_location()=expr.source_location();

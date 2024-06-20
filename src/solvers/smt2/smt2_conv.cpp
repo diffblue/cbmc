@@ -744,7 +744,8 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
 
     // split into object and offset
     mp_integer pow=power(2, width-config.bv_encoding.object_bits);
-    pointer_logict::pointert ptr{numeric_cast_v<std::size_t>(v / pow), v % pow};
+    pointer_logict::pointert ptr{
+      numeric_cast_v<std::size_t>(v / pow), bytest{v % pow}};
     return annotated_pointer_constant_exprt(
       bv_expr.get_value(),
       pointer_logic.pointer_expr(ptr, to_pointer_type(type)));
@@ -854,7 +855,7 @@ void smt2_convt::convert_address_of_rec(
     const irep_idt &component_name = member_expr.get_component_name();
 
     const auto offset = member_offset(struct_type, component_name, ns);
-    CHECK_RETURN(offset.has_value() && *offset >= 0);
+    CHECK_RETURN(offset.has_value() && *offset >= bytest{0});
 
     unsignedbv_typet index_type(boolbv_width(result_type));
 
@@ -1588,8 +1589,8 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       if(shift_expr.distance().type().id() == ID_integer)
       {
-        const mp_integer i =
-          numeric_cast_v<mp_integer>(to_constant_expr(shift_expr.distance()));
+        const auto i =
+          numeric_cast_v<bitst>(to_constant_expr(shift_expr.distance()));
 
         // shift distance must be bit vector
         std::size_t width_op0 = boolbv_width(shift_expr.op().type());
@@ -1652,7 +1653,7 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       out << ' ';
 
-      auto distance_int_op = numeric_cast<mp_integer>(shift_expr.distance());
+      auto distance_int_op = numeric_cast<bitst>(shift_expr.distance());
 
       if(distance_int_op.has_value())
       {
@@ -1812,8 +1813,8 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(extractbit_expr.index().is_constant())
     {
-      const mp_integer i =
-        numeric_cast_v<mp_integer>(to_constant_expr(extractbit_expr.index()));
+      const auto i =
+        numeric_cast_v<bitst>(to_constant_expr(extractbit_expr.index()));
 
       out << "(= ((_ extract " << i << " " << i << ") ";
       flatten2bv(extractbit_expr.src());
@@ -1838,10 +1839,11 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(extractbits_expr.index().is_constant())
     {
-      mp_integer index_i =
-        numeric_cast_v<mp_integer>(to_constant_expr(extractbits_expr.index()));
+      auto index_i =
+        numeric_cast_v<bitst>(to_constant_expr(extractbits_expr.index()));
 
-      out << "((_ extract " << (width + index_i - 1) << " " << index_i << ") ";
+      out << "((_ extract " << (bitst{width} + index_i - bitst{1}) << " "
+          << index_i << ") ";
       flatten2bv(extractbits_expr.src());
       out << ")";
     }
@@ -3683,8 +3685,9 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
         base_type.id() != ID_empty, "no pointer arithmetic over void pointers");
 
       auto element_size_opt = pointer_offset_size(base_type, ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 0);
-      mp_integer element_size = *element_size_opt;
+      CHECK_RETURN(
+        element_size_opt.has_value() && *element_size_opt >= bytest{0});
+      bytest element_size = *element_size_opt;
 
       // First convert the pointer operand
       out << "(let ((?pointerop ";
@@ -3701,7 +3704,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
           << ") ?pointerop) ";
       out << "(bvadd ((_ extract " << offset_bits - 1 << " 0) ?pointerop) ";
 
-      if(element_size >= 2)
+      if(element_size >= bytest{2})
       {
         out << "(bvmul ((_ extract " << offset_bits - 1 << " 0) ";
         convert_expr(i);
@@ -3842,10 +3845,11 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
       DATA_INVARIANT(
         base_type.id() != ID_empty, "no pointer arithmetic over void pointers");
       auto element_size_opt = pointer_offset_size(base_type, ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt >= 1);
-      mp_integer element_size = *element_size_opt;
+      CHECK_RETURN(
+        element_size_opt.has_value() && *element_size_opt >= bytest{1});
+      bytest element_size = *element_size_opt;
 
-      if(element_size >= 2)
+      if(element_size >= bytest{2})
         out << "(bvsdiv ";
 
       INVARIANT(
@@ -3859,7 +3863,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
       convert_expr(expr.op1());
       out << ")";
 
-      if(element_size >= 2)
+      if(element_size >= bytest{2})
         out << " (_ bv" << element_size << " " << boolbv_width(expr.type())
             << "))";
     }

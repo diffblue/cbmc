@@ -622,12 +622,11 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       auto element_size =
         pointer_offset_size(to_array_type(root_object_type).element_type(), ns);
       CHECK_RETURN(element_size.has_value());
-      CHECK_RETURN(*element_size > 0);
+      CHECK_RETURN(*element_size > bytest{0});
 
-      const auto offset_int =
-        numeric_cast_v<mp_integer>(to_constant_expr(offset));
+      const auto offset_int = numeric_cast_v<bytest>(to_constant_expr(offset));
 
-      if(offset_int % *element_size == 0)
+      if(offset_int % *element_size == bytest{0})
       {
         index_exprt index_expr{
           root_object,
@@ -777,14 +776,14 @@ bool value_set_dereferencet::memory_model_bytes(
   auto from_type_element_type_size =
     from_type.id() == ID_array
       ? pointer_offset_size(to_array_type(from_type).element_type(), ns)
-      : std::optional<mp_integer>{};
+      : std::optional<bytest>{};
 
   auto to_type_size = pointer_offset_size(to_type, ns);
 
   if(
     from_type.id() == ID_array && from_type_element_type_size.has_value() &&
-    *from_type_element_type_size == 1 && to_type_size.has_value() &&
-    *to_type_size == 1 &&
+    *from_type_element_type_size == bytest{1} && to_type_size.has_value() &&
+    *to_type_size == bytest{1} &&
     is_a_bv_type(to_array_type(from_type).element_type()) &&
     is_a_bv_type(to_type))
   {

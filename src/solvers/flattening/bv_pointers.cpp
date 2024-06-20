@@ -304,7 +304,8 @@ std::optional<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
     const std::size_t bits = boolbv_width(type);
     CHECK_RETURN(bv_opt->size() == bits);
 
-    bvt bv = offset_arithmetic(type, *bv_opt, 1, byte_extract_expr.offset());
+    bvt bv =
+      offset_arithmetic(type, *bv_opt, bytest{1}, byte_extract_expr.offset());
     CHECK_RETURN(bv.size()==bits);
     return std::move(bv);
   }
@@ -459,7 +460,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     bvt bv;
 
-    mp_integer size=0;
+    bytest size{0};
     std::size_t count=0;
 
     for(const auto &op : plus_expr.operands())
@@ -475,7 +476,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
           pointer_base_type.id() != ID_empty,
           "no pointer arithmetic over void pointers");
         auto size_opt = pointer_offset_size(pointer_base_type, ns);
-        CHECK_RETURN(size_opt.has_value() && *size_opt >= 0);
+        CHECK_RETURN(size_opt.has_value() && *size_opt >= bytest{0});
         size = *size_opt;
       }
     }
@@ -540,7 +541,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       pointer_base_type.id() != ID_empty,
       "no pointer arithmetic over void pointers");
     auto element_size_opt = pointer_offset_size(pointer_base_type, ns);
-    CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+    CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > bytest{0});
     return offset_arithmetic(type, bv, *element_size_opt, neg_op1);
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
@@ -596,7 +597,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     // get element size
     auto size = pointer_offset_size(element_address_expr.element_type(), ns);
-    CHECK_RETURN(size.has_value() && *size >= 0);
+    CHECK_RETURN(size.has_value() && *size >= bytest{0});
 
     // add offset
     bv = offset_arithmetic(
@@ -657,11 +658,13 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
         lhs_pt.base_type().id() != ID_empty,
         "no pointer arithmetic over void pointers");
       auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+      CHECK_RETURN(
+        element_size_opt.has_value() && *element_size_opt > bytest{0});
 
-      if(*element_size_opt != 1)
+      if(*element_size_opt != bytest{1})
       {
-        bvt element_size_bv = bv_utils.build_constant(*element_size_opt, width);
+        bvt element_size_bv =
+          bv_utils.build_constant(element_size_opt->get(), width);
         difference = bv_utils.divider(
           difference, element_size_bv, bv_utilst::representationt::SIGNED);
       }
@@ -813,7 +816,7 @@ exprt bv_pointerst::bv_get_rec(
 
   pointer_logict::pointert pointer{
     numeric_cast_v<std::size_t>(binary2integer(value_addr, false)),
-    binary2integer(value_offset, false)};
+    bytest{binary2integer(value_offset, false)}};
 
   return annotated_pointer_constant_exprt{
     bvrep, pointer_logic.pointer_expr(pointer, pt)};
@@ -834,18 +837,18 @@ bvt bv_pointerst::encode(const mp_integer &addr, const pointer_typet &type)
 bvt bv_pointerst::offset_arithmetic(
   const pointer_typet &type,
   const bvt &bv,
-  const mp_integer &x)
+  const bytest &x)
 {
   const std::size_t offset_bits = get_offset_width(type);
 
   return offset_arithmetic(
-    type, bv, 1, bv_utils.build_constant(x, offset_bits));
+    type, bv, bytest{1}, bv_utils.build_constant(x.get(), offset_bits));
 }
 
 bvt bv_pointerst::offset_arithmetic(
   const pointer_typet &type,
   const bvt &bv,
-  const mp_integer &factor,
+  const bytest &factor,
   const exprt &index)
 {
   bvt bv_index=convert_bv(index);
@@ -879,22 +882,22 @@ bvt bv_pointerst::offset_arithmetic(
   const std::size_t offset_bits = get_offset_width(type);
   bv_index = bv_utils.extension(bv_index, offset_bits, rep);
 
-  return offset_arithmetic(type, bv, 1, bv_index);
+  return offset_arithmetic(type, bv, bytest{1}, bv_index);
 }
 
 bvt bv_pointerst::offset_arithmetic(
   const pointer_typet &type,
   const bvt &bv,
-  const mp_integer &factor,
+  const bytest &factor,
   const bvt &index)
 {
   bvt bv_index;
 
-  if(factor==1)
+  if(factor == bytest{1})
     bv_index=index;
   else
   {
-    bvt bv_factor=bv_utils.build_constant(factor, index.size());
+    bvt bv_factor = bv_utils.build_constant(factor.get(), index.size());
     bv_index = bv_utils.signed_multiplier(index, bv_factor);
   }
 

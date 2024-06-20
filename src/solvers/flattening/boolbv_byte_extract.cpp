@@ -61,13 +61,12 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   // see if the byte number is constant and within bounds, else work from the
   // root object
   const auto op_bytes_opt = pointer_offset_size(expr.op().type(), ns);
-  auto index = numeric_cast<mp_integer>(expr.offset());
+  auto index = numeric_cast<bytest>(expr.offset());
 
   if(
-    (!index.has_value() || !op_bytes_opt.has_value() ||
-     *index < 0 || *index >= *op_bytes_opt) &&
-    (expr.op().id() == ID_member ||
-     expr.op().id() == ID_index ||
+    (!index.has_value() || !op_bytes_opt.has_value() || *index < bytest{0} ||
+     *index >= *op_bytes_opt) &&
+    (expr.op().id() == ID_member || expr.op().id() == ID_index ||
      expr.op().id() == ID_byte_extract_big_endian ||
      expr.op().id() == ID_byte_extract_little_endian))
   {
@@ -106,14 +105,17 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   // see if the byte number is constant
   if(index.has_value())
   {
-    const mp_integer offset = *index * expr.get_bits_per_byte();
+    const bitst offset = bytes_to_bits(*index, expr.get_bits_per_byte());
 
     for(std::size_t i=0; i<width; i++)
+    {
+      const bitst offset_plus_i = offset + bitst{i};
       // out of bounds?
-      if(offset + i < 0 || offset + i >= op_bv.size())
+      if(offset_plus_i < bitst{0} || offset_plus_i >= bitst{op_bv.size()})
         bv[i]=prop.new_variable();
       else
-        bv[i] = op_bv[numeric_cast_v<std::size_t>(offset + i)];
+        bv[i] = op_bv[numeric_cast_v<std::size_t>(offset_plus_i)];
+    }
   }
   else
   {

@@ -22,12 +22,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ssa_expr.h"
 #include "std_expr.h"
 
-std::optional<mp_integer> member_offset(
+std::optional<bytest> member_offset(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns)
 {
-  mp_integer result = 0;
+  bytest result{0};
   std::size_t bit_field_bits = 0;
 
   for(const auto &comp : type.components())
@@ -39,13 +39,15 @@ std::optional<mp_integer> member_offset(
     {
       const std::size_t w = to_c_bit_field_type(comp.type()).get_width();
       bit_field_bits += w;
-      result += bit_field_bits / config.ansi_c.char_width;
+      result +=
+        bits_to_bytes_trunc(bitst{bit_field_bits}, config.ansi_c.char_width);
       bit_field_bits %= config.ansi_c.char_width;
     }
     else if(comp.is_boolean())
     {
       ++bit_field_bits;
-      result += bit_field_bits / config.ansi_c.char_width;
+      result +=
+        bits_to_bytes_trunc(bitst{bit_field_bits}, config.ansi_c.char_width);
       bit_field_bits %= config.ansi_c.char_width;
     }
     else
@@ -63,12 +65,12 @@ std::optional<mp_integer> member_offset(
   return result;
 }
 
-std::optional<mp_integer> member_offset_bits(
+std::optional<bitst> member_offset_bits(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns)
 {
-  mp_integer offset=0;
+  bitst offset{0};
   const struct_typet::componentst &components=type.components();
 
   for(const auto &comp : components)
@@ -87,18 +89,18 @@ std::optional<mp_integer> member_offset_bits(
 }
 
 /// Compute the size of a type in bytes, rounding up to full bytes
-std::optional<mp_integer>
+std::optional<bytest>
 pointer_offset_size(const typet &type, const namespacet &ns)
 {
   auto bits = pointer_offset_bits(type, ns);
 
   if(bits.has_value())
-    return (*bits + config.ansi_c.char_width - 1) / config.ansi_c.char_width;
+    return bits_to_bytes_ceil(*bits, config.ansi_c.char_width);
   else
     return {};
 }
 
-std::optional<mp_integer>
+std::optional<bitst>
 pointer_offset_bits(const typet &type, const namespacet &ns)
 {
   if(type.id()==ID_array)
@@ -138,7 +140,7 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   else if(type.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(type);
-    mp_integer result=0;
+    bitst result{0};
 
     for(const auto &c : struct_type.components())
     {
@@ -158,7 +160,7 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
     const union_typet &union_type=to_union_type(type);
 
     if(union_type.components().empty())
-      return mp_integer{0};
+      return bitst{0};
 
     const auto widest_member = union_type.find_widest_union_component(ns);
 
@@ -175,12 +177,12 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
           type.id()==ID_c_bool ||
           type.id()==ID_c_bit_field)
   {
-    return mp_integer(to_bitvector_type(type).get_width());
+    return bitst{to_bitvector_type(type).get_width()};
   }
   else if(type.id()==ID_c_enum)
   {
-    return mp_integer(
-      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width());
+    return bitst{
+      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width()};
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -188,15 +190,15 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_bool)
   {
-    return mp_integer(1);
+    return bitst{1};
   }
   else if(type.id()==ID_pointer)
   {
     // the following is an MS extension
     if(type.get_bool(ID_C_ptr32))
-      return mp_integer(32);
+      return bitst{32};
 
-    return mp_integer(to_bitvector_type(type).get_width());
+    return bitst{to_bitvector_type(type).get_width()};
   }
   else if(type.id() == ID_union_tag)
   {
@@ -208,11 +210,11 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_code)
   {
-    return mp_integer(0);
+    return bitst{0};
   }
   else if(type.id()==ID_string)
   {
-    return mp_integer(32);
+    return bitst{32};
   }
   else
     return {};
@@ -314,9 +316,10 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
       auto bits = pointer_offset_bits(vector_type, ns);
 
       if(bits.has_value())
+      {
         return from_integer(
-          (*bits + config.ansi_c.char_width - 1) / config.ansi_c.char_width,
-          size_type());
+          bits_to_bytes_ceil(*bits, config.ansi_c.char_width), size_type());
+      }
     }
 
     auto sub = size_of_expr(vector_type.element_type(), ns);
@@ -384,7 +387,7 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
   {
     const union_typet &union_type=to_union_type(type);
 
-    mp_integer max_bytes=0;
+    bytest max_bytes{0};
     exprt result=from_integer(0, size_type());
 
     // compute max
@@ -398,7 +401,7 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
 
       if(!sub_bits.has_value())
       {
-        max_bytes=-1;
+        max_bytes = bytest{-1};
 
         auto sub_size_opt = size_of_expr(subtype, ns);
         if(!sub_size_opt.has_value())
@@ -407,10 +410,10 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
       }
       else
       {
-        mp_integer sub_bytes =
-          (*sub_bits + config.ansi_c.char_width - 1) / config.ansi_c.char_width;
+        bytest sub_bytes =
+          bits_to_bytes_ceil(*sub_bits, config.ansi_c.char_width);
 
-        if(max_bytes>=0)
+        if(max_bytes >= bytest{0})
         {
           if(max_bytes<sub_bytes)
           {
@@ -492,7 +495,7 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
     return {};
 }
 
-std::optional<mp_integer>
+std::optional<bytest>
 compute_pointer_offset(const exprt &expr, const namespacet &ns)
 {
   if(expr.id()==ID_symbol)
@@ -501,7 +504,7 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
       return compute_pointer_offset(
         to_ssa_expr(expr).get_original_expr(), ns);
     else
-      return mp_integer(0);
+      return bytest{0};
   }
   else if(expr.id()==ID_index)
   {
@@ -518,7 +521,7 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
       const auto &array_type = to_array_type(index_expr.array().type());
       auto sub_size = pointer_offset_size(array_type.element_type(), ns);
 
-      if(sub_size.has_value() && *sub_size > 0)
+      if(sub_size.has_value() && *sub_size > bytest{0})
       {
         const auto i = numeric_cast<mp_integer>(index_expr.index());
         if(i.has_value())
@@ -552,18 +555,18 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
     }
   }
   else if(expr.id()==ID_string_constant)
-    return mp_integer(0);
+    return bytest{0};
 
   return {}; // don't know
 }
 
 std::optional<exprt> get_subexpression_at_offset(
   const exprt &expr,
-  const mp_integer &offset_bytes,
+  const bytest &offset_bytes,
   const typet &target_type_raw,
   const namespacet &ns)
 {
-  if(offset_bytes == 0 && expr.type() == target_type_raw)
+  if(offset_bytes == bytest{0} && expr.type() == target_type_raw)
   {
     exprt result = expr;
 
@@ -574,7 +577,7 @@ std::optional<exprt> get_subexpression_at_offset(
   }
 
   if(
-    offset_bytes == 0 && expr.type().id() == ID_pointer &&
+    offset_bytes == bytest{0} && expr.type().id() == ID_pointer &&
     target_type_raw.id() == ID_pointer)
   {
     return typecast_exprt(expr, target_type_raw);
@@ -591,7 +594,7 @@ std::optional<exprt> get_subexpression_at_offset(
         ? ns.follow_tag(to_struct_tag_type(expr.type()))
         : to_struct_type(expr.type());
 
-    mp_integer m_offset_bits = 0;
+    bitst m_offset_bits{0};
     for(const auto &component : struct_type.components())
     {
       const auto m_size_bits = pointer_offset_bits(component.type(), ns);
@@ -601,15 +604,18 @@ std::optional<exprt> get_subexpression_at_offset(
       // if this member completely contains the target, and this member is
       // byte-aligned, recurse into it
       if(
-        offset_bytes * config.ansi_c.char_width >= m_offset_bits &&
-        m_offset_bits % config.ansi_c.char_width == 0 &&
-        offset_bytes * config.ansi_c.char_width + *target_size_bits <=
+        bytes_to_bits(offset_bytes, config.ansi_c.char_width) >=
+          m_offset_bits &&
+        m_offset_bits % bitst{config.ansi_c.char_width} == bitst{0} &&
+        bytes_to_bits(offset_bytes, config.ansi_c.char_width) +
+            *target_size_bits <=
           m_offset_bits + *m_size_bits)
       {
         const member_exprt member(expr, component.get_name(), component.type());
         return get_subexpression_at_offset(
           member,
-          offset_bytes - m_offset_bits / config.ansi_c.char_width,
+          offset_bytes -
+            bits_to_bytes_trunc(m_offset_bits, config.ansi_c.char_width),
           target_type_raw,
           ns);
       }
@@ -627,17 +633,18 @@ std::optional<exprt> get_subexpression_at_offset(
     // no arrays of non-byte-aligned, zero-, or unknown-sized objects
     if(
       array_type.size().is_constant() && elem_size_bits.has_value() &&
-      *elem_size_bits > 0 && *elem_size_bits % config.ansi_c.char_width == 0 &&
+      *elem_size_bits > bitst{0} &&
+      *elem_size_bits % bitst{config.ansi_c.char_width} == bitst{0} &&
       *target_size_bits <= *elem_size_bits)
     {
       const mp_integer array_size =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
-      const mp_integer elem_size_bytes =
-        *elem_size_bits / config.ansi_c.char_width;
+      const bytest elem_size_bytes{
+        bits_to_bytes_trunc(*elem_size_bits, config.ansi_c.char_width)};
       const mp_integer index = offset_bytes / elem_size_bytes;
-      const auto offset_inside_elem = offset_bytes % elem_size_bytes;
-      const auto target_size_bytes =
-        *target_size_bits / config.ansi_c.char_width;
+      const bytest offset_inside_elem{offset_bytes % elem_size_bytes};
+      const bytest target_size_bytes{
+        bits_to_bytes_trunc(*target_size_bits, config.ansi_c.char_width)};
       // only recurse if the cell completely contains the target
       if(
         index < array_size &&
@@ -671,7 +678,8 @@ std::optional<exprt> get_subexpression_at_offset(
 
       // if this member completely contains the target, recurse into it
       if(
-        offset_bytes * config.ansi_c.char_width + *target_size_bits <=
+        bytes_to_bits(offset_bytes, config.ansi_c.char_width) +
+          *target_size_bits <=
         *m_size_bits)
       {
         const member_exprt member(expr, component.get_name(), component.type());
@@ -691,7 +699,7 @@ std::optional<exprt> get_subexpression_at_offset(
   const typet &target_type,
   const namespacet &ns)
 {
-  const auto offset_bytes = numeric_cast<mp_integer>(offset);
+  const auto offset_bytes = numeric_cast<bytest>(offset);
 
   if(!offset_bytes.has_value())
     return {};

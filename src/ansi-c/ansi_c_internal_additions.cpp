@@ -128,9 +128,10 @@ static std::string architecture_string(const std::string &value, const char *s)
 template <typename T>
 static std::string architecture_string(T value, const char *s)
 {
-  return std::string("const " CPROVER_PREFIX "integer " CPROVER_PREFIX
-                     "architecture_") +
-         std::string(s) + "=" + std::to_string(value) + ";\n";
+  std::ostringstream os;
+  os << "const " << CPROVER_PREFIX "integer " << CPROVER_PREFIX "architecture_"
+     << s << '=' << value << ";\n";
+  return os.str();
 }
 
 void ansi_c_internal_additions(std::string &code, bool support_float16_type)

@@ -159,7 +159,7 @@ bool interpretert::count_type_leaves(const typet &ty, mp_integer &result)
 /// \return Offset into a vector of interpreter values; returns true on error
 bool interpretert::byte_offset_to_memory_offset(
   const typet &source_type,
-  const mp_integer &offset,
+  const bytest &offset,
   mp_integer &result)
 {
   if(source_type.id()==ID_struct)
@@ -206,7 +206,7 @@ bool interpretert::byte_offset_to_memory_offset(
 
     mp_integer array_size=array_size_vec[0];
     auto elem_size_bytes = pointer_offset_size(at.element_type(), ns);
-    if(!elem_size_bytes.has_value() || *elem_size_bytes == 0)
+    if(!elem_size_bytes.has_value() || *elem_size_bytes == bytest{0})
       return true;
 
     mp_integer elem_size_leaves;
@@ -228,7 +228,7 @@ bool interpretert::byte_offset_to_memory_offset(
   {
     result=0;
     // Can't currently subdivide a primitive.
-    return offset!=0;
+    return offset != bytest{0};
   }
 }
 
@@ -241,7 +241,7 @@ bool interpretert::byte_offset_to_memory_offset(
 bool interpretert::memory_offset_to_byte_offset(
   const typet &source_type,
   const mp_integer &full_cell_offset,
-  mp_integer &result)
+  bytest &result)
 {
   if(source_type.id()==ID_struct)
   {
@@ -255,7 +255,7 @@ bool interpretert::memory_offset_to_byte_offset(
         return true;
       if(component_count>cell_offset)
       {
-        mp_integer subtype_result;
+        bytest subtype_result{0};
         bool ret=memory_offset_to_byte_offset(
           comp.type(), cell_offset, subtype_result);
         const auto member_offset_result =
@@ -292,7 +292,7 @@ bool interpretert::memory_offset_to_byte_offset(
     if(this_idx>=array_size_vec[0])
       return true;
 
-    mp_integer subtype_result;
+    bytest subtype_result{0};
     bool ret = memory_offset_to_byte_offset(
       at.element_type(), full_cell_offset % elem_count, subtype_result);
     result = subtype_result + ((*elem_size) * this_idx);
@@ -301,7 +301,7 @@ bool interpretert::memory_offset_to_byte_offset(
   else
   {
     // Primitive type.
-    result=0;
+    result = bytest{0};
     return full_cell_offset!=0;
   }
 }
@@ -794,9 +794,9 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
         auto obj_type = address_to_symbol(address).type();
 
         mp_integer offset=address_to_offset(address);
-        mp_integer byte_offset;
+        bytest byte_offset{0};
         if(!memory_offset_to_byte_offset(obj_type, offset, byte_offset))
-          return {byte_offset};
+          return {byte_offset.get()};
       }
     }
     return {};
@@ -1071,7 +1071,9 @@ mp_integer interpretert::evaluate_address(
     {
       mp_integer memory_offset;
       if(!byte_offset_to_memory_offset(
-           byte_extract_expr.op0().type(), extract_offset[0], memory_offset))
+           byte_extract_expr.op0().type(),
+           bytest{extract_offset[0]},
+           memory_offset))
         return evaluate_address(byte_extract_expr.op0(), fail_quietly) +
                memory_offset;
     }

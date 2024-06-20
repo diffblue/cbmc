@@ -34,12 +34,12 @@ TEST_CASE("Build subexpression to access element at offset into array")
   symbol_exprt a("array", array_type);
 
   {
-    const auto result = get_subexpression_at_offset(a, 0, t, ns);
+    const auto result = get_subexpression_at_offset(a, bytest{0}, t, ns);
     REQUIRE(result.value() == index_exprt(a, from_integer(0, c_index_type())));
   }
 
   {
-    const auto result = get_subexpression_at_offset(a, 32 / 8, t, ns);
+    const auto result = get_subexpression_at_offset(a, bytest{32 / 8}, t, ns);
     REQUIRE(result.value() == index_exprt(a, from_integer(1, c_index_type())));
   }
 
@@ -57,7 +57,7 @@ TEST_CASE("Build subexpression to access element at offset into array")
 
   {
     const signedbv_typet small_t(8);
-    const auto result = get_subexpression_at_offset(a, 1, small_t, ns);
+    const auto result = get_subexpression_at_offset(a, bytest{1}, small_t, ns);
     REQUIRE(
       result.value() == make_byte_extract(
                           index_exprt(a, from_integer(0, c_index_type())),
@@ -67,7 +67,7 @@ TEST_CASE("Build subexpression to access element at offset into array")
 
   {
     const signedbv_typet int16_t(16);
-    const auto result = get_subexpression_at_offset(a, 3, int16_t, ns);
+    const auto result = get_subexpression_at_offset(a, bytest{3}, int16_t, ns);
     // At offset 3 there are only 8 bits remaining in an element of type t so
     // not enough to fill a 16 bit int, so this cannot be transformed in an
     // index_exprt.
@@ -94,12 +94,12 @@ TEST_CASE("Build subexpression to access element at offset into struct")
   symbol_exprt s("struct", st);
 
   {
-    const auto result = get_subexpression_at_offset(s, 0, t, ns);
+    const auto result = get_subexpression_at_offset(s, bytest{0}, t, ns);
     REQUIRE(result.value() == member_exprt(s, "foo", t));
   }
 
   {
-    const auto result = get_subexpression_at_offset(s, 32 / 8, t, ns);
+    const auto result = get_subexpression_at_offset(s, bytest{32 / 8}, t, ns);
     REQUIRE(result.value() == member_exprt(s, "bar", t));
   }
 
@@ -117,7 +117,7 @@ TEST_CASE("Build subexpression to access element at offset into struct")
 
   {
     const signedbv_typet small_t(8);
-    const auto result = get_subexpression_at_offset(s, 1, small_t, ns);
+    const auto result = get_subexpression_at_offset(s, bytest{1}, small_t, ns);
     REQUIRE(
       result.value() ==
       make_byte_extract(
