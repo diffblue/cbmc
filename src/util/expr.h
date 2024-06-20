@@ -317,12 +317,14 @@ public:
   void visit(class const_expr_visitort &visitor) const;
   void visit_pre(std::function<void(exprt &)>);
   void visit_pre(std::function<void(const exprt &)>) const;
+  optionalt<exprt> transform_pre(std::function<optionalt<exprt>(exprt)>) const;
 
   /// These are post-order traversal visitors, i.e.,
   /// the visitor is executed on a node _after_ its children
   /// have been visited.
   void visit_post(std::function<void(exprt &)>);
   void visit_post(std::function<void(const exprt &)>) const;
+  optionalt<exprt> transform_post(std::function<optionalt<exprt>(exprt)>) const;
 
   depth_iteratort depth_begin();
   depth_iteratort depth_end();
