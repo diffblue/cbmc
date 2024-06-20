@@ -410,7 +410,7 @@ bool ai_baset::visit_edge(
   return return_value;
 }
 
-bool ai_baset::visit_edge_function_call(
+bool ai_localt::visit_edge_function_call(
   const irep_idt &calling_function_id,
   trace_ptrt p_call,
   locationt l_return,
@@ -421,11 +421,11 @@ bool ai_baset::visit_edge_function_call(
   const namespacet &ns)
 {
   messaget log(message_handler);
-  log.progress() << "ai_baset::visit_edge_function_call from "
+  log.progress() << "ai_localt::visit_edge_function_call from "
                  << p_call->current_location()->location_number << " to "
                  << l_return->location_number << messaget::eom;
 
-  // The default implementation is not interprocedural
+  // This implementation is not interprocedural
   // so the effects of the call are approximated but nothing else
   return visit_edge(
     calling_function_id,
@@ -534,6 +534,47 @@ bool ai_baset::visit_end_function(
 
   // Do nothing
   return false;
+}
+
+void ai_localt::operator()(
+  const goto_functionst &goto_functions,
+  const namespacet &ns)
+{
+  initialize(goto_functions);
+  for(const auto &gf_entry : goto_functions.function_map)
+  {
+    if(gf_entry.second.body_available())
+    {
+      trace_ptrt p = entry_state(gf_entry.second.body);
+      fixedpoint(p, gf_entry.first, gf_entry.second.body, goto_functions, ns);
+    }
+  }
+  finalize();
+}
+
+void ai_localt::operator()(const abstract_goto_modelt &goto_model)
+{
+  const namespacet ns(goto_model.get_symbol_table());
+  operator()(goto_model.get_goto_functions(), ns);
+}
+
+void ai_recursive_interproceduralt::
+operator()(const goto_functionst &goto_functions, const namespacet &ns)
+{
+  initialize(goto_functions);
+  trace_ptrt p = entry_state(goto_functions);
+  fixedpoint(p, goto_functions, ns);
+  finalize();
+}
+
+void ai_recursive_interproceduralt::operator()(
+  const abstract_goto_modelt &goto_model)
+{
+  const namespacet ns(goto_model.get_symbol_table());
+  initialize(goto_model.get_goto_functions());
+  trace_ptrt p = entry_state(goto_model.get_goto_functions());
+  fixedpoint(p, goto_model.get_goto_functions(), ns);
+  finalize();
 }
 
 bool ai_recursive_interproceduralt::visit_edge_function_call(
