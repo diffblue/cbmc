@@ -16,6 +16,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "string2int.h"
 
+constant_exprt bv_typet::all_zeros_expr() const
+{
+  return constant_exprt{
+    make_bvrep(get_width(), [](std::size_t) { return false; }), *this};
+}
+
+constant_exprt bv_typet::all_ones_expr() const
+{
+  return constant_exprt{
+    make_bvrep(get_width(), [](std::size_t) { return true; }), *this};
+}
+
 std::size_t fixedbv_typet::get_integer_bits() const
 {
   const irep_idt integer_bits = get(ID_integer_bits);
