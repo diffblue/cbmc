@@ -579,7 +579,7 @@ static exprt unpack_array_vector(
         numeric_cast_v<std::size_t>(std::min(
           *offset_bytes - (*offset_bytes % el_bytes),
           *num_elements * el_bytes)),
-        from_integer(0, bv_typet{bits_per_byte}));
+        bv_typet{bits_per_byte}.all_zeros_expr());
     }
   }
 
@@ -791,7 +791,7 @@ static array_exprt unpack_struct(
       byte_operands.resize(
         byte_operands.size() +
           numeric_cast_v<std::size_t>(*component_bits / bits_per_byte),
-        from_integer(0, bv_typet{bits_per_byte}));
+        bv_typet{bits_per_byte}.all_zeros_expr());
     }
     else
     {
@@ -2417,7 +2417,7 @@ static exprt lower_byte_update(
     if(bit_width > type_bits)
     {
       val_before = concatenation_exprt{
-        from_integer(0, bv_typet{bit_width - type_bits}),
+        bv_typet{bit_width - type_bits}.all_zeros_expr(),
         val_before,
         bv_typet{bit_width}};
 
@@ -2492,7 +2492,7 @@ static exprt lower_byte_update(
     if(bit_width > update_size_bits)
     {
       zero_extended = concatenation_exprt{
-        from_integer(0, bv_typet{bit_width - update_size_bits}),
+        bv_typet{bit_width - update_size_bits}.all_zeros_expr(),
         value,
         bv_typet{bit_width}};
 

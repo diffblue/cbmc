@@ -60,6 +60,10 @@ public:
     DATA_CHECK(
       vm, !type.get(ID_width).empty(), "bitvector type must have width");
   }
+
+  // helpers to create common constants
+  constant_exprt all_zeros_expr() const;
+  constant_exprt all_ones_expr() const;
 };
 
 /// Check whether a reference to a typet is a \ref bv_typet.
