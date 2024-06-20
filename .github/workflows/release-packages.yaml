@@ -179,7 +179,9 @@ jobs:
           SLACK_USERNAME: Github Actions CI bot
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: "${{ job.status == 'success' && 'Homebrew PR submitted successfully' || 'Homebrew PR failed' }}"
-        run: go run scripts/slack_notification_action.go
+        run: |
+          brew install go
+          go run scripts/slack_notification_action.go
 
   windows-msi-package:
     runs-on: windows-2019
