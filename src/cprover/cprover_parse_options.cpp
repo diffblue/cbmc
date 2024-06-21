@@ -135,6 +135,11 @@ int cprover_parse_optionst::main()
     console_message_handlert message_handler;
     null_message_handlert null_message_handler;
 
+    if(cmdline.isset("verbose"))
+      message_handler.set_verbosity(messaget::M_PROGRESS);
+    else
+      message_handler.set_verbosity(messaget::M_STATUS);
+
     optionst options;
     auto goto_model =
       initialize_goto_model(cmdline.args, message_handler, options);
