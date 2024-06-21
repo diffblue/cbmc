@@ -407,16 +407,16 @@ void run_property_decider(
   auto const sat_solver_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> sat_solver_runtime =
     std::chrono::duration<double>(sat_solver_stop - sat_solver_start);
-  log.status() << "Runtime Solver: " << sat_solver_runtime.count() << "s"
-               << messaget::eom;
+  log.statistics() << "Runtime Solver: " << sat_solver_runtime.count() << "s"
+                   << messaget::eom;
 
   property_decider.update_properties_status_from_goals(
     properties, result.updated_properties, dec_result, set_pass);
 
   auto solver_stop = std::chrono::steady_clock::now();
   solver_runtime += std::chrono::duration<double>(solver_stop - solver_start);
-  log.status() << "Runtime decision procedure: " << solver_runtime.count()
-               << "s" << messaget::eom;
+  log.statistics() << "Runtime decision procedure: " << solver_runtime.count()
+                   << "s" << messaget::eom;
 
   if(dec_result == decision_proceduret::resultt::D_SATISFIABLE)
   {
