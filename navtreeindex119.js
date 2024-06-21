@@ -1,5 +1,6 @@
 var NAVTREEINDEX119 =
 {
+"local__safe__pointers_8cpp_source.html":[9,0,2,0,59],
 "local__safe__pointers_8h.html":[9,0,2,0,60],
 "local__safe__pointers_8h_source.html":[9,0,2,0,60],
 "locale_8c.html":[9,0,2,1,2,16],
@@ -248,6 +249,5 @@ var NAVTREEINDEX119 =
 "math_8c.html#af4dbce976984f75dc170aef9b4e68001":[9,0,2,1,2,17,109],
 "math_8c.html#af4f6badf29e0064603766a6f0875f6fc":[9,0,2,1,2,17,14],
 "math_8c.html#af5d42a1cfb3689630653039dc38c1554":[9,0,2,1,2,17,143],
-"math_8c.html#af67da1c28ce33b403f955103f201dfb8":[9,0,2,1,2,17,131],
-"math_8c.html#af7df01c4a9038dbf3562b41bc8c3be03":[9,0,2,1,2,17,153]
+"math_8c.html#af67da1c28ce33b403f955103f201dfb8":[9,0,2,1,2,17,131]
 };

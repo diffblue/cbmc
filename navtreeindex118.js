@@ -1,5 +1,6 @@
 var NAVTREEINDEX118 =
 {
+"json__symbol_8h.html#a9c75860191a854dfb005b60cdd06d6a7":[9,0,2,20,1,0],
 "json__symbol_8h_source.html":[9,0,2,20,1],
 "json__symbol__table_8cpp.html":[9,0,2,20,2],
 "json__symbol__table_8cpp.html#ab33c42e4a5b19f0477bb9e79503908dc":[9,0,2,20,2,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX118 =
 "local__may__alias_8h.html":[9,0,2,0,58],
 "local__may__alias_8h_source.html":[9,0,2,0,58],
 "local__safe__pointers_8cpp.html":[9,0,2,0,59],
-"local__safe__pointers_8cpp.html#a6484190110a509aba48f42ef4945aeca":[9,0,2,0,59,1],
-"local__safe__pointers_8cpp_source.html":[9,0,2,0,59]
+"local__safe__pointers_8cpp.html#a6484190110a509aba48f42ef4945aeca":[9,0,2,0,59,1]
 };
