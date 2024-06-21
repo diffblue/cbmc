@@ -354,8 +354,8 @@ void symex_target_equationt::convert(decision_proceduret &decision_procedure)
   const auto convert_SSA_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> convert_SSA_runtime =
     std::chrono::duration<double>(convert_SSA_stop - convert_SSA_start);
-  log.status() << "Runtime Convert SSA: " << convert_SSA_runtime.count() << "s"
-               << messaget::eom;
+  log.statistics() << "Runtime Convert SSA: " << convert_SSA_runtime.count()
+                   << "s" << messaget::eom;
 }
 
 void symex_target_equationt::convert_assignments(
