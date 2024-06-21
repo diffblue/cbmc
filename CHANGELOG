@@ -1,3 +1,19 @@
+# CBMC 6.0.1
+
+## Bug Fixes
+* Fix Python syntax error by @tautschnig in https://github.com/diffblue/cbmc/pull/8344
+* Use GNU parallel in Windows CI job by @tautschnig in https://github.com/diffblue/cbmc/pull/8345
+* goto-synthesizer: ignore __CPROVER_-prefixed symbols by @tautschnig in https://github.com/diffblue/cbmc/pull/8348
+* Union member fix by @kroening in https://github.com/diffblue/cbmc/pull/8347
+* GOTO conversion: Declaration hops must not invalidate incomplete gotos by @tautschnig in https://github.com/diffblue/cbmc/pull/8349
+* Increase Windows/clcache size to 2 GB by @tautschnig in https://github.com/diffblue/cbmc/pull/8346
+* homebrew-pr CI notification: install go by @tautschnig in https://github.com/diffblue/cbmc/pull/8340
+* add two helpers for bv_typet by @kroening in https://github.com/diffblue/cbmc/pull/8350
+* reduce default verbosity of cprover binary by @kroening in https://github.com/diffblue/cbmc/pull/8352
+* reduce verbosity of runtime messages by @kroening in https://github.com/diffblue/cbmc/pull/8354
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.0.0...cbmc-6.0.1
+
 # CBMC 6.0.0
 
 ## Major Changes
