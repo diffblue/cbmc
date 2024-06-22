@@ -588,8 +588,8 @@ std::optional<cext> cegis_verifiert::verify()
     log.get_message_handler().set_verbosity(messaget::M_ERROR);
 
   // Apply loop contracts we annotated.
-  code_contractst cont(goto_model, log);
-  cont.unwind_transformed_loops = false;
+  code_contractst cont(
+    goto_model, log, loop_contract_configt{true, false, true});
   cont.apply_loop_contracts();
   original_loop_number_map = cont.get_original_loop_number_map();
   loop_havoc_set = cont.get_loop_havoc_set();

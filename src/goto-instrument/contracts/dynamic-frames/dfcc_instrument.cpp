@@ -237,7 +237,7 @@ bool dfcc_instrumentt::do_not_instrument(const irep_idt &id) const
 
 void dfcc_instrumentt::instrument_harness_function(
   const irep_idt &function_id,
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt &loop_contract_config,
   std::set<irep_idt> &function_pointer_contracts)
 {
   // never instrument a function twice
@@ -272,7 +272,7 @@ void dfcc_instrumentt::instrument_harness_function(
     goto_function,
     write_set,
     local_statics,
-    loop_contract_mode,
+    loop_contract_config,
     function_pointer_contracts);
 
   auto &body = goto_function.body;
@@ -316,7 +316,7 @@ dfcc_instrumentt::get_local_statics(const irep_idt &function_id)
 
 void dfcc_instrumentt::instrument_function(
   const irep_idt &function_id,
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt &loop_contract_config,
   std::set<irep_idt> &function_pointer_contracts)
 {
   // never instrument a function twice
@@ -345,14 +345,14 @@ void dfcc_instrumentt::instrument_function(
     goto_function,
     write_set,
     local_statics,
-    loop_contract_mode,
+    loop_contract_config,
     function_pointer_contracts);
 }
 
 void dfcc_instrumentt::instrument_wrapped_function(
   const irep_idt &wrapped_function_id,
   const irep_idt &initial_function_id,
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt &loop_contract_config,
   std::set<irep_idt> &function_pointer_contracts)
 {
   // never instrument a function twice
@@ -383,7 +383,7 @@ void dfcc_instrumentt::instrument_wrapped_function(
     goto_function,
     write_set,
     local_statics,
-    loop_contract_mode,
+    loop_contract_config,
     function_pointer_contracts);
 }
 
@@ -402,7 +402,7 @@ void dfcc_instrumentt::instrument_goto_program(
     function_id,
     goto_function,
     write_set,
-    dfcc_loop_contract_modet::NONE,
+    loop_contract_configt{false},
     goto_model.symbol_table,
     message_handler,
     library);
@@ -429,7 +429,7 @@ void dfcc_instrumentt::instrument_goto_function(
   goto_functiont &goto_function,
   const exprt &write_set,
   const std::set<symbol_exprt> &local_statics,
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt &loop_contract_config,
   std::set<irep_idt> &function_pointer_contracts)
 {
   if(!goto_function.body_available())
@@ -451,7 +451,7 @@ void dfcc_instrumentt::instrument_goto_function(
     function_id,
     goto_function,
     write_set,
-    loop_contract_mode,
+    loop_contract_config,
     goto_model.symbol_table,
     message_handler,
     library);
@@ -468,13 +468,13 @@ void dfcc_instrumentt::instrument_goto_function(
   // recalculate numbers, etc.
   goto_model.goto_functions.update();
 
-  if(loop_contract_mode != dfcc_loop_contract_modet::NONE)
+  if(loop_contract_config.apply_loop_contracts)
   {
     apply_loop_contracts(
       function_id,
       goto_function,
       cfg_info,
-      loop_contract_mode,
+      loop_contract_config,
       local_statics,
       function_pointer_contracts);
   }
@@ -1241,11 +1241,11 @@ void dfcc_instrumentt::apply_loop_contracts(
   const irep_idt &function_id,
   goto_functiont &goto_function,
   dfcc_cfg_infot &cfg_info,
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt &loop_contract_config,
   const std::set<symbol_exprt> &local_statics,
   std::set<irep_idt> &function_pointer_contracts)
 {
-  PRECONDITION(loop_contract_mode != dfcc_loop_contract_modet::NONE);
+  PRECONDITION(loop_contract_config.apply_loop_contracts);
   cfg_info.get_loops_toposorted();
 
   std::list<std::string> to_unwind;
@@ -1275,7 +1275,7 @@ void dfcc_instrumentt::apply_loop_contracts(
   }
 
   // If required, unwind all transformed loops to yield base and step cases
-  if(loop_contract_mode == dfcc_loop_contract_modet::APPLY_UNWIND)
+  if(loop_contract_config.unwind_transformed_loops)
   {
     unwindsett unwindset{goto_model};
     unwindset.parse_unwindset(to_unwind, log.get_message_handler());

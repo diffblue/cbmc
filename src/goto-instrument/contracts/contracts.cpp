@@ -1500,7 +1500,7 @@ void code_contractst::apply_loop_contracts(
   nondet_static(goto_model, to_exclude_from_nondet_init);
 
   // unwind all transformed loops twice.
-  if(unwind_transformed_loops)
+  if(loop_contract_config.unwind_transformed_loops)
   {
     unwindsett unwindset{goto_model};
     unwindset.parse_unwindset(loop_names, log.get_message_handler());

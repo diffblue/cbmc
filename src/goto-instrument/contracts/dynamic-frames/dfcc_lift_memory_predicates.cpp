@@ -387,7 +387,7 @@ void dfcc_lift_memory_predicatest::lift_predicate(
   // adds checks for side effects, maps core predicates to their implementation.
   instrument.instrument_function(
     function_id,
-    dfcc_loop_contract_modet::NONE,
+    loop_contract_configt{false},
     discovered_function_pointer_contracts);
 }
 

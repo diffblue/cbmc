@@ -17,7 +17,6 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <langapi/language_util.h>
 
 #include "dfcc_library.h"
-#include "dfcc_loop_contract_mode.h"
 
 dfcc_spec_functionst::dfcc_spec_functionst(
   goto_modelt &goto_model,

@@ -133,9 +133,12 @@ int goto_synthesizer_parse_optionst::doit()
   std::set<std::string> to_exclude_from_nondet_static(
     cmdline.get_values("nondet-static-exclude").begin(),
     cmdline.get_values("nondet-static-exclude").end());
-  code_contractst contracts(goto_model, log);
-  contracts.unwind_transformed_loops =
-    !cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND);
+  code_contractst contracts(
+    goto_model,
+    log,
+    loop_contract_configt{
+      true, !cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND), true});
+
   contracts.apply_loop_contracts(to_exclude_from_nondet_static);
 
   // recalculate numbers, etc.

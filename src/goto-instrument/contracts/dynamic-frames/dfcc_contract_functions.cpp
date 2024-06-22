@@ -80,9 +80,7 @@ void dfcc_contract_functionst::
 {
   std::set<irep_idt> function_pointer_contracts;
   instrument.instrument_function(
-    spec_function_id,
-    dfcc_loop_contract_modet::NONE,
-    function_pointer_contracts);
+    spec_function_id, loop_contract_configt{false}, function_pointer_contracts);
 
   INVARIANT(
     function_pointer_contracts.empty(),

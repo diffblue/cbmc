@@ -38,7 +38,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 #include "dfcc_instrument.h"
 #include "dfcc_library.h"
 #include "dfcc_lift_memory_predicates.h"
-#include "dfcc_loop_contract_mode.h"
 #include "dfcc_spec_functions.h"
 #include "dfcc_swap_and_wrap.h"
 
@@ -96,9 +95,7 @@ public:
 /// \param to_check function to check against its contract
 /// \param allow_recursive_calls Allow the checked function to be recursive
 /// \param to_replace set of functions to replace with their contract
-/// \param apply_loop_contracts apply loop contract transformations iff true
-/// \param unwind_transformed_loops unwind transformed loops after applying loop
-///                                 contracts.
+/// \param loop_contract_config configuration for applying loop contracts
 /// \param to_exclude_from_nondet_static set of symbols to exclude when havocing
 /// static program symbols.
 /// \param message_handler used for debug/warning/error messages
@@ -109,41 +106,7 @@ void dfcc(
   const std::optional<irep_idt> &to_check,
   const bool allow_recursive_calls,
   const std::set<irep_idt> &to_replace,
-  const bool apply_loop_contracts,
-  const bool unwind_transformed_loops,
-  const std::set<std::string> &to_exclude_from_nondet_static,
-  message_handlert &message_handler);
-
-/// \ingroup dfcc-module
-/// \brief Applies function contracts and loop contracts transformation to GOTO
-/// model, using the dynamic frame condition checking approach.
-///
-/// Functions to check/replace are explicitly mapped to contracts.
-/// When checking function `foo` against contract `bar`, we require the
-/// actual contract symbol to exist as `contract::bar` in the symbol table.
-///
-/// \param options CLI options (used to lookup options for language config when
-/// re-defining the model's entry point)
-/// \param goto_model GOTO model to transform
-/// \param harness_id Proof harness name, must be the entry point of the model
-/// \param to_check (function,contract) pair for contract checking
-/// \param allow_recursive_calls Allow the checked function to be recursive
-/// \param to_replace Functions-to-contract mapping for replacement
-/// \param apply_loop_contracts Apply loop contract transformations iff true
-/// \param unwind_transformed_loops unwind transformed loops after applying loop
-///                                 contracts.
-/// \param to_exclude_from_nondet_static Set of symbols to exclude when havocing
-/// static program symbols.
-/// \param message_handler used for debug/warning/error messages
-void dfcc(
-  const optionst &options,
-  goto_modelt &goto_model,
-  const irep_idt &harness_id,
-  const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
-  const bool allow_recursive_calls,
-  const std::map<irep_idt, irep_idt> &to_replace,
-  const bool apply_loop_contracts,
-  const bool unwind_transformed_loops,
+  const loop_contract_configt loop_contract_config,
   const std::set<std::string> &to_exclude_from_nondet_static,
   message_handlert &message_handler);
 
@@ -160,7 +123,7 @@ public:
   /// \param to_check (function,contract) pair for contract checking
   /// \param allow_recursive_calls Allow the checked function to be recursive
   /// \param to_replace functions-to-contract mapping for replacement
-  /// \param loop_contract_mode mode to use for loop contracts
+  /// \param loop_contract_config configuration for applying loop contracts
   /// \param message_handler used for debug/warning/error messages
   /// \param to_exclude_from_nondet_static set of symbols to exclude when
   dfcct(
@@ -170,7 +133,7 @@ public:
     const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
     const bool allow_recursive_calls,
     const std::map<irep_idt, irep_idt> &to_replace,
-    const dfcc_loop_contract_modet loop_contract_mode,
+    const loop_contract_configt loop_contract_config,
     message_handlert &message_handler,
     const std::set<std::string> &to_exclude_from_nondet_static);
 
@@ -207,7 +170,7 @@ protected:
   const std::optional<std::pair<irep_idt, irep_idt>> &to_check;
   const bool allow_recursive_calls;
   const std::map<irep_idt, irep_idt> &to_replace;
-  const dfcc_loop_contract_modet loop_contract_mode;
+  const loop_contract_configt loop_contract_config;
   const std::set<std::string> &to_exclude_from_nondet_static;
   message_handlert &message_handler;
   messaget log;

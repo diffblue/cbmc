@@ -119,8 +119,7 @@ void dfcc(
   const std::optional<irep_idt> &to_check,
   const bool allow_recursive_calls,
   const std::set<irep_idt> &to_replace,
-  const bool apply_loop_contracts,
-  const bool unwind_transformed_loops,
+  const loop_contract_configt loop_contract_config,
   const std::set<std::string> &to_exclude_from_nondet_static,
   message_handlert &message_handler)
 {
@@ -128,7 +127,7 @@ void dfcc(
   for(const auto &cli_flag : to_replace)
     to_replace_map.insert(parse_function_contract_pair(cli_flag));
 
-  dfcc(
+  dfcct(
     options,
     goto_model,
     harness_id,
@@ -136,35 +135,9 @@ void dfcc(
                          : std::optional<std::pair<irep_idt, irep_idt>>{},
     allow_recursive_calls,
     to_replace_map,
-    apply_loop_contracts,
-    unwind_transformed_loops,
-    to_exclude_from_nondet_static,
-    message_handler);
-}
-
-void dfcc(
-  const optionst &options,
-  goto_modelt &goto_model,
-  const irep_idt &harness_id,
-  const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
-  const bool allow_recursive_calls,
-  const std::map<irep_idt, irep_idt> &to_replace,
-  const bool apply_loop_contracts,
-  const bool unwind_transformed_loops,
-  const std::set<std::string> &to_exclude_from_nondet_static,
-  message_handlert &message_handler)
-{
-  dfcct{
-    options,
-    goto_model,
-    harness_id,
-    to_check,
-    allow_recursive_calls,
-    to_replace,
-    dfcc_loop_contract_mode_from_bools(
-      apply_loop_contracts, unwind_transformed_loops),
+    loop_contract_config,
     message_handler,
-    to_exclude_from_nondet_static};
+    to_exclude_from_nondet_static);
 }
 
 dfcct::dfcct(
@@ -174,7 +147,7 @@ dfcct::dfcct(
   const std::optional<std::pair<irep_idt, irep_idt>> &to_check,
   const bool allow_recursive_calls,
   const std::map<irep_idt, irep_idt> &to_replace,
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt loop_contract_config,
   message_handlert &message_handler,
   const std::set<std::string> &to_exclude_from_nondet_static)
   : options(options),
@@ -183,7 +156,7 @@ dfcct::dfcct(
     to_check(to_check),
     allow_recursive_calls(allow_recursive_calls),
     to_replace(to_replace),
-    loop_contract_mode(loop_contract_mode),
+    loop_contract_config(loop_contract_config),
     to_exclude_from_nondet_static(to_exclude_from_nondet_static),
     message_handler(message_handler),
     log(message_handler),
@@ -339,7 +312,7 @@ void dfcct::instrument_harness_function()
                << messaget::eom;
 
   instrument.instrument_harness_function(
-    harness_id, loop_contract_mode, function_pointer_contracts);
+    harness_id, loop_contract_config, function_pointer_contracts);
 
   other_symbols.erase(harness_id);
 }
@@ -368,7 +341,7 @@ void dfcct::wrap_checked_function()
                  << contract_id << "' in CHECK mode" << messaget::eom;
 
     swap_and_wrap.swap_and_wrap_check(
-      loop_contract_mode,
+      loop_contract_config,
       wrapper_id,
       contract_id,
       function_pointer_contracts,
@@ -486,7 +459,7 @@ void dfcct::instrument_other_functions()
     log.status() << "Instrumenting '" << function_id << "'" << messaget::eom;
 
     instrument.instrument_function(
-      function_id, loop_contract_mode, function_pointer_contracts);
+      function_id, loop_contract_config, function_pointer_contracts);
   }
 
   goto_model.goto_functions.update();
