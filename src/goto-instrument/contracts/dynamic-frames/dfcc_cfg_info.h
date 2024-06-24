@@ -23,7 +23,7 @@ Date: March 2023
 
 #include <goto-programs/goto_program.h>
 
-#include "dfcc_loop_contract_mode.h"
+#include <goto-instrument/contracts/loop_contract_config.h>
 
 #include <map>
 #include <set>
@@ -238,7 +238,7 @@ public:
     const irep_idt &function_id,
     goto_functiont &goto_function,
     const exprt &top_level_write_set,
-    const dfcc_loop_contract_modet loop_contract_mode,
+    const loop_contract_configt &loop_contract_config,
     symbol_table_baset &symbol_table,
     message_handlert &message_handler,
     dfcc_libraryt &library);

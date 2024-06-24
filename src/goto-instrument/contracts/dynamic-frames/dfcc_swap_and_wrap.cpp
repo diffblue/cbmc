@@ -55,43 +55,42 @@ dfcc_swap_and_wrapt::dfcc_swap_and_wrapt(
 // static map
 std::map<
   irep_idt,
-  std::pair<irep_idt, std::pair<dfcc_contract_modet, dfcc_loop_contract_modet>>>
+  std::pair<irep_idt, std::pair<dfcc_contract_modet, loop_contract_configt>>>
   dfcc_swap_and_wrapt::cache;
 
 void dfcc_swap_and_wrapt::swap_and_wrap(
   const dfcc_contract_modet contract_mode,
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt &loop_contract_config,
   const irep_idt &function_id,
   const irep_idt &contract_id,
   std::set<irep_idt> &function_pointer_contracts,
   bool allow_recursive_calls)
 {
   auto pair = cache.insert(
-    {function_id, {contract_id, {contract_mode, loop_contract_mode}}});
+    {function_id, {contract_id, {contract_mode, loop_contract_config}}});
   auto inserted = pair.second;
 
   if(!inserted)
   {
     irep_idt old_contract_id = pair.first->second.first;
     dfcc_contract_modet old_contract_mode = pair.first->second.second.first;
-    dfcc_loop_contract_modet old_loop_contract_mode =
+    loop_contract_configt old_loop_contract_config =
       pair.first->second.second.second;
 
     // different swap already performed, abort (should be unreachable)
     if(
       old_contract_id != contract_id || old_contract_mode != contract_mode ||
-      old_loop_contract_mode != loop_contract_mode)
+      old_loop_contract_config != loop_contract_config)
     {
       std::ostringstream err_msg;
       err_msg << "DFCC: multiple attempts to swap and wrap function '"
               << function_id << "':\n";
       err_msg << "- with '" << old_contract_id << "' in "
               << dfcc_contract_mode_to_string(old_contract_mode) << " "
-              << dfcc_loop_contract_mode_to_string(old_loop_contract_mode)
-              << "\n";
+              << old_loop_contract_config.to_string() << "\n";
       err_msg << "- with '" << contract_id << "' in "
               << dfcc_contract_mode_to_string(contract_mode) << " "
-              << dfcc_loop_contract_mode_to_string(loop_contract_mode) << "\n";
+              << loop_contract_config.to_string() << "\n";
       throw invalid_input_exceptiont(err_msg.str());
     }
     // same swap already performed
@@ -104,7 +103,7 @@ void dfcc_swap_and_wrapt::swap_and_wrap(
   case dfcc_contract_modet::CHECK:
   {
     check_contract(
-      loop_contract_mode,
+      loop_contract_config,
       function_id,
       contract_id,
       function_pointer_contracts,
@@ -152,7 +151,7 @@ void dfcc_swap_and_wrapt::get_swapped_functions(std::set<irep_idt> &dest) const
 /// END_FUNCTION;
 /// ```
 void dfcc_swap_and_wrapt::check_contract(
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt &loop_contract_config,
   const irep_idt &function_id,
   const irep_idt &contract_id,
   std::set<irep_idt> &function_pointer_contracts,
@@ -278,7 +277,7 @@ void dfcc_swap_and_wrapt::check_contract(
 
   // instrument the wrapped function
   instrument.instrument_wrapped_function(
-    wrapped_id, wrapper_id, loop_contract_mode, function_pointer_contracts);
+    wrapped_id, wrapper_id, loop_contract_config, function_pointer_contracts);
 
   goto_model.goto_functions.update();
 }

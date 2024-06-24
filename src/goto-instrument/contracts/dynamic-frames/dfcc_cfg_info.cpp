@@ -506,7 +506,7 @@ dfcc_cfg_infot::dfcc_cfg_infot(
   const irep_idt &function_id,
   goto_functiont &goto_function,
   const exprt &top_level_write_set,
-  const dfcc_loop_contract_modet loop_contract_mode,
+  const loop_contract_configt &loop_contract_config,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   dfcc_libraryt &library)
@@ -517,7 +517,7 @@ dfcc_cfg_infot::dfcc_cfg_infot(
 {
   dfcc_loop_nesting_grapht loop_nesting_graph;
   goto_programt &goto_program = goto_function.body;
-  if(loop_contract_mode != dfcc_loop_contract_modet::NONE)
+  if(loop_contract_config.apply_loop_contracts)
   {
     messaget log(message_handler);
     dfcc_check_loop_normal_form(goto_program, log);

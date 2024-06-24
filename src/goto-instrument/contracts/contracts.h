@@ -22,6 +22,8 @@ Date: February 2016
 
 #include <goto-instrument/loop_utils.h>
 
+#include "loop_contract_config.h"
+
 #include <map>
 #include <set>
 #include <string>
@@ -55,12 +57,16 @@ class local_may_aliast;
 class code_contractst
 {
 public:
-  code_contractst(goto_modelt &goto_model, messaget &log)
+  code_contractst(
+    goto_modelt &goto_model,
+    messaget &log,
+    const loop_contract_configt &loop_contract_config)
     : ns(goto_model.symbol_table),
       goto_model(goto_model),
       symbol_table(goto_model.symbol_table),
       goto_functions(goto_model.goto_functions),
-      log(log)
+      log(log),
+      loop_contract_config(loop_contract_config)
   {
   }
 
@@ -138,9 +144,6 @@ public:
 
   namespacet ns;
 
-  // Unwind transformed loops after applying loop contracts or not.
-  bool unwind_transformed_loops = true;
-
 protected:
   goto_modelt &goto_model;
   symbol_tablet &symbol_table;
@@ -163,6 +166,9 @@ protected:
   /// Loop havoc instructions instrumented during applying loop contracts.
   std::unordered_set<goto_programt::const_targett, const_target_hash>
     loop_havoc_set;
+
+  // Loop contract configuration
+  loop_contract_configt loop_contract_config;
 
 public:
   /// \brief Enforce contract of a single function

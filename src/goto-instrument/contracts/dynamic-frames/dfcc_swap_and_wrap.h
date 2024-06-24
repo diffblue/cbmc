@@ -50,7 +50,7 @@ public:
     dfcc_contract_handlert &contract_handler);
 
   void swap_and_wrap_check(
-    const dfcc_loop_contract_modet loop_contract_mode,
+    const loop_contract_configt &loop_contract_config,
     const irep_idt &function_id,
     const irep_idt &contract_id,
     std::set<irep_idt> &function_pointer_contracts,
@@ -58,7 +58,7 @@ public:
   {
     swap_and_wrap(
       dfcc_contract_modet::CHECK,
-      loop_contract_mode,
+      loop_contract_config,
       function_id,
       contract_id,
       function_pointer_contracts,
@@ -72,7 +72,7 @@ public:
   {
     swap_and_wrap(
       dfcc_contract_modet::REPLACE,
-      dfcc_loop_contract_modet::NONE,
+      loop_contract_configt{false},
       function_id,
       contract_id,
       function_pointer_contracts,
@@ -95,13 +95,12 @@ protected:
   /// remember all functions that were swapped/wrapped and in which mode
   static std::map<
     irep_idt,
-    std::
-      pair<irep_idt, std::pair<dfcc_contract_modet, dfcc_loop_contract_modet>>>
+    std::pair<irep_idt, std::pair<dfcc_contract_modet, loop_contract_configt>>>
     cache;
 
   void swap_and_wrap(
     const dfcc_contract_modet contract_mode,
-    const dfcc_loop_contract_modet loop_contract_mode,
+    const loop_contract_configt &loop_contract_config,
     const irep_idt &function_id,
     const irep_idt &contract_id,
     std::set<irep_idt> &function_pointer_contracts,
@@ -110,7 +109,7 @@ protected:
   /// Swaps-and-wraps the given `function_id` in a wrapper function that
   /// checks the given `contract_id`.
   void check_contract(
-    const dfcc_loop_contract_modet loop_contract_mode,
+    const loop_contract_configt &loop_contract_config,
     const irep_idt &function_id,
     const irep_idt &contract_id,
     std::set<irep_idt> &function_pointer_contracts,

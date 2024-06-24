@@ -1166,6 +1166,26 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       goto_model, file_name, ui_message_handler);
   }
 
+  // Initialize loop contract config from cmdline.
+  loop_contract_configt loop_contract_config = {
+    cmdline.isset(FLAG_LOOP_CONTRACTS),
+    !cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND)};
+
+  if(
+    cmdline.isset(FLAG_LOOP_CONTRACTS) &&
+    cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND))
+  {
+    // After instrumentation, all annotated loops will be transformed to
+    // loops execute exactly once. CBMC by default unwinds transformed loops
+    // by twice.
+    // Users may want to disable the default unwinding to avoid duplicate
+    // assertions.
+    log.warning() << "**** WARNING: transformed loops will not be unwound "
+                  << "after applying loop contracts. Note that transformed "
+                  << "loops require at least unwinding bounds 2 to pass "
+                  << "the unwinding assertions." << messaget::eom;
+  }
+
   bool use_dfcc = cmdline.isset(FLAG_DFCC);
   if(use_dfcc)
   {
@@ -1209,22 +1229,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       cmdline.get_values("nondet-static-exclude").begin(),
       cmdline.get_values("nondet-static-exclude").end());
 
-    if(
-      cmdline.isset(FLAG_LOOP_CONTRACTS) &&
-      cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND))
-    {
-      // When the model is produced by Kani, we must not automatically unwind
-      // the backjump introduced by the loop transformation.
-      // Automatic unwinding duplicates assertions found in the loop body, and
-      // since Kani expects property identifiers to remain unique. Having
-      // duplicate instances of the assertions makes Kani fail to handle the
-      // analysis results.
-      log.warning() << "**** WARNING: transformed loops will not be unwound "
-                    << "after applying loop contracts. Remember to unwind "
-                    << "them at least twice to pass unwinding-assertions."
-                    << messaget::eom;
-    }
-
     dfcc(
       options,
       goto_model,
@@ -1233,8 +1237,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
                          : std::optional<irep_idt>{to_enforce.front()},
       allow_recursive_calls,
       to_replace,
-      cmdline.isset(FLAG_LOOP_CONTRACTS),
-      !cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND),
+      loop_contract_config,
       to_exclude_from_nondet_static,
       log.get_message_handler());
   }
@@ -1245,7 +1248,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
     log.status() << "Trying to force one backedge per target" << messaget::eom;
     ensure_one_backedge_per_target(goto_model);
-    code_contractst contracts(goto_model, log);
+    code_contractst contracts(goto_model, log, loop_contract_config);
 
     std::set<std::string> to_replace(
       cmdline.get_values(FLAG_REPLACE_CALL).begin(),
@@ -1268,20 +1271,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     if(cmdline.isset(FLAG_LOOP_CONTRACTS))
     {
-      if(cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND))
-      {
-        contracts.unwind_transformed_loops = false;
-        // When the model is produced by Kani, we must not automatically unwind
-        // the backjump introduced by the loop transformation.
-        // Automatic unwinding duplicates assertions found in the loop body, and
-        // since Kani expects property identifiers to remain unique. Having
-        // duplicate instances of the assertions makes Kani fail to handle the
-        // analysis results.
-        log.warning() << "**** WARNING: transformed loops will not be unwound "
-                      << "after applying loop contracts. Remember to unwind "
-                      << "them at least twice to pass unwinding-assertions."
-                      << messaget::eom;
-      }
       contracts.apply_loop_contracts(to_exclude_from_nondet_static);
     }
   }

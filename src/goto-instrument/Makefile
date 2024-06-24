@@ -21,7 +21,6 @@ SRC = accelerate/accelerate.cpp \
       contracts/dynamic-frames/dfcc_utils.cpp \
       contracts/dynamic-frames/dfcc_loop_nesting_graph.cpp \
       contracts/dynamic-frames/dfcc_contract_mode.cpp \
-      contracts/dynamic-frames/dfcc_loop_contract_mode.cpp \
       contracts/dynamic-frames/dfcc_loop_tags.cpp \
       contracts/dynamic-frames/dfcc_check_loop_normal_form.cpp \
       contracts/dynamic-frames/dfcc_root_object.cpp \
