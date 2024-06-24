@@ -122,15 +122,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9cab5285f589a99ca88184776f371a83"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a9cab5285f589a99ca88184776f371a83">do_not_instrument</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id) const</td></tr>
 <tr class="memdesc:a9cab5285f589a99ca88184776f371a83"><td class="mdescLeft">&#160;</td><td class="mdescRight">True iff the symbol must not be instrumented because it is an internal symbol or a CPROVER symbol.  <a href="classdfcc__instrumentt.html#a9cab5285f589a99ca88184776f371a83">More...</a><br /></td></tr>
 <tr class="separator:a9cab5285f589a99ca88184776f371a83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b64567a8667fe1688f9e84d6bd65492"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a8b64567a8667fe1688f9e84d6bd65492">instrument_harness_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a> loop_contract_mode, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
-<tr class="memdesc:a8b64567a8667fe1688f9e84d6bd65492"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function used as a proof harness.  <a href="classdfcc__instrumentt.html#a8b64567a8667fe1688f9e84d6bd65492">More...</a><br /></td></tr>
-<tr class="separator:a8b64567a8667fe1688f9e84d6bd65492"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab97eed4d8c42a694fe37d23d4cbf6598"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#ab97eed4d8c42a694fe37d23d4cbf6598">instrument_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a> loop_contract_mode, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
-<tr class="memdesc:ab97eed4d8c42a694fe37d23d4cbf6598"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and instrumenting its body instructions against the write set.  <a href="classdfcc__instrumentt.html#ab97eed4d8c42a694fe37d23d4cbf6598">More...</a><br /></td></tr>
-<tr class="separator:ab97eed4d8c42a694fe37d23d4cbf6598"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ead72aab863c4f9dc2b9f9e56a2be37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a7ead72aab863c4f9dc2b9f9e56a2be37">instrument_wrapped_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;wrapped_function_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;initial_function_id, const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a> loop_contract_mode, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
-<tr class="memdesc:a7ead72aab863c4f9dc2b9f9e56a2be37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set.  <a href="classdfcc__instrumentt.html#a7ead72aab863c4f9dc2b9f9e56a2be37">More...</a><br /></td></tr>
-<tr class="separator:a7ead72aab863c4f9dc2b9f9e56a2be37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab972ee5f630edafda75bc81e8e02fcc9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#ab972ee5f630edafda75bc81e8e02fcc9">instrument_harness_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;loop_contract_config, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:ab972ee5f630edafda75bc81e8e02fcc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function used as a proof harness.  <a href="classdfcc__instrumentt.html#ab972ee5f630edafda75bc81e8e02fcc9">More...</a><br /></td></tr>
+<tr class="separator:ab972ee5f630edafda75bc81e8e02fcc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a6a48701202b060afaf8a1e34aa47cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a0a6a48701202b060afaf8a1e34aa47cb">instrument_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;loop_contract_config, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:a0a6a48701202b060afaf8a1e34aa47cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and instrumenting its body instructions against the write set.  <a href="classdfcc__instrumentt.html#a0a6a48701202b060afaf8a1e34aa47cb">More...</a><br /></td></tr>
+<tr class="separator:a0a6a48701202b060afaf8a1e34aa47cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b03b82b15fbf626ef67d74c18700afa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a5b03b82b15fbf626ef67d74c18700afa">instrument_wrapped_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;wrapped_function_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;initial_function_id, const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;loop_contract_config, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:a5b03b82b15fbf626ef67d74c18700afa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set.  <a href="classdfcc__instrumentt.html#a5b03b82b15fbf626ef67d74c18700afa">More...</a><br /></td></tr>
+<tr class="separator:a5b03b82b15fbf626ef67d74c18700afa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b838afe502ea0ad537327a67c900cb5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a1b838afe502ea0ad537327a67c900cb5">instrument_goto_program</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
 <tr class="memdesc:a1b838afe502ea0ad537327a67c900cb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a GOTO program against a given write set variable.  <a href="classdfcc__instrumentt.html#a1b838afe502ea0ad537327a67c900cb5">More...</a><br /></td></tr>
 <tr class="separator:a1b838afe502ea0ad537327a67c900cb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,9 +151,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ac931dd3f011d2dd6f0fe3bed1f4dc035"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">insert_record_dead_call</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, const <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &amp;symbol_expr, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;target, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</td></tr>
 <tr class="memdesc:ac931dd3f011d2dd6f0fe3bed1f4dc035"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a guarded call to record the death of a local symbol and inserts it in the goto_program at the target, and moves the target forward.  <a href="classdfcc__instrumentt.html#ac931dd3f011d2dd6f0fe3bed1f4dc035">More...</a><br /></td></tr>
 <tr class="separator:ac931dd3f011d2dd6f0fe3bed1f4dc035"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a405501104073af23031002d4653af177"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a405501104073af23031002d4653af177">instrument_goto_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;local_statics, const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a> loop_contract_mode, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
-<tr class="memdesc:a405501104073af23031002d4653af177"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments the body of a GOTO function against a given write set.  <a href="classdfcc__instrumentt.html#a405501104073af23031002d4653af177">More...</a><br /></td></tr>
-<tr class="separator:a405501104073af23031002d4653af177"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a539800a10dca33442780a59aa46eea86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a539800a10dca33442780a59aa46eea86">instrument_goto_function</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function, const <a class="el" href="classexprt.html">exprt</a> &amp;write_set, const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;local_statics, const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;loop_contract_config, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:a539800a10dca33442780a59aa46eea86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments the body of a GOTO function against a given write set.  <a href="classdfcc__instrumentt.html#a539800a10dca33442780a59aa46eea86">More...</a><br /></td></tr>
+<tr class="separator:a539800a10dca33442780a59aa46eea86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fa95f4fe6a58475399fc12f533cded6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a5fa95f4fe6a58475399fc12f533cded6">instrument_instructions</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> first_instruction, const <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;last_instruction, <a class="el" href="classdfcc__cfg__infot.html">dfcc_cfg_infot</a> &amp;cfg_info, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
 <tr class="memdesc:a5fa95f4fe6a58475399fc12f533cded6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments the instructions found between <code>first_instruction</code> and <code>last_instruction</code> in the instructions of <code>goto_program</code> against the given <code>write_set</code> variable.  <a href="classdfcc__instrumentt.html#a5fa95f4fe6a58475399fc12f533cded6">More...</a><br /></td></tr>
 <tr class="separator:a5fa95f4fe6a58475399fc12f533cded6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,9 +187,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a2531d6c563767a2656e49e213fb3e455"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a2531d6c563767a2656e49e213fb3e455">instrument_other</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;target, <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classdfcc__cfg__infot.html">dfcc_cfg_infot</a> &amp;cfg_info)</td></tr>
 <tr class="memdesc:a2531d6c563767a2656e49e213fb3e455"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instruments a <code>OTHER statement;</code> instruction.  <a href="classdfcc__instrumentt.html#a2531d6c563767a2656e49e213fb3e455">More...</a><br /></td></tr>
 <tr class="separator:a2531d6c563767a2656e49e213fb3e455"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e1ed46c66c6ff4be64f05422f69ba64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#a1e1ed46c66c6ff4be64f05422f69ba64">apply_loop_contracts</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function, <a class="el" href="classdfcc__cfg__infot.html">dfcc_cfg_infot</a> &amp;cfg_info, const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a> loop_contract_mode, const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;local_statics, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
-<tr class="memdesc:a1e1ed46c66c6ff4be64f05422f69ba64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies loop contracts transformations to the given GOTO function, using the given cfg_info instance to drive the transformation.  <a href="classdfcc__instrumentt.html#a1e1ed46c66c6ff4be64f05422f69ba64">More...</a><br /></td></tr>
-<tr class="separator:a1e1ed46c66c6ff4be64f05422f69ba64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa68a7e7061d56c4c0a32b67c5cd382a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__instrumentt.html#aaa68a7e7061d56c4c0a32b67c5cd382a">apply_loop_contracts</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function, <a class="el" href="classdfcc__cfg__infot.html">dfcc_cfg_infot</a> &amp;cfg_info, const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;loop_contract_config, const std::set&lt; <a class="el" href="classsymbol__exprt.html">symbol_exprt</a> &gt; &amp;local_statics, std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;function_pointer_contracts)</td></tr>
+<tr class="memdesc:aaa68a7e7061d56c4c0a32b67c5cd382a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies loop contracts transformations to the given GOTO function, using the given cfg_info instance to drive the transformation.  <a href="classdfcc__instrumentt.html#aaa68a7e7061d56c4c0a32b67c5cd382a">More...</a><br /></td></tr>
+<tr class="separator:aaa68a7e7061d56c4c0a32b67c5cd382a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -222,7 +222,7 @@ Static Protected Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class instruments GOTO functions or instruction sequences for frame condition checking and loop contracts. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00042">42</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00043">43</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8501a212fb2a284c9841d4cb6479b361"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8501a212fb2a284c9841d4cb6479b361">&#9670;&nbsp;</a></span>dfcc_instrumentt()</h2>
@@ -276,8 +276,8 @@ Static Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a1e1ed46c66c6ff4be64f05422f69ba64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e1ed46c66c6ff4be64f05422f69ba64">&#9670;&nbsp;</a></span>apply_loop_contracts()</h2>
+<a id="aaa68a7e7061d56c4c0a32b67c5cd382a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa68a7e7061d56c4c0a32b67c5cd382a">&#9670;&nbsp;</a></span>apply_loop_contracts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -306,8 +306,8 @@ Static Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a>&#160;</td>
-          <td class="paramname"><em>loop_contract_mode</em>, </td>
+          <td class="paramtype">const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_contract_config</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -904,8 +904,8 @@ Static Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab97eed4d8c42a694fe37d23d4cbf6598"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab97eed4d8c42a694fe37d23d4cbf6598">&#9670;&nbsp;</a></span>instrument_function()</h2>
+<a id="a0a6a48701202b060afaf8a1e34aa47cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a6a48701202b060afaf8a1e34aa47cb">&#9670;&nbsp;</a></span>instrument_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -919,8 +919,8 @@ Static Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a>&#160;</td>
-          <td class="paramname"><em>loop_contract_mode</em>, </td>
+          <td class="paramtype">const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_contract_config</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -938,11 +938,11 @@ Static Protected Attributes</h2></td></tr>
 
 <p>Instruments a GOTO function by adding an extra write set parameter and instrumenting its body instructions against the write set. </p>
 <p>Adds ghost instructions that automatically insert locally declared static variables to the write set when entering the function and removing them upon exit.</p>
-<dl class="section pre"><dt>Precondition</dt><dd>The function must <em>not</em> be one of the functions checked against a contract or replaced by a contract. The method <a class="el" href="classdfcc__instrumentt.html#a7ead72aab863c4f9dc2b9f9e56a2be37">instrument_wrapped_function</a> must be used to instrument check/replaced functions instead.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The function must <em>not</em> be one of the functions checked against a contract or replaced by a contract. The method <a class="el" href="classdfcc__instrumentt.html#a5b03b82b15fbf626ef67d74c18700afa">instrument_wrapped_function</a> must be used to instrument check/replaced functions instead.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">function_id</td><td>The name of the function, used to retrieve the function to instrument and used as prefix when generating new symbols during instrumentation. </td></tr>
-    <tr><td class="paramname">loop_contract_mode</td><td>Mode to use for loop contracts </td></tr>
+    <tr><td class="paramname">loop_contract_config</td><td>Config to use for loop contracts </td></tr>
     <tr><td class="paramname">function_pointer_contracts</td><td>Contracts discovered in calls to the obeys_contract predicate are added to this set. </td></tr>
   </table>
   </dd>
@@ -1005,8 +1005,8 @@ Static Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a405501104073af23031002d4653af177"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a405501104073af23031002d4653af177">&#9670;&nbsp;</a></span>instrument_goto_function()</h2>
+<a id="a539800a10dca33442780a59aa46eea86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a539800a10dca33442780a59aa46eea86">&#9670;&nbsp;</a></span>instrument_goto_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1041,8 +1041,8 @@ Static Protected Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a>&#160;</td>
-          <td class="paramname"><em>loop_contract_mode</em>, </td>
+          <td class="paramtype">const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_contract_config</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1130,8 +1130,8 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 
 </div>
 </div>
-<a id="a8b64567a8667fe1688f9e84d6bd65492"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b64567a8667fe1688f9e84d6bd65492">&#9670;&nbsp;</a></span>instrument_harness_function()</h2>
+<a id="ab972ee5f630edafda75bc81e8e02fcc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab972ee5f630edafda75bc81e8e02fcc9">&#9670;&nbsp;</a></span>instrument_harness_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1145,8 +1145,8 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a>&#160;</td>
-          <td class="paramname"><em>loop_contract_mode</em>, </td>
+          <td class="paramtype">const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_contract_config</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1171,7 +1171,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">function_id</td><td>Function to instrument </td></tr>
-    <tr><td class="paramname">loop_contract_mode</td><td>Mode to use for loop contracts </td></tr>
+    <tr><td class="paramname">loop_contract_config</td><td>Config to use for loop contracts </td></tr>
     <tr><td class="paramname">function_pointer_contracts</td><td>Contract names discovered in calls to the <code>obeys_contract</code> predicate are added to this set. </td></tr>
   </table>
   </dd>
@@ -1367,8 +1367,8 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 
 </div>
 </div>
-<a id="a7ead72aab863c4f9dc2b9f9e56a2be37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ead72aab863c4f9dc2b9f9e56a2be37">&#9670;&nbsp;</a></span>instrument_wrapped_function()</h2>
+<a id="a5b03b82b15fbf626ef67d74c18700afa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b03b82b15fbf626ef67d74c18700afa">&#9670;&nbsp;</a></span>instrument_wrapped_function()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1388,8 +1388,8 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="dfcc__loop__contract__mode_8h.html#a5aba9a66ccfdfe41a8873804a2b62bf1">dfcc_loop_contract_modet</a>&#160;</td>
-          <td class="paramname"><em>loop_contract_mode</em>, </td>
+          <td class="paramtype">const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_contract_config</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1406,12 +1406,12 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </div><div class="memdoc">
 
 <p>Instruments a GOTO function by adding an extra write set parameter and inserting frame condition checks in its GOTO program, as well as instructions to automatically insert and remove locally declared static variables in the write set. </p>
-<dl class="section pre"><dt>Precondition</dt><dd>The function must be a function wrapped for contract checking or replacement checking. For other functions <a class="el" href="classdfcc__instrumentt.html#ab97eed4d8c42a694fe37d23d4cbf6598">instrument_function</a> must be used instead. The difference is that checked or replaced functions have their name mangled, so the the search for local statics uses a possibly different function identifier as base name for static symbols.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The function must be a function wrapped for contract checking or replacement checking. For other functions <a class="el" href="classdfcc__instrumentt.html#a0a6a48701202b060afaf8a1e34aa47cb">instrument_function</a> must be used instead. The difference is that checked or replaced functions have their name mangled, so the the search for local statics uses a possibly different function identifier as base name for static symbols.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wrapped_function_id</td><td>The name of the function, used to retrieve the function to instrument and used as prefix when generating new symbols during instrumentation. </td></tr>
     <tr><td class="paramname">initial_function_id</td><td>The initial name of the function, before mangling. This is the name used to identify statics symbols in the symbol table that were locally declared in the function. </td></tr>
-    <tr><td class="paramname">loop_contract_mode</td><td>Mode to use for loop contracts </td></tr>
+    <tr><td class="paramname">loop_contract_config</td><td>Config to use for loop contracts </td></tr>
     <tr><td class="paramname">function_pointer_contracts</td><td>contracts discovered in calls to the obeys_contract predicate are added to this set. </td></tr>
   </table>
   </dd>
@@ -1508,7 +1508,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00170">170</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00171">171</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1534,7 +1534,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 
 <p>Keeps track of instrumented functions, so that no function gets instrumented more than once. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00176">176</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00177">177</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1558,7 +1558,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00165">165</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00166">166</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1582,7 +1582,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00171">171</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00172">172</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1608,7 +1608,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 
 <p>Set of internal symbols which implementation is generated and inlined into the model at conversion or symex time and must not be instrumented. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00181">181</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00182">182</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1632,7 +1632,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00168">168</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00169">169</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1656,7 +1656,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00167">167</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00168">168</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1680,7 +1680,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00166">166</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00167">167</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1704,7 +1704,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00172">172</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00173">173</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>
@@ -1728,7 +1728,7 @@ Local statics are <em>not</em> collected and added to the write set.</dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00169">169</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__instrument_8h_source.html#l00170">170</a> of file <a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>.</p>
 
 </div>
 </div>

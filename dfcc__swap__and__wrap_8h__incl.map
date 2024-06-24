@@ -1,62 +1,62 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_swap_and_wrap.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_swap_and_wrap.h">
-<area shape="rect" id="node1" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="616,5,813,76"/>
-<area shape="rect" id="node2" href="$arith__tools_8h.html" title=" " alt="" coords="93,534,221,561"/>
-<area shape="rect" id="node11" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="466,698,555,725"/>
-<area shape="rect" id="node27" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="803,780,901,807"/>
-<area shape="rect" id="node30" href="$c__types_8h.html" title=" " alt="" coords="701,534,811,561"/>
-<area shape="rect" id="node33" href="$src_2util_2message_8h.html" title=" " alt="" coords="2010,616,2129,643"/>
-<area shape="rect" id="node34" href="$goto__convert__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1745,273,1935,315"/>
-<area shape="rect" id="node42" title=" " alt="" coords="853,616,896,643"/>
-<area shape="rect" id="node49" title=" " alt="" coords="2537,616,2588,643"/>
-<area shape="rect" id="node50" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="1253,199,1429,225"/>
-<area shape="rect" id="node53" href="$dfcc__instrument_8h.html" title="Add instrumentation to a goto program to perform frame condition checks." alt="" coords="971,124,1109,151"/>
-<area shape="rect" id="node58" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="2070,534,2178,561"/>
-<area shape="rect" id="node59" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="787,452,952,479"/>
-<area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="718,1228,810,1255"/>
-<area shape="rect" id="node8" href="$mp__arith_8h.html" title=" " alt="" coords="1667,855,1759,881"/>
-<area shape="rect" id="node29" title=" " alt="" coords="365,616,424,643"/>
-<area shape="rect" id="node4" title=" " alt="" coords="731,1303,797,1329"/>
-<area shape="rect" id="node5" title=" " alt="" coords="1347,1303,1421,1329"/>
-<area shape="rect" id="node6" title=" " alt="" coords="2163,1303,2221,1329"/>
-<area shape="rect" id="node7" title=" " alt="" coords="566,1303,658,1329"/>
-<area shape="rect" id="node9" title=" " alt="" coords="1867,929,1931,956"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1667,929,1792,956"/>
-<area shape="rect" id="node12" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="741,855,838,881"/>
-<area shape="rect" id="node13" title=" " alt="" coords="751,929,827,956"/>
-<area shape="rect" id="node14" title=" " alt="" coords="1353,1004,1439,1031"/>
-<area shape="rect" id="node15" href="$expr_8h.html" title=" " alt="" coords="1099,929,1162,956"/>
-<area shape="rect" id="node16" href="$as__const_8h.html" title=" " alt="" coords="1187,1004,1277,1031"/>
-<area shape="rect" id="node17" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="1099,1004,1162,1031"/>
-<area shape="rect" id="node24" href="$validation__mode_8h.html" title=" " alt="" coords="855,1153,998,1180"/>
-<area shape="rect" id="node25" href="$validate__types_8h.html" title=" " alt="" coords="1171,1079,1301,1105"/>
-<area shape="rect" id="node26" href="$validate__expressions_8h.html" title=" " alt="" coords="903,1004,1075,1031"/>
-<area shape="rect" id="node18" href="$source__location_8h.html" title=" " alt="" coords="1947,1079,2083,1105"/>
-<area shape="rect" id="node23" href="$validate_8h.html" title=" " alt="" coords="802,1079,889,1105"/>
-<area shape="rect" id="node19" href="$deprecate_8h.html" title=" " alt="" coords="1493,1153,1592,1180"/>
-<area shape="rect" id="node20" href="$irep_8h.html" title=" " alt="" coords="2125,1153,2184,1180"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1976,1153,2051,1180"/>
-<area shape="rect" id="node21" title=" " alt="" coords="2259,1228,2322,1255"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1005,855,1129,881"/>
-<area shape="rect" id="node31" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="589,616,704,643"/>
-<area shape="rect" id="node32" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="579,698,714,725"/>
-<area shape="rect" id="node35" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="1394,370,1553,397"/>
-<area shape="rect" id="node46" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="2070,363,2221,404"/>
-<area shape="rect" id="node36" href="$namespace_8h.html" title=" " alt="" coords="1795,616,1930,643"/>
-<area shape="rect" id="node37" href="$replace__expr_8h.html" title=" " alt="" coords="1095,780,1238,807"/>
-<area shape="rect" id="node38" href="$std__code_8h.html" title=" " alt="" coords="1056,534,1173,561"/>
-<area shape="rect" id="node39" title=" " alt="" coords="1168,616,1211,643"/>
-<area shape="rect" id="node40" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1350,527,1501,568"/>
-<area shape="rect" id="node43" href="$allocate__objects_8h.html" title=" " alt="" coords="1230,452,1413,479"/>
-<area shape="rect" id="node44" href="$scope__tree_8h.html" title=" " alt="" coords="1585,452,1690,479"/>
-<area shape="rect" id="node45" title=" " alt="" coords="1627,534,1741,561"/>
-<area shape="rect" id="node41" href="$goto__instruction__code_8h.html" title=" " alt="" coords="1337,616,1514,643"/>
-<area shape="rect" id="node47" href="$goto__function_8h.html" title="Goto Function." alt="" coords="1437,452,1560,479"/>
-<area shape="rect" id="node48" href="$cprover__prefix_8h.html" title=" " alt="" coords="2221,452,2373,479"/>
-<area shape="rect" id="node51" href="$dfcc__contract__functions_8h.html" title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a..." alt="" coords="1379,281,1567,307"/>
-<area shape="rect" id="node52" href="$dfcc__contract__mode_8h.html" title="Enum type representing the contract checking and replacement modes." alt="" coords="2411,370,2576,397"/>
-<area shape="rect" id="node54" href="$dfcc__instrument__loop_8h.html" title="This class applies the loop contract transformation to a loop in a goto function." alt="" coords="2034,199,2209,225"/>
-<area shape="rect" id="node57" href="$dfcc__loop__contract__mode_8h.html" title="Enumeration representing the instrumentation mode for loop contracts." alt="" coords="2723,691,2867,732"/>
-<area shape="rect" id="node55" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="2134,273,2285,315"/>
-<area shape="rect" id="node56" href="$local__may__alias_8h.html" title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis." alt="" coords="1959,273,2110,315"/>
-<area shape="rect" id="node60" href="$dfcc__utils_8h.html" title="Dynamic frame condition checking utility functions." alt="" coords="885,534,981,561"/>
+<area shape="rect" id="node1" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="2443,5,2640,76"/>
+<area shape="rect" id="node2" href="$arith__tools_8h.html" title=" " alt="" coords="1667,549,1795,575"/>
+<area shape="rect" id="node11" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="2058,705,2147,732"/>
+<area shape="rect" id="node27" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="2054,780,2151,807"/>
+<area shape="rect" id="node30" href="$c__types_8h.html" title=" " alt="" coords="1533,549,1643,575"/>
+<area shape="rect" id="node33" href="$src_2util_2message_8h.html" title=" " alt="" coords="1234,631,1353,657"/>
+<area shape="rect" id="node34" href="$goto__convert__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1289,288,1479,329"/>
+<area shape="rect" id="node42" title=" " alt="" coords="2292,631,2335,657"/>
+<area shape="rect" id="node49" title=" " alt="" coords="2668,631,2719,657"/>
+<area shape="rect" id="node50" href="$dfcc__contract__handler_8h.html" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="1163,206,1339,233"/>
+<area shape="rect" id="node53" href="$dfcc__instrument_8h.html" title="Add instrumentation to a goto program to perform frame condition checks." alt="" coords="2053,124,2192,151"/>
+<area shape="rect" id="node58" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="2193,549,2301,575"/>
+<area shape="rect" id="node59" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="2211,467,2376,493"/>
+<area shape="rect" id="node3" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="1206,1228,1298,1255"/>
+<area shape="rect" id="node8" href="$mp__arith_8h.html" title=" " alt="" coords="1357,855,1449,881"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1100,631,1159,657"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1219,1303,1285,1329"/>
+<area shape="rect" id="node5" title=" " alt="" coords="1092,1303,1167,1329"/>
+<area shape="rect" id="node6" title=" " alt="" coords="804,1303,863,1329"/>
+<area shape="rect" id="node7" title=" " alt="" coords="1949,1303,2041,1329"/>
+<area shape="rect" id="node9" title=" " alt="" coords="999,929,1063,956"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1340,929,1465,956"/>
+<area shape="rect" id="node12" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="1967,855,2065,881"/>
+<area shape="rect" id="node13" title=" " alt="" coords="1902,929,1978,956"/>
+<area shape="rect" id="node14" title=" " alt="" coords="1391,1004,1478,1031"/>
+<area shape="rect" id="node15" href="$expr_8h.html" title=" " alt="" coords="1723,929,1786,956"/>
+<area shape="rect" id="node16" href="$as__const_8h.html" title=" " alt="" coords="1503,1004,1593,1031"/>
+<area shape="rect" id="node17" href="$type_8h.html" title="Defines typet, type_with_subtypet and type_with_subtypest." alt="" coords="1865,1004,1927,1031"/>
+<area shape="rect" id="node24" href="$validation__mode_8h.html" title=" " alt="" coords="1814,1153,1957,1180"/>
+<area shape="rect" id="node25" href="$validate__types_8h.html" title=" " alt="" coords="1623,1079,1753,1105"/>
+<area shape="rect" id="node26" href="$validate__expressions_8h.html" title=" " alt="" coords="1669,1004,1841,1031"/>
+<area shape="rect" id="node18" href="$source__location_8h.html" title=" " alt="" coords="876,1079,1012,1105"/>
+<area shape="rect" id="node23" href="$validate_8h.html" title=" " alt="" coords="1938,1079,2025,1105"/>
+<area shape="rect" id="node19" href="$deprecate_8h.html" title=" " alt="" coords="681,1153,780,1180"/>
+<area shape="rect" id="node20" href="$irep_8h.html" title=" " alt="" coords="804,1153,863,1180"/>
+<area shape="rect" id="node22" title=" " alt="" coords="937,1153,1012,1180"/>
+<area shape="rect" id="node21" title=" " alt="" coords="663,1228,726,1255"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1767,855,1891,881"/>
+<area shape="rect" id="node31" href="$pointer__expr_8h.html" title="API to expression classes for Pointers." alt="" coords="1680,631,1795,657"/>
+<area shape="rect" id="node32" href="$bitvector__types_8h.html" title="Pre&#45;defined bitvector types." alt="" coords="1815,705,1950,732"/>
+<area shape="rect" id="node35" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="907,385,1066,411"/>
+<area shape="rect" id="node46" href="$goto__functions_8h.html" title="Goto Programs with Functions." alt="" coords="1657,377,1807,419"/>
+<area shape="rect" id="node36" href="$namespace_8h.html" title=" " alt="" coords="483,631,618,657"/>
+<area shape="rect" id="node37" href="$replace__expr_8h.html" title=" " alt="" coords="1658,780,1801,807"/>
+<area shape="rect" id="node38" href="$std__code_8h.html" title=" " alt="" coords="1037,549,1155,575"/>
+<area shape="rect" id="node39" title=" " alt="" coords="932,631,975,657"/>
+<area shape="rect" id="node40" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="673,541,823,583"/>
+<area shape="rect" id="node43" href="$allocate__objects_8h.html" title=" " alt="" coords="921,467,1103,493"/>
+<area shape="rect" id="node44" href="$scope__tree_8h.html" title=" " alt="" coords="739,467,845,493"/>
+<area shape="rect" id="node45" title=" " alt="" coords="848,549,963,575"/>
+<area shape="rect" id="node41" href="$goto__instruction__code_8h.html" title=" " alt="" coords="1921,631,2098,657"/>
+<area shape="rect" id="node47" href="$goto__function_8h.html" title="Goto Function." alt="" coords="1483,467,1605,493"/>
+<area shape="rect" id="node48" href="$cprover__prefix_8h.html" title=" " alt="" coords="1781,467,1933,493"/>
+<area shape="rect" id="node51" href="$dfcc__contract__functions_8h.html" title="Translates assigns and frees clauses of a function contract into goto functions that allow to build a..." alt="" coords="1025,295,1213,322"/>
+<area shape="rect" id="node52" href="$dfcc__contract__mode_8h.html" title="Enum type representing the contract checking and replacement modes." alt="" coords="93,385,259,411"/>
+<area shape="rect" id="node54" href="$loop__contract__config_8h.html" title="Config for loop contract." alt="" coords="2262,199,2453,240"/>
+<area shape="rect" id="node55" href="$dfcc__instrument__loop_8h.html" title="This class applies the loop contract transformation to a loop in a goto function." alt="" coords="1783,206,1958,233"/>
+<area shape="rect" id="node56" href="$goto__model_8h.html" title="Symbol Table + CFG." alt="" coords="1606,288,1757,329"/>
+<area shape="rect" id="node57" href="$local__may__alias_8h.html" title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis." alt="" coords="1934,288,2085,329"/>
+<area shape="rect" id="node60" href="$dfcc__utils_8h.html" title="Dynamic frame condition checking utility functions." alt="" coords="2021,549,2117,575"/>
 </map>

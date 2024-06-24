@@ -107,7 +107,6 @@ $(document).ready(function(){initNavTree('dfcc_8h.html',''); initResizable(); })
 <code>#include &quot;<a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__lift__memory__predicates_8h_source.html">dfcc_lift_memory_predicates.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="dfcc__loop__contract__mode_8h_source.html">dfcc_loop_contract_mode.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__spec__functions_8h_source.html">dfcc_spec_functions.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__swap__and__wrap_8h_source.html">dfcc_swap_and_wrap.h</a>&quot;</code><br />
 <code>#include &lt;map&gt;</code><br />
@@ -117,7 +116,7 @@ $(document).ready(function(){initNavTree('dfcc_8h.html',''); initResizable(); })
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc_8h__incl.svg" width="3654" height="1410"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc_8h__incl.svg" width="3688" height="1410"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -157,12 +156,9 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaa8df472ec760037b14a556ce1eb6212f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dfcc-module.html#gaa8df472ec760037b14a556ce1eb6212f">dfcc</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;options, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;harness_id, const std::optional&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_check, const bool allow_recursive_calls, const std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_replace, const bool apply_loop_contracts, const bool unwind_transformed_loops, const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_static, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:gaa8df472ec760037b14a556ce1eb6212f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <a href="group__dfcc-module.html#gaa8df472ec760037b14a556ce1eb6212f">More...</a><br /></td></tr>
-<tr class="separator:gaa8df472ec760037b14a556ce1eb6212f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa27d3a3ed2b347c9699a30bb3ef13fd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dfcc-module.html#gaa27d3a3ed2b347c9699a30bb3ef13fd6">dfcc</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;options, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;harness_id, const std::optional&lt; std::pair&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&gt; &amp;to_check, const bool allow_recursive_calls, const std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_replace, const bool apply_loop_contracts, const bool unwind_transformed_loops, const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_static, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:gaa27d3a3ed2b347c9699a30bb3ef13fd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts and loop contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <a href="group__dfcc-module.html#gaa27d3a3ed2b347c9699a30bb3ef13fd6">More...</a><br /></td></tr>
-<tr class="separator:gaa27d3a3ed2b347c9699a30bb3ef13fd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6919243ec4c04ea33fa91a043a06e9b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dfcc-module.html#ga6919243ec4c04ea33fa91a043a06e9b3">dfcc</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;options, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;harness_id, const std::optional&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_check, const bool allow_recursive_calls, const std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_replace, const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> loop_contract_config, const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_static, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:ga6919243ec4c04ea33fa91a043a06e9b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <a href="group__dfcc-module.html#ga6919243ec4c04ea33fa91a043a06e9b3">More...</a><br /></td></tr>
+<tr class="separator:ga6919243ec4c04ea33fa91a043a06e9b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Main class orchestrating the the whole program transformation for function contracts with Dynamic Frame Condition Checking (DFCC) </p>
@@ -183,7 +179,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00055">55</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00054">54</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -199,7 +195,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00063">63</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00062">62</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -218,7 +214,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;activate dynamic frame condition checking for contracts using the given &quot;</span>   \</div>
 <div class="line">  <span class="stringliteral">&quot;harness as entry point\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00058">58</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00057">57</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -238,7 +234,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;calls to &quot;</span>                                                                  \</div>
 <div class="line">  <span class="stringliteral">&quot;{ufunction} satisfy the contract\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00065">65</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00064">64</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -254,7 +250,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00056">56</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00055">55</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>
@@ -270,7 +266,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00064">64</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8h_source.html#l00063">63</a> of file <a class="el" href="dfcc_8h_source.html">dfcc.h</a>.</p>
 
 </div>
 </div>

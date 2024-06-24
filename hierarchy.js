@@ -1050,6 +1050,7 @@ var hierarchy =
       [ "natural_loops_templatet< P, T, C >", "classnatural__loops__templatet.html", null ]
     ] ],
     [ "c_wranglert::loop_contract_clauset", "structc__wranglert_1_1loop__contract__clauset.html", null ],
+    [ "loop_contract_configt", "structloop__contract__configt.html", null ],
     [ "loop_contracts_clauset", "structloop__contracts__clauset.html", null ],
     [ "loop_contracts_synthesizer_baset", "classloop__contracts__synthesizer__baset.html", [
       [ "enumerative_loop_contracts_synthesizert", "classenumerative__loop__contracts__synthesizert.html", null ]

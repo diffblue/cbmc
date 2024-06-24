@@ -1,6 +1,6 @@
 var classdfcct =
 [
-    [ "dfcct", "classdfcct.html#a26057d423831639abc02676aa6e5d61b", null ],
+    [ "dfcct", "classdfcct.html#a489422353e3a2eba74826001fad6cb9b", null ],
     [ "check_transform_goto_model_preconditions", "classdfcct.html#a866e917d642e523a0efa4019dde9d61e", null ],
     [ "instrument_harness_function", "classdfcct.html#a1e6ce41e4f34d847b5dddfc8f4bc000a", null ],
     [ "instrument_other_functions", "classdfcct.html#a2388b1d8922bcaea275f2d4e8a941ba4", null ],
@@ -21,7 +21,7 @@ var classdfcct =
     [ "instrument", "classdfcct.html#a99c66a5ec01c109314a988750f7b3eac", null ],
     [ "library", "classdfcct.html#a9cc1c63e43fea45a8bf5557be05c6d91", null ],
     [ "log", "classdfcct.html#a6e85cf09b373a87f153f40ac5003d18b", null ],
-    [ "loop_contract_mode", "classdfcct.html#a702650a805d2770a7dbbd29df4508ed5", null ],
+    [ "loop_contract_config", "classdfcct.html#a2a826ea1b556ca12bb24f6792212f209", null ],
     [ "max_assigns_clause_size", "classdfcct.html#a8b6e9e9bd01786b03cb827f7e6cc465d", null ],
     [ "memory_predicates", "classdfcct.html#a5d4f8fdd6358c4053754f8eefa056244", null ],
     [ "message_handler", "classdfcct.html#ab25bd5b238085ffa1288f5ba32268991", null ],

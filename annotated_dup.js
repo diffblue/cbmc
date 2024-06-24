@@ -801,6 +801,7 @@ var annotated_dup =
     [ "location_update_visitort", "classlocation__update__visitort.html", "classlocation__update__visitort" ],
     [ "loop_analysist", "classloop__analysist.html", "classloop__analysist" ],
     [ "loop_cfg_infot", "classloop__cfg__infot.html", "classloop__cfg__infot" ],
+    [ "loop_contract_configt", "structloop__contract__configt.html", "structloop__contract__configt" ],
     [ "loop_contracts_clauset", "structloop__contracts__clauset.html", "structloop__contracts__clauset" ],
     [ "loop_contracts_synthesizer_baset", "classloop__contracts__synthesizer__baset.html", "classloop__contracts__synthesizer__baset" ],
     [ "loop_idt", "structloop__idt.html", "structloop__idt" ],
