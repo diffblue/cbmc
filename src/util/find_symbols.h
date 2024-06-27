@@ -79,16 +79,20 @@ void find_non_pointer_type_symbols(
   const exprt &src,
   find_symbols_sett &dest);
 
-/// Find identifiers of the sub expressions with id ID_symbol, considering both
-/// free and bound variables, as well as any type tags.
+/// Find identifiers with id ID_symbol of the sub expressions and the subs with
+/// ID in \p subs_to_find
+/// considering both free and bound variables, as well as any type tags.
 void find_type_and_expr_symbols(
   const typet &src,
-  find_symbols_sett &dest);
+  find_symbols_sett &dest,
+  const std::vector<irep_idt> &subs_to_find = {});
 
-/// Find identifiers of the sub expressions with id ID_symbol, considering both
-/// free and bound variables, as well as any type tags.
+/// Find identifiers with id ID_symbol of the sub expressions and the subs with
+/// ID in \p subs_to_find
+/// considering both free and bound variables, as well as any type tags.
 void find_type_and_expr_symbols(
   const exprt &src,
-  find_symbols_sett &dest);
+  find_symbols_sett &dest,
+  const std::vector<irep_idt> &subs_to_find = {});
 
 #endif // CPROVER_UTIL_FIND_SYMBOLS_H
