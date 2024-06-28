@@ -11,10 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "destructor.h"
 
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/symbol.h>
 
-#include <goto-programs/goto_instruction_code.h>
+#include <goto-programs/goto_program.h>
 
 code_function_callt get_destructor(const namespacet &ns, const typet &type)
 {
@@ -55,4 +57,34 @@ code_function_callt get_destructor(const namespacet &ns, const typet &type)
   }
 
   return static_cast<const code_function_callt &>(get_nil_irep());
+}
+
+void destruct_locals(
+  const std::list<irep_idt> &vars,
+  goto_programt &dest,
+  const namespacet &ns)
+{
+  for(const auto &id : vars)
+  {
+    const symbolt &symbol = ns.lookup(id);
+
+    // do destructor
+    code_function_callt destructor = get_destructor(ns, symbol.type);
+
+    if(destructor.is_not_nil())
+    {
+      // add "this"
+      address_of_exprt this_expr(
+        symbol.symbol_expr(), pointer_type(symbol.type));
+      destructor.arguments().push_back(this_expr);
+
+      dest.add(goto_programt::make_function_call(
+        destructor, destructor.source_location()));
+    }
+
+    // now create a 'dead' instruction -- will be added after the
+    // destructor created below as unwind_destructor_stack pops off the
+    // top of the destructor stack
+    dest.add(goto_programt::make_dead(symbol.symbol_expr(), symbol.location));
+  }
 }

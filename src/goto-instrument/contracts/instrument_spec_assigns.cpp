@@ -23,6 +23,7 @@ Date: January 2022
 #include <util/simplify_expr.h>
 
 #include <ansi-c/c_expr.h>
+#include <ansi-c/goto-conversion/destructor.h>
 #include <langapi/language_util.h>
 
 #include "cfg_info.h"
@@ -419,8 +420,9 @@ void instrument_spec_assignst::track_spec_target_group(
   // clean up side effects from the guard expression if needed
   cleanert cleaner(st, log.get_message_handler());
   exprt condition(group.condition());
+  std::list<irep_idt> new_vars;
   if(has_subexpr(condition, ID_side_effect))
-    cleaner.clean(condition, dest, mode);
+    new_vars = cleaner.clean(condition, dest, mode);
 
   // create conditional address ranges by distributing the condition
   for(const auto &target : group.targets())
@@ -434,6 +436,8 @@ void instrument_spec_assignst::track_spec_target_group(
     // generate snapshot instructions for this target.
     create_snapshot(car, dest);
   }
+
+  destruct_locals(new_vars, dest, ns);
 }
 
 void instrument_spec_assignst::track_plain_spec_target(

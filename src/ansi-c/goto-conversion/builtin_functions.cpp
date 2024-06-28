@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
+#include "destructor.h"
 #include "format_strings.h"
 
 void goto_convertt::do_prob_uniform(
@@ -400,6 +401,7 @@ void goto_convertt::do_cpp_new(
   bool new_array = rhs.get(ID_statement) == ID_cpp_new_array;
 
   exprt count;
+  needs_destructiont new_vars;
 
   if(new_array)
   {
@@ -407,7 +409,7 @@ void goto_convertt::do_cpp_new(
       static_cast<const exprt &>(rhs.find(ID_size)), object_size.type());
 
     // might have side-effect
-    clean_expr(count, dest, ID_cpp);
+    new_vars.add(clean_expr(count, dest, ID_cpp));
   }
 
   exprt tmp_symbol_expr;
@@ -492,6 +494,10 @@ void goto_convertt::do_cpp_new(
     lhs,
     typecast_exprt(tmp_symbol_expr, lhs.type()),
     rhs.find_source_location()));
+
+  new_vars.minimal_scope.push_front(
+    to_symbol_expr(tmp_symbol_expr).get_identifier());
+  destruct_locals(new_vars.minimal_scope, dest, ns);
 
   // grab initializer
   goto_programt tmp_initializer;
@@ -685,6 +691,8 @@ void goto_convertt::do_havoc_slice(
 
   codet array_replace(ID_array_replace, {arg0, arg1}, source_location);
   dest.add(goto_programt::make_other(array_replace, source_location));
+
+  destruct_locals({nondet_contents.name}, dest, ns);
 }
 
 /// alloca allocates memory that is freed when leaving the function (and not the
@@ -772,6 +780,9 @@ void goto_convertt::do_alloca(
     this_alloca_ptr};
   dest.add(goto_programt::make_assignment(
     this_alloca_ptr, std::move(rhs), source_location));
+
+  if(lhs.is_nil())
+    destruct_locals({to_symbol_expr(new_lhs).get_identifier()}, dest, ns);
 
   // mark pointer to alloca result as dead, unless the alloca result (in
   // this_alloca_ptr)  is still NULL

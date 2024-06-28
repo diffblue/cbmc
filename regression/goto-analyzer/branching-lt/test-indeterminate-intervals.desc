@@ -3,6 +3,6 @@ main-indeterminate.c
 --no-standard-checks --variable-sensitivity --vsd-values intervals --show
 ^EXIT=0$
 ^SIGNAL=0$
-^main::1::i .* \[FFFFFFFB, 5\] @ \[17, 19\]
-^main::1::p .* \[0, A\] @ \[3, 8, 14\]
+^main::1::i .* \[FFFFFFFB, 5\] @ \[23, 25\]
+^main::1::p .* \[0, A\] @ \[3, 9, 18\]
 --

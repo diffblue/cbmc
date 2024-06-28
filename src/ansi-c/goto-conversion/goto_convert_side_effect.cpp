@@ -22,7 +22,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_expr.h>
 
-void goto_convertt::remove_assignment(
+#include "destructor.h"
+
+goto_convertt::needs_destructiont goto_convertt::remove_assignment(
   side_effect_exprt &expr,
   goto_programt &dest,
   bool result_is_used,
@@ -32,6 +34,8 @@ void goto_convertt::remove_assignment(
   const irep_idt statement = expr.get_statement();
 
   std::optional<exprt> replacement_expr_opt;
+
+  needs_destructiont new_vars;
 
   if(statement == ID_assign)
   {
@@ -43,7 +47,10 @@ void goto_convertt::remove_assignment(
       assignment_lhs_needs_temporary(old_assignment.lhs()))
     {
       if(!old_assignment.rhs().is_constant())
-        make_temp_symbol(old_assignment.rhs(), "assign", dest, mode);
+      {
+        new_vars.minimal_scope.push_front(
+          make_temp_symbol(old_assignment.rhs(), "assign", dest, mode));
+      }
 
       replacement_expr_opt =
         typecast_exprt::conditional_cast(old_assignment.rhs(), new_lhs.type());
@@ -113,7 +120,8 @@ void goto_convertt::remove_assignment(
       result_is_used && !address_taken &&
       assignment_lhs_needs_temporary(binary_expr.op0()))
     {
-      make_temp_symbol(rhs, "assign", dest, mode);
+      new_vars.minimal_scope.push_front(
+        make_temp_symbol(rhs, "assign", dest, mode));
       replacement_expr_opt =
         typecast_exprt::conditional_cast(rhs, new_lhs.type());
     }
@@ -134,8 +142,13 @@ void goto_convertt::remove_assignment(
     exprt new_lhs =
       typecast_exprt::conditional_cast(*replacement_expr_opt, expr.type());
     expr.swap(new_lhs);
+
+    return new_vars;
   }
-  else if(result_is_used)
+
+  destruct_locals(new_vars.minimal_scope, dest, ns);
+
+  if(result_is_used)
   {
     exprt lhs = to_binary_expr(expr).op0();
     // assign_* statements can have an lhs operand with a different type than
@@ -159,9 +172,11 @@ void goto_convertt::remove_assignment(
   }
   else
     expr.make_nil();
+
+  return {};
 }
 
-void goto_convertt::remove_pre(
+goto_convertt::needs_destructiont goto_convertt::remove_pre(
   side_effect_exprt &expr,
   goto_programt &dest,
   bool result_is_used,
@@ -227,8 +242,9 @@ void goto_convertt::remove_pre(
 
   const bool cannot_use_lhs =
     result_is_used && !address_taken && assignment_lhs_needs_temporary(lhs);
+  needs_destructiont new_vars;
   if(cannot_use_lhs)
-    make_temp_symbol(rhs, "pre", dest, mode);
+    new_vars.minimal_scope.push_front(make_temp_symbol(rhs, "pre", dest, mode));
 
   code_assignt assignment(lhs, rhs);
   assignment.add_source_location() = expr.find_source_location();
@@ -251,9 +267,11 @@ void goto_convertt::remove_pre(
   }
   else
     expr.make_nil();
+
+  return new_vars;
 }
 
-void goto_convertt::remove_post(
+goto_convertt::needs_destructiont goto_convertt::remove_post(
   side_effect_exprt &expr,
   goto_programt &dest,
   const irep_idt &mode,
@@ -316,6 +334,8 @@ void goto_convertt::remove_post(
 
   // fix up the expression, if needed
 
+  needs_destructiont new_vars;
+
   if(result_is_used)
   {
     exprt tmp = op;
@@ -326,7 +346,8 @@ void goto_convertt::remove_post(
       suffix += "_" + id2string(base_name);
     }
 
-    make_temp_symbol(tmp, suffix, dest, mode);
+    new_vars.minimal_scope.push_front(
+      make_temp_symbol(tmp, suffix, dest, mode));
     expr.swap(tmp);
   }
   else
@@ -334,9 +355,11 @@ void goto_convertt::remove_post(
 
   dest.destructive_append(tmp1);
   dest.destructive_append(tmp2);
+
+  return new_vars;
 }
 
-void goto_convertt::remove_function_call(
+goto_convertt::needs_destructiont goto_convertt::remove_function_call(
   side_effect_expr_function_callt &expr,
   goto_programt &dest,
   const irep_idt &mode,
@@ -348,7 +371,7 @@ void goto_convertt::remove_function_call(
     call.add_source_location() = expr.source_location();
     convert_function_call(call, dest, mode);
     expr.make_nil();
-    return;
+    return {};
   }
 
   // get name of function, if available
@@ -374,11 +397,9 @@ void goto_convertt::remove_function_call(
     new_symbol_mode,
     symbol_table);
 
-  {
-    code_frontend_declt decl(new_symbol.symbol_expr());
-    decl.add_source_location() = new_symbol.location;
-    convert_frontend_decl(decl, dest, mode);
-  }
+  PRECONDITION(expr.type().id() != ID_code);
+  dest.add(
+    goto_programt::make_decl(new_symbol.symbol_expr(), new_symbol.location));
 
   {
     goto_programt tmp_program2;
@@ -389,6 +410,8 @@ void goto_convertt::remove_function_call(
   }
 
   static_cast<exprt &>(expr) = new_symbol.symbol_expr();
+
+  return needs_destructiont{to_symbol_expr(expr).get_identifier()};
 }
 
 void goto_convertt::replace_new_object(const exprt &object, exprt &dest)
@@ -400,7 +423,7 @@ void goto_convertt::replace_new_object(const exprt &object, exprt &dest)
       replace_new_object(object, *it);
 }
 
-void goto_convertt::remove_cpp_new(
+goto_convertt::needs_destructiont goto_convertt::remove_cpp_new(
   side_effect_exprt &expr,
   goto_programt &dest,
   bool result_is_used)
@@ -413,18 +436,24 @@ void goto_convertt::remove_cpp_new(
     ID_cpp,
     symbol_table);
 
-  code_frontend_declt decl(new_symbol.symbol_expr());
-  decl.add_source_location() = new_symbol.location;
-  convert_frontend_decl(decl, dest, ID_cpp);
+  PRECONDITION(expr.type().id() != ID_code);
+  dest.add(
+    goto_programt::make_decl(new_symbol.symbol_expr(), new_symbol.location));
 
   const code_assignt call(new_symbol.symbol_expr(), expr);
 
-  if(result_is_used)
-    static_cast<exprt &>(expr) = new_symbol.symbol_expr();
-  else
-    expr.make_nil();
-
   convert(call, dest, ID_cpp);
+
+  if(result_is_used)
+  {
+    static_cast<exprt &>(expr) = new_symbol.symbol_expr();
+    return needs_destructiont{to_symbol_expr(expr).get_identifier()};
+  }
+  else
+  {
+    expr.make_nil();
+    return {};
+  }
 }
 
 void goto_convertt::remove_cpp_delete(
@@ -443,7 +472,7 @@ void goto_convertt::remove_cpp_delete(
   expr.make_nil();
 }
 
-void goto_convertt::remove_malloc(
+goto_convertt::needs_destructiont goto_convertt::remove_malloc(
   side_effect_exprt &expr,
   goto_programt &dest,
   const irep_idt &mode,
@@ -469,14 +498,18 @@ void goto_convertt::remove_malloc(
     static_cast<exprt &>(expr) = new_symbol.symbol_expr();
 
     convert(call, dest, mode);
+
+    return needs_destructiont{to_symbol_expr(expr).get_identifier()};
   }
   else
   {
     convert(code_expressiont(std::move(expr)), dest, mode);
+
+    return {};
   }
 }
 
-void goto_convertt::remove_temporary_object(
+goto_convertt::needs_destructiont goto_convertt::remove_temporary_object(
   side_effect_exprt &expr,
   goto_programt &dest)
 {
@@ -510,9 +543,11 @@ void goto_convertt::remove_temporary_object(
   }
 
   static_cast<exprt &>(expr) = new_symbol.symbol_expr();
+
+  return needs_destructiont{to_symbol_expr(expr).get_identifier()};
 }
 
-void goto_convertt::remove_statement_expression(
+goto_convertt::needs_destructiont goto_convertt::remove_statement_expression(
   side_effect_exprt &expr,
   goto_programt &dest,
   const irep_idt &mode,
@@ -529,7 +564,7 @@ void goto_convertt::remove_statement_expression(
   {
     convert(code, dest, mode);
     expr.make_nil();
-    return;
+    return {};
   }
 
   INVARIANT_WITH_DIAGNOSTICS(
@@ -579,9 +614,11 @@ void goto_convertt::remove_statement_expression(
   }
 
   static_cast<exprt &>(expr) = tmp_symbol_expr;
+
+  return needs_destructiont{to_symbol_expr(expr).get_identifier()};
 }
 
-void goto_convertt::remove_overflow(
+goto_convertt::needs_destructiont goto_convertt::remove_overflow(
   side_effect_expr_overflowt &expr,
   goto_programt &dest,
   bool result_is_used,
@@ -592,12 +629,14 @@ void goto_convertt::remove_overflow(
   const exprt &rhs = expr.rhs();
   const exprt &result = expr.result();
 
+  needs_destructiont new_vars;
+
   if(result.type().id() != ID_pointer)
   {
     // result of the arithmetic operation is _not_ used, just evaluate side
     // effects
     exprt tmp = result;
-    clean_expr(tmp, dest, mode, false);
+    new_vars.add(clean_expr(tmp, dest, mode, false));
 
     // the is-there-an-overflow result may be used
     if(result_is_used)
@@ -627,7 +666,10 @@ void goto_convertt::remove_overflow(
     overflow_with_result.add_source_location() = expr.source_location();
 
     if(result_is_used)
-      make_temp_symbol(overflow_with_result, "overflow_result", dest, mode);
+    {
+      new_vars.minimal_scope.push_front(
+        make_temp_symbol(overflow_with_result, "overflow_result", dest, mode));
+    }
 
     const struct_typet::componentst &result_comps =
       to_struct_type(overflow_with_result.type()).components();
@@ -649,9 +691,11 @@ void goto_convertt::remove_overflow(
     else
       expr.make_nil();
   }
+
+  return new_vars;
 }
 
-void goto_convertt::remove_side_effect(
+goto_convertt::needs_destructiont goto_convertt::remove_side_effect(
   side_effect_exprt &expr,
   goto_programt &dest,
   const irep_idt &mode,
@@ -661,8 +705,10 @@ void goto_convertt::remove_side_effect(
   const irep_idt &statement = expr.get_statement();
 
   if(statement == ID_function_call)
-    remove_function_call(
+  {
+    return remove_function_call(
       to_side_effect_expr_function_call(expr), dest, mode, result_is_used);
+  }
   else if(
     statement == ID_assign || statement == ID_assign_plus ||
     statement == ID_assign_minus || statement == ID_assign_mult ||
@@ -670,28 +716,47 @@ void goto_convertt::remove_side_effect(
     statement == ID_assign_bitxor || statement == ID_assign_bitand ||
     statement == ID_assign_lshr || statement == ID_assign_ashr ||
     statement == ID_assign_shl || statement == ID_assign_mod)
-    remove_assignment(expr, dest, result_is_used, address_taken, mode);
+  {
+    return remove_assignment(expr, dest, result_is_used, address_taken, mode);
+  }
   else if(statement == ID_postincrement || statement == ID_postdecrement)
-    remove_post(expr, dest, mode, result_is_used);
+  {
+    return remove_post(expr, dest, mode, result_is_used);
+  }
   else if(statement == ID_preincrement || statement == ID_predecrement)
-    remove_pre(expr, dest, result_is_used, address_taken, mode);
+  {
+    return remove_pre(expr, dest, result_is_used, address_taken, mode);
+  }
   else if(statement == ID_cpp_new || statement == ID_cpp_new_array)
-    remove_cpp_new(expr, dest, result_is_used);
+  {
+    return remove_cpp_new(expr, dest, result_is_used);
+  }
   else if(statement == ID_cpp_delete || statement == ID_cpp_delete_array)
+  {
     remove_cpp_delete(expr, dest);
+    return {};
+  }
   else if(statement == ID_allocate)
-    remove_malloc(expr, dest, mode, result_is_used);
+  {
+    return remove_malloc(expr, dest, mode, result_is_used);
+  }
   else if(statement == ID_temporary_object)
-    remove_temporary_object(expr, dest);
+  {
+    return remove_temporary_object(expr, dest);
+  }
   else if(statement == ID_statement_expression)
-    remove_statement_expression(expr, dest, mode, result_is_used);
+  {
+    return remove_statement_expression(expr, dest, mode, result_is_used);
+  }
   else if(statement == ID_nondet)
   {
     // these are fine
+    return {};
   }
   else if(statement == ID_skip)
   {
     expr.make_nil();
+    return {};
   }
   else if(statement == ID_throw)
   {
@@ -704,12 +769,13 @@ void goto_convertt::remove_side_effect(
 
     // the result can't be used, these are void
     expr.make_nil();
+    return {};
   }
   else if(
     statement == ID_overflow_plus || statement == ID_overflow_minus ||
     statement == ID_overflow_mult)
   {
-    remove_overflow(
+    return remove_overflow(
       to_side_effect_expr_overflow(expr), dest, result_is_used, mode);
   }
   else

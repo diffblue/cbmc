@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
+#include "destructor.h"
+
 symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,
   goto_programt &dest,
@@ -164,7 +166,7 @@ void goto_convertt::rewrite_boolean(exprt &expr)
   expr.swap(tmp);
 }
 
-void goto_convertt::clean_expr(
+goto_convertt::needs_destructiont goto_convertt::clean_expr(
   exprt &expr,
   goto_programt &dest,
   const irep_idt &mode,
@@ -179,7 +181,7 @@ void goto_convertt::clean_expr(
   //   compound literals
 
   if(!needs_cleaning(expr))
-    return;
+    return {};
 
   if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies)
   {
@@ -187,19 +189,21 @@ void goto_convertt::clean_expr(
     rewrite_boolean(expr);
 
     // recursive call
-    clean_expr(expr, dest, mode, result_is_used);
-    return;
+    return clean_expr(expr, dest, mode, result_is_used);
   }
   else if(expr.id() == ID_if)
   {
     // first clean condition
-    clean_expr(to_if_expr(expr).cond(), dest, mode, true);
+    needs_destructiont new_vars =
+      clean_expr(to_if_expr(expr).cond(), dest, mode, true);
 
     // possibly done now
     if(
       !needs_cleaning(to_if_expr(expr).true_case()) &&
       !needs_cleaning(to_if_expr(expr).false_case()))
-      return;
+    {
+      return new_vars;
+    }
 
     // copy expression
     if_exprt if_expr = to_if_expr(expr);
@@ -233,10 +237,12 @@ void goto_convertt::clean_expr(
 #endif
 
     goto_programt tmp_true;
-    clean_expr(if_expr.true_case(), tmp_true, mode, result_is_used);
+    new_vars.add(
+      clean_expr(if_expr.true_case(), tmp_true, mode, result_is_used));
 
     goto_programt tmp_false;
-    clean_expr(if_expr.false_case(), tmp_false, mode, result_is_used);
+    new_vars.add(
+      clean_expr(if_expr.false_case(), tmp_false, mode, result_is_used));
 
     if(result_is_used)
     {
@@ -293,10 +299,18 @@ void goto_convertt::clean_expr(
       dest,
       mode);
 
-    return;
+    destruct_locals(new_vars.minimal_scope, dest, ns);
+    new_vars.minimal_scope.clear();
+
+    if(expr.is_not_nil())
+      new_vars.minimal_scope.push_front(to_symbol_expr(expr).get_identifier());
+
+    return new_vars;
   }
   else if(expr.id() == ID_comma)
   {
+    needs_destructiont new_vars;
+
     if(result_is_used)
     {
       exprt result;
@@ -309,11 +323,11 @@ void goto_convertt::clean_expr(
         if(last)
         {
           result.swap(*it);
-          clean_expr(result, dest, mode, true);
+          new_vars.add(clean_expr(result, dest, mode, true));
         }
         else
         {
-          clean_expr(*it, dest, mode, false);
+          new_vars.add(clean_expr(*it, dest, mode, false));
 
           // remember these for later checks
           if(it->is_not_nil())
@@ -327,7 +341,7 @@ void goto_convertt::clean_expr(
     {
       Forall_operands(it, expr)
       {
-        clean_expr(*it, dest, mode, false);
+        new_vars.add(clean_expr(*it, dest, mode, false));
 
         // remember as expression statement for later checks
         if(it->is_not_nil())
@@ -337,19 +351,20 @@ void goto_convertt::clean_expr(
       expr = nil_exprt();
     }
 
-    return;
+    return new_vars;
   }
   else if(expr.id() == ID_typecast)
   {
     typecast_exprt &typecast = to_typecast_expr(expr);
 
     // preserve 'result_is_used'
-    clean_expr(typecast.op(), dest, mode, result_is_used);
+    needs_destructiont new_vars =
+      clean_expr(typecast.op(), dest, mode, result_is_used);
 
     if(typecast.op().is_nil())
       expr.make_nil();
 
-    return;
+    return new_vars;
   }
   else if(expr.id() == ID_side_effect)
   {
@@ -359,16 +374,14 @@ void goto_convertt::clean_expr(
     if(statement == ID_gcc_conditional_expression)
     {
       // need to do separately
-      remove_gcc_conditional_expression(expr, dest, mode);
-      return;
+      return remove_gcc_conditional_expression(expr, dest, mode);
     }
     else if(statement == ID_statement_expression)
     {
       // need to do separately to prevent that
       // the operands of expr get 'cleaned'
-      remove_statement_expression(
+      return remove_statement_expression(
         to_side_effect_expr(expr), dest, mode, result_is_used);
-      return;
     }
     else if(statement == ID_assign)
     {
@@ -384,17 +397,18 @@ void goto_convertt::clean_expr(
         to_side_effect_expr(side_effect_assign.rhs()).get_statement() ==
           ID_function_call)
       {
-        clean_expr(side_effect_assign.lhs(), dest, mode);
+        needs_destructiont new_vars =
+          clean_expr(side_effect_assign.lhs(), dest, mode);
         exprt lhs = side_effect_assign.lhs();
 
         const bool must_use_rhs = assignment_lhs_needs_temporary(lhs);
         if(must_use_rhs)
         {
-          remove_function_call(
+          new_vars.add(remove_function_call(
             to_side_effect_expr_function_call(side_effect_assign.rhs()),
             dest,
             mode,
-            true);
+            true));
         }
 
         // turn into code
@@ -409,7 +423,8 @@ void goto_convertt::clean_expr(
           expr = must_use_rhs ? new_rhs : lhs;
         else
           expr.make_nil();
-        return;
+
+        return new_vars;
       }
     }
   }
@@ -422,19 +437,20 @@ void goto_convertt::clean_expr(
   else if(expr.id() == ID_address_of)
   {
     address_of_exprt &addr = to_address_of_expr(expr);
-    clean_expr_address_of(addr.object(), dest, mode);
-    return;
+    return clean_expr_address_of(addr.object(), dest, mode);
   }
+
+  needs_destructiont new_vars;
 
   // TODO: evaluation order
 
   Forall_operands(it, expr)
-    clean_expr(*it, dest, mode);
+    new_vars.add(clean_expr(*it, dest, mode));
 
   if(expr.id() == ID_side_effect)
   {
-    remove_side_effect(
-      to_side_effect_expr(expr), dest, mode, result_is_used, false);
+    new_vars.add(remove_side_effect(
+      to_side_effect_expr(expr), dest, mode, result_is_used, false));
   }
   else if(expr.id() == ID_compound_literal)
   {
@@ -443,13 +459,17 @@ void goto_convertt::clean_expr(
       expr.operands().size() == 1, "ID_compound_literal has a single operand");
     expr = to_unary_expr(expr).op();
   }
+
+  return new_vars;
 }
 
-void goto_convertt::clean_expr_address_of(
+goto_convertt::needs_destructiont goto_convertt::clean_expr_address_of(
   exprt &expr,
   goto_programt &dest,
   const irep_idt &mode)
 {
+  needs_destructiont new_vars;
+
   // The address of object constructors can be taken,
   // which is re-written into the address of a variable.
 
@@ -457,7 +477,7 @@ void goto_convertt::clean_expr_address_of(
   {
     DATA_INVARIANT(
       expr.operands().size() == 1, "ID_compound_literal has a single operand");
-    clean_expr(to_unary_expr(expr).op(), dest, mode);
+    new_vars.add(clean_expr(to_unary_expr(expr).op(), dest, mode));
     expr = make_compound_literal(to_unary_expr(expr).op(), dest, mode);
   }
   else if(expr.id() == ID_string_constant)
@@ -468,13 +488,13 @@ void goto_convertt::clean_expr_address_of(
   else if(expr.id() == ID_index)
   {
     index_exprt &index_expr = to_index_expr(expr);
-    clean_expr_address_of(index_expr.array(), dest, mode);
-    clean_expr(index_expr.index(), dest, mode);
+    new_vars.add(clean_expr_address_of(index_expr.array(), dest, mode));
+    new_vars.add(clean_expr(index_expr.index(), dest, mode));
   }
   else if(expr.id() == ID_dereference)
   {
     dereference_exprt &deref_expr = to_dereference_expr(expr);
-    clean_expr(deref_expr.pointer(), dest, mode);
+    new_vars.add(clean_expr(deref_expr.pointer(), dest, mode));
   }
   else if(expr.id() == ID_comma)
   {
@@ -492,7 +512,7 @@ void goto_convertt::clean_expr_address_of(
         result.swap(*it);
       else
       {
-        clean_expr(*it, dest, mode, false);
+        new_vars.add(clean_expr(*it, dest, mode, false));
 
         // get any side-effects
         if(it->is_not_nil())
@@ -503,27 +523,33 @@ void goto_convertt::clean_expr_address_of(
     expr.swap(result);
 
     // do again
-    clean_expr_address_of(expr, dest, mode);
+    new_vars.add(clean_expr_address_of(expr, dest, mode));
   }
   else if(expr.id() == ID_side_effect)
   {
-    remove_side_effect(to_side_effect_expr(expr), dest, mode, true, true);
+    new_vars.add(
+      remove_side_effect(to_side_effect_expr(expr), dest, mode, true, true));
   }
   else
     Forall_operands(it, expr)
-      clean_expr_address_of(*it, dest, mode);
+      new_vars.add(clean_expr_address_of(*it, dest, mode));
+
+  return new_vars;
 }
 
-void goto_convertt::remove_gcc_conditional_expression(
+goto_convertt::needs_destructiont
+goto_convertt::remove_gcc_conditional_expression(
   exprt &expr,
   goto_programt &dest,
   const irep_idt &mode)
 {
+  needs_destructiont new_vars;
+
   {
     auto &binary_expr = to_binary_expr(expr);
 
     // first remove side-effects from condition
-    clean_expr(to_binary_expr(expr).op0(), dest, mode);
+    new_vars = clean_expr(to_binary_expr(expr).op0(), dest, mode);
 
     // now we can copy op0 safely
     if_exprt if_expr(
@@ -537,5 +563,7 @@ void goto_convertt::remove_gcc_conditional_expression(
   }
 
   // there might still be junk in expr.op2()
-  clean_expr(expr, dest, mode);
+  new_vars.add(clean_expr(expr, dest, mode));
+
+  return new_vars;
 }

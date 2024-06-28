@@ -43,9 +43,10 @@ public:
   {
   }
 
-  void clean(exprt &guard, goto_programt &dest, const irep_idt &mode)
+  [[nodiscard]] std::list<irep_idt>
+  clean(exprt &guard, goto_programt &dest, const irep_idt &mode)
   {
-    goto_convertt::clean_expr(guard, dest, mode, true);
+    return goto_convertt::clean_expr(guard, dest, mode, true).minimal_scope;
   }
 
   void do_havoc_slice(

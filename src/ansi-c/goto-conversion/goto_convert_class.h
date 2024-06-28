@@ -56,6 +56,22 @@ protected:
   std::string tmp_symbol_prefix;
   lifetimet lifetime = lifetimet::STATIC_GLOBAL;
 
+  struct needs_destructiont
+  {
+    std::list<irep_idt> minimal_scope;
+
+    needs_destructiont() = default;
+
+    explicit needs_destructiont(irep_idt id) : minimal_scope({id})
+    {
+    }
+
+    void add(needs_destructiont &&other)
+    {
+      minimal_scope.splice(minimal_scope.begin(), other.minimal_scope);
+    }
+  };
+
   void goto_convert_rec(
     const codet &code,
     goto_programt &dest,
@@ -64,7 +80,7 @@ protected:
   //
   // tools for symbols
   //
-  symbolt &new_tmp_symbol(
+  [[nodiscard]] symbolt &new_tmp_symbol(
     const typet &type,
     const std::string &suffix,
     goto_programt &dest,
@@ -81,13 +97,13 @@ protected:
   // into the program logic
   //
 
-  void clean_expr(
+  [[nodiscard]] needs_destructiont clean_expr(
     exprt &expr,
     goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used = true);
 
-  void
+  [[nodiscard]] needs_destructiont
   clean_expr_address_of(exprt &expr, goto_programt &dest, const irep_idt &mode);
 
   static bool needs_cleaning(const exprt &expr);
@@ -101,7 +117,7 @@ protected:
     return lhs.id() != ID_symbol;
   }
 
-  void make_temp_symbol(
+  [[nodiscard]] irep_idt make_temp_symbol(
     exprt &expr,
     const std::string &suffix,
     goto_programt &,
@@ -109,55 +125,56 @@ protected:
 
   void rewrite_boolean(exprt &dest);
 
-  void remove_side_effect(
+  [[nodiscard]] needs_destructiont remove_side_effect(
     side_effect_exprt &expr,
     goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used,
     bool address_taken);
-  void remove_assignment(
+  [[nodiscard]] needs_destructiont remove_assignment(
     side_effect_exprt &expr,
     goto_programt &dest,
     bool result_is_used,
     bool address_taken,
     const irep_idt &mode);
-  void remove_pre(
+  [[nodiscard]] needs_destructiont remove_pre(
     side_effect_exprt &expr,
     goto_programt &dest,
     bool result_is_used,
     bool address_taken,
     const irep_idt &mode);
-  void remove_post(
+  [[nodiscard]] needs_destructiont remove_post(
     side_effect_exprt &expr,
     goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_function_call(
+  [[nodiscard]] needs_destructiont remove_function_call(
     side_effect_expr_function_callt &expr,
     goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_cpp_new(
+  [[nodiscard]] needs_destructiont remove_cpp_new(
     side_effect_exprt &expr,
     goto_programt &dest,
     bool result_is_used);
   void remove_cpp_delete(side_effect_exprt &expr, goto_programt &dest);
-  void remove_malloc(
+  [[nodiscard]] needs_destructiont remove_malloc(
     side_effect_exprt &expr,
     goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_temporary_object(side_effect_exprt &expr, goto_programt &dest);
-  void remove_statement_expression(
+  [[nodiscard]] needs_destructiont
+  remove_temporary_object(side_effect_exprt &expr, goto_programt &dest);
+  [[nodiscard]] needs_destructiont remove_statement_expression(
     side_effect_exprt &expr,
     goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_gcc_conditional_expression(
+  [[nodiscard]] needs_destructiont remove_gcc_conditional_expression(
     exprt &expr,
     goto_programt &dest,
     const irep_idt &mode);
-  void remove_overflow(
+  [[nodiscard]] needs_destructiont remove_overflow(
     side_effect_expr_overflowt &expr,
     goto_programt &dest,
     bool result_is_used,
