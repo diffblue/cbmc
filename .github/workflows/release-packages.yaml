@@ -200,8 +200,8 @@ jobs:
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Setup code sign environment
         run: |
+          dotnet tool install --global AzureSignTool --version 5.0.0
           echo "$(Split-Path -Path $(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe"))" >> $env:GITHUB_PATH
-          echo "pfxcert=$([string](Get-Location)+'\CodeSignCertificate.pfx')" >> $env:GITHUB_ENV
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
@@ -232,28 +232,28 @@ jobs:
           $msi_name = Get-ChildItem -Filter *.msi -Name
           echo "msi_installer=build/$msi_name" >> $env:GITHUB_OUTPUT
           echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
-      - name: Decode signing certificate
-        id: decode_certificate
-        run: |
-          $pfx_bytes=[System.Convert]::FromBase64String("${{ secrets.CODESIGNCERTPFX }}")
-          [IO.File]::WriteAllBytes($env:pfxcert, $pfx_bytes)
       - name: Sign the installer
         id: code_sign
         run: |
           $servers = @('http://ts.ssl.com', 'http://timestamp.digicert.com', 'http://timestamp.sectigo.com')
           foreach($ts_server in $servers)
           {
-            & signtool.exe sign /f $env:pfxcert /p "${{ secrets.CODESIGNCERTPASSWORD }}" /tr $ts_server /td SHA256 /fd SHA256 ${{ steps.create_packages.outputs.msi_installer }}
+            & AzureSignTool sign `
+            --azure-key-vault-url "${{ secrets.AZURE_KEYVAULT_URL }}" `
+            --azure-key-vault-client-id "${{ secrets.AZURE_CLIENT_ID }}" `
+            --azure-key-vault-tenant-id "${{ secrets.AZURE_TENANT_ID }}" `
+            --azure-key-vault-client-secret "${{ secrets.AZURE_CLIENT_SECRET }}" `
+            --azure-key-vault-certificate "${{ secrets.AZURE_CERTIFICATE_NAME }}" `
+            --timestamp-rfc3161 $ts_server `
+            --timestamp-digest sha256 `
+            --file-digest sha256 `
+            --verbose ${{ steps.create_packages.outputs.msi_installer }}
             if ($LastExitCode -eq "0")
             {
               # Stop if code-signing the binary using this server was successful.
               break
             }
           }
-      - name: Remove signing certificate
-        id: remove_certificate
-        run: |
-          Remove-Item $env:pfxcert
       - name: Verify installer signature
         id: verify_codesign
         run: |
