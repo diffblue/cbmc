@@ -18,8 +18,8 @@ tests.log:
 	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument $(is_windows)'
 
 clean:
+	$(RM) tests.log
 	@for dir in *; do \
-		$(RM) tests.log; \
 		if [ -d "$$dir" ]; then \
 			cd "$$dir"; \
 			$(RM) *.out *.gb; \
