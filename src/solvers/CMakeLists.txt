@@ -121,11 +121,11 @@ foreach(SOLVER ${sat_impl})
         message(STATUS "Building solvers with cadical")
 
         download_project(PROJ cadical
-            URL https://github.com/arminbiere/cadical/archive/rel-1.7.2.tar.gz
-            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/cadical-1.7.2-patch
+            URL https://github.com/arminbiere/cadical/archive/rel-2.0.0.tar.gz
+            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/cadical-2.0.0-patch
             COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/cadical_CMakeLists.txt CMakeLists.txt
             COMMAND ./configure
-            URL_MD5 be646831a017f81b300664e58deba1b5
+            URL_MD5 9fc2a66196b86adceb822a583318cc35
         )
 
         add_subdirectory(${cadical_SOURCE_DIR} ${cadical_BINARY_DIR})
@@ -144,10 +144,10 @@ foreach(SOLVER ${sat_impl})
         message(STATUS "Building with IPASIR solver linking against: CaDiCaL")
 
         download_project(PROJ cadical
-            URL https://github.com/arminbiere/cadical/archive/rel-1.7.2.tar.gz
-            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/cadical-1.7.2-patch
+            URL https://github.com/arminbiere/cadical/archive/rel-2.0.0.tar.gz
+            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/cadical-2.0.0-patch
             COMMAND ./configure
-            URL_MD5 be646831a017f81b300664e58deba1b5
+            URL_MD5 9fc2a66196b86adceb822a583318cc35
         )
 
         message(STATUS "Building CaDiCaL")

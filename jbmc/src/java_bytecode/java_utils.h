@@ -164,7 +164,11 @@ bool is_non_null_library_global(const irep_idt &);
 
 extern const std::unordered_set<std::string> cprover_methods_to_ignore;
 
-symbolt &fresh_java_symbol(
+#if defined(__GNUC__) && __GNUC__ >= 14
+[[gnu::no_dangling]]
+#endif
+symbolt &
+fresh_java_symbol(
   const typet &type,
   const std::string &basename_prefix,
   const source_locationt &source_location,

@@ -37,7 +37,11 @@ typedef dstringt irep_idt;
 // NOLINTNEXTLINE(readability/identifiers)
 typedef dstring_hash irep_id_hash;
 
-inline const std::string &id2string(const irep_idt &d)
+#if defined(__GNUC__) && __GNUC__ >= 14
+[[gnu::no_dangling]]
+#endif
+inline const std::string &
+id2string(const irep_idt &d)
 {
   return as_string(d);
 }

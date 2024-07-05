@@ -444,7 +444,11 @@ void create_invokedynamic_synthetic_classes(
   }
 }
 
-static const symbolt &get_or_create_method_symbol(
+#if defined(__GNUC__) && __GNUC__ >= 14
+[[gnu::no_dangling]]
+#endif
+static const symbolt &
+get_or_create_method_symbol(
   const irep_idt &identifier,
   const irep_idt &base_name,
   const irep_idt &pretty_name,

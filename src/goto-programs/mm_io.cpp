@@ -54,15 +54,14 @@ mm_iot::mm_iot(symbol_table_baset &symbol_table)
   {
     mm_io_r = mm_io_r_symbol->symbol_expr();
 
-    const auto &value_symbol = get_fresh_aux_symbol(
-      to_code_type(mm_io_r.type()).return_type(),
-      id2string(id_r) + "$value",
-      id2string(id_r) + "$value",
-      mm_io_r_symbol->location,
-      mm_io_r_symbol->mode,
-      symbol_table);
-
-    mm_io_r_value = value_symbol.symbol_expr();
+    mm_io_r_value = get_fresh_aux_symbol(
+                      to_code_type(mm_io_r.type()).return_type(),
+                      id2string(id_r) + "$value",
+                      id2string(id_r) + "$value",
+                      mm_io_r_symbol->location,
+                      mm_io_r_symbol->mode,
+                      symbol_table)
+                      .symbol_expr();
   }
 
   if(const auto mm_io_w_symbol = symbol_table.lookup(id_w))

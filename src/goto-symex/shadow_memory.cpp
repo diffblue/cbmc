@@ -71,17 +71,19 @@ const symbol_exprt &shadow_memoryt::add_field(
   const typet &field_type)
 {
   const auto &function_symbol = ns.lookup(state.source.function_id);
-  const symbolt &new_symbol = get_fresh_aux_symbol(
-    field_type,
-    id2string(state.source.function_id),
-    SHADOW_MEMORY_PREFIX + from_expr(expr) + "__" + id2string(field_name),
-    state.source.pc->source_location(),
-    function_symbol.mode,
-    state.symbol_table);
+  symbol_exprt new_symbol_expr =
+    get_fresh_aux_symbol(
+      field_type,
+      id2string(state.source.function_id),
+      SHADOW_MEMORY_PREFIX + from_expr(expr) + "__" + id2string(field_name),
+      state.source.pc->source_location(),
+      function_symbol.mode,
+      state.symbol_table)
+      .symbol_expr();
 
   auto &addresses = state.shadow_memory.address_fields[field_name];
   addresses.push_back(
-    shadow_memory_statet::shadowed_addresst{expr, new_symbol.symbol_expr()});
+    shadow_memory_statet::shadowed_addresst{expr, new_symbol_expr});
 
   return addresses.back().shadow;
 }

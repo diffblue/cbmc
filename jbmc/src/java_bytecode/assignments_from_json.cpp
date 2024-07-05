@@ -641,8 +641,9 @@ static code_with_references_listt assign_enum_from_json(
 
   dereference_exprt values_struct{
     info.symbol_table.lookup_ref(values_name).symbol_expr()};
-  const auto &values_struct_type = namespacet{info.symbol_table}.follow_tag(
-    to_struct_tag_type(values_struct.type()));
+  const namespacet ns{info.symbol_table};
+  const auto &values_struct_type =
+    ns.follow_tag(to_struct_tag_type(values_struct.type()));
   PRECONDITION(is_valid_java_array(values_struct_type));
   const member_exprt values_data = member_exprt{
     values_struct, "data", values_struct_type.components()[2].type()};

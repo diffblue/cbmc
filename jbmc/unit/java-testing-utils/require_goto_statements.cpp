@@ -381,7 +381,7 @@ get_ultimate_source_symbol(
 /// \return The identifier of the ultimate source symbol assigned to the field,
 ///   which will be used for future calls to
 ///   `require_struct_component_assignment`.
-const irep_idt &require_goto_statements::require_struct_component_assignment(
+irep_idt require_goto_statements::require_struct_component_assignment(
   const irep_idt &structure_name,
   const std::optional<irep_idt> &superclass_name,
   const irep_idt &component_name,
@@ -514,8 +514,7 @@ require_goto_statements::require_struct_array_component_assignment(
 /// \param argument_name: Name of the input argument of method under test
 /// \param entry_point_statements: The statements to look through
 /// \return The identifier of the variable assigned to the input argument
-const irep_idt &
-require_goto_statements::require_entry_point_argument_assignment(
+irep_idt require_goto_statements::require_entry_point_argument_assignment(
   const irep_idt &argument_name,
   const std::vector<codet> &entry_point_statements)
 {

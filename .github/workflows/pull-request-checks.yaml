@@ -399,7 +399,7 @@ jobs:
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
   # This job takes approximately 14 to 46 minutes
-  check-ubuntu-24_04-cmake-gcc-13:
+  check-ubuntu-24_04-cmake-gcc-14:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -412,13 +412,13 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-13 gdb g++-13 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-14 gdb g++-14 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
           # Update symlinks so that any use of gcc (including our regression
-          # tests) will use GCC 13.
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 110 \
-            --slave /usr/bin/g++ g++ /usr/bin/g++-13 \
-            --slave /usr/bin/gcov gcov /usr/bin/gcov-13
-          sudo ln -sf cpp-13 /usr/bin/cpp
+          # tests) will use GCC 14.
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 110 \
+            --slave /usr/bin/g++ g++ /usr/bin/g++-14 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-14
+          sudo ln -sf cpp-14 /usr/bin/cpp
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -432,10 +432,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-24.04-Release-gcc-13-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-24.04-Release-gcc-13-${{ github.ref }}
-            ${{ runner.os }}-24.04-Release-gcc-13
+            ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}
+            ${{ runner.os }}-24.04-Release-gcc-14
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV

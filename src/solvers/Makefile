@@ -281,7 +281,7 @@ solvers$(LIBEXT): $(OBJ) $(SOLVER_LIB)
 	$(LINKLIB)
 
 ../../cadical/build/libcadical$(LIBEXT):
-	$(MAKE) $(MAKEARGS) -C $(CADICAL)/build libcadical.a CXX="$(CXX)" CXXFLAGS="$(CP_CXXFLAGS)"
+	$(MAKE) $(MAKEARGS) -C $(CADICAL)/build libcadical.a CXX="$(CXX)" CXXFLAGS="$(CP_CXXFLAGS) -DNFLEXIBLE"
 
 -include smt2/smt2_solver$(DEPEXT)
 

@@ -72,7 +72,7 @@ const code_declt &require_declaration_of_name(
   const irep_idt &variable_name,
   const std::vector<codet> &entry_point_instructions);
 
-const irep_idt &require_struct_component_assignment(
+irep_idt require_struct_component_assignment(
   const irep_idt &structure_name,
   const std::optional<irep_idt> &superclass_name,
   const irep_idt &component_name,
@@ -89,7 +89,7 @@ const irep_idt &require_struct_array_component_assignment(
   const std::vector<codet> &entry_point_instructions,
   const symbol_table_baset &symbol_table);
 
-const irep_idt &require_entry_point_argument_assignment(
+irep_idt require_entry_point_argument_assignment(
   const irep_idt &argument_name,
   const std::vector<codet> &entry_point_statements);
 
