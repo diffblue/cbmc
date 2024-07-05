@@ -54,6 +54,15 @@ int fcntl64(int fd, int cmd, ...)
   return __CPROVER_fcntl(fd, cmd);
 }
 
+/* FUNCTION: __fcntl_time64 */
+
+int __CPROVER_fcntl(int, int);
+
+int __fcntl_time64(int fd, int cmd, ...)
+{
+  return __CPROVER_fcntl(fd, cmd);
+}
+
 /* FUNCTION: __CPROVER_open */
 
 #ifndef __CPROVER_FCNTL_H_INCLUDED
