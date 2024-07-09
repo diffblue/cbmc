@@ -45,6 +45,7 @@ perl -p -i -e 's/^_setjmp\n//' __functions # pipe, macOS
 perl -p -i -e 's/^_time(32|64)\n//' __functions # time, Windows
 perl -p -i -e 's/^__builtin___snprintf_chk\n//' __functions # snprintf, macOS
 perl -p -i -e 's/^__builtin___vsnprintf_chk\n//' __functions # vsnprintf, macOS
+perl -p -i -e 's/^__fcntl_time64\n//' __functions # fcntl, Linux
 perl -p -i -e 's/^__inet_(addr|aton|ntoa|network)\n//' __functions # inet_*, FreeBSD
 perl -p -i -e 's/^__isoc99_v?fscanf\n//' __functions # fscanf, Linux
 perl -p -i -e 's/^__isoc99_v?scanf\n//' __functions # scanf, Linux
