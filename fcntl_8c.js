@@ -7,6 +7,7 @@ var fcntl_8c =
     [ "__CPROVER_fcntl", "fcntl_8c.html#ad23b9ff1b55a47c771319b9c915dd220", null ],
     [ "__CPROVER_open", "fcntl_8c.html#aad36a4f53a4c3d382ec3dc176bdeccb0", null ],
     [ "__CPROVER_openat", "fcntl_8c.html#af819c6f53c180cc5b48265918008f41e", null ],
+    [ "__fcntl_time64", "fcntl_8c.html#affd93c62f71f17e02d2df17152c51f34", null ],
     [ "__VERIFIER_nondet_int", "fcntl_8c.html#a04daf060736c4b84b8132b745409c7cf", null ],
     [ "_creat", "fcntl_8c.html#a2ee1cfa1f0caa2ab8868b0babaad0f58", null ],
     [ "_fcntl", "fcntl_8c.html#a7396d2845fde04b857dbf6ba5f89cb19", null ],
