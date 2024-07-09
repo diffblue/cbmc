@@ -1,0 +1,74 @@
+name: Codecov coverage report
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+env:
+  cvc5-version: "1.0.0"
+  linux-vcpus: 4
+  windows-vcpus: 4
+
+jobs:
+  # This job takes approximately 22 to 75 minutes
+  Linux:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Remove unnecessary software to free up disk space
+        run: |
+          # inspired by https://github.com/easimon/maximize-build-space/blob/master/action.yml
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/* /opt/*
+          df -h
+      - name: Download testing and coverage dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y g++ gcc gdb binutils flex bison cmake maven jq libxml2-utils openjdk-11-jdk-headless lcov ccache z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
+          chmod u+x cvc5
+          mv cvc5 /usr/local/bin
+          cvc5 --version
+      - name: Prepare ccache
+        uses: actions/cache@v4
+        with:
+          save-always: true
+          path: .ccache
+          key: ${{ runner.os }}-20.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-20.04-Coverage-${{ github.ref }}
+            ${{ runner.os }}-20.04-Coverage
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Configure CMake CBMC build with coverage instrumentation parameters
+        run: cmake -S . -Bbuild -Denable_coverage=1 -Dparallel_tests=${{env.linux-vcpus}} -DCMAKE_CXX_COMPILER=/usr/bin/g++
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=7G
+      - name: Execute CMake CBMC build
+        run: cmake --build build -- -j${{env.linux-vcpus}}
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run CTest and collect coverage statistics
+        run: |
+          echo "lcov_excl_line = UNREACHABLE" > ~/.lcovrc
+          cmake --build build --target coverage -- -j${{env.linux-vcpus}}
+      - name: Upload coverage statistics to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/html/coverage.info
+          fail_ci_if_error: true
+          verbose: true
