@@ -401,7 +401,7 @@ void goto_convertt::do_cpp_new(
   bool new_array = rhs.get(ID_statement) == ID_cpp_new_array;
 
   exprt count;
-  needs_destructiont new_vars;
+  clean_expr_resultt side_effects;
 
   if(new_array)
   {
@@ -409,7 +409,8 @@ void goto_convertt::do_cpp_new(
       static_cast<const exprt &>(rhs.find(ID_size)), object_size.type());
 
     // might have side-effect
-    new_vars.add(clean_expr(count, dest, ID_cpp));
+    side_effects.add(clean_expr(count, ID_cpp));
+    dest.destructive_append(side_effects.side_effects);
   }
 
   exprt tmp_symbol_expr;
@@ -495,9 +496,8 @@ void goto_convertt::do_cpp_new(
     typecast_exprt(tmp_symbol_expr, lhs.type()),
     rhs.find_source_location()));
 
-  new_vars.minimal_scope.push_front(
-    to_symbol_expr(tmp_symbol_expr).get_identifier());
-  destruct_locals(new_vars.minimal_scope, dest, ns);
+  side_effects.add_temporary(to_symbol_expr(tmp_symbol_expr).get_identifier());
+  destruct_locals(side_effects.temporaries, dest, ns);
 
   // grab initializer
   goto_programt tmp_initializer;

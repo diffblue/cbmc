@@ -43,15 +43,17 @@ void goto_convertt::do_function_call(
 
   exprt::operandst new_arguments = arguments;
 
-  needs_destructiont new_vars;
+  clean_expr_resultt side_effects;
 
   if(!new_lhs.is_nil())
-    new_vars.add(clean_expr(new_lhs, dest, mode));
+    side_effects.add(clean_expr(new_lhs, mode));
 
-  new_vars.add(clean_expr(new_function, dest, mode));
+  side_effects.add(clean_expr(new_function, mode));
 
   for(auto &new_argument : new_arguments)
-    new_vars.add(clean_expr(new_argument, dest, mode));
+    side_effects.add(clean_expr(new_argument, mode));
+
+  dest.destructive_append(side_effects.side_effects);
 
   // split on the function
 
@@ -83,7 +85,7 @@ void goto_convertt::do_function_call(
       function.find_source_location());
   }
 
-  destruct_locals(new_vars.minimal_scope, dest, ns);
+  destruct_locals(side_effects.temporaries, dest, ns);
 }
 
 void goto_convertt::do_function_call_if(
