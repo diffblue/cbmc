@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --smt2
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test case checks the handling of quantifiers in a nested loop's
+loop contracts.

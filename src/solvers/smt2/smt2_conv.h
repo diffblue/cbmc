@@ -242,13 +242,16 @@ protected:
   // keeps track of all non-Boolean symbols and their value
   struct identifiert
   {
+    // We do not currently read any of the following members, but might do so in
+    // future. At this time, we just care about (not) having an entry in
+    // `identifier_map`.
     bool is_bound;
     typet type;
     exprt value;
 
-    identifiert() : is_bound(false)
+    identifiert(typet type, bool is_bound)
+      : is_bound(is_bound), type(std::move(type))
     {
-      type.make_nil();
       value.make_nil();
     }
   };

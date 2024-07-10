@@ -4721,11 +4721,11 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         identifier_map.find(identifier) == identifier_map.end() &&
         equal_expr.lhs() != equal_expr.rhs())
       {
-        identifiert &id=identifier_map[identifier];
-        CHECK_RETURN(id.type.is_nil());
+        auto id_entry = identifier_map.insert(
+          {identifier, identifiert{equal_expr.lhs().type(), false}});
+        CHECK_RETURN(id_entry.second);
 
-        id.type=equal_expr.lhs().type();
-        find_symbols(id.type);
+        find_symbols(id_entry.first->second.type);
         exprt prepared_rhs = prepare_for_convert_expr(equal_expr.rhs());
 
         std::string smt2_identifier=convert_identifier(identifier);
@@ -4908,17 +4908,30 @@ void smt2_convt::find_symbols(const exprt &expr)
 
   if(expr.id() == ID_exists || expr.id() == ID_forall)
   {
+    std::unordered_map<irep_idt, std::optional<identifiert>> shadowed_syms;
+
     // do not declare the quantified symbol, but record
     // as 'bound symbol'
     const auto &q_expr = to_quantifier_expr(expr);
     for(const auto &symbol : q_expr.variables())
     {
       const auto identifier = symbol.get_identifier();
-      identifiert &id = identifier_map[identifier];
-      id.type = symbol.type();
-      id.is_bound = true;
+      auto id_entry =
+        identifier_map.insert({identifier, identifiert{symbol.type(), true}});
+      shadowed_syms.insert(
+        {identifier,
+         id_entry.second ? std::nullopt
+                         : std::optional{id_entry.first->second}});
     }
     find_symbols(q_expr.where());
+    for(const auto &[id, shadowed_val] : shadowed_syms)
+    {
+      auto previous_entry = identifier_map.find(id);
+      if(!shadowed_val.has_value())
+        identifier_map.erase(previous_entry);
+      else
+        previous_entry->second = std::move(*shadowed_val);
+    }
     return;
   }
 
@@ -4941,12 +4954,11 @@ void smt2_convt::find_symbols(const exprt &expr)
       identifier="nondet_"+
         id2string(to_nondet_symbol_expr(expr).get_identifier());
 
-    identifiert &id=identifier_map[identifier];
+    auto id_entry =
+      identifier_map.insert({identifier, identifiert{expr.type(), false}});
 
-    if(id.type.is_nil())
+    if(id_entry.second)
     {
-      id.type=expr.type();
-
       std::string smt2_identifier=convert_identifier(identifier);
       smt2_identifiers.insert(smt2_identifier);
 
