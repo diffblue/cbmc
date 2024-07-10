@@ -215,14 +215,15 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
     return *cached;
   }
 
-  auto const &cache_symbol = get_fresh_aux_symbol(
-    cache_key.type(),
-    "symex",
-    "dereference_cache",
-    dereference_result.source_location(),
-    language_mode,
-    ns,
-    state.symbol_table);
+  auto cache_symbol_expr = get_fresh_aux_symbol(
+                             cache_key.type(),
+                             "symex",
+                             "dereference_cache",
+                             dereference_result.source_location(),
+                             language_mode,
+                             ns,
+                             state.symbol_table)
+                             .symbol_expr();
 
   // we need to lift possible lets
   // (come from the value set to avoid repeating complex pointer comparisons)
@@ -237,7 +238,6 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
     symex_config,
     target};
 
-  auto cache_symbol_expr = cache_symbol.symbol_expr();
   assign.assign_symbol(
     to_ssa_expr(state.rename<L1>(cache_symbol_expr, ns).get()),
     expr_skeletont{},

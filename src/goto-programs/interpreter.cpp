@@ -607,7 +607,7 @@ exprt interpretert::get_value(
     {
       // We want the symbol pointed to
       mp_integer address = rhs[numeric_cast_v<std::size_t>(offset)];
-      const symbol_exprt &symbol_expr = address_to_symbol(address);
+      const symbol_exprt symbol_expr = address_to_symbol(address);
       mp_integer offset_from_address = address_to_offset(address);
 
       if(offset_from_address == 0)
@@ -751,7 +751,7 @@ void interpretert::execute_function_call()
 #if 0
   const memory_cellt &cell=memory[address];
 #endif
-  const irep_idt &identifier = address_to_symbol(address).get_identifier();
+  const irep_idt identifier = address_to_symbol(address).get_identifier();
   trace_step.called_function = identifier;
 
   const goto_functionst::function_mapt::const_iterator f_it=

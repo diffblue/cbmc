@@ -22,7 +22,11 @@ class symbolt;
 class symbol_table_baset;
 class typet;
 
-symbolt &get_fresh_aux_symbol(
+#if defined(__GNUC__) && __GNUC__ >= 14
+[[gnu::no_dangling]]
+#endif
+symbolt &
+get_fresh_aux_symbol(
   const typet &type,
   const std::string &name_prefix,
   const std::string &basename_prefix,
@@ -30,7 +34,11 @@ symbolt &get_fresh_aux_symbol(
   const irep_idt &symbol_mode,
   symbol_table_baset &symbol_table);
 
-symbolt &get_fresh_aux_symbol(
+#if defined(__GNUC__) && __GNUC__ >= 14
+[[gnu::no_dangling]]
+#endif
+symbolt &
+get_fresh_aux_symbol(
   const typet &type,
   const std::string &name_prefix,
   const std::string &basename_prefix,

@@ -32,8 +32,12 @@ typedef long long __gcc_v2di __attribute__ ((__vector_size__ (16)));
 typedef long long __gcc_v4di __attribute__ ((__vector_size__ (32)));
 typedef long long __gcc_v8di __attribute__ ((__vector_size__ (64)));
 typedef unsigned short __gcc_v32uhi __attribute__ ((__vector_size__ (64)));
+typedef unsigned int __gcc_v4usi __attribute__ ((__vector_size__ (16)));
+typedef unsigned int __gcc_v8usi __attribute__ ((__vector_size__ (32)));
 typedef unsigned int __gcc_v16usi  __attribute__ ((__vector_size__ (64)));
 typedef unsigned long long __gcc_di;
+typedef unsigned long long __gcc_v2udi __attribute__ ((__vector_size__ (16)));
+typedef unsigned long long __gcc_v4udi __attribute__ ((__vector_size__ (32)));
 typedef unsigned long long __gcc_v8udi __attribute__ ((__vector_size__ (64)));
 
 enum __gcc_atomic_memmodels {

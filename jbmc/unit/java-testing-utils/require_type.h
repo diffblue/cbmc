@@ -24,6 +24,9 @@ namespace require_type
 pointer_typet
 require_pointer(const typet &type, const std::optional<typet> &subtype);
 
+#if defined(__GNUC__) && __GNUC__ >= 14
+[[gnu::no_dangling]]
+#endif
 const struct_tag_typet &
 require_struct_tag(const typet &type, const irep_idt &identifier = "");
 

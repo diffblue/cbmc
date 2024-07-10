@@ -20,7 +20,11 @@ class symbolt;
 // NOLINTNEXTLINE(readability/namespace)
 namespace require_symbol
 {
-const symbolt &require_symbol_exists(
+#if defined(__GNUC__) && __GNUC__ >= 14
+[[gnu::no_dangling]]
+#endif
+const symbolt &
+require_symbol_exists(
   const symbol_tablet &symbol_table,
   const irep_idt &symbol_identifier);
 }

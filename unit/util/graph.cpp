@@ -70,7 +70,15 @@ static bool contains_hole(
       continue;
     }
 
+    // Work around spurious GCC 14 warning about __builtin_memmove accessing
+    // elements out-of-bounds
+#pragma GCC diagnostic push
+#ifndef __clang__
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#  pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
     std::vector<typename grapht<N>::node_indext> extended_cycle = cycle_so_far;
+#pragma GCC diagnostic pop
     extended_cycle.push_back(successor.first);
     if(contains_hole(g, extended_cycle))
       return true;
@@ -88,7 +96,7 @@ static bool contains_hole(const grapht<N> &g)
 
   for(typename grapht<N>::node_indext i = 0; i < g.size(); ++i)
   {
-    std::vector<typename grapht<N>::node_indext> start_node {i};
+    std::vector<typename grapht<N>::node_indext> start_node(1, i);
     if(contains_hole(g, start_node))
       return true;
   }

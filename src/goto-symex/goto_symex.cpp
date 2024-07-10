@@ -347,16 +347,18 @@ void goto_symext::associate_array_to_pointer(
   const function_application_exprt array_to_pointer_app{
     function_symbol.symbol_expr(), {new_char_array, string_data}};
 
-  const symbolt &return_symbol = get_fresh_aux_symbol(
-    to_mathematical_function_type(function_symbol.type).codomain(),
-    "",
-    "return_value",
-    source_locationt(),
-    function_symbol.mode,
-    ns,
-    state.symbol_table);
+  symbol_exprt return_symbol_expr =
+    get_fresh_aux_symbol(
+      to_mathematical_function_type(function_symbol.type).codomain(),
+      "",
+      "return_value",
+      source_locationt(),
+      function_symbol.mode,
+      ns,
+      state.symbol_table)
+      .symbol_expr();
 
-  const ssa_exprt ssa_expr(return_symbol.symbol_expr());
+  const ssa_exprt ssa_expr(return_symbol_expr);
 
   symex_assign.assign_symbol(
     ssa_expr, expr_skeletont{}, array_to_pointer_app, {});
