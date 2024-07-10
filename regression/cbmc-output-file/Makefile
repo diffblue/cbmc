@@ -10,8 +10,8 @@ tests.log:
 	@../test.pl -f -e -p -c '../chain.py ../../../src/cbmc/cbmc'
 
 clean:
+	$(RM) tests.log
 	@for dir in *; do \
-		$(RM) tests.log; \
 		if [ -d "$$dir" ]; then \
 			cd "$$dir"; \
 			$(RM) *.out *.gb; \

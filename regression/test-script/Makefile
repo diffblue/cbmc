@@ -17,8 +17,8 @@ tests.log:
 	@../test.pl -e -p -c ../program_runner.sh -K
 
 clean:
+	$(RM) tests.log
 	@for dir in *; do \
-		$(RM) tests.log; \
 		if [ -d "$$dir" ]; then \
 			cd "$$dir"; \
 			$(RM) *.out *.gb; \
