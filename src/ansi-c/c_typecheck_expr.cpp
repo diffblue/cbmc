@@ -43,6 +43,148 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
+/// Architecturally similar to \ref can_forward_propagatet, but specialized for
+/// what is an expression that can be fully evaluated at compile time within
+/// the limits of what the C standard permits. See 6.6 Constant expressions in
+/// C11.
+class is_compile_time_constantt
+{
+public:
+  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
+  {
+  }
+
+  /// returns true iff the expression can be considered constant
+  bool operator()(const exprt &e) const
+  {
+    return is_constant(e);
+  }
+
+protected:
+  const namespacet &ns;
+
+  /// This function determines what expressions are to be propagated as
+  /// "constants"
+  virtual bool is_constant(const exprt &e) const
+  {
+    // non-standard numeric constant
+    if(e.id() == ID_infinity)
+      return true;
+
+    // numeric, character, or pointer-typed constant
+    if(e.is_constant() || e.id() == ID_string_constant)
+      return true;
+
+    // possibly an address constant
+    if(e.id() == ID_address_of)
+    {
+      return is_constant_address_of(to_address_of_expr(e).object());
+    }
+    // we choose to accept the following expressions (over constant operands) as
+    // constant expressions
+    else if(
+      e.id() == ID_typecast || e.id() == ID_array_of || e.id() == ID_plus ||
+      e.id() == ID_mult || e.id() == ID_array || e.id() == ID_with ||
+      e.id() == ID_struct || e.id() == ID_union || e.id() == ID_empty_union ||
+      e.id() == ID_equal || e.id() == ID_notequal || e.id() == ID_lt ||
+      e.id() == ID_le || e.id() == ID_gt || e.id() == ID_ge ||
+      e.id() == ID_if || e.id() == ID_not || e.id() == ID_and ||
+      e.id() == ID_or || e.id() == ID_bitnot || e.id() == ID_bitand ||
+      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector)
+    {
+      return std::all_of(
+        e.operands().begin(), e.operands().end(), [this](const exprt &op) {
+          return is_constant(op);
+        });
+    }
+
+    return false;
+  }
+
+  /// this function determines which reference-typed expressions are constant
+  bool is_constant_address_of(const exprt &e) const
+  {
+    if(e.id() == ID_symbol)
+    {
+      return e.type().id() == ID_code ||
+             ns.lookup(to_symbol_expr(e).get_identifier()).is_static_lifetime;
+    }
+    else if(e.id() == ID_array && e.get_bool(ID_C_string_constant))
+      return true;
+    else if(e.id() == ID_label)
+      return true;
+    else if(e.id() == ID_index)
+    {
+      const index_exprt &index_expr = to_index_expr(e);
+
+      return is_constant_address_of(index_expr.array()) &&
+             is_constant(index_expr.index());
+    }
+    else if(e.id() == ID_member)
+    {
+      return is_constant_address_of(to_member_expr(e).compound());
+    }
+    else if(e.id() == ID_dereference)
+    {
+      const dereference_exprt &deref = to_dereference_expr(e);
+
+      return is_constant(deref.pointer());
+    }
+    else if(e.id() == ID_string_constant)
+      return true;
+
+    return false;
+  }
+};
+
+/// Clang appears to have a somewhat different idea of what is/isn't to be
+/// considered a constant at compile time.
+class clang_is_constant_foldedt : public is_compile_time_constantt
+{
+public:
+  explicit clang_is_constant_foldedt(const namespacet &ns)
+    : is_compile_time_constantt(ns)
+  {
+  }
+
+protected:
+  /// This function determines what expressions are constant folded by clang
+  bool is_constant(const exprt &e) const override
+  {
+    // we need to adhere to short-circuit semantics for the following
+    if(e.id() == ID_if)
+    {
+      const if_exprt &if_expr = to_if_expr(e);
+      if(!is_constant(if_expr.cond()))
+        return false;
+      exprt const_cond = simplify_expr(if_expr.cond(), ns);
+      CHECK_RETURN(const_cond.is_constant());
+      if(const_cond.is_true())
+        return is_constant(if_expr.true_case());
+      else
+        return is_constant(if_expr.false_case());
+    }
+    else if(e.id() == ID_and || e.id() == ID_or)
+    {
+      for(const auto &op : e.operands())
+      {
+        if(!is_constant(op))
+          return false;
+        exprt const_cond = simplify_expr(op, ns);
+        CHECK_RETURN(const_cond.is_constant());
+        // stop when we hit false (for an and) or true (for an or)
+        if(const_cond == make_boolean_expr(e.id() == ID_or))
+          break;
+      }
+      return true;
+    }
+    else if(e.id() == ID_address_of)
+      return false;
+    else
+      return is_compile_time_constantt::is_constant(e);
+  }
+};
+
 void c_typecheck_baset::typecheck_expr(exprt &expr)
 {
   if(expr.id()==ID_already_typechecked)
@@ -1661,24 +1803,32 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
           operands[1].type().id()!=ID_pointer)
     implicit_typecast(operands[1], operands[2].type());
 
+  auto compile_time_null_pointer = [](const exprt &e, const namespacet &ns) {
+    if(!is_compile_time_constantt(ns)(e))
+      return false;
+    auto s = simplify_expr(e, ns);
+    CHECK_RETURN(is_compile_time_constantt(ns)(s));
+    if(!s.is_constant())
+      return false;
+    return is_null_pointer(to_constant_expr(s));
+  };
+
   if(operands[1].type().id()==ID_pointer &&
      operands[2].type().id()==ID_pointer &&
      operands[1].type()!=operands[2].type())
   {
-    exprt tmp1=simplify_expr(operands[1], *this);
-    exprt tmp2=simplify_expr(operands[2], *this);
-
-    // is one of them void * AND null? Convert that to the other.
-    // (at least that's how GCC behaves)
+    // Is one of them void * AND null? Convert that to the other.
+    // (At least that's how GCC, Clang, and Visual Studio behave. Presence of
+    // symbols blocks them from simplifying the expression to NULL.)
     if(
       to_pointer_type(operands[1].type()).base_type().id() == ID_empty &&
-      tmp1.is_constant() && is_null_pointer(to_constant_expr(tmp1)))
+      compile_time_null_pointer(operands[1], *this))
     {
       implicit_typecast(operands[1], operands[2].type());
     }
     else if(
       to_pointer_type(operands[2].type()).base_type().id() == ID_empty &&
-      tmp2.is_constant() && is_null_pointer(to_constant_expr(tmp2)))
+      compile_time_null_pointer(operands[2], *this))
     {
       implicit_typecast(operands[2], operands[1].type());
     }
@@ -3634,8 +3784,11 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier=="__builtin_constant_p")
   {
-    // this is a gcc extension to tell whether the argument
-    // is known to be a compile-time constant
+    // This is a gcc/clang extension to tell whether the argument
+    // is known to be a compile-time constant. The behavior of these two
+    // compiler families, however, is quite different, which we need to take
+    // care of in the below config-dependent branches.
+
     if(expr.arguments().size()!=1)
     {
       error().source_location = f_op.source_location();
@@ -3643,30 +3796,35 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    // do not typecheck the argument - it is never evaluated, and thus side
-    // effects must not show up either
-
-    // try to produce constant
-    exprt tmp1=expr.arguments().front();
-    simplify(tmp1, *this);
-
-    bool is_constant=false;
-
-    // Need to do some special treatment for string literals,
-    // which are (void *)&("lit"[0])
-    if(
-      tmp1.id() == ID_typecast &&
-      to_typecast_expr(tmp1).op().id() == ID_address_of &&
-      to_address_of_expr(to_typecast_expr(tmp1).op()).object().id() ==
-        ID_index &&
-      to_index_expr(to_address_of_expr(to_typecast_expr(tmp1).op()).object())
-          .array()
-          .id() == ID_string_constant)
+    bool is_constant = false;
+    if(config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
     {
-      is_constant=true;
+      is_constant = clang_is_constant_foldedt(*this)(expr.arguments().front());
     }
     else
-      is_constant=tmp1.is_constant();
+    {
+      // try to produce constant
+      exprt tmp1 = expr.arguments().front();
+      simplify(tmp1, *this);
+
+      // Need to do some special treatment for string literals,
+      // which are (void *)&("lit"[0])
+      if(
+        tmp1.id() == ID_typecast &&
+        to_typecast_expr(tmp1).op().id() == ID_address_of &&
+        to_address_of_expr(to_typecast_expr(tmp1).op()).object().id() ==
+          ID_index &&
+        to_index_expr(to_address_of_expr(to_typecast_expr(tmp1).op()).object())
+            .array()
+            .id() == ID_string_constant)
+      {
+        is_constant = true;
+      }
+      else if(tmp1.id() == ID_string_constant)
+        is_constant = true;
+      else
+        is_constant = tmp1.is_constant();
+    }
 
     exprt tmp2=from_integer(is_constant, expr.type());
     tmp2.add_source_location()=source_location;
@@ -4613,94 +4771,6 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
   throw 0;
 }
-
-/// Architecturally similar to \ref can_forward_propagatet, but specialized for
-/// what is a constexpr, i.e., an expression that can be fully evaluated at
-/// compile time.
-class is_compile_time_constantt
-{
-public:
-  explicit is_compile_time_constantt(const namespacet &ns) : ns(ns)
-  {
-  }
-
-  /// returns true iff the expression can be considered constant
-  bool operator()(const exprt &e) const
-  {
-    return is_constant(e);
-  }
-
-protected:
-  const namespacet &ns;
-
-  /// This function determines what expressions are to be propagated as
-  /// "constants"
-  bool is_constant(const exprt &e) const
-  {
-    if(e.id() == ID_infinity)
-      return true;
-
-    if(e.is_constant())
-      return true;
-
-    if(e.id() == ID_address_of)
-    {
-      return is_constant_address_of(to_address_of_expr(e).object());
-    }
-    else if(
-      e.id() == ID_typecast || e.id() == ID_array_of || e.id() == ID_plus ||
-      e.id() == ID_mult || e.id() == ID_array || e.id() == ID_with ||
-      e.id() == ID_struct || e.id() == ID_union || e.id() == ID_empty_union ||
-      e.id() == ID_equal || e.id() == ID_notequal || e.id() == ID_lt ||
-      e.id() == ID_le || e.id() == ID_gt || e.id() == ID_ge ||
-      e.id() == ID_if || e.id() == ID_not || e.id() == ID_and ||
-      e.id() == ID_or || e.id() == ID_bitnot || e.id() == ID_bitand ||
-      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector)
-    {
-      return std::all_of(
-        e.operands().begin(), e.operands().end(), [this](const exprt &op) {
-          return is_constant(op);
-        });
-    }
-
-    return false;
-  }
-
-  /// this function determines which reference-typed expressions are constant
-  bool is_constant_address_of(const exprt &e) const
-  {
-    if(e.id() == ID_symbol)
-    {
-      return e.type().id() == ID_code ||
-             ns.lookup(to_symbol_expr(e).get_identifier()).is_static_lifetime;
-    }
-    else if(e.id() == ID_array && e.get_bool(ID_C_string_constant))
-      return true;
-    else if(e.id() == ID_label)
-      return true;
-    else if(e.id() == ID_index)
-    {
-      const index_exprt &index_expr = to_index_expr(e);
-
-      return is_constant_address_of(index_expr.array()) &&
-             is_constant(index_expr.index());
-    }
-    else if(e.id() == ID_member)
-    {
-      return is_constant_address_of(to_member_expr(e).compound());
-    }
-    else if(e.id() == ID_dereference)
-    {
-      const dereference_exprt &deref = to_dereference_expr(e);
-
-      return is_constant(deref.pointer());
-    }
-    else if(e.id() == ID_string_constant)
-      return true;
-
-    return false;
-  }
-};
 
 void c_typecheck_baset::make_constant(exprt &expr)
 {
