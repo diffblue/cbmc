@@ -1,6 +1,5 @@
 var NAVTREEINDEX129 =
 {
-"satabs.html#man_satabs-overview":[0,4,6,0,4],
 "satabs.html#man_satabs-tutorial-aeon":[0,4,6,0,8,1],
 "satabs.html#man_satabs-tutorial-driver":[0,4,6,0,8,0],
 "satabs.html#man_satabs-tutorials":[0,4,6,0,8],
@@ -249,5 +248,6 @@ var NAVTREEINDEX129 =
 "show__goto__functions__xml_8h.html":[9,0,2,16,106],
 "show__goto__functions__xml_8h_source.html":[9,0,2,16,106],
 "show__locations_8cpp.html":[9,0,2,15,90],
-"show__locations_8cpp.html#a17459870c4c70969b124c96770024dd4":[9,0,2,15,90,0]
+"show__locations_8cpp.html#a17459870c4c70969b124c96770024dd4":[9,0,2,15,90,0],
+"show__locations_8cpp.html#a523f2815702bcb74042d3af0d6770c49":[9,0,2,15,90,1]
 };
