@@ -9,8 +9,8 @@ var require__goto__statements_8h =
     [ "find_this_component_assignment", "require__goto__statements_8h.html#a9f8e972d5c5b198c5f3d10709d89b4fe", null ],
     [ "get_all_statements", "require__goto__statements_8h.html#a29d3167bd79f061c2649b35b753ad872", null ],
     [ "require_declaration_of_name", "require__goto__statements_8h.html#abd34360e599ba81eaf8b7092dcca6dc7", null ],
-    [ "require_entry_point_argument_assignment", "require__goto__statements_8h.html#a4940fd2a08c6ffc0073a38535da9bcf6", null ],
+    [ "require_entry_point_argument_assignment", "require__goto__statements_8h.html#a153dcd18fa7cd58170bf409a9476023b", null ],
     [ "require_entry_point_statements", "require__goto__statements_8h.html#a6a4b20cd665df89c50506f99b13cc0ad", null ],
     [ "require_struct_array_component_assignment", "require__goto__statements_8h.html#af3522fbc2ca02de91363c83241c8d51f", null ],
-    [ "require_struct_component_assignment", "require__goto__statements_8h.html#a1f54a0cfbdca18618c8275535894b36b", null ]
+    [ "require_struct_component_assignment", "require__goto__statements_8h.html#aa53f0af25c5d1994cd8b9aaa2ed8b361", null ]
 ];

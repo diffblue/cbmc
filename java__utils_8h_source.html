@@ -201,21 +201,25 @@ $(document).ready(function(){initNavTree('java__utils_8h_source.html',''); initR
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="keyword">extern</span> <span class="keyword">const</span> std::unordered_set&lt;std::string&gt; <a class="code" href="java__utils_8h.html#a2e5e95f3f68ae320b6e7dac6e38624c9">cprover_methods_to_ignore</a>;</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<a class="code" href="classsymbolt.html">symbolt</a> &amp;<a class="code" href="java__utils_8h.html#a49fc9008a1330e6329658847b547673b">fresh_java_symbol</a>(</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <span class="keyword">const</span> std::string &amp;basename_prefix,</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_name,</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;std::optional&lt;irep_idt&gt; <a class="code" href="java__utils_8h.html#a311344961a89d136fc69d8b53083e46c">declaring_class</a>(<span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="keywordtype">void</span> <a class="code" href="java__utils_8h.html#a5c20fc5d92ae7b166e1ae96b0b902424">set_declaring_class</a>(<a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol, <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<a class="code" href="java__utils_8h.html#a311344961a89d136fc69d8b53083e46c">declaring_class</a>);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="preprocessor">#if defined(__GNUC__) &amp;&amp; __GNUC__ &gt;= 14</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;[[gnu::no_dangling]]</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<a class="code" href="classsymbolt.html">symbolt</a> &amp;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<a class="code" href="java__utils_8h.html#a49fc9008a1330e6329658847b547673b">fresh_java_symbol</a>(</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  <span class="keyword">const</span> <a class="code" href="classtypet.html">typet</a> &amp;type,</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="keyword">const</span> std::string &amp;basename_prefix,</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="keyword">const</span> <a class="code" href="classsource__locationt.html">source_locationt</a> &amp;source_location,</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;function_name,</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  <a class="code" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;std::optional&lt;irep_idt&gt; <a class="code" href="java__utils_8h.html#a311344961a89d136fc69d8b53083e46c">declaring_class</a>(<span class="keyword">const</span> <a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol);</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;[[nodiscard]] std::optional&lt;std::string&gt;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<a class="code" href="java__utils_8h.html#ae18a8f330d49fbe452689b4c9f95a344">class_name_from_method_name</a>(<span class="keyword">const</span> std::string &amp;method_name);</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_JAVA_BYTECODE_JAVA_UTILS_H</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="keywordtype">void</span> <a class="code" href="java__utils_8h.html#a5c20fc5d92ae7b166e1ae96b0b902424">set_declaring_class</a>(<a class="code" href="classsymbolt.html">symbolt</a> &amp;symbol, <span class="keyword">const</span> <a class="code" href="classdstringt.html">irep_idt</a> &amp;<a class="code" href="java__utils_8h.html#a311344961a89d136fc69d8b53083e46c">declaring_class</a>);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;[[nodiscard]] std::optional&lt;std::string&gt;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<a class="code" href="java__utils_8h.html#ae18a8f330d49fbe452689b4c9f95a344">class_name_from_method_name</a>(<span class="keyword">const</span> std::string &amp;method_name);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// CPROVER_JAVA_BYTECODE_JAVA_UTILS_H</span></div>
 <div class="ttc" id="aclassdereference__exprt_html"><div class="ttname"><a href="classdereference__exprt.html">dereference_exprt</a></div><div class="ttdoc">Operator to dereference a pointer.</div><div class="ttdef"><b>Definition:</b> <a href="pointer__expr_8h_source.html#l00833">pointer_expr.h:834</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition:</b> <a href="dstring_8h_source.html#l00037">dstring.h:38</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
