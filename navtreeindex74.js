@@ -1,5 +1,6 @@
 var NAVTREEINDEX74 =
 {
+"cover__instrument__decision_8cpp.html":[9,0,2,15,25],
 "cover__instrument__decision_8cpp_source.html":[9,0,2,15,25],
 "cover__instrument__location_8cpp.html":[9,0,2,15,26],
 "cover__instrument__location_8cpp_source.html":[9,0,2,15,26],
@@ -248,6 +249,5 @@ var NAVTREEINDEX74 =
 "cpp__typecheck__conversions_8cpp_source.html":[9,0,2,5,56],
 "cpp__typecheck__declaration_8cpp.html":[9,0,2,5,57],
 "cpp__typecheck__declaration_8cpp_source.html":[9,0,2,5,57],
-"cpp__typecheck__destructor_8cpp.html":[9,0,2,5,58],
-"cpp__typecheck__destructor_8cpp_source.html":[9,0,2,5,58]
+"cpp__typecheck__destructor_8cpp.html":[9,0,2,5,58]
 };
