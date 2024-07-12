@@ -1,6 +1,5 @@
 var NAVTREEINDEX136 =
 {
-"string__dependencies_8h_source.html":[9,0,2,27,10,25],
 "string__expr_8h.html":[9,0,2,30,222],
 "string__expr_8h.html#a01efc714b08b4851e4899606ff085861":[9,0,2,30,222,8],
 "string__expr_8h.html#a0c9b4d45af5a17c09e1f602e7ee3f5b8":[9,0,2,30,222,12],
@@ -249,5 +248,6 @@ var NAVTREEINDEX136 =
 "struct_elf32___ehdr.html#a77f781adafe1821376691d2b76f30bcf":[8,0,416,3],
 "struct_elf32___ehdr.html#a87cf481be7917fafde0c4ecf78c8e574":[8,0,416,2],
 "struct_elf32___ehdr.html#aa27627bda53281221325df4dd782e800":[8,0,416,13],
-"struct_elf32___ehdr.html#ab53c709a841960e499da68e2316ed428":[8,0,416,8]
+"struct_elf32___ehdr.html#ab53c709a841960e499da68e2316ed428":[8,0,416,8],
+"struct_elf32___ehdr.html#ab8a982696048d807017919b7d0145482":[8,0,416,1]
 };
