@@ -1,4 +1,4 @@
-CORE smt-backend no-new-smt
+KNOWNBUG smt-backend no-new-smt
 smt_missing_range_check.c
 --no-malloc-may-fail --pointer-check -z3
 ^EXIT=10$
@@ -9,7 +9,10 @@ smt_missing_range_check.c
 --
 --
 Check that memory checks fail for pointer dereferences inside an existential
-qualifier, for out of bounds memory access, when using the smt backend and
+quantifier, for out of bounds memory access, when using the smt backend and
 the range of the index is unbound. Note that this test is not expected to work
 with the SAT backend at the time of writing, as the SAT backend does not support
-qualifiers in this form.
+quantifiers in this form.
+
+Neither Z3 nor CVC5 currently return complete models, and Bitwuzla does not
+complete in more than 5 minutes.

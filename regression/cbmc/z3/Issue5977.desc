@@ -3,7 +3,7 @@ Issue5977.c
 --z3
 ^EXIT=(6|10)$
 ^SIGNAL=0$
-^SMT2 solver returned "unknown"$
+^SMT2 solver returned ("unknown"|non-constant value for variable B\d+)$
 --
 --
 This tests that an "unknown" result from the SMT solver is reported.

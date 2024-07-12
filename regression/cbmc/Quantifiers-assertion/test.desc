@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE broken-z3-smt-backend no-new-smt
 main.c
 
 ^\*\* Results:$

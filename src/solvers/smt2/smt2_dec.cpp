@@ -236,22 +236,45 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
   {
     const std::string boolean_identifier =
       convert_identifier("B" + std::to_string(v));
-    boolean_assignment[v] = [&]() {
       const auto found_parsed_value =
         parsed_values.find(drop_quotes(boolean_identifier));
       if(found_parsed_value != parsed_values.end())
       {
-        return found_parsed_value->second.id() == ID_true;
+        const irept &value = found_parsed_value->second;
+
+        if(value.id() != ID_true && value.id() != ID_false)
+        {
+          messaget log{message_handler};
+          log.error() << "SMT2 solver returned non-constant value for variable "
+                      << boolean_identifier << messaget::eom;
+          return decision_proceduret::resultt::D_ERROR;
+        }
+        boolean_assignment[v] = value.id() == ID_true;
       }
-      // Work out the value based on what set_to was called with.
-      const auto found_set_value = set_values.find(boolean_identifier);
-      if(found_set_value != set_values.end())
-        return found_set_value->second;
-      // Old code used the computation
-      // const irept &value=values["B"+std::to_string(v)];
-      // boolean_assignment[v]=(value.id()==ID_true);
-      return parsed_values[boolean_identifier].id() == ID_true;
-    }();
+      else
+      {
+        // Work out the value based on what set_to was called with.
+        const auto found_set_value = set_values.find(boolean_identifier);
+        if(found_set_value != set_values.end())
+          boolean_assignment[v] = found_set_value->second;
+        else
+        {
+          // Old code used the computation
+          // const irept &value=values["B"+std::to_string(v)];
+          // boolean_assignment[v]=(value.id()==ID_true);
+          const irept &value = parsed_values[boolean_identifier];
+
+          if(value.id() != ID_true && value.id() != ID_false)
+          {
+            messaget log{message_handler};
+            log.error()
+              << "SMT2 solver returned non-Boolean value for variable "
+              << boolean_identifier << messaget::eom;
+            return decision_proceduret::resultt::D_ERROR;
+          }
+          boolean_assignment[v] = value.id() == ID_true;
+        }
+      }
   }
 
   return res;
