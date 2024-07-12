@@ -3337,17 +3337,27 @@ parameter_abstract_declarator:
         ;
 
 cprover_function_contract:
-          TOK_CPROVER_ENSURES '(' ACSL_binding_expression ')'
+          TOK_CPROVER_ENSURES
+        {
+          PARSER.new_scope("ensures::");
+        }
+          '(' ACSL_binding_expression ')'
         {
           $$=$1;
           set($$, ID_C_spec_ensures);
-          mto($$, $3);
+          mto($$, $4);
+          PARSER.pop_scope();
         }
-        | TOK_CPROVER_REQUIRES '(' ACSL_binding_expression ')'
+        | TOK_CPROVER_REQUIRES
+        {
+          PARSER.new_scope("requires::");
+        }
+          '(' ACSL_binding_expression ')'
         {
           $$=$1;
           set($$, ID_C_spec_requires);
-          mto($$, $3);
+          mto($$, $4);
+          PARSER.pop_scope();
         }
         | cprover_contract_assigns
         | cprover_contract_frees
