@@ -25,7 +25,7 @@ external environment (in a precondition), or returning it to the calling context
 
 `__CPROVER_is_fresh` takes two arguments: a pointer and an allocation size.
 The first argument is the pointer to be checked for "freshness" (i.e., not previously
-allocated), and the second is the expected size in bytes for the memory
+allocated), and the second is the expected size **in bytes** for the memory
 available at the pointer.
 
 #### Return Value

@@ -43,6 +43,7 @@ For a loop contract, the condition and target expressions in the assigns clause
 may involve any identifier that is in scope at loop entry
 (parameters of the surrounding function, local variables, global variables,
 type identifiers in `sizeof` or cast expressions, etc.).
+In case of nested loops, the assigns clause of the outer loop should contain all assigns targets of the inner loops.
 The target expression must be free of function calls and side-effects.
 The condition expression may contain calls to side-effect-free functions.
 

@@ -42,7 +42,34 @@ __CPROVER_assigns(*out)
 
 ## In Loop Contracts
 
-TODO: Document `__CPROVER_loop_entry` and `__CPROVER_loop_old`.
+### Syntax
+
+```c
+__CPROVER_loop_entry(*identifier*)
+```
+
+### Parameters
+`__CPROVER_loop_entry` takes a variable name that is in scope at the place of the loop contract.
+
+### Semantics
+`__CPROVER_loop_entry` takes a snapshot of the variable value right before the **first iteration** of the loop.
+
+### Example
+In this example the loop invariant asserts that `x <= 200` is upheld before and after every iteration of the `while` loop:
+```c
+void my_function()
+{
+  unsigned x = 200;
+  while( x >= 64 )
+  __CPROVER_loop_invariant(x <= __CPROVER_loop_entry(x)) //equivalent to x <= 200
+  {
+    ...
+    x -= 64;
+  }
+}
+```
+
+
 
 ## Additional Resources
 
