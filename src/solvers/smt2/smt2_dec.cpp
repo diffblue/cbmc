@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2irep.h"
 
+#include <filesystem>
+
 std::string smt2_dect::decision_procedure_text() const
 {
   // clang-format off
@@ -135,13 +137,14 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
     UNREACHABLE;
   }
 
-  int res =
-    run(argv[0], argv, stdin_filename, temp_file_stdout(), temp_file_stderr());
+  run(argv[0], argv, stdin_filename, temp_file_stdout(), temp_file_stderr());
 
-  if(res<0)
+  if(!std::filesystem::is_empty(temp_file_stderr()))
   {
     messaget log{message_handler};
-    log.error() << "error running SMT2 solver" << messaget::eom;
+    std::ifstream stderr_stream(temp_file_stderr());
+    log.error() << "error running SMT2 solver: " << stderr_stream.rdbuf()
+                << messaget::eom;
     return decision_proceduret::resultt::D_ERROR;
   }
 
