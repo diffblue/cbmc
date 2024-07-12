@@ -53,4 +53,11 @@ protected:
   resultt read_result(std::istream &in);
 };
 
+/// Determine whether \p exit_code is an expected exit code for \p solver, i.e.
+/// one that does not by itself indicate a failed solver invocation. A zero exit
+/// code is always expected; some solvers additionally use a specific non-zero
+/// exit code to signal that they emitted an (error ...) response on stdout
+/// (which is read back via read_result) while otherwise running successfully.
+bool smt2_solver_exit_code_expected(smt2_convt::solvert solver, int exit_code);
+
 #endif // CPROVER_SOLVERS_SMT2_SMT2_DEC_H

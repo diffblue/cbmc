@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "smt2irep.h"
 
 #include <fstream>
+#include <iterator>
 
 std::string smt2_dect::decision_procedure_text() const
 {
@@ -31,6 +32,47 @@ std::string smt2_dect::decision_procedure_text() const
      solver==solvert::Z3?"Z3":
      "(unknown)");
   // clang-format on
+}
+
+bool smt2_solver_exit_code_expected(smt2_convt::solvert solver, int exit_code)
+{
+  // A zero exit code always indicates a successful invocation.
+  if(exit_code == 0)
+    return true;
+
+  // Some solvers use a non-zero exit code to report that they emitted an
+  // (error ...) response while otherwise running successfully. Such errors are
+  // written to stdout and read back via read_result, so they do not indicate a
+  // failed invocation and must not be reported as one.
+  switch(solver)
+  {
+  case smt2_convt::solvert::CPROVER_SMT2:
+    // smt2_solver.cpp returns 20 when it emitted an (error ...) response.
+    return exit_code == 20;
+
+  case smt2_convt::solvert::Z3:
+    // z3 -smt2 returns 1 when it encountered at least one error while
+    // processing the commands: read_smtlib2_commands returns
+    // `parse_smt2_commands(...) ? 0 : 1`, and those errors are printed as
+    // (error ...) on stdout, analogous to CPROVER_SMT2's exit code 20.
+    // Genuine failures use distinct codes (e.g. 101 memout, 102 timeout, 110
+    // internal fatal). A missing z3 binary also yields exit code 1 via run()'s
+    // execvp failure, but that case is distinguished by its non-empty stderr.
+    return exit_code == 1;
+
+  case smt2_convt::solvert::BITWUZLA:
+  case smt2_convt::solvert::BOOLECTOR:
+  case smt2_convt::solvert::CVC3:
+  case smt2_convt::solvert::CVC4:
+  case smt2_convt::solvert::CVC5:
+  case smt2_convt::solvert::MATHSAT:
+  case smt2_convt::solvert::YICES:
+  case smt2_convt::solvert::GENERIC:
+    // No known benign non-zero exit code for these solvers.
+    return false;
+  }
+
+  UNREACHABLE;
 }
 
 decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
@@ -135,11 +177,33 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
   int res =
     run(argv[0], argv, stdin_filename, temp_file_stdout(), temp_file_stderr());
 
-  if(res<0)
+  // We report a problem when the exit code is unexpected for this solver, or
+  // when the solver produced any stderr output. The first catches a solver
+  // that failed while running; the second catches a solver that could not be
+  // invoked at all (e.g. a missing binary, which run() reports via a non-empty
+  // stderr -- see #8362). Benign solver-reported errors (e.g. get-value after
+  // an unsat result) instead appear as (error ...) on stdout and are handled
+  // by read_result, so they must not trigger a report here.
+  const bool solver_exit_expected = smt2_solver_exit_code_expected(solver, res);
+
+  std::ifstream stderr_stream(temp_file_stderr());
+  const std::string stderr_contents{
+    std::istreambuf_iterator<char>{stderr_stream},
+    std::istreambuf_iterator<char>{}};
+
+  if(!solver_exit_expected || !stderr_contents.empty())
   {
     messaget log{message_handler};
-    log.error() << "error running SMT2 solver" << messaget::eom;
-    return decision_proceduret::resultt::D_ERROR;
+    // An unexpected exit code means the solver could not be invoked or failed
+    // while running, which is reported as an error. An expected exit code with
+    // stderr output means the solver ran but emitted diagnostics, reported as
+    // a warning.
+    messaget::mstreamt &message =
+      solver_exit_expected ? log.warning() : log.error();
+    message << "SMT2 solver returned exit code " << res;
+    if(!stderr_contents.empty())
+      message << ": " << stderr_contents;
+    message << messaget::eom;
   }
 
   std::ifstream in(temp_file_stdout());

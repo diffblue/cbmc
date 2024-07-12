@@ -112,6 +112,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/sat/satcheck_cadical.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/smt2/smt2_conv.cpp \
+       solvers/smt2/smt2_dec.cpp \
        solvers/smt2/smt2irep.cpp \
        solvers/smt2/smt2_tokenizer.cpp \
        solvers/smt2_incremental/ast/smt_commands.cpp \
