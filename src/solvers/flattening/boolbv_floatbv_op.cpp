@@ -6,15 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
-#include <algorithm>
-
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/floatbv_expr.h>
 
 #include <solvers/floatbv/float_utils.h>
+
+#include "boolbv.h"
 
 bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
@@ -131,44 +129,66 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
         sub_width > 0 && width % sub_width == 0,
         "width of a complex subtype must be positive and evenly divide the "
         "width of the complex expression");
+      DATA_INVARIANT(
+        sub_width * 2 == width, "a complex type consists of exactly two parts");
 
-      std::size_t size=width/sub_width;
-      bvt result_bv;
-      result_bv.resize(width);
+      bvt lhs_real{lhs_as_bv.begin(), lhs_as_bv.begin() + sub_width};
+      bvt rhs_real{rhs_as_bv.begin(), rhs_as_bv.begin() + sub_width};
 
-      for(std::size_t i=0; i<size; i++)
+      bvt lhs_imag{lhs_as_bv.begin() + sub_width, lhs_as_bv.end()};
+      bvt rhs_imag{rhs_as_bv.begin() + sub_width, rhs_as_bv.end()};
+
+      bvt result_real, result_imag;
+
+      if(expr.id() == ID_floatbv_plus || expr.id() == ID_floatbv_minus)
       {
-        bvt lhs_sub_bv, rhs_sub_bv, sub_result_bv;
-
-        lhs_sub_bv.assign(
-          lhs_as_bv.begin() + i * sub_width,
-          lhs_as_bv.begin() + (i + 1) * sub_width);
-        rhs_sub_bv.assign(
-          rhs_as_bv.begin() + i * sub_width,
-          rhs_as_bv.begin() + (i + 1) * sub_width);
-
-        if(expr.id()==ID_floatbv_plus)
-          sub_result_bv = float_utils.add_sub(lhs_sub_bv, rhs_sub_bv, false);
-        else if(expr.id()==ID_floatbv_minus)
-          sub_result_bv = float_utils.add_sub(lhs_sub_bv, rhs_sub_bv, true);
-        else if(expr.id()==ID_floatbv_mult)
-          sub_result_bv = float_utils.mul(lhs_sub_bv, rhs_sub_bv);
-        else if(expr.id()==ID_floatbv_div)
-          sub_result_bv = float_utils.div(lhs_sub_bv, rhs_sub_bv);
-        else
-          UNREACHABLE;
-
-        INVARIANT(
-          sub_result_bv.size() == sub_width,
-          "we constructed a new complex of the right size");
-        INVARIANT(
-          i * sub_width + sub_width - 1 < result_bv.size(),
-          "the sub-bitvector fits into the result bitvector");
-        std::copy(
-          sub_result_bv.begin(),
-          sub_result_bv.end(),
-          result_bv.begin() + i * sub_width);
+        result_real = float_utils.add_sub(
+          lhs_real, rhs_real, expr.id() == ID_floatbv_minus);
+        result_imag = float_utils.add_sub(
+          lhs_imag, rhs_imag, expr.id() == ID_floatbv_minus);
       }
+      else if(expr.id() == ID_floatbv_mult)
+      {
+        // Could be optimised to just three multiplications with more additions
+        // instead, but then we'd have to worry about the impact of possible
+        // overflows. So we use the naive approach for now:
+        result_real = float_utils.add_sub(
+          float_utils.mul(lhs_real, rhs_real),
+          float_utils.mul(lhs_imag, rhs_imag),
+          true);
+        result_imag = float_utils.add_sub(
+          float_utils.mul(lhs_real, rhs_imag),
+          float_utils.mul(lhs_imag, rhs_real),
+          false);
+      }
+      else if(expr.id() == ID_floatbv_div)
+      {
+        bvt numerator_real = float_utils.add_sub(
+          float_utils.mul(lhs_real, rhs_real),
+          float_utils.mul(lhs_imag, rhs_imag),
+          false);
+        bvt numerator_imag = float_utils.add_sub(
+          float_utils.mul(lhs_imag, rhs_real),
+          float_utils.mul(lhs_real, rhs_imag),
+          true);
+
+        bvt denominator = float_utils.add_sub(
+          float_utils.mul(rhs_real, rhs_real),
+          float_utils.mul(rhs_imag, rhs_imag),
+          false);
+
+        result_real = float_utils.div(numerator_real, denominator);
+        result_imag = float_utils.div(numerator_imag, denominator);
+      }
+      else
+        UNREACHABLE;
+
+      bvt result_bv = std::move(result_real);
+      result_bv.reserve(width);
+      result_bv.insert(
+        result_bv.end(),
+        std::make_move_iterator(result_imag.begin()),
+        std::make_move_iterator(result_imag.end()));
 
       return result_bv;
     }

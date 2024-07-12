@@ -127,13 +127,10 @@ static void remove_complex(exprt &expr)
 
   if(expr.type().id()==ID_complex)
   {
-    if(expr.id()==ID_plus || expr.id()==ID_minus ||
-       expr.id()==ID_mult || expr.id()==ID_div)
+    if(expr.id() == ID_plus || expr.id() == ID_minus)
     {
-      // FIXME plus and mult are defined as n-ary operations
-      //      rather than binary. This code assumes that they
-      //      can only have exactly 2 operands, and it is not clear
-      //      that it is safe to do so in this context
+      // plus and mult are n-ary expressions, but front-ends currently ensure
+      // that we only see them as binary ones
       PRECONDITION(expr.operands().size() == 2);
       // do component-wise:
       // x+y -> complex(x.r+y.r,x.i+y.i)
@@ -152,6 +149,53 @@ static void remove_complex(exprt &expr)
       struct_expr.op1().add_source_location()=expr.source_location();
 
       expr=struct_expr;
+    }
+    else if(expr.id() == ID_mult)
+    {
+      // plus and mult are n-ary expressions, but front-ends currently ensure
+      // that we only see them as binary ones
+      PRECONDITION(expr.operands().size() == 2);
+      exprt lhs_real = complex_member(to_binary_expr(expr).op0(), ID_real);
+      exprt lhs_imag = complex_member(to_binary_expr(expr).op0(), ID_imag);
+      exprt rhs_real = complex_member(to_binary_expr(expr).op1(), ID_real);
+      exprt rhs_imag = complex_member(to_binary_expr(expr).op1(), ID_imag);
+
+      struct_exprt struct_expr{
+        {minus_exprt{
+           mult_exprt{lhs_real, rhs_real}, mult_exprt{lhs_imag, rhs_imag}},
+         plus_exprt{
+           mult_exprt{lhs_imag, rhs_real}, mult_exprt{lhs_real, rhs_imag}}},
+        expr.type()};
+
+      struct_expr.op0().add_source_location() = expr.source_location();
+      struct_expr.op1().add_source_location() = expr.source_location();
+
+      expr = struct_expr;
+    }
+    else if(expr.id() == ID_div)
+    {
+      exprt lhs_real = complex_member(to_binary_expr(expr).op0(), ID_real);
+      exprt lhs_imag = complex_member(to_binary_expr(expr).op0(), ID_imag);
+      exprt rhs_real = complex_member(to_binary_expr(expr).op1(), ID_real);
+      exprt rhs_imag = complex_member(to_binary_expr(expr).op1(), ID_imag);
+
+      plus_exprt numerator_real{
+        mult_exprt{lhs_real, rhs_real}, mult_exprt{lhs_imag, rhs_imag}};
+      minus_exprt numerator_imag{
+        mult_exprt{lhs_imag, rhs_real}, mult_exprt{lhs_real, rhs_imag}};
+
+      plus_exprt denominator{
+        mult_exprt{rhs_real, rhs_real}, mult_exprt{rhs_imag, rhs_imag}};
+
+      struct_exprt struct_expr{
+        {div_exprt{numerator_real, denominator},
+         div_exprt{numerator_imag, denominator}},
+        expr.type()};
+
+      struct_expr.op0().add_source_location() = expr.source_location();
+      struct_expr.op1().add_source_location() = expr.source_location();
+
+      expr = struct_expr;
     }
     else if(expr.id()==ID_unary_minus)
     {
