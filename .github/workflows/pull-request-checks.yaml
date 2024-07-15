@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ develop ]
 env:
-  cvc5-version: "1.0.0"
+  cvc5-version: "1.1.2"
   linux-vcpus: 4
   windows-vcpus: 4
 
@@ -29,9 +29,9 @@ jobs:
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-static.zip cvc5-Linux-static/bin/cvc5
+          rm cvc5-Linux-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -115,9 +115,9 @@ jobs:
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-static.zip cvc5-Linux-static/bin/cvc5
+          rm cvc5-Linux-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -225,9 +225,9 @@ jobs:
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-static.zip cvc5-Linux-static/bin/cvc5
+          rm cvc5-Linux-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -297,9 +297,9 @@ jobs:
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-static.zip cvc5-Linux-static/bin/cvc5
+          rm cvc5-Linux-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -363,9 +363,9 @@ jobs:
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-static.zip cvc5-Linux-static/bin/cvc5
+          rm cvc5-Linux-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -423,9 +423,9 @@ jobs:
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-static.zip cvc5-Linux-static/bin/cvc5
+          rm cvc5-Linux-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -470,9 +470,9 @@ jobs:
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-static.zip cvc5-Linux-static/bin/cvc5
+          rm cvc5-Linux-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -600,9 +600,9 @@ jobs:
         run: z3 --version
       - name: Download cvc5 binary and make sure it can be deployed
         run: |
-          curl -L https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS --output cvc5
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS-static.zip
+          unzip -j -d /usr/local/bin cvc5-macOS-static.zip cvc5-macOS-static/bin/cvc5
+          rm cvc5-macOS-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -652,9 +652,9 @@ jobs:
         run: z3 --version
       - name: Download cvc5 binary and make sure it can be deployed
         run: |
-          curl -L https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS --output cvc5
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS-static.zip
+          unzip -j -d /usr/local/bin cvc5-macOS-static.zip cvc5-macOS-static/bin/cvc5
+          rm cvc5-macOS-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
@@ -708,7 +708,9 @@ jobs:
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
           New-Item -ItemType directory "C:\tools\cvc5"
-          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe -OutFile c:\tools\cvc5\cvc5.exe
+          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64-static.zip -OutFile .\cvc5-Win64-static.zip
+          Expand-Archive -LiteralPath '.\cvc5-Win64-static.Zip'
+          Move-Item -Path .\cvc5-Win64-static\cvc5-Win64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
           echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
@@ -769,7 +771,9 @@ jobs:
           Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
           echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
           New-Item -ItemType directory "C:\tools\cvc5"
-          wget.exe -O c:\tools\cvc5\cvc5.exe https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64.exe
+          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64-static.zip -OutFile .\cvc5-Win64-static.zip
+          Expand-Archive -LiteralPath '.\cvc5-Win64-static.Zip'
+          Move-Item -Path .\cvc5-Win64-static\cvc5-Win64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
           echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
           New-Item -ItemType directory "C:\tools\parallel"
           wget.exe -O c:\tools\parallel\parallel https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel

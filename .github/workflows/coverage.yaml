@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ develop ]
 env:
-  cvc5-version: "1.0.0"
+  cvc5-version: "1.1.2"
   linux-vcpus: 4
   windows-vcpus: 4
 
@@ -36,9 +36,9 @@ jobs:
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
         run: |
-          wget -O cvc5 https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux
-          chmod u+x cvc5
-          mv cvc5 /usr/local/bin
+          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-static.zip cvc5-Linux-static/bin/cvc5
+          rm cvc5-Linux-static.zip
           cvc5 --version
       - name: Prepare ccache
         uses: actions/cache@v4
