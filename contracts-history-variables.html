@@ -98,8 +98,13 @@ $(document).ready(function(){initNavTree('contracts-history-variables.html','');
 <li class="level2"><a href="#autotoc_md96">Semantics</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md97">In Loop Contracts</a></li>
-<li class="level1"><a href="#autotoc_md98">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md97">In Loop Contracts</a><ul><li class="level2"><a href="#autotoc_md98">Syntax</a></li>
+<li class="level2"><a href="#autotoc_md99">Parameters</a></li>
+<li class="level2"><a href="#autotoc_md100">Semantics</a></li>
+<li class="level2"><a href="#autotoc_md101">Example</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#autotoc_md102">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p><a class="anchor" id="md__home_runner_work_cbmc_cbmc_src_goto_instrument_contracts_doc_user_contracts_history_variables"></a> Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
@@ -127,8 +132,29 @@ Semantics</h2>
 <div class="line">}</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md97"></a>
 In Loop Contracts</h1>
-<p>TODO: Document <code>__CPROVER_loop_entry</code> and <code>__CPROVER_loop_old</code>.</p>
-<h1><a class="anchor" id="autotoc_md98"></a>
+<h2><a class="anchor" id="autotoc_md98"></a>
+Syntax</h2>
+<div class="fragment"><div class="line"><a class="code" href="cprover__builtin__headers_8h.html#a18bd108f1896778e24fbb282fa99121a">__CPROVER_loop_entry</a>(*identifier*)</div>
+<div class="ttc" id="acprover__builtin__headers_8h_html_a18bd108f1896778e24fbb282fa99121a"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a18bd108f1896778e24fbb282fa99121a">__CPROVER_loop_entry</a></div><div class="ttdeci">void __CPROVER_loop_entry(const void *)</div></div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md99"></a>
+Parameters</h2>
+<p><code>__CPROVER_loop_entry</code> takes a variable name that is in scope at the place of the loop contract.</p>
+<h2><a class="anchor" id="autotoc_md100"></a>
+Semantics</h2>
+<p><code>__CPROVER_loop_entry</code> takes a snapshot of the variable value right before the <b>first iteration</b> of the loop.</p>
+<h2><a class="anchor" id="autotoc_md101"></a>
+Example</h2>
+<p>In this example the loop invariant asserts that <code>x &lt;= 200</code> is upheld before and after every iteration of the <code>while</code> loop: </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> my_function()</div>
+<div class="line">{</div>
+<div class="line">  <span class="keywordtype">unsigned</span> x = 200;</div>
+<div class="line">  <span class="keywordflow">while</span>( x &gt;= 64 )</div>
+<div class="line">  __CPROVER_loop_invariant(x &lt;= <a class="code" href="cprover__builtin__headers_8h.html#a18bd108f1896778e24fbb282fa99121a">__CPROVER_loop_entry</a>(x)) <span class="comment">//equivalent to x &lt;= 200</span></div>
+<div class="line">  {</div>
+<div class="line">    ...</div>
+<div class="line">    x -= 64;</div>
+<div class="line">  }</div>
+<div class="line">}</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md102"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>

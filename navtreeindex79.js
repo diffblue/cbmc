@@ -1,5 +1,12 @@
 var NAVTREEINDEX79 =
 {
+"expr__initializer_8h.html#a39479b71327daed2b75f241f49aa04c8":[9,0,2,30,47,3],
+"expr__initializer_8h.html#a7ec4ca8fccf225eb2fbdb71926cc519f":[9,0,2,30,47,2],
+"expr__initializer_8h.html#ae2e4eb1a8528ce884203c18e67ba1d50":[9,0,2,30,47,1],
+"expr__initializer_8h_source.html":[9,0,2,30,47],
+"expr__iterator_8h.html":[9,0,2,30,48],
+"expr__iterator_8h.html#addfbeeaadc665ad599c8ea568433f6c2":[9,0,2,30,48,5],
+"expr__iterator_8h_source.html":[9,0,2,30,48],
 "expr__query_8h.html":[9,0,3,0,2],
 "expr__query_8h.html#add4a1a8e5afb0e07d66e6df3edb0aa26":[9,0,3,0,2,1],
 "expr__query_8h_source.html":[9,0,3,0,2],
@@ -227,11 +234,11 @@ var NAVTREEINDEX79 =
 "flow__insensitive__analysis_8h.html":[9,0,2,0,28],
 "flow__insensitive__analysis_8h_source.html":[9,0,2,0,28],
 "folder-walkthrough.html":[0,4,10],
-"folder-walkthrough.html#autotoc_md184":[0],
-"folder-walkthrough.html#autotoc_md185":[1],
-"folder-walkthrough.html#autotoc_md186":[2],
-"folder-walkthrough.html#autotoc_md187":[3],
-"folder-walkthrough.html#autotoc_md188":[4],
+"folder-walkthrough.html#autotoc_md191":[0],
+"folder-walkthrough.html#autotoc_md192":[1],
+"folder-walkthrough.html#autotoc_md193":[2],
+"folder-walkthrough.html#autotoc_md194":[3],
+"folder-walkthrough.html#autotoc_md195":[4],
 "format_8h.html":[9,0,2,30,60],
 "format_8h.html#a61196a1705b48aa9e0b23cf0ffe32060":[9,0,2,30,60,2],
 "format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca":[9,0,2,30,60,1],
@@ -242,12 +249,5 @@ var NAVTREEINDEX79 =
 "format__constant_8h.html":[9,0,2,30,62],
 "format__constant_8h_source.html":[9,0,2,30,62],
 "format__expr_8cpp.html":[9,0,2,30,63],
-"format__expr_8cpp.html#a1c5639fbdd43a5a0a6eddf163effa1e9":[9,0,2,30,63,3],
-"format__expr_8cpp.html#a2fe54b2a560704112106d4b41e8cd39c":[9,0,2,30,63,5],
-"format__expr_8cpp.html#a5385186ffa3de952df0a9376480afecc":[9,0,2,30,63,9],
-"format__expr_8cpp.html#a6301f0c9ac6b61f103c2e000f49b7ca2":[9,0,2,30,63,8],
-"format__expr_8cpp.html#a7c107e44f5a8ef914457dd282537161f":[9,0,2,30,63,6],
-"format__expr_8cpp.html#a84065f9e07984618f5744cd0ca0bf671":[9,0,2,30,63,11],
-"format__expr_8cpp.html#a8986772751d28e7cd9135c2249f46338":[9,0,2,30,63,12],
-"format__expr_8cpp.html#aa807dadc3378c755d768715f2811a2b7":[9,0,2,30,63,2]
+"format__expr_8cpp.html#a1c5639fbdd43a5a0a6eddf163effa1e9":[9,0,2,30,63,3]
 };
