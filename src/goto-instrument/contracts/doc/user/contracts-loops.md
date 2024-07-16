@@ -5,16 +5,24 @@ Back to @ref contracts-user
 @tableofcontents
 
 CBMC offers support for loop contracts, which includes four basic clauses:
+- an _assigns_ clause for declaring the memory locations assignable by the loop,
 - an _invariant_ clause for establishing safety properties,
 - a _decreases_ clause for establishing termination,
-- an _assigns_ clause for declaring the memory locations assignable by the loop,
-- a _frees_ clause for declaring the pointers freeable by the loop.
 
-These clauses formally describe an abstraction of a loop for the purpose of a proof.
+**The three clauses need to be declared in this sequence to avoid errors. Each loop contract 
+should only have one assigns clause that contains all assigned targets.**
+Loop contracts are not used by default. To enable CBMC to check for loop contracts,
+add the `--apply-loop-contract` flag at the `goto-instrument` step.
+
+These clauses formally describe an abstraction of a loop for the purpose of an unbounded proof.
 CBMC also provides a series of built-in constructs
 to aid writing loop contracts (e.g., _history variables_ and _quantifiers_).
+CBMC will use the abstraction in place of the loop and prove the invariants of the loop only if 
+the loop contracts describes a sound and inductive abstraction of the loop.
 
-## Overview
+## Examples
+
+### Binary Search Unbounded Proof 
 
 Consider an implementation of the [binary search algorithm] below.
 
@@ -140,6 +148,50 @@ cbmc binary_search_inst.goto --pointer-check --bounds-check --signed-overflow-ch
 The first command compiles the program to a GOTO binary,
 next we instrument the loops using the annotated loop contracts,
 and finally we verify the instrumented GOTO binary with desired checks.
+
+### Array Wipe Unbounded Proof
+This example uses the __forall__ quantifiers hence requires solving with the  `--smt2` flag.
+```c
+void array_wipe(__CPROVER_size_t len, char * array)
+{  
+  __CPROVER_assume(array != NULL); // pre-condition
+
+  for (__CPROVER_size_t i = 0; i < len; i++)
+  __CPROVER_assigns(i, __CPROVER_object_upto(array, len))
+  __CPROVER_loop_invariant(i >= 0 && i <= len)
+  __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> array[j] == 0 } )
+  {
+      array[i] = 0; //set all array indices to 0
+  }
+
+  __CPROVER_assert(__CPROVER_forall { size_t j; (0 <= j && j < len) ==> array[j] == 0 }, "array is set to 0"); // post-condition
+}
+```
+
+### Caution With Nested Loop
+Due to the nature of @ref contracts-assigns, we need to be aware of the non-deterministic value of the assigned target.
+In the example below, 
+```c
+const unsigned table[256] = {1, 2, 3, ..., 256};
+
+void nested_loop_example() {
+        unsigned t = 0;
+        for( j=0; j<18; j++ )
+        __CPROVER_assigns(t, j, k) // t and k are also assigns targets of the outer loop as they are assigned in the inner loop
+        __CPROVER_loop_invariant(0 <= j && j <= 18 && t < 256) // without t < 256, the program state for the inductive step allows t to have arbitrary value
+        __CPROVER_decreases(18 - j)
+        {
+            for( k=0; k<48; k++ )
+            __CPROVER_assigns(t, k)
+            __CPROVER_loop_invariant(0 <= k && k <= 48 && t < 256)
+            __CPROVER_decreases(48 - k)
+            {
+                t = table[t];
+            }
+        }
+}
+```
+If `t < 256` is not included in the outer loop invariant, the inner loop invariant `t < 256` will immediately fail at loop entry because, in the inductive step of the outer loop, the assigns target `t` of the outer loop will be a non-deterministic value which can be greater than 256. With the predicate `t<256` in the outer loop's invariants will restrict `t` to be less than `256` in the proof of the inductive step of the outer loop.
 
 ## Additional Resources
 
