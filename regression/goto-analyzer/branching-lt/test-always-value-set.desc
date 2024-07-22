@@ -3,6 +3,6 @@ main-always.c
 --no-standard-checks --variable-sensitivity --vsd-values set-of-constants --show
 ^EXIT=0$
 ^SIGNAL=0$
-^main::1::i .* value-set-begin: 5 :value-set-end @ \[17\]
-^main::1::p .* value-set-begin: 0, 5, 10 :value-set-end @ \[3, 8, 14\]
+^main::1::i .* value-set-begin: 5 :value-set-end @ \[23\]
+^main::1::p .* value-set-begin: 0, 5, 10 :value-set-end @ \[3, 9, 18\]
 --

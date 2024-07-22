@@ -517,6 +517,10 @@ exprt simplify_object_size_expr(
   {
     return src.with_state(to_update_state_expr(src.state()).state());
   }
+  else if(src.state().id() == ID_exit_scope_state)
+  {
+    return src.with_state(to_exit_scope_state_expr(src.state()).state());
+  }
 
   return std::move(src);
 }

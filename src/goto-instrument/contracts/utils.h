@@ -43,9 +43,12 @@ public:
   {
   }
 
-  void clean(exprt &guard, goto_programt &dest, const irep_idt &mode)
+  [[nodiscard]] std::list<irep_idt>
+  clean(exprt &guard, goto_programt &dest, const irep_idt &mode)
   {
-    goto_convertt::clean_expr(guard, dest, mode, true);
+    auto clean_result = goto_convertt::clean_expr(guard, mode, true);
+    dest.destructive_append(clean_result.side_effects);
+    return clean_result.temporaries;
   }
 
   void do_havoc_slice(

@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/std_expr.h>
 
+#include "destructor.h"
+
 void goto_convertt::convert_function_call(
   const code_function_callt &function_call,
   goto_programt &dest,
@@ -41,13 +43,17 @@ void goto_convertt::do_function_call(
 
   exprt::operandst new_arguments = arguments;
 
-  if(!new_lhs.is_nil())
-    clean_expr(new_lhs, dest, mode);
+  clean_expr_resultt side_effects;
 
-  clean_expr(new_function, dest, mode);
+  if(!new_lhs.is_nil())
+    side_effects.add(clean_expr(new_lhs, mode));
+
+  side_effects.add(clean_expr(new_function, mode));
 
   for(auto &new_argument : new_arguments)
-    clean_expr(new_argument, dest, mode);
+    side_effects.add(clean_expr(new_argument, mode));
+
+  dest.destructive_append(side_effects.side_effects);
 
   // split on the function
 
@@ -78,6 +84,8 @@ void goto_convertt::do_function_call(
       new_function.id(),
       function.find_source_location());
   }
+
+  destruct_locals(side_effects.temporaries, dest, ns);
 }
 
 void goto_convertt::do_function_call_if(

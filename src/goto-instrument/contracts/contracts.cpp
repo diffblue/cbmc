@@ -581,13 +581,16 @@ static void generate_contract_constraints(
   goto_programt constraint;
   if(location.get_property_class() == ID_assume)
   {
-    converter.goto_convert(code_assumet(instantiated_clause), constraint, mode);
+    code_assumet assumption(instantiated_clause);
+    assumption.add_source_location() = location;
+    converter.goto_convert(assumption, constraint, mode);
   }
   else
   {
-    converter.goto_convert(code_assertt(instantiated_clause), constraint, mode);
+    code_assertt assertion(instantiated_clause);
+    assertion.add_source_location() = location;
+    converter.goto_convert(assertion, constraint, mode);
   }
-  constraint.instructions.back().source_location_nonconst() = location;
   is_fresh_update(constraint);
   throw_on_unsupported(constraint);
   program.destructive_append(constraint);

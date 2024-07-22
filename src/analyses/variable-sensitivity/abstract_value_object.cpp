@@ -438,7 +438,7 @@ private:
     }
 
     INVARIANT(
-      result.type() == expression.type(),
+      result.is_top() || result.type() == expression.type(),
       "Type of result interval should match expression type");
     return make_interval(result);
   }

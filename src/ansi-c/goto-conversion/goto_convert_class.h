@@ -56,6 +56,32 @@ protected:
   std::string tmp_symbol_prefix;
   lifetimet lifetime = lifetimet::STATIC_GLOBAL;
 
+  struct clean_expr_resultt
+  {
+    /// Identifiers of temporaries introduced while cleaning an expression. The
+    /// caller needs to add destructors for these (via `destruct_locals`) on all
+    /// control-flow paths as soon as the temporaries are no longer needed.
+    std::list<irep_idt> temporaries;
+    /// Statements implementing side effects of the expression that was subject
+    /// to cleaning. The caller needs to merge (typically via
+    /// `destructive_append`) these statements into the destination GOTO
+    /// program.
+    goto_programt side_effects;
+
+    clean_expr_resultt() = default;
+
+    void add(clean_expr_resultt &&other)
+    {
+      temporaries.splice(temporaries.begin(), other.temporaries);
+      side_effects.destructive_append(other.side_effects);
+    }
+
+    void add_temporary(const irep_idt &id)
+    {
+      temporaries.push_front(id);
+    }
+  };
+
   void goto_convert_rec(
     const codet &code,
     goto_programt &dest,
@@ -64,7 +90,7 @@ protected:
   //
   // tools for symbols
   //
-  symbolt &new_tmp_symbol(
+  [[nodiscard]] symbolt &new_tmp_symbol(
     const typet &type,
     const std::string &suffix,
     goto_programt &dest,
@@ -81,14 +107,11 @@ protected:
   // into the program logic
   //
 
-  void clean_expr(
-    exprt &expr,
-    goto_programt &dest,
-    const irep_idt &mode,
-    bool result_is_used = true);
+  [[nodiscard]] clean_expr_resultt
+  clean_expr(exprt &expr, const irep_idt &mode, bool result_is_used = true);
 
-  void
-  clean_expr_address_of(exprt &expr, goto_programt &dest, const irep_idt &mode);
+  [[nodiscard]] clean_expr_resultt
+  clean_expr_address_of(exprt &expr, const irep_idt &mode);
 
   static bool needs_cleaning(const exprt &expr);
 
@@ -101,7 +124,7 @@ protected:
     return lhs.id() != ID_symbol;
   }
 
-  void make_temp_symbol(
+  [[nodiscard]] irep_idt make_temp_symbol(
     exprt &expr,
     const std::string &suffix,
     goto_programt &,
@@ -109,57 +132,46 @@ protected:
 
   void rewrite_boolean(exprt &dest);
 
-  void remove_side_effect(
+  [[nodiscard]] clean_expr_resultt remove_side_effect(
     side_effect_exprt &expr,
-    goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used,
     bool address_taken);
-  void remove_assignment(
+  [[nodiscard]] clean_expr_resultt remove_assignment(
     side_effect_exprt &expr,
-    goto_programt &dest,
     bool result_is_used,
     bool address_taken,
     const irep_idt &mode);
-  void remove_pre(
+  [[nodiscard]] clean_expr_resultt remove_pre(
     side_effect_exprt &expr,
-    goto_programt &dest,
     bool result_is_used,
     bool address_taken,
     const irep_idt &mode);
-  void remove_post(
+  [[nodiscard]] clean_expr_resultt remove_post(
     side_effect_exprt &expr,
-    goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_function_call(
+  [[nodiscard]] clean_expr_resultt remove_function_call(
     side_effect_expr_function_callt &expr,
-    goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_cpp_new(
+  [[nodiscard]] clean_expr_resultt
+  remove_cpp_new(side_effect_exprt &expr, bool result_is_used);
+  [[nodiscard]] clean_expr_resultt remove_cpp_delete(side_effect_exprt &expr);
+  [[nodiscard]] clean_expr_resultt remove_malloc(
     side_effect_exprt &expr,
-    goto_programt &dest,
-    bool result_is_used);
-  void remove_cpp_delete(side_effect_exprt &expr, goto_programt &dest);
-  void remove_malloc(
-    side_effect_exprt &expr,
-    goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_temporary_object(side_effect_exprt &expr, goto_programt &dest);
-  void remove_statement_expression(
+  [[nodiscard]] clean_expr_resultt
+  remove_temporary_object(side_effect_exprt &expr);
+  [[nodiscard]] clean_expr_resultt remove_statement_expression(
     side_effect_exprt &expr,
-    goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
-  void remove_gcc_conditional_expression(
-    exprt &expr,
-    goto_programt &dest,
-    const irep_idt &mode);
-  void remove_overflow(
+  [[nodiscard]] clean_expr_resultt
+  remove_gcc_conditional_expression(exprt &expr, const irep_idt &mode);
+  [[nodiscard]] clean_expr_resultt remove_overflow(
     side_effect_expr_overflowt &expr,
-    goto_programt &dest,
     bool result_is_used,
     const irep_idt &mode);
 
