@@ -1,3 +1,30 @@
+# CBMC 6.1.0
+
+## What's Changed
+* Add support for building with GCC 14 by @tautschnig in https://github.com/diffblue/cbmc/pull/8368
+* Add documentation to loop contracts, __CPROVER_loop_entry by @QinyuanWu in https://github.com/diffblue/cbmc/pull/8377
+* [CONTRACTS] Check side effect of loop contracts during instrumentation by @qinheping in https://github.com/diffblue/cbmc/pull/8360
+* GOTO conversion: create temporaries with minimal scope by @tautschnig in https://github.com/diffblue/cbmc/pull/8363
+
+## Bug Fixes
+* [CONTRACTS] Use unified loop contract config by @qinheping in https://github.com/diffblue/cbmc/pull/8356
+* Replace expired key for signing the MSI Installer by @JohnLBergqvist in https://github.com/diffblue/cbmc/pull/8364
+* [CONTRACTS] Add loop-contract symbols into symbol table during typecheck by @qinheping in https://github.com/diffblue/cbmc/pull/8359
+* C library: __fcntl_time64 for Debian/ARM by @tautschnig in https://github.com/diffblue/cbmc/pull/8371
+* Bump Homebrew/git-user-config version to avoid deprecation warnings by @tautschnig in https://github.com/diffblue/cbmc/pull/8341
+* Refactor Codecov CI job by @tautschnig in https://github.com/diffblue/cbmc/pull/8339
+* Regression cleanup: don't repeatedly remove the same file by @tautschnig in https://github.com/diffblue/cbmc/pull/8369
+* Purge winbug from regression tests by @tautschnig in https://github.com/diffblue/cbmc/pull/7857
+* Make sure free symbols are declared in SMT2_conv after quantifier rewriting by @qinheping in https://github.com/diffblue/cbmc/pull/8361
+* Regression test: support big and little endian by @tautschnig in https://github.com/diffblue/cbmc/pull/8370
+* Fix multiplication and division of complex numbers by @tautschnig in https://github.com/diffblue/cbmc/pull/8376
+* Update Xen integration test Docker image by @tautschnig in https://github.com/diffblue/cbmc/pull/8381
+* SMT2 back-end: detect when solver returns unexpected model by @tautschnig in https://github.com/diffblue/cbmc/pull/8379
+* SMT2 back-end: Bitwuzla does not support lambda expressions by @tautschnig in https://github.com/diffblue/cbmc/pull/8387
+* C front-end: place requires and ensures in designated scope by @tautschnig in https://github.com/diffblue/cbmc/pull/8380
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.0.1...cbmc-6.1.0
+
 # CBMC 6.0.1
 
 ## Bug Fixes
