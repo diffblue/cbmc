@@ -251,6 +251,7 @@ var hierarchy =
       [ "solver_hardnesst", "structsolver__hardnesst.html", null ]
     ] ],
     [ "clauset", "classclauset.html", null ],
+    [ "goto_convertt::clean_expr_resultt", "structgoto__convertt_1_1clean__expr__resultt.html", null ],
     [ "escape_domaint::cleanupt", "structescape__domaint_1_1cleanupt.html", null ],
     [ "cmdlinet", "classcmdlinet.html", [
       [ "free_form_cmdlinet", "classfree__form__cmdlinet.html", null ],

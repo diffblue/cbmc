@@ -13,6 +13,7 @@ var dir_0ea4c3d6b179c025c29bf4f50d04840d =
     [ "goto_convert.h", "goto__convert_8h.html", "goto__convert_8h" ],
     [ "goto_convert_class.h", "goto__convert__class_8h.html", [
       [ "goto_convertt", "classgoto__convertt.html", "classgoto__convertt" ],
+      [ "clean_expr_resultt", "structgoto__convertt_1_1clean__expr__resultt.html", "structgoto__convertt_1_1clean__expr__resultt" ],
       [ "targetst", "structgoto__convertt_1_1targetst.html", "structgoto__convertt_1_1targetst" ],
       [ "break_continue_targetst", "structgoto__convertt_1_1break__continue__targetst.html", "structgoto__convertt_1_1break__continue__targetst" ],
       [ "break_switch_targetst", "structgoto__convertt_1_1break__switch__targetst.html", "structgoto__convertt_1_1break__switch__targetst" ],

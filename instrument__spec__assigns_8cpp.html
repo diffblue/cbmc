@@ -108,6 +108,7 @@ $(document).ready(function(){initNavTree('instrument__spec__assigns_8cpp.html','
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__expr_8h_source.html">ansi-c/c_expr.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="destructor_8h_source.html">ansi-c/goto-conversion/destructor.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="language__util_8h_source.html">langapi/language_util.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="cfg__info_8h_source.html">cfg_info.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="utils_8h_source.html">utils.h</a>&quot;</code><br />
@@ -116,7 +117,7 @@ $(document).ready(function(){initNavTree('instrument__spec__assigns_8cpp.html','
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="instrument__spec__assigns_8cpp__incl.svg" width="3446" height="798"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="instrument__spec__assigns_8cpp__incl.svg" width="3555" height="798"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -190,7 +191,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The same reference after mutation (i.e., adding the pragmas). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00084">84</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00085">85</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +220,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The same reference after mutation (i.e., adding the pragma). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00078">78</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00079">79</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -241,7 +242,7 @@ Variables</h2></td></tr>
 
 <p>Adds a pragma on a <a class="el" href="classsource__locationt.html">source_locationt</a> to disable inclusion checking. </p>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00072">72</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00073">73</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -264,7 +265,7 @@ Variables</h2></td></tr>
 <p>Adds a pragma on a source location disable all pointer checks. </p>
 <p>The disabled checks are: "pointer-check", "pointer-primitive-check", "pointer-overflow-check", "signed-overflow-check", </p>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00053">53</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00054">54</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -286,7 +287,7 @@ Variables</h2></td></tr>
 
 <p>Sets a pragma to mark assignments to static local variables that need to be propagated upwards in the search. </p>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00044">44</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00045">45</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +345,7 @@ Variables</h2></td></tr>
 
 <p>Creates a fresh symbolt with given suffix, scoped to the function of <code>location</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00455">455</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00459">459</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -366,7 +367,7 @@ Variables</h2></td></tr>
 
 <p>Returns true iff the target instruction is tagged with a 'CONTRACT_PRAGMA_DISABLE_ASSIGNS_CHECK' pragma. </p>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00065">65</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00066">66</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -386,7 +387,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00038">38</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00039">39</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -407,7 +408,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p>A local pragma used to keep track and skip already instrumented instructions. </p>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00050">50</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00051">51</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -433,7 +434,7 @@ Variables</h2></td></tr>
 
 <p>header for log messages </p>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00032">32</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00033">33</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +462,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p>Pragma used to mark assignments to static locals that need to be propagated. </p>
 
-<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00035">35</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="instrument__spec__assigns_8cpp_source.html#l00036">36</a> of file <a class="el" href="instrument__spec__assigns_8cpp_source.html">instrument_spec_assigns.cpp</a>.</p>
 
 </div>
 </div>
