@@ -767,7 +767,10 @@ void call(fptr_t fptr) {
 <h2>Code contracts:</h2>
 <dl>
 <dt><strong>--apply-loop-contracts</strong></dt>
-<dd><p>check and use loop contracts when provided</p>
+<dd>
+</dd>
+<dt><strong>-disable-loop-contracts-side-effect-check</strong></dt>
+<dd><p>UNSOUND OPTION. Disable checking the absence of side effects in loop contract clauses. In absence of such checking, loop contracts clauses will accept more expressions, such as pure functions and statement expressions. But user have to make sure the loop contracts are side-effect free by them self to get a sound result.</p>
 </dd>
 <dt><strong>-loop-contracts-no-unwind</strong></dt>
 <dd><p>do not unwind transformed loops</p>

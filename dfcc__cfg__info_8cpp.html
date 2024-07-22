@@ -130,23 +130,14 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a6e3fdf15618ceb3a7ba01823230395f8"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a6e3fdf15618ceb3a7ba01823230395f8">get_assigns</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;latch_target)</td></tr>
-<tr class="memdesc:a6e3fdf15618ceb3a7ba01823230395f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the assigns clause expression from the latch condition.  <a href="dfcc__cfg__info_8cpp.html#a6e3fdf15618ceb3a7ba01823230395f8">More...</a><br /></td></tr>
-<tr class="separator:a6e3fdf15618ceb3a7ba01823230395f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7aa448af19702d918ab822f16a315ccb"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a7aa448af19702d918ab822f16a315ccb">get_invariants</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;latch_target)</td></tr>
-<tr class="memdesc:a7aa448af19702d918ab822f16a315ccb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the invariant clause expression from the latch condition.  <a href="dfcc__cfg__info_8cpp.html#a7aa448af19702d918ab822f16a315ccb">More...</a><br /></td></tr>
-<tr class="separator:a7aa448af19702d918ab822f16a315ccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56695d572879e91d7dca818b87bd4478"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a56695d572879e91d7dca818b87bd4478">get_decreases</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;latch_target)</td></tr>
-<tr class="memdesc:a56695d572879e91d7dca818b87bd4478"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the decreases clause expression from the latch condition.  <a href="dfcc__cfg__info_8cpp.html#a56695d572879e91d7dca818b87bd4478">More...</a><br /></td></tr>
-<tr class="separator:a56695d572879e91d7dca818b87bd4478"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8594e099901cd36abd1e95c852153b71"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a8594e099901cd36abd1e95c852153b71">has_contract</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;latch_target)</td></tr>
-<tr class="memdesc:a8594e099901cd36abd1e95c852153b71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff some contract clause expression is attached to the latch condition of this loop.  <a href="dfcc__cfg__info_8cpp.html#a8594e099901cd36abd1e95c852153b71">More...</a><br /></td></tr>
-<tr class="separator:a8594e099901cd36abd1e95c852153b71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d7279622d3d52dfd420623999f5c0c0"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a1d7279622d3d52dfd420623999f5c0c0">check_has_contract_rec</a> (const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph, const std::size_t loop_idx, const bool must_have_contract)</td></tr>
-<tr class="separator:a1d7279622d3d52dfd420623999f5c0c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7903d310b5aa6d8e98b0c1abda3db00"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#ab7903d310b5aa6d8e98b0c1abda3db00">check_inner_loops_have_contracts</a> (const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph)</td></tr>
-<tr class="memdesc:ab7903d310b5aa6d8e98b0c1abda3db00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Traverses the loop nesting graph from top level loops and checks if all loops nested in loops that have contracts also have contracts.  <a href="dfcc__cfg__info_8cpp.html#ab7903d310b5aa6d8e98b0c1abda3db00">More...</a><br /></td></tr>
-<tr class="separator:ab7903d310b5aa6d8e98b0c1abda3db00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e3943ae13b1de2bb10d2cc608a27061"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a3e3943ae13b1de2bb10d2cc608a27061">has_contract</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;latch_target, const bool check_side_effect)</td></tr>
+<tr class="memdesc:a3e3943ae13b1de2bb10d2cc608a27061"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff some contract clause expression is attached to the latch condition of this loop.  <a href="dfcc__cfg__info_8cpp.html#a3e3943ae13b1de2bb10d2cc608a27061">More...</a><br /></td></tr>
+<tr class="separator:a3e3943ae13b1de2bb10d2cc608a27061"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab356763ed4e479e9b98f5a5f34a1a944"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#ab356763ed4e479e9b98f5a5f34a1a944">check_has_contract_rec</a> (const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph, const std::size_t loop_idx, const bool must_have_contract, const bool check_side_effect)</td></tr>
+<tr class="separator:ab356763ed4e479e9b98f5a5f34a1a944"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b399ff97b508fe5e3893c84ab136a3c"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a2b399ff97b508fe5e3893c84ab136a3c">check_inner_loops_have_contracts</a> (const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph, const bool check_side_effect)</td></tr>
+<tr class="memdesc:a2b399ff97b508fe5e3893c84ab136a3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Traverses the loop nesting graph from top level loops and checks if all loops nested in loops that have contracts also have contracts.  <a href="dfcc__cfg__info_8cpp.html#a2b399ff97b508fe5e3893c84ab136a3c">More...</a><br /></td></tr>
+<tr class="separator:a2b399ff97b508fe5e3893c84ab136a3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49b41f868b8aa1491017595ca177b28e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a49b41f868b8aa1491017595ca177b28e">tag_loop_instructions</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph)</td></tr>
 <tr class="memdesc:a49b41f868b8aa1491017595ca177b28e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tags instructions of loops found in <code>loop_nesting_graph</code> with the loop identifier of the innermost loop it belongs to, and the loop instruction type : head, body, exiting or latch.  <a href="dfcc__cfg__info_8cpp.html#a49b41f868b8aa1491017595ca177b28e">More...</a><br /></td></tr>
 <tr class="separator:a49b41f868b8aa1491017595ca177b28e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,18 +149,18 @@ Functions</h2></td></tr>
 <tr class="memitem:a8590c82b7b9bf53ddfa93a02e7b621e5"><td class="memItemLeft" align="right" valign="top">static std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a8590c82b7b9bf53ddfa93a02e7b621e5">gen_tracked_set</a> (const std::vector&lt; std::size_t &gt; &amp;inner_loops_ids, const std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;locals, <a class="el" href="classdirtyt.html">dirtyt</a> &amp;dirty, const std::map&lt; std::size_t, <a class="el" href="classdfcc__loop__infot.html">dfcc_loop_infot</a> &gt; &amp;loop_info_map)</td></tr>
 <tr class="memdesc:a8590c82b7b9bf53ddfa93a02e7b621e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute subset of locals that must be tracked in the loop's write set.  <a href="dfcc__cfg__info_8cpp.html#a8590c82b7b9bf53ddfa93a02e7b621e5">More...</a><br /></td></tr>
 <tr class="separator:a8590c82b7b9bf53ddfa93a02e7b621e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99f012848c7a4db34c05b81f82c3b0b2"><td class="memItemLeft" align="right" valign="top">static struct <a class="el" href="structcontract__clausest.html">contract_clausest</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a99f012848c7a4db34c05b81f82c3b0b2">default_loop_contract_clauses</a> (const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph, const std::size_t loop_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;local_may_alias, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:a99f012848c7a4db34c05b81f82c3b0b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate defaults for all contract clauses of the loop with ID <code>loop_id</code> if at least one type of clause is defined.  <a href="dfcc__cfg__info_8cpp.html#a99f012848c7a4db34c05b81f82c3b0b2">More...</a><br /></td></tr>
-<tr class="separator:a99f012848c7a4db34c05b81f82c3b0b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc4c87431dbc60f5c0ccbf621a5b537d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classdfcc__loop__infot.html">dfcc_loop_infot</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#acc4c87431dbc60f5c0ccbf621a5b537d">gen_dfcc_loop_info</a> (const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph, const std::size_t loop_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const std::map&lt; std::size_t, <a class="el" href="classdfcc__loop__infot.html">dfcc_loop_infot</a> &gt; &amp;loop_info_map, <a class="el" href="classdirtyt.html">dirtyt</a> &amp;dirty, <a class="el" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;local_may_alias, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, <a class="el" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;library, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
-<tr class="separator:acc4c87431dbc60f5c0ccbf621a5b537d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d4ed373dcb4b286ba74fc561175194a"><td class="memItemLeft" align="right" valign="top">static struct <a class="el" href="structcontract__clausest.html">contract_clausest</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a2d4ed373dcb4b286ba74fc561175194a">default_loop_contract_clauses</a> (const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph, const std::size_t loop_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;local_may_alias, const bool check_side_effect, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a2d4ed373dcb4b286ba74fc561175194a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate defaults for all contract clauses of the loop with ID <code>loop_id</code> if at least one type of clause is defined.  <a href="dfcc__cfg__info_8cpp.html#a2d4ed373dcb4b286ba74fc561175194a">More...</a><br /></td></tr>
+<tr class="separator:a2d4ed373dcb4b286ba74fc561175194a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57fe35c339568253ae3a8554d77c5793"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classdfcc__loop__infot.html">dfcc_loop_infot</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a57fe35c339568253ae3a8554d77c5793">gen_dfcc_loop_info</a> (const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;loop_nesting_graph, const std::size_t loop_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const std::map&lt; std::size_t, <a class="el" href="classdfcc__loop__infot.html">dfcc_loop_infot</a> &gt; &amp;loop_info_map, <a class="el" href="classdirtyt.html">dirtyt</a> &amp;dirty, <a class="el" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;local_may_alias, const bool check_side_effect, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, <a class="el" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;library, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
+<tr class="separator:a57fe35c339568253ae3a8554d77c5793"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a543b07008907c0cea0f320c3862656aa"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__cfg__info_8cpp.html#a543b07008907c0cea0f320c3862656aa">must_check_lhs_from_local_and_tracked</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;lhs, const std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;local, const std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;tracked)</td></tr>
 <tr class="memdesc:a543b07008907c0cea0f320c3862656aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the lhs to an assignment must be checked against its write set.  <a href="dfcc__cfg__info_8cpp.html#a543b07008907c0cea0f320c3862656aa">More...</a><br /></td></tr>
 <tr class="separator:a543b07008907c0cea0f320c3862656aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a1d7279622d3d52dfd420623999f5c0c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d7279622d3d52dfd420623999f5c0c0">&#9670;&nbsp;</a></span>check_has_contract_rec()</h2>
+<a id="ab356763ed4e479e9b98f5a5f34a1a944"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab356763ed4e479e9b98f5a5f34a1a944">&#9670;&nbsp;</a></span>check_has_contract_rec()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -193,7 +184,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>must_have_contract</em>&#160;</td>
+          <td class="paramname"><em>must_have_contract</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -208,12 +205,12 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00155">155</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00130">130</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
-<a id="ab7903d310b5aa6d8e98b0c1abda3db00"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab7903d310b5aa6d8e98b0c1abda3db00">&#9670;&nbsp;</a></span>check_inner_loops_have_contracts()</h2>
+<a id="a2b399ff97b508fe5e3893c84ab136a3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b399ff97b508fe5e3893c84ab136a3c">&#9670;&nbsp;</a></span>check_inner_loops_have_contracts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -225,8 +222,18 @@ Functions</h2></td></tr>
           <td class="memname">static std::optional&lt;<a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&gt; check_inner_loops_have_contracts </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="dfcc__loop__nesting__graph_8h.html#ab94d6337ec6dcbe3fa7c61ae54045ca2">dfcc_loop_nesting_grapht</a> &amp;&#160;</td>
-          <td class="paramname"><em>loop_nesting_graph</em></td><td>)</td>
+          <td class="paramname"><em>loop_nesting_graph</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -239,12 +246,12 @@ Functions</h2></td></tr>
 <p>Traverses the loop nesting graph from top level loops and checks if all loops nested in loops that have contracts also have contracts. </p>
 <p>Return the head of the first offending loop if it exists, nothing otherwise. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00177">177</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00156">156</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a99f012848c7a4db34c05b81f82c3b0b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a99f012848c7a4db34c05b81f82c3b0b2">&#9670;&nbsp;</a></span>default_loop_contract_clauses()</h2>
+<a id="a2d4ed373dcb4b286ba74fc561175194a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d4ed373dcb4b286ba74fc561175194a">&#9670;&nbsp;</a></span>default_loop_contract_clauses()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -279,6 +286,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
           <td class="paramname"><em>message_handler</em>, </td>
         </tr>
@@ -303,12 +316,12 @@ Functions</h2></td></tr>
 
 <p>Generate defaults for all contract clauses of the loop with ID <code>loop_id</code> if at least one type of clause is defined. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00308">308</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00289">289</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
-<a id="acc4c87431dbc60f5c0ccbf621a5b537d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc4c87431dbc60f5c0ccbf621a5b537d">&#9670;&nbsp;</a></span>gen_dfcc_loop_info()</h2>
+<a id="a57fe35c339568253ae3a8554d77c5793"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57fe35c339568253ae3a8554d77c5793">&#9670;&nbsp;</a></span>gen_dfcc_loop_info()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -355,6 +368,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
           <td class="paramname"><em>message_handler</em>, </td>
         </tr>
@@ -383,7 +402,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00431">431</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00415">415</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -423,7 +442,7 @@ Functions</h2></td></tr>
 
 <p>Collect identifiers that are local to this loop only (excluding nested loop). </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00277">277</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00258">258</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -476,102 +495,12 @@ Functions</h2></td></tr>
 <p>Compute subset of locals that must be tracked in the loop's write set. </p>
 <p>A local must be tracked if it is dirty or if it may be assigned by one of the inner loops. To understand why, just consider what would happen in this situation: The loop-local must be declared in the assigns clause of the inner loop otherwise assigns clause checking for the inner loop would fail (from the point of view of the inner loop, that variable is non-local). Since write sets inclusion checks are performed between a loop and its immediately inner loops, if a loop-local variable that's dirty or that is assigned by an inner loop is not tracked in the loop's write set the inclusion check between the loop write set and inner loop would fail, because the inner loop contains a location that cannot be found in the outer loop's write set. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00308">308</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00289">289</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a6e3fdf15618ceb3a7ba01823230395f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e3fdf15618ceb3a7ba01823230395f8">&#9670;&nbsp;</a></span>get_assigns()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>&amp; get_assigns </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>latch_target</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Extracts the assigns clause expression from the latch condition. </p>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00034">34</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a56695d572879e91d7dca818b87bd4478"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56695d572879e91d7dca818b87bd4478">&#9670;&nbsp;</a></span>get_decreases()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>&amp; get_decreases </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>latch_target</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Extracts the decreases clause expression from the latch condition. </p>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00052">52</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a7aa448af19702d918ab822f16a315ccb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7aa448af19702d918ab822f16a315ccb">&#9670;&nbsp;</a></span>get_invariants()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a>&amp; get_invariants </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>latch_target</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Extracts the invariant clause expression from the latch condition. </p>
-
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00043">43</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a8594e099901cd36abd1e95c852153b71"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8594e099901cd36abd1e95c852153b71">&#9670;&nbsp;</a></span>has_contract()</h2>
+<a id="a3e3943ae13b1de2bb10d2cc608a27061"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e3943ae13b1de2bb10d2cc608a27061">&#9670;&nbsp;</a></span>has_contract()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -583,8 +512,18 @@ Functions</h2></td></tr>
           <td class="memname">static bool has_contract </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
-          <td class="paramname"><em>latch_target</em></td><td>)</td>
+          <td class="paramname"><em>latch_target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -596,7 +535,7 @@ Functions</h2></td></tr>
 
 <p>Returns true iff some contract clause expression is attached to the latch condition of this loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00061">61</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00034">34</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -640,7 +579,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00246">246</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00227">227</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -687,7 +626,7 @@ Functions</h2></td></tr>
 <p>Returns true if the lhs to an assignment must be checked against its write set. </p>
 <p>The set of locally declared identifiers and the subset of that that are tracked explicitly in the write set are used to make the decision. See comments inside the function for explanations. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00764">764</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00752">752</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -727,7 +666,7 @@ Functions</h2></td></tr>
 
 <p>Tags instructions of loops found in <code>loop_nesting_graph</code> with the loop identifier of the innermost loop it belongs to, and the loop instruction type : head, body, exiting or latch. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00195">195</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00176">176</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>

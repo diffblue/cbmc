@@ -103,50 +103,62 @@ $(document).ready(function(){initNavTree('instrument__given__invariants_8cpp_sou
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="instrument__given__invariants_8h.html">instrument_given_invariants.h</a>&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="goto__model_8h.html">goto-programs/goto_model.h</a>&gt;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="expr__util_8h.html">util/expr_util.h</a>&gt;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">   16</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a>(goto_functionst::function_mapt::value_type &amp;f)</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;{</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">auto</span> &amp;body = f.second.body;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = body.instructions.begin(); it != body.instructions.end(); it++)</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  {</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="comment">// annotated invariants -- these are stuck to the condition</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="comment">// of the (backwards) goto</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_backwards_goto())</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;invariants = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        it-&gt;condition().find(ID_C_spec_loop_invariant));</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;invariant : invariants.operands())</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      {</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keyword">auto</span> source_location = invariant.<a class="code" href="classexprt.html#a6886a3ce6164e88129c3c969de596893">source_location</a>(); <span class="comment">// copy</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        source_location.<a class="code" href="classsource__locationt.html#a5f616b9345f345e4792ae6de077e33cd">set_property_class</a>(<span class="stringliteral">&quot;invariant&quot;</span>);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        source_location.set_comment(<span class="stringliteral">&quot;loop invariant&quot;</span>);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <span class="keyword">auto</span> assertion =</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;          <a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(invariant, source_location);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        body.insert_before_swap(it-&gt;get_target(), assertion);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      }</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  }</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="instrument__given__invariants_8cpp.html#a98afcef9a151292bf606433bfbf4522d">   44</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;{</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;f : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a>(f);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="goto__model_8h.html">goto-programs/goto_model.h</a>&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">   18</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a>(goto_functionst::function_mapt::value_type &amp;f)</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">auto</span> &amp;body = f.second.body;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it = body.instructions.begin(); it != body.instructions.end(); it++)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  {</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="comment">// annotated invariants -- these are stuck to the condition</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="comment">// of the (backwards) goto</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_backwards_goto())</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;invariants = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        it-&gt;condition().find(ID_C_spec_loop_invariant));</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;      <span class="keywordflow">if</span>(!invariants.is_nil())</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;      {</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="expr__util_8cpp.html#aca6b71a541c76387dbcc2c635f94c959">has_subexpr</a>(invariants, ID_side_effect))</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;          <span class="keywordflow">throw</span> <a class="code" href="classincorrect__goto__program__exceptiont.html">incorrect_goto_program_exceptiont</a>(</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;            <span class="stringliteral">&quot;Loop invariant is not side-effect free.&quot;</span>,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;            it-&gt;condition().find_source_location());</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        }</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;invariant : invariants.operands())</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keyword">auto</span> source_location = invariant.source_location(); <span class="comment">// copy</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        source_location.set_property_class(<span class="stringliteral">&quot;invariant&quot;</span>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        source_location.set_comment(<span class="stringliteral">&quot;loop invariant&quot;</span>);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keyword">auto</span> assertion =</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;          <a class="code" href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a>(invariant, source_location);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        body.insert_before_swap(it-&gt;get_target(), assertion);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      }</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  }</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;}</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="instrument__given__invariants_8cpp.html#a98afcef9a151292bf606433bfbf4522d">   55</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a>(<a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;{</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;f : goto_model.<a class="code" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <a class="code" href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a>(f);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
-<div class="ttc" id="aclassexprt_html_a6886a3ce6164e88129c3c969de596893"><div class="ttname"><a href="classexprt.html#a6886a3ce6164e88129c3c969de596893">exprt::source_location</a></div><div class="ttdeci">const source_locationt &amp; source_location() const</div><div class="ttdef"><b>Definition:</b> <a href="expr_8h_source.html#l00231">expr.h:231</a></div></div>
 <div class="ttc" id="aclassgoto__functionst_html_a749020112f81660d0cd07a2cb2201cb9"><div class="ttname"><a href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">goto_functionst::function_map</a></div><div class="ttdeci">function_mapt function_map</div><div class="ttdef"><b>Definition:</b> <a href="goto__functions_8h_source.html#l00029">goto_functions.h:29</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html_ae63ccd9b824a94422f0bcead059bcaa2"><div class="ttname"><a href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_modelt::goto_functions</a></div><div class="ttdeci">goto_functionst goto_functions</div><div class="ttdoc">GOTO functions.</div><div class="ttdef"><b>Definition:</b> <a href="goto__model_8h_source.html#l00034">goto_model.h:34</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_aed8ea398e35fc4ff9cc8c5067c455326"><div class="ttname"><a href="classgoto__programt.html#aed8ea398e35fc4ff9cc8c5067c455326">goto_programt::make_assertion</a></div><div class="ttdeci">static instructiont make_assertion(const exprt &amp;g, const source_locationt &amp;l=source_locationt::nil())</div><div class="ttdef"><b>Definition:</b> <a href="goto__program_8h_source.html#l00933">goto_program.h:933</a></div></div>
-<div class="ttc" id="aclasssource__locationt_html_a5f616b9345f345e4792ae6de077e33cd"><div class="ttname"><a href="classsource__locationt.html#a5f616b9345f345e4792ae6de077e33cd">source_locationt::set_property_class</a></div><div class="ttdeci">void set_property_class(const irep_idt &amp;property_class)</div><div class="ttdef"><b>Definition:</b> <a href="source__location_8h_source.html#l00145">source_location.h:145</a></div></div>
+<div class="ttc" id="aclassincorrect__goto__program__exceptiont_html"><div class="ttname"><a href="classincorrect__goto__program__exceptiont.html">incorrect_goto_program_exceptiont</a></div><div class="ttdoc">Thrown when a goto program that's being processed is in an invalid format, for example passing the wr...</div><div class="ttdef"><b>Definition:</b> <a href="exception__utils_8h_source.html#l00091">exception_utils.h:92</a></div></div>
+<div class="ttc" id="aexpr__util_8cpp_html_aca6b71a541c76387dbcc2c635f94c959"><div class="ttname"><a href="expr__util_8cpp.html#aca6b71a541c76387dbcc2c635f94c959">has_subexpr</a></div><div class="ttdeci">bool has_subexpr(const exprt &amp;expr, const std::function&lt; bool(const exprt &amp;)&gt; &amp;pred)</div><div class="ttdoc">returns true if the expression has a subexpression that satisfies pred</div><div class="ttdef"><b>Definition:</b> <a href="expr__util_8cpp_source.html#l00141">expr_util.cpp:141</a></div></div>
+<div class="ttc" id="aexpr__util_8h_html"><div class="ttname"><a href="expr__util_8h.html">expr_util.h</a></div><div class="ttdoc">Deprecated expression utility functions.</div></div>
 <div class="ttc" id="agoto__model_8h_html"><div class="ttname"><a href="goto__model_8h.html">goto_model.h</a></div><div class="ttdoc">Symbol Table + CFG.</div></div>
-<div class="ttc" id="ainstrument__given__invariants_8cpp_html_a5124e9ec8e65e3905dba7123c74bf416"><div class="ttname"><a href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a></div><div class="ttdeci">void instrument_given_invariants(goto_functionst::function_mapt::value_type &amp;f)</div><div class="ttdef"><b>Definition:</b> <a href="instrument__given__invariants_8cpp_source.html#l00016">instrument_given_invariants.cpp:16</a></div></div>
+<div class="ttc" id="ainstrument__given__invariants_8cpp_html_a5124e9ec8e65e3905dba7123c74bf416"><div class="ttname"><a href="instrument__given__invariants_8cpp.html#a5124e9ec8e65e3905dba7123c74bf416">instrument_given_invariants</a></div><div class="ttdeci">void instrument_given_invariants(goto_functionst::function_mapt::value_type &amp;f)</div><div class="ttdef"><b>Definition:</b> <a href="instrument__given__invariants_8cpp_source.html#l00018">instrument_given_invariants.cpp:18</a></div></div>
 <div class="ttc" id="ainstrument__given__invariants_8h_html"><div class="ttname"><a href="instrument__given__invariants_8h.html">instrument_given_invariants.h</a></div><div class="ttdoc">Instrument Given Invariants.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

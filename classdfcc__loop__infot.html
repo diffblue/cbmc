@@ -276,7 +276,7 @@ Public Attributes</h2></td></tr>
 <p>Finds the first instruction tagged as loop head and having the same loop identifier as this struct in the given program. </p>
 <p>The goto program passed as argument to this method must be the program from which that instance was initially generated. Technically it will not be the exact same program because the whole point of contract instrumentation is to turn the program into a different program by adding new instructions and turning loops into non-loops. However, when the program given as argument is the one obtained from the initial program through DFCC instrumentation steps then the first instruction from the start of the program that has the head tag for the same loop id corresponds to the head instruction of the loop that initially had this loop id in the not-yet instrumented program. This is because since the tags are attached to the instruction's source locations and instrumenting instructions after or before the original head instruction does not affect the head instruction itself and preserves the structure of the goto program's CFG that is relevant for dominator properties, which is what loop heads are (the loop head dominates ther nodes of the loop when looking from outside of the loop). If the instruction itself was instrumented by adding instructions right before or right after it while copying its source location to the inserted instructions then it is not the head instruction anymore, however the first instruction found from the start of the goto program that carries this same head tag is head instruction of the loop. If the program was instrumented in any other manner that might not maintain or copy the source location tags properly then nothing of the argument above is expected to hold anymore and you then use this method at your own risk. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00124">124</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00099">99</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -296,7 +296,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00139">139</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00114">114</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -318,7 +318,7 @@ Public Attributes</h2></td></tr>
 
 <p>Prints a textual representation of the struct to <code>out</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00068">68</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00043">43</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>

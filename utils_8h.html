@@ -223,6 +223,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a5b70f6fb5fede91018331caeb1991280"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a5b70f6fb5fede91018331caeb1991280">get_loop_head</a> (const unsigned int loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function)</td></tr>
 <tr class="memdesc:a5b70f6fb5fede91018331caeb1991280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>.  <a href="utils_8h.html#a5b70f6fb5fede91018331caeb1991280">More...</a><br /></td></tr>
 <tr class="separator:a5b70f6fb5fede91018331caeb1991280"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2dd9b5e29dad3f207a13ed8a34644bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#af2dd9b5e29dad3f207a13ed8a34644bf">get_loop_invariants</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;loop_end, const bool check_side_effect=true)</td></tr>
+<tr class="memdesc:af2dd9b5e29dad3f207a13ed8a34644bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract loop invariants from annotated loop end.  <a href="utils_8h.html#af2dd9b5e29dad3f207a13ed8a34644bf">More...</a><br /></td></tr>
+<tr class="separator:af2dd9b5e29dad3f207a13ed8a34644bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a877a2a163b03545e093c694671a414"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a3a877a2a163b03545e093c694671a414">get_loop_assigns</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;loop_end)</td></tr>
+<tr class="memdesc:a3a877a2a163b03545e093c694671a414"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract loop assigns from annotated loop end.  <a href="utils_8h.html#a3a877a2a163b03545e093c694671a414">More...</a><br /></td></tr>
+<tr class="separator:a3a877a2a163b03545e093c694671a414"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae86effaa2a5d639ed4d4b0ed546c3916"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#ae86effaa2a5d639ed4d4b0ed546c3916">get_loop_decreases</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;loop_end, const bool check_side_effect=true)</td></tr>
+<tr class="memdesc:ae86effaa2a5d639ed4d4b0ed546c3916"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract loop decreases from annotated loop end.  <a href="utils_8h.html#ae86effaa2a5d639ed4d4b0ed546c3916">More...</a><br /></td></tr>
+<tr class="separator:ae86effaa2a5d639ed4d4b0ed546c3916"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab60371e081d74195d69c087bb3b9543"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#aab60371e081d74195d69c087bb3b9543">annotate_invariants</a> (const <a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;invariant_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
 <tr class="memdesc:aab60371e081d74195d69c087bb3b9543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the invariants in <code>invariant_map</code> to their corresponding loops.  <a href="utils_8h.html#aab60371e081d74195d69c087bb3b9543">More...</a><br /></td></tr>
 <tr class="separator:aab60371e081d74195d69c087bb3b9543"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -426,7 +435,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00727">727</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00787">787</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -459,7 +468,7 @@ Functions</h2></td></tr>
 <p>Annotate the assigns in <code>assigns_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>assigns_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00705">705</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00765">765</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -492,7 +501,7 @@ Functions</h2></td></tr>
 <p>Annotate the decreases in <code>decreases_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>decreases_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00746">746</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00806">806</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -525,7 +534,7 @@ Functions</h2></td></tr>
 <p>Annotate the invariants in <code>invariant_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>invariant_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00685">685</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00745">745</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -611,6 +620,61 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A lexicographic less-than comparison expression: LHS &lt; RHS. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00191">191</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3a877a2a163b03545e093c694671a414"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a877a2a163b03545e093c694671a414">&#9670;&nbsp;</a></span>get_loop_assigns()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> get_loop_assigns </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_end</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extract loop assigns from annotated loop end. </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00723">723</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ae86effaa2a5d639ed4d4b0ed546c3916"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae86effaa2a5d639ed4d4b0ed546c3916">&#9670;&nbsp;</a></span>get_loop_decreases()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> get_loop_decreases </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extract loop decreases from annotated loop end. </p>
+<p>Will check if the loop decreases is side-effect free if <code>check_side_effect`</code> is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00728">728</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -777,6 +841,39 @@ Functions</h2></td></tr>
 <p>Return loop head if <code>finding_head</code> is true, Otherwise return loop end. </p>
 
 <p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00647">647</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="af2dd9b5e29dad3f207a13ed8a34644bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2dd9b5e29dad3f207a13ed8a34644bf">&#9670;&nbsp;</a></span>get_loop_invariants()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> get_loop_invariants </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extract loop invariants from annotated loop end. </p>
+<p>Will check if the loop invariant is side-effect free if <code>check_side_effect`</code> is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00706">706</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
