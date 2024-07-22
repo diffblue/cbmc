@@ -1036,12 +1036,6 @@ void goto_convertt::convert_loop_contracts(
     static_cast<const exprt &>(code.find(ID_C_spec_loop_invariant));
   if(!invariant.is_nil())
   {
-    if(has_subexpr(invariant, ID_side_effect))
-    {
-      throw incorrect_goto_program_exceptiont(
-        "Loop invariant is not side-effect free.", code.find_source_location());
-    }
-
     PRECONDITION(loop->is_goto() || loop->is_incomplete_goto());
     loop->condition_nonconst().add(ID_C_spec_loop_invariant).swap(invariant);
   }
@@ -1050,13 +1044,6 @@ void goto_convertt::convert_loop_contracts(
     static_cast<const exprt &>(code.find(ID_C_spec_decreases));
   if(!decreases_clause.is_nil())
   {
-    if(has_subexpr(decreases_clause, ID_side_effect))
-    {
-      throw incorrect_goto_program_exceptiont(
-        "Decreases clause is not side-effect free.",
-        code.find_source_location());
-    }
-
     PRECONDITION(loop->is_goto() || loop->is_incomplete_goto());
     loop->condition_nonconst().add(ID_C_spec_decreases).swap(decreases_clause);
   }

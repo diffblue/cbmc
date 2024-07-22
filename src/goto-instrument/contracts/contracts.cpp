@@ -983,12 +983,11 @@ void code_contractst::apply_loop_contract(
       goto_function.body, loop_head, goto_programt::make_skip());
     loop_end->set_target(loop_head);
 
-    exprt assigns_clause =
-      static_cast<const exprt &>(loop_end->condition().find(ID_C_spec_assigns));
-    exprt invariant = static_cast<const exprt &>(
-      loop_end->condition().find(ID_C_spec_loop_invariant));
-    exprt decreases_clause = static_cast<const exprt &>(
-      loop_end->condition().find(ID_C_spec_decreases));
+    exprt assigns_clause = get_loop_assigns(loop_end);
+    exprt invariant =
+      get_loop_invariants(loop_end, loop_contract_config.check_side_effect);
+    exprt decreases_clause =
+      get_loop_decreases(loop_end, loop_contract_config.check_side_effect);
 
     if(invariant.is_nil())
     {

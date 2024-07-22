@@ -1,0 +1,10 @@
+CORE
+main.c
+--apply-loop-contracts --disable-loop-contracts-side-effect-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test demonstrates a case where the loop invariant
+is a side-effect free statement expression.

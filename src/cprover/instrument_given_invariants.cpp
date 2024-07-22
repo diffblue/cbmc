@@ -11,6 +11,8 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "instrument_given_invariants.h"
 
+#include <util/expr_util.h>
+
 #include <goto-programs/goto_model.h>
 
 void instrument_given_invariants(goto_functionst::function_mapt::value_type &f)
@@ -25,6 +27,15 @@ void instrument_given_invariants(goto_functionst::function_mapt::value_type &f)
     {
       const auto &invariants = static_cast<const exprt &>(
         it->condition().find(ID_C_spec_loop_invariant));
+      if(!invariants.is_nil())
+      {
+        if(has_subexpr(invariants, ID_side_effect))
+        {
+          throw incorrect_goto_program_exceptiont(
+            "Loop invariant is not side-effect free.",
+            it->condition().find_source_location());
+        }
+      }
 
       for(const auto &invariant : invariants.operands())
       {

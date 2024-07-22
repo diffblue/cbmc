@@ -1169,7 +1169,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // Initialize loop contract config from cmdline.
   loop_contract_configt loop_contract_config = {
     cmdline.isset(FLAG_LOOP_CONTRACTS),
-    !cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND)};
+    !cmdline.isset(FLAG_LOOP_CONTRACTS_NO_UNWIND),
+    !cmdline.isset(FLAG_DISABLE_SIDE_EFFECT_CHECK)};
 
   if(
     cmdline.isset(FLAG_LOOP_CONTRACTS) &&
@@ -2029,6 +2030,7 @@ void goto_instrument_parse_optionst::help()
     "Code contracts:\n"
     HELP_DFCC
     HELP_LOOP_CONTRACTS
+    HELP_DISABLE_SIDE_EFFECT_CHECK
     HELP_LOOP_CONTRACTS_NO_UNWIND
     HELP_LOOP_CONTRACTS_FILE
     HELP_REPLACE_CALL
