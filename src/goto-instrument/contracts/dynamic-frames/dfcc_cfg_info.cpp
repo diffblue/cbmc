@@ -29,40 +29,15 @@ Date: March 2023
 #include "dfcc_root_object.h"
 #include "dfcc_utils.h"
 
-/// Extracts the assigns clause expression from the latch condition
-static const exprt::operandst &
-get_assigns(const goto_programt::const_targett &latch_target)
-{
-  return static_cast<const exprt &>(
-           latch_target->condition().find(ID_C_spec_assigns))
-    .operands();
-}
-
-/// Extracts the invariant clause expression from the latch condition
-static const exprt::operandst &
-get_invariants(const goto_programt::const_targett &latch_target)
-{
-  return static_cast<const exprt &>(
-           latch_target->condition().find(ID_C_spec_loop_invariant))
-    .operands();
-}
-
-/// Extracts the decreases clause expression from the latch condition
-static const exprt::operandst &
-get_decreases(const goto_programt::const_targett &latch_target)
-{
-  return static_cast<const exprt &>(
-           latch_target->condition().find(ID_C_spec_decreases))
-    .operands();
-}
-
 /// Returns true iff some contract clause expression is attached
 /// to the latch condition of this loop
-static bool has_contract(const goto_programt::const_targett &latch_target)
+static bool has_contract(
+  const goto_programt::const_targett &latch_target,
+  const bool check_side_effect)
 {
-  return !get_assigns(latch_target).empty() ||
-         !get_invariants(latch_target).empty() ||
-         !get_decreases(latch_target).empty();
+  return get_loop_assigns(latch_target).is_not_nil() ||
+         get_loop_invariants(latch_target, check_side_effect).is_not_nil() ||
+         get_loop_decreases(latch_target, check_side_effect).is_not_nil();
 }
 
 void dfcc_loop_infot::output(std::ostream &out) const
@@ -155,16 +130,20 @@ dfcc_loop_infot::find_latch(goto_programt &goto_program) const
 static std::optional<goto_programt::targett> check_has_contract_rec(
   const dfcc_loop_nesting_grapht &loop_nesting_graph,
   const std::size_t loop_idx,
-  const bool must_have_contract)
+  const bool must_have_contract,
+  const bool check_side_effect)
 {
   const auto &node = loop_nesting_graph[loop_idx];
-  if(must_have_contract && !has_contract(node.latch))
+  if(must_have_contract && !has_contract(node.latch, check_side_effect))
     return node.head;
 
   for(const auto pred_idx : loop_nesting_graph.get_predecessors(loop_idx))
   {
     auto result = check_has_contract_rec(
-      loop_nesting_graph, pred_idx, has_contract(node.latch));
+      loop_nesting_graph,
+      pred_idx,
+      has_contract(node.latch, check_side_effect),
+      check_side_effect);
     if(result.has_value())
       return result;
   }
@@ -175,13 +154,15 @@ static std::optional<goto_programt::targett> check_has_contract_rec(
 /// loops nested in loops that have contracts also have contracts.
 /// Return the head of the first offending loop if it exists, nothing otherwise.
 static std::optional<goto_programt::targett> check_inner_loops_have_contracts(
-  const dfcc_loop_nesting_grapht &loop_nesting_graph)
+  const dfcc_loop_nesting_grapht &loop_nesting_graph,
+  const bool check_side_effect)
 {
   for(std::size_t idx = 0; idx < loop_nesting_graph.size(); idx++)
   {
     if(loop_nesting_graph.get_successors(idx).empty())
     {
-      auto result = check_has_contract_rec(loop_nesting_graph, idx, false);
+      auto result = check_has_contract_rec(
+        loop_nesting_graph, idx, false, check_side_effect);
       if(result.has_value())
         return result;
     }
@@ -349,6 +330,7 @@ static struct contract_clausest default_loop_contract_clauses(
   const std::size_t loop_id,
   const irep_idt &function_id,
   local_may_aliast &local_may_alias,
+  const bool check_side_effect,
   message_handlert &message_handler,
   const namespacet &ns)
 {
@@ -356,11 +338,13 @@ static struct contract_clausest default_loop_contract_clauses(
   const auto &loop = loop_nesting_graph[loop_id];
 
   // Process loop contract clauses
-  exprt::operandst invariant_clauses = get_invariants(loop.latch);
-  exprt::operandst assigns_clauses = get_assigns(loop.latch);
+  exprt::operandst invariant_clauses =
+    get_loop_invariants(loop.latch, check_side_effect).operands();
+  exprt::operandst assigns_clauses = get_loop_assigns(loop.latch).operands();
 
   // Initialise defaults
-  struct contract_clausest result(get_decreases(loop.latch));
+  struct contract_clausest result(
+    get_loop_decreases(loop.latch, check_side_effect).operands());
 
   // Generate defaults for all clauses if at least one type of clause is defined
   if(
@@ -435,6 +419,7 @@ static dfcc_loop_infot gen_dfcc_loop_info(
   const std::map<std::size_t, dfcc_loop_infot> &loop_info_map,
   dirtyt &dirty,
   local_may_aliast &local_may_alias,
+  const bool check_side_effect,
   message_handlert &message_handler,
   dfcc_libraryt &library,
   symbol_table_baset &symbol_table)
@@ -454,6 +439,7 @@ static dfcc_loop_infot gen_dfcc_loop_info(
     loop_id,
     function_id,
     local_may_alias,
+    check_side_effect,
     message_handler,
     ns);
 
@@ -523,7 +509,8 @@ dfcc_cfg_infot::dfcc_cfg_infot(
     dfcc_check_loop_normal_form(goto_program, log);
     loop_nesting_graph = build_loop_nesting_graph(goto_program);
 
-    const auto head = check_inner_loops_have_contracts(loop_nesting_graph);
+    const auto head = check_inner_loops_have_contracts(
+      loop_nesting_graph, loop_contract_config.check_side_effect);
     if(head.has_value())
     {
       throw invalid_source_file_exceptiont(
@@ -571,6 +558,7 @@ dfcc_cfg_infot::dfcc_cfg_infot(
          loop_info_map,
          dirty,
          local_may_alias,
+         loop_contract_config.check_side_effect,
          message_handler,
          library,
          symbol_table)});

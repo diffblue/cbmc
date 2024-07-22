@@ -682,6 +682,66 @@ get_loop_head(const unsigned int target_loop_number, goto_functiont &function)
   return get_loop_head_or_end(target_loop_number, function, true);
 }
 
+/// Extract loop invariants from loop end without any checks.
+static exprt
+extract_loop_invariants(const goto_programt::const_targett &loop_end)
+{
+  return static_cast<const exprt &>(
+    loop_end->condition().find(ID_C_spec_loop_invariant));
+}
+
+static exprt extract_loop_assigns(const goto_programt::const_targett &loop_end)
+{
+  return static_cast<const exprt &>(
+    loop_end->condition().find(ID_C_spec_assigns));
+}
+
+static exprt
+extract_loop_decreases(const goto_programt::const_targett &loop_end)
+{
+  return static_cast<const exprt &>(
+    loop_end->condition().find(ID_C_spec_decreases));
+}
+
+exprt get_loop_invariants(
+  const goto_programt::const_targett &loop_end,
+  const bool check_side_effect)
+{
+  auto invariant = extract_loop_invariants(loop_end);
+  if(!invariant.is_nil() && check_side_effect)
+  {
+    if(has_subexpr(invariant, ID_side_effect))
+    {
+      throw incorrect_goto_program_exceptiont(
+        "Loop invariant is not side-effect free.",
+        loop_end->condition().find_source_location());
+    }
+  }
+  return invariant;
+}
+
+exprt get_loop_assigns(const goto_programt::const_targett &loop_end)
+{
+  return extract_loop_assigns(loop_end);
+}
+
+exprt get_loop_decreases(
+  const goto_programt::const_targett &loop_end,
+  const bool check_side_effect)
+{
+  auto decreases_clause = extract_loop_decreases(loop_end);
+  if(!decreases_clause.is_nil() && check_side_effect)
+  {
+    if(has_subexpr(decreases_clause, ID_side_effect))
+    {
+      throw incorrect_goto_program_exceptiont(
+        "Decreases clause is not side-effect free.",
+        loop_end->condition().find_source_location());
+    }
+  }
+  return decreases_clause;
+}
+
 void annotate_invariants(
   const invariant_mapt &invariant_map,
   goto_modelt &goto_model)

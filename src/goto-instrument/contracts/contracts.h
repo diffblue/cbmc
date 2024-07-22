@@ -33,6 +33,11 @@ Date: February 2016
 #define HELP_LOOP_CONTRACTS                                                    \
   " {y--apply-loop-contracts} \t check and use loop contracts when provided\n"
 
+#define FLAG_DISABLE_SIDE_EFFECT_CHECK                                         \
+  "disable-loop-contracts-side-effect-check"
+#define HELP_DISABLE_SIDE_EFFECT_CHECK                                         \
+  " {y--disable-loop-contracts-side-effect-check} \t UNSOUND OPTION.\t "       \
+  " disable the check of side-effect of loop contracts\n"
 #define FLAG_LOOP_CONTRACTS_NO_UNWIND "loop-contracts-no-unwind"
 #define HELP_LOOP_CONTRACTS_NO_UNWIND                                          \
   " {y--loop-contracts-no-unwind} \t do not unwind transformed loops\n"

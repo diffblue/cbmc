@@ -102,6 +102,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(horn)(skip-loops):(model-argc-argv):" \
   OPT_DFCC \
   "(" FLAG_LOOP_CONTRACTS ")" \
+  "(" FLAG_DISABLE_SIDE_EFFECT_CHECK ")" \
   "(" FLAG_LOOP_CONTRACTS_NO_UNWIND ")" \
   "(" FLAG_LOOP_CONTRACTS_FILE "):" \
   "(" FLAG_REPLACE_CALL "):" \
