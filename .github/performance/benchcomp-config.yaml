@@ -14,12 +14,14 @@ variants:
       directory: /home/runner/work/cbmc/cbmc/aws-c-common.git
       env:
         PATH: /home/runner/work/cbmc/cbmc/old/build/bin:${PATH}
+        CBMC_VERBOSITY: --verbosity 9
   aws-c-common@new:
     config:
       command_line: cd verification/cbmc/proofs && ./run-cbmc-proofs.py
       directory: /home/runner/work/cbmc/cbmc/aws-c-common.git
       env:
         PATH: /home/runner/work/cbmc/cbmc/new/build/bin:${PATH}
+        CBMC_VERBOSITY: --verbosity 9
 
 run:
   suites:
