@@ -9,7 +9,7 @@ add_library(cadical ${sources})
 
 # Pass -DNBUILD to disable including the version information, which is not
 # needed since cbmc doesn't run the cadical binary
-target_compile_options(cadical PUBLIC -DNBUILD -DNFLEXIBLE)
+target_compile_options(cadical PRIVATE -DNBUILD -DNFLEXIBLE -DNDEBUG)
 
 set_target_properties(
     cadical
