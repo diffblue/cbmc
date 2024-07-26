@@ -124,6 +124,15 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
         }
       }
     }
+    else if(type.id() == ID_range)
+    {
+      // add: lhs + from + rhs + from - from = lhs + rhs + from
+      // sub: lhs + from - (rhs + from) - from = lhs - rhs - from
+      mp_integer from = to_range_type(type).get_from();
+      bv = bv_utils.add_sub(bv, op, subtract);
+      bv = bv_utils.add_sub(
+        bv, bv_utils.build_constant(from, op.size()), subtract);
+    }
     else if(type.id()==ID_floatbv)
     {
       // needs to change due to rounding mode
