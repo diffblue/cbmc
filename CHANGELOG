@@ -1,3 +1,15 @@
+# CBMC 6.1.1
+
+## What's Changed
+* Compile CaDiCaL with -DNDEBUG by @tautschnig in https://github.com/diffblue/cbmc/pull/8397
+
+## Bug Fixes
+* Enable higher verbosity for benchmarking by @tautschnig in https://github.com/diffblue/cbmc/pull/8395
+* CI jobs: upgrade CVC5 from 1.0.0 to 1.1.2 by @tautschnig in https://github.com/diffblue/cbmc/pull/8383
+* implement flattening for +/- for the range type by @kroening in https://github.com/diffblue/cbmc/pull/8396
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.1.0...cbmc-6.1.1
+
 # CBMC 6.1.0
 
 ## What's Changed
