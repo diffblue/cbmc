@@ -4445,15 +4445,22 @@ void smt2_convt::convert_member(const member_exprt &expr)
     CHECK_RETURN_WITH_DIAGNOSTICS(
       width != 0, "failed to get union member width");
 
-    unflatten(wheret::BEGIN, expr.type());
+    if(use_datatypes)
+    {
+      unflatten(wheret::BEGIN, expr.type());
 
-    out << "((_ extract "
-           << (width-1)
-           << " 0) ";
-    convert_expr(struct_op);
-    out << ")";
+      out << "((_ extract " << (width - 1) << " 0) ";
+      convert_expr(struct_op);
+      out << ")";
 
-    unflatten(wheret::END, expr.type());
+      unflatten(wheret::END, expr.type());
+    }
+    else
+    {
+      out << "((_ extract " << (width - 1) << " 0) ";
+      convert_expr(struct_op);
+      out << ")";
+    }
   }
   else
     UNEXPECTEDCASE(
@@ -4565,57 +4572,50 @@ void smt2_convt::unflatten(
   }
   else if(type.id() == ID_array)
   {
-    if(use_datatypes)
-    {
-      PRECONDITION(use_as_const);
+    PRECONDITION(use_as_const);
 
-      if(where == wheret::BEGIN)
-        out << "(let ((?ufop" << nesting << " ";
-      else
-      {
-        out << ")) ";
-
-        const array_typet &array_type = to_array_type(type);
-
-        std::size_t subtype_width = boolbv_width(array_type.element_type());
-
-        DATA_INVARIANT(
-          array_type.size().is_constant(),
-          "cannot unflatten arrays of non-constant size");
-        mp_integer size =
-          numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
-
-        for(mp_integer i = 1; i < size; ++i)
-          out << "(store ";
-
-        out << "((as const ";
-        convert_type(array_type);
-        out << ") ";
-        // use element at index 0 as default value
-        unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
-        out << "((_ extract " << subtype_width - 1 << " "
-            << "0) ?ufop" << nesting << ")";
-        unflatten(wheret::END, array_type.element_type(), nesting + 1);
-        out << ") ";
-
-        std::size_t offset = subtype_width;
-        for(mp_integer i = 1; i < size; ++i, offset += subtype_width)
-        {
-          convert_expr(from_integer(i, array_type.index_type()));
-          out << ' ';
-          unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
-          out << "((_ extract " << offset + subtype_width - 1 << " " << offset
-              << ") ?ufop" << nesting << ")";
-          unflatten(wheret::END, array_type.element_type(), nesting + 1);
-          out << ")"; // store
-        }
-
-        out << ")"; // let
-      }
-    }
+    if(where == wheret::BEGIN)
+      out << "(let ((?ufop" << nesting << " ";
     else
     {
-      // nop, already a bv
+      out << ")) ";
+
+      const array_typet &array_type = to_array_type(type);
+
+      std::size_t subtype_width = boolbv_width(array_type.element_type());
+
+      DATA_INVARIANT(
+        array_type.size().is_constant(),
+        "cannot unflatten arrays of non-constant size");
+      mp_integer size =
+        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+
+      for(mp_integer i = 1; i < size; ++i)
+        out << "(store ";
+
+      out << "((as const ";
+      convert_type(array_type);
+      out << ") ";
+      // use element at index 0 as default value
+      unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+      out << "((_ extract " << subtype_width - 1 << " "
+          << "0) ?ufop" << nesting << ")";
+      unflatten(wheret::END, array_type.element_type(), nesting + 1);
+      out << ") ";
+
+      std::size_t offset = subtype_width;
+      for(mp_integer i = 1; i < size; ++i, offset += subtype_width)
+      {
+        convert_expr(from_integer(i, array_type.index_type()));
+        out << ' ';
+        unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+        out << "((_ extract " << offset + subtype_width - 1 << " " << offset
+            << ") ?ufop" << nesting << ")";
+        unflatten(wheret::END, array_type.element_type(), nesting + 1);
+        out << ")"; // store
+      }
+
+      out << ")"; // let
     }
   }
   else if(type.id() == ID_struct || type.id() == ID_struct_tag)
@@ -4767,19 +4767,22 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         {
           out << "(define-fun " << smt2_identifier;
           out << " () ";
+          convert_type(equal_expr.lhs().type());
+          out << ' ';
           if(
             equal_expr.lhs().type().id() != ID_array ||
             use_array_theory(prepared_rhs))
           {
-            convert_type(equal_expr.lhs().type());
+            convert_expr(prepared_rhs);
           }
           else
           {
-            std::size_t width = boolbv_width(equal_expr.lhs().type());
-            out << "(_ BitVec " << width << ")";
+            unflatten(wheret::BEGIN, equal_expr.lhs().type());
+
+            convert_expr(prepared_rhs);
+
+            unflatten(wheret::END, equal_expr.lhs().type());
           }
-          out << ' ';
-          convert_expr(prepared_rhs);
           out << ')' << '\n';
         }
 
