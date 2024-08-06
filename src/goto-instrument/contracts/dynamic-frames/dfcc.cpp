@@ -265,7 +265,7 @@ void dfcct::partition_function_symbols(
     const symbolt &symbol = entry.second;
 
     // not a function symbol
-    if(symbol.type.id() != ID_code)
+    if(symbol.type.id() != ID_code || symbol.is_macro)
       continue;
 
     // is it a pure contract ?
