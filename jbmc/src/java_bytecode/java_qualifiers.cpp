@@ -51,36 +51,26 @@ void java_qualifierst::write(typet &src) const
   type_checked_cast<annotated_typet>(src).get_annotations() = annotations;
 }
 
-qualifierst &java_qualifierst::operator+=(const qualifierst &other)
+java_qualifierst &java_qualifierst::operator+=(const java_qualifierst &other)
 {
   c_qualifierst::operator+=(other);
-  auto jq = dynamic_cast<const java_qualifierst *>(&other);
-  if(jq != nullptr)
-  {
-    std::copy(
-      jq->annotations.begin(),
-      jq->annotations.end(),
-      std::back_inserter(annotations));
-  }
+  std::copy(
+    other.annotations.begin(),
+    other.annotations.end(),
+    std::back_inserter(annotations));
   return *this;
 }
 
-bool java_qualifierst::operator==(const qualifierst &other) const
+bool java_qualifierst::operator==(const java_qualifierst &other) const
 {
-  auto jq = dynamic_cast<const java_qualifierst *>(&other);
-  if(jq == nullptr)
-    return false;
-  return c_qualifierst::operator==(other) && annotations == jq->annotations;
+  return c_qualifierst::operator==(other) && annotations == other.annotations;
 }
 
-bool java_qualifierst::is_subset_of(const qualifierst &other) const
+bool java_qualifierst::is_subset_of(const java_qualifierst &other) const
 {
   if(!c_qualifierst::is_subset_of(other))
     return false;
-  auto jq = dynamic_cast<const java_qualifierst *>(&other);
-  if(jq == nullptr)
-    return annotations.empty();
-  auto &other_a = jq->annotations;
+  auto &other_a = other.annotations;
   for(const auto &annotation : annotations)
   {
     if(std::find(other_a.begin(), other_a.end(), annotation) == other_a.end())
