@@ -20,7 +20,7 @@ public:
   explicit dimacs_cnft(message_handlert &);
   virtual ~dimacs_cnft() { }
 
-  virtual void write_dimacs_cnf(std::ostream &out);
+  virtual void write_dimacs_cnf(std::ostream &out) const;
 
   // dummy functions
 
@@ -36,8 +36,8 @@ public:
   write_dimacs_clause(const bvt &, std::ostream &, bool break_lines);
 
 protected:
-  void write_problem_line(std::ostream &out);
-  void write_clauses(std::ostream &out);
+  void write_problem_line(std::ostream &out) const;
+  void write_clauses(std::ostream &out) const;
 
   bool break_lines;
 };
