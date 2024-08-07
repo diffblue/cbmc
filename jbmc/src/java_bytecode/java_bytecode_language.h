@@ -267,12 +267,6 @@ public:
     std::ostream &outstream,
     message_handlert &message_handler) override;
 
-  // This is an extension to languaget
-  // required because parsing of Java programs can be initiated without
-  // opening a file first or providing a path to a file
-  // as dictated by \ref languaget.
-  virtual bool parse(message_handlert &);
-
   bool parse(
     std::istream &instream,
     const std::string &path,

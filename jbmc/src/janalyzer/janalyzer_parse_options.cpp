@@ -380,8 +380,8 @@ int janalyzer_parse_optionst::doit()
 
     log.status() << "Parsing ..." << messaget::eom;
 
-    if(static_cast<java_bytecode_languaget *>(language.get())
-         ->parse(ui_message_handler))
+    std::istringstream unused;
+    if(language.get()->parse(unused, "", ui_message_handler))
     {
       log.error() << "PARSING ERROR" << messaget::eom;
       return CPROVER_EXIT_PARSE_ERROR;
