@@ -35,22 +35,12 @@ public:
 public:
   virtual std::unique_ptr<qualifierst> clone() const = 0;
 
-  virtual qualifierst &operator+=(const qualifierst &b) = 0;
-
   virtual std::size_t count() const = 0;
 
   virtual void clear() = 0;
 
   virtual void read(const typet &src) = 0;
   virtual void write(typet &src) const = 0;
-
-  // Comparisons
-  virtual bool is_subset_of(const qualifierst &q) const = 0;
-  virtual bool operator==(const qualifierst &other) const = 0;
-  bool operator!=(const qualifierst &other) const
-  {
-    return !(*this == other);
-  }
 
   // String conversion
   virtual std::string as_string() const = 0;
@@ -107,41 +97,47 @@ public:
 
   static void clear(typet &dest);
 
-  virtual bool is_subset_of(const qualifierst &other) const override
+  bool is_subset_of(const c_qualifierst &other) const
   {
-    const c_qualifierst *cq = dynamic_cast<const c_qualifierst *>(&other);
-    return (!is_constant || cq->is_constant) &&
-           (!is_volatile || cq->is_volatile) &&
-           (!is_restricted || cq->is_restricted) &&
-           (!is_atomic || cq->is_atomic) && (!is_ptr32 || cq->is_ptr32) &&
-           (!is_ptr64 || cq->is_ptr64) && (!is_nodiscard || cq->is_nodiscard) &&
-           (!is_noreturn || cq->is_noreturn);
+    return (!is_constant || other.is_constant) &&
+           (!is_volatile || other.is_volatile) &&
+           (!is_restricted || other.is_restricted) &&
+           (!is_atomic || other.is_atomic) && (!is_ptr32 || other.is_ptr32) &&
+           (!is_ptr64 || other.is_ptr64) &&
+           (!is_nodiscard || other.is_nodiscard) &&
+           (!is_noreturn || other.is_noreturn);
 
     // is_transparent_union isn't checked
   }
 
-  virtual bool operator==(const qualifierst &other) const override
+  bool operator==(const c_qualifierst &other) const
   {
-    const c_qualifierst *cq = dynamic_cast<const c_qualifierst *>(&other);
-    return is_constant == cq->is_constant && is_volatile == cq->is_volatile &&
-           is_restricted == cq->is_restricted && is_atomic == cq->is_atomic &&
-           is_ptr32 == cq->is_ptr32 && is_ptr64 == cq->is_ptr64 &&
-           is_transparent_union == cq->is_transparent_union &&
-           is_nodiscard == cq->is_nodiscard && is_noreturn == cq->is_noreturn;
+    return is_constant == other.is_constant &&
+           is_volatile == other.is_volatile &&
+           is_restricted == other.is_restricted &&
+           is_atomic == other.is_atomic && is_ptr32 == other.is_ptr32 &&
+           is_ptr64 == other.is_ptr64 &&
+           is_transparent_union == other.is_transparent_union &&
+           is_nodiscard == other.is_nodiscard &&
+           is_noreturn == other.is_noreturn;
   }
 
-  virtual qualifierst &operator+=(const qualifierst &other) override
+  bool operator!=(const c_qualifierst &other) const
   {
-    const c_qualifierst *cq = dynamic_cast<const c_qualifierst *>(&other);
-    is_constant |= cq->is_constant;
-    is_volatile |= cq->is_volatile;
-    is_restricted |= cq->is_restricted;
-    is_atomic |= cq->is_atomic;
-    is_ptr32 |= cq->is_ptr32;
-    is_ptr64 |= cq->is_ptr64;
-    is_transparent_union |= cq->is_transparent_union;
-    is_nodiscard |= cq->is_nodiscard;
-    is_noreturn |= cq->is_noreturn;
+    return !(*this == other);
+  }
+
+  c_qualifierst &operator+=(const c_qualifierst &other)
+  {
+    is_constant |= other.is_constant;
+    is_volatile |= other.is_volatile;
+    is_restricted |= other.is_restricted;
+    is_atomic |= other.is_atomic;
+    is_ptr32 |= other.is_ptr32;
+    is_ptr64 |= other.is_ptr64;
+    is_transparent_union |= other.is_transparent_union;
+    is_nodiscard |= other.is_nodiscard;
+    is_noreturn |= other.is_noreturn;
     return *this;
   }
 

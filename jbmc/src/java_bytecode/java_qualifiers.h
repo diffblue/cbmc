@@ -25,7 +25,7 @@ protected:
 public:
   virtual std::unique_ptr<qualifierst> clone() const override;
 
-  virtual qualifierst &operator+=(const qualifierst &other) override;
+  java_qualifierst &operator+=(const java_qualifierst &other);
 
   const std::vector<java_annotationt> &get_annotations() const
   {
@@ -38,8 +38,12 @@ public:
   virtual void read(const typet &src) override;
   virtual void write(typet &src) const override;
 
-  virtual bool is_subset_of(const qualifierst &other) const override;
-  virtual bool operator==(const qualifierst &other) const override;
+  bool is_subset_of(const java_qualifierst &other) const;
+  bool operator==(const java_qualifierst &other) const;
+  bool operator!=(const java_qualifierst &other) const
+  {
+    return !(*this == other);
+  }
 
   virtual std::string as_string() const override;
 };
