@@ -14,17 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_pointers.h"
 
+class dimacs_cnft;
+
 class bv_dimacst : public bv_pointerst
 {
 public:
   bv_dimacst(
     const namespacet &_ns,
-    propt &_prop,
+    dimacs_cnft &_prop,
     message_handlert &message_handler,
-    const std::string &_filename)
-    : bv_pointerst(_ns, _prop, message_handler), filename(_filename)
-  {
-  }
+    const std::string &_filename);
 
   virtual ~bv_dimacst()
   {
@@ -33,6 +32,8 @@ public:
 
 protected:
   const std::string filename;
+  const dimacs_cnft &dimacs_cnf_prop;
+
   bool write_dimacs();
   bool write_dimacs(std::ostream &);
 };

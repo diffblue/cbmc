@@ -16,6 +16,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
 
+bv_dimacst::bv_dimacst(
+  const namespacet &_ns,
+  dimacs_cnft &_prop,
+  message_handlert &message_handler,
+  const std::string &_filename)
+  : bv_pointerst(_ns, _prop, message_handler),
+    filename(_filename),
+    dimacs_cnf_prop(_prop)
+{
+}
+
 bool bv_dimacst::write_dimacs()
 {
   if(filename.empty() || filename == "-")
@@ -34,7 +45,7 @@ bool bv_dimacst::write_dimacs()
 
 bool bv_dimacst::write_dimacs(std::ostream &out)
 {
-  dynamic_cast<dimacs_cnft &>(prop).write_dimacs_cnf(out);
+  dimacs_cnf_prop.write_dimacs_cnf(out);
 
   // we dump the mapping variable<->literals
   for(const auto &s : get_symbols())
