@@ -363,17 +363,6 @@ void java_bytecode_languaget::parse_from_main_class(
 }
 
 /// We set the main class (i.e.\ class to start the class loading analysis,
-/// see \ref java_class_loadert) when we have have been given a main class.
-bool java_bytecode_languaget::parse(message_handlert &message_handler)
-{
-  PRECONDITION(language_options.has_value());
-  initialize_class_loader(message_handler);
-  main_class = config.java.main_class;
-  parse_from_main_class(message_handler);
-  return false;
-}
-
-/// We set the main class (i.e.\ class to start the class loading analysis,
 /// see \ref java_class_loadert)
 /// when we have a JAR file given via the -jar option:
 ///    a) the argument of the --main-class command-line option,

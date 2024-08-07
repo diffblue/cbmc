@@ -145,7 +145,8 @@ void lazy_goto_modelt::initialize(
 
     msg.status() << "Parsing ..." << messaget::eom;
 
-    if(dynamic_cast<java_bytecode_languaget &>(language).parse(message_handler))
+    std::istringstream unused;
+    if(language.parse(unused, "", message_handler))
     {
       throw invalid_input_exceptiont("PARSING ERROR");
     }
