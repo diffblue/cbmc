@@ -1,5 +1,6 @@
 var NAVTREEINDEX138 =
 {
+"structcfg__base__nodet.html#a59549ad55e5fad45568f0a3555a32eab":[8,0,176,2],
 "structcfg__dominators__templatet_1_1nodet.html":[8,0,178,0],
 "structcfg__dominators__templatet_1_1nodet.html#a4ac3df8c441c484760ac5fe67b83fac3":[8,0,178,0,0],
 "structcheck__call__sequencet_1_1call__stack__entryt.html":[8,0,184,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX138 =
 "structcover__configt.html#aed32a6b9d3b38cf92eef1d12d771d7c1":[8,0,294,3],
 "structcover__goalst_1_1goalt.html":[8,0,298,0],
 "structcover__goalst_1_1goalt.html#a1d839ed4e182a9ff1a40b10d9e641467":[8,0,298,0,0],
-"structcover__goalst_1_1goalt.html#a1d839ed4e182a9ff1a40b10d9e641467a19fa901d0342d2ef237e501308076e44":[8,0,298,0,0,2],
-"structcover__goalst_1_1goalt.html#a1d839ed4e182a9ff1a40b10d9e641467a45f13b5d901c0830b50b76c99914492f":[8,0,298,0,0,1]
+"structcover__goalst_1_1goalt.html#a1d839ed4e182a9ff1a40b10d9e641467a19fa901d0342d2ef237e501308076e44":[8,0,298,0,0,2]
 };
