@@ -21,6 +21,7 @@ class cmdlinet;
 class message_handlert;
 class namespacet;
 class optionst;
+class solver_resource_limitst;
 class stack_decision_proceduret;
 
 class solver_factoryt final
@@ -81,8 +82,8 @@ protected:
   /// Sets the timeout of \p decision_procedure if the `solver-time-limit`
   /// option has a positive value (in seconds).
   /// \note Most solvers silently ignore the time limit at the moment.
-  void
-  set_decision_procedure_time_limit(decision_proceduret &decision_procedure);
+  void set_decision_procedure_time_limit(
+    solver_resource_limitst &decision_procedure);
 
   // consistency checks during solver creation
   void no_beautification();

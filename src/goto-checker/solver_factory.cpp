@@ -82,26 +82,13 @@ solver_factoryt::solvert::stack_decision_procedure() const
 }
 
 void solver_factoryt::set_decision_procedure_time_limit(
-  decision_proceduret &decision_procedure)
+  solver_resource_limitst &decision_procedure)
 {
   const int timeout_seconds =
     options.get_signed_int_option("solver-time-limit");
 
   if(timeout_seconds > 0)
-  {
-    solver_resource_limitst *solver =
-      dynamic_cast<solver_resource_limitst *>(&decision_procedure);
-    if(solver == nullptr)
-    {
-      messaget log(message_handler);
-      log.warning() << "cannot set solver time limit on "
-                    << decision_procedure.decision_procedure_text()
-                    << messaget::eom;
-      return;
-    }
-
-    solver->set_time_limit_seconds(timeout_seconds);
-  }
+    decision_procedure.set_time_limit_seconds(timeout_seconds);
 }
 
 void solver_factoryt::solvert::set_decision_procedure(
@@ -531,7 +518,6 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_dec->use_FPA_theory = true;
 
-    set_decision_procedure_time_limit(*smt2_dec);
     return std::make_unique<solvert>(std::move(smt2_dec));
   }
   else if(filename == "-")
@@ -547,7 +533,6 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_conv->use_FPA_theory = true;
 
-    set_decision_procedure_time_limit(*smt2_conv);
     return std::make_unique<solvert>(std::move(smt2_conv));
   }
   else
@@ -565,7 +550,6 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_conv->use_FPA_theory = true;
 
-    set_decision_procedure_time_limit(*smt2_conv);
     return std::make_unique<solvert>(std::move(smt2_conv), std::move(out));
   }
 }
