@@ -188,27 +188,35 @@ static void emit_solver_warning(
 }
 
 template <typename SatcheckT>
-static std::unique_ptr<SatcheckT>
+static typename std::enable_if<
+  !std::is_base_of<hardness_collectort, SatcheckT>::value,
+  std::unique_ptr<SatcheckT>>::type
 make_satcheck_prop(message_handlert &message_handler, const optionst &options)
 {
   auto satcheck = std::make_unique<SatcheckT>(message_handler);
   if(options.is_set("write-solver-stats-to"))
   {
-    if(
-      auto hardness_collector = dynamic_cast<hardness_collectort *>(&*satcheck))
-    {
-      std::unique_ptr<solver_hardnesst> solver_hardness =
-        std::make_unique<solver_hardnesst>();
-      solver_hardness->set_outfile(options.get_option("write-solver-stats-to"));
-      hardness_collector->solver_hardness = std::move(solver_hardness);
-    }
-    else
-    {
-      messaget log(message_handler);
-      log.warning()
-        << "Configured solver does not support --write-solver-stats-to. "
-        << "Solver stats will not be written." << messaget::eom;
-    }
+    messaget log(message_handler);
+    log.warning()
+      << "Configured solver does not support --write-solver-stats-to. "
+      << "Solver stats will not be written." << messaget::eom;
+  }
+  return satcheck;
+}
+
+template <typename SatcheckT>
+static typename std::enable_if<
+  std::is_base_of<hardness_collectort, SatcheckT>::value,
+  std::unique_ptr<SatcheckT>>::type
+make_satcheck_prop(message_handlert &message_handler, const optionst &options)
+{
+  auto satcheck = std::make_unique<SatcheckT>(message_handler);
+  if(options.is_set("write-solver-stats-to"))
+  {
+    std::unique_ptr<solver_hardnesst> solver_hardness =
+      std::make_unique<solver_hardnesst>();
+    solver_hardness->set_outfile(options.get_option("write-solver-stats-to"));
+    satcheck->solver_hardness = std::move(solver_hardness);
   }
   return satcheck;
 }
