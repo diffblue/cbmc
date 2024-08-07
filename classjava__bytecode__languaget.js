@@ -21,7 +21,6 @@ var classjava__bytecode__languaget =
     [ "methods_provided", "classjava__bytecode__languaget.html#a003bf82dc490d51197043cfb70a0839f", null ],
     [ "modules_provided", "classjava__bytecode__languaget.html#a9b031de42fb5d0fe1a2ae705545c8b73", null ],
     [ "new_language", "classjava__bytecode__languaget.html#a4202acca3fd114dc994f91be0b625c4e", null ],
-    [ "parse", "classjava__bytecode__languaget.html#a5e86fd0fafc7ae76b3035ec01ffc4d03", null ],
     [ "parse", "classjava__bytecode__languaget.html#afe55bd1c9b0a0b3604bd034bdde7561c", null ],
     [ "parse_from_main_class", "classjava__bytecode__languaget.html#ab32eab233cbbfe988feeb2ce982f87fc", null ],
     [ "preprocess", "classjava__bytecode__languaget.html#acf962e24b8ae1afc58f720ddf8cf2424", null ],

@@ -126,9 +126,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acf962e24b8ae1afc58f720ddf8cf2424"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#acf962e24b8ae1afc58f720ddf8cf2424">preprocess</a> (std::istream &amp;instream, const std::string &amp;path, std::ostream &amp;outstream, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler) override</td></tr>
 <tr class="memdesc:acf962e24b8ae1afc58f720ddf8cf2424"><td class="mdescLeft">&#160;</td><td class="mdescRight">ANSI-C preprocessing.  <a href="classjava__bytecode__languaget.html#acf962e24b8ae1afc58f720ddf8cf2424">More...</a><br /></td></tr>
 <tr class="separator:acf962e24b8ae1afc58f720ddf8cf2424"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e86fd0fafc7ae76b3035ec01ffc4d03"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#a5e86fd0fafc7ae76b3035ec01ffc4d03">parse</a> (<a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)</td></tr>
-<tr class="memdesc:a5e86fd0fafc7ae76b3035ec01ffc4d03"><td class="mdescLeft">&#160;</td><td class="mdescRight">We set the main class (i.e. class to start the class loading analysis, see <a class="el" href="classjava__class__loadert.html">java_class_loadert</a>) when we have have been given a main class.  <a href="classjava__bytecode__languaget.html#a5e86fd0fafc7ae76b3035ec01ffc4d03">More...</a><br /></td></tr>
-<tr class="separator:a5e86fd0fafc7ae76b3035ec01ffc4d03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe55bd1c9b0a0b3604bd034bdde7561c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classjava__bytecode__languaget.html#afe55bd1c9b0a0b3604bd034bdde7561c">parse</a> (std::istream &amp;instream, const std::string &amp;path, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler) override</td></tr>
 <tr class="memdesc:afe55bd1c9b0a0b3604bd034bdde7561c"><td class="mdescLeft">&#160;</td><td class="mdescRight">We set the main class (i.e. class to start the class loading analysis, see <a class="el" href="classjava__class__loadert.html">java_class_loadert</a>) when we have a JAR file given via the -jar option: a) the argument of the &ndash;main-class command-line option, b) the manifest file of the JAR If no main class was found, all classes in the JAR file are loaded.  <a href="classjava__bytecode__languaget.html#afe55bd1c9b0a0b3604bd034bdde7561c">More...</a><br /></td></tr>
 <tr class="separator:afe55bd1c9b0a0b3604bd034bdde7561c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -277,7 +274,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01621">1621</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01610">1610</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -305,7 +302,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00295">295</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00289">289</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -332,7 +329,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00302">302</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00296">296</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -364,7 +361,7 @@ Private Attributes</h2></td></tr>
 <p>This method should be overloaded to provide alternative approaches for specifying extra entry points. </p>
 <p>To provide a regex entry point, the command line option <code>--lazy-methods-extra-entry-point</code> can be used directly. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01629">1629</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01618">1618</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +418,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classlanguaget.html#a8d5ac6e2cf32a1cb5d42ab452afe84d0">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01195">1195</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01184">1184</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -471,7 +468,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00343">343</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00337">337</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -540,7 +537,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01293">1293</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01282">1282</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -609,7 +606,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01352">1352</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01341">1341</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -638,7 +635,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a1db4852627eb8d907d090ca52371d308">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00331">331</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00325">325</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -686,7 +683,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Elaborates lazily-converted methods that may be reachable starting from the main entry point (usually provided with the &ndash;function command- line option) (side-effect on the symbol_table). Returns false on success. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01123">1123</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01112">1112</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -748,7 +745,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classlanguaget.html#a0ba12f507e032e78edb4f8a21b59ec41">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01517">1517</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01506">1506</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -805,7 +802,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classlanguaget.html#a847eca622950c809780855374e1dd5c2">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01548">1548</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01537">1537</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -862,7 +859,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classlanguaget.html#a647304652c611724a2efc0d042b00a49">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01557">1557</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01546">1546</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -905,7 +902,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a982876f4b43cef4bc27f3734dd6142a5">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01060">1060</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01049">1049</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -932,7 +929,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01159">1159</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01148">1148</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -961,7 +958,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a82505a4c60a113558ee4ab3a0fdf99ad">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00330">330</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00324">324</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1027,7 +1024,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classlanguaget.html#af1e5abdaf9c6aea7f4dcf8d4ebd75d7a">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01170">1170</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01159">1159</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1086,42 +1083,12 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a747b4a0836507a6f4668cbfd3f89c7f2">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00325">325</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
-
-</div>
-</div>
-<a id="a5e86fd0fafc7ae76b3035ec01ffc4d03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e86fd0fafc7ae76b3035ec01ffc4d03">&#9670;&nbsp;</a></span>parse() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool java_bytecode_languaget::parse </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
-          <td class="paramname"><em>message_handler</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>We set the main class (i.e. class to start the class loading analysis, see <a class="el" href="classjava__class__loadert.html">java_class_loadert</a>) when we have have been given a main class. </p>
-
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00367">367</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00319">319</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
 <a id="afe55bd1c9b0a0b3604bd034bdde7561c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe55bd1c9b0a0b3604bd034bdde7561c">&#9670;&nbsp;</a></span>parse() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afe55bd1c9b0a0b3604bd034bdde7561c">&#9670;&nbsp;</a></span>parse()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1164,7 +1131,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#a6eacec14006eab49749b5a783a007349">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00382">382</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00371">371</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1328,7 +1295,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#afdd0fc4cee082c4fed4f6c6bf57ecd23">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01523">1523</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01512">1512</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1399,7 +1366,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#accea2a680b8739d3395ad63b7f485f07">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01566">1566</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l01555">1555</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1445,7 +1412,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classlanguaget.html#aa15880f00d015c012c82895a6677e2cb">languaget</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00805">805</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8cpp_source.html#l00794">794</a> of file <a class="el" href="java__bytecode__language_8cpp_source.html">java_bytecode_language.cpp</a>.</p>
 
 </div>
 </div>
@@ -1470,7 +1437,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00390">390</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00384">384</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1494,7 +1461,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00375">375</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00369">369</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1518,7 +1485,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00372">372</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00366">366</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1542,7 +1509,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00373">373</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00367">367</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1566,7 +1533,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00374">374</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00368">368</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1590,7 +1557,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00377">377</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00371">371</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1614,7 +1581,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00376">376</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00370">370</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1638,7 +1605,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00383">383</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00377">377</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1665,7 +1632,7 @@ Private Attributes</h2></td></tr>
 <p>Map used in all calls to functions that deterministically create objects (currently only <a class="el" href="assignments__from__json_8h.html#adc3a79527bc14884f08ecef901937cbe">assign_from_json</a>). </p>
 <p>It tracks objects that should be reference-equal to each other by mapping IDs of such objects to symbols that store their values. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00396">396</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00390">390</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1689,7 +1656,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00378">378</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00372">372</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1713,7 +1680,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00389">389</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00383">383</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
@@ -1740,7 +1707,7 @@ Private Attributes</h2></td></tr>
 <p>Maps synthetic method names on to the particular type of synthetic method (static initializer, initializer wrapper, etc). </p>
 <p>For full documentation see synthetic_method_map.h </p>
 
-<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00388">388</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__bytecode__language_8h_source.html#l00382">382</a> of file <a class="el" href="java__bytecode__language_8h_source.html">java_bytecode_language.h</a>.</p>
 
 </div>
 </div>
