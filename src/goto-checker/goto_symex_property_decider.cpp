@@ -114,16 +114,10 @@ decision_proceduret::resultt goto_symex_property_decidert::solve()
   return solver->decision_procedure()();
 }
 
-decision_proceduret &
+stack_decision_proceduret &
 goto_symex_property_decidert::get_decision_procedure() const
 {
   return solver->decision_procedure();
-}
-
-stack_decision_proceduret &
-goto_symex_property_decidert::get_stack_decision_procedure() const
-{
-  return solver->stack_decision_procedure();
 }
 
 symex_target_equationt &goto_symex_property_decidert::get_equation() const
