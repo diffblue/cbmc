@@ -1,5 +1,7 @@
 var NAVTREEINDEX146 =
 {
+"structured__data_8cpp_source.html":[9,0,2,30,227],
+"structured__data_8h.html":[9,0,2,30,228],
 "structured__data_8h.html#abe9d3fd2e7c47ba0bfb2f030ca0288cc":[9,0,2,30,228,3],
 "structured__data_8h_source.html":[9,0,2,30,228],
 "structured__trace__util_8cpp.html":[9,0,2,16,115],
@@ -247,7 +249,5 @@ var NAVTREEINDEX146 =
 "symtab2gb__parse__options_8cpp_source.html":[9,0,2,29,1],
 "symtab2gb__parse__options_8h.html":[9,0,2,29,2],
 "symtab2gb__parse__options_8h.html#a314aebff2cbbd99877d7e64a0ff6827f":[9,0,2,29,2,1],
-"symtab2gb__parse__options_8h.html#ab5f301549b42d5d1745d9aea4abf3cb5":[9,0,2,29,2,2],
-"symtab2gb__parse__options_8h_source.html":[9,0,2,29,2],
-"syntactic__diff_8cpp.html":[9,0,2,12,8]
+"symtab2gb__parse__options_8h.html#ab5f301549b42d5d1745d9aea4abf3cb5":[9,0,2,29,2,2]
 };
