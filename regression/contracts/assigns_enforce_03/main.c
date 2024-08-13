@@ -1,3 +1,6 @@
+void f2(int *, int *, int *);
+void f3(int *, int *, int *);
+
 void f1(int *x1, int *y1, int *z1) __CPROVER_assigns(*x1, *y1, *z1)
 {
   f2(x1, y1, z1);
@@ -22,6 +25,8 @@ int main()
   int q = 2;
   int r = 3;
   f1(&p, &q, &r);
+  f2(&p, &q, &r);
+  f3(&p, &q, &r);
 
   return 0;
 }
