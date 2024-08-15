@@ -14,74 +14,82 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_tokenizer.h"
 
-class smt2irept:public smt2_tokenizert
+class smt2irept
 {
 public:
-  smt2irept(std::istream &_in, message_handlert &message_handler)
-    : smt2_tokenizert(_in), log(message_handler)
+  explicit smt2irept(smt2_tokenizert &_tokenizer)
+    : tokenizer(_tokenizer)
   {
   }
 
   std::optional<irept> operator()();
 
 protected:
-  messaget log;
+  smt2_tokenizert tokenizer;
 };
 
 std::optional<irept> smt2irept::operator()()
 {
-  try
+  std::stack<irept> stack;
+
+  while(true)
   {
-    std::stack<irept> stack;
-
-    while(true)
+    switch(tokenizer.next_token())
     {
-      switch(next_token())
+    case smt2_tokenizert::END_OF_FILE:
+      if(stack.empty())
+        return {};
+      else
+        throw tokenizer.error("unexpected end of file");
+
+    case smt2_tokenizert::STRING_LITERAL:
+    case smt2_tokenizert::NUMERAL:
+    case smt2_tokenizert::SYMBOL:
+      if(stack.empty())
+        return irept(tokenizer.get_buffer()); // all done!
+      else
+        stack.top().get_sub().push_back(irept(tokenizer.get_buffer()));
+      break;
+
+    case smt2_tokenizert::OPEN: // '('
+      // produce sub-irep
+      stack.push(irept());
+      break;
+
+    case smt2_tokenizert::CLOSE: // ')'
+      // done with sub-irep
+      if(stack.empty())
+        throw tokenizer.error("unexpected ')'");
+      else
       {
-      case END_OF_FILE:
-        if(stack.empty())
-          return {};
-        else
-          throw error("unexpected end of file");
+        irept tmp = stack.top();
+        stack.pop();
 
-      case STRING_LITERAL:
-      case NUMERAL:
-      case SYMBOL:
         if(stack.empty())
-          return irept(buffer); // all done!
-        else
-          stack.top().get_sub().push_back(irept(buffer));
+          return tmp; // all done!
+
+        stack.top().get_sub().push_back(tmp);
         break;
-
-      case OPEN: // '('
-        // produce sub-irep
-        stack.push(irept());
-        break;
-
-      case CLOSE: // ')'
-        // done with sub-irep
-        if(stack.empty())
-          throw error("unexpected ')'");
-        else
-        {
-          irept tmp = stack.top();
-          stack.pop();
-
-          if(stack.empty())
-            return tmp; // all done!
-
-          stack.top().get_sub().push_back(tmp);
-          break;
-        }
-
-      case NONE:
-      case KEYWORD:
-        throw error("unexpected token");
       }
+
+    case smt2_tokenizert::NONE:
+    case smt2_tokenizert::KEYWORD:
+      throw tokenizer.error("unexpected token");
     }
   }
-  catch(const smt2_errort &e)
+}
+
+std::optional<irept>
+smt2irep(std::istream &in, message_handlert &message_handler)
+{
+  try
   {
+    smt2_tokenizert tokenizer{in};
+    return smt2irept{tokenizer}();
+  }
+  catch(const smt2_tokenizert::smt2_errort &e)
+  {
+    messaget log{message_handler};
     log.error().source_location.set_line(e.get_line_no());
     log.error() << e.what() << messaget::eom;
     return {};
@@ -89,7 +97,7 @@ std::optional<irept> smt2irept::operator()()
 }
 
 std::optional<irept>
-smt2irep(std::istream &in, message_handlert &message_handler)
+smt2irep(smt2_tokenizert &tokenizer)
 {
-  return smt2irept(in, message_handler)();
+  return smt2irept{tokenizer}();
 }
