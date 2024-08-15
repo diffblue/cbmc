@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "smt2_parser.h"
 
 #include "smt2_format.h"
+#include "smt2irep.h"
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
@@ -1010,6 +1011,29 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
 
 exprt smt2_parsert::expression()
 {
+  auto irep_opt = smt2irep(smt2_tokenizer);
+
+  if(!irep_opt.has_value())
+    throw error("EOF in an expression");
+
+  auto &irep_as_expr = static_cast<exprt &>(irep_opt.value());
+
+  // transform into exprt, without recursion using post-order
+  // traversal
+  irep_as_expr.visit_post([](exprt &expr) {
+    // is it a function application?
+    if(expr.get_sub().size() >= 2)
+    {
+    }
+    else
+    {
+      // literal or symbol
+    }
+  });
+
+  return irep_as_expr;
+
+#if 0
   switch(next_token())
   {
   case smt2_tokenizert::SYMBOL:
@@ -1076,6 +1100,7 @@ exprt smt2_parsert::expression()
   }
 
   UNREACHABLE;
+#endif
 }
 
 void smt2_parsert::setup_expressions()
