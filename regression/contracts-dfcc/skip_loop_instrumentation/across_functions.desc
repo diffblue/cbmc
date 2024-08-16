@@ -1,0 +1,11 @@
+CORE
+across_functions.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test case checks that when instrumentation of any look is skipped, we
+redirect write set checks to the parent write set.

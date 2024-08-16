@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 nested.c
 --dfcc main --apply-loop-contracts
 ^EXIT=0$
@@ -6,4 +6,4 @@ nested.c
 ^VERIFICATION SUCCESSFUL$
 --
 --
-We spuriously report that x is not assignable.
+We properly skip the instrumentation of both loops.
