@@ -1,6 +1,5 @@
 var NAVTREEINDEX118 =
 {
-"json__symtab__language_8h.html":[9,0,2,20,5],
 "json__symtab__language_8h.html#ac036a632affe8194bdd6454746da2a3f":[9,0,2,20,5,1],
 "json__symtab__language_8h_source.html":[9,0,2,20,5],
 "k__induction_8cpp.html":[9,0,2,15,63],
@@ -249,5 +248,6 @@ var NAVTREEINDEX118 =
 "locale_8c.html#afe784c4f5d12b74272740c5211c960c5":[9,0,2,1,2,16,2],
 "locale_8c_source.html":[9,0,2,1,2,16],
 "locals_8cpp.html":[9,0,2,0,61],
-"locals_8cpp_source.html":[9,0,2,0,61]
+"locals_8cpp_source.html":[9,0,2,0,61],
+"locals_8h.html":[9,0,2,0,62]
 };
