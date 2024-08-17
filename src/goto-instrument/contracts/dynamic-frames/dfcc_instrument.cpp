@@ -693,54 +693,38 @@ void dfcc_instrumentt::instrument_lhs(
   check_source_location.set_comment(
     "Check that " + from_expr_using_mode(ns, mode, lhs) + " is assignable");
 
-  if(cfg_info.must_check_lhs(target))
-  {
-    // ```
-    // IF !write_set GOTO skip_target;
-    // DECL check_assign: bool;
-    // CALL check_assign = check_assignment(write_set, &lhs, sizeof(lhs));
-    // ASSERT(check_assign);
-    // DEAD check_assign;
-    // skip_target: SKIP;
-    // ----
-    // ASSIGN lhs := rhs;
-    // ```
+  // ```
+  // IF !write_set GOTO skip_target;
+  // DECL check_assign: bool;
+  // CALL check_assign = check_assignment(write_set, &lhs, sizeof(lhs));
+  // ASSERT(check_assign);
+  // DEAD check_assign;
+  // skip_target: SKIP;
+  // ----
+  // ASSIGN lhs := rhs;
+  // ```
 
-    const auto check_var = dfcc_utilst::create_symbol(
-      goto_model.symbol_table,
-      bool_typet(),
-      function_id,
-      "__check_lhs_assignment",
-      lhs_source_location);
+  const auto check_var = dfcc_utilst::create_symbol(
+    goto_model.symbol_table,
+    bool_typet(),
+    function_id,
+    "__check_lhs_assignment",
+    lhs_source_location);
 
-    payload.add(goto_programt::make_decl(check_var, lhs_source_location));
+  payload.add(goto_programt::make_decl(check_var, lhs_source_location));
 
-    payload.add(goto_programt::make_function_call(
-      library.write_set_check_assignment_call(
-        check_var,
-        write_set,
-        typecast_exprt::conditional_cast(
-          address_of_exprt(lhs), pointer_type(empty_typet{})),
-        dfcc_utilst::make_sizeof_expr(lhs, ns),
-        lhs_source_location),
-      lhs_source_location));
+  payload.add(goto_programt::make_function_call(
+    library.write_set_check_assignment_call(
+      check_var,
+      write_set,
+      typecast_exprt::conditional_cast(
+        address_of_exprt(lhs), pointer_type(empty_typet{})),
+      dfcc_utilst::make_sizeof_expr(lhs, ns),
+      lhs_source_location),
+    lhs_source_location));
 
-    payload.add(
-      goto_programt::make_assertion(check_var, check_source_location));
-    payload.add(goto_programt::make_dead(check_var, check_source_location));
-  }
-  else
-  {
-    // ```
-    // IF !write_set GOTO skip_target;
-    // ASSERT(true);
-    // skip_target: SKIP;
-    // ----
-    // ASSIGN lhs := rhs;
-    // ```
-    payload.add(
-      goto_programt::make_assertion(true_exprt(), check_source_location));
-  }
+  payload.add(goto_programt::make_assertion(check_var, check_source_location));
+  payload.add(goto_programt::make_dead(check_var, check_source_location));
 
   auto label_instruction =
     payload.add(goto_programt::make_skip(lhs_source_location));
@@ -786,7 +770,8 @@ void dfcc_instrumentt::instrument_assign(
   auto &write_set = cfg_info.get_write_set(target);
 
   // check the lhs
-  instrument_lhs(function_id, target, lhs, goto_program, cfg_info);
+  if(cfg_info.must_check_lhs(target))
+    instrument_lhs(function_id, target, lhs, goto_program, cfg_info);
 
   // handle dead_object updates (created by __builtin_alloca for instance)
   // Remark: we do not really need to track this deallocation since the default
@@ -1018,7 +1003,7 @@ void dfcc_instrumentt::instrument_function_call(
   auto &write_set = cfg_info.get_write_set(target);
 
   // Instrument the lhs if any.
-  if(target->call_lhs().is_not_nil())
+  if(target->call_lhs().is_not_nil() && cfg_info.must_check_lhs(target))
   {
     instrument_lhs(
       function_id, target, target->call_lhs(), goto_program, cfg_info);
