@@ -5,7 +5,7 @@ int main()
   int x = 0;
 
   do
-    __CPROVER_loop_invariant(0 <= x && x <= 10)
+    __CPROVER_loop_invariant(0 <= x && x < 10)
     {
       x++;
     }

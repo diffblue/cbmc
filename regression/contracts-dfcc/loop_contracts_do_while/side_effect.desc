@@ -1,5 +1,5 @@
-CORE dfcc-only
-main.c
+KNOWNBUG
+side_effect.c
 --dfcc main --apply-loop-contracts
 ^EXIT=0$
 ^SIGNAL=0$
