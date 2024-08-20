@@ -12,7 +12,7 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 #define CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 
-#include <solvers/prop/prop.h>
+#include <solvers/flattening/boolbv.h>
 #include <solvers/smt2/smt2_dec.h>
 
 #include <memory>
@@ -45,17 +45,17 @@ public:
     solvert(
       std::unique_ptr<stack_decision_proceduret> p1,
       std::unique_ptr<std::ofstream> p2);
+    solvert(std::unique_ptr<boolbvt> p1, std::unique_ptr<propt> p2);
 
     stack_decision_proceduret &decision_procedure() const;
+    boolbvt &boolbv_decision_procedure() const;
 
-    void set_decision_procedure(std::unique_ptr<stack_decision_proceduret> p);
-    void set_prop(std::unique_ptr<propt> p);
-    void set_ofstream(std::unique_ptr<std::ofstream> p);
-
+  private:
     // the objects are deleted in the opposite order they appear below
     std::unique_ptr<std::ofstream> ofstream_ptr;
     std::unique_ptr<propt> prop_ptr;
     std::unique_ptr<stack_decision_proceduret> decision_procedure_ptr;
+    std::unique_ptr<boolbvt> decision_procedure_is_boolbvt_ptr;
   };
 
   /// Returns a solvert object
