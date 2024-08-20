@@ -42,7 +42,7 @@ protected:
 
   std::string convert_rec(
     const typet &src,
-    const qualifierst &qualifiers,
+    const c_qualifierst &qualifiers,
     const std::string &declarator) override;
 };
 
@@ -130,11 +130,11 @@ std::string expr2cppt::convert_constant(
 
 std::string expr2cppt::convert_rec(
   const typet &src,
-  const qualifierst &qualifiers,
+  const c_qualifierst &qualifiers,
   const std::string &declarator)
 {
-  std::unique_ptr<qualifierst> clone = qualifiers.clone();
-  qualifierst &new_qualifiers = *clone;
+  std::unique_ptr<c_qualifierst> clone = qualifiers.clone();
+  c_qualifierst &new_qualifiers = *clone;
   new_qualifiers.read(src);
 
   const std::string d = declarator.empty() ? declarator : (" " + declarator);
@@ -274,7 +274,7 @@ std::string expr2cppt::convert_rec(
     typet member;
     member.swap(tmp.add(ID_to_member));
 
-    std::string dest="("+convert_rec(member, c_qualifierst(), "")+":: *)";
+    std::string dest = "(" + convert(member) + ":: *)";
 
     const auto &base_type = to_pointer_type(src).base_type();
 
@@ -282,7 +282,7 @@ std::string expr2cppt::convert_rec(
     {
       const code_typet &code_type = to_code_type(base_type);
       const typet &return_type = code_type.return_type();
-      dest=convert_rec(return_type, c_qualifierst(), "")+" "+dest;
+      dest = convert(return_type) + " " + dest;
 
       const code_typet::parameterst &args = code_type.parameters();
       dest+="(";
@@ -293,14 +293,14 @@ std::string expr2cppt::convert_rec(
       {
         if(it!=args.begin())
           dest+=", ";
-        dest+=convert_rec(it->type(), c_qualifierst(), "");
+        dest += convert(it->type());
       }
 
       dest+=")";
       dest+=d;
     }
     else
-      dest = convert_rec(base_type, c_qualifierst(), "") + " " + dest + d;
+      dest = convert(base_type) + " " + dest + d;
 
     return dest;
   }

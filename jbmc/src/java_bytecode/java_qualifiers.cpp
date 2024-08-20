@@ -20,7 +20,7 @@ java_qualifierst &java_qualifierst::operator=(const java_qualifierst &other)
   return *this;
 }
 
-std::unique_ptr<qualifierst> java_qualifierst::clone() const
+std::unique_ptr<c_qualifierst> java_qualifierst::clone() const
 {
   auto other = std::make_unique<java_qualifierst>(ns);
   *other = *this;

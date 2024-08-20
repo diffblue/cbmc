@@ -24,11 +24,11 @@ c_qualifierst &c_qualifierst::operator=(const c_qualifierst &other)
   return *this;
 }
 
-std::unique_ptr<qualifierst> c_qualifierst::clone() const
+std::unique_ptr<c_qualifierst> c_qualifierst::clone() const
 {
   auto other = std::make_unique<c_qualifierst>();
   *other = *this;
-  return std::move(other);
+  return other;
 }
 
 std::string c_qualifierst::as_string() const
@@ -150,10 +150,4 @@ void c_qualifierst::clear(typet &dest)
   dest.remove(ID_C_transparent_union);
   dest.remove(ID_C_nodiscard);
   dest.remove(ID_C_noreturn);
-}
-
-/// pretty-print the qualifiers
-std::ostream &operator<<(std::ostream &out, const qualifierst &qualifiers)
-{
-  return out << qualifiers.as_string();
 }

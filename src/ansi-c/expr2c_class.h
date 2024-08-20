@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 
 class annotated_pointer_constant_exprt;
-class qualifierst;
+class c_qualifierst;
 class namespacet;
 class r_or_w_ok_exprt;
 class pointer_in_range_exprt;
@@ -57,7 +57,7 @@ protected:
 
   virtual std::string convert_rec(
     const typet &src,
-    const qualifierst &qualifiers,
+    const c_qualifierst &qualifiers,
     const std::string &declarator);
 
   virtual std::string convert_struct_type(
@@ -74,12 +74,12 @@ protected:
 
   virtual std::string convert_array_type(
     const typet &src,
-    const qualifierst &qualifiers,
+    const c_qualifierst &qualifiers,
     const std::string &declarator_str);
 
   std::string convert_array_type(
     const typet &src,
-    const qualifierst &qualifiers,
+    const c_qualifierst &qualifiers,
     const std::string &declarator_str,
     bool inc_size_if_possible);
 
