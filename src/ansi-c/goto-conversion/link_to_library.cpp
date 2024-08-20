@@ -41,26 +41,36 @@ add_one_function(
   // convert to CFG
   if(
     library_model.symbol_table.symbols.find(missing_function) !=
-    library_model.symbol_table.symbols.end())
+      library_model.symbol_table.symbols.end() &&
+    library_model.symbol_table.lookup_ref(missing_function).value.is_not_nil())
   {
     goto_convert(
       missing_function,
       library_model.symbol_table,
       library_model.goto_functions,
       message_handler);
+    // this function is now included in goto_functions, no need to re-convert
+    // should the goto binary be reloaded
+    library_model.symbol_table.get_writeable_ref(missing_function)
+      .set_compiled();
   }
   // We might need a function that's outside our own library, but brought in via
   // some header file included by the library. Those functions already exist in
   // goto_model.symbol_table, but haven't been converted just yet.
   else if(
     goto_model.symbol_table.symbols.find(missing_function) !=
-    goto_model.symbol_table.symbols.end())
+      goto_model.symbol_table.symbols.end() &&
+    goto_model.symbol_table.lookup_ref(missing_function).value.is_not_nil() &&
+    !goto_model.symbol_table.lookup_ref(missing_function).is_compiled())
   {
     goto_convert(
       missing_function,
       goto_model.symbol_table,
       library_model.goto_functions,
       message_handler);
+    // this function is now included in goto_functions, no need to re-convert
+    // should the goto binary be reloaded
+    goto_model.symbol_table.get_writeable_ref(missing_function).set_compiled();
   }
 
   // check whether additional initialization may be required

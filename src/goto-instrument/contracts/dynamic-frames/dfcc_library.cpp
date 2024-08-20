@@ -326,6 +326,7 @@ void dfcc_libraryt::load(std::set<irep_idt> &to_instrument)
   {
     goto_convert(
       id, goto_model.symbol_table, goto_model.goto_functions, message_handler);
+    goto_model.symbol_table.get_writeable_ref(id).set_compiled();
   }
 
   // check that all symbols have a goto_implementation

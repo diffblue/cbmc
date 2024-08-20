@@ -546,12 +546,8 @@ cext cegis_verifiert::build_cex(
 
 void cegis_verifiert::restore_functions()
 {
-  for(const auto &fun_entry : goto_model.goto_functions.function_map)
-  {
-    irep_idt fun_name = fun_entry.first;
-    goto_model.goto_functions.function_map[fun_name].body.swap(
-      original_functions[fun_name]);
-  }
+  for(auto &[fun_name, orig_fun_body] : original_functions)
+    goto_model.goto_functions.function_map[fun_name].body.swap(orig_fun_body);
 }
 
 std::optional<cext> cegis_verifiert::verify()
@@ -569,10 +565,12 @@ std::optional<cext> cegis_verifiert::verify()
   // 3. construct the formatted counterexample from the violated property and
   //    its trace.
 
-  // Store the original functions. We will restore them after the verification.
+  // Store the original functions when they have a body (library functions might
+  // not yet have one). We will restore them after the verification.
   for(const auto &fun_entry : goto_model.goto_functions.function_map)
   {
-    original_functions[fun_entry.first].copy_from(fun_entry.second.body);
+    if(fun_entry.second.body_available())
+      original_functions[fun_entry.first].copy_from(fun_entry.second.body);
   }
 
   // Annotate the candidates to the goto_model for checking.

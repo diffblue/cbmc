@@ -58,5 +58,8 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
 
   rm "${name}${dfcc_suffix}-mod.c"
 fi
+if ! echo "${args_cbmc}" | grep -q -- --function ; then
+  $goto_instrument --drop-unused-functions "${name}${dfcc_suffix}-mod.gb" "${name}${dfcc_suffix}-mod.gb"
+fi
 $goto_instrument --show-goto-functions "${name}${dfcc_suffix}-mod.gb"
 $cbmc --sat-solver cadical "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}

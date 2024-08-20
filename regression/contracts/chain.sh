@@ -41,5 +41,8 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
 
   rm "${name}-mod.c"
 fi
+if ! echo "${args_cbmc}" | grep -q -- --function ; then
+  $goto_instrument --drop-unused-functions "${name}-mod.gb" "${name}-mod.gb"
+fi
 $goto_instrument --show-goto-functions "${name}-mod.gb"
 $cbmc "${name}-mod.gb" ${args_cbmc}
