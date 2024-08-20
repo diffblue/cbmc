@@ -22,7 +22,6 @@ class message_handlert;
 class namespacet;
 class optionst;
 class solver_resource_limitst;
-class stack_decision_proceduret;
 
 class solver_factoryt final
 {
@@ -39,23 +38,24 @@ public:
   class solvert final
   {
   public:
-    explicit solvert(std::unique_ptr<decision_proceduret> p);
-    solvert(std::unique_ptr<decision_proceduret> p1, std::unique_ptr<propt> p2);
+    explicit solvert(std::unique_ptr<stack_decision_proceduret> p);
     solvert(
-      std::unique_ptr<decision_proceduret> p1,
+      std::unique_ptr<stack_decision_proceduret> p1,
+      std::unique_ptr<propt> p2);
+    solvert(
+      std::unique_ptr<stack_decision_proceduret> p1,
       std::unique_ptr<std::ofstream> p2);
 
-    decision_proceduret &decision_procedure() const;
-    stack_decision_proceduret &stack_decision_procedure() const;
+    stack_decision_proceduret &decision_procedure() const;
 
-    void set_decision_procedure(std::unique_ptr<decision_proceduret> p);
+    void set_decision_procedure(std::unique_ptr<stack_decision_proceduret> p);
     void set_prop(std::unique_ptr<propt> p);
     void set_ofstream(std::unique_ptr<std::ofstream> p);
 
     // the objects are deleted in the opposite order they appear below
     std::unique_ptr<std::ofstream> ofstream_ptr;
     std::unique_ptr<propt> prop_ptr;
-    std::unique_ptr<decision_proceduret> decision_procedure_ptr;
+    std::unique_ptr<stack_decision_proceduret> decision_procedure_ptr;
   };
 
   /// Returns a solvert object

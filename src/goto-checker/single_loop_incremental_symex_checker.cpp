@@ -44,7 +44,7 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
 
   // Freeze all symbols if we are using a prop_conv_solvert
   prop_conv_solvert *prop_conv_solver = dynamic_cast<prop_conv_solvert *>(
-    &property_decider.get_stack_decision_procedure());
+    &property_decider.get_decision_procedure());
   if(prop_conv_solver != nullptr)
     prop_conv_solver->set_all_frozen();
 }
@@ -114,7 +114,7 @@ operator()(propertiest &properties)
           properties);
 
         // We convert the assertions in a new context.
-        property_decider.get_stack_decision_procedure().push();
+        property_decider.get_decision_procedure().push();
         equation.convert_assertions(
           property_decider.get_decision_procedure(), false);
         property_decider.convert_goals();
@@ -154,7 +154,7 @@ operator()(propertiest &properties)
 
       // Nothing else to do with the current set of assertions.
       // Let's pop them.
-      property_decider.get_stack_decision_procedure().pop();
+      property_decider.get_decision_procedure().pop();
     }
 
     // Now we are finally done.
@@ -207,7 +207,7 @@ goto_tracet single_loop_incremental_symex_checkert::build_shortest_trace() const
   {
     // NOLINTNEXTLINE(whitespace/braces)
     counterexample_beautificationt{ui_message_handler}(
-      dynamic_cast<boolbvt &>(property_decider.get_stack_decision_procedure()),
+      dynamic_cast<boolbvt &>(property_decider.get_decision_procedure()),
       equation);
   }
 

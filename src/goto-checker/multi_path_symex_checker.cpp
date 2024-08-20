@@ -113,7 +113,7 @@ goto_tracet multi_path_symex_checkert::build_shortest_trace() const
   {
     // NOLINTNEXTLINE(whitespace/braces)
     counterexample_beautificationt{ui_message_handler}(
-      dynamic_cast<boolbvt &>(property_decider.get_stack_decision_procedure()),
+      dynamic_cast<boolbvt &>(property_decider.get_decision_procedure()),
       equation);
   }
 
@@ -161,7 +161,7 @@ multi_path_symex_checkert::localize_fault(const irep_idt &property_id) const
     options,
     ui_message_handler,
     equation,
-    property_decider.get_stack_decision_procedure());
+    property_decider.get_decision_procedure());
 
   return fault_localizer(property_id);
 }

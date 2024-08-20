@@ -46,39 +46,29 @@ solver_factoryt::solver_factoryt(
 {
 }
 
-solver_factoryt::solvert::solvert(std::unique_ptr<decision_proceduret> p)
+solver_factoryt::solvert::solvert(std::unique_ptr<stack_decision_proceduret> p)
   : decision_procedure_ptr(std::move(p))
 {
 }
 
 solver_factoryt::solvert::solvert(
-  std::unique_ptr<decision_proceduret> p1,
+  std::unique_ptr<stack_decision_proceduret> p1,
   std::unique_ptr<propt> p2)
   : prop_ptr(std::move(p2)), decision_procedure_ptr(std::move(p1))
 {
 }
 
 solver_factoryt::solvert::solvert(
-  std::unique_ptr<decision_proceduret> p1,
+  std::unique_ptr<stack_decision_proceduret> p1,
   std::unique_ptr<std::ofstream> p2)
   : ofstream_ptr(std::move(p2)), decision_procedure_ptr(std::move(p1))
 {
 }
 
-decision_proceduret &solver_factoryt::solvert::decision_procedure() const
+stack_decision_proceduret &solver_factoryt::solvert::decision_procedure() const
 {
   PRECONDITION(decision_procedure_ptr != nullptr);
   return *decision_procedure_ptr;
-}
-
-stack_decision_proceduret &
-solver_factoryt::solvert::stack_decision_procedure() const
-{
-  PRECONDITION(decision_procedure_ptr != nullptr);
-  stack_decision_proceduret *solver =
-    dynamic_cast<stack_decision_proceduret *>(&*decision_procedure_ptr);
-  INVARIANT(solver != nullptr, "stack decision procedure required");
-  return *solver;
 }
 
 void solver_factoryt::set_decision_procedure_time_limit(
@@ -92,7 +82,7 @@ void solver_factoryt::set_decision_procedure_time_limit(
 }
 
 void solver_factoryt::solvert::set_decision_procedure(
-  std::unique_ptr<decision_proceduret> p)
+  std::unique_ptr<stack_decision_proceduret> p)
 {
   decision_procedure_ptr = std::move(p);
 }
