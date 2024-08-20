@@ -1,7 +1,5 @@
 var NAVTREEINDEX147 =
 {
-"syntactic__diff_8cpp.html":[9,0,2,12,8],
-"syntactic__diff_8cpp_source.html":[9,0,2,12,8],
 "syntactic__diff_8h.html":[9,0,2,12,9],
 "syntactic__diff_8h_source.html":[9,0,2,12,9],
 "synthesizer__utils_8cpp.html":[9,0,2,18,15],
@@ -249,5 +247,7 @@ var NAVTREEINDEX147 =
 "unicode_8h.html":[9,0,2,30,254],
 "unicode_8h.html#a029bf76c5dee7c32254d25ebaa1c2cf4":[9,0,2,30,254,3],
 "unicode_8h.html#a156423ccc1d0cc47ac7cc6260b3a5851":[9,0,2,30,254,5],
-"unicode_8h.html#a1f4587d9e92cb548931b3b29508561de":[9,0,2,30,254,4]
+"unicode_8h.html#a1f4587d9e92cb548931b3b29508561de":[9,0,2,30,254,4],
+"unicode_8h.html#a54a797d3af974232b7a83cc83845156e":[9,0,2,30,254,0],
+"unicode_8h.html#a5847ed5909234c93c684322a16cf1fe0":[9,0,2,30,254,12]
 };
