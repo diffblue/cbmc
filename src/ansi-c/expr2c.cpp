@@ -213,16 +213,16 @@ void expr2ct::get_shorthands(const exprt &expr)
 
 std::string expr2ct::convert(const typet &src)
 {
-  return convert_rec(src, c_qualifierst(), "");
+  return convert_with_identifier(src, "");
 }
 
 std::string expr2ct::convert_rec(
   const typet &src,
-  const qualifierst &qualifiers,
+  const c_qualifierst &qualifiers,
   const std::string &declarator)
 {
-  std::unique_ptr<qualifierst> clone = qualifiers.clone();
-  c_qualifierst &new_qualifiers = dynamic_cast<c_qualifierst &>(*clone);
+  std::unique_ptr<c_qualifierst> clone = qualifiers.clone();
+  c_qualifierst &new_qualifiers = *clone;
   new_qualifiers.read(src);
 
   std::string q=new_qualifiers.as_string();
@@ -379,7 +379,7 @@ std::string expr2ct::convert_rec(
       for(const auto &c : union_type.components())
       {
         dest += ' ';
-        dest += convert_rec(c.type(), c_qualifierst(), id2string(c.get_name()));
+        dest += convert_with_identifier(c.type(), id2string(c.get_name()));
         dest += ';';
       }
 
@@ -538,7 +538,7 @@ std::string expr2ct::convert_rec(
         {
           std::string arg_declarator=
             convert(symbol_exprt(it->get_identifier(), it->type()));
-          dest+=convert_rec(it->type(), c_qualifierst(), arg_declarator);
+          dest += convert_with_identifier(it->type(), arg_declarator);
         }
       }
 
@@ -692,10 +692,8 @@ std::string expr2ct::convert_struct_type(
       }
 
       dest+=' ';
-      dest+=convert_rec(
-        component.type(),
-        c_qualifierst(),
-        id2string(component.get_name()));
+      dest += convert_with_identifier(
+        component.type(), id2string(component.get_name()));
       dest+=';';
     }
 
@@ -715,7 +713,7 @@ std::string expr2ct::convert_struct_type(
 /// \return A C-like type declaration of an array
 std::string expr2ct::convert_array_type(
   const typet &src,
-  const qualifierst &qualifiers,
+  const c_qualifierst &qualifiers,
   const std::string &declarator_str)
 {
   return convert_array_type(
@@ -732,7 +730,7 @@ std::string expr2ct::convert_array_type(
 /// \return A C-like type declaration of an array
 std::string expr2ct::convert_array_type(
   const typet &src,
-  const qualifierst &qualifiers,
+  const c_qualifierst &qualifiers,
   const std::string &declarator_str,
   bool inc_size_if_possible)
 {
@@ -2850,7 +2848,7 @@ expr2ct::convert_code_frontend_decl(const codet &src, unsigned indent)
       dest+="inline ";
   }
 
-  dest+=convert_rec(src.op0().type(), c_qualifierst(), declarator);
+  dest += convert_with_identifier(src.op0().type(), declarator);
 
   if(src.operands().size()==2)
     dest+="="+convert(src.op1());

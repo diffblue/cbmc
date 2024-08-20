@@ -42,7 +42,7 @@ protected:
 
   virtual std::string convert_rec(
     const typet &src,
-    const qualifierst &qualifiers,
+    const c_qualifierst &qualifiers,
     const std::string &declarator) override;
 
   // length of string representation of Java Char

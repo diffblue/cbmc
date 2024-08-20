@@ -23,7 +23,7 @@ public:
 protected:
   java_qualifierst &operator=(const java_qualifierst &other);
 public:
-  virtual std::unique_ptr<qualifierst> clone() const override;
+  std::unique_ptr<c_qualifierst> clone() const override;
 
   java_qualifierst &operator+=(const java_qualifierst &other);
 
@@ -31,12 +31,12 @@ public:
   {
     return annotations;
   }
-  virtual std::size_t count() const override;
+  std::size_t count() const override;
 
-  virtual void clear() override;
+  void clear() override;
 
-  virtual void read(const typet &src) override;
-  virtual void write(typet &src) const override;
+  void read(const typet &src) override;
+  void write(typet &src) const override;
 
   bool is_subset_of(const java_qualifierst &other) const;
   bool operator==(const java_qualifierst &other) const;
@@ -45,7 +45,7 @@ public:
     return !(*this == other);
   }
 
-  virtual std::string as_string() const override;
+  std::string as_string() const override;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_QUALIFIERS_H
