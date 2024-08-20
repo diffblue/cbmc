@@ -250,7 +250,7 @@ void insert_before_and_update_jumps(
   const auto new_target = destination.insert_before(target, i);
   for(auto it : target->incoming_edges)
   {
-    if(it->is_goto())
+    if(it->is_goto() && it->get_target() == target)
       it->set_target(new_target);
   }
 }

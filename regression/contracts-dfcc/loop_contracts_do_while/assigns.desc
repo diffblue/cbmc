@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE dfcc-only
 assigns.c
 --dfcc main --apply-loop-contracts
 ^EXIT=0$
