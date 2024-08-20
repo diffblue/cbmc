@@ -11,7 +11,6 @@ var searchData=
   ['qbf_5fsquolemt_23422',['qbf_squolemt',['../classqbf__squolemt.html',1,'']]],
   ['qdimacs_5fcnft_23423',['qdimacs_cnft',['../classqdimacs__cnft.html',1,'']]],
   ['qdimacs_5fcoret_23424',['qdimacs_coret',['../classqdimacs__coret.html',1,'']]],
-  ['qualifierst_23425',['qualifierst',['../classqualifierst.html',1,'']]],
-  ['quantifier_5fexprt_23426',['quantifier_exprt',['../classquantifier__exprt.html',1,'']]],
-  ['quantifiert_23427',['quantifiert',['../classboolbvt_1_1quantifiert.html',1,'boolbvt::quantifiert'],['../classqdimacs__cnft_1_1quantifiert.html',1,'qdimacs_cnft::quantifiert']]]
+  ['quantifier_5fexprt_23425',['quantifier_exprt',['../classquantifier__exprt.html',1,'']]],
+  ['quantifiert_23426',['quantifiert',['../classboolbvt_1_1quantifiert.html',1,'boolbvt::quantifiert'],['../classqdimacs__cnft_1_1quantifiert.html',1,'qdimacs_cnft::quantifiert']]]
 ];

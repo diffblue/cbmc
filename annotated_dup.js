@@ -971,7 +971,6 @@ var annotated_dup =
     [ "qbf_squolemt", "classqbf__squolemt.html", "classqbf__squolemt" ],
     [ "qdimacs_cnft", "classqdimacs__cnft.html", "classqdimacs__cnft" ],
     [ "qdimacs_coret", "classqdimacs__coret.html", "classqdimacs__coret" ],
-    [ "qualifierst", "classqualifierst.html", "classqualifierst" ],
     [ "quantifier_exprt", "classquantifier__exprt.html", "classquantifier__exprt" ],
     [ "r_ok_exprt", "classr__ok__exprt.html", "classr__ok__exprt" ],
     [ "r_or_w_ok_exprt", "classr__or__w__ok__exprt.html", "classr__or__w__ok__exprt" ],

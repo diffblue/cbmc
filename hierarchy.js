@@ -204,6 +204,9 @@ var hierarchy =
     [ "bytecode_infot", "structbytecode__infot.html", null ],
     [ "c_declarationt", "structc__declarationt.html", null ],
     [ "c_definest", "classc__definest.html", null ],
+    [ "c_qualifierst", "classc__qualifierst.html", [
+      [ "java_qualifierst", "classjava__qualifierst.html", null ]
+    ] ],
     [ "c_storage_spect", "classc__storage__spect.html", null ],
     [ "c_test_input_generatort", "classc__test__input__generatort.html", null ],
     [ "c_typecastt", "classc__typecastt.html", [
@@ -1333,11 +1336,6 @@ var hierarchy =
           [ "satcheck_picosatt", "classsatcheck__picosatt.html", null ]
         ] ],
         [ "dimacs_cnf_dumpt", "classdimacs__cnf__dumpt.html", null ]
-      ] ]
-    ] ],
-    [ "qualifierst", "classqualifierst.html", [
-      [ "c_qualifierst", "classc__qualifierst.html", [
-        [ "java_qualifierst", "classjava__qualifierst.html", null ]
       ] ]
     ] ],
     [ "boolbvt::quantifiert", "classboolbvt_1_1quantifiert.html", null ],

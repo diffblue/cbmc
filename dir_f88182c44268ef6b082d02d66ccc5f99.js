@@ -42,9 +42,8 @@ var dir_f88182c44268ef6b082d02d66ccc5f99 =
     [ "c_object_factory_parameters.h", "c__object__factory__parameters_8h.html", "c__object__factory__parameters_8h" ],
     [ "c_preprocess.cpp", "c__preprocess_8cpp.html", "c__preprocess_8cpp" ],
     [ "c_preprocess.h", "c__preprocess_8h.html", "c__preprocess_8h" ],
-    [ "c_qualifiers.cpp", "c__qualifiers_8cpp.html", "c__qualifiers_8cpp" ],
+    [ "c_qualifiers.cpp", "c__qualifiers_8cpp.html", null ],
     [ "c_qualifiers.h", "c__qualifiers_8h.html", [
-      [ "qualifierst", "classqualifierst.html", "classqualifierst" ],
       [ "c_qualifierst", "classc__qualifierst.html", "classc__qualifierst" ]
     ] ],
     [ "c_storage_spec.cpp", "c__storage__spec_8cpp.html", null ],

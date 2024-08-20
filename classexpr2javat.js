@@ -11,7 +11,7 @@ var classexpr2javat =
     [ "convert_java_instanceof", "classexpr2javat.html#acf3e38fcd3769cf38f8a3078447000b5", null ],
     [ "convert_java_new", "classexpr2javat.html#a4f4d071f91d3eb381f8187152ee0e361", null ],
     [ "convert_java_this", "classexpr2javat.html#af3646e2ddd4428c339605d895d415d40", null ],
-    [ "convert_rec", "classexpr2javat.html#a2901f36313595634d54b41a0ce7bbed1", null ],
+    [ "convert_rec", "classexpr2javat.html#a8bc01dbbac83f4d5b9ee9d1699ac6b7f", null ],
     [ "convert_struct", "classexpr2javat.html#a51ed3ff483c24ec51267dee379f409f7", null ],
     [ "convert_with_precedence", "classexpr2javat.html#a53b83c15a6f2f51658ffa7ee8a1e6d79", null ],
     [ "char_representation_length", "classexpr2javat.html#ac77ee026ce1a4467a0209cd89a0e7fe2", null ]
