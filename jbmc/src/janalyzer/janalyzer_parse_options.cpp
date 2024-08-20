@@ -401,13 +401,13 @@ int janalyzer_parse_optionst::doit()
   log.status() << "Generating GOTO Program" << messaget::eom;
   lazy_goto_model.load_all_functions();
 
-  std::unique_ptr<abstract_goto_modelt> goto_model_ptr =
+  std::unique_ptr<goto_modelt> goto_model_ptr =
     lazy_goto_modelt::process_whole_model_and_freeze(
       std::move(lazy_goto_model));
   if(goto_model_ptr == nullptr)
     return CPROVER_EXIT_INTERNAL_ERROR;
 
-  goto_modelt &goto_model = dynamic_cast<goto_modelt &>(*goto_model_ptr);
+  goto_modelt &goto_model = *goto_model_ptr;
 
   // show it?
   if(cmdline.isset("show-symbol-table"))
