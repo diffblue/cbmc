@@ -153,7 +153,7 @@ void dfcc_check_loop_normal_form(goto_programt &goto_program, messaget &log)
     //       IF g THEN GOTO HEAD
     // --------------------------
     //       IF !g THEN GOTO EXIT
-    //       GOTO HEAD
+    //       IF TRUE GOTO HEAD
     // EXIT: SKIP
     // ```
     if(latch->has_condition() && !latch->condition().is_true())
@@ -162,24 +162,38 @@ void dfcc_check_loop_normal_form(goto_programt &goto_program, messaget &log)
       const auto &exit =
         goto_program.insert_after(latch, goto_programt::make_skip(loc));
 
+      // Insert the loop exit jump `F !g THEN GOTO EXIT`
       insert_before_and_update_jumps(
         goto_program,
         latch,
         goto_programt::make_goto(
           exit, not_exprt(latch->condition()), latch->source_location()));
 
-      // CAUTION: The condition expression needs to be updated in place because
-      // this is where loop contract clauses are stored as extra ireps.
-      // Overwriting this expression with a fresh expression will also lose the
-      // loop contract.
-      exprt latch_condition = latch->condition();
-      latch_condition.set(ID_value, ID_true);
-      *latch = goto_programt::make_goto(head, latch_condition, loc);
+      // Rewrite the latch node `IF g THEN GOTO HEAD`
+      // into `IF true THEN GOTO HEAD`
+      // and transplanting contract clauses
+      exprt new_condition = true_exprt();
+
+      // Extract the contract clauses from the existing latch condition,
+      const exprt &latch_condition = latch->condition();
+      irept latch_assigns = latch_condition.find(ID_C_spec_assigns);
+      if(latch_assigns.is_not_nil())
+        new_condition.add(ID_C_spec_assigns).swap(latch_assigns);
+
+      irept latch_loop_invariant =
+        latch_condition.find(ID_C_spec_loop_invariant);
+      if(latch_loop_invariant.is_not_nil())
+        new_condition.add(ID_C_spec_loop_invariant).swap(latch_loop_invariant);
+
+      irept latch_decreases = latch_condition.find(ID_C_spec_decreases);
+      if(latch_decreases.is_not_nil())
+        new_condition.add(ID_C_spec_decreases).swap(latch_decreases);
+
+      latch->condition_nonconst() = new_condition;
+      // The latch node is now an unconditional jump with contract clauses
     }
 
-    // The latch node is now an unconditional jump.
-
-    // insert a SKIP pre-head node and reroute all incoming edges to that node,
+    // Insert a SKIP pre-head node and reroute all incoming edges to that node,
     // except for edge coming from the latch.
     insert_before_and_update_jumps(
       goto_program, head, goto_programt::make_skip(head->source_location()));
