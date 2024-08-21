@@ -124,7 +124,7 @@ foreach(SOLVER ${sat_impl})
             URL https://github.com/arminbiere/cadical/archive/rel-2.0.0.tar.gz
             PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/cadical-2.0.0-patch
             COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/cadical_CMakeLists.txt CMakeLists.txt
-            COMMAND ./configure
+            COMMAND sh ./configure
             URL_MD5 9fc2a66196b86adceb822a583318cc35
         )
 
@@ -146,7 +146,7 @@ foreach(SOLVER ${sat_impl})
         download_project(PROJ cadical
             URL https://github.com/arminbiere/cadical/archive/rel-2.0.0.tar.gz
             PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/cadical-2.0.0-patch
-            COMMAND ./configure
+            COMMAND sh ./configure
             URL_MD5 9fc2a66196b86adceb822a583318cc35
         )
 

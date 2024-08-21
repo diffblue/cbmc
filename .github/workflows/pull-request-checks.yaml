@@ -730,7 +730,7 @@ jobs:
           echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
           echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
       - name: Configure with cmake
-        run: cmake -S . -B build
+        run: cmake -S . -B build -Dsat_impl="minisat2;cadical"
       - name: Zero ccache stats and limit in size (2 GB)
         run: |
           clcache -z
@@ -858,7 +858,7 @@ jobs:
           echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
           echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
       - name: Configure with cmake
-        run: cmake -S . -B build
+        run: cmake -S . -B build -Dsat_impl="minisat2;cadical"
       - name: Build Release
         run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
       - name: Print ccache stats
