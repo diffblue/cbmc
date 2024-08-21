@@ -144,6 +144,13 @@ public:
   /// this loop. This is the one that must be passed as argument to write set
   /// functions.
   const symbol_exprt addr_of_write_set_var;
+
+  /// Returns true if the loop has no invariant and no decreases clause
+  /// and its instrumentation must be skipped.
+  const bool must_skip() const
+  {
+    return invariant.is_nil() && decreases.empty();
+  }
 };
 
 /// Computes natural loops, enforces normal form conditions, computes the
@@ -248,7 +255,9 @@ public:
   /// \brief Returns the loop info for that loop_id.
   const dfcc_loop_infot &get_loop_info(const std::size_t loop_id) const;
 
-  /// \brief Returns the write set variable for that instruction.
+  /// \brief Returns the write set variable to use for the given instruction
+  /// Returns the write set for the loop, or one of the outer loops,
+  /// or top level, passing through all loops that are [must_skip]
   const exprt &get_write_set(goto_programt::const_targett target) const;
 
   /// \brief Returns the set of local variable for the scope where that
@@ -269,6 +278,11 @@ public:
   {
     return topsorted_loops;
   }
+
+  /// \brief Returns the id of the first outer loop (including this one) that
+  /// is not skipped, or the top level id.
+  std::size_t
+  get_first_id_not_skipped_or_top_level_id(const std::size_t loop_id) const;
 
   /// Finds the DFCC id of the loop that contains the given loop, returns
   /// nullopt when the loop has no outer loop.
@@ -313,6 +327,9 @@ private:
 
   /// True iff \p id is in the valid range for a loop id for this function.
   bool is_top_level_id(const std::size_t id) const;
+
+  /// Returns the top level ID
+  size_t top_level_id() const;
 
   /// Loop identifiers sorted from most deeply nested to less deeply nested
   std::vector<std::size_t> topsorted_loops;

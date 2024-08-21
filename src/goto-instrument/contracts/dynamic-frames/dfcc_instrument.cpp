@@ -1239,7 +1239,7 @@ void dfcc_instrumentt::apply_loop_contracts(
   for(const auto &loop_id : cfg_info.get_loops_toposorted())
   {
     const auto &loop = cfg_info.get_loop_info(loop_id);
-    if(loop.invariant.is_nil() && loop.decreases.empty())
+    if(loop.must_skip())
     {
       // skip loops that do not have contracts
       log.warning() << "loop " << function_id << "." << loop.cbmc_loop_id

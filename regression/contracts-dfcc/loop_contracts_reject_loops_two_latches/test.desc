@@ -1,10 +1,11 @@
 CORE dfcc-only
 main.c
 --dfcc main --apply-loop-contracts
-^EXIT=10$
+^EXIT=0$
 ^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
 --
-^Found loop with more than one latch instruction$
 --
 This test checks that our loop contract instrumentation first transforms loops
-so as to only have a single loop latch.
+so as to only have a single loop latch, and skips instrumentation if the result
+has no contract.

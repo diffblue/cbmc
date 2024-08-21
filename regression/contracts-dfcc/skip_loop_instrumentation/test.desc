@@ -1,0 +1,11 @@
+CORE
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test case checks that when the instrumentation of nested loops is skipped, we redirect the write set checks to the
+outer write set.

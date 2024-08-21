@@ -628,6 +628,17 @@ void dfcc_cfg_infot::output(std::ostream &out) const
   }
 }
 
+std::size_t dfcc_cfg_infot::get_first_id_not_skipped_or_top_level_id(
+  const std::size_t loop_id) const
+{
+  if(is_top_level_id(loop_id) || !get_loop_info(loop_id).must_skip())
+  {
+    return loop_id;
+  }
+  return get_first_id_not_skipped_or_top_level_id(
+    get_outer_loop_identifier(loop_id).value_or(top_level_id()));
+}
+
 const exprt &
 dfcc_cfg_infot::get_write_set(goto_programt::const_targett target) const
 {
@@ -635,7 +646,7 @@ dfcc_cfg_infot::get_write_set(goto_programt::const_targett target) const
   PRECONDITION(
     loop_id_opt.has_value() &&
     is_valid_loop_or_top_level_id(loop_id_opt.value()));
-  auto loop_id = loop_id_opt.value();
+  auto loop_id = get_first_id_not_skipped_or_top_level_id(loop_id_opt.value());
   if(is_top_level_id(loop_id))
   {
     return top_level_write_set;
@@ -734,6 +745,11 @@ bool dfcc_cfg_infot::is_top_level_id(const std::size_t id) const
   return id == loop_info_map.size();
 }
 
+size_t dfcc_cfg_infot::top_level_id() const
+{
+  return loop_info_map.size();
+}
+
 bool dfcc_cfg_infot::must_track_decl_or_dead(
   goto_programt::const_targett target) const
 {
@@ -743,7 +759,6 @@ bool dfcc_cfg_infot::must_track_decl_or_dead(
   auto &tracked = get_tracked_set(target);
   return tracked.find(ident) != tracked.end();
 }
-#include <iostream>
 
 /// Returns true if the lhs to an assignment must be checked against its write
 /// set. The set of locally declared identifiers and the subset of that that
