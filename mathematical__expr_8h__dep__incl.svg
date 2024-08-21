@@ -382,9 +382,9 @@
 <path fill="none" stroke="midnightblue" d="M3482.38,-252.13C3507.97,-240 3538.68,-225.45 3562.84,-214"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3480.74,-249.03 3473.2,-256.48 3483.73,-255.36 3480.74,-249.03"/>
 </g>
-<!-- Node142 -->
+<!-- Node159 -->
 <g id="node39" class="node">
-<title>Node142</title>
+<title>Node159</title>
 <g id="a_node39"><a xlink:href="smt2__conv_8cpp.html" target="_top" xlink:title="SMT Backend.">
 <polygon fill="none" stroke="black" points="3695,-173 3695,-214 3833,-214 3833,-173 3695,-173"/>
 <text text-anchor="start" x="3703" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -393,15 +393,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node142 -->
+<!-- Node1&#45;&gt;Node159 -->
 <g id="edge43" class="edge">
-<title>Node1&#45;&gt;Node142</title>
+<title>Node1&#45;&gt;Node159</title>
 <path fill="none" stroke="midnightblue" d="M3518.62,-259.12C3567.96,-248.95 3630.78,-235.07 3686,-220 3692.6,-218.2 3699.46,-216.18 3706.26,-214.08"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3517.71,-255.73 3508.62,-261.17 3519.12,-262.59 3517.71,-255.73"/>
 </g>
-<!-- Node143 -->
+<!-- Node160 -->
 <g id="node40" class="node">
-<title>Node143</title>
+<title>Node160</title>
 <g id="a_node40"><a xlink:href="smt2__parser_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="3851,-173 3851,-214 3989,-214 3989,-173 3851,-173"/>
 <text text-anchor="start" x="3859" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -410,15 +410,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node143 -->
+<!-- Node1&#45;&gt;Node160 -->
 <g id="edge44" class="edge">
-<title>Node1&#45;&gt;Node143</title>
+<title>Node1&#45;&gt;Node160</title>
 <path fill="none" stroke="midnightblue" d="M3518.64,-268.74C3602.19,-260.67 3731.83,-245.32 3842,-220 3849.22,-218.34 3856.73,-216.3 3864.1,-214.11"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.31,-265.26 3508.69,-269.69 3518.97,-272.22 3518.31,-265.26"/>
 </g>
-<!-- Node144 -->
+<!-- Node161 -->
 <g id="node41" class="node">
-<title>Node144</title>
+<title>Node161</title>
 <g id="a_node41"><a xlink:href="convert__expr__to__smt_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="4007.5,-167.5 4007.5,-219.5 4154.5,-219.5 4154.5,-167.5 4007.5,-167.5"/>
 <text text-anchor="start" x="4015.5" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -428,15 +428,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node144 -->
+<!-- Node1&#45;&gt;Node161 -->
 <g id="edge45" class="edge">
-<title>Node1&#45;&gt;Node144</title>
+<title>Node1&#45;&gt;Node161</title>
 <path fill="none" stroke="midnightblue" d="M3518.91,-272.78C3630.7,-267.42 3830.43,-253.68 3998,-220 4001.1,-219.38 4004.26,-218.68 4007.43,-217.94"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.53,-269.3 3508.7,-273.26 3518.85,-276.29 3518.53,-269.3"/>
 </g>
-<!-- Node145 -->
+<!-- Node162 -->
 <g id="node42" class="node">
-<title>Node145</title>
+<title>Node162</title>
 <g id="a_node42"><a xlink:href="string__builtin__function_8h.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="4173,-173 4173,-214 4311,-214 4311,-173 4173,-173"/>
 <text text-anchor="start" x="4181" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -445,15 +445,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node145 -->
+<!-- Node1&#45;&gt;Node162 -->
 <g id="edge46" class="edge">
-<title>Node1&#45;&gt;Node145</title>
+<title>Node1&#45;&gt;Node162</title>
 <path fill="none" stroke="midnightblue" d="M3518.78,-276.05C3656.77,-274.63 3934.11,-265.68 4164,-220 4171.83,-218.44 4179.96,-216.35 4187.89,-214.03"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.65,-272.55 3508.69,-276.14 3518.72,-279.55 3518.65,-272.55"/>
 </g>
-<!-- Node155 -->
+<!-- Node172 -->
 <g id="node47" class="node">
-<title>Node155</title>
+<title>Node172</title>
 <g id="a_node47"><a xlink:href="string__constraint__generator__code__points_8cpp.html" target="_top" xlink:title="Generates string constraints for Java functions dealing with code points.">
 <polygon fill="none" stroke="black" points="4329,-167.5 4329,-219.5 4483,-219.5 4483,-167.5 4329,-167.5"/>
 <text text-anchor="start" x="4337" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -463,15 +463,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node155 -->
+<!-- Node1&#45;&gt;Node172 -->
 <g id="edge51" class="edge">
-<title>Node1&#45;&gt;Node155</title>
+<title>Node1&#45;&gt;Node172</title>
 <path fill="none" stroke="midnightblue" d="M3518.96,-276.97C3678.86,-277.34 4029.78,-271.5 4320,-220 4322.91,-219.48 4325.87,-218.9 4328.84,-218.27"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.72,-273.47 3508.71,-276.94 3518.7,-280.47 3518.72,-273.47"/>
 </g>
-<!-- Node156 -->
+<!-- Node173 -->
 <g id="node48" class="node">
-<title>Node156</title>
+<title>Node173</title>
 <g id="a_node48"><a xlink:href="string__constraint__generator__comparison_8cpp.html" target="_top" xlink:title="Generates string constraints for function comparing strings, such as: equals, equalsIgnoreCase,...">
 <polygon fill="none" stroke="black" points="4501,-167.5 4501,-219.5 4655,-219.5 4655,-167.5 4501,-167.5"/>
 <text text-anchor="start" x="4509" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -481,15 +481,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node156 -->
+<!-- Node1&#45;&gt;Node173 -->
 <g id="edge52" class="edge">
-<title>Node1&#45;&gt;Node156</title>
+<title>Node1&#45;&gt;Node173</title>
 <path fill="none" stroke="midnightblue" d="M3518.9,-274.04C3737.44,-268.7 4305.74,-252.07 4492,-220 4494.92,-219.5 4497.87,-218.93 4500.85,-218.31"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.67,-270.55 3508.76,-274.29 3518.84,-277.55 3518.67,-270.55"/>
 </g>
-<!-- Node157 -->
+<!-- Node174 -->
 <g id="node49" class="node">
-<title>Node157</title>
+<title>Node174</title>
 <g id="a_node49"><a xlink:href="string__constraint__generator__constants_8cpp.html" target="_top" xlink:title="Generates string constraints for constant strings.">
 <polygon fill="none" stroke="black" points="4673,-167.5 4673,-219.5 4827,-219.5 4827,-167.5 4673,-167.5"/>
 <text text-anchor="start" x="4681" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -499,15 +499,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node157 -->
+<!-- Node1&#45;&gt;Node174 -->
 <g id="edge53" class="edge">
-<title>Node1&#45;&gt;Node157</title>
+<title>Node1&#45;&gt;Node174</title>
 <path fill="none" stroke="midnightblue" d="M3519.03,-274.79C3761.85,-270.97 4443.36,-257.16 4664,-220 4666.92,-219.51 4669.88,-218.95 4672.85,-218.34"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.78,-271.29 3508.84,-274.95 3518.89,-278.29 3518.78,-271.29"/>
 </g>
-<!-- Node158 -->
+<!-- Node175 -->
 <g id="node50" class="node">
-<title>Node158</title>
+<title>Node175</title>
 <g id="a_node50"><a xlink:href="string__constraint__generator__float_8cpp.html" target="_top" xlink:title="Generates string constraints for functions generating strings from other types, in particular int,...">
 <polygon fill="none" stroke="black" points="4845,-167.5 4845,-219.5 4999,-219.5 4999,-167.5 4845,-167.5"/>
 <text text-anchor="start" x="4853" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -517,15 +517,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node158 -->
+<!-- Node1&#45;&gt;Node175 -->
 <g id="edge54" class="edge">
-<title>Node1&#45;&gt;Node158</title>
+<title>Node1&#45;&gt;Node175</title>
 <path fill="none" stroke="midnightblue" d="M3518.94,-275.35C3784.21,-272.94 4580.69,-262.27 4836,-220 4838.92,-219.52 4841.88,-218.96 4844.86,-218.36"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.56,-271.86 3508.59,-275.45 3518.63,-278.86 3518.56,-271.86"/>
 </g>
-<!-- Node159 -->
+<!-- Node176 -->
 <g id="node51" class="node">
-<title>Node159</title>
+<title>Node176</title>
 <g id="a_node51"><a xlink:href="string__constraint__generator__indexof_8cpp.html" target="_top" xlink:title="Generates string constraints for the family of indexOf and lastIndexOf java functions.">
 <polygon fill="none" stroke="black" points="5017,-167.5 5017,-219.5 5171,-219.5 5171,-167.5 5017,-167.5"/>
 <text text-anchor="start" x="5025" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -535,15 +535,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node159 -->
+<!-- Node1&#45;&gt;Node176 -->
 <g id="edge55" class="edge">
-<title>Node1&#45;&gt;Node159</title>
+<title>Node1&#45;&gt;Node176</title>
 <path fill="none" stroke="midnightblue" d="M3519.09,-275.8C3805.71,-274.68 4717.91,-267.38 5008,-220 5010.92,-219.52 5013.88,-218.98 5016.86,-218.37"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.73,-272.3 3508.75,-275.84 3518.76,-279.3 3518.73,-272.3"/>
 </g>
-<!-- Node160 -->
+<!-- Node177 -->
 <g id="node52" class="node">
-<title>Node160</title>
+<title>Node177</title>
 <g id="a_node52"><a xlink:href="string__constraint__generator__main_8cpp.html" target="_top" xlink:title="Generates string constraints to link results from string functions with their arguments.">
 <polygon fill="none" stroke="black" points="5189,-167.5 5189,-219.5 5343,-219.5 5343,-167.5 5189,-167.5"/>
 <text text-anchor="start" x="5197" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -553,15 +553,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node160 -->
+<!-- Node1&#45;&gt;Node177 -->
 <g id="edge56" class="edge">
-<title>Node1&#45;&gt;Node160</title>
+<title>Node1&#45;&gt;Node177</title>
 <path fill="none" stroke="midnightblue" d="M3518.82,-276.15C3825.19,-276.24 4854.82,-272.52 5180,-220 5182.92,-219.53 5185.88,-218.99 5188.86,-218.39"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.66,-272.65 3508.66,-276.15 3518.66,-279.65 3518.66,-272.65"/>
 </g>
-<!-- Node161 -->
+<!-- Node178 -->
 <g id="node53" class="node">
-<title>Node161</title>
+<title>Node178</title>
 <g id="a_node53"><a xlink:href="string__constraint__generator__testing_8cpp.html" target="_top" xlink:title="Generates string constraints for string functions that return Boolean values.">
 <polygon fill="none" stroke="black" points="5361,-167.5 5361,-219.5 5515,-219.5 5515,-167.5 5361,-167.5"/>
 <text text-anchor="start" x="5369" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -571,15 +571,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node161 -->
+<!-- Node1&#45;&gt;Node178 -->
 <g id="edge57" class="edge">
-<title>Node1&#45;&gt;Node161</title>
+<title>Node1&#45;&gt;Node178</title>
 <path fill="none" stroke="midnightblue" d="M3518.97,-276.45C3844.64,-277.66 4991.74,-277.66 5352,-220 5354.92,-219.53 5357.88,-218.99 5360.86,-218.4"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.67,-272.95 3508.66,-276.41 3518.64,-279.95 3518.67,-272.95"/>
 </g>
-<!-- Node162 -->
+<!-- Node179 -->
 <g id="node54" class="node">
-<title>Node162</title>
+<title>Node179</title>
 <g id="a_node54"><a xlink:href="string__constraint__generator__transformation_8cpp.html" target="_top" xlink:title="Generates string constraints for string transformations, that is, functions taking one string and ret...">
 <polygon fill="none" stroke="black" points="5533,-167.5 5533,-219.5 5687,-219.5 5687,-167.5 5533,-167.5"/>
 <text text-anchor="start" x="5541" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -589,15 +589,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node162 -->
+<!-- Node1&#45;&gt;Node179 -->
 <g id="edge58" class="edge">
-<title>Node1&#45;&gt;Node162</title>
+<title>Node1&#45;&gt;Node179</title>
 <path fill="none" stroke="midnightblue" d="M3518.71,-275.02C3888.53,-270.64 5324.2,-251.73 5524,-220 5526.92,-219.54 5529.88,-219 5532.86,-218.41"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.56,-271.52 3508.6,-275.14 3518.64,-278.52 3518.56,-271.52"/>
 </g>
-<!-- Node163 -->
+<!-- Node180 -->
 <g id="node55" class="node">
-<title>Node163</title>
+<title>Node180</title>
 <g id="a_node55"><a xlink:href="string__constraint__generator__valueof_8cpp.html" target="_top" xlink:title="Generates string constraints for functions generating strings from other types, in particular int,...">
 <polygon fill="none" stroke="black" points="5705,-167.5 5705,-219.5 5859,-219.5 5859,-167.5 5705,-167.5"/>
 <text text-anchor="start" x="5713" y="-207.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -607,15 +607,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node163 -->
+<!-- Node1&#45;&gt;Node180 -->
 <g id="edge59" class="edge">
-<title>Node1&#45;&gt;Node163</title>
+<title>Node1&#45;&gt;Node180</title>
 <path fill="none" stroke="midnightblue" d="M3518.69,-275.21C3907.19,-271.47 5478.44,-254.33 5696,-220 5698.92,-219.54 5701.89,-219.01 5704.87,-218.41"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.6,-271.71 3508.64,-275.3 3518.67,-278.71 3518.6,-271.71"/>
 </g>
-<!-- Node164 -->
+<!-- Node181 -->
 <g id="node56" class="node">
-<title>Node164</title>
+<title>Node181</title>
 <g id="a_node56"><a xlink:href="format__expr_8cpp.html" target="_top" xlink:title="Expression Pretty Printing.">
 <polygon fill="none" stroke="black" points="5877,-173 5877,-214 6015,-214 6015,-173 5877,-173"/>
 <text text-anchor="start" x="5885" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -624,15 +624,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node164 -->
+<!-- Node1&#45;&gt;Node181 -->
 <g id="edge60" class="edge">
-<title>Node1&#45;&gt;Node164</title>
+<title>Node1&#45;&gt;Node181</title>
 <path fill="none" stroke="midnightblue" d="M3518.85,-275.51C3925.71,-273.01 5633.2,-260.18 5868,-220 5876.29,-218.58 5884.89,-216.46 5893.24,-214.04"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.6,-272.01 3508.63,-275.57 3518.65,-279.01 3518.6,-272.01"/>
 </g>
-<!-- Node165 -->
+<!-- Node182 -->
 <g id="node57" class="node">
-<title>Node165</title>
+<title>Node182</title>
 <g id="a_node57"><a xlink:href="mathematical__expr_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="6033.5,-173 6033.5,-214 6186.5,-214 6186.5,-173 6033.5,-173"/>
 <text text-anchor="start" x="6041.5" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -641,15 +641,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node165 -->
+<!-- Node1&#45;&gt;Node182 -->
 <g id="edge61" class="edge">
-<title>Node1&#45;&gt;Node165</title>
+<title>Node1&#45;&gt;Node182</title>
 <path fill="none" stroke="midnightblue" d="M3518.83,-275.5C3941.37,-272.87 5772.49,-259.28 6024,-220 6033.08,-218.58 6042.54,-216.46 6051.73,-214.04"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.79,-272 3508.81,-275.56 3518.83,-279 3518.79,-272"/>
 </g>
-<!-- Node166 -->
+<!-- Node183 -->
 <g id="node58" class="node">
-<title>Node166</title>
+<title>Node183</title>
 <g id="a_node58"><a xlink:href="simplify__expr_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="6205,-173 6205,-214 6343,-214 6343,-173 6205,-173"/>
 <text text-anchor="start" x="6213" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -658,15 +658,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node166 -->
+<!-- Node1&#45;&gt;Node183 -->
 <g id="edge62" class="edge">
-<title>Node1&#45;&gt;Node166</title>
+<title>Node1&#45;&gt;Node183</title>
 <path fill="none" stroke="midnightblue" d="M3518.81,-275.77C3958.25,-274.37 5927.21,-265.62 6196,-220 6204.29,-218.59 6212.9,-216.48 6221.24,-214.06"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.7,-272.27 3508.71,-275.8 3518.72,-279.27 3518.7,-272.27"/>
 </g>
-<!-- Node167 -->
+<!-- Node184 -->
 <g id="node59" class="node">
-<title>Node167</title>
+<title>Node184</title>
 <g id="a_node59"><a xlink:href="simplify__expr__boolean_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="6361,-173 6361,-214 6499,-214 6499,-173 6361,-173"/>
 <text text-anchor="start" x="6369" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -675,15 +675,15 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node167 -->
+<!-- Node1&#45;&gt;Node184 -->
 <g id="edge63" class="edge">
-<title>Node1&#45;&gt;Node167</title>
+<title>Node1&#45;&gt;Node184</title>
 <path fill="none" stroke="midnightblue" d="M3518.86,-275.87C3973.28,-274.97 6067.02,-268.21 6352,-220 6360.29,-218.6 6368.9,-216.49 6377.24,-214.07"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.74,-272.37 3508.75,-275.89 3518.76,-279.37 3518.74,-272.37"/>
 </g>
-<!-- Node168 -->
+<!-- Node185 -->
 <g id="node60" class="node">
-<title>Node168</title>
+<title>Node185</title>
 <g id="a_node60"><a xlink:href="java__utils_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="6517,-173 6517,-214 6681,-214 6681,-173 6517,-173"/>
 <text text-anchor="start" x="6525" y="-202" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -692,9 +692,9 @@
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node168 -->
+<!-- Node1&#45;&gt;Node185 -->
 <g id="edge64" class="edge">
-<title>Node1&#45;&gt;Node168</title>
+<title>Node1&#45;&gt;Node185</title>
 <path fill="none" stroke="midnightblue" d="M3518.87,-275.74C3987.67,-274.15 6205.79,-264.35 6508,-220 6517.58,-218.59 6527.57,-216.48 6537.29,-214.06"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3518.77,-272.24 3508.78,-275.77 3518.79,-279.24 3518.77,-272.24"/>
 </g>
@@ -977,9 +977,9 @@
 <path fill="none" stroke="midnightblue" d="M3573.69,-166.13C3558.54,-152.95 3540.52,-137.27 3526.6,-125.16"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3571.47,-168.84 3581.31,-172.76 3576.06,-163.55 3571.47,-168.84"/>
 </g>
-<!-- Node141 -->
+<!-- Node158 -->
 <g id="node38" class="node">
-<title>Node141</title>
+<title>Node158</title>
 <g id="a_node38"><a xlink:href="functions_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="3598,-84 3598,-125 3744,-125 3744,-84 3598,-84"/>
 <text text-anchor="start" x="3606" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -988,15 +988,15 @@
 </a>
 </g>
 </g>
-<!-- Node55&#45;&gt;Node141 -->
+<!-- Node55&#45;&gt;Node158 -->
 <g id="edge42" class="edge">
-<title>Node55&#45;&gt;Node141</title>
+<title>Node55&#45;&gt;Node158</title>
 <path fill="none" stroke="midnightblue" d="M3625.44,-164.67C3635.34,-151.8 3646.87,-136.83 3655.86,-125.16"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="3622.53,-162.7 3619.2,-172.76 3628.08,-166.97 3622.53,-162.7"/>
 </g>
-<!-- Node146 -->
+<!-- Node163 -->
 <g id="node43" class="node">
-<title>Node146</title>
+<title>Node163</title>
 <g id="a_node43"><a xlink:href="string__builtin__function_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="3917.5,-84 3917.5,-125 4066.5,-125 4066.5,-84 3917.5,-84"/>
 <text text-anchor="start" x="3925.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -1005,15 +1005,15 @@
 </a>
 </g>
 </g>
-<!-- Node145&#45;&gt;Node146 -->
+<!-- Node162&#45;&gt;Node163 -->
 <g id="edge47" class="edge">
-<title>Node145&#45;&gt;Node146</title>
+<title>Node162&#45;&gt;Node163</title>
 <path fill="none" stroke="midnightblue" d="M4176.28,-169.63C4136.5,-155.79 4086.31,-138.32 4048.35,-125.11"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="4175.3,-172.99 4185.9,-172.98 4177.6,-166.38 4175.3,-172.99"/>
 </g>
-<!-- Node147 -->
+<!-- Node164 -->
 <g id="node44" class="node">
-<title>Node147</title>
+<title>Node164</title>
 <g id="a_node44"><a xlink:href="string__dependencies_8h.html" target="_top" xlink:title="Keeps track of dependencies between strings.">
 <polygon fill="none" stroke="red" points="4085,-84 4085,-125 4223,-125 4223,-84 4085,-84"/>
 <text text-anchor="start" x="4093" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -1022,15 +1022,15 @@
 </a>
 </g>
 </g>
-<!-- Node145&#45;&gt;Node147 -->
+<!-- Node162&#45;&gt;Node164 -->
 <g id="edge48" class="edge">
-<title>Node145&#45;&gt;Node147</title>
+<title>Node162&#45;&gt;Node164</title>
 <path fill="none" stroke="midnightblue" d="M4214.59,-165.4C4201.41,-152.37 4185.91,-137.05 4173.89,-125.16"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="4212.46,-168.22 4222.03,-172.76 4217.38,-163.24 4212.46,-168.22"/>
 </g>
-<!-- Node149 -->
+<!-- Node166 -->
 <g id="node45" class="node">
-<title>Node149</title>
+<title>Node166</title>
 <g id="a_node45"><a xlink:href="string__format__builtin__function_8h.html" target="_top" xlink:title="Built&#45;in function for String.format.">
 <polygon fill="none" stroke="red" points="4241,-84 4241,-125 4417,-125 4417,-84 4241,-84"/>
 <text text-anchor="start" x="4249" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -1039,15 +1039,15 @@
 </a>
 </g>
 </g>
-<!-- Node145&#45;&gt;Node149 -->
+<!-- Node162&#45;&gt;Node166 -->
 <g id="edge49" class="edge">
-<title>Node145&#45;&gt;Node149</title>
+<title>Node162&#45;&gt;Node166</title>
 <path fill="none" stroke="midnightblue" d="M4269.1,-165.4C4282.13,-152.37 4297.45,-137.05 4309.34,-125.16"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="4266.34,-163.21 4261.74,-172.76 4271.29,-168.16 4266.34,-163.21"/>
 </g>
-<!-- Node151 -->
+<!-- Node168 -->
 <g id="node46" class="node">
-<title>Node151</title>
+<title>Node168</title>
 <g id="a_node46"><a xlink:href="string__insertion__builtin__function_8h.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="red" points="4435,-78.5 4435,-130.5 4573,-130.5 4573,-78.5 4435,-78.5"/>
 <text text-anchor="start" x="4443" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
@@ -1057,9 +1057,9 @@
 </a>
 </g>
 </g>
-<!-- Node145&#45;&gt;Node151 -->
+<!-- Node162&#45;&gt;Node168 -->
 <g id="edge50" class="edge">
-<title>Node145&#45;&gt;Node151</title>
+<title>Node162&#45;&gt;Node168</title>
 <path fill="none" stroke="midnightblue" d="M4310.32,-169.81C4348.62,-157.1 4396.27,-141.27 4434.72,-128.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="4309.19,-166.5 4300.8,-172.98 4311.39,-173.15 4309.19,-166.5"/>
 </g>

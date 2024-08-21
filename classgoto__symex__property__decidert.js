@@ -4,6 +4,7 @@ var classgoto__symex__property__decidert =
     [ "goto_symex_property_decidert", "classgoto__symex__property__decidert.html#a41bf9783b06f259d950c6c0f6a046f04", null ],
     [ "add_constraint_from_goals", "classgoto__symex__property__decidert.html#addb3f5b91dc9bf41361da28cea3a842a", null ],
     [ "convert_goals", "classgoto__symex__property__decidert.html#adfbbf79c4f9b290943519d7162d9182c", null ],
+    [ "get_boolbv_decision_procedure", "classgoto__symex__property__decidert.html#a275e8c7182d91ed4b503db20e58531e4", null ],
     [ "get_decision_procedure", "classgoto__symex__property__decidert.html#a9e61d8317cb5880477a7b511a22f39a0", null ],
     [ "get_equation", "classgoto__symex__property__decidert.html#a06582c5aad1c1d5632f82c4545fb51cf", null ],
     [ "solve", "classgoto__symex__property__decidert.html#ab33b3670804a8d826de9e01caeee6d18", null ],
