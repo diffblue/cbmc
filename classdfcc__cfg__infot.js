@@ -1,6 +1,7 @@
 var classdfcc__cfg__infot =
 [
     [ "dfcc_cfg_infot", "classdfcc__cfg__infot.html#a68e4b051e1f1118f9d077d55ce5426b2", null ],
+    [ "get_first_id_not_skipped_or_top_level_id", "classdfcc__cfg__infot.html#a35950917a3f2053bc1469852b39cabed", null ],
     [ "get_local_set", "classdfcc__cfg__infot.html#ab07f49a217532b1c767348c0d45b47f2", null ],
     [ "get_loop_info", "classdfcc__cfg__infot.html#a563f1c474d385eb43343bf34f5ed740c", null ],
     [ "get_loops_toposorted", "classdfcc__cfg__infot.html#a1f181c03819a3b9cb3de5b39b222d021", null ],
@@ -16,6 +17,7 @@ var classdfcc__cfg__infot =
     [ "must_check_lhs", "classdfcc__cfg__infot.html#aa996f5f7e4b3894d1f80619cf6b4b63b", null ],
     [ "must_track_decl_or_dead", "classdfcc__cfg__infot.html#adb1b8ba063004f8f2be8457fdd71ba51", null ],
     [ "output", "classdfcc__cfg__infot.html#a5a0467a5099cc2d051bcdeeef77479af", null ],
+    [ "top_level_id", "classdfcc__cfg__infot.html#ae12cf957524923724fb85aac4d93b57f", null ],
     [ "function_id", "classdfcc__cfg__infot.html#ae5e21d2677b966153c375f8bd4536ca4", null ],
     [ "goto_function", "classdfcc__cfg__infot.html#a7b2c770e97dde27d8d33b0fa16ec2556", null ],
     [ "loop_info_map", "classdfcc__cfg__infot.html#aef94d5df9a8ea9ca48aa58c2fc727544", null ],

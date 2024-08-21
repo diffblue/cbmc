@@ -121,7 +121,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a563f1c474d385eb43343bf34f5ed740c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the loop info for that loop_id.  <a href="classdfcc__cfg__infot.html#a563f1c474d385eb43343bf34f5ed740c">More...</a><br /></td></tr>
 <tr class="separator:a563f1c474d385eb43343bf34f5ed740c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdee8dbd7ef70e72a6c956b11f498378"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#acdee8dbd7ef70e72a6c956b11f498378">get_write_set</a> (<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> target) const</td></tr>
-<tr class="memdesc:acdee8dbd7ef70e72a6c956b11f498378"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the write set variable for that instruction.  <a href="classdfcc__cfg__infot.html#acdee8dbd7ef70e72a6c956b11f498378">More...</a><br /></td></tr>
+<tr class="memdesc:acdee8dbd7ef70e72a6c956b11f498378"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the write set variable to use for the given instruction Returns the write set for the loop, or one of the outer loops, or top level, passing through all loops that are [must_skip].  <a href="classdfcc__cfg__infot.html#acdee8dbd7ef70e72a6c956b11f498378">More...</a><br /></td></tr>
 <tr class="separator:acdee8dbd7ef70e72a6c956b11f498378"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab07f49a217532b1c767348c0d45b47f2"><td class="memItemLeft" align="right" valign="top">const std::unordered_set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#ab07f49a217532b1c767348c0d45b47f2">get_local_set</a> (<a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> target) const</td></tr>
 <tr class="memdesc:ab07f49a217532b1c767348c0d45b47f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the set of local variable for the scope where that target instruction is found.  <a href="classdfcc__cfg__infot.html#ab07f49a217532b1c767348c0d45b47f2">More...</a><br /></td></tr>
@@ -134,6 +134,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:abc6b5481e5f664eb063a9a001b8a0df6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f181c03819a3b9cb3de5b39b222d021"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::size_t &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#a1f181c03819a3b9cb3de5b39b222d021">get_loops_toposorted</a> () const</td></tr>
 <tr class="separator:a1f181c03819a3b9cb3de5b39b222d021"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35950917a3f2053bc1469852b39cabed"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#a35950917a3f2053bc1469852b39cabed">get_first_id_not_skipped_or_top_level_id</a> (const std::size_t loop_id) const</td></tr>
+<tr class="memdesc:a35950917a3f2053bc1469852b39cabed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the id of the first outer loop (including this one) that is not skipped, or the top level id.  <a href="classdfcc__cfg__infot.html#a35950917a3f2053bc1469852b39cabed">More...</a><br /></td></tr>
+<tr class="separator:a35950917a3f2053bc1469852b39cabed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c7075c4d098296983bb7fd0e65abfba"><td class="memItemLeft" align="right" valign="top">const std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#a1c7075c4d098296983bb7fd0e65abfba">get_outer_loop_identifier</a> (const std::size_t loop_id) const</td></tr>
 <tr class="memdesc:a1c7075c4d098296983bb7fd0e65abfba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the DFCC id of the loop that contains the given loop, returns nullopt when the loop has no outer loop.  <a href="classdfcc__cfg__infot.html#a1c7075c4d098296983bb7fd0e65abfba">More...</a><br /></td></tr>
 <tr class="separator:a1c7075c4d098296983bb7fd0e65abfba"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -160,6 +163,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a519cef9a0785239283213f8c65d7b3f1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#a519cef9a0785239283213f8c65d7b3f1">is_top_level_id</a> (const std::size_t id) const</td></tr>
 <tr class="memdesc:a519cef9a0785239283213f8c65d7b3f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">True iff <code>id</code> is in the valid range for a loop id for this function.  <a href="classdfcc__cfg__infot.html#a519cef9a0785239283213f8c65d7b3f1">More...</a><br /></td></tr>
 <tr class="separator:a519cef9a0785239283213f8c65d7b3f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae12cf957524923724fb85aac4d93b57f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdfcc__cfg__infot.html#ae12cf957524923724fb85aac4d93b57f">top_level_id</a> () const</td></tr>
+<tr class="memdesc:ae12cf957524923724fb85aac4d93b57f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the top level ID.  <a href="classdfcc__cfg__infot.html#ae12cf957524923724fb85aac4d93b57f">More...</a><br /></td></tr>
+<tr class="separator:ae12cf957524923724fb85aac4d93b57f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -253,7 +259,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="comment">   END_FUNCTION                          // loop_id:3 tags:{top-level}</span></div>
 </div><!-- fragment --><p>The tags allow to the dynamic frames instrumentation pass to select the write set instance of the specific loop to instrument the instruction, and allow the loop contracts instrumentation pass to robustly locate head, exiting nodes and latch nodes when applying the loop contract transformation. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00234">234</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00241">241</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a68e4b051e1f1118f9d077d55ce5426b2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a68e4b051e1f1118f9d077d55ce5426b2">&#9670;&nbsp;</a></span>dfcc_cfg_infot()</h2>
@@ -316,6 +322,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a35950917a3f2053bc1469852b39cabed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35950917a3f2053bc1469852b39cabed">&#9670;&nbsp;</a></span>get_first_id_not_skipped_or_top_level_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t dfcc_cfg_infot::get_first_id_not_skipped_or_top_level_id </td>
+          <td>(</td>
+          <td class="paramtype">const std::size_t&#160;</td>
+          <td class="paramname"><em>loop_id</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the id of the first outer loop (including this one) that is not skipped, or the top level id. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00631">631</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+
+</div>
+</div>
 <a id="ab07f49a217532b1c767348c0d45b47f2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab07f49a217532b1c767348c0d45b47f2">&#9670;&nbsp;</a></span>get_local_set()</h2>
 
@@ -334,7 +362,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the set of local variable for the scope where that target instruction is found. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00668">668</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00679">679</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -356,7 +384,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the loop info for that loop_id. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00695">695</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00706">706</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -383,7 +411,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00268">268</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00277">277</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -405,7 +433,7 @@ Private Attributes</h2></td></tr>
 
 <p>Finds the DFCC id of the loop that contains the given loop, returns nullopt when the loop has no outer loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00702">702</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00713">713</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -427,7 +455,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the write set of the outer loop of that loop or the top level write set if that loop has no outer loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00685">685</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00696">696</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -456,7 +484,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the set of top level symbols that must be tracked explicitly in the top level write set of the function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00296">296</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00310">310</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -483,7 +511,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00289">289</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00303">303</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -505,7 +533,7 @@ Private Attributes</h2></td></tr>
 
 <p>Returns the subset of local variable that are explicitly tracked in the write set for the scope where that target instruction is found. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00650">650</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00661">661</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -525,9 +553,9 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the write set variable for that instruction. </p>
+<p>Returns the write set variable to use for the given instruction Returns the write set for the loop, or one of the outer loops, or top level, passing through all loops that are [must_skip]. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00632">632</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00643">643</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -557,7 +585,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff <code>id</code> is in the valid range for a loop id for this function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00732">732</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00743">743</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -587,7 +615,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff <code>id</code> is in the valid range for a loop id for this function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00727">727</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00738">738</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -617,7 +645,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff <code>id</code> is in the valid range for a loop id or is equal to the top level id for this function. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00722">722</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00733">733</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -643,7 +671,7 @@ Private Attributes</h2></td></tr>
 <li>lhs depends on some non-local roots. </li>
 </ol>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00862">862</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00877">877</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -665,7 +693,7 @@ Private Attributes</h2></td></tr>
 
 <p>True iff a DECL ident must be tracked in the write set of the loop that contains the DECL. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00737">737</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00753">753</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -686,6 +714,35 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00587">587</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ae12cf957524923724fb85aac4d93b57f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae12cf957524923724fb85aac4d93b57f">&#9670;&nbsp;</a></span>top_level_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t dfcc_cfg_infot::top_level_id </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the top level ID. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00748">748</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -710,7 +767,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00302">302</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00316">316</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -734,7 +791,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00303">303</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00317">317</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -760,7 +817,7 @@ Private Attributes</h2></td></tr>
 
 <p>Map from loop identifier to loop info struct. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00331">331</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00348">348</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -784,7 +841,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00305">305</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00319">319</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -810,7 +867,7 @@ Private Attributes</h2></td></tr>
 
 <p>Set of identifiers DECL at top level. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00325">325</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00342">342</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -836,7 +893,7 @@ Private Attributes</h2></td></tr>
 
 <p>Loop identifiers for top level loops (ie for loops that are not nested in in another loop). </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00322">322</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00339">339</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -862,7 +919,7 @@ Private Attributes</h2></td></tr>
 
 <p>Set of identifiers DECL at top level. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00328">328</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00345">345</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -886,7 +943,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00304">304</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00318">318</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
@@ -912,7 +969,7 @@ Private Attributes</h2></td></tr>
 
 <p>Loop identifiers sorted from most deeply nested to less deeply nested. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00318">318</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8h_source.html#l00335">335</a> of file <a class="el" href="dfcc__cfg__info_8h_source.html">dfcc_cfg_info.h</a>.</p>
 
 </div>
 </div>
