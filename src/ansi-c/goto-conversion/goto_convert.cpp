@@ -432,8 +432,25 @@ void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
     // cannot compare iterators, so compare target number instead
     if(it->get_target()->target_number == it_z->target_number)
     {
+      DATA_INVARIANT(
+        it->condition().find(ID_C_spec_assigns).is_nil() &&
+          it->condition().find(ID_C_spec_loop_invariant).is_nil() &&
+          it->condition().find(ID_C_spec_decreases).is_nil(),
+        "no loop invariant expected");
+      irept y_assigns = it_goto_y->condition().find(ID_C_spec_assigns);
+      irept y_loop_invariant =
+        it_goto_y->condition().find(ID_C_spec_loop_invariant);
+      irept y_decreases = it_goto_y->condition().find(ID_C_spec_decreases);
+
       it->set_target(it_goto_y->get_target());
-      it->condition_nonconst() = boolean_negate(it->condition());
+      exprt updated_condition = boolean_negate(it->condition());
+      if(y_assigns.is_not_nil())
+        updated_condition.add(ID_C_spec_assigns).swap(y_assigns);
+      if(y_loop_invariant.is_not_nil())
+        updated_condition.add(ID_C_spec_loop_invariant).swap(y_loop_invariant);
+      if(y_decreases.is_not_nil())
+        updated_condition.add(ID_C_spec_decreases).swap(y_decreases);
+      it->condition_nonconst() = updated_condition;
       it_goto_y->turn_into_skip();
     }
   }
@@ -1301,7 +1318,7 @@ void goto_convertt::convert_dowhile(
   W->complete_goto(w);
 
   // assigns_clause, loop invariant and decreases clause
-  convert_loop_contracts(code, y);
+  convert_loop_contracts(code, W);
 
   dest.destructive_append(tmp_w);
   dest.destructive_append(side_effects.side_effects);
