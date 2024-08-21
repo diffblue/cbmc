@@ -29,7 +29,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
-#include <solvers/stack_decision_procedure.h>
 #include <solvers/strings/string_refinement.h>
 
 #include <iostream>
@@ -65,10 +64,28 @@ solver_factoryt::solvert::solvert(
 {
 }
 
+solver_factoryt::solvert::solvert(
+  std::unique_ptr<boolbvt> p1,
+  std::unique_ptr<propt> p2)
+  : prop_ptr(std::move(p2)), decision_procedure_is_boolbvt_ptr(std::move(p1))
+{
+}
+
 stack_decision_proceduret &solver_factoryt::solvert::decision_procedure() const
 {
-  PRECONDITION(decision_procedure_ptr != nullptr);
-  return *decision_procedure_ptr;
+  PRECONDITION(
+    (decision_procedure_ptr != nullptr) !=
+    (decision_procedure_is_boolbvt_ptr != nullptr));
+  if(decision_procedure_ptr)
+    return *decision_procedure_ptr;
+  else
+    return *decision_procedure_is_boolbvt_ptr;
+}
+
+boolbvt &solver_factoryt::solvert::boolbv_decision_procedure() const
+{
+  PRECONDITION(decision_procedure_is_boolbvt_ptr != nullptr);
+  return *decision_procedure_is_boolbvt_ptr;
 }
 
 void solver_factoryt::set_decision_procedure_time_limit(
@@ -79,22 +96,6 @@ void solver_factoryt::set_decision_procedure_time_limit(
 
   if(timeout_seconds > 0)
     decision_procedure.set_time_limit_seconds(timeout_seconds);
-}
-
-void solver_factoryt::solvert::set_decision_procedure(
-  std::unique_ptr<stack_decision_proceduret> p)
-{
-  decision_procedure_ptr = std::move(p);
-}
-
-void solver_factoryt::solvert::set_prop(std::unique_ptr<propt> p)
-{
-  prop_ptr = std::move(p);
-}
-
-void solver_factoryt::solvert::set_ofstream(std::unique_ptr<std::ofstream> p)
-{
-  ofstream_ptr = std::move(p);
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_solver()
@@ -339,8 +340,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 
   set_decision_procedure_time_limit(*bv_pointers);
 
-  return std::make_unique<solvert>(
-    std::move(bv_pointers), std::move(sat_solver));
+  std::unique_ptr<boolbvt> boolbv = std::move(bv_pointers);
+  return std::make_unique<solvert>(std::move(boolbv), std::move(sat_solver));
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
@@ -352,7 +353,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
 
   std::string filename = options.get_option("outfile");
 
-  auto bv_dimacs =
+  std::unique_ptr<boolbvt> bv_dimacs =
     std::make_unique<bv_dimacst>(ns, *prop, message_handler, filename);
 
   return std::make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
@@ -367,7 +368,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
   auto prop =
     std::make_unique<external_satt>(message_handler, external_sat_solver);
 
-  auto bv_pointers = std::make_unique<bv_pointerst>(ns, *prop, message_handler);
+  std::unique_ptr<boolbvt> bv_pointers =
+    std::make_unique<bv_pointerst>(ns, *prop, message_handler);
 
   return std::make_unique<solvert>(std::move(bv_pointers), std::move(prop));
 }
@@ -390,7 +392,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
-  auto decision_procedure = std::make_unique<bv_refinementt>(info);
+  std::unique_ptr<boolbvt> decision_procedure =
+    std::make_unique<bv_refinementt>(info);
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
@@ -415,7 +418,8 @@ solver_factoryt::get_string_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
-  auto decision_procedure = std::make_unique<string_refinementt>(info);
+  std::unique_ptr<boolbvt> decision_procedure =
+    std::make_unique<string_refinementt>(info);
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));

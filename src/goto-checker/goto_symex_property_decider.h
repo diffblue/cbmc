@@ -47,6 +47,9 @@ public:
   /// Returns the solver instance
   stack_decision_proceduret &get_decision_procedure() const;
 
+  /// Returns the solver instance
+  boolbvt &get_boolbv_decision_procedure() const;
+
   /// Return the equation associated with this instance
   symex_target_equationt &get_equation() const;
 

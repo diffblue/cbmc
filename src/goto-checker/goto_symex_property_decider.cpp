@@ -120,6 +120,11 @@ goto_symex_property_decidert::get_decision_procedure() const
   return solver->decision_procedure();
 }
 
+boolbvt &goto_symex_property_decidert::get_boolbv_decision_procedure() const
+{
+  return solver->boolbv_decision_procedure();
+}
+
 symex_target_equationt &goto_symex_property_decidert::get_equation() const
 {
   return equation;
