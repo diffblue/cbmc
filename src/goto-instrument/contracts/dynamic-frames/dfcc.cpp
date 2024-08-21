@@ -70,8 +70,6 @@ std::string invalid_function_contract_pair_exceptiont::what() const
   return res;
 }
 
-#include <iostream>
-
 static std::pair<irep_idt, irep_idt>
 parse_function_contract_pair(const irep_idt &cli_flag)
 {

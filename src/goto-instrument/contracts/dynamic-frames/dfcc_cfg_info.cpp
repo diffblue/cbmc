@@ -759,7 +759,6 @@ bool dfcc_cfg_infot::must_track_decl_or_dead(
   auto &tracked = get_tracked_set(target);
   return tracked.find(ident) != tracked.end();
 }
-#include <iostream>
 
 /// Returns true if the lhs to an assignment must be checked against its write
 /// set. The set of locally declared identifiers and the subset of that that
