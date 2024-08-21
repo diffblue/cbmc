@@ -344,7 +344,7 @@ $(document).ready(function(){initNavTree('utils_8cpp_source.html',''); initResiz
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> new_target = destination.<a class="code" href="classgoto__programt.html#af3d59c861f24c8a670074614bf016d9d">insert_before</a>(target, i);</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">auto</span> it : target-&gt;incoming_edges)</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;  {</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_goto())</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; it-&gt;get_target() == target)</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      it-&gt;set_target(new_target);</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  }</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;}</div>
