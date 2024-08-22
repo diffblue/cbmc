@@ -349,7 +349,7 @@ void symex_target_equationt::convert(decision_proceduret &decision_procedure)
   const auto convert_SSA_start = std::chrono::steady_clock::now();
 
   convert_without_assertions(decision_procedure);
-  convert_assertions(decision_procedure);
+  convert_assertions(decision_procedure, true);
 
   const auto convert_SSA_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> convert_SSA_runtime =
