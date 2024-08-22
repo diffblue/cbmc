@@ -12,17 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 
-#include <algorithm>
-#include <iosfwd>
-#include <list>
-
-#include <util/invariant.h>
 #include <util/merge_irep.h>
 #include <util/message.h>
 #include <util/narrow.h>
 
 #include "ssa_step.h"
 #include "symex_target.h"
+
+#include <algorithm>
+#include <iosfwd>
+#include <list>
 
 class decision_proceduret;
 class namespacet;
@@ -183,6 +182,50 @@ public:
   ///   interface
   void convert_without_assertions(decision_proceduret &decision_procedure);
 
+  /// Converts assertions: build a disjunction of negated assertions.
+  /// \param decision_procedure: A handle to a decision procedure interface
+  /// \param optimized_for_single_assertions: Use an optimized encoding for
+  ///   single assertions (unsound for incremental conversions)
+  void convert_assertions(
+    decision_proceduret &decision_procedure,
+    bool optimized_for_single_assertions);
+
+  typedef std::list<SSA_stept> SSA_stepst;
+  SSA_stepst SSA_steps;
+
+  std::size_t count_assertions() const
+  {
+    return narrow_cast<std::size_t>(std::count_if(
+      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
+        return step.is_assert() && !step.ignore && !step.converted;
+      }));
+  }
+
+  std::size_t count_ignored_SSA_steps() const
+  {
+    return narrow_cast<std::size_t>(std::count_if(
+      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
+        return step.ignore;
+      }));
+  }
+
+  void output(std::ostream &out) const;
+
+  bool has_threads() const
+  {
+    return std::any_of(
+      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
+        return step.source.thread_nr != 0;
+      });
+  }
+
+  void validate(const namespacet &ns, const validation_modet vm) const
+  {
+    for(const SSA_stept &step : SSA_steps)
+      step.validate(ns, vm);
+  }
+
+protected:
   /// Converts assignments: set the equality _lhs==rhs_ to _True_.
   /// \param decision_procedure: A handle to a decision procedure
   ///  interface
@@ -197,14 +240,6 @@ public:
   /// Converts assumptions: convert the expression the assumption represents.
   /// \param decision_procedure: A handle to a decision procedure interface
   void convert_assumptions(decision_proceduret &decision_procedure);
-
-  /// Converts assertions: build a disjunction of negated assertions.
-  /// \param decision_procedure: A handle to a decision procedure interface
-  /// \param optimized_for_single_assertions: Use an optimized encoding for
-  ///   single assertions (unsound for incremental conversions)
-  void convert_assertions(
-    decision_proceduret &decision_procedure,
-    bool optimized_for_single_assertions = true);
 
   /// Converts constraints: set the represented condition to _True_.
   /// \param decision_procedure: A handle to a decision procedure interface
@@ -229,60 +264,6 @@ public:
   /// \param decision_procedure: A handle to a decision procedure interface
   void convert_io(decision_proceduret &decision_procedure);
 
-  exprt make_expression() const;
-
-  std::size_t count_assertions() const
-  {
-    return narrow_cast<std::size_t>(std::count_if(
-      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
-        return step.is_assert() && !step.ignore && !step.converted;
-      }));
-  }
-
-  std::size_t count_ignored_SSA_steps() const
-  {
-    return narrow_cast<std::size_t>(std::count_if(
-      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
-        return step.ignore;
-      }));
-  }
-
-  typedef std::list<SSA_stept> SSA_stepst;
-  SSA_stepst SSA_steps;
-
-  SSA_stepst::iterator get_SSA_step(std::size_t s)
-  {
-    SSA_stepst::iterator it=SSA_steps.begin();
-    for(; s!=0; s--)
-    {
-      PRECONDITION(it != SSA_steps.end());
-      it++;
-    }
-    return it;
-  }
-
-  void output(std::ostream &out) const;
-
-  void clear()
-  {
-    SSA_steps.clear();
-  }
-
-  bool has_threads() const
-  {
-    return std::any_of(
-      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
-        return step.source.thread_nr != 0;
-      });
-  }
-
-  void validate(const namespacet &ns, const validation_modet vm) const
-  {
-    for(const SSA_stept &step : SSA_steps)
-      step.validate(ns, vm);
-  }
-
-protected:
   messaget log;
 
   // for enforcing sharing in the expressions stored
