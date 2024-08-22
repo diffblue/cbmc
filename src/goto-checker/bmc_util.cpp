@@ -147,15 +147,16 @@ void output_graphml(
   }
 }
 
-void convert_symex_target_equation(
+static void convert_symex_target_equation(
   symex_target_equationt &equation,
   decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector,
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
   msg.status() << "converting SSA" << messaget::eom;
 
-  equation.convert(decision_procedure);
+  equation.convert(decision_procedure, hardness_collector);
 }
 
 std::unique_ptr<memory_model_baset>
@@ -370,7 +371,10 @@ std::chrono::duration<double> prepare_property_decider(
     << messaget::eom;
 
   convert_symex_target_equation(
-    equation, property_decider.get_decision_procedure(), ui_message_handler);
+    equation,
+    property_decider.get_decision_procedure(),
+    property_decider.get_hardness_collector(),
+    ui_message_handler);
   property_decider.update_properties_goals_from_symex_target_equation(
     properties);
   property_decider.convert_goals();

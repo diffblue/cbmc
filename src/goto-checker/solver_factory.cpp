@@ -19,7 +19,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/unicode.h>
 #include <util/version.h>
 
-#include <goto-symex/solver_hardness.h>
 #include <solvers/flattening/bv_dimacs.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/solver_resource_limits.h>
@@ -71,6 +70,16 @@ solver_factoryt::solvert::solvert(
 {
 }
 
+solver_factoryt::solvert::solvert(
+  std::unique_ptr<boolbvt> p1,
+  std::unique_ptr<propt> p2,
+  std::shared_ptr<solver_hardnesst> p3)
+  : hardness_ptr(std::move(p3)),
+    prop_ptr(std::move(p2)),
+    decision_procedure_is_boolbvt_ptr(std::move(p1))
+{
+}
+
 stack_decision_proceduret &solver_factoryt::solvert::decision_procedure() const
 {
   PRECONDITION(
@@ -86,6 +95,11 @@ boolbvt &solver_factoryt::solvert::boolbv_decision_procedure() const
 {
   PRECONDITION(decision_procedure_is_boolbvt_ptr != nullptr);
   return *decision_procedure_is_boolbvt_ptr;
+}
+
+solver_hardnesst *solver_factoryt::solvert::hardness_collector() const
+{
+  return hardness_ptr.get();
 }
 
 void solver_factoryt::set_decision_procedure_time_limit(
@@ -168,8 +182,9 @@ static void emit_solver_warning(
 template <typename SatcheckT>
 static typename std::enable_if<
   !std::is_base_of<hardness_collectort, SatcheckT>::value,
-  std::unique_ptr<SatcheckT>>::type
-make_satcheck_prop(message_handlert &message_handler, const optionst &options)
+  std::pair<std::unique_ptr<SatcheckT>, std::shared_ptr<solver_hardnesst>>>::
+  type
+  make_satcheck_prop(message_handlert &message_handler, const optionst &options)
 {
   auto satcheck = std::make_unique<SatcheckT>(message_handler);
   if(options.is_set("write-solver-stats-to"))
@@ -179,27 +194,29 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
       << "Configured solver does not support --write-solver-stats-to. "
       << "Solver stats will not be written." << messaget::eom;
   }
-  return satcheck;
+  return {std::move(satcheck), nullptr};
 }
 
 template <typename SatcheckT>
 static typename std::enable_if<
   std::is_base_of<hardness_collectort, SatcheckT>::value,
-  std::unique_ptr<SatcheckT>>::type
-make_satcheck_prop(message_handlert &message_handler, const optionst &options)
+  std::pair<std::unique_ptr<SatcheckT>, std::shared_ptr<solver_hardnesst>>>::
+  type
+  make_satcheck_prop(message_handlert &message_handler, const optionst &options)
 {
   auto satcheck = std::make_unique<SatcheckT>(message_handler);
-  if(options.is_set("write-solver-stats-to"))
-  {
-    std::unique_ptr<solver_hardnesst> solver_hardness =
-      std::make_unique<solver_hardnesst>();
-    solver_hardness->set_outfile(options.get_option("write-solver-stats-to"));
-    satcheck->solver_hardness = std::move(solver_hardness);
-  }
-  return satcheck;
+  if(!options.is_set("write-solver-stats-to"))
+    return {std::move(satcheck), nullptr};
+
+  std::shared_ptr<solver_hardnesst> solver_hardness =
+    std::make_shared<solver_hardnesst>();
+  solver_hardness->set_outfile(options.get_option("write-solver-stats-to"));
+  satcheck->solver_hardness = solver_hardness;
+
+  return {std::move(satcheck), std::move(solver_hardness)};
 }
 
-static std::unique_ptr<propt>
+static std::pair<std::unique_ptr<propt>, std::shared_ptr<solver_hardnesst>>
 get_sat_solver(message_handlert &message_handler, const optionst &options)
 {
   const bool no_simplifier = options.get_bool_option("beautify") ||
@@ -326,12 +343,15 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 {
-  auto sat_solver = get_sat_solver(message_handler, options);
+  auto sat_solver_and_hardness_opt = get_sat_solver(message_handler, options);
 
   bool get_array_constraints =
     options.get_bool_option("show-array-constraints");
   auto bv_pointers = std::make_unique<bv_pointerst>(
-    ns, *sat_solver, message_handler, get_array_constraints);
+    ns,
+    *sat_solver_and_hardness_opt.first,
+    message_handler,
+    get_array_constraints);
 
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
@@ -341,7 +361,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   set_decision_procedure_time_limit(*bv_pointers);
 
   std::unique_ptr<boolbvt> boolbv = std::move(bv_pointers);
-  return std::make_unique<solvert>(std::move(boolbv), std::move(sat_solver));
+  return std::make_unique<solvert>(
+    std::move(boolbv),
+    std::move(sat_solver_and_hardness_opt.first),
+    std::move(sat_solver_and_hardness_opt.second));
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
@@ -376,11 +399,11 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
 {
-  std::unique_ptr<propt> prop = get_sat_solver(message_handler, options);
+  auto prop_and_hardness_opt = get_sat_solver(message_handler, options);
 
   bv_refinementt::infot info;
   info.ns = &ns;
-  info.prop = prop.get();
+  info.prop = prop_and_hardness_opt.first.get();
   info.output_xml = output_xml_in_refinement;
 
   // we allow setting some parameters
@@ -396,7 +419,9 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
     std::make_unique<bv_refinementt>(info);
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
-    std::move(decision_procedure), std::move(prop));
+    std::move(decision_procedure),
+    std::move(prop_and_hardness_opt.first),
+    std::move(prop_and_hardness_opt.second));
 }
 
 /// the string refinement adds to the bit vector refinement specifications for
@@ -407,8 +432,8 @@ solver_factoryt::get_string_refinement()
 {
   string_refinementt::infot info;
   info.ns = &ns;
-  auto prop = get_sat_solver(message_handler, options);
-  info.prop = prop.get();
+  auto prop_and_hardness_opt = get_sat_solver(message_handler, options);
+  info.prop = prop_and_hardness_opt.first.get();
   info.refinement_bound = DEFAULT_MAX_NB_REFINEMENT;
   info.output_xml = output_xml_in_refinement;
   if(options.get_bool_option("max-node-refinement"))
@@ -422,7 +447,9 @@ solver_factoryt::get_string_refinement()
     std::make_unique<string_refinementt>(info);
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
-    std::move(decision_procedure), std::move(prop));
+    std::move(decision_procedure),
+    std::move(prop_and_hardness_opt.first),
+    std::move(prop_and_hardness_opt.second));
 }
 
 std::unique_ptr<std::ofstream> open_outfile_and_check(

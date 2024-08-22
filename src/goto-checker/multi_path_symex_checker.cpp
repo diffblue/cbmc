@@ -169,8 +169,9 @@ void multi_path_symex_checkert::report()
 {
   if(options.is_set("write-solver-stats-to"))
   {
-    with_solver_hardness(
-      property_decider.get_decision_procedure(),
-      [](solver_hardnesst &hardness) { hardness.produce_report(); });
+    if(auto hardness = property_decider.get_hardness_collector())
+    {
+      hardness->produce_report();
+    }
   }
 }

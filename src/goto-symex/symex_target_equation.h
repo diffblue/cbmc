@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class decision_proceduret;
 class namespacet;
+struct solver_hardnesst;
 
 /// Inheriting the interface of symex_targett this class represents the SSA
 /// form of the input program as a list of \ref SSA_stept. It further extends
@@ -171,7 +172,11 @@ public:
   /// format. The method iterates over the equation, i.e. over the SSA steps and
   /// converts each type of step separately.
   /// \param decision_procedure: A handle to a decision procedure interface
-  void convert(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Interface method to initiate the conversion into a decision procedure
   /// format. The method iterates over the equation, i.e. over the SSA steps and
@@ -180,14 +185,21 @@ public:
   /// e.g. for incremental solving.
   /// \param decision_procedure: A handle to a particular decision procedure
   ///   interface
-  void convert_without_assertions(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_without_assertions(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Converts assertions: build a disjunction of negated assertions.
   /// \param decision_procedure: A handle to a decision procedure interface
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
   /// \param optimized_for_single_assertions: Use an optimized encoding for
   ///   single assertions (unsound for incremental conversions)
   void convert_assertions(
     decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector,
     bool optimized_for_single_assertions);
 
   typedef std::list<SSA_stept> SSA_stepst;
@@ -229,40 +241,72 @@ protected:
   /// Converts assignments: set the equality _lhs==rhs_ to _True_.
   /// \param decision_procedure: A handle to a decision procedure
   ///  interface
-  void convert_assignments(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_assignments(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Converts declarations: these are effectively ignored by the decision
   /// procedure.
   /// \param decision_procedure: A handle to a decision procedure
   ///  interface
-  void convert_decls(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_decls(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Converts assumptions: convert the expression the assumption represents.
   /// \param decision_procedure: A handle to a decision procedure interface
-  void convert_assumptions(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_assumptions(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Converts constraints: set the represented condition to _True_.
   /// \param decision_procedure: A handle to a decision procedure interface
-  void convert_constraints(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_constraints(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Converts goto instructions: convert the expression representing the
   /// condition of this goto.
   /// \param decision_procedure: A handle to a decision procedure interface
-  void convert_goto_instructions(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_goto_instructions(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Converts guards: convert the expression the guard represents.
   /// \param decision_procedure: A handle to a decision procedure interface
-  void convert_guards(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_guards(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Converts function calls: for each argument build an equality between its
   /// symbol and the argument itself.
   /// \param decision_procedure: A handle to a decision procedure interface
-  void convert_function_calls(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_function_calls(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   /// Converts I/O: for each argument build an equality between its
   /// symbol and the argument itself.
   /// \param decision_procedure: A handle to a decision procedure interface
-  void convert_io(decision_proceduret &decision_procedure);
+  /// \param hardness_collector: If non-null, a collector for hardness
+  ///   statistics
+  void convert_io(
+    decision_proceduret &decision_procedure,
+    solver_hardnesst *hardness_collector);
 
   messaget log;
 

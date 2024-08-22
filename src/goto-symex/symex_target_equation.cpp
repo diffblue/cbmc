@@ -14,10 +14,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
+#include <solvers/decision_procedure.h>
+
 #include "solver_hardness.h"
 #include "ssa_step.h"
 
 #include <chrono> // IWYU pragma: keep
+
+static void with_solver_hardness(
+  solver_hardnesst *maybe_hardness_collector,
+  std::function<void(solver_hardnesst &hardness)> handler)
+{
+  if(maybe_hardness_collector)
+    handler(*maybe_hardness_collector);
+}
 
 static std::function<void(solver_hardnesst &)>
 hardness_register_ssa(std::size_t step_index, const SSA_stept &step)
@@ -328,28 +338,31 @@ void symex_target_equationt::constraint(
 }
 
 void symex_target_equationt::convert_without_assertions(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
-  with_solver_hardness(decision_procedure, [&](solver_hardnesst &hardness) {
+  with_solver_hardness(hardness_collector, [&](solver_hardnesst &hardness) {
     hardness.register_ssa_size(SSA_steps.size());
   });
 
-  convert_guards(decision_procedure);
-  convert_assignments(decision_procedure);
-  convert_decls(decision_procedure);
-  convert_assumptions(decision_procedure);
-  convert_goto_instructions(decision_procedure);
-  convert_function_calls(decision_procedure);
-  convert_io(decision_procedure);
-  convert_constraints(decision_procedure);
+  convert_guards(decision_procedure, hardness_collector);
+  convert_assignments(decision_procedure, hardness_collector);
+  convert_decls(decision_procedure, hardness_collector);
+  convert_assumptions(decision_procedure, hardness_collector);
+  convert_goto_instructions(decision_procedure, hardness_collector);
+  convert_function_calls(decision_procedure, hardness_collector);
+  convert_io(decision_procedure, hardness_collector);
+  convert_constraints(decision_procedure, hardness_collector);
 }
 
-void symex_target_equationt::convert(decision_proceduret &decision_procedure)
+void symex_target_equationt::convert(
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   const auto convert_SSA_start = std::chrono::steady_clock::now();
 
-  convert_without_assertions(decision_procedure);
-  convert_assertions(decision_procedure, true);
+  convert_without_assertions(decision_procedure, hardness_collector);
+  convert_assertions(decision_procedure, hardness_collector, true);
 
   const auto convert_SSA_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> convert_SSA_runtime =
@@ -359,7 +372,8 @@ void symex_target_equationt::convert(decision_proceduret &decision_procedure)
 }
 
 void symex_target_equationt::convert_assignments(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
@@ -374,14 +388,15 @@ void symex_target_equationt::convert_assignments(
       decision_procedure.set_to_true(step.cond_expr);
       step.converted = true;
       with_solver_hardness(
-        decision_procedure, hardness_register_ssa(step_index, step));
+        hardness_collector, hardness_register_ssa(step_index, step));
     }
     ++step_index;
   }
 }
 
 void symex_target_equationt::convert_decls(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
@@ -395,14 +410,15 @@ void symex_target_equationt::convert_decls(
         equal_exprt{step.ssa_full_lhs, step.ssa_full_lhs});
       step.converted = true;
       with_solver_hardness(
-        decision_procedure, hardness_register_ssa(step_index, step));
+        hardness_collector, hardness_register_ssa(step_index, step));
     }
     ++step_index;
   }
 }
 
 void symex_target_equationt::convert_guards(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
@@ -418,7 +434,7 @@ void symex_target_equationt::convert_guards(
 
       step.guard_handle = decision_procedure.handle(step.guard);
       with_solver_hardness(
-        decision_procedure, [step_index, &step](solver_hardnesst &hardness) {
+        hardness_collector, [step_index, &step](solver_hardnesst &hardness) {
           hardness.register_ssa(step_index, step.guard, step.source.pc);
         });
     }
@@ -427,7 +443,8 @@ void symex_target_equationt::convert_guards(
 }
 
 void symex_target_equationt::convert_assumptions(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
@@ -447,7 +464,7 @@ void symex_target_equationt::convert_assumptions(
         step.cond_handle = decision_procedure.handle(step.cond_expr);
 
         with_solver_hardness(
-          decision_procedure, hardness_register_ssa(step_index, step));
+          hardness_collector, hardness_register_ssa(step_index, step));
       }
     }
     ++step_index;
@@ -455,7 +472,8 @@ void symex_target_equationt::convert_assumptions(
 }
 
 void symex_target_equationt::convert_goto_instructions(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
@@ -474,7 +492,7 @@ void symex_target_equationt::convert_goto_instructions(
 
         step.cond_handle = decision_procedure.handle(step.cond_expr);
         with_solver_hardness(
-          decision_procedure, hardness_register_ssa(step_index, step));
+          hardness_collector, hardness_register_ssa(step_index, step));
       }
     }
     ++step_index;
@@ -482,7 +500,8 @@ void symex_target_equationt::convert_goto_instructions(
 }
 
 void symex_target_equationt::convert_constraints(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
@@ -498,7 +517,7 @@ void symex_target_equationt::convert_constraints(
       step.converted = true;
 
       with_solver_hardness(
-        decision_procedure, hardness_register_ssa(step_index, step));
+        hardness_collector, hardness_register_ssa(step_index, step));
     }
     ++step_index;
   }
@@ -506,6 +525,7 @@ void symex_target_equationt::convert_constraints(
 
 void symex_target_equationt::convert_assertions(
   decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector,
   bool optimized_for_single_assertions)
 {
   // we find out if there is only _one_ assertion,
@@ -532,7 +552,7 @@ void symex_target_equationt::convert_assertions(
         step.cond_handle = false_exprt();
 
         with_solver_hardness(
-          decision_procedure, hardness_register_ssa(step_index, step));
+          hardness_collector, hardness_register_ssa(step_index, step));
         return; // prevent further assumptions!
       }
       else if(step.is_assume())
@@ -540,7 +560,7 @@ void symex_target_equationt::convert_assertions(
         decision_procedure.set_to_true(step.cond_expr);
 
         with_solver_hardness(
-          decision_procedure, hardness_register_ssa(step_index, step));
+          hardness_collector, hardness_register_ssa(step_index, step));
       }
       ++step_index;
     }
@@ -580,7 +600,7 @@ void symex_target_equationt::convert_assertions(
       step.cond_handle = decision_procedure.handle(implication);
 
       with_solver_hardness(
-        decision_procedure,
+        hardness_collector,
         [&involved_steps, &step](solver_hardnesst &hardness) {
           involved_steps.push_back(step.source.pc);
         });
@@ -598,7 +618,7 @@ void symex_target_equationt::convert_assertions(
         assumption = and_exprt(assumption, step.cond_handle);
 
       with_solver_hardness(
-        decision_procedure,
+        hardness_collector,
         [&involved_steps, &step](solver_hardnesst &hardness) {
           involved_steps.push_back(step.source.pc);
         });
@@ -610,14 +630,15 @@ void symex_target_equationt::convert_assertions(
   decision_procedure.set_to_true(assertion_disjunction);
 
   with_solver_hardness(
-    decision_procedure,
+    hardness_collector,
     [&assertion_disjunction, &involved_steps](solver_hardnesst &hardness) {
       hardness.register_assertion_ssas(assertion_disjunction, involved_steps);
     });
 }
 
 void symex_target_equationt::convert_function_calls(
-  decision_proceduret &decision_procedure)
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
@@ -646,7 +667,7 @@ void symex_target_equationt::convert_function_calls(
         }
       }
       with_solver_hardness(
-        decision_procedure,
+        hardness_collector,
         [step_index, &conjuncts, &step](solver_hardnesst &hardness) {
           hardness.register_ssa(
             step_index, conjunction(conjuncts), step.source.pc);
@@ -656,7 +677,9 @@ void symex_target_equationt::convert_function_calls(
   }
 }
 
-void symex_target_equationt::convert_io(decision_proceduret &decision_procedure)
+void symex_target_equationt::convert_io(
+  decision_proceduret &decision_procedure,
+  solver_hardnesst *hardness_collector)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
@@ -684,7 +707,7 @@ void symex_target_equationt::convert_io(decision_proceduret &decision_procedure)
         }
       }
       with_solver_hardness(
-        decision_procedure,
+        hardness_collector,
         [step_index, &conjuncts, &step](solver_hardnesst &hardness) {
           hardness.register_ssa(
             step_index, conjunction(conjuncts), step.source.pc);
