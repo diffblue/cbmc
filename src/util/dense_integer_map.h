@@ -12,11 +12,12 @@ Author: Diffblue Ltd
 #ifndef CPROVER_UTIL_DENSE_INTEGER_MAP_H
 #define CPROVER_UTIL_DENSE_INTEGER_MAP_H
 
+#include <util/invariant.h>
+
+#include <cstdint>
 #include <limits>
 #include <unordered_set>
 #include <vector>
-
-#include <util/invariant.h>
 
 /// Identity functor. When we use C++20 this can be replaced with std::identity.
 class identity_functort
