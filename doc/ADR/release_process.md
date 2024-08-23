@@ -10,15 +10,25 @@
 The current process we follow through to make a new release is the following:
 
 1. At the point in time we want to make the release, we make a change to
-   two files: `src/config.inc`, wherein we update the configuration variable
-   `CBMC_VERSION`, and `src/libcprover-rust/Cargo.toml`, wherein we update
-   the `version` variable to be the same as `CBMC_VERSION` (e.g. set both
-   to `5.80.0`).
+   three files: `CHANGELOG`, wherein we add release notes, `src/config.inc`,
+   wherein we update the configuration variable `CBMC_VERSION`, and
+   `src/libcprover-rust/Cargo.toml`, wherein we update the `version`
+   variable to be the same as `CBMC_VERSION` (e.g. set both to `5.80.0`).
 
    This is important as it informs the various tools of the current version
    of CBMC.
 
    (This needs to be pushed as a PR, and after it gets merged we move on to:)
+
+   On the 14th and 28th of each month,
+   `.github/workflows/release-timetabled.yaml` automatically creates such a
+   PR, unless `develop` has not changed since the latest release. This PR
+   always proposes a new *minor* version (e.g., `5.81.0` following
+   `5.80.0`), and its `CHANGELOG` entry consists of the release notes that
+   GitHub generates from the merged PRs; consider adding a summary before
+   merging. Releases with a different version number, or at other points in
+   time, can still be prepared manually (or by dispatching the workflow
+   manually, which also proposes a new minor version).
 
 2. Then we make a `git tag` out of that commit, and push it to github. The
    tag needs to be of the form `cbmc-<version>` with version being a version
@@ -60,8 +70,8 @@ anything more, but the process is described below for reference:
 ## Versioning
 
 We adopt an approach approximating SemVer. That is, our version numbers should
-be major.minor.patch. Regular releases (as of 2022-06-23: every other week)
-should normally increment the minor version number. This is also where we can
+be major.minor.patch. Regular releases (proposed automatically on the 14th and
+28th of each month, see above) should normally increment the minor version number. This is also where we can
 deprecate undesired features, i.e., mark as deprecated, warn existing users.
 
 Patch version increments should not be done as part of the regular releases, and
