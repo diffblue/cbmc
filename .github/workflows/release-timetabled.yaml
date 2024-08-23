@@ -1,0 +1,70 @@
+name: Release on 14th and 28th of each month
+
+on:
+  schedule:
+    - cron: "0 8 */14 * *" # Run this on 14th and 28th of each month at 08:00
+  workflow_dispatch:       # Allow manual dispatching for a release at a custom point in time.
+
+permissions:
+  checks: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Compare CBMC versions and determine next step
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest_release=$(gh -R diffblue/cbmc release list | grep Latest | awk '{print $3}' | cut -f2 -d-)
+          latest_release_sha=$(git ls-remote origin cbmc-$latest_release | awk '{print $1}')
+          head_sha=$(git ls-remote origin refs/heads/develop | awk '{ print $1 }')
+          echo "head_sha=$head_sha" >> $GITHUB_ENV
+          if [ x$latest_release_sha = x$head_sha ] ; then
+            # no changes since latest release
+            echo "next_step=none" >> $GITHUB_ENV
+          else
+            # create a draft release to construct release notes
+            gh release create cbmc-DRAFT --draft --generate-notes
+            gh release view cbmc-DRAFT --json body --jq '.body' > CHANGELOG.new
+            gh release delete -y cbmc-DRAFT
+            # compute the new version
+            latest_major=$(echo $latest_release | cut -f1 -d.)
+            latest_minor=$(echo $latest_release | cut -f2 -d.)
+            next_minor=$(($latest_minor + 1))
+            next_version="$latest_major.$next_minor.0"
+            echo "next_version=$next_version" >> $GITHUB_ENV
+            # produce an updated CHANGELOG
+            echo "# CBMC $next_version" > CHANGELOG.tmp
+            echo >> CHANGELOG.tmp
+            cat -s CHANGELOG.new >> CHANGELOG.tmp
+            rm CHANGELOG.new
+            cho >> CHANGELOG.tmp
+            cat CHANGELOG >> CHANGELOG.tmp
+            mv CHANGELOG.tmp CHANGELOG
+            # update version strings in source tree
+            perl -p -i -e \
+              "s/^CBMC_VERSION\s*=\s*\Q$latest_release\E/CBMC_VERSION = $next_version/" \
+               src/config.inc
+            perl -p -i -e \
+              "s/^version\s*=\s*\"\Q$latest_release\E\"/version = \"$next_version\"/" \
+               src/libcprover-rust/Cargo.toml
+            # debug logging of changes
+            git diff
+            echo "next_step=create_pr" >> $GITHUB_ENV
+          fi
+      - name: Create Pull Request
+        if: ${{ env.next_step == 'create_pr' }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: Release CBMC ${{ env.next_version }}
+          branch: cbmc-${{ env.next_version }}
+          delete-branch: true
+          title: 'Automatic release of CBMC ${{ env.next_version }}'
+          body: >
+            Release CBMC ${{ env.next_version }} up to the changes in ${{ env.head_sha }}.
