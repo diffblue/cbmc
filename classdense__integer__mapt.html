@@ -211,7 +211,7 @@ class dense_integer_mapt&lt; K, V, KeyToDenseInteger &gt;</h3>
 <p>The type is optimised for fast lookups at the expense of flexibility. It makes one compromise on the iterface of std::map / unordered_map: the iterator refers to a pair&lt;key, std::optional&lt;value&gt;&gt;, where the value optional will always be defined. This is because the backing store uses std::optional this way and we don't want to impose the price of copying the key and value each time we move the iterator just so we have a &lt;const K, V&gt; &amp; to give out.</p>
 <p>Undocumented functions with matching names have the same semantics as std::map equivalents (including perfect iterator stability, with ordering according to the given KeyToDenseInteger function) </p>
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00053">53</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00054">54</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aa7b7d698b89d58b6ec7b062a0669c6bf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa7b7d698b89d58b6ec7b062a0669c6bf">&#9670;&nbsp;</a></span>backing_storet</h2>
@@ -235,7 +235,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00064">64</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00065">65</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -256,7 +256,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 <p>const iterator. </p>
 <p>Stable with respect to all operations on this type once setup_for_keys has been called. </p>
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00217">217</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00218">218</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -277,7 +277,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 <p>iterator. </p>
 <p>Stable with respect to all operations on this type once setup_for_keys has been called. </p>
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00210">210</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00211">211</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -297,7 +297,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 
 <p>Type of the container returned by <a class="el" href="classdense__integer__mapt.html#a6192abacbac463f372561acea5dcc81f">possible_keys</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00057">57</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00058">58</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -327,7 +327,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00219">219</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00220">220</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -358,7 +358,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00279">279</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00280">280</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -388,7 +388,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00273">273</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00274">274</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -417,7 +417,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00325">325</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00326">326</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -446,7 +446,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00335">335</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00336">336</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -475,7 +475,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00345">345</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00346">346</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -504,7 +504,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00350">350</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00351">351</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -534,7 +534,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00310">310</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00311">311</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -563,7 +563,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00330">330</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00331">331</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -592,7 +592,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00340">340</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00341">341</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -622,7 +622,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00109">109</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00110">110</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -652,7 +652,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00293">293</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00294">294</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -682,7 +682,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00089">89</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00090">90</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -712,7 +712,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00099">99</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00100">100</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -742,7 +742,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00286">286</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00287">287</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -771,7 +771,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00320">320</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00321">321</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -816,7 +816,7 @@ template&lt;typename Iter &gt; </div>
 <p>Set the keys that are allowed to be used in this container. </p>
 <p>Checks that the integers produced for each key by <code>KeyToDenseInteger</code> are unique and fall within a std::size_t's range (the integers are allowed to be negative so long as max(integers) - min(integers) &lt;= max-size_t). This should be called before the container is used and not called again. Using keys not provided to this function with operator[], insert, at(...) etc may cause an invariant failure or undefined behaviour. </p>
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00231">231</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00232">232</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -845,7 +845,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00315">315</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00316">316</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -872,7 +872,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00070">70</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00071">71</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -898,7 +898,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00081">81</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00082">82</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -924,7 +924,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00062">62</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00063">63</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -950,7 +950,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00086">86</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00087">87</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>
@@ -976,7 +976,7 @@ template&lt;class K , class V , class KeyToDenseInteger  = identity_functort&gt;
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00077">77</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dense__integer__map_8h_source.html#l00078">78</a> of file <a class="el" href="dense__integer__map_8h_source.html">dense_integer_map.h</a>.</p>
 
 </div>
 </div>

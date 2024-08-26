@@ -1,6 +1,5 @@
 var NAVTREEINDEX27 =
 {
-"classdisjunctive__polynomial__accelerationt.html#a34d96c8895e9147dd1e0401bceb7048c":[8,0,403,5],
 "classdisjunctive__polynomial__accelerationt.html#a4143abca56855ca7936eb95b1ed1d229":[8,0,403,23],
 "classdisjunctive__polynomial__accelerationt.html#a48e85e16ad12e43fe1e665a0eaa0d9c4":[8,0,403,4],
 "classdisjunctive__polynomial__accelerationt.html#a4dd231687ff953eee96d7d5557450357":[8,0,403,20],
@@ -249,5 +248,6 @@ var NAVTREEINDEX27 =
 "classenumerating__loop__accelerationt.html#ada5b38be8ea8d198c4e67f9199c48126":[8,0,432,8],
 "classenumerating__loop__accelerationt.html#ae3e443aa7874bd2ab0e84d356eeae133":[8,0,432,1],
 "classenumerating__loop__accelerationt.html#afb345dba5007da7be766ef194b1325f5":[8,0,432,5],
-"classenumeration__typet.html":[8,0,433]
+"classenumeration__typet.html":[8,0,433],
+"classenumeration__typet.html#a27751d01c7b29441c89684ea41b50b83":[8,0,433,0]
 };
