@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/threeval.h>
 
+#include <cstdint>
 #include <map>
 #include <set>
 #include <sstream>
