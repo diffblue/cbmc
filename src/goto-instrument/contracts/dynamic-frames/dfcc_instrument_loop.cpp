@@ -235,9 +235,6 @@ dfcc_instrument_loopt::add_prehead_instructions(
   //   GOTO HEAD;
   // ```
 
-  // Replace bound variables by fresh instances in quantified formulas.
-  if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
-    add_quantified_variable(symbol_table, invariant, language_mode);
   // initialize loop_entry history vars;
   auto replace_history_result = replace_history_loop_entry(
     symbol_table, invariant, loop_head_location, language_mode);
@@ -429,9 +426,6 @@ dfcc_instrument_loopt::add_step_instructions(
     dfcc_utilst::get_function_symbol(symbol_table, function_id).mode;
   {
     // Assume the loop invariant after havocing the state.
-    // Replace bound variables by fresh instances in quantified formulas.
-    if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
-      add_quantified_variable(symbol_table, invariant, language_mode);
     code_assumet assumption{invariant};
     assumption.add_source_location() = loop_head_location;
     converter.goto_convert(assumption, step_instrs, language_mode);
@@ -513,9 +507,6 @@ void dfcc_instrument_loopt::add_body_instructions(
       id2string(check_location.get_function()) + "." +
       std::to_string(cbmc_loop_id));
     // Assume the loop invariant after havocing the state.
-    // Replace bound variables by fresh instances in quantified formulas.
-    if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
-      add_quantified_variable(symbol_table, invariant, language_mode);
     code_assertt assertion{invariant};
     assertion.add_source_location() = check_location;
     converter.goto_convert(assertion, pre_loop_latch_instrs, language_mode);
