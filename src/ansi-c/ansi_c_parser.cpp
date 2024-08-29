@@ -188,21 +188,37 @@ void ansi_c_parsert::pragma_cprover_add_check(
   if(pragma_cprover_stack.empty())
     pragma_cprover_push();
 
-  pragma_cprover_stack.back()[name] = enabled;
+  pragma_cprover_stack.back()[name] = enabled ? 1 : 0;
+}
+
+void ansi_c_parsert::pragma_cprover_add_unwind(size_t bound)
+{
+  if(pragma_cprover_stack.empty())
+    pragma_cprover_push();
+
+  pragma_cprover_stack.back()["unwind"] = bound;
+}
+
+void ansi_c_parsert::pragma_cprover_consume_unwind()
+{
+  for(auto &map : pragma_cprover_stack)
+    map.erase("unwind");
+
+  set_pragma_cprover();
 }
 
 bool ansi_c_parsert::pragma_cprover_clash(const irep_idt &name, bool enabled)
 {
   auto top = pragma_cprover_stack.back();
   auto found = top.find(name);
-  return found != top.end() && found->second != enabled;
+  return found != top.end() && found->second != (enabled ? 1 : 0);
 }
 
 void ansi_c_parsert::set_pragma_cprover()
 {
   // handle enable/disable shadowing
   // by bottom-to-top flattening
-  std::map<irep_idt, bool> flattened;
+  std::map<irep_idt, size_t> flattened;
 
   for(const auto &pragma_set : pragma_cprover_stack)
     for(const auto &pragma : pragma_set)
@@ -212,9 +228,18 @@ void ansi_c_parsert::set_pragma_cprover()
 
   for(const auto &pragma : flattened)
   {
-    std::string check_name = id2string(pragma.first);
-    std::string full_name =
-      (pragma.second ? "enable:" : "disable:") + check_name;
-    source_location.add_pragma(full_name);
+    if(pragma.first == "unwind")
+    {
+      std::string unwind_info =
+        id2string(pragma.first) + ":" + std::to_string(pragma.second);
+      source_location.add_pragma(unwind_info);
+    }
+    else
+    {
+      std::string check_name = id2string(pragma.first);
+      std::string full_name =
+        (pragma.second == 1 ? "enable:" : "disable:") + check_name;
+      source_location.add_pragma(full_name);
+    }
   }
 }

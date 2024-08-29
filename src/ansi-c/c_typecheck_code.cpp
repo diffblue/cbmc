@@ -415,6 +415,7 @@ void c_typecheck_baset::typecheck_expression(codet &code)
 
 void c_typecheck_baset::typecheck_for(codet &code)
 {
+  warning() << code.pretty() << eom;
   if(code.operands().size()!=4)
   {
     error().source_location = code.source_location();
@@ -771,6 +772,7 @@ void c_typecheck_baset::typecheck_switch(codet &code)
 
 void c_typecheck_baset::typecheck_while(code_whilet &code)
 {
+  warning() << code.pretty() << eom;
   if(code.operands().size()!=2)
   {
     error().source_location = code.source_location();
@@ -817,6 +819,7 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
 
 void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
 {
+  warning() << code.pretty() << eom;
   if(code.operands().size()!=2)
   {
     error().source_location = code.source_location();
