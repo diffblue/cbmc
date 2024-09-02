@@ -1,5 +1,16 @@
 var NAVTREEINDEX65 =
 {
+"classstring__of__int__builtin__functiont.html#a1651744b55092b4b9b62c18ad4790c61":[8,0,1209,0],
+"classstring__of__int__builtin__functiont.html#a1b2171a70191550ed5c935ff2921d9aa":[8,0,1209,1],
+"classstring__of__int__builtin__functiont.html#a26724b5b14584644c34961db03c8f3f2":[8,0,1209,3],
+"classstring__of__int__builtin__functiont.html#a9e88af25f07795fe8d277d45c298e1be":[8,0,1209,4],
+"classstring__of__int__builtin__functiont.html#aaec83a4f292cfc09555e45ffff2bbbcc":[8,0,1209,2],
+"classstring__ptr__hash.html":[8,0,1210],
+"classstring__ptr__hash.html#aa55c879aa6e941f35e80cc141787c590":[8,0,1210,0],
+"classstring__refinementt.html":[8,0,1212],
+"classstring__refinementt.html#a036afbcb5e27e3990f0795e22de946d4":[8,0,1212,16],
+"classstring__refinementt.html#a083a457556ee99b0ce241a5c2a3db2a8":[8,0,1212,7],
+"classstring__refinementt.html#a231b9204f3e24c2893f071a94ca555f9":[8,0,1212,20],
 "classstring__refinementt.html#a2650a151bd843fa35884d41b9e5b257f":[8,0,1212,2],
 "classstring__refinementt.html#a30aa5b3caac3fdfcd80b4298ab8f2d12":[8,0,1212,15],
 "classstring__refinementt.html#a37fa353a4270173a8e0debb28dc25244":[8,0,1212,11],
@@ -238,16 +249,5 @@ var NAVTREEINDEX65 =
 "classsymbol__table__buildert.html#abc67f19af554d94fa4d0232df8df5301":[8,0,1235,17],
 "classsymbol__table__buildert.html#abe444d61e716c4a6c5822a6de03e85e9":[8,0,1235,4],
 "classsymbol__table__buildert.html#aca4912fe8e9e5523f076212d41336dda":[8,0,1235,1],
-"classsymbol__table__buildert.html#ae807903096b2b41bbc7cbb476aefa1ad":[8,0,1235,10],
-"classsymbol__table__buildert.html#af77245ab37e2a5d1466529d88dd67312":[8,0,1235,11],
-"classsymbol__tablet.html":[8,0,1236],
-"classsymbol__tablet.html#a00fde001a95f7cc59621dd410a038d37":[8,0,1236,17],
-"classsymbol__tablet.html#a1b812343b11c7f743355c60a252e7fa1":[8,0,1236,22],
-"classsymbol__tablet.html#a24925a9255ea17b90fa2d089716fbffe":[8,0,1236,7],
-"classsymbol__tablet.html#a304b3aed25b8fb226489b7051b0925eb":[8,0,1236,0],
-"classsymbol__tablet.html#a3331954a71bea91f811b11e8240446ad":[8,0,1236,10],
-"classsymbol__tablet.html#a37f5fc099e1a366d89564aaa3b1f51a4":[8,0,1236,4],
-"classsymbol__tablet.html#a38e91020a8c8fd97c6b643ff66c647c3":[8,0,1236,2],
-"classsymbol__tablet.html#a42bff91aa07a96d0708557341a51bc81":[8,0,1236,15],
-"classsymbol__tablet.html#a4c43eccfbe1f0a70885148ebfe8a518d":[8,0,1236,1]
+"classsymbol__table__buildert.html#ae807903096b2b41bbc7cbb476aefa1ad":[8,0,1235,10]
 };
