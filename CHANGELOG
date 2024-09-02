@@ -1,3 +1,28 @@
+# CBMC 6.2.0
+
+## What's Changed
+* Dynamic frames: do not add trivial properties by @tautschnig in https://github.com/diffblue/cbmc/pull/8413
+
+## Bug Fixes
+* Contracts/dynamic frames: do not attempt to instrument typedefs by @tautschnig in https://github.com/diffblue/cbmc/pull/8403
+* Remove dynamic_cast from bv_dimacst by @tautschnig in https://github.com/diffblue/cbmc/pull/8406
+* Remove uses of `dynamic_cast` from qualifierst hierarchy by @tautschnig in https://github.com/diffblue/cbmc/pull/8405
+* Remove Java's unnecessary languaget::parse peculiarity by @tautschnig in https://github.com/diffblue/cbmc/pull/8407
+* Solver factory: set_decision_procedure_time_limit does not require dynamic_cast by @tautschnig in https://github.com/diffblue/cbmc/pull/8409
+* Solver factory: make_satcheck_prop does not require dynamic_cast by @tautschnig in https://github.com/diffblue/cbmc/pull/8410
+* Solver factory: all solvers are stack_decision_proceduret by @tautschnig in https://github.com/diffblue/cbmc/pull/8408
+* Remove qualifierst by @tautschnig in https://github.com/diffblue/cbmc/pull/8419
+* Contracts (DFCC) regression tests: use CaDiCaL by @tautschnig in https://github.com/diffblue/cbmc/pull/8414
+* Library functions: mark them as compiled by @tautschnig in https://github.com/diffblue/cbmc/pull/8412
+* Maintain loop invariant annotation when converting do .. while by @tautschnig in https://github.com/diffblue/cbmc/pull/8417
+* CONTRACTS: redirect checks to outer write set for loops that get skipped by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8416
+* CONTRACTS: fix do while latch by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8420
+* Remove dynamic_cast from counterexample beautification code path by @tautschnig in https://github.com/diffblue/cbmc/pull/8421
+* Include <cstdint> for int64_t by @ismaell in https://github.com/diffblue/cbmc/pull/8426
+* SMT2 back-end: fix inconsistent array flattening by @tautschnig in https://github.com/diffblue/cbmc/pull/8400
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.1.1...cbmc-6.2.0
+
 # CBMC 6.1.1
 
 ## What's Changed
