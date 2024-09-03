@@ -70,8 +70,6 @@ public:
   guard_managert &guard_manager;
   symex_target_equationt *symex_target;
 
-  symex_level1t level1;
-
   /// Rewrites symbol expressions in \ref exprt, applying a suffix to each
   /// symbol reflecting its most recent version, which differs depending on
   /// which level you requested. Each level also updates its predecessors, so
@@ -188,6 +186,7 @@ public:
     irep_idt function_id;
     guardt guard;
     call_stackt call_stack;
+    symex_level1t level1;
     std::map<irep_idt, unsigned> function_frame;
     unsigned atomic_section_id = 0;
     explicit threadt(guard_managert &guard_manager)

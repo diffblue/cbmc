@@ -117,6 +117,10 @@ void goto_symext::symex_start_thread(statet &state)
     }
   }
 
+  // retain the current set of objects so as to restore when symbolically
+  // executing the thread
+  new_thread.level1 = state.level1;
+
   // initialize all variables marked thread-local
   const symbol_tablet &symbol_table=ns.get_symbol_table();
 
