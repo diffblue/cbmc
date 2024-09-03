@@ -1,4 +1,4 @@
-set(test_pl_path "${CBMC_SOURCE_DIR}/../regression/test.pl")
+set(test_pl_path "${CBMC_SOURCE_DIR}/regression/test.pl")
 
 # For the best possible utilisation of multiple cores when
 # running tests in parallel, it is important that these directories are
