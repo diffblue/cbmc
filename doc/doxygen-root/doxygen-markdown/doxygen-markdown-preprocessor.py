@@ -53,15 +53,15 @@ def parse_arguments():
 
 
 def pandoc(path, pandoc_write, pandoc_wrap, pandoc_filter=None):
-    args = {
-        '--write': pandoc_write,
-        '--wrap': pandoc_wrap
-    }
+    args = [
+        '--write', pandoc_write,
+        '--wrap', pandoc_wrap
+        ]
     if pandoc_filter:
-        args['--filter'] = Path(pandoc_filter).resolve()
+        args.extend(['--filter', Path(pandoc_filter).resolve()])
 
 
-    lines = subprocess.run(['pandoc', **args, path],
+    lines = subprocess.run(['pandoc', *args, path],
                            check=True,
                            text=True,
                            capture_output=True).stdout.splitlines()
