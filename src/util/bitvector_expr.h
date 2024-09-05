@@ -1663,4 +1663,48 @@ inline find_first_set_exprt &to_find_first_set_expr(exprt &expr)
   return ret;
 }
 
+/// \brief zero extension
+/// The operand is converted to the given type by either
+/// a) truncating if the new type is shorter, or
+/// b) padding with most-significant zero bits if the new type is larger, or
+/// c) reinterprets the operand as the given type if their widths match.
+class zero_extend_exprt : public unary_exprt
+{
+public:
+  zero_extend_exprt(exprt _op, typet _type)
+    : unary_exprt(ID_zero_extend, std::move(_op), std::move(_type))
+  {
+  }
+
+  // a lowering to extraction or concatenation
+  exprt lower() const;
+};
+
+template <>
+inline bool can_cast_expr<zero_extend_exprt>(const exprt &base)
+{
+  return base.id() == ID_zero_extend;
+}
+
+/// \brief Cast an exprt to a \ref zero_extend_exprt
+///
+/// \a expr must be known to be \ref zero_extend_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref zero_extend_exprt
+inline const zero_extend_exprt &to_zero_extend_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_zero_extend);
+  zero_extend_exprt::check(expr);
+  return static_cast<const zero_extend_exprt &>(expr);
+}
+
+/// \copydoc to_zero_extend_expr(const exprt &)
+inline zero_extend_exprt &to_zero_extend_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_zero_extend);
+  zero_extend_exprt::check(expr);
+  return static_cast<zero_extend_exprt &>(expr);
+}
+
 #endif // CPROVER_UTIL_BITVECTOR_EXPR_H

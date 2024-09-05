@@ -376,6 +376,12 @@ void format_expr_configt::setup()
               << format(expr.type()) << ')';
   };
 
+  expr_map[ID_zero_extend] =
+    [](std::ostream &os, const exprt &expr) -> std::ostream & {
+    return os << "zero_extend(" << format(to_zero_extend_expr(expr).op())
+              << ", " << format(expr.type()) << ')';
+  };
+
   expr_map[ID_floatbv_typecast] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &floatbv_typecast_expr = to_floatbv_typecast_expr(expr);

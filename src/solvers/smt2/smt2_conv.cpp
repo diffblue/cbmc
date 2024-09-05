@@ -2456,6 +2456,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_expr(simplify_expr(to_bitreverse_expr(expr).lower(), ns));
   }
+  else if(expr.id() == ID_zero_extend)
+  {
+    convert_expr(to_zero_extend_expr(expr).lower());
+  }
   else if(expr.id() == ID_function_application)
   {
     const auto &function_application_expr = to_function_application_expr(expr);

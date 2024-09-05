@@ -165,6 +165,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_replication(to_replication_expr(expr));
   else if(expr.id()==ID_extractbits)
     return convert_extractbits(to_extractbits_expr(expr));
+  else if(expr.id() == ID_zero_extend)
+    return convert_bitvector(to_zero_extend_expr(expr).lower());
   else if(expr.id()==ID_bitnot || expr.id()==ID_bitand ||
           expr.id()==ID_bitor || expr.id()==ID_bitxor ||
           expr.id()==ID_bitxnor || expr.id()==ID_bitnor ||

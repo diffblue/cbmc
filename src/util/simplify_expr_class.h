@@ -76,6 +76,7 @@ class unary_overflow_exprt;
 class unary_plus_exprt;
 class update_exprt;
 class with_exprt;
+class zero_extend_exprt;
 
 class simplify_exprt
 {
@@ -152,6 +153,7 @@ public:
   [[nodiscard]] resultt<> simplify_extractbit(const extractbit_exprt &);
   [[nodiscard]] resultt<> simplify_extractbits(const extractbits_exprt &);
   [[nodiscard]] resultt<> simplify_concatenation(const concatenation_exprt &);
+  [[nodiscard]] resultt<> simplify_zero_extend(const zero_extend_exprt &);
   [[nodiscard]] resultt<> simplify_mult(const mult_exprt &);
   [[nodiscard]] resultt<> simplify_div(const div_exprt &);
   [[nodiscard]] resultt<> simplify_mod(const mod_exprt &);

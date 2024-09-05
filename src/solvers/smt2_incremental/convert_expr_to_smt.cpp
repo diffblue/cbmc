@@ -1470,6 +1470,15 @@ static smt_termt convert_expr_to_smt(
 }
 
 static smt_termt convert_expr_to_smt(
+  const zero_extend_exprt &zero_extend,
+  const sub_expression_mapt &converted)
+{
+  UNREACHABLE_BECAUSE(
+    "zero_extend expression should have been lowered by the decision "
+    "procedure before conversion to smt terms");
+}
+
+static smt_termt convert_expr_to_smt(
   const prophecy_r_or_w_ok_exprt &prophecy_r_or_w_ok,
   const sub_expression_mapt &converted)
 {
@@ -1821,6 +1830,10 @@ static smt_termt dispatch_expr_to_smt_conversion(
       expr_try_dynamic_cast<count_trailing_zeros_exprt>(expr))
   {
     return convert_expr_to_smt(*count_trailing_zeros, converted);
+  }
+  if(const auto zero_extend = expr_try_dynamic_cast<zero_extend_exprt>(expr))
+  {
+    return convert_expr_to_smt(*zero_extend, converted);
   }
   if(
     const auto prophecy_r_or_w_ok =

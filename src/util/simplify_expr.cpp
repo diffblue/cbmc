@@ -3028,6 +3028,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(const exprt &node)
   {
     r = simplify_extractbits(to_extractbits_expr(expr));
   }
+  else if(expr.id() == ID_zero_extend)
+  {
+    r = simplify_zero_extend(to_zero_extend_expr(expr));
+  }
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
   {

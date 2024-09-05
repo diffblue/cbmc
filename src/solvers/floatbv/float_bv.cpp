@@ -692,8 +692,10 @@ exprt float_bvt::mul(
 
   // zero-extend the fractions (unpacked fraction has the hidden bit)
   typet new_fraction_type=unsignedbv_typet((spec.f+1)*2);
-  const exprt fraction1=typecast_exprt(unpacked1.fraction, new_fraction_type);
-  const exprt fraction2=typecast_exprt(unpacked2.fraction, new_fraction_type);
+  const exprt fraction1 =
+    zero_extend_exprt{unpacked1.fraction, new_fraction_type};
+  const exprt fraction2 =
+    zero_extend_exprt{unpacked2.fraction, new_fraction_type};
 
   // multiply the fractions
   unbiased_floatt result;
@@ -750,7 +752,7 @@ exprt float_bvt::div(
     unsignedbv_typet(div_width));
 
   // zero-extend fraction2 to match fraction1
-  const typecast_exprt fraction2(unpacked2.fraction, fraction1.type());
+  const zero_extend_exprt fraction2{unpacked2.fraction, fraction1.type()};
 
   // divide fractions
   unbiased_floatt result;
