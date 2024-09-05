@@ -7,5 +7,5 @@ target_link_libraries(java-testing-utils
 target_include_directories(java-testing-utils
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CBMC_SOURCE_DIR}/../unit
+    ${CBMC_SOURCE_DIR}/unit
 )
