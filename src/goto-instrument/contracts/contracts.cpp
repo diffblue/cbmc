@@ -68,10 +68,6 @@ void code_contractst::check_apply_loop_contracts(
   // at the start of and end of a loop body
   std::vector<symbol_exprt> old_decreases_vars, new_decreases_vars;
 
-  // replace bound variables by fresh instances
-  if(has_subexpr(invariant, ID_exists) || has_subexpr(invariant, ID_forall))
-    add_quantified_variable(symbol_table, invariant, mode);
-
   // instrument
   //
   //   ... preamble ...
@@ -571,13 +567,6 @@ static void generate_contract_constraints(
   goto_programt &program,
   const source_locationt &location)
 {
-  if(
-    has_subexpr(instantiated_clause, ID_exists) ||
-    has_subexpr(instantiated_clause, ID_forall))
-  {
-    add_quantified_variable(symbol_table, instantiated_clause, mode);
-  }
-
   goto_programt constraint;
   if(location.get_property_class() == ID_assume)
   {
