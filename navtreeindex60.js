@@ -1,5 +1,13 @@
 var NAVTREEINDEX60 =
 {
+"classsmt2__incremental__decision__proceduret.html#a1ff609bb217d8a3d1f0c6f98b2ff3902":[8,0,1085,21],
+"classsmt2__incremental__decision__proceduret.html#a24fcd617b07c36ea2598f3685c99aab8":[8,0,1085,44],
+"classsmt2__incremental__decision__proceduret.html#a25d83a0f811f46e0948c3bb341090b32":[8,0,1085,27],
+"classsmt2__incremental__decision__proceduret.html#a498b2da7435112dd01d885f42a91c7ce":[8,0,1085,12],
+"classsmt2__incremental__decision__proceduret.html#a4a9c51d367b9c96a09f0612416662121":[8,0,1085,16],
+"classsmt2__incremental__decision__proceduret.html#a4d0a2b50444bef7fa612f1326bc1684b":[8,0,1085,4],
+"classsmt2__incremental__decision__proceduret.html#a520ba106c8342662e8cf1b6292fc15da":[8,0,1085,34],
+"classsmt2__incremental__decision__proceduret.html#a52bb60c2493c6b7a4d75d0bd6f75b655":[8,0,1085,9],
 "classsmt2__incremental__decision__proceduret.html#a58e33e70ccca4c6de0f2fa4e4ec0db46":[8,0,1085,6],
 "classsmt2__incremental__decision__proceduret.html#a5c5e32b8c28122940ff53675ddcfb647":[8,0,1085,18],
 "classsmt2__incremental__decision__proceduret.html#a632c5481e95879e402064297f1b822a9":[8,0,1085,23],
@@ -241,13 +249,5 @@ var NAVTREEINDEX60 =
 "classsmt__commandt.html":[8,0,1109],
 "classsmt__commandt.html#a03b253c617775718b1ea6354fa32329d":[8,0,1109,3],
 "classsmt__commandt.html#a0fd0f0b7d9f7e9a01f503d596333eb06":[8,0,1109,8],
-"classsmt__commandt.html#a18fe6222b7053bec3415665c275cdd0d":[8,0,1109,2],
-"classsmt__commandt.html#a3c513f7545d2b747c2dda21d1066aa68":[8,0,1109,1],
-"classsmt__commandt.html#a4924f2845a5023d67e22ef133ce7bcd2":[8,0,1109,4],
-"classsmt__commandt.html#a5d97262e9894e83cacb200eb43ec1583":[8,0,1109,5],
-"classsmt__commandt.html#a83ead1da0b666e861c1ac8c29712a95e":[8,0,1109,7],
-"classsmt__commandt.html#a915450ff7f600216139d3062dcfdfb75":[8,0,1109,6],
-"classsmt__commandt.html#adea302ee0e221ce3dd2ee194a0d73238":[8,0,1109,0],
-"classsmt__core__theoryt.html":[8,0,1110],
-"classsmt__core__theoryt.html#a15f215304aba83973e2c7ba811b059b4":[8,0,1110,8]
+"classsmt__commandt.html#a18fe6222b7053bec3415665c275cdd0d":[8,0,1109,2]
 };

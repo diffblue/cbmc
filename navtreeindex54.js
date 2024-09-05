@@ -1,5 +1,11 @@
 var NAVTREEINDEX54 =
 {
+"classrational__typet.html#a97972d4b7406b74c298d1bd535ff95da":[8,0,963,0],
+"classrationalt.html":[8,0,964],
+"classrationalt.html#a05234bcb7d150c1f394dddd52bfc9a77":[8,0,964,15],
+"classrationalt.html#a152b4a1961d29d2a0d6d129914ef52b8":[8,0,964,2],
+"classrationalt.html#a18152e45b41ac1e68b02753267edfde9":[8,0,964,20],
+"classrationalt.html#a1cfc342c8142492e5986559ff597999e":[8,0,964,7],
 "classrationalt.html#a212b27321528973aef0d5a08c811e6f8":[8,0,964,12],
 "classrationalt.html#a3011d7db290881f5b5c57d0246eff01f":[8,0,964,3],
 "classrationalt.html#a33f62e5ac12f874e1d23e4173e8f636e":[8,0,964,17],
@@ -85,7 +91,9 @@ var NAVTREEINDEX54 =
 "classreaching__definitions__analysist.html#ad0b59de9d4670dcd4775ad9fe58f2de1":[8,0,968,2],
 "classreaching__definitions__analysist.html#ae25e5c3a9f3d26c74077173dac54cec3":[8,0,968,5],
 "classreal__typet.html":[8,0,970],
+"classreal__typet.html#a2fd044b89ed0651dff8ca6fdb38dca5b":[8,0,970,2],
 "classreal__typet.html#a3f1511a4d75423fe4e2ee9c85d82def3":[8,0,970,0],
+"classreal__typet.html#ac942744e742321328efa42147d433cce":[8,0,970,1],
 "classreallocate__exprt.html":[8,0,971],
 "classreallocate__exprt.html#a37cd4ae851dce11b1b402aa6a4f9512c":[8,0,971,1],
 "classreallocate__exprt.html#a6a6a67760e253c9ee77ab17fb1c79e05":[8,0,971,4],
@@ -241,13 +249,5 @@ var NAVTREEINDEX54 =
 "classremove__const__function__pointerst.html#af247fb33a652443bfdee4af27cb2a540":[8,0,988,10],
 "classremove__const__function__pointerst.html#af6d817af2eb98d06991ec825aad818e8":[8,0,988,21],
 "classremove__const__function__pointerst.html#afbaea18e33b16d143e2279b12ad53c7a":[8,0,988,7],
-"classremove__exceptionst.html":[8,0,989],
-"classremove__exceptionst.html#a0999c67a2187e358d68b9b3dc04eb66a":[8,0,989,15],
-"classremove__exceptionst.html#a134d64efc8b393cd4e5dea7cd3e4721f":[8,0,989,2],
-"classremove__exceptionst.html#a5275725cdeebbd29f949f25a12fc719b":[8,0,989,16],
-"classremove__exceptionst.html#a58bb1e69810d7c5dff4fc3567e5e59ec":[8,0,989,8],
-"classremove__exceptionst.html#a59516ec32f2b39cdf8e09cb0a2f87b0c":[8,0,989,5],
-"classremove__exceptionst.html#a6bc571b801494b1a4c929704b4cebf1a":[8,0,989,17],
-"classremove__exceptionst.html#a7be58d5cf0f35d866d58323155cc0710":[8,0,989,13],
-"classremove__exceptionst.html#a94538ebe2f2775750234585a52f63e91":[8,0,989,9]
+"classremove__exceptionst.html":[8,0,989]
 };
