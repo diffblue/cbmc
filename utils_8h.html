@@ -185,9 +185,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a8ec8b1b695a472d1ee3ffc455fb07995"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a8ec8b1b695a472d1ee3ffc455fb07995">widen_assigns</a> (<a class="el" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> &amp;assigns, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a8ec8b1b695a472d1ee3ffc455fb07995"><td class="mdescLeft">&#160;</td><td class="mdescRight">Widen expressions in <code>assigns</code> with the following strategy.  <a href="utils_8h.html#a8ec8b1b695a472d1ee3ffc455fb07995">More...</a><br /></td></tr>
 <tr class="separator:a8ec8b1b695a472d1ee3ffc455fb07995"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a294e2a465538cef6fe58910023492ac3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a294e2a465538cef6fe58910023492ac3">add_quantified_variable</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classexprt.html">exprt</a> &amp;expression, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode)</td></tr>
-<tr class="memdesc:a294e2a465538cef6fe58910023492ac3"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function recursively searches <code>expression</code> to find nested or non-nested quantified expressions.  <a href="utils_8h.html#a294e2a465538cef6fe58910023492ac3">More...</a><br /></td></tr>
-<tr class="separator:a294e2a465538cef6fe58910023492ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b931288a19e60b91ac791eb53cbf9a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structreplace__history__parametert.html">replace_history_parametert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a0b931288a19e60b91ac791eb53cbf9a1">replace_history_old</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode)</td></tr>
 <tr class="memdesc:a0b931288a19e60b91ac791eb53cbf9a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function recursively identifies the "old" expressions within <code>expr</code> and replaces them with corresponding history variables.  <a href="utils_8h.html#a0b931288a19e60b91ac791eb53cbf9a1">More...</a><br /></td></tr>
 <tr class="separator:a0b931288a19e60b91ac791eb53cbf9a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -327,45 +324,6 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a294e2a465538cef6fe58910023492ac3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a294e2a465538cef6fe58910023492ac3">&#9670;&nbsp;</a></span>add_quantified_variable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void add_quantified_variable </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
-          <td class="paramname"><em>symbol_table</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>expression</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>mode</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This function recursively searches <code>expression</code> to find nested or non-nested quantified expressions. </p>
-<p>When a quantified expression is found, a fresh quantified variable is added to the symbol table and <code>expression</code> is updated to use this fresh variable. </p>
-
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00384">384</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a593dcf3d2c7f0c9332afe812cc5ec689"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a593dcf3d2c7f0c9332afe812cc5ec689">&#9670;&nbsp;</a></span>all_dereferences_are_valid()</h2>
 
@@ -435,7 +393,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00787">787</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00745">745</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -468,7 +426,7 @@ Functions</h2></td></tr>
 <p>Annotate the assigns in <code>assigns_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>assigns_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00765">765</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00723">723</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -501,7 +459,7 @@ Functions</h2></td></tr>
 <p>Annotate the decreases in <code>decreases_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>decreases_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00806">806</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00764">764</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -534,7 +492,7 @@ Functions</h2></td></tr>
 <p>Annotate the invariants in <code>invariant_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>invariant_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00745">745</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00703">703</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -578,7 +536,7 @@ Functions</h2></td></tr>
 
 <p>This function generates all the instructions required to initialize history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00534">534</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00492">492</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -641,7 +599,7 @@ Functions</h2></td></tr>
 
 <p>Extract loop assigns from annotated loop end. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00723">723</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00681">681</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -674,7 +632,7 @@ Functions</h2></td></tr>
 <p>Extract loop decreases from annotated loop end. </p>
 <p>Will check if the loop decreases is side-effect free if <code>check_side_effect`</code> is set. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00728">728</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00686">686</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -707,7 +665,7 @@ Functions</h2></td></tr>
 <p>Find and return the last instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00674">674</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00632">632</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -737,7 +695,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00600">600</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00558">558</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -769,7 +727,7 @@ Functions</h2></td></tr>
 
 <p>Find the goto instruction of <code>loop</code> that jumps to <code>loop_head</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00624">624</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00582">582</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -802,7 +760,7 @@ Functions</h2></td></tr>
 <p>Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00680">680</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00638">638</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -840,7 +798,7 @@ Functions</h2></td></tr>
 
 <p>Return loop head if <code>finding_head</code> is true, Otherwise return loop end. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00647">647</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00605">605</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -873,7 +831,7 @@ Functions</h2></td></tr>
 <p>Extract loop invariants from annotated loop end. </p>
 <p>Will check if the loop invariant is side-effect free if <code>check_side_effect`</code> is set. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00706">706</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00664">664</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -905,7 +863,7 @@ Functions</h2></td></tr>
 
 <p>Convert the suffix digits right after <code>prefix</code> of <code>str</code> into unsigned. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00586">586</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00544">544</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1071,7 +1029,7 @@ Functions</h2></td></tr>
 
 <p>Return true if <code>target</code> is an assignment to an instrumented variable with name <code>var_name</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00564">564</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00522">522</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1154,7 +1112,7 @@ Functions</h2></td></tr>
 
 <p>Return true if <code>target</code> is the end of some transformed loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00556">556</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00514">514</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1176,7 +1134,7 @@ Functions</h2></td></tr>
 
 <p>Return true if <code>target</code> is the head of some transformed loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00548">548</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00506">506</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1258,7 +1216,7 @@ Functions</h2></td></tr>
 
 <p>This function recursively identifies the "loop_entry" expressions within <code>expr</code> and replaces them with corresponding history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00515">515</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00473">473</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1302,7 +1260,7 @@ Functions</h2></td></tr>
 
 <p>This function recursively identifies the "old" expressions within <code>expr</code> and replaces them with corresponding history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00496">496</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00454">454</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>

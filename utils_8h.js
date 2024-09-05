@@ -9,7 +9,6 @@ var utils_8h =
     [ "IN_LOOP_HAVOC_BLOCK", "utils_8h.html#af716ec54b6b85bb035b702320eea0bbf", null ],
     [ "INIT_INVARIANT", "utils_8h.html#abaebb3ff8b3755a0e5c13cb4de8bff42", null ],
     [ "invariant_mapt", "utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c", null ],
-    [ "add_quantified_variable", "utils_8h.html#a294e2a465538cef6fe58910023492ac3", null ],
     [ "all_dereferences_are_valid", "utils_8h.html#a593dcf3d2c7f0c9332afe812cc5ec689", null ],
     [ "annotate_assigns", "utils_8h.html#a3efc5ac13d2416bd72f7f3199f6e546d", null ],
     [ "annotate_assigns", "utils_8h.html#aaeb6c0147c7354441c41b25a535e008a", null ],
