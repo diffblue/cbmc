@@ -471,17 +471,13 @@ void goto_symext::symex_output(
   PRECONDITION(code.operands().size() >= 2);
   exprt id_arg = state.rename(code.op0(), ns).get();
 
-  std::list<renamedt<exprt, L2>> args;
+  std::list<exprt> args;
 
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
     renamedt<exprt, L2> l2_arg = state.rename(code.operands()[i], ns);
-    if(symex_config.simplify_opt)
-    {
-      simplify_expr_with_value_sett simp{state.value_set, language_mode, ns};
-      l2_arg.simplify(simp);
-    }
-    args.emplace_back(l2_arg);
+    args.emplace_back(l2_arg.get());
+    do_simplify(args.back(), state.value_set);
   }
 
   const irep_idt output_id =

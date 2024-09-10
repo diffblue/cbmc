@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 #include "path_storage.h"
-#include "simplify_expr_with_value_set.h"
 
 #include <algorithm>
 #include <map>
@@ -74,12 +73,8 @@ void goto_symext::symex_goto(statet &state)
   exprt new_guard = clean_expr(instruction.condition(), state, false);
 
   renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
-  if(symex_config.simplify_opt)
-  {
-    simplify_expr_with_value_sett simp{state.value_set, language_mode, ns};
-    renamed_guard.simplify(simp);
-  }
   new_guard = renamed_guard.get();
+  do_simplify(new_guard, state.value_set);
 
   if(new_guard == false)
   {
@@ -90,7 +85,7 @@ void goto_symext::symex_goto(statet &state)
     return; // nothing to do
   }
 
-  target.goto_instruction(state.guard.as_expr(), renamed_guard, state.source);
+  target.goto_instruction(state.guard.as_expr(), new_guard, state.source);
 
   DATA_INVARIANT(
     !instruction.targets.empty(), "goto should have at least one target");
