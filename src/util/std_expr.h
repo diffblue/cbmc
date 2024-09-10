@@ -3002,7 +3002,6 @@ public:
     set(ID_value, value);
   }
 
-  bool value_is_zero_string() const;
   /// Return whether the expression is a constant representing `true`.
   /// \return True if is a Boolean value representing `true`, false otherwise.
   bool is_true() const;
@@ -3045,6 +3044,9 @@ public:
   {
     check(expr, vm);
   }
+
+protected:
+  bool value_is_zero_string() const;
 };
 
 template <>
