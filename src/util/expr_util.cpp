@@ -68,33 +68,7 @@ exprt make_binary(const exprt &expr)
 
 with_exprt make_with_expr(const update_exprt &src)
 {
-  const exprt::operandst &designator=src.designator();
-  PRECONDITION(!designator.empty());
-
-  with_exprt result{exprt{}, exprt{}, exprt{}};
-  exprt *dest=&result;
-
-  for(const auto &expr : designator)
-  {
-    with_exprt tmp{exprt{}, exprt{}, exprt{}};
-
-    if(expr.id() == ID_index_designator)
-    {
-      tmp.where() = to_index_designator(expr).index();
-    }
-    else if(expr.id() == ID_member_designator)
-    {
-      // irep_idt component_name=
-      //  to_member_designator(*it).get_component_name();
-    }
-    else
-      UNREACHABLE;
-
-    *dest=tmp;
-    dest=&to_with_expr(*dest).new_value();
-  }
-
-  return result;
+  return src.make_with_expr();
 }
 
 exprt is_not_zero(

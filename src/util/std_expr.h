@@ -2703,6 +2703,9 @@ public:
     return op2();
   }
 
+  /// converts an update expr into a (possibly nested) with expression
+  with_exprt make_with_expr() const;
+
   static void check(
     const exprt &expr,
     const validation_modet vm = validation_modet::INVARIANT)
