@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symex_assign.h"
 
 #include <util/byte_operators.h>
-#include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/range.h>
 
@@ -238,7 +237,7 @@ void symex_assignt::assign_non_struct_symbol(
       : assignment_type;
 
   target.assignment(
-    make_and(state.guard.as_expr(), conjunction(guard)),
+    conjunction(state.guard.as_expr(), conjunction(guard)),
     l2_lhs,
     l2_full_lhs,
     get_original_name(l2_full_lhs),

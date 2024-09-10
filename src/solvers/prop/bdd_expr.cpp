@@ -138,7 +138,7 @@ exprt bdd_exprt::as_expr(
           if(r.else_branch().is_complement()) // else is false
           {
             exprt then_case = as_expr(r.then_branch(), cache);
-            return make_and(n_expr, then_case);
+            return conjunction(n_expr, then_case);
           }
           exprt then_case = as_expr(r.then_branch(), cache);
           return make_or(not_exprt(n_expr), then_case);
@@ -149,7 +149,7 @@ exprt bdd_exprt::as_expr(
         if(r.then_branch().is_complement()) // then is false
         {
           exprt else_case = as_expr(r.else_branch(), cache);
-          return make_and(not_exprt(n_expr), else_case);
+          return conjunction(not_exprt(n_expr), else_case);
         }
         exprt else_case = as_expr(r.else_branch(), cache);
         return make_or(n_expr, else_case);
