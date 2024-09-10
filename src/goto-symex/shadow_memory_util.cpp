@@ -319,9 +319,7 @@ bool contains_null_or_invalid(
   const std::vector<exprt> &value_set,
   const exprt &address)
 {
-  if(
-    address.id() == ID_constant && address.type().id() == ID_pointer &&
-    to_constant_expr(address).is_zero())
+  if(address.is_constant() && to_constant_expr(address).is_null_pointer())
   {
     for(const auto &e : value_set)
     {

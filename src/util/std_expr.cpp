@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
+#include "config.h"
 #include "namespace.h"
 #include "pointer_expr.h"
 #include "range.h"
@@ -19,6 +20,26 @@ bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());
   return val.find_first_not_of('0')==std::string::npos;
+}
+
+bool constant_exprt::is_null_pointer() const
+{
+  if(type().id() != ID_pointer)
+    return false;
+
+  if(get_value() == ID_NULL)
+    return true;
+
+    // We used to support "0" (when NULL_is_zero), but really front-ends should
+    // resolve this and generate ID_NULL instead.
+#if 0
+  return config.ansi_c.NULL_is_zero && value_is_zero_string();
+#else
+  INVARIANT(
+    !value_is_zero_string() || !config.ansi_c.NULL_is_zero,
+    "front-end should use ID_NULL");
+  return false;
+#endif
 }
 
 void constant_exprt::check(const exprt &expr, const validation_modet vm)

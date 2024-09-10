@@ -439,7 +439,7 @@ expr2bits(const exprt &expr, bool little_endian, const namespacet &ns)
     }
     else if(type.id() == ID_pointer)
     {
-      if(config.ansi_c.NULL_is_zero && is_null_pointer(to_constant_expr(expr)))
+      if(config.ansi_c.NULL_is_zero && to_constant_expr(expr).is_null_pointer())
         return std::string(to_bitvector_type(type).get_width(), '0');
       else
         return {};

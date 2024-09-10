@@ -1983,7 +1983,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    if(is_null_pointer(src))
+    if(src.is_null_pointer())
     {
       if(configuration.use_library_macros)
         dest = "NULL";

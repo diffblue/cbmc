@@ -3379,7 +3379,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr_type.id()==ID_pointer)
   {
-    if(is_null_pointer(expr))
+    if(expr.is_null_pointer())
     {
       out << "(_ bv0 " << boolbv_width(expr_type)
           << ")";

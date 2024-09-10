@@ -532,7 +532,7 @@ void value_set_fit::get_value_set_rec(
   else if(expr.is_constant())
   {
     // check if NULL
-    if(is_null_pointer(to_constant_expr(expr)))
+    if(to_constant_expr(expr).is_null_pointer())
     {
       insert(
         dest,
