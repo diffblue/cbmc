@@ -44,7 +44,8 @@ goto_programt::targett acceleratet::find_back_jump(
   for(const auto &t : loop)
   {
     if(
-      t->is_goto() && t->condition().is_true() && t->targets.size() == 1 &&
+      t->is_goto() && t->condition().is_constant() &&
+      to_constant_expr(t->condition()).is_true() && t->targets.size() == 1 &&
       t->targets.front() == loop_header &&
       t->location_number > back_jump->location_number)
     {

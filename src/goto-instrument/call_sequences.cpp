@@ -231,8 +231,12 @@ void check_call_sequencet::operator()()
     {
       goto_programt::const_targett t=e.pc->get_target();
 
-      if(e.pc->condition().is_true())
+      if(
+        e.pc->condition().is_constant() &&
+        to_constant_expr(e.pc->condition()).is_true())
+      {
         e.pc=t;
+      }
       else
       {
         e.pc++;

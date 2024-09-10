@@ -47,7 +47,7 @@ static void show_step(
     std::cout << annotation << '(' << string_value << ')';
   std::cout << '\n';
 
-  if(!step.guard.is_true())
+  if(!step.guard.is_constant() || !to_constant_expr(step.guard).is_true())
   {
     const std::string guard_string = from_expr(ns, function_id, step.guard);
     std::cout << std::string(std::to_string(count).size() + 3, ' ');
@@ -76,7 +76,8 @@ void show_program(const namespacet &ns, const symex_target_equationt &equation)
       show_step(ns, step, "ASSUME", count);
     else if(step.is_constraint())
     {
-      PRECONDITION(step.guard.is_true());
+      PRECONDITION(
+        step.guard.is_constant() && to_constant_expr(step.guard).is_true());
       show_step(ns, step, "CONSTRAINT", count);
     }
     else if(step.is_shared_read())

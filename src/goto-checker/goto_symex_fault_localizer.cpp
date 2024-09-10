@@ -108,11 +108,12 @@ void goto_symex_fault_localizert::update_scores(
   for(auto &l : localization_points)
   {
     auto &score = l.second->second;
-    if(solver.get(l.first).is_true())
+    exprt v = solver.get(l.first);
+    if(v.is_constant() && to_constant_expr(v).is_true())
     {
       score++;
     }
-    else if(solver.get(l.first).is_false() && score > 0)
+    else if(v.is_constant() && to_constant_expr(v).is_false() && score > 0)
     {
       score--;
     }

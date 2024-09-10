@@ -288,8 +288,9 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
     else if(type.id() == ID_bool)
     {
       result["name"] = json_stringt("boolean");
-      result["binary"] = json_stringt(expr.is_true() ? "1" : "0");
-      result["data"] = jsont::json_boolean(expr.is_true());
+      result["binary"] =
+        json_stringt(to_constant_expr(expr).is_true() ? "1" : "0");
+      result["data"] = jsont::json_boolean(to_constant_expr(expr).is_true());
     }
     else if(type.id() == ID_string)
     {

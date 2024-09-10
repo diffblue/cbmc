@@ -56,13 +56,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 
       bool erase;
 
-      if(it->is_true())
+      if(it->is_constant() && to_constant_expr(*it).is_true())
       {
         erase=true;
         negate=!negate;
       }
       else
-        erase=it->is_false();
+        erase = it->is_constant() && to_constant_expr(*it).is_false();
 
       if(erase)
       {
@@ -110,8 +110,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
       if(!it->is_boolean())
         return unchanged(expr);
 
-      bool is_true=it->is_true();
-      bool is_false=it->is_false();
+      bool is_true = it->is_constant() && to_constant_expr(*it).is_true();
+      bool is_false = it->is_constant() && to_constant_expr(*it).is_false();
 
       if(expr.id()==ID_and && is_false)
       {
@@ -334,11 +334,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
   {
     return to_not_expr(op).op();
   }
-  else if(op.is_false())
+  else if(op.is_constant() && to_constant_expr(op).is_false())
   {
     return true_exprt();
   }
-  else if(op.is_true())
+  else if(op.is_constant() && to_constant_expr(op).is_true())
   {
     return false_exprt();
   }

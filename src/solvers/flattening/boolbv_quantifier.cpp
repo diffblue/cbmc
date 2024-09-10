@@ -176,7 +176,9 @@ static std::optional<exprt> eager_quantifier_instantiation(
   const exprt where_simplified = simplify_expr(expr.where(), ns);
 
   if(
-    (where_simplified.is_true() || where_simplified.is_false()) &&
+    where_simplified.is_constant() &&
+    (to_constant_expr(where_simplified).is_true() ||
+     to_constant_expr(where_simplified).is_false()) &&
     (var_expr.type().id() == ID_integer ||
      var_expr.type().id() == ID_rational || var_expr.type().id() == ID_real ||
      var_expr.type().id() == ID_bool ||

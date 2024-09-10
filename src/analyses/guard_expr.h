@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_GUARD_EXPR_H
 #define CPROVER_ANALYSES_GUARD_EXPR_H
 
-#include <util/expr.h>
+#include <util/std_expr.h>
 
 /// This is unused by this implementation of guards, but can be used by other
 /// implementations of the same interface.
@@ -59,12 +59,12 @@ public:
 
   bool is_true() const
   {
-    return expr.is_true();
+    return expr.is_constant() && to_constant_expr(expr).is_true();
   }
 
   bool is_false() const
   {
-    return expr.is_false();
+    return expr.is_constant() && to_constant_expr(expr).is_false();
   }
 
   friend guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2);

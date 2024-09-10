@@ -108,8 +108,12 @@ void dott::write_dot_subgraph(
       std::stringstream tmp;
       if(it->is_goto())
       {
-        if(it->condition().is_true())
+        if(
+          it->condition().is_constant() &&
+          to_constant_expr(it->condition()).is_true())
+        {
           tmp.str("Goto");
+        }
         else
         {
           std::string t = from_expr(ns, function_id, it->condition());
@@ -320,14 +324,20 @@ void dott::find_next(
   std::set<goto_programt::const_targett, goto_programt::target_less_than> &tres,
   std::set<goto_programt::const_targett, goto_programt::target_less_than> &fres)
 {
-  if(it->is_goto() && !it->condition().is_false())
+  if(
+    it->is_goto() && (!it->condition().is_constant() ||
+                      !to_constant_expr(it->condition()).is_false()))
   {
     for(const auto &target : it->targets)
       tres.insert(target);
   }
 
-  if(it->is_goto() && it->condition().is_true())
+  if(
+    it->is_goto() && it->condition().is_constant() &&
+    to_constant_expr(it->condition()).is_true())
+  {
     return;
+  }
 
   goto_programt::const_targett next = it; next++;
   if(next!=instructions.end())

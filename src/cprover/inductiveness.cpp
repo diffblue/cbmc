@@ -36,7 +36,7 @@ bool is_subsumed(
   bool verbose,
   const namespacet &ns)
 {
-  if(b.is_true())
+  if(b.is_constant() && to_constant_expr(b).is_true())
     return true; // anything subsumes 'true'
 
   if(a1.find(false_exprt()) != a1.end())
@@ -161,7 +161,7 @@ inductiveness_resultt inductiveness_check(
                   << frame_ref.index << consolet::reset << ' ';
 
       // trivially true?
-      if(invariant.is_true())
+      if(invariant.is_constant() && to_constant_expr(invariant).is_true())
       {
         if(solver_options.verbose)
           std::cout << "trivial\n";

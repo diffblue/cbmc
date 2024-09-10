@@ -170,7 +170,7 @@ bool remove_const_function_pointerst::try_resolve_function_call(
   }
   else if(simplified_expr.is_constant())
   {
-    if(simplified_expr.is_zero())
+    if(to_constant_expr(simplified_expr).is_zero())
     {
       // We have the null pointer - no need to throw everything away
       // but we don't add any functions either

@@ -673,7 +673,7 @@ void value_sett::get_value_set_rec(
     {
       // integer-to-something
 
-      if(op.is_zero())
+      if(op.is_constant() && to_constant_expr(op).is_zero())
       {
         insert(
           dest,

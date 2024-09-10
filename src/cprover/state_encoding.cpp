@@ -134,7 +134,9 @@ std::vector<symbol_exprt> state_encodingt::incoming_symbols(loct loc) const
 
     // conditional jump from loc_in to loc?
     if(
-      loc_in->is_goto() && !loc_in->condition().is_true() &&
+      loc_in->is_goto() &&
+      (!loc_in->condition().is_constant() ||
+       !to_constant_expr(loc_in->condition()).is_true()) &&
       loc != std::next(loc_in))
     {
       suffix = "T";
@@ -617,7 +619,9 @@ void state_encodingt::setup_incoming(const goto_functiont &goto_function)
   forall_goto_program_instructions(it, goto_function.body)
   {
     auto next = std::next(it);
-    if(it->is_goto() && it->condition().is_true())
+    if(
+      it->is_goto() && it->condition().is_constant() &&
+      to_constant_expr(it->condition()).is_true())
     {
     }
     else if(next != goto_function.body.instructions.end())
@@ -1013,7 +1017,7 @@ void state_encodingt::encode(
       // We produce ∅ when the 'other' branch is taken. Get the condition.
       const auto &condition = loc->condition();
 
-      if(condition.is_true())
+      if(condition.is_constant() && to_constant_expr(condition).is_true())
       {
         dest << equal_exprt(out_state_expr(loc), in_state_expr(loc));
       }

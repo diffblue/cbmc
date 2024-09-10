@@ -910,7 +910,7 @@ bool string_abstractiont::build_array(const array_exprt &object,
 
   exprt::operandst::const_iterator it=object.operands().begin();
   for(mp_integer i = 0; i < *size; ++i, ++it)
-    if(it->is_zero())
+    if(it->is_constant() && to_constant_expr(*it).is_zero())
       return build_symbol_constant(i, *size, dest);
 
   return true;
@@ -1194,7 +1194,7 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
     rhsp = &(to_typecast_expr(*rhsp).op());
 
   // we only care if the constant zero is assigned
-  if(!rhsp->is_zero())
+  if(!rhsp->is_constant() || !to_constant_expr(*rhsp).is_zero())
     return target;
 
   // index into a character array

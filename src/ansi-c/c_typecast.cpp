@@ -565,11 +565,11 @@ void c_typecastt::implicit_typecast_followed(
   {
     // special case: 0 == NULL
 
-    if(simplify_expr(expr, ns).is_zero() && (
-       src_type.id()==ID_unsignedbv ||
-       src_type.id()==ID_signedbv ||
-       src_type.id()==ID_natural ||
-       src_type.id()==ID_integer))
+    auto simp_expr = simplify_expr(expr, ns);
+    if(
+      simp_expr.is_constant() && to_constant_expr(simp_expr).is_zero() &&
+      (src_type.id() == ID_unsignedbv || src_type.id() == ID_signedbv ||
+       src_type.id() == ID_natural || src_type.id() == ID_integer))
     {
       expr = null_pointer_exprt{to_pointer_type(orig_dest_type)};
       return; // ok

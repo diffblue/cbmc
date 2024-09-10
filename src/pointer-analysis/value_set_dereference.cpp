@@ -487,7 +487,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
   if(root_object.id() == ID_null_object)
   {
-    if(!o.offset().is_zero())
+    if(!o.offset().is_constant() || !to_constant_expr(o.offset()).is_zero())
       return {};
 
     valuet result;
@@ -573,7 +573,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     // something generic -- really has to be a symbol
     address_of_exprt object_pointer(object);
 
-    if(o.offset().is_zero())
+    if(o.offset().is_constant() && to_constant_expr(o.offset()).is_zero())
     {
       result.pointer_guard = equal_exprt(
         typecast_exprt::conditional_cast(pointer_expr, object_pointer.type()),
@@ -589,7 +589,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
     if(
       dereference_type_compare(object_type, dereference_type, ns) &&
-      o.offset().is_zero())
+      o.offset().is_constant() && to_constant_expr(o.offset()).is_zero())
     {
       // The simplest case: types match, and offset is zero!
       // This is great, we are almost done.

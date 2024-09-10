@@ -26,9 +26,12 @@ void cover_goalst::mark()
     o->satisfying_assignment();
 
   for(auto &g : goals)
-    if(
-      g.status == goalt::statust::UNKNOWN &&
-      decision_procedure.get(g.condition).is_true())
+  {
+    if(g.status != goalt::statust::UNKNOWN)
+      continue;
+
+    exprt v = decision_procedure.get(g.condition);
+    if(v.is_constant() && to_constant_expr(v).is_true())
     {
       g.status=goalt::statust::COVERED;
       _number_covered++;
@@ -37,6 +40,7 @@ void cover_goalst::mark()
       for(const auto &o : observers)
         o->goal_covered(g);
     }
+  }
 }
 
 /// Build clause
@@ -47,8 +51,14 @@ void cover_goalst::constraint()
   // cover at least one unknown goal
 
   for(const auto &g : goals)
-    if(g.status == goalt::statust::UNKNOWN && !g.condition.is_false())
+  {
+    if(
+      g.status == goalt::statust::UNKNOWN &&
+      (!g.condition.is_constant() || !to_constant_expr(g.condition).is_false()))
+    {
       disjuncts.push_back(g.condition);
+    }
+  }
 
   // this is 'false' if there are no disjuncts
   decision_procedure.set_to_true(disjunction(disjuncts));

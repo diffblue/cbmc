@@ -920,7 +920,7 @@ void string_refinementt::add_lemma(
     simplify(simple_lemma, ns);
   }
 
-  if(simple_lemma.is_true())
+  if(simple_lemma.is_constant() && to_constant_expr(simple_lemma).is_true())
   {
 #if 0
     log.debug() << "string_refinementt::add_lemma : tautology" << messaget::eom;
@@ -1843,9 +1843,9 @@ exprt string_refinementt::get(const exprt &expr) const
     {
       const auto &if_expr = expr_dynamic_cast<if_exprt>(current.get());
       const exprt cond = get(if_expr.cond());
-      if(cond.is_true())
+      if(cond.is_constant() && to_constant_expr(cond).is_true())
         current = std::cref(if_expr.true_case());
-      else if(cond.is_false())
+      else if(cond.is_constant() && to_constant_expr(cond).is_false())
         current = std::cref(if_expr.false_case());
       else
         UNREACHABLE;
@@ -2021,7 +2021,7 @@ static bool is_valid_string_constraint(
       const exprt i = pair.second[j];
       const equal_exprt equals(rep, i);
       const exprt result = simplify_expr(equals, ns);
-      if(result.is_false())
+      if(result.is_constant() && to_constant_expr(result).is_false())
       {
         stream << "Indices not equal: " << to_string(constraint)
                << ", str: " << format(pair.first) << messaget::eom;

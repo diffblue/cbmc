@@ -218,11 +218,15 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
     }
 
     // condition is a constant?
-    if(new_if_expr.cond().is_true())
+    if(
+      new_if_expr.cond().is_constant() &&
+      to_constant_expr(new_if_expr.cond()).is_true())
     {
       return new_if_expr.true_case();
     }
-    else if(new_if_expr.cond().is_false())
+    else if(
+      new_if_expr.cond().is_constant() &&
+      to_constant_expr(new_if_expr.cond()).is_false())
     {
       return new_if_expr.false_case();
     }
@@ -246,7 +250,9 @@ simplify_exprt::simplify_address_of(const address_of_exprt &expr)
   {
     auto index_expr = to_index_expr(new_object.expr);
 
-    if(!index_expr.index().is_zero())
+    if(
+      !index_expr.index().is_constant() ||
+      !to_constant_expr(index_expr.index()).is_zero())
     {
       // we normalize &a[i] to (&a[0])+i
       exprt offset = index_expr.op1();
@@ -353,7 +359,7 @@ simplify_exprt::simplify_pointer_offset(const pointer_offset_exprt &expr)
     {
       if(op.type().id()==ID_pointer)
         ptr_expr.push_back(op);
-      else if(!op.is_zero())
+      else if(!op.is_constant() || !to_constant_expr(op).is_zero())
       {
         exprt tmp=op;
         if(tmp.type()!=expr.type())
@@ -424,7 +430,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
 
   if(
     tmp0_address_of.object().id() == ID_index &&
-    to_index_expr(tmp0_address_of.object()).index().is_zero())
+    to_index_expr(tmp0_address_of.object()).index().is_constant() &&
+    to_constant_expr(to_index_expr(tmp0_address_of.object()).index()).is_zero())
   {
     tmp0_address_of =
       address_of_exprt(to_index_expr(tmp0_address_of.object()).array());
@@ -438,7 +445,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
 
   if(
     tmp1_address_of.object().id() == ID_index &&
-    to_index_expr(tmp1_address_of.object()).index().is_zero())
+    to_index_expr(tmp1_address_of.object()).index().is_constant() &&
+    to_constant_expr(to_index_expr(tmp1_address_of.object()).index()).is_zero())
   {
     tmp1 = address_of_exprt(to_index_expr(tmp1_address_of.object()).array());
   }
@@ -500,7 +508,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
         return unchanged(expr);
       }
     }
-    else if(!op.is_constant() || !op.is_zero())
+    else if(!op.is_constant() || !to_constant_expr(op).is_zero())
     {
       return unchanged(expr);
     }

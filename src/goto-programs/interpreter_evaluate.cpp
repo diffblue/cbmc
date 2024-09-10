@@ -382,7 +382,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
     }
     else if(expr.is_boolean())
     {
-      return {expr.is_true()};
+      return {to_constant_expr(expr).is_true()};
     }
     else if(expr.type().id()==ID_string)
     {

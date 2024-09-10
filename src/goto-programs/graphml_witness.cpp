@@ -238,8 +238,12 @@ static bool filter_out(
     prev_it->pc->source_location() == it->pc->source_location())
     return true;
 
-  if(it->is_goto() && it->pc->condition().is_true())
+  if(
+    it->is_goto() && it->pc->condition().is_constant() &&
+    to_constant_expr(it->pc->condition()).is_true())
+  {
     return true;
+  }
 
   const source_locationt &source_location = it->pc->source_location();
 
@@ -546,7 +550,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     if(
       it->hidden ||
       (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
-      (it->is_goto() && it->source.pc->condition().is_true()) ||
+      (it->is_goto() && it->source.pc->condition().is_constant() &&
+       to_constant_expr(it->source.pc->condition()).is_true()) ||
       source_location.is_nil() || source_location.is_built_in() ||
       source_location.get_line().empty())
     {
