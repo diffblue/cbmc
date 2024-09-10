@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
+#include "deprecate.h"
 #include "irep.h"
 
 #include <functional>
@@ -116,6 +117,7 @@ exprt make_and(exprt a, exprt b);
 /// Returns true if \p expr has a pointer type and a value NULL; it also returns
 /// true when \p expr has value zero and NULL_is_zero is true; returns false in
 /// all other cases.
+DEPRECATED(SINCE(2024, 9, 10, "use constant_exprt::is_null_pointer() instead"))
 bool is_null_pointer(const constant_exprt &expr);
 
 #endif // CPROVER_UTIL_EXPR_UTIL_H

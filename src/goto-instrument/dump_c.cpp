@@ -1399,7 +1399,7 @@ void dump_ct::cleanup_expr(exprt &expr)
     }
     // add a typecast for NULL
     else if(
-      u.op().is_constant() && is_null_pointer(to_constant_expr(u.op())) &&
+      u.op().is_constant() && to_constant_expr(u.op()).is_null_pointer() &&
       to_pointer_type(u.op().type()).base_type().id() == ID_empty)
     {
       const struct_union_typet::componentt &comp=
@@ -1459,7 +1459,7 @@ void dump_ct::cleanup_expr(exprt &expr)
             // add a typecast for NULL or 0
             if(
               argument.is_constant() &&
-              is_null_pointer(to_constant_expr(argument)))
+              to_constant_expr(argument).is_null_pointer())
             {
               const typet &comp_type=
                 to_union_type(type).components().front().type();

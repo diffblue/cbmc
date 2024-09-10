@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
-#include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -443,7 +442,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   {
     const constant_exprt &c = to_constant_expr(expr);
 
-    if(is_null_pointer(c))
+    if(c.is_null_pointer())
       return encode(pointer_logic.get_null_object(), type);
     else
     {

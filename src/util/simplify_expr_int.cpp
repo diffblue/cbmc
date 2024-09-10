@@ -1538,8 +1538,8 @@ static bool eliminate_common_addends(exprt &op0, exprt &op1)
   // we can't eliminate zeros
   if(
     op0.is_zero() || op1.is_zero() ||
-    (op0.is_constant() && is_null_pointer(to_constant_expr(op0))) ||
-    (op1.is_constant() && is_null_pointer(to_constant_expr(op1))))
+    (op0.is_constant() && to_constant_expr(op0).is_null_pointer()) ||
+    (op1.is_constant() && to_constant_expr(op1).is_null_pointer()))
   {
     return true;
   }
@@ -1736,7 +1736,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
 
     const constant_exprt &op1_constant = to_constant_expr(expr.op1());
 
-    if(is_null_pointer(op1_constant))
+    if(op1_constant.is_null_pointer())
     {
       // the address of an object is never NULL
 
@@ -1799,7 +1799,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
 
         exprt ptr = simplify_object(expr.op0()).expr;
         // NULL + N == NULL is N == 0
-        if(ptr.is_constant() && is_null_pointer(to_constant_expr(ptr)))
+        if(ptr.is_constant() && to_constant_expr(ptr).is_null_pointer())
           return make_boolean_expr(offset.is_zero());
         // &x + N == NULL is false when the offset is in bounds
         else if(auto address_of = expr_try_dynamic_cast<address_of_exprt>(ptr))

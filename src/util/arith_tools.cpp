@@ -25,7 +25,7 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
 
   if(type_id==ID_pointer)
   {
-    if(is_null_pointer(expr))
+    if(expr.is_null_pointer())
     {
       int_value=0;
       return false;
