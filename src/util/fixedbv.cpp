@@ -126,11 +126,6 @@ fixedbvt &fixedbvt::operator/=(const fixedbvt &o)
   return *this;
 }
 
-bool fixedbvt::operator==(int i) const
-{
-  return v==power(2, spec.get_fraction_bits())*i;
-}
-
 std::string fixedbvt::format(
   const format_spect &format_spec) const
 {
