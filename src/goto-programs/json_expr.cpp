@@ -51,9 +51,7 @@ static exprt simplify_json_expr(const exprt &src)
       // simplify expressions of the form &member(object, @class_identifier)
       return simplify_json_expr(object);
     }
-    else if(
-      object.id() == ID_index && to_index_expr(object).index().is_constant() &&
-      to_constant_expr(to_index_expr(object).index()).value_is_zero_string())
+    else if(object.id() == ID_index && to_index_expr(object).index() == 0)
     {
       // simplify expressions of the form  &array[0]
       return simplify_json_expr(to_index_expr(object).array());
