@@ -70,7 +70,7 @@ void precondition(
   {
     preconditiont precondition(ns, value_sets, target, *it, s, message_handler);
     precondition.compute(dest);
-    if(dest.is_false())
+    if(dest.is_constant() && to_constant_expr(dest).is_false())
       return;
   }
 }

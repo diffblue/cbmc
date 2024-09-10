@@ -8,17 +8,153 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
+#include "arith_tools.h"
+#include "config.h"
+#include "expr_util.h"
+#include "fixedbv.h"
+#include "ieee_float.h"
+#include "mathematical_types.h"
 #include "namespace.h"
 #include "pointer_expr.h"
 #include "range.h"
+#include "rational.h"
+#include "rational_tools.h"
 #include "substitute_symbols.h"
 
 #include <map>
+
+constant_exprt::constant_exprt(bool value)
+  : constant_exprt(value ? ID_true : ID_false, bool_typet{})
+{
+}
 
 bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());
   return val.find_first_not_of('0')==std::string::npos;
+}
+
+bool constant_exprt::is_true() const
+{
+  return is_boolean() && get_value() != ID_false;
+}
+
+bool constant_exprt::is_false() const
+{
+  return is_boolean() && get_value() == ID_false;
+}
+
+bool constant_exprt::is_zero() const
+{
+  const irep_idt &type_id = type().id();
+
+  if(type_id == ID_integer)
+  {
+    return integer_typet{}.zero_expr() == *this;
+  }
+  else if(type_id == ID_natural)
+  {
+    return natural_typet{}.zero_expr() == *this;
+  }
+  else if(type_id == ID_real)
+  {
+    return real_typet{}.zero_expr() == *this;
+  }
+  else if(type_id == ID_rational)
+  {
+    rationalt rat_value;
+    if(to_rational(*this, rat_value))
+      CHECK_RETURN(false);
+    return rat_value.is_zero();
+  }
+  else if(
+    type_id == ID_unsignedbv || type_id == ID_signedbv ||
+    type_id == ID_c_bool || type_id == ID_c_bit_field)
+  {
+    return value_is_zero_string();
+  }
+  else if(type_id == ID_fixedbv)
+  {
+    return fixedbvt(*this).is_zero();
+  }
+  else if(type_id == ID_floatbv)
+  {
+    return ieee_floatt(*this).is_zero();
+  }
+  else if(type_id == ID_pointer)
+  {
+    return is_null_pointer();
+  }
+  else
+    return false;
+}
+
+bool constant_exprt::is_one() const
+{
+  const irep_idt &type_id = type().id();
+
+  if(type_id == ID_integer)
+  {
+    return integer_typet{}.one_expr() == *this;
+  }
+  else if(type_id == ID_natural)
+  {
+    return natural_typet{}.one_expr() == *this;
+  }
+  else if(type_id == ID_real)
+  {
+    return real_typet{}.one_expr() == *this;
+  }
+  else if(type_id == ID_rational)
+  {
+    rationalt rat_value;
+    if(to_rational(*this, rat_value))
+      CHECK_RETURN(false);
+    return rat_value.is_one();
+  }
+  else if(
+    type_id == ID_unsignedbv || type_id == ID_signedbv ||
+    type_id == ID_c_bool || type_id == ID_c_bit_field)
+  {
+    const auto width = to_bitvector_type(type()).get_width();
+    mp_integer int_value = bvrep2integer(id2string(get_value()), width, false);
+    return int_value == 1;
+  }
+  else if(type_id == ID_fixedbv)
+  {
+    fixedbv_spect spec{to_fixedbv_type(type())};
+    fixedbvt one{spec};
+    one.from_integer(1);
+    return one == fixedbvt{*this};
+  }
+  else if(type_id == ID_floatbv)
+  {
+    ieee_floatt one{to_floatbv_type(type())};
+    one.from_integer(1);
+    return one == ieee_floatt{*this};
+  }
+  else
+    return false;
+}
+
+bool constant_exprt::is_null_pointer() const
+{
+  if(type().id() != ID_pointer)
+    return false;
+
+  if(get_value() == ID_NULL)
+    return true;
+
+    // We used to support "0" (when NULL_is_zero), but really front-ends should
+    // resolve this and generate ID_NULL instead.
+#if 0
+  return config.ansi_c.NULL_is_zero && value_is_zero_string();
+#else
+  INVARIANT(
+    !value_is_zero_string() || !config.ansi_c.NULL_is_zero,
+    "front-end should use ID_NULL");
+  return false;
+#endif
 }
 
 void constant_exprt::check(const exprt &expr, const validation_modet vm)
@@ -63,12 +199,37 @@ exprt disjunction(const exprt::operandst &op)
   }
 }
 
+exprt conjunction(exprt a, exprt b)
+{
+  PRECONDITION(a.is_boolean() && b.is_boolean());
+  if(b.is_constant())
+  {
+    if(to_constant_expr(b).is_false())
+      return false_exprt{};
+    return a;
+  }
+  if(a.is_constant())
+  {
+    if(to_constant_expr(a).is_false())
+      return false_exprt{};
+    return b;
+  }
+  if(b.id() == ID_and)
+  {
+    b.add_to_operands(std::move(a));
+    return b;
+  }
+  return and_exprt{std::move(a), std::move(b)};
+}
+
 exprt conjunction(const exprt::operandst &op)
 {
   if(op.empty())
     return true_exprt();
   else if(op.size()==1)
     return op.front();
+  else if(op.size() == 2)
+    return conjunction(op[0], op[1]);
   else
   {
     return and_exprt(exprt::operandst(op));
@@ -172,6 +333,37 @@ void let_exprt::validate(const exprt &expr, const validation_modet vm)
       binding.first.type() == binding.second.type(),
       "let bindings must be type consistent");
   }
+}
+
+with_exprt update_exprt::make_with_expr() const
+{
+  const exprt::operandst &designators = designator();
+  PRECONDITION(!designators.empty());
+
+  with_exprt result{exprt{}, exprt{}, exprt{}};
+  exprt *dest = &result;
+
+  for(const auto &expr : designators)
+  {
+    with_exprt tmp{exprt{}, exprt{}, exprt{}};
+
+    if(expr.id() == ID_index_designator)
+    {
+      tmp.where() = to_index_designator(expr).index();
+    }
+    else if(expr.id() == ID_member_designator)
+    {
+      // irep_idt component_name=
+      //  to_member_designator(*it).get_component_name();
+    }
+    else
+      UNREACHABLE;
+
+    *dest = tmp;
+    dest = &to_with_expr(*dest).new_value();
+  }
+
+  return result;
 }
 
 exprt binding_exprt::instantiate(const operandst &values) const

@@ -179,8 +179,12 @@ same_address(const exprt &a, const exprt &b, const namespacet &ns)
 
       CHECK_RETURN(base_same_address.has_value());
 
-      if(base_same_address->is_false())
+      if(
+        base_same_address->is_constant() &&
+        to_constant_expr(*base_same_address).is_false())
+      {
         return false_expr;
+      }
       else
       {
         return and_exprt(

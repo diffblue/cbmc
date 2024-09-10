@@ -91,7 +91,7 @@ static std::optional<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
 
   if(
     skip_typecast(other_operand).id() != ID_address_of &&
-    (!constant_expr || !is_null_pointer(*constant_expr)))
+    (!constant_expr || !constant_expr->is_null_pointer()))
   {
     return {};
   }
@@ -139,13 +139,14 @@ static std::optional<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
           typecast_exprt::conditional_cast(value.pointer, other_operand.type()),
           other_operand},
         ns);
-      if(test_equal.is_true())
+      auto constant_expr = expr_try_dynamic_cast<constant_exprt>(test_equal);
+      if(constant_expr && constant_expr->is_true())
       {
         constant_found = true;
         // We can't break because we have to make sure we find any instances of
         // ID_unknown or ID_invalid
       }
-      else if(!test_equal.is_false())
+      else if(!constant_expr)
       {
         // We can't conclude anything about the value-set
         return {};
@@ -238,11 +239,10 @@ void goto_symext::symex_goto(statet &state)
   renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
   renamed_guard = try_evaluate_pointer_comparisons(
     std::move(renamed_guard), state.value_set, language_mode, ns);
-  if(symex_config.simplify_opt)
-    renamed_guard.simplify(ns);
   new_guard = renamed_guard.get();
+  do_simplify(new_guard);
 
-  if(new_guard.is_false())
+  if(new_guard.is_constant() && to_constant_expr(new_guard).is_false())
   {
     target.location(state.guard.as_expr(), state.source);
 
@@ -251,7 +251,7 @@ void goto_symext::symex_goto(statet &state)
     return; // nothing to do
   }
 
-  target.goto_instruction(state.guard.as_expr(), renamed_guard, state.source);
+  target.goto_instruction(state.guard.as_expr(), new_guard, state.source);
 
   DATA_INVARIANT(
     !instruction.targets.empty(), "goto should have at least one target");
@@ -275,11 +275,12 @@ void goto_symext::symex_goto(statet &state)
        // while(cond);
        (instruction.incoming_edges.size() == 1 &&
         *instruction.incoming_edges.begin() == goto_target &&
-        goto_target->is_goto() && new_guard.is_true())))
+        goto_target->is_goto() && new_guard.is_constant() &&
+        to_constant_expr(new_guard).is_true())))
     {
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
-      exprt negated_guard = not_exprt{new_guard};
+      exprt negated_guard = boolean_negate(new_guard);
       do_simplify(negated_guard);
       log.statistics() << "replacing self-loop at "
                        << state.source.pc->source_location() << " by assume("
@@ -314,7 +315,7 @@ void goto_symext::symex_goto(statet &state)
       return;
     }
 
-    if(new_guard.is_true())
+    if(new_guard.is_constant() && to_constant_expr(new_guard).is_true())
     {
       // we continue executing the loop
       if(check_break(loop_id, unwind))
@@ -328,7 +329,8 @@ void goto_symext::symex_goto(statet &state)
 
   // No point executing both branches of an unconditional goto.
   if(
-    new_guard.is_true() && // We have an unconditional goto, AND
+    new_guard.is_constant() && to_constant_expr(new_guard).is_true() &&
+    // We have an unconditional goto, AND
     // either there are no reachable blocks between us and the target in the
     // surrounding scope (because state.guard == true implies there is no path
     // around this GOTO instruction)
@@ -355,7 +357,7 @@ void goto_symext::symex_goto(statet &state)
     state_pc++;
 
     // skip dead instructions
-    if(new_guard.is_true())
+    if(new_guard.is_constant() && to_constant_expr(new_guard).is_true())
       while(state_pc!=goto_target && !state_pc->is_target())
         ++state_pc;
 
@@ -442,7 +444,7 @@ void goto_symext::symex_goto(statet &state)
   // On an unconditional GOTO we don't need our state, as it will be overwritten
   // by merge_goto. Therefore we move it onto goto_state_list instead of copying
   // as usual.
-  if(new_guard.is_true())
+  if(new_guard.is_constant() && to_constant_expr(new_guard).is_true())
   {
     // The move here only moves goto_statet, the base class of goto_symex_statet
     // and not the entire thing.
@@ -572,7 +574,9 @@ void goto_symext::symex_unreachable_goto(statet &state)
     goto_state_list.emplace_back(state.source, std::move(new_state));
   };
 
-  if(instruction.condition().is_true())
+  if(
+    instruction.condition().is_constant() &&
+    to_constant_expr(instruction.condition()).is_true())
   {
     if(instruction.is_backwards_goto())
     {
@@ -929,12 +933,7 @@ void goto_symext::loop_bound_exceeded(
 {
   const std::string loop_number = std::to_string(state.source.pc->loop_number);
 
-  exprt negated_cond;
-
-  if(guard.is_true())
-    negated_cond=false_exprt();
-  else
-    negated_cond=not_exprt(guard);
+  exprt negated_cond = boolean_negate(guard);
 
   if(symex_config.unwinding_assertions)
   {

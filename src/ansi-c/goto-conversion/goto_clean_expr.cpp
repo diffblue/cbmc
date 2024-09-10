@@ -114,13 +114,15 @@ void goto_convertt::rewrite_boolean(exprt &expr)
     "' must be Boolean, but got ",
     irep_pretty_diagnosticst{expr});
 
+  const source_locationt source_location = expr.find_source_location();
+
   // re-write "a ==> b" into a?b:1
   if(auto implies = expr_try_dynamic_cast<implies_exprt>(expr))
   {
     expr = if_exprt{
       std::move(implies->lhs()),
       std::move(implies->rhs()),
-      true_exprt{},
+      true_exprt{}.with_source_location(source_location),
       bool_typet{}};
     return;
   }
@@ -135,6 +137,8 @@ void goto_convertt::rewrite_boolean(exprt &expr)
   else // ID_or
     tmp = false_exprt();
 
+  tmp.add_source_location() = source_location;
+
   exprt::operandst &ops = expr.operands();
 
   // start with last one
@@ -146,17 +150,21 @@ void goto_convertt::rewrite_boolean(exprt &expr)
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       op.is_boolean(),
       "boolean operators must have only boolean operands",
-      expr.find_source_location());
+      source_location);
 
     if(expr.id() == ID_and)
     {
-      if_exprt if_e(op, tmp, false_exprt());
+      exprt if_e =
+        if_exprt{op, tmp, false_exprt{}.with_source_location(source_location)}
+          .with_source_location(source_location);
       tmp.swap(if_e);
       continue;
     }
     if(expr.id() == ID_or)
     {
-      if_exprt if_e(op, true_exprt(), tmp);
+      exprt if_e =
+        if_exprt{op, true_exprt{}.with_source_location(source_location), tmp}
+          .with_source_location(source_location);
       tmp.swap(if_e);
       continue;
     }
@@ -220,13 +228,13 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
     {
       exprt tmp_cond=if_expr.cond();
       simplify(tmp_cond, ns);
-      if(tmp_cond.is_true())
+      if(tmp_cond.is_constant() && to_constant_expr(tmp_cond).is_true())
       {
         clean_expr(if_expr.true_case(), dest, result_is_used);
         expr=if_expr.true_case();
         return;
       }
-      else if(tmp_cond.is_false())
+      else if(tmp_cond.is_constant() && to_constant_expr(tmp_cond).is_false())
       {
         clean_expr(if_expr.false_case(), dest, result_is_used);
         expr=if_expr.false_case();

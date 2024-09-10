@@ -26,14 +26,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \return True if is a Boolean constant representing `true`, false otherwise.
 bool exprt::is_true() const
 {
-  return is_constant() && is_boolean() && get(ID_value) != ID_false;
+  return is_constant() && to_constant_expr(*this).is_true();
 }
 
 /// Return whether the expression is a constant representing `false`.
 /// \return True if is a Boolean constant representing `false`, false otherwise.
 bool exprt::is_false() const
 {
-  return is_constant() && is_boolean() && get(ID_value) == ID_false;
+  return is_constant() && to_constant_expr(*this).is_false();
 }
 
 /// Return whether the expression is a constant representing 0.
@@ -47,44 +47,9 @@ bool exprt::is_false() const
 bool exprt::is_zero() const
 {
   if(is_constant())
-  {
-    const constant_exprt &constant=to_constant_expr(*this);
-    const irep_idt &type_id=type().id_string();
-
-    if(type_id==ID_integer || type_id==ID_natural)
-    {
-      return constant.value_is_zero_string();
-    }
-    else if(type_id==ID_rational)
-    {
-      rationalt rat_value;
-      if(to_rational(*this, rat_value))
-        CHECK_RETURN(false);
-      return rat_value.is_zero();
-    }
-    else if(
-      type_id == ID_unsignedbv || type_id == ID_signedbv ||
-      type_id == ID_c_bool || type_id == ID_c_bit_field)
-    {
-      return constant.value_is_zero_string();
-    }
-    else if(type_id==ID_fixedbv)
-    {
-      if(fixedbvt(constant)==0)
-        return true;
-    }
-    else if(type_id==ID_floatbv)
-    {
-      if(ieee_floatt(constant)==0)
-        return true;
-    }
-    else if(type_id==ID_pointer)
-    {
-      return is_null_pointer(constant);
-    }
-  }
-
-  return false;
+    return to_constant_expr(*this).is_zero();
+  else
+    return false;
 }
 
 /// Return whether the expression is a constant representing 1.
@@ -96,47 +61,9 @@ bool exprt::is_zero() const
 bool exprt::is_one() const
 {
   if(is_constant())
-  {
-    const auto &constant_expr = to_constant_expr(*this);
-    const irep_idt &type_id = type().id();
-
-    if(type_id==ID_integer || type_id==ID_natural)
-    {
-      mp_integer int_value =
-        string2integer(id2string(constant_expr.get_value()));
-      if(int_value==1)
-        return true;
-    }
-    else if(type_id==ID_rational)
-    {
-      rationalt rat_value;
-      if(to_rational(*this, rat_value))
-        CHECK_RETURN(false);
-      return rat_value.is_one();
-    }
-    else if(
-      type_id == ID_unsignedbv || type_id == ID_signedbv ||
-      type_id == ID_c_bool || type_id == ID_c_bit_field)
-    {
-      const auto width = to_bitvector_type(type()).get_width();
-      mp_integer int_value =
-        bvrep2integer(id2string(constant_expr.get_value()), width, false);
-      if(int_value==1)
-        return true;
-    }
-    else if(type_id==ID_fixedbv)
-    {
-      if(fixedbvt(constant_expr) == 1)
-        return true;
-    }
-    else if(type_id==ID_floatbv)
-    {
-      if(ieee_floatt(constant_expr) == 1)
-        return true;
-    }
-  }
-
-  return false;
+    return to_constant_expr(*this).is_one();
+  else
+    return false;
 }
 
 /// Get a \ref source_locationt from the expression or from its operands

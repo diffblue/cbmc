@@ -23,8 +23,11 @@ std::optional<std::size_t> cover_basic_blockst::continuation_of_block(
   const goto_programt::targett in_t = *instruction->incoming_edges.cbegin();
   if(
     in_t->is_goto() && !in_t->is_backwards_goto() &&
-    in_t->condition().is_true())
+    in_t->condition().is_constant() &&
+    to_constant_expr(in_t->condition()).is_true())
+  {
     return block_map[in_t];
+  }
 
   return {};
 }

@@ -105,7 +105,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_sign(const sign_exprt &expr)
     if(type.id()==ID_floatbv)
     {
       ieee_floatt value(to_constant_expr(expr.op()));
-      return make_boolean_expr(value.get_sign());
+      return constant_exprt{value.get_sign()};
     }
     else if(type.id()==ID_signedbv ||
             type.id()==ID_unsignedbv)
@@ -113,7 +113,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_sign(const sign_exprt &expr)
       const auto value = numeric_cast<mp_integer>(expr.op());
       if(value.has_value())
       {
-        return make_boolean_expr(*value >= 0);
+        return constant_exprt{*value >= 0};
       }
     }
   }
@@ -858,7 +858,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   if(
     expr_type.id() == ID_pointer && expr.op().is_constant() &&
     (to_constant_expr(expr.op()).get_value() == ID_NULL ||
-     (expr.op().is_zero() && config.ansi_c.NULL_is_zero)))
+     (to_constant_expr(expr.op()).is_zero() && config.ansi_c.NULL_is_zero)))
   {
     exprt tmp = expr.op();
     tmp.type()=expr.type();
@@ -904,9 +904,10 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 
     if(
       (op_plus_expr.op0().id() == ID_typecast &&
-       to_typecast_expr(op_plus_expr.op0()).op().is_zero()) ||
+       to_typecast_expr(op_plus_expr.op0()).op().is_constant() &&
+       to_constant_expr(to_typecast_expr(op_plus_expr.op0()).op()).is_zero()) ||
       (op_plus_expr.op0().is_constant() &&
-       is_null_pointer(to_constant_expr(op_plus_expr.op0()))))
+       to_constant_expr(op_plus_expr.op0()).is_null_pointer()))
     {
       auto sub_size =
         pointer_offset_size(to_pointer_type(op_type).base_type(), ns);
@@ -1032,7 +1033,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        return make_boolean_expr(int_value != 0);
+        return constant_exprt{int_value != 0};
       }
 
       if(expr_type_id==ID_unsignedbv ||
@@ -1071,11 +1072,11 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
          expr_type_id==ID_c_enum ||
          expr_type_id==ID_c_bit_field)
       {
-        if(operand.is_true())
+        if(to_constant_expr(operand).is_true())
         {
           return from_integer(1, expr_type);
         }
-        else if(operand.is_false())
+        else if(to_constant_expr(operand).is_false())
         {
           return from_integer(0, expr_type);
         }
@@ -1085,15 +1086,15 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
         const auto &c_enum_type = ns.follow_tag(to_c_enum_tag_type(expr_type));
         if(!c_enum_type.is_incomplete()) // possibly incomplete
         {
-          unsigned int_value = operand.is_true() ? 1u : 0u;
+          unsigned int_value = to_constant_expr(operand).is_true() ? 1u : 0u;
           exprt tmp=from_integer(int_value, c_enum_type);
           tmp.type()=expr_type; // we maintain the tag type
           return std::move(tmp);
         }
       }
-      else if(expr_type_id==ID_pointer &&
-              operand.is_false() &&
-              config.ansi_c.NULL_is_zero)
+      else if(
+        expr_type_id == ID_pointer && to_constant_expr(operand).is_false() &&
+        config.ansi_c.NULL_is_zero)
       {
         return null_pointer_exprt(to_pointer_type(expr_type));
       }
@@ -1110,7 +1111,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        return make_boolean_expr(int_value != 0);
+        return constant_exprt{int_value != 0};
       }
 
       if(expr_type_id==ID_c_bool)
@@ -2094,8 +2095,9 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
 
   // byte update of full object is byte_extract(new value)
   if(
-    offset.is_zero() && val_size.has_value() && *val_size > 0 &&
-    root_size.has_value() && *root_size > 0 && *val_size >= *root_size)
+    offset.is_constant() && to_constant_expr(offset).is_zero() &&
+    val_size.has_value() && *val_size > 0 && root_size.has_value() &&
+    *root_size > 0 && *val_size >= *root_size)
   {
     byte_extract_exprt be(
       matching_byte_extract_id,
@@ -2419,8 +2421,9 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
   // When one operand is zero, an overflow can only occur for a subtraction from
   // zero.
   if(
-    expr.op1().is_zero() ||
-    (expr.op0().is_zero() && !can_cast_expr<minus_overflow_exprt>(expr)))
+    (expr.op1().is_constant() && to_constant_expr(expr.op1()).is_zero()) ||
+    (expr.op0().is_constant() && to_constant_expr(expr.op0()).is_zero() &&
+     !can_cast_expr<minus_overflow_exprt>(expr)))
   {
     return false_exprt{};
   }
@@ -2428,7 +2431,8 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
   // One is neutral element for multiplication
   if(
     can_cast_expr<mult_overflow_exprt>(expr) &&
-    (expr.op0().is_one() || expr.op1().is_one()))
+    ((expr.op0().is_constant() && to_constant_expr(expr.op0()).is_one()) ||
+     (expr.op1().is_constant() && to_constant_expr(expr.op1()).is_one())))
   {
     return false_exprt{};
   }
@@ -2489,7 +2493,7 @@ simplify_exprt::resultt<>
 simplify_exprt::simplify_overflow_unary(const unary_overflow_exprt &expr)
 {
   // zero is a neutral element for all operations supported here
-  if(expr.op().is_zero())
+  if(expr.op().is_constant() && to_constant_expr(expr.op()).is_zero())
     return false_exprt{};
 
   // catch some cases over mathematical types
@@ -2539,7 +2543,7 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
   if(expr.id() == ID_overflow_result_unary_minus)
   {
     // zero is a neutral element
-    if(expr.op0().is_zero())
+    if(expr.op0().is_constant() && to_constant_expr(expr.op0()).is_zero())
       return struct_exprt{{expr.op0(), false_exprt{}}, expr.type()};
 
     // catch some cases over mathematical types
@@ -2590,7 +2594,7 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
   {
     // When one operand is zero, an overflow can only occur for a subtraction
     // from zero.
-    if(expr.op0().is_zero())
+    if(expr.op0().is_constant() && to_constant_expr(expr.op0()).is_zero())
     {
       if(
         expr.id() == ID_overflow_result_plus ||
@@ -2604,7 +2608,7 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
           {from_integer(0, expr.op0().type()), false_exprt{}}, expr.type()};
       }
     }
-    else if(expr.op1().is_zero())
+    else if(expr.op1().is_constant() && to_constant_expr(expr.op1()).is_zero())
     {
       if(
         expr.id() == ID_overflow_result_plus ||
@@ -2623,10 +2627,14 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
     // One is neutral element for multiplication
     if(
       expr.id() == ID_overflow_result_mult &&
-      (expr.op0().is_one() || expr.op1().is_one()))
+      ((expr.op0().is_constant() && to_constant_expr(expr.op0()).is_one()) ||
+       (expr.op1().is_constant() && to_constant_expr(expr.op1()).is_one())))
     {
       return struct_exprt{
-        {expr.op0().is_one() ? expr.op1() : expr.op0(), false_exprt{}},
+        {(expr.op0().is_constant() && to_constant_expr(expr.op0()).is_one())
+           ? expr.op1()
+           : expr.op0(),
+         false_exprt{}},
         expr.type()};
     }
 

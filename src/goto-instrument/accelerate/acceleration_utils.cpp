@@ -256,7 +256,10 @@ exprt acceleration_utilst::precondition(patht &path)
       // Ignore.
     }
 
-    if(!r_it->guard.is_true() && !r_it->guard.is_nil())
+    if(
+      (!r_it->guard.is_constant() ||
+       !to_constant_expr(r_it->guard).is_true()) &&
+      !r_it->guard.is_nil())
     {
       // The guard isn't constant true, so we need to accumulate that too.
       ret=implies_exprt(r_it->guard, ret);

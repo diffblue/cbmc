@@ -349,7 +349,7 @@ void custom_bitvector_domaint::transform(
             {
               if(
                 lhs.is_constant() &&
-                is_null_pointer(to_constant_expr(lhs))) // NULL means all
+                to_constant_expr(lhs).is_null_pointer()) // NULL means all
               {
                 if(mode==modet::CLEAR_MAY)
                 {
@@ -478,7 +478,7 @@ void custom_bitvector_domaint::transform(
         {
           if(
             lhs.is_constant() &&
-            is_null_pointer(to_constant_expr(lhs))) // NULL means all
+            to_constant_expr(lhs).is_null_pointer()) // NULL means all
           {
             if(mode==modet::CLEAR_MAY)
             {
@@ -530,7 +530,7 @@ void custom_bitvector_domaint::transform(
 
       const exprt result2 = simplify_expr(eval(guard, cba), ns);
 
-      if(result2.is_false())
+      if(result2.is_constant() && to_constant_expr(result2).is_false())
         make_bottom();
     }
     break;
@@ -716,7 +716,7 @@ exprt custom_bitvector_domaint::eval(
 
       if(
         pointer.is_constant() &&
-        is_null_pointer(to_constant_expr(pointer))) // NULL means all
+        to_constant_expr(pointer).is_null_pointer()) // NULL means all
       {
         if(src.id() == ID_get_may)
         {
@@ -814,12 +814,12 @@ void custom_bitvector_analysist::check(
       if(use_xml)
       {
         out << "<result status=\"";
-        if(result.is_true())
-          out << "SUCCESS";
-        else if(result.is_false())
-          out << "FAILURE";
-        else
+        if(!result.is_constant())
           out << "UNKNOWN";
+        else if(to_constant_expr(result).is_true())
+          out << "SUCCESS";
+        else
+          out << "FAILURE";
         out << "\">\n";
         out << xml(i_it->source_location());
         out << "<description>"
@@ -838,12 +838,12 @@ void custom_bitvector_analysist::check(
         out << '\n';
       }
 
-      if(result.is_true())
-        pass++;
-      else if(result.is_false())
-        fail++;
-      else
+      if(!result.is_constant())
         unknown++;
+      else if(to_constant_expr(result).is_true())
+        pass++;
+      else
+        fail++;
     }
 
     if(!use_xml)

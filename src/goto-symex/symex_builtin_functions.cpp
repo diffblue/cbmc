@@ -172,7 +172,9 @@ void goto_symext::symex_allocate(
   INVARIANT(
     zero_init.is_constant(), "allocate expects constant as second argument");
 
-  if(!zero_init.is_zero() && !zero_init.is_false())
+  if(
+    !to_constant_expr(zero_init).is_zero() &&
+    !to_constant_expr(zero_init).is_false())
   {
     const auto zero_value =
       zero_initializer(*object_type, code.source_location(), ns);
@@ -317,7 +319,8 @@ static irep_idt get_string_argument_rec(const exprt &src)
 
       if(
         index_expr.array().id() == ID_string_constant &&
-        index_expr.index().is_zero())
+        index_expr.index().is_constant() &&
+        to_constant_expr(index_expr.index()).is_zero())
       {
         const exprt &fmt_str = index_expr.array();
         return to_string_constant(fmt_str).value();
@@ -358,8 +361,12 @@ static std::optional<exprt> get_va_args(const exprt::operandst &operands)
     return {};
 
   const index_exprt &index_expr = to_index_expr(object);
-  if(!index_expr.index().is_zero())
+  if(
+    !index_expr.index().is_constant() ||
+    !to_constant_expr(index_expr.index()).is_zero())
+  {
     return {};
+  }
   else
     return index_expr.array();
 }
@@ -454,14 +461,13 @@ void goto_symext::symex_output(
   PRECONDITION(code.operands().size() >= 2);
   exprt id_arg = state.rename(code.op0(), ns).get();
 
-  std::list<renamedt<exprt, L2>> args;
+  std::list<exprt> args;
 
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
     renamedt<exprt, L2> l2_arg = state.rename(code.operands()[i], ns);
-    if(symex_config.simplify_opt)
-      l2_arg.simplify(ns);
-    args.emplace_back(l2_arg);
+    args.emplace_back(l2_arg.get());
+    do_simplify(args.back());
   }
 
   const irep_idt output_id=get_string_argument(id_arg, ns);

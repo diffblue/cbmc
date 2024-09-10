@@ -263,7 +263,7 @@ exprt simplify_bit_or_exprt(const exprt &expr)
     for(const auto &operand : or_expr->operands())
     {
       const exprt reduced = simplify_bit_or_exprt(operand);
-      res |= reduced.is_true();
+      res |= reduced.is_constant() && to_constant_expr(reduced).is_true();
     }
     return from_integer(res, bool_typet{});
   }

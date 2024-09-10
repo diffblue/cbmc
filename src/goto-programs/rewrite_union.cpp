@@ -146,7 +146,9 @@ static bool restore_union_rec(exprt &expr, const namespacet &ns)
 
       for(const auto &comp : union_type.components())
       {
-        if(be.offset().is_zero() && be.type() == comp.type())
+        if(
+          be.offset().is_constant() &&
+          to_constant_expr(be.offset()).is_zero() && be.type() == comp.type())
         {
           expr = member_exprt{be.op(), comp.get_name(), be.type()};
           return false;

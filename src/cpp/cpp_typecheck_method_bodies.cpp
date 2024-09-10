@@ -39,10 +39,16 @@ void cpp_typecheckt::typecheck_method_bodies()
 #ifdef DEBUG
     std::cout << "convert_method_body: " << method_symbol.name << '\n';
     std::cout << "  is_not_nil: " << body.is_not_nil() << '\n';
-    std::cout << "  !is_zero: " << (!body.is_zero()) << '\n';
+    std::cout << "  !is_zero: "
+              << (!body.is_constant() || !to_constant_expr(body).is_zero())
+              << '\n';
 #endif
-    if(body.is_not_nil() && !body.is_zero())
+    if(
+      body.is_not_nil() &&
+      (!body.is_constant() || !to_constant_expr(body).is_zero()))
+    {
       convert_function(method_symbol);
+    }
   }
 
   old_instantiation_stack.swap(instantiation_stack);

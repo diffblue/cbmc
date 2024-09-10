@@ -689,7 +689,7 @@ exprt constant_interval_exprt::generate_division_expression(
 
   PRECONDITION(!is_zero(rhs));
 
-  if(rhs.is_one())
+  if(rhs.is_constant() && to_constant_expr(rhs).is_one())
   {
     return lhs;
   }
@@ -744,7 +744,7 @@ exprt constant_interval_exprt::generate_modulo_expression(
 
   PRECONDITION(!is_zero(rhs));
 
-  if(rhs.is_one())
+  if(rhs.is_constant() && to_constant_expr(rhs).is_one())
   {
     return lhs;
   }
@@ -1269,7 +1269,7 @@ bool constant_interval_exprt::is_zero(const exprt &expr)
 
   INVARIANT(!is_max(expr) && !is_min(expr), "We excluded those cases");
 
-  if(expr.is_zero())
+  if(expr.is_constant() && to_constant_expr(expr).is_zero())
   {
     return true;
   }
@@ -1351,7 +1351,8 @@ bool constant_interval_exprt::equal(const exprt &a, const exprt &b)
 
   INVARIANT(!is_extreme(l, r), "We've excluded this before");
 
-  return simplified_expr(equal_exprt(l, r)).is_true();
+  exprt simp_eq = simplified_expr(equal_exprt(l, r));
+  return simp_eq.is_constant() && to_constant_expr(simp_eq).is_true();
 }
 
 // TODO: Signed/unsigned comparisons.
@@ -1399,7 +1400,8 @@ bool constant_interval_exprt::less_than(const exprt &a, const exprt &b)
     !is_extreme(l) && !is_extreme(r),
     "We have excluded all of these cases in the code above");
 
-  return simplified_expr(binary_relation_exprt(l, ID_lt, r)).is_true();
+  exprt simp_lt = simplified_expr(binary_relation_exprt(l, ID_lt, r));
+  return simp_lt.is_constant() && to_constant_expr(simp_lt).is_true();
 }
 
 bool constant_interval_exprt::greater_than(const exprt &a, const exprt &b)
@@ -1628,8 +1630,11 @@ constant_interval_exprt::typecast(const typet &type) const
 {
   if(is_boolean() && is_int(type))
   {
-    bool lower = !has_no_lower_bound() && get_lower().is_true();
-    bool upper = has_no_upper_bound() || get_upper().is_true();
+    bool lower = !has_no_lower_bound() && get_lower().is_constant() &&
+                 to_constant_expr(get_lower()).is_true();
+    bool upper =
+      has_no_upper_bound() ||
+      (get_upper().is_constant() && to_constant_expr(get_upper()).is_true());
 
     INVARIANT(!lower || upper, "");
 
@@ -1875,7 +1880,9 @@ bool constant_interval_exprt::contains_zero() const
     return false;
   }
 
-  if(get_lower().is_zero() || get_upper().is_zero())
+  if(
+    (get_lower().is_constant() && to_constant_expr(get_lower()).is_zero()) ||
+    (get_upper().is_constant() && to_constant_expr(get_upper()).is_zero()))
   {
     return true;
   }

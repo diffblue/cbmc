@@ -46,7 +46,10 @@ static bool is_string_constant_initialization(const exprt &rhs)
       const auto &index =
         expr_try_dynamic_cast<index_exprt>(address_of->object()))
     {
-      if(index->array().id() == ID_string_constant && index->index().is_zero())
+      if(
+        index->array().id() == ID_string_constant &&
+        index->index().is_constant() &&
+        to_constant_expr(index->index()).is_zero())
       {
         return true;
       }
@@ -238,7 +241,7 @@ void symex_assignt::assign_non_struct_symbol(
       : assignment_type;
 
   target.assignment(
-    make_and(state.guard.as_expr(), conjunction(guard)),
+    conjunction(state.guard.as_expr(), conjunction(guard)),
     l2_lhs,
     l2_full_lhs,
     get_original_name(l2_full_lhs),

@@ -221,7 +221,7 @@ xmlt xml(const exprt &expr, const namespacet &ns)
       result.name = "pointer";
       result.set_attribute(
         "binary", integer2binary(bvrep2integer(value, width, false), width));
-      if(is_null_pointer(constant_expr))
+      if(constant_expr.is_null_pointer())
         result.data = "NULL";
     }
     else if(type.id() == ID_bool)

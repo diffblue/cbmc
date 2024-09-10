@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_EXPR_H
 
 #include "as_const.h"
+#include "deprecate.h"
 #include "type.h"
 #include "validate_expressions.h"
 #include "validate_types.h"
@@ -214,9 +215,13 @@ public:
     return id() == ID_constant;
   }
 
+  DEPRECATED(SINCE(2024, 9, 10, "use constant_exprt::is_true() instead"))
   bool is_true() const;
+  DEPRECATED(SINCE(2024, 9, 10, "use constant_exprt::is_false() instead"))
   bool is_false() const;
+  DEPRECATED(SINCE(2024, 9, 10, "use constant_exprt::is_zero() instead"))
   bool is_zero() const;
+  DEPRECATED(SINCE(2024, 9, 10, "use constant_exprt::is_one() instead"))
   bool is_one() const;
 
   /// Return whether the expression represents a Boolean.

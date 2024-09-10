@@ -269,7 +269,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
     // Should be of the right type
     INVARIANT(assumption.is_boolean(), "simplification preserves type");
 
-    if(assumption.is_false())
+    if(assumption.is_constant() && to_constant_expr(assumption).is_false())
     {
       bool currently_bottom = is_bottom();
       make_bottom();
@@ -573,10 +573,10 @@ static auto inverse_operations =
 
 static exprt invert_result(const exprt &result)
 {
-  if(!result.is_boolean())
+  if(!result.is_boolean() || !result.is_constant())
     return result;
 
-  if(result.is_true())
+  if(to_constant_expr(result).is_true())
     return false_exprt();
   return true_exprt();
 }
@@ -634,7 +634,7 @@ exprt assume_and(
   for(auto const &operand : and_expr.operands())
   {
     auto result = env.do_assume(operand, ns);
-    if(result.is_false())
+    if(result.is_constant() && to_constant_expr(result).is_false())
       return result;
     nil |= result.is_nil();
   }
@@ -827,7 +827,7 @@ exprt assume_less_than(
   auto reduced_le_expr =
     binary_relation_exprt(left_lower, expr.id(), right_upper);
   auto result = env.eval(reduced_le_expr, ns)->to_constant();
-  if(result.is_true())
+  if(result.is_constant() && to_constant_expr(result).is_true())
   {
     if(is_assignable(operands.lhs))
     {

@@ -96,8 +96,11 @@ void goto_convert_functionst::add_return(
   // see if we have an unconditional goto at the end
   if(!f.body.instructions.empty() &&
      f.body.instructions.back().is_goto() &&
-     f.body.instructions.back().guard.is_true())
+     f.body.instructions.back().guard.is_constant() &&
+     to_constant_expr(f.body.instructions.back().guard).is_true())
+  {
     return;
+  }
 #else
 
   if(!f.body.instructions.empty())
@@ -108,7 +111,10 @@ void goto_convert_functionst::add_return(
     while(true)
     {
       // unconditional goto, say from while(1)?
-      if(last_instruction->is_goto() && last_instruction->condition().is_true())
+      if(
+        last_instruction->is_goto() &&
+        last_instruction->condition().is_constant() &&
+        to_constant_expr(last_instruction->condition()).is_true())
       {
         return;
       }

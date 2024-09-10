@@ -41,7 +41,9 @@ static void append_safe_havoc_code_for_expr(
   // skip havocing only if all pointer derefs in the expression are valid
   // (to avoid spurious pointer deref errors)
   dest.add(goto_programt::make_goto(
-    skip_target, not_exprt{all_dereferences_are_valid(expr, ns)}, location));
+    skip_target,
+    boolean_negate(all_dereferences_are_valid(expr, ns)),
+    location));
 
   havoc_code_impl();
 
@@ -149,7 +151,9 @@ void havoc_assigns_targetst::append_havoc_code_for_expr(
     {
       const auto &ptr = funcall.arguments().at(0);
       const auto &size = funcall.arguments().at(1);
-      if(funcall.arguments().at(2).is_true())
+      if(
+        funcall.arguments().at(2).is_constant() &&
+        to_constant_expr(funcall.arguments().at(2)).is_true())
       {
         append_havoc_pointer_code(expr.source_location(), ptr, dest);
       }
@@ -259,10 +263,14 @@ void simplify_gotos(goto_programt &goto_program, namespacet &ns)
 {
   for(auto &instruction : goto_program.instructions)
   {
-    if(
-      instruction.is_goto() &&
-      simplify_expr(instruction.condition(), ns).is_false())
+    if(!instruction.is_goto())
+      continue;
+
+    exprt simp_cond = simplify_expr(instruction.condition(), ns);
+    if(simp_cond.is_constant() && to_constant_expr(simp_cond).is_false())
+    {
       instruction.turn_into_skip();
+    }
   }
 }
 
@@ -433,8 +441,8 @@ static void replace_history_parameter_rec(
 
     // 2.2. Skip storing the history if the expression is invalid
     auto goto_instruction = history.add(goto_programt::make_incomplete_goto(
-      not_exprt{
-        all_dereferences_are_valid(parameter, namespacet(symbol_table))},
+      boolean_negate(
+        all_dereferences_are_valid(parameter, namespacet(symbol_table))),
       location));
 
     // 2.3. Add an assignment such that the value pointed to by the new

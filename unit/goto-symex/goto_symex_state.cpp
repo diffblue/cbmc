@@ -172,8 +172,7 @@ SCENARIO(
           const symbol_exprt object_symbol =
             to_symbol_expr(object_descriptor->object());
           REQUIRE(object_symbol.get_identifier() == "int_value!0");
-          REQUIRE(to_constant_expr(object_descriptor->offset())
-                    .value_is_zero_string());
+          REQUIRE(to_constant_expr(object_descriptor->offset()).is_zero());
         }
         THEN("The target equations are unchanged")
         {

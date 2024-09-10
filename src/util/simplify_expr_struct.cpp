@@ -172,7 +172,9 @@ simplify_exprt::simplify_member(const member_exprt &expr)
     {
       // rewrite byte_extract(X, 0).member to X
       // if the type of X is that of the member
-      if(byte_extract_expr.offset().is_zero())
+      if(
+        byte_extract_expr.offset().is_constant() &&
+        to_constant_expr(byte_extract_expr.offset()).is_zero())
       {
         const union_typet &union_type =
           op.type().id() == ID_union_tag

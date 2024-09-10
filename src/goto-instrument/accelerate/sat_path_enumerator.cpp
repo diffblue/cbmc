@@ -136,7 +136,9 @@ void sat_path_enumeratort::build_path(
     for(const auto &succ : succs)
     {
       exprt &distinguisher=distinguishing_points[succ];
-      bool taken=scratch_program.eval(distinguisher).is_true();
+      exprt distinguisher_eval = scratch_program.eval(distinguisher);
+      bool taken = distinguisher_eval.is_constant() &&
+                   to_constant_expr(distinguisher_eval).is_true();
 
       if(taken)
       {
@@ -335,7 +337,10 @@ void sat_path_enumeratort::record_path(scratch_programt &program)
   distinguish_valuest path_val;
 
   for(const auto &expr : distinguishers)
-    path_val[expr]=program.eval(expr).is_true();
+  {
+    exprt eval = program.eval(expr);
+    path_val[expr] = eval.is_constant() && to_constant_expr(eval).is_true();
+  }
 
   accelerated_paths.push_back(path_val);
 }

@@ -66,8 +66,6 @@ public:
 
   std::string format(const format_spect &format_spec) const;
 
-  bool operator==(int i) const;
-
   bool is_zero() const
   {
     return v==0;

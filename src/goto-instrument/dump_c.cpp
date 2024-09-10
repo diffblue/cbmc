@@ -1399,7 +1399,7 @@ void dump_ct::cleanup_expr(exprt &expr)
     }
     // add a typecast for NULL
     else if(
-      u.op().is_constant() && is_null_pointer(to_constant_expr(u.op())) &&
+      u.op().is_constant() && to_constant_expr(u.op()).is_null_pointer() &&
       to_pointer_type(u.op().type()).base_type().id() == ID_empty)
     {
       const struct_union_typet::componentt &comp=
@@ -1459,7 +1459,7 @@ void dump_ct::cleanup_expr(exprt &expr)
             // add a typecast for NULL or 0
             if(
               argument.is_constant() &&
-              is_null_pointer(to_constant_expr(argument)))
+              to_constant_expr(argument).is_null_pointer())
             {
               const typet &comp_type=
                 to_union_type(type).components().front().type();
@@ -1499,7 +1499,9 @@ void dump_ct::cleanup_expr(exprt &expr)
   {
     const byte_update_exprt &bu = to_byte_update_expr(expr);
 
-    if(bu.op().id() == ID_union && bu.offset().is_zero())
+    if(
+      bu.op().id() == ID_union && bu.offset().is_constant() &&
+      to_constant_expr(bu.offset()).is_zero())
     {
       const union_exprt &union_expr = to_union_expr(bu.op());
       const union_typet &union_type =
@@ -1537,7 +1539,7 @@ void dump_ct::cleanup_expr(exprt &expr)
       to_side_effect_expr(bu.op()).get_statement() == ID_nondet &&
       (bu.op().type().id() == ID_union ||
        bu.op().type().id() == ID_union_tag) &&
-      bu.offset().is_zero())
+      bu.offset().is_constant() && to_constant_expr(bu.offset()).is_zero())
     {
       const union_typet &union_type =
         bu.op().type().id() == ID_union_tag

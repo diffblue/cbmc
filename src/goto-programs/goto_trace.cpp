@@ -229,7 +229,7 @@ std::string trace_numeric_value(
     }
     else if(type.id()==ID_bool)
     {
-      return expr.is_true()?"1":"0";
+      return to_constant_expr(expr).is_true() ? "1" : "0";
     }
     else if(type.id()==ID_integer)
     {

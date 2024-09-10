@@ -426,7 +426,7 @@ exprt full_array_abstract_objectt::to_predicate_internal(
     auto index = index_exprt(name, ii);
     auto field_expr = field.second->to_predicate(index);
 
-    if(!field_expr.is_true())
+    if(!field_expr.is_constant() || !to_constant_expr(field_expr).is_true())
       all_predicates.push_back(field_expr);
   }
 

@@ -116,17 +116,17 @@ void rw_range_sett::get_objects_if(
   const range_spect &range_start,
   const range_spect &size)
 {
-  if(if_expr.cond().is_false())
-    get_objects_rec(mode, if_expr.false_case(), range_start, size);
-  else if(if_expr.cond().is_true())
-    get_objects_rec(mode, if_expr.true_case(), range_start, size);
-  else
+  if(!if_expr.cond().is_constant())
   {
     get_objects_rec(get_modet::READ, if_expr.cond());
 
     get_objects_rec(mode, if_expr.false_case(), range_start, size);
     get_objects_rec(mode, if_expr.true_case(), range_start, size);
   }
+  else if(to_constant_expr(if_expr.cond()).is_false())
+    get_objects_rec(mode, if_expr.false_case(), range_start, size);
+  else
+    get_objects_rec(mode, if_expr.true_case(), range_start, size);
 }
 
 void rw_range_sett::get_objects_dereference(
@@ -735,11 +735,7 @@ void rw_guarded_range_set_value_sett::get_objects_if(
   const range_spect &range_start,
   const range_spect &size)
 {
-  if(if_expr.cond().is_false())
-    get_objects_rec(mode, if_expr.false_case(), range_start, size);
-  else if(if_expr.cond().is_true())
-    get_objects_rec(mode, if_expr.true_case(), range_start, size);
-  else
+  if(!if_expr.cond().is_constant())
   {
     get_objects_rec(get_modet::READ, if_expr.cond());
 
@@ -753,6 +749,10 @@ void rw_guarded_range_set_value_sett::get_objects_if(
     get_objects_rec(mode, if_expr.true_case(), range_start, size);
     guard = std::move(copy);
   }
+  else if(to_constant_expr(if_expr.cond()).is_false())
+    get_objects_rec(mode, if_expr.false_case(), range_start, size);
+  else
+    get_objects_rec(mode, if_expr.true_case(), range_start, size);
 }
 
 void rw_guarded_range_set_value_sett::add(

@@ -68,33 +68,7 @@ exprt make_binary(const exprt &expr)
 
 with_exprt make_with_expr(const update_exprt &src)
 {
-  const exprt::operandst &designator=src.designator();
-  PRECONDITION(!designator.empty());
-
-  with_exprt result{exprt{}, exprt{}, exprt{}};
-  exprt *dest=&result;
-
-  for(const auto &expr : designator)
-  {
-    with_exprt tmp{exprt{}, exprt{}, exprt{}};
-
-    if(expr.id() == ID_index_designator)
-    {
-      tmp.where() = to_index_designator(expr).index();
-    }
-    else if(expr.id() == ID_member_designator)
-    {
-      // irep_idt component_name=
-      //  to_member_designator(*it).get_component_name();
-    }
-    else
-      UNREACHABLE;
-
-    *dest=tmp;
-    dest=&to_with_expr(*dest).new_value();
-  }
-
-  return result;
+  return src.make_with_expr();
 }
 
 exprt is_not_zero(
@@ -128,12 +102,17 @@ exprt is_not_zero(
 
 exprt boolean_negate(const exprt &src)
 {
+  PRECONDITION(src.is_boolean());
+
   if(src.id() == ID_not)
     return to_not_expr(src).op();
-  else if(src.is_true())
-    return false_exprt();
-  else if(src.is_false())
-    return true_exprt();
+  else if(auto constant_expr = expr_try_dynamic_cast<constant_exprt>(src))
+  {
+    if(constant_expr->is_true())
+      return false_exprt{};
+    else
+      return true_exprt{};
+  }
   else
     return not_exprt(src);
 }
@@ -338,51 +317,15 @@ bool can_forward_propagatet::is_constant_address_of(const exprt &expr) const
 
 constant_exprt make_boolean_expr(bool value)
 {
-  if(value)
-    return true_exprt();
-  else
-    return false_exprt();
+  return constant_exprt{value};
 }
 
 exprt make_and(exprt a, exprt b)
 {
-  PRECONDITION(a.is_boolean() && b.is_boolean());
-  if(b.is_constant())
-  {
-    if(b.get(ID_value) == ID_false)
-      return false_exprt{};
-    return a;
-  }
-  if(a.is_constant())
-  {
-    if(a.get(ID_value) == ID_false)
-      return false_exprt{};
-    return b;
-  }
-  if(b.id() == ID_and)
-  {
-    b.add_to_operands(std::move(a));
-    return b;
-  }
-  return and_exprt{std::move(a), std::move(b)};
+  return conjunction(a, b);
 }
 
 bool is_null_pointer(const constant_exprt &expr)
 {
-  if(expr.type().id() != ID_pointer)
-    return false;
-
-  if(expr.get_value() == ID_NULL)
-    return true;
-
-    // We used to support "0" (when NULL_is_zero), but really front-ends should
-    // resolve this and generate ID_NULL instead.
-#if 0
-  return config.ansi_c.NULL_is_zero && expr.value_is_zero_string();
-#else
-  INVARIANT(
-    !expr.value_is_zero_string() || !config.ansi_c.NULL_is_zero,
-    "front-end should use ID_NULL");
-  return false;
-#endif
+  return expr.is_null_pointer();
 }

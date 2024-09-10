@@ -789,7 +789,9 @@ void disjunctive_polynomial_accelerationt::build_path(
     for(const auto &succ : succs)
     {
       exprt &distinguisher=distinguishing_points[succ];
-      bool taken=scratch_program.eval(distinguisher).is_true();
+      exprt distinguisher_eval = scratch_program.eval(distinguisher);
+      bool taken = distinguisher_eval.is_constant() &&
+                   to_constant_expr(distinguisher_eval).is_true();
 
       if(taken)
       {
@@ -992,7 +994,8 @@ void disjunctive_polynomial_accelerationt::record_path(
       it != distinguishers.end();
       ++it)
   {
-    path_val[*it]=program.eval(*it).is_true();
+    exprt eval = program.eval(*it);
+    path_val[*it] = eval.is_constant() && to_constant_expr(eval).is_true();
   }
 
   accelerated_paths.push_back(path_val);

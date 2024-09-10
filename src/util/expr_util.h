@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
+#include "deprecate.h"
 #include "irep.h"
 
 #include <functional>
@@ -40,6 +41,7 @@ bool is_assignable(const exprt &);
 exprt make_binary(const exprt &);
 
 /// converts an update expr into a (possibly nested) with expression
+DEPRECATED(SINCE(2024, 9, 10, "use update_exprt::make_with_expr() instead"))
 with_exprt make_with_expr(const update_exprt &);
 
 /// converts a scalar/float expression to C/C++ Booleans
@@ -106,16 +108,19 @@ protected:
 };
 
 /// returns true_exprt if given true and false_exprt otherwise
+DEPRECATED(SINCE(2024, 9, 10, "use constant_exprt::constant_exprt(bool)"))
 constant_exprt make_boolean_expr(bool);
 
 /// Conjunction of two expressions. If the second is already an `and_exprt`
 /// add to its operands instead of creating a new expression. If one is `true`,
 /// return the other expression. If one is `false` returns `false`.
+DEPRECATED(SINCE(2024, 9, 10, "use conjunction(exprt, exprt) instead"))
 exprt make_and(exprt a, exprt b);
 
 /// Returns true if \p expr has a pointer type and a value NULL; it also returns
 /// true when \p expr has value zero and NULL_is_zero is true; returns false in
 /// all other cases.
+DEPRECATED(SINCE(2024, 9, 10, "use constant_exprt::is_null_pointer() instead"))
 bool is_null_pointer(const constant_exprt &expr);
 
 #endif // CPROVER_UTIL_EXPR_UTIL_H

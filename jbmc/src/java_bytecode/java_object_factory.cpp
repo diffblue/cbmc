@@ -1087,8 +1087,12 @@ void java_object_factoryt::gen_nondet_init(
       else
       {
         exprt within_bounds = interval.make_contains_expr(expr);
-        if(!within_bounds.is_true())
+        if(
+          !within_bounds.is_constant() ||
+          !to_constant_expr(within_bounds).is_true())
+        {
           assignments.add(code_assumet(std::move(within_bounds)));
+        }
       }
 
       if(

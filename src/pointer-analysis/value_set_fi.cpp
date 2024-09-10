@@ -532,7 +532,7 @@ void value_set_fit::get_value_set_rec(
   else if(expr.is_constant())
   {
     // check if NULL
-    if(is_null_pointer(to_constant_expr(expr)))
+    if(to_constant_expr(expr).is_null_pointer())
     {
       insert(
         dest,
@@ -924,7 +924,7 @@ void value_set_fit::get_reference_set_sharing_rec(
         offsett o = object_entry.second;
         const auto i = numeric_cast<mp_integer>(offset);
 
-        if(offset.is_zero())
+        if(i.has_value() && i == 0)
         {
         }
         else if(i.has_value() && offset_is_zero(o))

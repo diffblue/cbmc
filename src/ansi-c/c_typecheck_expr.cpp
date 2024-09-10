@@ -258,7 +258,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     subtypes[1].remove(ID_C_volatile);
     subtypes[1].remove(ID_C_restricted);
 
-    expr = make_boolean_expr(gcc_types_compatible_p(subtypes[0], subtypes[1]));
+    expr = constant_exprt{gcc_types_compatible_p(subtypes[0], subtypes[1])};
     expr.add_source_location()=source_location;
   }
   else if(expr.id()==ID_clang_builtin_convertvector)
@@ -1435,18 +1435,24 @@ void c_typecheck_baset::typecheck_expr_rel(
   else
   {
     // pointer and zero
-    if(type0.id()==ID_pointer &&
-       simplify_expr(op1, *this).is_zero())
+    if(type0.id() == ID_pointer)
     {
-      op1 = null_pointer_exprt{to_pointer_type(type0)};
-      return;
+      auto simp_op1 = simplify_expr(op1, *this);
+      if(simp_op1.is_constant() && to_constant_expr(simp_op1).is_zero())
+      {
+        op1 = null_pointer_exprt{to_pointer_type(type0)};
+        return;
+      }
     }
 
-    if(type1.id()==ID_pointer &&
-       simplify_expr(op0, *this).is_zero())
+    if(type1.id() == ID_pointer)
     {
-      op0 = null_pointer_exprt{to_pointer_type(type1)};
-      return;
+      auto simp_op0 = simplify_expr(op0, *this);
+      if(simp_op0.is_constant() && to_constant_expr(simp_op0).is_zero())
+      {
+        op0 = null_pointer_exprt{to_pointer_type(type1)};
+        return;
+      }
     }
 
     // pointer and integer
@@ -1672,13 +1678,13 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     // (at least that's how GCC behaves)
     if(
       to_pointer_type(operands[1].type()).base_type().id() == ID_empty &&
-      tmp1.is_constant() && is_null_pointer(to_constant_expr(tmp1)))
+      tmp1.is_constant() && to_constant_expr(tmp1).is_null_pointer())
     {
       implicit_typecast(operands[1], operands[2].type());
     }
     else if(
       to_pointer_type(operands[2].type()).base_type().id() == ID_empty &&
-      tmp2.is_constant() && is_null_pointer(to_constant_expr(tmp2)))
+      tmp2.is_constant() && to_constant_expr(tmp2).is_null_pointer())
     {
       implicit_typecast(operands[2], operands[1].type());
     }
@@ -3583,9 +3589,9 @@ exprt c_typecheck_baset::do_special_functions(
 
     mp_integer arg1;
 
-    if(expr.arguments()[1].is_true())
+    if(to_constant_expr(expr.arguments()[1]).is_true())
       arg1=1;
-    else if(expr.arguments()[1].is_false())
+    else if(to_constant_expr(expr.arguments()[1]).is_false())
       arg1=0;
     else if(to_integer(to_constant_expr(expr.arguments()[1]), arg1))
     {
@@ -3627,7 +3633,7 @@ exprt c_typecheck_baset::do_special_functions(
       typecast_exprt::conditional_cast(expr.arguments()[0], bool_typet());
     make_constant(arg0);
 
-    if(arg0.is_true())
+    if(to_constant_expr(arg0).is_true())
       return expr.arguments()[1];
     else
       return expr.arguments()[2];

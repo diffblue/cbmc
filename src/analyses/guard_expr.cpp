@@ -24,7 +24,7 @@ exprt guard_exprt::guard_expr(exprt expr) const
   }
   else
   {
-    if(expr.is_false())
+    if(expr.is_constant() && to_constant_expr(expr).is_false())
     {
       return boolean_negate(as_expr());
     }
@@ -39,9 +39,10 @@ void guard_exprt::add(const exprt &expr)
 {
   PRECONDITION(expr.is_boolean());
 
-  if(is_false() || expr.is_true())
+  if(is_false() || (expr.is_constant() && to_constant_expr(expr).is_true()))
     return;
-  else if(is_true() || expr.is_false())
+  else if(
+    is_true() || (expr.is_constant() && to_constant_expr(expr).is_false()))
   {
     this->expr = expr;
 
@@ -198,7 +199,9 @@ guard_exprt &operator|=(guard_exprt &g1, const guard_exprt &g2)
 
   if(tmp != and_expr1)
   {
-    if(and_expr1.is_true() || and_expr2.is_true())
+    if(
+      (and_expr1.is_constant() && to_constant_expr(and_expr1).is_true()) ||
+      (and_expr2.is_constant() && to_constant_expr(and_expr2).is_true()))
     {
     }
     else

@@ -45,8 +45,9 @@ public:
   {
     index = next;
     next = next_element(next, ns);
-    return simplify_expr(binary_predicate_exprt(index, ID_le, upper), ns)
-      .is_true();
+    auto simp_expr =
+      simplify_expr(binary_predicate_exprt(index, ID_le, upper), ns);
+    return simp_expr.is_constant() && to_constant_expr(simp_expr).is_true();
   }
 
   index_range_implementation_ptrt reset() const override
@@ -239,11 +240,15 @@ bool new_interval_is_top(const constant_interval_exprt &e)
   if(e.is_top())
     return true;
 
-  if(e.get_lower().is_false() && e.get_upper().is_true())
+  if(!e.get_lower().is_constant() || !e.get_upper().is_constant())
+    return false;
+
+  const constant_exprt &lower = to_constant_expr(e.get_lower());
+  const constant_exprt &upper = to_constant_expr(e.get_upper());
+
+  if(lower.is_false() && upper.is_true())
     return true;
-  if(
-    e.type().id() == ID_c_bool && e.get_lower().is_zero() &&
-    e.get_upper().is_one())
+  if(e.type().id() == ID_c_bool && lower.is_zero() && upper.is_one())
     return true;
 
   return false;

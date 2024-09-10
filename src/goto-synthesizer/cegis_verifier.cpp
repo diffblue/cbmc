@@ -71,7 +71,7 @@ get_checked_pointer_from_null_pointer_check(const exprt &violation)
   // NULL == ptr
   if(
     can_cast_expr<constant_exprt>(lhs_pointer) &&
-    is_null_pointer(*expr_try_dynamic_cast<constant_exprt>(lhs_pointer)))
+    expr_try_dynamic_cast<constant_exprt>(lhs_pointer)->is_null_pointer())
   {
     return rhs_pointer;
   }

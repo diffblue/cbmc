@@ -621,7 +621,7 @@ void value_sett::get_value_set_rec(
   else if(expr.is_constant())
   {
     // check if NULL
-    if(is_null_pointer(to_constant_expr(expr)))
+    if(to_constant_expr(expr).is_null_pointer())
     {
       insert(
         dest,
@@ -656,7 +656,7 @@ void value_sett::get_value_set_rec(
     {
       // integer-to-something
 
-      if(op.is_zero())
+      if(op.is_constant() && to_constant_expr(op).is_zero())
       {
         insert(dest, exprt(ID_null_object, empty_typet{}), mp_integer{0});
       }
@@ -1398,7 +1398,7 @@ void value_sett::get_reference_set_rec(
         offsett o = a_it->second;
         const auto i = numeric_cast<mp_integer>(offset);
 
-        if(offset.is_zero())
+        if(i.has_value() && i == 0)
         {
         }
         else if(i.has_value() && o)

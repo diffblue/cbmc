@@ -585,8 +585,10 @@ car_exprt instrument_spec_assignst::create_car_expr(
           valid_var,
           lower_bound_var,
           upper_bound_var,
-          is_ptr_to_ptr.is_true() ? car_havoc_methodt::NONDET_ASSIGN
-                                  : car_havoc_methodt::HAVOC_SLICE};
+          (is_ptr_to_ptr.is_constant() &&
+           to_constant_expr(is_ptr_to_ptr).is_true())
+            ? car_havoc_methodt::NONDET_ASSIGN
+            : car_havoc_methodt::HAVOC_SLICE};
       }
     }
   }
@@ -656,9 +658,9 @@ exprt instrument_spec_assignst::target_validity_expr(
   // (or is NULL if we allow it explicitly).
   // This assertion will be falsified whenever `start_address` is invalid or
   // not of the right size (or is NULL if we do not allow it explicitly).
-  auto result =
-    or_exprt{not_exprt{car.condition()},
-             w_ok_exprt{car.target_start_address(), car.target_size()}};
+  auto result = or_exprt{
+    boolean_negate(car.condition()),
+    w_ok_exprt{car.target_start_address(), car.target_size()}};
 
   if(allow_null_target)
     result.add_to_operands(null_object(car.target_start_address()));
@@ -685,7 +687,9 @@ void instrument_spec_assignst::target_validity_assertion(
   std::string comment = "Check that ";
   comment += from_expr(ns, "", car.target());
   comment += " is valid";
-  if(!car.condition().is_true())
+  if(
+    !car.condition().is_constant() ||
+    !to_constant_expr(car.condition()).is_true())
   {
     comment += " when ";
     comment += from_expr(ns, "", car.condition());
@@ -719,8 +723,12 @@ void instrument_spec_assignst::inclusion_check_assertion(
   std::string comment = "Check that ";
   if(!is_assigns_clause_replacement_tracking_comment(orig_comment))
   {
-    if(!car.condition().is_true())
+    if(
+      !car.condition().is_constant() ||
+      !to_constant_expr(car.condition()).is_true())
+    {
       comment += from_expr(ns, "", car.condition()) + ": ";
+    }
     comment += from_expr(ns, "", car.target());
   }
   else

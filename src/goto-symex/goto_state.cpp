@@ -145,11 +145,7 @@ void goto_statet::apply_condition(
     if(!is_ssa_expr(lhs) || !goto_symex_can_forward_propagatet(ns)(rhs))
       return;
 
-    if(rhs.is_true())
-      apply_condition(equal_exprt{lhs, false_exprt{}}, previous_state, ns);
-    else if(rhs.is_false())
-      apply_condition(equal_exprt{lhs, true_exprt{}}, previous_state, ns);
-    else
-      UNREACHABLE;
+    PRECONDITION(rhs.is_constant());
+    apply_condition(equal_exprt{lhs, boolean_negate(rhs)}, previous_state, ns);
   }
 }

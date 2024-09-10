@@ -129,7 +129,7 @@ exprt pointer_logict::pointer_expr(
 
   const byte_extract_exprt &be = to_byte_extract_expr(deep_object);
   const address_of_exprt base(be.op());
-  if(be.offset().is_zero())
+  if(be.offset().is_constant() && to_constant_expr(be.offset()).is_zero())
     return typecast_exprt::conditional_cast(base, type);
 
   const auto object_size = pointer_offset_size(be.op().type(), ns);

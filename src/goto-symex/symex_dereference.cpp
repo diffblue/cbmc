@@ -362,7 +362,9 @@ void goto_symext::dereference_rec(
   }
   else if(
     expr.id() == ID_index && to_index_expr(expr).array().id() == ID_member &&
-    to_array_type(to_index_expr(expr).array().type()).size().is_zero())
+    to_array_type(to_index_expr(expr).array().type()).size().is_constant() &&
+    to_constant_expr(to_array_type(to_index_expr(expr).array().type()).size())
+      .is_zero())
   {
     // This is an expression of the form x.a[i],
     // where a is a zero-sized array. This gets

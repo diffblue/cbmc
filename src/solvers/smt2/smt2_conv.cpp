@@ -273,7 +273,7 @@ static bool is_zero_width(const typet &type, const namespacet &ns)
   }
   else if(auto array_type = type_try_dynamic_cast<array_typet>(type))
   {
-    // we ignore array_type->size().is_zero() for now as there may be
+    // we ignore array_type->size() being zero for now as there may be
     // out-of-bounds accesses that we need to model
     return is_zero_width(array_type->element_type(), ns);
   }
@@ -364,9 +364,9 @@ exprt smt2_convt::get(const exprt &expr) const
   else if(expr.id() == ID_not)
   {
     auto op = get(to_not_expr(expr).op());
-    if(op.is_true())
+    if(op.is_constant() && to_constant_expr(op).is_true())
       return false_exprt();
-    else if(op.is_false())
+    else if(op.is_constant() && to_constant_expr(op).is_false())
       return true_exprt();
   }
   else if(
@@ -811,7 +811,7 @@ void smt2_convt::convert_address_of_rec(
     const exprt &array = index_expr.array();
     const exprt &index = index_expr.index();
 
-    if(index.is_zero())
+    if(index.is_constant() && to_constant_expr(index).is_zero())
     {
       if(array.type().id()==ID_pointer)
         convert_expr(array);
@@ -899,9 +899,9 @@ literalt smt2_convt::convert(const exprt &expr)
 
   // Three cases where no new handle is needed.
 
-  if(expr.is_true())
+  if(expr.is_constant() && to_constant_expr(expr).is_true())
     return const_literal(true);
-  else if(expr.is_false())
+  else if(expr.is_constant() && to_constant_expr(expr).is_false())
     return const_literal(false);
   else if(expr.id()==ID_literal)
     return to_literal_expr(expr).get_literal();
@@ -3379,7 +3379,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr_type.id()==ID_pointer)
   {
-    if(is_null_pointer(expr))
+    if(expr.is_null_pointer())
     {
       out << "(_ bv0 " << boolbv_width(expr_type)
           << ")";

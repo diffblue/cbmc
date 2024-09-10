@@ -194,7 +194,7 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     return os << ieee_floatt(src);
   else if(type == ID_pointer)
   {
-    if(is_null_pointer(src))
+    if(src.is_null_pointer())
       return os << ID_NULL;
     else if(
       src.get_value() == "INVALID" || src.get_value().starts_with("INVALID-"))

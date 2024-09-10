@@ -38,7 +38,7 @@ static bool is_dereference_integer_object(
     {
       const constant_exprt &constant = to_constant_expr(pointer);
 
-      if(is_null_pointer(constant))
+      if(constant.is_null_pointer())
       {
         address=0;
         return true;
@@ -218,11 +218,15 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
     }
 
     // condition is a constant?
-    if(new_if_expr.cond().is_true())
+    if(
+      new_if_expr.cond().is_constant() &&
+      to_constant_expr(new_if_expr.cond()).is_true())
     {
       return new_if_expr.true_case();
     }
-    else if(new_if_expr.cond().is_false())
+    else if(
+      new_if_expr.cond().is_constant() &&
+      to_constant_expr(new_if_expr.cond()).is_false())
     {
       return new_if_expr.false_case();
     }
@@ -246,7 +250,9 @@ simplify_exprt::simplify_address_of(const address_of_exprt &expr)
   {
     auto index_expr = to_index_expr(new_object.expr);
 
-    if(!index_expr.index().is_zero())
+    if(
+      !index_expr.index().is_constant() ||
+      !to_constant_expr(index_expr.index()).is_zero())
     {
       // we normalize &a[i] to (&a[0])+i
       exprt offset = index_expr.op1();
@@ -353,7 +359,7 @@ simplify_exprt::simplify_pointer_offset(const pointer_offset_exprt &expr)
     {
       if(op.type().id()==ID_pointer)
         ptr_expr.push_back(op);
-      else if(!op.is_zero())
+      else if(!op.is_constant() || !to_constant_expr(op).is_zero())
       {
         exprt tmp=op;
         if(tmp.type()!=expr.type())
@@ -398,7 +404,7 @@ simplify_exprt::simplify_pointer_offset(const pointer_offset_exprt &expr)
   {
     const constant_exprt &c_ptr = to_constant_expr(ptr);
 
-    if(is_null_pointer(c_ptr))
+    if(c_ptr.is_null_pointer())
     {
       return from_integer(0, expr.type());
     }
@@ -424,7 +430,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
 
   if(
     tmp0_address_of.object().id() == ID_index &&
-    to_index_expr(tmp0_address_of.object()).index().is_zero())
+    to_index_expr(tmp0_address_of.object()).index().is_constant() &&
+    to_constant_expr(to_index_expr(tmp0_address_of.object()).index()).is_zero())
   {
     tmp0_address_of =
       address_of_exprt(to_index_expr(tmp0_address_of.object()).array());
@@ -438,7 +445,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
 
   if(
     tmp1_address_of.object().id() == ID_index &&
-    to_index_expr(tmp1_address_of.object()).index().is_zero())
+    to_index_expr(tmp1_address_of.object()).index().is_constant() &&
+    to_constant_expr(to_index_expr(tmp1_address_of.object()).index()).is_zero())
   {
     tmp1 = address_of_exprt(to_index_expr(tmp1_address_of.object()).array());
   }
@@ -451,7 +459,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
     bool equal = to_symbol_expr(tmp0_object).get_identifier() ==
                  to_symbol_expr(tmp1_object).get_identifier();
 
-    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+    return constant_exprt{expr.id() == ID_equal ? equal : !equal};
   }
   else if(
     tmp0_object.id() == ID_dynamic_object &&
@@ -460,19 +468,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
     bool equal = to_dynamic_object_expr(tmp0_object).get_instance() ==
                  to_dynamic_object_expr(tmp1_object).get_instance();
 
-    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+    return constant_exprt{expr.id() == ID_equal ? equal : !equal};
   }
   else if(
     (tmp0_object.id() == ID_symbol && tmp1_object.id() == ID_dynamic_object) ||
     (tmp0_object.id() == ID_dynamic_object && tmp1_object.id() == ID_symbol))
   {
-    return make_boolean_expr(expr.id() != ID_equal);
+    return constant_exprt{expr.id() != ID_equal};
   }
   else if(
     tmp0_object.id() == ID_string_constant &&
     tmp1_object.id() == ID_string_constant && tmp0_object == tmp1_object)
   {
-    return make_boolean_expr(expr.id() == ID_equal);
+    return constant_exprt{expr.id() == ID_equal};
   }
 
   return unchanged(expr);
@@ -500,7 +508,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_pointer_object(
         return unchanged(expr);
       }
     }
-    else if(!op.is_constant() || !op.is_zero())
+    else if(!op.is_constant() || !to_constant_expr(op).is_zero())
     {
       return unchanged(expr);
     }
@@ -571,7 +579,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
   }
 
   // NULL is not dynamic
-  if(op.is_constant() && is_null_pointer(to_constant_expr(op)))
+  if(op.is_constant() && to_constant_expr(op).is_null_pointer())
     return false_exprt();
 
   // &something depends on the something
@@ -584,8 +592,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
       const irep_idt identifier = to_symbol_expr(op_object).get_identifier();
 
       // this is for the benefit of symex
-      return make_boolean_expr(
-        identifier.starts_with(SYMEX_DYNAMIC_PREFIX "::"));
+      return constant_exprt{identifier.starts_with(SYMEX_DYNAMIC_PREFIX "::")};
     }
     else if(op_object.id() == ID_string_constant)
     {
@@ -619,7 +626,7 @@ simplify_exprt::simplify_is_invalid_pointer(const unary_exprt &expr)
   }
 
   // NULL is not invalid
-  if(op.is_constant() && is_null_pointer(to_constant_expr(op)))
+  if(op.is_constant() && to_constant_expr(op).is_null_pointer())
   {
     return false_exprt();
   }

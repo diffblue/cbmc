@@ -148,7 +148,7 @@ void memory_model_tsot::program_order(
           simplify(cond, ns);
         }
 
-        if(!cond.is_false())
+        if(!cond.is_constant() || !to_constant_expr(cond).is_false())
         {
           if(ordering.is_nil())
             ordering=partial_order_concurrencyt::before(

@@ -82,7 +82,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
     if(expr.type().id() == ID_empty)
       return;
 
-    if(!ode.offset().is_zero())
+    if(!ode.offset().is_constant() || !to_constant_expr(ode.offset()).is_zero())
     {
       if(expr.type().id() != ID_array)
       {
