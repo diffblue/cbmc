@@ -30,16 +30,12 @@ bool constant_exprt::is_null_pointer() const
   if(get_value() == ID_NULL)
     return true;
 
-    // We used to support "0" (when NULL_is_zero), but really front-ends should
-    // resolve this and generate ID_NULL instead.
-#if 0
-  return config.ansi_c.NULL_is_zero && value_is_zero_string();
-#else
+  // We used to support "0" (when NULL_is_zero), but really front-ends should
+  // resolve this and generate ID_NULL instead.
   INVARIANT(
     !value_is_zero_string() || !config.ansi_c.NULL_is_zero,
     "front-end should use ID_NULL");
   return false;
-#endif
 }
 
 void constant_exprt::check(const exprt &expr, const validation_modet vm)
