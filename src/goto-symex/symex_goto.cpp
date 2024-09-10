@@ -238,9 +238,8 @@ void goto_symext::symex_goto(statet &state)
   renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
   renamed_guard = try_evaluate_pointer_comparisons(
     std::move(renamed_guard), state.value_set, language_mode, ns);
-  if(symex_config.simplify_opt)
-    renamed_guard.simplify(ns);
   new_guard = renamed_guard.get();
+  do_simplify(new_guard);
 
   if(new_guard.is_false())
   {
@@ -251,7 +250,7 @@ void goto_symext::symex_goto(statet &state)
     return; // nothing to do
   }
 
-  target.goto_instruction(state.guard.as_expr(), renamed_guard, state.source);
+  target.goto_instruction(state.guard.as_expr(), new_guard, state.source);
 
   DATA_INVARIANT(
     !instruction.targets.empty(), "goto should have at least one target");
