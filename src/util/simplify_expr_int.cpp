@@ -866,7 +866,7 @@ simplify_exprt::simplify_extractbit(const extractbit_exprt &expr)
     src_bit_width,
     numeric_cast_v<std::size_t>(*index_converted_to_int));
 
-  return make_boolean_expr(bit);
+  return constant_exprt{bit};
 }
 
 simplify_exprt::resultt<>
@@ -1461,7 +1461,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
       }
       equal = tmp0_const.is_zero() && tmp1_const.is_zero();
     }
-    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+    return constant_exprt{expr.id() == ID_equal ? equal : !equal};
   }
 
   if(tmp0.type().id() == ID_fixedbv)
@@ -1470,13 +1470,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
     fixedbvt f1(tmp1_const);
 
     if(expr.id() == ID_ge)
-      return make_boolean_expr(f0 >= f1);
+      return constant_exprt{f0 >= f1};
     else if(expr.id() == ID_le)
-      return make_boolean_expr(f0 <= f1);
+      return constant_exprt{f0 <= f1};
     else if(expr.id() == ID_gt)
-      return make_boolean_expr(f0 > f1);
+      return constant_exprt{f0 > f1};
     else if(expr.id() == ID_lt)
-      return make_boolean_expr(f0 < f1);
+      return constant_exprt{f0 < f1};
     else
       UNREACHABLE;
   }
@@ -1486,13 +1486,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
     ieee_floatt f1(tmp1_const);
 
     if(expr.id() == ID_ge)
-      return make_boolean_expr(f0 >= f1);
+      return constant_exprt{f0 >= f1};
     else if(expr.id() == ID_le)
-      return make_boolean_expr(f0 <= f1);
+      return constant_exprt{f0 <= f1};
     else if(expr.id() == ID_gt)
-      return make_boolean_expr(f0 > f1);
+      return constant_exprt{f0 > f1};
     else if(expr.id() == ID_lt)
-      return make_boolean_expr(f0 < f1);
+      return constant_exprt{f0 < f1};
     else
       UNREACHABLE;
   }
@@ -1507,13 +1507,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
       return unchanged(expr);
 
     if(expr.id() == ID_ge)
-      return make_boolean_expr(r0 >= r1);
+      return constant_exprt{r0 >= r1};
     else if(expr.id() == ID_le)
-      return make_boolean_expr(r0 <= r1);
+      return constant_exprt{r0 <= r1};
     else if(expr.id() == ID_gt)
-      return make_boolean_expr(r0 > r1);
+      return constant_exprt{r0 > r1};
     else if(expr.id() == ID_lt)
-      return make_boolean_expr(r0 < r1);
+      return constant_exprt{r0 < r1};
     else
       UNREACHABLE;
   }
@@ -1530,13 +1530,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
       return unchanged(expr);
 
     if(expr.id() == ID_ge)
-      return make_boolean_expr(*v0 >= *v1);
+      return constant_exprt{*v0 >= *v1};
     else if(expr.id() == ID_le)
-      return make_boolean_expr(*v0 <= *v1);
+      return constant_exprt{*v0 <= *v1};
     else if(expr.id() == ID_gt)
-      return make_boolean_expr(*v0 > *v1);
+      return constant_exprt{*v0 > *v1};
     else if(expr.id() == ID_lt)
-      return make_boolean_expr(*v0 < *v1);
+      return constant_exprt{*v0 < *v1};
     else
       UNREACHABLE;
   }
@@ -1811,7 +1811,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
         exprt ptr = simplify_object(expr.op0()).expr;
         // NULL + N == NULL is N == 0
         if(ptr.is_constant() && to_constant_expr(ptr).is_null_pointer())
-          return make_boolean_expr(to_constant_expr(offset).is_zero());
+          return constant_exprt{to_constant_expr(offset).is_zero()};
         // &x + N == NULL is false when the offset is in bounds
         else if(auto address_of = expr_try_dynamic_cast<address_of_exprt>(ptr))
         {

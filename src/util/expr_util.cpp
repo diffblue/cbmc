@@ -343,10 +343,7 @@ bool can_forward_propagatet::is_constant_address_of(const exprt &expr) const
 
 constant_exprt make_boolean_expr(bool value)
 {
-  if(value)
-    return true_exprt();
-  else
-    return false_exprt();
+  return constant_exprt{value};
 }
 
 exprt make_and(exprt a, exprt b)

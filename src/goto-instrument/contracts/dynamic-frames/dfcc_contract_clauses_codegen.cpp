@@ -169,7 +169,7 @@ void dfcc_contract_clauses_codegent::encode_assignable_target(
     arguments.emplace_back(size.value());
 
     // is_ptr_to_ptr
-    arguments.emplace_back(make_boolean_expr(target.type().id() == ID_pointer));
+    arguments.emplace_back(constant_exprt{target.type().id() == ID_pointer});
 
     dest.add(
       goto_programt::make_function_call(code_function_call, source_location));

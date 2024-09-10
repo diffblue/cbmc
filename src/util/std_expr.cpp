@@ -23,6 +23,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 
+constant_exprt::constant_exprt(bool value)
+  : constant_exprt(value ? ID_true : ID_false, bool_typet{})
+{
+}
+
 bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());

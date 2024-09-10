@@ -107,6 +107,7 @@ protected:
 };
 
 /// returns true_exprt if given true and false_exprt otherwise
+DEPRECATED(SINCE(2024, 9, 10, "use constant_exprt::constant_exprt(bool)"))
 constant_exprt make_boolean_expr(bool);
 
 /// Conjunction of two expressions. If the second is already an `and_exprt`

@@ -444,7 +444,7 @@ exprt simplify_writeable_object_expr(
     else
     {
       const auto &symbol = ns.lookup(identifier);
-      return make_boolean_expr(!symbol.type.get_bool(ID_C_constant));
+      return constant_exprt{!symbol.type.get_bool(ID_C_constant)};
     }
   }
 

@@ -2992,6 +2992,9 @@ public:
     set_value(_value);
   }
 
+  /// returns true_exprt if given true and false_exprt otherwise
+  explicit constant_exprt(bool);
+
   const irep_idt &get_value() const
   {
     return get(ID_value);

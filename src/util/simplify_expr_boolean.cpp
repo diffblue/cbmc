@@ -75,7 +75,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 
     if(new_operands.empty())
     {
-      return make_boolean_expr(negate);
+      return constant_exprt{negate};
     }
     else if(new_operands.size() == 1)
     {
@@ -298,12 +298,12 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
         op.id() == ID_not && op.is_boolean() &&
         expr_set.find(to_not_expr(op).op()) != expr_set.end())
       {
-        return make_boolean_expr(expr.id() == ID_or);
+        return constant_exprt{expr.id() == ID_or};
       }
 
     if(new_operands.empty())
     {
-      return make_boolean_expr(expr.id() == ID_and);
+      return constant_exprt{expr.id() == ID_and};
     }
     else if(new_operands.size() == 1)
     {

@@ -105,7 +105,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_sign(const sign_exprt &expr)
     if(type.id()==ID_floatbv)
     {
       ieee_floatt value(to_constant_expr(expr.op()));
-      return make_boolean_expr(value.get_sign());
+      return constant_exprt{value.get_sign()};
     }
     else if(type.id()==ID_signedbv ||
             type.id()==ID_unsignedbv)
@@ -113,7 +113,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_sign(const sign_exprt &expr)
       const auto value = numeric_cast<mp_integer>(expr.op());
       if(value.has_value())
       {
-        return make_boolean_expr(*value >= 0);
+        return constant_exprt{*value >= 0};
       }
     }
   }
@@ -1033,7 +1033,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        return make_boolean_expr(int_value != 0);
+        return constant_exprt{int_value != 0};
       }
 
       if(expr_type_id==ID_unsignedbv ||
@@ -1111,7 +1111,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        return make_boolean_expr(int_value != 0);
+        return constant_exprt{int_value != 0};
       }
 
       if(expr_type_id==ID_c_bool)

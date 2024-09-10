@@ -27,7 +27,7 @@ simplify_exprt::simplify_isinf(const unary_exprt &expr)
   if(expr.op().is_constant())
   {
     ieee_floatt value(to_constant_expr(expr.op()));
-    return make_boolean_expr(value.is_infinity());
+    return constant_exprt{value.is_infinity()};
   }
 
   return unchanged(expr);
@@ -41,7 +41,7 @@ simplify_exprt::simplify_isnan(const unary_exprt &expr)
   if(expr.op().is_constant())
   {
     ieee_floatt value(to_constant_expr(expr.op()));
-    return make_boolean_expr(value.is_NaN());
+    return constant_exprt{value.is_NaN()};
   }
 
   return unchanged(expr);
@@ -55,7 +55,7 @@ simplify_exprt::simplify_isnormal(const unary_exprt &expr)
   if(expr.op().is_constant())
   {
     ieee_floatt value(to_constant_expr(expr.op()));
-    return make_boolean_expr(value.is_normal());
+    return constant_exprt{value.is_normal()};
   }
 
   return unchanged(expr);
@@ -116,7 +116,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
     if(type.id()==ID_floatbv)
     {
       ieee_floatt value(to_constant_expr(expr.op0()));
-      expr = make_boolean_expr(value.get_sign());
+      expr = constant_exprt{value.get_sign()};
       return false;
     }
     else if(type.id()==ID_signedbv ||
@@ -125,7 +125,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
       mp_integer value;
       if(!to_integer(expr.op0(), value))
       {
-        expr = make_boolean_expr(value>=0);
+        expr = constant_exprt{value>=0};
         return false;
       }
     }
@@ -356,9 +356,9 @@ simplify_exprt::simplify_ieee_float_relation(const binary_relation_exprt &expr)
     ieee_floatt f_rhs(to_constant_expr(expr.rhs()));
 
     if(expr.id()==ID_ieee_float_notequal)
-      return make_boolean_expr(f_lhs.ieee_not_equal(f_rhs));
+      return constant_exprt{f_lhs.ieee_not_equal(f_rhs)};
     else if(expr.id()==ID_ieee_float_equal)
-      return make_boolean_expr(f_lhs.ieee_equal(f_rhs));
+      return constant_exprt{f_lhs.ieee_equal(f_rhs)};
     else
       UNREACHABLE;
   }

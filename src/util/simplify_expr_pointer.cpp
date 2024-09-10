@@ -459,7 +459,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
     bool equal = to_symbol_expr(tmp0_object).get_identifier() ==
                  to_symbol_expr(tmp1_object).get_identifier();
 
-    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+    return constant_exprt{expr.id() == ID_equal ? equal : !equal};
   }
   else if(
     tmp0_object.id() == ID_dynamic_object &&
@@ -468,19 +468,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
     bool equal = to_dynamic_object_expr(tmp0_object).get_instance() ==
                  to_dynamic_object_expr(tmp1_object).get_instance();
 
-    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+    return constant_exprt{expr.id() == ID_equal ? equal : !equal};
   }
   else if(
     (tmp0_object.id() == ID_symbol && tmp1_object.id() == ID_dynamic_object) ||
     (tmp0_object.id() == ID_dynamic_object && tmp1_object.id() == ID_symbol))
   {
-    return make_boolean_expr(expr.id() != ID_equal);
+    return constant_exprt{expr.id() != ID_equal};
   }
   else if(
     tmp0_object.id() == ID_string_constant &&
     tmp1_object.id() == ID_string_constant && tmp0_object == tmp1_object)
   {
-    return make_boolean_expr(expr.id() == ID_equal);
+    return constant_exprt{expr.id() == ID_equal};
   }
 
   return unchanged(expr);
@@ -592,8 +592,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
       const irep_idt identifier = to_symbol_expr(op_object).get_identifier();
 
       // this is for the benefit of symex
-      return make_boolean_expr(
-        identifier.starts_with(SYMEX_DYNAMIC_PREFIX "::"));
+      return constant_exprt{identifier.starts_with(SYMEX_DYNAMIC_PREFIX "::")};
     }
     else if(op_object.id() == ID_string_constant)
     {
