@@ -53,7 +53,7 @@ static exprt simplify_json_expr(const exprt &src)
     }
     else if(
       object.id() == ID_index && to_index_expr(object).index().is_constant() &&
-      to_constant_expr(to_index_expr(object).index()).value_is_zero_string())
+      to_constant_expr(to_index_expr(object).index()).is_zero())
     {
       // simplify expressions of the form  &array[0]
       return simplify_json_expr(to_index_expr(object).array());

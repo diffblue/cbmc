@@ -3005,8 +3005,6 @@ public:
     set(ID_value, value);
   }
 
-  bool value_is_zero_string() const;
-
   /// Returns true if \p expr has a pointer type and a value NULL; it also
   /// returns true when \p expr has value zero and NULL_is_zero is true; returns
   /// false in all other cases.
@@ -3023,6 +3021,9 @@ public:
   {
     check(expr, vm);
   }
+
+protected:
+  bool value_is_zero_string() const;
 };
 
 template <>

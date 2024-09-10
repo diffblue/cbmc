@@ -777,7 +777,7 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
       }
       else if(
         it->is_constant() && it->type().id() == ID_bv &&
-        to_constant_expr(*it).value_is_zero_string() &&
+        *it == to_bv_type(it->type()).all_zeros_expr() &&
         new_expr.operands().size() > 1)
       {
         it = new_expr.operands().erase(it);
