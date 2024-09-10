@@ -133,13 +133,6 @@ public:
 
   ieee_float_spect spec;
 
-  explicit ieee_floatt(const ieee_float_spect &_spec):
-    rounding_mode(ROUND_TO_EVEN),
-    spec(_spec), sign_flag(false), exponent(0), fraction(0),
-    NaN_flag(false), infinity_flag(false)
-  {
-  }
-
   explicit ieee_floatt(ieee_float_spect __spec, rounding_modet __rounding_mode)
     : rounding_mode(__rounding_mode),
       spec(std::move(__spec)),
@@ -151,21 +144,17 @@ public:
   {
   }
 
-  explicit ieee_floatt(const floatbv_typet &type):
-    rounding_mode(ROUND_TO_EVEN),
-    spec(ieee_float_spect(type)),
-    sign_flag(false),
-    exponent(0),
-    fraction(0),
-    NaN_flag(false),
-    infinity_flag(false)
+  explicit ieee_floatt(const ieee_float_spect &_spec)
+    : ieee_floatt(_spec, ROUND_TO_EVEN)
   {
   }
 
-  ieee_floatt():
-    rounding_mode(ROUND_TO_EVEN),
-    sign_flag(false), exponent(0), fraction(0),
-    NaN_flag(false), infinity_flag(false)
+  explicit ieee_floatt(const floatbv_typet &type)
+    : ieee_floatt(ieee_float_spect(type))
+  {
+  }
+
+  ieee_floatt() : ieee_floatt(ieee_float_spect{}, ROUND_TO_EVEN)
   {
   }
 
@@ -305,7 +294,6 @@ public:
   // e.g., NAN==NAN
   bool operator==(const ieee_floatt &other) const;
   bool operator!=(const ieee_floatt &other) const;
-  bool operator==(int i) const;
 
   // these do IEEE equality, i.e., NAN!=NAN
   bool ieee_equal(const ieee_floatt &other) const;

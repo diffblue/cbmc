@@ -1024,13 +1024,6 @@ bool ieee_floatt::ieee_equal(const ieee_floatt &other) const
   return *this==other;
 }
 
-bool ieee_floatt::operator==(int i) const
-{
-  ieee_floatt other(spec);
-  other.from_integer(i);
-  return *this==other;
-}
-
 bool ieee_floatt::operator!=(const ieee_floatt &other) const
 {
   return !(*this==other);
