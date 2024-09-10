@@ -199,12 +199,37 @@ exprt disjunction(const exprt::operandst &op)
   }
 }
 
+exprt conjunction(exprt a, exprt b)
+{
+  PRECONDITION(a.is_boolean() && b.is_boolean());
+  if(b.is_constant())
+  {
+    if(to_constant_expr(b).is_false())
+      return false_exprt{};
+    return a;
+  }
+  if(a.is_constant())
+  {
+    if(to_constant_expr(a).is_false())
+      return false_exprt{};
+    return b;
+  }
+  if(b.id() == ID_and)
+  {
+    b.add_to_operands(std::move(a));
+    return b;
+  }
+  return and_exprt{std::move(a), std::move(b)};
+}
+
 exprt conjunction(const exprt::operandst &op)
 {
   if(op.empty())
     return true_exprt();
   else if(op.size()==1)
     return op.front();
+  else if(op.size() == 2)
+    return conjunction(op[0], op[1]);
   else
   {
     return and_exprt(exprt::operandst(op));

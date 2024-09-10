@@ -2152,6 +2152,11 @@ public:
 
 exprt conjunction(const exprt::operandst &);
 
+/// Conjunction of two expressions. If the second is already an `and_exprt`
+/// add to its operands instead of creating a new expression. If one is `true`,
+/// return the other expression. If one is `false` returns `false`.
+exprt conjunction(exprt a, exprt b);
+
 template <>
 inline bool can_cast_expr<and_exprt>(const exprt &base)
 {
