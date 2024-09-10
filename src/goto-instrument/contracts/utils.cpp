@@ -41,7 +41,9 @@ static void append_safe_havoc_code_for_expr(
   // skip havocing only if all pointer derefs in the expression are valid
   // (to avoid spurious pointer deref errors)
   dest.add(goto_programt::make_goto(
-    skip_target, not_exprt{all_dereferences_are_valid(expr, ns)}, location));
+    skip_target,
+    boolean_negate(all_dereferences_are_valid(expr, ns)),
+    location));
 
   havoc_code_impl();
 
@@ -439,8 +441,8 @@ static void replace_history_parameter_rec(
 
     // 2.2. Skip storing the history if the expression is invalid
     auto goto_instruction = history.add(goto_programt::make_incomplete_goto(
-      not_exprt{
-        all_dereferences_are_valid(parameter, namespacet(symbol_table))},
+      boolean_negate(
+        all_dereferences_are_valid(parameter, namespacet(symbol_table))),
       location));
 
     // 2.3. Add an assignment such that the value pointed to by the new

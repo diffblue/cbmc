@@ -110,8 +110,8 @@ void dfcc_contract_clauses_codegent::encode_assignable_target_group(
     new_vars = cleaner.clean(condition, dest, language_mode);
 
   // Jump target if condition is false
-  auto goto_instruction = dest.add(
-    goto_programt::make_incomplete_goto(not_exprt{condition}, source_location));
+  auto goto_instruction = dest.add(goto_programt::make_incomplete_goto(
+    boolean_negate(condition), source_location));
 
   for(const auto &target : group.targets())
     encode_assignable_target(language_mode, target, dest);
@@ -199,8 +199,8 @@ void dfcc_contract_clauses_codegent::encode_freeable_target_group(
     new_vars = cleaner.clean(condition, dest, language_mode);
 
   // Jump target if condition is false
-  auto goto_instruction = dest.add(
-    goto_programt::make_incomplete_goto(not_exprt{condition}, source_location));
+  auto goto_instruction = dest.add(goto_programt::make_incomplete_goto(
+    boolean_negate(condition), source_location));
 
   for(const auto &target : group.targets())
     encode_freeable_target(language_mode, target, dest);

@@ -658,9 +658,9 @@ exprt instrument_spec_assignst::target_validity_expr(
   // (or is NULL if we allow it explicitly).
   // This assertion will be falsified whenever `start_address` is invalid or
   // not of the right size (or is NULL if we do not allow it explicitly).
-  auto result =
-    or_exprt{not_exprt{car.condition()},
-             w_ok_exprt{car.target_start_address(), car.target_size()}};
+  auto result = or_exprt{
+    boolean_negate(car.condition()),
+    w_ok_exprt{car.target_start_address(), car.target_size()}};
 
   if(allow_null_target)
     result.add_to_operands(null_object(car.target_start_address()));
