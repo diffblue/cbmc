@@ -606,7 +606,8 @@ exprt make_va_list(const exprt &expr)
   }
 
   while(result.type().id() == ID_array &&
-        to_array_type(result.type()).size().is_one())
+        to_array_type(result.type()).size().is_constant() &&
+        to_constant_expr(to_array_type(result.type()).size()).is_one())
   {
     result = index_exprt{result, from_integer(0, c_index_type())};
   }

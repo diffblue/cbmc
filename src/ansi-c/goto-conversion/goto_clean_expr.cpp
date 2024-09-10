@@ -228,13 +228,13 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
     {
       exprt tmp_cond=if_expr.cond();
       simplify(tmp_cond, ns);
-      if(tmp_cond.is_true())
+      if(tmp_cond.is_constant() && to_constant_expr(tmp_cond).is_true())
       {
         clean_expr(if_expr.true_case(), dest, result_is_used);
         expr=if_expr.true_case();
         return;
       }
-      else if(tmp_cond.is_false())
+      else if(tmp_cond.is_constant() && to_constant_expr(tmp_cond).is_false())
       {
         clean_expr(if_expr.false_case(), dest, result_is_used);
         expr=if_expr.false_case();

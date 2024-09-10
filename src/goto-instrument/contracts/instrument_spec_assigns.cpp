@@ -585,8 +585,10 @@ car_exprt instrument_spec_assignst::create_car_expr(
           valid_var,
           lower_bound_var,
           upper_bound_var,
-          is_ptr_to_ptr.is_true() ? car_havoc_methodt::NONDET_ASSIGN
-                                  : car_havoc_methodt::HAVOC_SLICE};
+          (is_ptr_to_ptr.is_constant() &&
+           to_constant_expr(is_ptr_to_ptr).is_true())
+            ? car_havoc_methodt::NONDET_ASSIGN
+            : car_havoc_methodt::HAVOC_SLICE};
       }
     }
   }
@@ -685,7 +687,9 @@ void instrument_spec_assignst::target_validity_assertion(
   std::string comment = "Check that ";
   comment += from_expr(ns, "", car.target());
   comment += " is valid";
-  if(!car.condition().is_true())
+  if(
+    !car.condition().is_constant() ||
+    !to_constant_expr(car.condition()).is_true())
   {
     comment += " when ";
     comment += from_expr(ns, "", car.condition());
@@ -719,8 +723,12 @@ void instrument_spec_assignst::inclusion_check_assertion(
   std::string comment = "Check that ";
   if(!is_assigns_clause_replacement_tracking_comment(orig_comment))
   {
-    if(!car.condition().is_true())
+    if(
+      !car.condition().is_constant() ||
+      !to_constant_expr(car.condition()).is_true())
+    {
       comment += from_expr(ns, "", car.condition()) + ": ";
+    }
     comment += from_expr(ns, "", car.target());
   }
   else

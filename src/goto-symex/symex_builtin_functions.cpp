@@ -172,7 +172,9 @@ void goto_symext::symex_allocate(
   INVARIANT(
     zero_init.is_constant(), "allocate expects constant as second argument");
 
-  if(!zero_init.is_zero() && !zero_init.is_false())
+  if(
+    !to_constant_expr(zero_init).is_zero() &&
+    !to_constant_expr(zero_init).is_false())
   {
     const auto zero_value =
       zero_initializer(*object_type, code.source_location(), ns);
@@ -317,7 +319,8 @@ static irep_idt get_string_argument_rec(const exprt &src)
 
       if(
         index_expr.array().id() == ID_string_constant &&
-        index_expr.index().is_zero())
+        index_expr.index().is_constant() &&
+        to_constant_expr(index_expr.index()).is_zero())
       {
         const exprt &fmt_str = index_expr.array();
         return to_string_constant(fmt_str).value();
@@ -358,8 +361,12 @@ static std::optional<exprt> get_va_args(const exprt::operandst &operands)
     return {};
 
   const index_exprt &index_expr = to_index_expr(object);
-  if(!index_expr.index().is_zero())
+  if(
+    !index_expr.index().is_constant() ||
+    !to_constant_expr(index_expr.index()).is_zero())
+  {
     return {};
+  }
   else
     return index_expr.array();
 }

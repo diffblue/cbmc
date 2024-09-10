@@ -128,12 +128,17 @@ exprt is_not_zero(
 
 exprt boolean_negate(const exprt &src)
 {
+  PRECONDITION(src.is_boolean());
+
   if(src.id() == ID_not)
     return to_not_expr(src).op();
-  else if(src.is_true())
-    return false_exprt();
-  else if(src.is_false())
-    return true_exprt();
+  else if(auto constant_expr = expr_try_dynamic_cast<constant_exprt>(src))
+  {
+    if(constant_expr->is_true())
+      return false_exprt{};
+    else
+      return true_exprt{};
+  }
   else
     return not_exprt(src);
 }

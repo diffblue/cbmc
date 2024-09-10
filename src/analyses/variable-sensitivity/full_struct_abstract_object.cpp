@@ -312,7 +312,7 @@ exprt full_struct_abstract_objectt::to_predicate_internal(
       member_exprt(name, compound_type.get_component(field.first));
     auto field_expr = field.second->to_predicate(field_name);
 
-    if(!field_expr.is_true())
+    if(!field_expr.is_constant() || !to_constant_expr(field_expr).is_true())
       all_predicates.push_back(field_expr);
   }
 

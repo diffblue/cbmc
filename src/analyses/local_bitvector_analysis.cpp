@@ -115,7 +115,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
 {
   if(rhs.is_constant())
   {
-    if(rhs.is_zero())
+    if(to_constant_expr(rhs).is_zero())
       return flagst::mk_null();
     else
       return flagst::mk_integer_address();

@@ -35,8 +35,12 @@ void local_cfgt::build(const goto_programt &goto_program)
     switch(instruction.type())
     {
     case GOTO:
-      if(!instruction.condition().is_true())
+      if(
+        !instruction.condition().is_constant() ||
+        !to_constant_expr(instruction.condition()).is_true())
+      {
         node.successors.push_back(loc_nr+1);
+      }
 
       for(const auto &target : instruction.targets)
       {

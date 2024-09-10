@@ -21,7 +21,10 @@ bddt bdd_exprt::from_expr_rec(const exprt &expr)
   PRECONDITION(expr.is_boolean());
 
   if(expr.is_constant())
-    return expr.is_false() ? bdd_mgr.bdd_false() : bdd_mgr.bdd_true();
+  {
+    return to_constant_expr(expr).is_false() ? bdd_mgr.bdd_false()
+                                             : bdd_mgr.bdd_true();
+  }
   else if(expr.id()==ID_not)
     return from_expr_rec(to_not_expr(expr).op()).bdd_not();
   else if(expr.id()==ID_and ||

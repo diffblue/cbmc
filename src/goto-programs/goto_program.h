@@ -1137,8 +1137,13 @@ std::list<Target> goto_programt::get_successors(
   {
     std::list<Target> successors(i.targets.begin(), i.targets.end());
 
-    if(!i.condition().is_true() && next != instructions.end())
+    if(
+      (!i.condition().is_constant() ||
+       !to_constant_expr(i.condition()).is_true()) &&
+      next != instructions.end())
+    {
       successors.push_back(next);
+    }
 
     return successors;
   }
@@ -1167,7 +1172,9 @@ std::list<Target> goto_programt::get_successors(
 
   if(i.is_assume())
   {
-    return !i.condition().is_false() && next != instructions.end()
+    return (!i.condition().is_constant() ||
+            !to_constant_expr(i.condition()).is_false()) &&
+               next != instructions.end()
              ? std::list<Target>{next}
              : std::list<Target>();
   }

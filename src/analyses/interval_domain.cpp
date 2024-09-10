@@ -501,7 +501,8 @@ bool interval_domaint::ai_simplify(
                                           //  of when condition is true
     if(!a.join(d))                        // If d (this) is included in a...
     {                                     // Then the condition is always true
-      unchanged=condition.is_true();
+      unchanged =
+        condition.is_constant() && to_constant_expr(condition).is_true();
       condition = true_exprt();
     }
   }
@@ -514,7 +515,8 @@ bool interval_domaint::ai_simplify(
     d.assume(not_exprt(condition), ns);   // Restrict to when condition is false
     if(d.is_bottom())                     // If there there are none...
     {                                     // Then the condition is always true
-      unchanged=condition.is_true();
+      unchanged =
+        condition.is_constant() && to_constant_expr(condition).is_true();
       condition = true_exprt();
     }
   }

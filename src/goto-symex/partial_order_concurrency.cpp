@@ -51,9 +51,9 @@ void partial_order_concurrencyt::add_init_writes(
     if(init_done.find(a)!=init_done.end())
       continue;
 
-    if(spawn_seen ||
-       e_it->is_shared_read() ||
-       !e_it->guard.is_true())
+    if(
+      spawn_seen || e_it->is_shared_read() || !e_it->guard.is_constant() ||
+      !to_constant_expr(e_it->guard).is_true())
     {
       init_steps.emplace_back(
         e_it->source, goto_trace_stept::typet::SHARED_WRITE);

@@ -3003,6 +3003,31 @@ public:
   }
 
   bool value_is_zero_string() const;
+  /// Return whether the expression is a constant representing `true`.
+  /// \return True if is a Boolean value representing `true`, false otherwise.
+  bool is_true() const;
+
+  /// Return whether the expression is a constant representing `false`.
+  /// \return True if is a Boolean constant representing `false`, false otherwise.
+  bool is_false() const;
+
+  /// Return whether the expression is a constant representing 0.
+  /// Will consider the following types: ID_integer, ID_natural, ID_rational,
+  /// ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field, ID_fixedbv,
+  /// ID_floatbv, ID_pointer.<br>
+  /// For ID_pointer, returns true iff the value is a zero string or a null
+  /// pointer.
+  /// For everything not in the above list, return false.
+  /// \return True if has value 0, false otherwise.
+  bool is_zero() const;
+
+  /// Return whether the expression is a constant representing 1.
+  /// Will consider the following types: ID_integer, ID_natural, ID_rational,
+  /// ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field, ID_fixedbv,
+  /// ID_floatbv.<br>
+  /// For all other types, return false.
+  /// \return True if has value 1, false otherwise.
+  bool is_one() const;
 
   /// Returns true if \p expr has a pointer type and a value NULL; it also
   /// returns true when \p expr has value zero and NULL_is_zero is true; returns

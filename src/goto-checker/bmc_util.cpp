@@ -57,7 +57,9 @@ ssa_step_matches_failing_property(const irep_idt &property_id)
            symex_target_equationt::SSA_stepst::const_iterator step,
            const decision_proceduret &decision_procedure) {
     return step->is_assert() && step->property_id == property_id &&
-           decision_procedure.get(step->cond_handle).is_false();
+           decision_procedure.get(step->cond_handle).is_constant() &&
+           to_constant_expr(decision_procedure.get(step->cond_handle))
+             .is_false();
   };
 }
 
@@ -250,8 +252,10 @@ void update_properties_status_from_symex_target_equation(
 
     // Don't update status of properties that are constant 'false';
     // we wouldn't have traces for them.
-    const auto status = step.cond_expr.is_true() ? property_statust::PASS
-                                                 : property_statust::UNKNOWN;
+    const auto status = (step.cond_expr.is_constant() &&
+                         to_constant_expr(step.cond_expr).is_true())
+                          ? property_statust::PASS
+                          : property_statust::UNKNOWN;
     auto emplace_result = properties.emplace(
       property_id, property_infot{step.source.pc, step.comment, status});
 

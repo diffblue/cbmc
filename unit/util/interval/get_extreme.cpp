@@ -41,7 +41,8 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 
       THEN("Require it is TRUE")
       {
-        REQUIRE(op1.is_true());
+        REQUIRE(op1.is_constant());
+        REQUIRE(to_constant_expr(op1).is_true());
         REQUIRE(interval_eval);
       }
     }
@@ -55,7 +56,8 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 
       THEN("Require it is FALSE")
       {
-        REQUIRE(op1.is_false());
+        REQUIRE(op1.is_constant());
+        REQUIRE(to_constant_expr(op1).is_false());
         REQUIRE_FALSE(interval_eval);
       }
     }
@@ -70,7 +72,8 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 
       THEN("Require it is TRUE")
       {
-        REQUIRE(op1.is_true());
+        REQUIRE(op1.is_constant());
+        REQUIRE(to_constant_expr(op1).is_true());
         REQUIRE(interval_eval);
         REQUIRE(constant_interval_exprt::equal(CEV(1), CEV(1)));
       }

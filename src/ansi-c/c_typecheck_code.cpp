@@ -113,7 +113,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
     implicit_typecast_bool(code.op0());
     make_constant(code.op0());
 
-    if(code.op0().is_false())
+    if(code.op0().is_constant() && to_constant_expr(code.op0()).is_false())
     {
       // failed
       error().source_location = code.find_source_location();
@@ -948,7 +948,7 @@ void c_typecheck_baset::typecheck_conditional_targets(
     auto &condition = conditional_target_group.condition();
     typecheck_spec_condition(condition);
 
-    if(condition.is_true())
+    if(condition.is_constant() && to_constant_expr(condition).is_true())
     {
       // if the condition is trivially true,
       // simplify expr and expose the bare expressions

@@ -1435,18 +1435,24 @@ void c_typecheck_baset::typecheck_expr_rel(
   else
   {
     // pointer and zero
-    if(type0.id()==ID_pointer &&
-       simplify_expr(op1, *this).is_zero())
+    if(type0.id() == ID_pointer)
     {
-      op1 = null_pointer_exprt{to_pointer_type(type0)};
-      return;
+      auto simp_op1 = simplify_expr(op1, *this);
+      if(simp_op1.is_constant() && to_constant_expr(simp_op1).is_zero())
+      {
+        op1 = null_pointer_exprt{to_pointer_type(type0)};
+        return;
+      }
     }
 
-    if(type1.id()==ID_pointer &&
-       simplify_expr(op0, *this).is_zero())
+    if(type1.id() == ID_pointer)
     {
-      op0 = null_pointer_exprt{to_pointer_type(type1)};
-      return;
+      auto simp_op0 = simplify_expr(op0, *this);
+      if(simp_op0.is_constant() && to_constant_expr(simp_op0).is_zero())
+      {
+        op0 = null_pointer_exprt{to_pointer_type(type1)};
+        return;
+      }
     }
 
     // pointer and integer
@@ -3583,9 +3589,9 @@ exprt c_typecheck_baset::do_special_functions(
 
     mp_integer arg1;
 
-    if(expr.arguments()[1].is_true())
+    if(to_constant_expr(expr.arguments()[1]).is_true())
       arg1=1;
-    else if(expr.arguments()[1].is_false())
+    else if(to_constant_expr(expr.arguments()[1]).is_false())
       arg1=0;
     else if(to_integer(to_constant_expr(expr.arguments()[1]), arg1))
     {
@@ -3627,7 +3633,7 @@ exprt c_typecheck_baset::do_special_functions(
       typecast_exprt::conditional_cast(expr.arguments()[0], bool_typet());
     make_constant(arg0);
 
-    if(arg0.is_true())
+    if(to_constant_expr(arg0).is_true())
       return expr.arguments()[1];
     else
       return expr.arguments()[2];

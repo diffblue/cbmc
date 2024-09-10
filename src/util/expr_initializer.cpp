@@ -66,7 +66,7 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
     exprt result;
     if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else if(init_expr.is_zero())
+    else if(init_expr.is_constant() && to_constant_expr(init_expr).is_zero())
       result = from_integer(0, type);
     else
       result = duplicate_per_byte(init_expr, type, ns);
@@ -80,7 +80,7 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
     exprt result;
     if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else if(init_expr.is_zero())
+    else if(init_expr.is_constant() && to_constant_expr(init_expr).is_zero())
       result = constant_exprt(ID_0, type);
     else
       result = duplicate_per_byte(init_expr, type, ns);
@@ -94,7 +94,7 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
     exprt result;
     if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else if(init_expr.is_zero())
+    else if(init_expr.is_constant() && to_constant_expr(init_expr).is_zero())
     {
       const std::size_t width = to_bitvector_type(type).get_width();
       std::string value(width, '0');
@@ -112,7 +112,7 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
     exprt result;
     if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else if(init_expr.is_zero())
+    else if(init_expr.is_constant() && to_constant_expr(init_expr).is_zero())
     {
       auto sub_zero = expr_initializer_rec(
         to_complex_type(type).subtype(), source_location, init_expr);
@@ -287,7 +287,7 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
     exprt result;
     if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else if(init_expr.is_zero())
+    else if(init_expr.is_constant() && to_constant_expr(init_expr).is_zero())
       result = constant_exprt(irep_idt(), type);
     else
       result = duplicate_per_byte(init_expr, type, ns);

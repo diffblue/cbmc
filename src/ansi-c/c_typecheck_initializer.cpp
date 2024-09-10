@@ -405,8 +405,10 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       if(index>=dest->operands().size())
       {
         if(
-          type.id() == ID_array && (to_array_type(type).size().is_zero() ||
-                                    to_array_type(type).size().is_nil()))
+          type.id() == ID_array &&
+          ((to_array_type(type).size().is_constant() &&
+            to_constant_expr(to_array_type(type).size()).is_zero()) ||
+           to_array_type(type).size().is_nil()))
         {
           const typet &element_type = to_array_type(type).element_type();
 
@@ -673,10 +675,11 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       // in case of a variable-length array consume all remaining
       // initializer elements
-      if(vla_permitted &&
-         dest_type.id()==ID_array &&
-         (to_array_type(dest_type).size().is_zero() ||
-          to_array_type(dest_type).size().is_nil()))
+      if(
+        vla_permitted && dest_type.id() == ID_array &&
+        ((to_array_type(dest_type).size().is_constant() &&
+          to_constant_expr(to_array_type(dest_type).size()).is_zero()) ||
+         to_array_type(dest_type).size().is_nil()))
       {
         value.id(ID_initializer_list);
         value.operands().clear();

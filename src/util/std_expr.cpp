@@ -8,10 +8,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
+#include "arith_tools.h"
 #include "config.h"
+#include "expr_util.h"
+#include "fixedbv.h"
+#include "ieee_float.h"
+#include "mathematical_types.h"
 #include "namespace.h"
 #include "pointer_expr.h"
 #include "range.h"
+#include "rational.h"
+#include "rational_tools.h"
 #include "substitute_symbols.h"
 
 #include <map>
@@ -20,6 +27,109 @@ bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());
   return val.find_first_not_of('0')==std::string::npos;
+}
+
+bool constant_exprt::is_true() const
+{
+  return is_boolean() && get_value() != ID_false;
+}
+
+bool constant_exprt::is_false() const
+{
+  return is_boolean() && get_value() == ID_false;
+}
+
+bool constant_exprt::is_zero() const
+{
+  const irep_idt &type_id = type().id();
+
+  if(type_id == ID_integer)
+  {
+    return integer_typet{}.zero_expr() == *this;
+  }
+  else if(type_id == ID_natural)
+  {
+    return natural_typet{}.zero_expr() == *this;
+  }
+  else if(type_id == ID_real)
+  {
+    return real_typet{}.zero_expr() == *this;
+  }
+  else if(type_id == ID_rational)
+  {
+    rationalt rat_value;
+    if(to_rational(*this, rat_value))
+      CHECK_RETURN(false);
+    return rat_value.is_zero();
+  }
+  else if(
+    type_id == ID_unsignedbv || type_id == ID_signedbv ||
+    type_id == ID_c_bool || type_id == ID_c_bit_field)
+  {
+    return value_is_zero_string();
+  }
+  else if(type_id == ID_fixedbv)
+  {
+    return fixedbvt(*this).is_zero();
+  }
+  else if(type_id == ID_floatbv)
+  {
+    return ieee_floatt(*this).is_zero();
+  }
+  else if(type_id == ID_pointer)
+  {
+    return is_null_pointer();
+  }
+  else
+    return false;
+}
+
+bool constant_exprt::is_one() const
+{
+  const irep_idt &type_id = type().id();
+
+  if(type_id == ID_integer)
+  {
+    return integer_typet{}.one_expr() == *this;
+  }
+  else if(type_id == ID_natural)
+  {
+    return natural_typet{}.one_expr() == *this;
+  }
+  else if(type_id == ID_real)
+  {
+    return real_typet{}.one_expr() == *this;
+  }
+  else if(type_id == ID_rational)
+  {
+    rationalt rat_value;
+    if(to_rational(*this, rat_value))
+      CHECK_RETURN(false);
+    return rat_value.is_one();
+  }
+  else if(
+    type_id == ID_unsignedbv || type_id == ID_signedbv ||
+    type_id == ID_c_bool || type_id == ID_c_bit_field)
+  {
+    const auto width = to_bitvector_type(type()).get_width();
+    mp_integer int_value = bvrep2integer(id2string(get_value()), width, false);
+    return int_value == 1;
+  }
+  else if(type_id == ID_fixedbv)
+  {
+    fixedbv_spect spec{to_fixedbv_type(type())};
+    fixedbvt one{spec};
+    one.from_integer(1);
+    return one == fixedbvt{*this};
+  }
+  else if(type_id == ID_floatbv)
+  {
+    ieee_floatt one{to_floatbv_type(type())};
+    one.from_integer(1);
+    return one == ieee_floatt{*this};
+  }
+  else
+    return false;
 }
 
 bool constant_exprt::is_null_pointer() const

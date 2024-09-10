@@ -62,7 +62,7 @@ void postcondition(
   {
     postconditiont postcondition(ns, value_set, *it, s);
     postcondition.compute(dest);
-    if(dest.is_false())
+    if(dest.is_constant() && to_constant_expr(dest).is_false())
       return;
   }
 }
@@ -137,7 +137,7 @@ void postconditiont::strengthen(exprt &dest)
     exprt equality =
       get_original_name(equal_exprt{SSA_step.ssa_lhs, SSA_step.ssa_rhs});
 
-    if(dest.is_true())
+    if(dest.is_constant() && to_constant_expr(dest).is_true())
       dest.swap(equality);
     else
       dest=and_exprt(dest, equality);

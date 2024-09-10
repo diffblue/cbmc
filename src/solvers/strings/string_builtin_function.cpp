@@ -31,7 +31,7 @@ std::optional<std::vector<mp_integer>> eval_string(
     const exprt cond = get_value(ite.cond());
     if(!cond.is_constant())
       return {};
-    return cond.is_true()
+    return to_constant_expr(cond).is_true()
              ? eval_string(to_array_string_expr(ite.true_case()), get_value)
              : eval_string(to_array_string_expr(ite.false_case()), get_value);
   }

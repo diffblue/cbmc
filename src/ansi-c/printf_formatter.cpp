@@ -215,7 +215,8 @@ void printf_formattert::process_format(std::ostream &out)
             expr_try_dynamic_cast<index_exprt>(address_of->object()))
         {
           if(
-            index_expr->index().is_zero() &&
+            index_expr->index().is_constant() &&
+            to_constant_expr(index_expr->index()).is_zero() &&
             index_expr->array().id() == ID_string_constant)
           {
             out << format_constant(index_expr->array());

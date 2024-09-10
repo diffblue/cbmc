@@ -67,9 +67,9 @@ std::string cpp_typecheckt::template_suffix(
       // this must be a constant, which includes true/false
       mp_integer i;
 
-      if(e.is_true())
+      if(to_constant_expr(e).is_true())
         i=1;
-      else if(e.is_false())
+      else if(to_constant_expr(e).is_false())
         i=0;
       else if(to_integer(to_constant_expr(e), i))
       {

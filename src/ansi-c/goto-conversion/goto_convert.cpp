@@ -419,7 +419,9 @@ void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
 
     if(
       it_goto_y == dest.instructions.end() || !it_goto_y->is_goto() ||
-      !it_goto_y->condition().is_true() || it_goto_y->is_target())
+      !it_goto_y->condition().is_constant() ||
+      !to_constant_expr(it_goto_y->condition()).is_true() ||
+      it_goto_y->is_target())
     {
       continue;
     }
@@ -700,7 +702,7 @@ void goto_convertt::convert(
       typecast_exprt::conditional_cast(code.op0(), bool_typet());
     simplify(assertion, ns);
     INVARIANT_WITH_DIAGNOSTICS(
-      !assertion.is_false(),
+      !assertion.is_constant() || !to_constant_expr(assertion).is_false(),
       "static assertion " + id2string(get_string_constant(code.op1())),
       code.op0().find_source_location());
   }
@@ -743,7 +745,8 @@ void goto_convertt::convert_block(
   // in a prior break/continue/return already, don't create dead code
   if(
     !dest.empty() && dest.instructions.back().is_goto() &&
-    dest.instructions.back().condition().is_true())
+    dest.instructions.back().condition().is_constant() &&
+    to_constant_expr(dest.instructions.back().condition()).is_true())
   {
     // don't do destructors when we are unreachable
   }
@@ -1774,7 +1777,8 @@ void goto_convertt::generate_ifthenelse(
   // do guarded assertions directly
   if(
     is_size_one(true_case) && true_case.instructions.back().is_assert() &&
-    true_case.instructions.back().condition().is_false() &&
+    true_case.instructions.back().condition().is_constant() &&
+    to_constant_expr(true_case.instructions.back().condition()).is_false() &&
     true_case.instructions.back().labels.empty())
   {
     // The above conjunction deliberately excludes the instance
@@ -1792,7 +1796,8 @@ void goto_convertt::generate_ifthenelse(
   // similarly, do guarded assertions directly
   if(
     is_size_one(false_case) && false_case.instructions.back().is_assert() &&
-    false_case.instructions.back().condition().is_false() &&
+    false_case.instructions.back().condition().is_constant() &&
+    to_constant_expr(false_case.instructions.back().condition()).is_false() &&
     false_case.instructions.back().labels.empty())
   {
     // The above conjunction deliberately excludes the instance
@@ -1812,7 +1817,11 @@ void goto_convertt::generate_ifthenelse(
   if(
     is_empty(false_case) && true_case.instructions.size() == 2 &&
     true_case.instructions.front().is_assert() &&
-    simplify_expr(true_case.instructions.front().condition(), ns).is_false() &&
+    simplify_expr(true_case.instructions.front().condition(), ns)
+      .is_constant() &&
+    to_constant_expr(
+      simplify_expr(true_case.instructions.front().condition(), ns))
+      .is_false() &&
     true_case.instructions.front().labels.empty() &&
     true_case.instructions.back().is_other() &&
     true_case.instructions.back().get_other().get_statement() ==

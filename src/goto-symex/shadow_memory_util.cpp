@@ -690,7 +690,8 @@ static void clean_string_constant(exprt &expr)
 {
   const auto *index_expr = expr_try_dynamic_cast<index_exprt>(expr);
   if(
-    index_expr && index_expr->index().is_zero() &&
+    index_expr && index_expr->index().is_constant() &&
+    to_constant_expr(index_expr->index()).is_zero() &&
     can_cast_expr<string_constantt>(index_expr->array()))
   {
     expr = index_expr->array();
@@ -928,19 +929,21 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
     const exprt base_cond = get_matched_base_cond(
       shadowed_address.address, matched_base_address, ns, log);
     shadow_memory_log_text_and_expr(ns, log, "base_cond", base_cond);
-    if(base_cond.is_false())
+    if(base_cond.is_constant() && to_constant_expr(base_cond).is_false())
     {
       continue;
     }
 
     const exprt expr_cond =
       get_matched_expr_cond(dereference.pointer, expr, ns, log);
-    if(expr_cond.is_false())
+    if(expr_cond.is_constant() && to_constant_expr(expr_cond).is_false())
     {
       continue;
     }
 
-    if(base_cond.is_true() && expr_cond.is_true())
+    if(
+      base_cond.is_constant() && to_constant_expr(base_cond).is_true() &&
+      expr_cond.is_constant() && to_constant_expr(expr_cond).is_true())
     {
 #ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "exact match" << messaget::eom;
@@ -951,7 +954,7 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
       break;
     }
 
-    if(base_cond.is_true())
+    if(base_cond.is_constant() && to_constant_expr(base_cond).is_true())
     {
       // No point looking at further shadow addresses
       // as only one of them can match.
@@ -1095,19 +1098,21 @@ get_shadow_memory_for_matched_object(
     const exprt base_cond = get_matched_base_cond(
       shadowed_address.address, matched_base_address, ns, log);
     shadow_memory_log_text_and_expr(ns, log, "base_cond", base_cond);
-    if(base_cond.is_false())
+    if(base_cond.is_constant() && to_constant_expr(base_cond).is_false())
     {
       continue;
     }
 
     const exprt expr_cond =
       get_matched_expr_cond(dereference.pointer, expr, ns, log);
-    if(expr_cond.is_false())
+    if(expr_cond.is_constant() && to_constant_expr(expr_cond).is_false())
     {
       continue;
     }
 
-    if(base_cond.is_true() && expr_cond.is_true())
+    if(
+      base_cond.is_constant() && to_constant_expr(base_cond).is_true() &&
+      expr_cond.is_constant() && to_constant_expr(expr_cond).is_true())
     {
       log_shadow_memory_message(log, "exact match");
 
@@ -1117,7 +1122,7 @@ get_shadow_memory_for_matched_object(
       break;
     }
 
-    if(base_cond.is_true())
+    if(base_cond.is_constant() && to_constant_expr(base_cond).is_true())
     {
       // No point looking at further shadow addresses
       // as only one of them can match.

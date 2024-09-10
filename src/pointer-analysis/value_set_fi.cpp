@@ -924,7 +924,7 @@ void value_set_fit::get_reference_set_sharing_rec(
         offsett o = object_entry.second;
         const auto i = numeric_cast<mp_integer>(offset);
 
-        if(offset.is_zero())
+        if(i.has_value() && i == 0)
         {
         }
         else if(i.has_value() && offset_is_zero(o))

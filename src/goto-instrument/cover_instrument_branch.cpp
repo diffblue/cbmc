@@ -26,7 +26,8 @@ void cover_branch_instrumentert::instrument(
   const bool is_function_entry_point =
     i_it == goto_program.instructions.begin();
   const bool is_conditional_goto =
-    i_it->is_goto() && !i_it->condition().is_true();
+    i_it->is_goto() && (!i_it->condition().is_constant() ||
+                        !to_constant_expr(i_it->condition()).is_true());
   if(!is_function_entry_point && !is_conditional_goto)
     return;
 

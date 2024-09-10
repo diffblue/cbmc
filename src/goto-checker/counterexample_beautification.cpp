@@ -37,7 +37,8 @@ void counterexample_beautificationt::get_minimization_list(
       it->is_assignment() &&
       it->assignment_type == symex_targett::assignment_typet::STATE)
     {
-      if(!prop_conv.get(it->guard_handle).is_false())
+      exprt v = prop_conv.get(it->guard_handle);
+      if(!v.is_constant() || !to_constant_expr(v).is_false())
       {
         const typet &type = it->ssa_lhs.type();
 
@@ -75,9 +76,14 @@ counterexample_beautificationt::get_failed_property(
       it != equation.SSA_steps.end();
       it++)
   {
+    if(!it->is_assert())
+      continue;
+
+    exprt g = prop_conv.get(it->guard_handle);
+    exprt c = prop_conv.get(it->cond_handle);
     if(
-      it->is_assert() && prop_conv.get(it->guard_handle).is_true() &&
-      prop_conv.get(it->cond_handle).is_false())
+      g.is_constant() && to_constant_expr(g).is_true() && c.is_constant() &&
+      to_constant_expr(c).is_false())
     {
       return it;
     }

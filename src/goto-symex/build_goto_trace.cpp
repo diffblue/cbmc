@@ -84,9 +84,9 @@ static exprt build_full_lhs_rec(
 
     exprt tmp = decision_procedure.get(to_if_expr(src_ssa).cond());
 
-    if(tmp.is_true())
+    if(tmp.is_constant() && to_constant_expr(tmp).is_true())
       return tmp2.true_case();
-    else if(tmp.is_false())
+    else if(tmp.is_constant() && to_constant_expr(tmp).is_false())
       return tmp2.false_case();
     else
       return std::move(tmp2);
@@ -241,7 +241,8 @@ void build_goto_trace(
 
     const SSA_stept &SSA_step = *it;
 
-    if(!decision_procedure.get(SSA_step.guard_handle).is_true())
+    exprt v = decision_procedure.get(SSA_step.guard_handle);
+    if(!v.is_constant() || !to_constant_expr(v).is_true())
       continue;
 
     if(it->is_constraint() ||
@@ -409,8 +410,9 @@ void build_goto_trace(
       {
         goto_trace_step.cond_expr = SSA_step.cond_expr;
 
+        exprt v = decision_procedure.get(SSA_step.cond_handle);
         goto_trace_step.cond_value =
-          decision_procedure.get(SSA_step.cond_handle).is_true();
+          v.is_constant() && to_constant_expr(v).is_true();
       }
 
       if(SSA_step.source.pc->is_assert() || SSA_step.source.pc->is_assume())
@@ -445,8 +447,11 @@ static bool is_failed_assertion_step(
   symex_target_equationt::SSA_stepst::const_iterator step,
   const decision_proceduret &decision_procedure)
 {
-  return step->is_assert() &&
-         decision_procedure.get(step->cond_handle).is_false();
+  if(!step->is_assert())
+    return false;
+
+  exprt v = decision_procedure.get(step->cond_handle);
+  return v.is_constant() && to_constant_expr(v).is_false();
 }
 
 void build_goto_trace(
