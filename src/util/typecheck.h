@@ -25,6 +25,15 @@ public:
   class errort final
   {
   public:
+    errort() = default;
+    errort(errort &&) = default;
+    errort(const errort &other)
+    {
+      // ostringstream does not have a copy constructor
+      message << other.message.str();
+      __location = other.__location;
+    }
+
     std::string what() const
     {
       return message.str();
