@@ -191,6 +191,37 @@ void let_exprt::validate(const exprt &expr, const validation_modet vm)
   }
 }
 
+with_exprt update_exprt::make_with_expr() const
+{
+  const exprt::operandst &designators = designator();
+  PRECONDITION(!designators.empty());
+
+  with_exprt result{exprt{}, exprt{}, exprt{}};
+  exprt *dest = &result;
+
+  for(const auto &expr : designators)
+  {
+    with_exprt tmp{exprt{}, exprt{}, exprt{}};
+
+    if(expr.id() == ID_index_designator)
+    {
+      tmp.where() = to_index_designator(expr).index();
+    }
+    else if(expr.id() == ID_member_designator)
+    {
+      // irep_idt component_name=
+      //  to_member_designator(*it).get_component_name();
+    }
+    else
+      UNREACHABLE;
+
+    *dest = tmp;
+    dest = &to_with_expr(*dest).new_value();
+  }
+
+  return result;
+}
+
 exprt binding_exprt::instantiate(const operandst &values) const
 {
   // number of values must match the number of bound variables
