@@ -72,6 +72,14 @@ void c_typecheck_baset::typecheck_type(typet &type)
     {
       typecheck_expr(alignment);
       make_constant(alignment);
+      const auto align_int = numeric_cast<mp_integer>(alignment);
+      if(
+        !align_int.has_value() ||
+        power(2, align_int->floorPow2()) != *align_int)
+      {
+        throw errort().with_location(type.source_location())
+          << "alignment is not a positive power of 2";
+      }
     }
   }
 
@@ -726,6 +734,29 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   type = new_type.with_source_location(source_location);
 }
 
+/// Adjust \p alignment to be the least common multiple with \p other_alignment,
+/// if both of them are non-nil. If exactly one of them is non-nil, set
+/// \p alignment to that value.
+static void align_to(exprt &alignment, const exprt &other_alignment)
+{
+  if(other_alignment.is_nil())
+    return;
+  else if(alignment.is_nil())
+    alignment = other_alignment;
+  else
+  {
+    const auto a = numeric_cast<mp_integer>(alignment);
+    CHECK_RETURN(a.has_value());
+    const auto other = numeric_cast<mp_integer>(other_alignment);
+    CHECK_RETURN(other.has_value());
+
+    // alignments are powers of two, so taking the maximum is sufficient for it
+    // will be equal to the least common multiple
+    if(a < other)
+      alignment = other_alignment;
+  }
+}
+
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
   // These get replaced by symbol types later.
@@ -744,7 +775,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   remove_qualifiers.write(type);
 
   bool is_packed = type.get_bool(ID_C_packed);
-  irept alignment = type.find(ID_C_alignment);
+  exprt alignment = static_cast<const exprt &>(type.find(ID_C_alignment));
 
   if(type.find(ID_tag).is_nil())
   {
@@ -835,6 +866,10 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
         throw errort().with_location(type.source_location())
           << "redefinition of body of '" << s_it->second.pretty_name << "'";
       }
+
+      align_to(
+        alignment,
+        static_cast<const exprt &>(s_it->second.type.find(ID_C_alignment)));
     }
   }
 
@@ -1606,7 +1641,7 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 
   c_qualifierst c_qualifiers(type);
   bool is_packed = type.get_bool(ID_C_packed);
-  irept alignment = type.find(ID_C_alignment);
+  exprt alignment = static_cast<const exprt &>(type.find(ID_C_alignment));
 
   c_qualifiers += c_qualifierst(symbol.type);
   type = symbol.type;
@@ -1614,6 +1649,11 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 
   if(is_packed)
     type.set(ID_C_packed, true);
+  else
+    type.remove(ID_C_packed);
+
+  align_to(
+    alignment, static_cast<const exprt &>(symbol.type.find(ID_C_alignment)));
   if(alignment.is_not_nil())
     type.set(ID_C_alignment, alignment);
 
