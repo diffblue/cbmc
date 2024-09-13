@@ -1,0 +1,12 @@
+CORE clang-only
+main.c
+-target i386-unknown-linux-gnu
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The long double of i386 has a size of 12, but an alignment of 4. stddef.h uses
+__alignof__(long double) as an alignment, which must therefore be a power of
+two.

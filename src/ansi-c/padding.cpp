@@ -112,7 +112,12 @@ bytest alignment(const typet &type, const namespacet &ns)
           type.id()==ID_c_bool ||
           type.id()==ID_pointer)
   {
-    result = *pointer_offset_size(type, ns);
+    // Scalars are aligned to their size, or, if that is not a power of two,
+    // to the largest power of two that divides the size: the 12-byte long
+    // double of i386 has an alignment of 4.
+    const bytest size = *pointer_offset_size(type, ns);
+    while(size > bytest{0} && size % (result * 2) == bytest{0})
+      result = result * 2;
   }
   else if(type.id()==ID_c_enum)
     result = alignment(to_c_enum_type(type).underlying_type(), ns);
