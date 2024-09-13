@@ -68,7 +68,7 @@ void havoc_assigns_clause_targetst::havoc_if_valid(
     skip_program.add(goto_programt::make_skip(source_location_no_checks));
 
   dest.add(goto_programt::make_goto(
-    skip_target, not_exprt{car.valid_var()}, source_location_no_checks));
+    skip_target, boolean_negate(car.valid_var()), source_location_no_checks));
 
   if(car.havoc_method == car_havoc_methodt::HAVOC_OBJECT)
   {
@@ -142,7 +142,7 @@ void havoc_assigns_clause_targetst::havoc_static_local(
     skip_program.add(goto_programt::make_skip(source_location_no_checks));
 
   dest.add(goto_programt::make_goto(
-    skip_target, not_exprt{car.valid_var()}, source_location_no_checks));
+    skip_target, boolean_negate(car.valid_var()), source_location_no_checks));
 
   const auto &target_type = car.target().type();
   side_effect_expr_nondett nondet(target_type, source_location);
