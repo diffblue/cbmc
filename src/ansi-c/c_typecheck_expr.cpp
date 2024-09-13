@@ -1672,13 +1672,13 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     // (at least that's how GCC behaves)
     if(
       to_pointer_type(operands[1].type()).base_type().id() == ID_empty &&
-      tmp1.is_constant() && is_null_pointer(to_constant_expr(tmp1)))
+      tmp1.is_constant() && to_constant_expr(tmp1).is_null_pointer())
     {
       implicit_typecast(operands[1], operands[2].type());
     }
     else if(
       to_pointer_type(operands[2].type()).base_type().id() == ID_empty &&
-      tmp2.is_constant() && is_null_pointer(to_constant_expr(tmp2)))
+      tmp2.is_constant() && to_constant_expr(tmp2).is_null_pointer())
     {
       implicit_typecast(operands[2], operands[1].type());
     }

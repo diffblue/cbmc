@@ -369,20 +369,5 @@ exprt make_and(exprt a, exprt b)
 
 bool is_null_pointer(const constant_exprt &expr)
 {
-  if(expr.type().id() != ID_pointer)
-    return false;
-
-  if(expr.get_value() == ID_NULL)
-    return true;
-
-    // We used to support "0" (when NULL_is_zero), but really front-ends should
-    // resolve this and generate ID_NULL instead.
-#if 0
-  return config.ansi_c.NULL_is_zero && expr.value_is_zero_string();
-#else
-  INVARIANT(
-    !expr.value_is_zero_string() || !config.ansi_c.NULL_is_zero,
-    "front-end should use ID_NULL");
-  return false;
-#endif
+  return expr.is_null_pointer();
 }

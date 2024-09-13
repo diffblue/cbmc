@@ -3004,6 +3004,11 @@ public:
 
   bool value_is_zero_string() const;
 
+  /// Returns true if \p expr has a pointer type and a value NULL; it also
+  /// returns true when \p expr has value zero and NULL_is_zero is true; returns
+  /// false in all other cases.
+  bool is_null_pointer() const;
+
   static void check(
     const exprt &expr,
     const validation_modet vm = validation_modet::INVARIANT);
