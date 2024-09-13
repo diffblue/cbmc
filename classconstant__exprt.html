@@ -128,6 +128,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa9b05b27f4092103a8a74d3d6845b77d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a382dfcad97288ce8abf7055759dfc081"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconstant__exprt.html#a382dfcad97288ce8abf7055759dfc081">value_is_zero_string</a> () const</td></tr>
 <tr class="separator:a382dfcad97288ce8abf7055759dfc081"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef8d0d103ec2d5be179cb2ca87eaba6a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconstant__exprt.html#aef8d0d103ec2d5be179cb2ca87eaba6a">is_null_pointer</a> () const</td></tr>
+<tr class="memdesc:aef8d0d103ec2d5be179cb2ca87eaba6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if <code>expr</code> has a pointer type and a value NULL; it also returns true when <code>expr</code> has value zero and NULL_is_zero is true; returns false in all other cases.  <a href="classconstant__exprt.html#aef8d0d103ec2d5be179cb2ca87eaba6a">More...</a><br /></td></tr>
+<tr class="separator:aef8d0d103ec2d5be179cb2ca87eaba6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classnullary__exprt"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnullary__exprt')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnullary__exprt.html">nullary_exprt</a></td></tr>
 <tr class="memitem:a31fef0d8e45ff84bc6f89151f759cea3 inherit pub_methods_classnullary__exprt"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnullary__exprt.html#a31fef0d8e45ff84bc6f89151f759cea3">nullary_exprt</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;_id, <a class="el" href="classtypet.html">typet</a> _type)</td></tr>
 <tr class="separator:a31fef0d8e45ff84bc6f89151f759cea3 inherit pub_methods_classnullary__exprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -561,7 +564,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00024">24</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00041">41</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -589,6 +592,27 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l02995">2995</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="aef8d0d103ec2d5be179cb2ca87eaba6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef8d0d103ec2d5be179cb2ca87eaba6a">&#9670;&nbsp;</a></span>is_null_pointer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool constant_exprt::is_null_pointer </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns true if <code>expr</code> has a pointer type and a value NULL; it also returns true when <code>expr</code> has value zero and NULL_is_zero is true; returns false in all other cases. </p>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00025">25</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -660,7 +684,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03011">3011</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03016">3016</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -679,7 +703,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00018">18</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00019">19</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
