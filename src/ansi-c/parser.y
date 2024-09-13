@@ -1276,7 +1276,10 @@ basic_type_specifier:
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
         {
-          $$=merge($1, $2);
+          // ignore packed or aligned attributes in this context (Clang warns
+          // that they will be ignored, GCC just silently ignores them)
+          strip_ignored_attributes(parser_stack($1));
+          $$ = parser_stack($1).is_nil() ? $2 : merge($1, $2);
         }
         | sue_type_specifier storage_class gcc_type_attribute_opt
         {

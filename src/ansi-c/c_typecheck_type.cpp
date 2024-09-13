@@ -72,6 +72,16 @@ void c_typecheck_baset::typecheck_type(typet &type)
     {
       typecheck_expr(alignment);
       make_constant(alignment);
+      const auto align_int = numeric_cast<mp_integer>(alignment);
+      // A valid alignment is a positive power of two (C11 6.2.8 "Alignment of
+      // objects": "Every valid alignment value shall be a nonnegative integral
+      // power of two"). is_power_of_two already requires a strictly positive
+      // value, so the has_value() guard is the only additional check needed.
+      if(!align_int.has_value() || !is_power_of_two(*align_int))
+      {
+        throw errort().with_location(type.source_location())
+          << "alignment is not a positive power of 2";
+      }
     }
   }
 
@@ -786,6 +796,41 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   type = new_type.with_source_location(source_location);
 }
 
+/// Widen \p alignment to the least common multiple of itself and
+/// \p other_alignment, if both of them are non-nil. If exactly one of them is
+/// non-nil, set \p alignment to that value; if both are nil, leave \p alignment
+/// unchanged.
+/// \pre Both alignments, when present, are positive powers of two (as enforced
+///   by c_typecheck_baset::typecheck_type). Under that precondition the least
+///   common multiple is simply the maximum of the two values, which is what
+///   this computes.
+static void combine_alignments(exprt &alignment, const exprt &other_alignment)
+{
+  if(other_alignment.is_nil())
+    return;
+  else if(alignment.is_nil())
+    alignment = other_alignment;
+  else
+  {
+    // Both alignments have already been through typecheck_type, so they are
+    // constants that convert to an mp_integer; a conversion failure would be a
+    // logic error rather than a user-facing problem, hence CHECK_RETURN.
+    const auto alignment_value = numeric_cast<mp_integer>(alignment);
+    CHECK_RETURN(alignment_value.has_value());
+    const auto other_value = numeric_cast<mp_integer>(other_alignment);
+    CHECK_RETURN(other_value.has_value());
+
+    // Powers of two are totally ordered by divisibility, so their least common
+    // multiple is simply the larger of the two values.
+    INVARIANT(
+      is_power_of_two(*alignment_value) && is_power_of_two(*other_value),
+      "alignments are positive powers of two");
+
+    if(*alignment_value < *other_value)
+      alignment = other_alignment;
+  }
+}
+
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
   // These get replaced by symbol types later.
@@ -804,7 +849,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   remove_qualifiers.write(type);
 
   bool is_packed = type.get_bool(ID_C_packed);
-  irept alignment = type.find(ID_C_alignment);
+  exprt alignment = static_cast<const exprt &>(type.find(ID_C_alignment));
 
   if(type.find(ID_tag).is_nil())
   {
@@ -895,6 +940,10 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
         throw errort().with_location(type.source_location())
           << "redefinition of body of '" << s_it->second.pretty_name << "'";
       }
+
+      combine_alignments(
+        alignment,
+        static_cast<const exprt &>(s_it->second.type.find(ID_C_alignment)));
     }
   }
 
@@ -1678,14 +1727,25 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 
   c_qualifierst c_qualifiers(type);
   bool is_packed = type.get_bool(ID_C_packed);
-  irept alignment = type.find(ID_C_alignment);
+  exprt alignment = static_cast<const exprt &>(type.find(ID_C_alignment));
 
   c_qualifiers += c_qualifierst(symbol.type);
   type = symbol.type;
   c_qualifiers.write(type);
 
+  // For a typedef of a packed struct/union, the packing has already been baked
+  // into the component offsets when the definition was type-checked, so the
+  // residual ID_C_packed flag on the type is redundant. Retaining it here would
+  // wrongly affect alignment/padding when the typedef'd type is used (e.g. as a
+  // struct member), so it is stripped unless the use site itself requests
+  // packing. This matches GCC (see #8443 and the gcc_attributes16 test).
   if(is_packed)
     type.set(ID_C_packed, true);
+  else
+    type.remove(ID_C_packed);
+
+  combine_alignments(
+    alignment, static_cast<const exprt &>(symbol.type.find(ID_C_alignment)));
   if(alignment.is_not_nil())
     type.set(ID_C_alignment, alignment);
 
