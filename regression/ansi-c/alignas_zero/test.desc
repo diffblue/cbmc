@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+GCC and Clang accept _Alignas(0), which goto-cc rejected as an alignment that
+is not a power of two.

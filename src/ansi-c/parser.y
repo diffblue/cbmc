@@ -1299,7 +1299,11 @@ basic_type_specifier:
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
         {
-          $$=merge($1, $2);
+          // GCC and Clang ignore a packed attribute preceding the
+          // struct/union keyword, as it applies neither to the type nor to
+          // an object
+          strip_ignored_attributes(parser_stack($1), {ID_packed});
+          $$ = parser_stack($1).is_nil() ? $2 : merge($1, $2);
         }
         | sue_type_specifier storage_class gcc_type_attribute_opt
         {

@@ -4,6 +4,8 @@
 
 #include "merged_type.h"
 
+#include <algorithm>
+
 #define YYSTYPE unsigned
 #define YYSTYPE_IS_TRIVIAL 1
 
@@ -158,6 +160,53 @@ static YYSTYPE merge(const YYSTYPE src1, const YYSTYPE src2)
 {
   merge_types(parser_stack(src1), parser_stack(src2));
   return src1;
+}
+
+/*******************************************************************\
+
+Function: strip_ignored_attributes
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Remove the attributes with an id in \p ids from \p irep, which
+          GCC accepts but ignores in the position of \p irep (Clang warns
+          that they will be ignored). \p irep is set to nil when nothing
+          else remains, so that the caller can drop it.
+
+\*******************************************************************/
+
+static void
+strip_ignored_attributes(irept &irep, std::initializer_list<irep_idt> ids)
+{
+  const auto is_ignored = [&ids](const irept &attribute)
+  { return std::find(ids.begin(), ids.end(), attribute.id()) != ids.end(); };
+
+  if(is_ignored(irep))
+  {
+    irep.make_nil();
+    return;
+  }
+
+  if(irep.id() != ID_merged_type)
+    return;
+
+  irept::subt &sub = irep.get_sub();
+  irept::subt filtered_sub;
+  filtered_sub.reserve(sub.size());
+  for(const auto &s : sub)
+  {
+    if(!is_ignored(s))
+      filtered_sub.push_back(s);
+  }
+
+  if(filtered_sub.empty())
+    irep.make_nil();
+  else if(filtered_sub.size() == 1)
+    irep.swap(filtered_sub.front());
+  else
+    sub.swap(filtered_sub);
 }
 
 /*******************************************************************\
