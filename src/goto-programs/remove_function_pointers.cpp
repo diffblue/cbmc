@@ -236,11 +236,11 @@ static void fix_return_type(
   exprt old_lhs=function_call.lhs();
   function_call.lhs()=tmp_symbol_expr;
 
-  dest.add(goto_programt::make_assignment(code_assignt(
+  dest.add(goto_programt::make_assignment(
     old_lhs,
     make_byte_extract(
       tmp_symbol_expr, from_integer(0, c_index_type()), old_lhs.type()),
-    source_location)));
+    source_location));
 }
 
 void remove_function_pointerst::remove_function_pointer(

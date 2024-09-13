@@ -1,5 +1,3 @@
-project(CBMC VERSION ${CBMC_VERSION})
-
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
@@ -66,8 +64,8 @@ endmacro(generic_flex)
 macro(generic_includes name)
     target_include_directories(${name}
         PUBLIC
-        ${CBMC_BINARY_DIR}
-        ${CBMC_SOURCE_DIR}
+        ${CBMC_BINARY_DIR}/src
+        ${CBMC_SOURCE_DIR}/src
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}
     )

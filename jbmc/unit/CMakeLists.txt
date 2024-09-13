@@ -1,5 +1,5 @@
 file(GLOB_RECURSE sources "*.cpp" "*.h")
-list(APPEND sources  ${CBMC_SOURCE_DIR}/../unit/unit_tests.cpp)
+list(APPEND sources  ${CBMC_SOURCE_DIR}/unit/unit_tests.cpp)
 
 file(GLOB_RECURSE java-testing_utils "java-testing-utils/*.cpp" "java-testing-utils/*.h")
 
@@ -14,8 +14,8 @@ add_executable(java-unit ${sources})
 target_include_directories(java-unit
     PUBLIC
     ${CBMC_BINARY_DIR}
-    ${CBMC_SOURCE_DIR}
-    ${CBMC_SOURCE_DIR}/../unit
+    ${CBMC_SOURCE_DIR}/src
+    ${CBMC_SOURCE_DIR}/unit
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_link_libraries(java-unit

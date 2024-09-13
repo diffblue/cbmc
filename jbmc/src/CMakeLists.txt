@@ -7,7 +7,7 @@ macro(generic_includes name)
         ${JBMC_BINARY_DIR}
         ${JBMC_SOURCE_DIR}
         ${CBMC_BINARY_DIR}
-        ${CBMC_SOURCE_DIR}
+        ${CBMC_SOURCE_DIR}/src
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CUDD_INCLUDE}

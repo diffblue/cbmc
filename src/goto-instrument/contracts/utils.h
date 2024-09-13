@@ -232,15 +232,6 @@ void infer_loop_assigns(
 /// *(b+i) when `i` is a known constant, keep the expression in the result.
 void widen_assigns(assignst &assigns, const namespacet &ns);
 
-/// This function recursively searches \p expression to find nested or
-/// non-nested quantified expressions. When a quantified expression is found,
-/// a fresh quantified variable is added to the symbol table and \p expression
-/// is updated to use this fresh variable.
-void add_quantified_variable(
-  symbol_table_baset &symbol_table,
-  exprt &expression,
-  const irep_idt &mode);
-
 struct replace_history_parametert
 {
   exprt expression_after_replacement;

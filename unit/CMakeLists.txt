@@ -75,7 +75,7 @@ add_executable(unit ${sources})
 target_include_directories(unit
     PUBLIC
     ${CBMC_BINARY_DIR}
-    ${CBMC_SOURCE_DIR}
+    ${CBMC_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CUDD_INCLUDE}

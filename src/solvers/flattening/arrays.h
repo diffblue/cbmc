@@ -93,7 +93,8 @@ protected:
     ARRAY_OF,
     ARRAY_TYPECAST,
     ARRAY_CONSTANT,
-    ARRAY_COMPREHENSION
+    ARRAY_COMPREHENSION,
+    ARRAY_LET
   };
 
   struct lazy_constraintt
@@ -124,7 +125,8 @@ protected:
     ARRAY_TYPECAST,
     ARRAY_CONSTANT,
     ARRAY_COMPREHENSION,
-    ARRAY_EQUALITY
+    ARRAY_EQUALITY,
+    ARRAY_LET
   };
 
   typedef std::map<constraint_typet, size_t> array_constraint_countt;
