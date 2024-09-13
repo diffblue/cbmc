@@ -489,13 +489,13 @@ $(document).ready(function(){initNavTree('janalyzer__parse__options_8cpp_source.
 <div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  <a class="code" href="classparse__options__baset.html#ae029a38cbf17b37ffedfd21a826112a9">log</a>.<a class="code" href="classmessaget.html#a4ff7dd53c201e241ca4e86221a0e7259">status</a>() &lt;&lt; <span class="stringliteral">&quot;Generating GOTO Program&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;  lazy_goto_model.<a class="code" href="classlazy__goto__modelt.html#a077c1fc2426f300eaebb33aaf02d85a8">load_all_functions</a>();</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160; </div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  std::unique_ptr&lt;abstract_goto_modelt&gt; goto_model_ptr =</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  std::unique_ptr&lt;goto_modelt&gt; goto_model_ptr =</div>
 <div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <a class="code" href="classlazy__goto__modelt.html#af38a918fc33baed651ea496c2aac9263">lazy_goto_modelt::process_whole_model_and_freeze</a>(</div>
 <div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;      std::move(lazy_goto_model));</div>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;  <span class="keywordflow">if</span>(goto_model_ptr == <span class="keyword">nullptr</span>)</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="exit__codes_8h.html#a344cebae9dbcedcf3be9d03065d392a0">CPROVER_EXIT_INTERNAL_ERROR</a>;</div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160; </div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;<span class="keyword">&gt;</span>(*goto_model_ptr);</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <a class="code" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model = *goto_model_ptr;</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160; </div>
 <div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <span class="comment">// show it?</span></div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classparse__options__baset.html#a5031a82e4ab9208af3a5a812bdc9ebf8">cmdline</a>.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="stringliteral">&quot;show-symbol-table&quot;</span>))</div>
