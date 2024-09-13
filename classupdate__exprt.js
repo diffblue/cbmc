@@ -4,6 +4,7 @@ var classupdate__exprt =
     [ "check", "classupdate__exprt.html#ad942ab87a51dfc68c0ea3ee5cd350020", null ],
     [ "designator", "classupdate__exprt.html#a027ae74b565e7623d88510fc565376c6", null ],
     [ "designator", "classupdate__exprt.html#afbe5feb0b8ec19d169cc64d2aedd0424", null ],
+    [ "make_with_expr", "classupdate__exprt.html#a3c6d208535e2d83d1cbc1b67a919d73f", null ],
     [ "new_value", "classupdate__exprt.html#ab1a49094705a8c10b97cb8b98e7a034f", null ],
     [ "new_value", "classupdate__exprt.html#a96478ce460f836d16a2f500b5e88ee1b", null ],
     [ "old", "classupdate__exprt.html#a86dcd01c991b63b0f33f6205c32fabfb", null ],
