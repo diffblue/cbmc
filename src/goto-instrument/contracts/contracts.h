@@ -147,7 +147,7 @@ public:
     return loop_havoc_set;
   }
 
-  namespacet ns;
+  const namespacet ns;
 
 protected:
   goto_modelt &goto_model;

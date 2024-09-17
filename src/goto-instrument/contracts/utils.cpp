@@ -257,7 +257,7 @@ void insert_before_and_update_jumps(
   }
 }
 
-void simplify_gotos(goto_programt &goto_program, namespacet &ns)
+void simplify_gotos(goto_programt &goto_program, const namespacet &ns)
 {
   for(auto &instruction : goto_program.instructions)
   {
@@ -270,7 +270,7 @@ void simplify_gotos(goto_programt &goto_program, namespacet &ns)
 
 bool is_loop_free(
   const goto_programt &goto_program,
-  namespacet &ns,
+  const namespacet &ns,
   messaget &log)
 {
   // create cfg from instruction list
