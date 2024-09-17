@@ -199,13 +199,13 @@ void insert_before_and_update_jumps(
 
 /// Turns goto instructions `IF cond GOTO label` where the condition
 /// statically simplifies to `false` into SKIP instructions.
-void simplify_gotos(goto_programt &goto_program, namespacet &ns);
+void simplify_gotos(goto_programt &goto_program, const namespacet &ns);
 
 /// Returns true iff the given program is loop-free,
 /// i.e. if each SCC of its CFG contains a single element.
 bool is_loop_free(
   const goto_programt &goto_program,
-  namespacet &ns,
+  const namespacet &ns,
   messaget &log);
 
 /// Returns an \ref irep_idt that essentially says that

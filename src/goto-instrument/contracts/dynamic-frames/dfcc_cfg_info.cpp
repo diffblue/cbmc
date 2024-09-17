@@ -503,6 +503,10 @@ dfcc_cfg_infot::dfcc_cfg_infot(
 {
   dfcc_loop_nesting_grapht loop_nesting_graph;
   goto_programt &goto_program = goto_function.body;
+
+  // Clean up possible fake loops that are due to do { ... } while(0);
+  simplify_gotos(goto_program, ns);
+
   if(loop_contract_config.apply_loop_contracts)
   {
     messaget log(message_handler);
