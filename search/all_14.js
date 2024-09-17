@@ -725,7 +725,7 @@ var searchData=
   ['simplify_5ffloatbv_5fop_19007',['simplify_floatbv_op',['../classsimplify__exprt.html#af3eeb6bbc690359c5b56c76da1bf7cc2',1,'simplify_exprt']]],
   ['simplify_5ffloatbv_5ftypecast_19008',['simplify_floatbv_typecast',['../classsimplify__exprt.html#a945fa0fe27a5a64d0a0e6ee5a62dfba1',1,'simplify_exprt']]],
   ['simplify_5ffunction_5fapplication_19009',['simplify_function_application',['../classsimplify__exprt.html#aae5ce5667107791421e4d24d3e7ac1af',1,'simplify_exprt']]],
-  ['simplify_5fgotos_19010',['simplify_gotos',['../utils_8cpp.html#aba81cb53e8d0082cbe68db4136188024',1,'simplify_gotos(goto_programt &amp;goto_program, namespacet &amp;ns):&#160;utils.cpp'],['../utils_8h.html#aba81cb53e8d0082cbe68db4136188024',1,'simplify_gotos(goto_programt &amp;goto_program, namespacet &amp;ns):&#160;utils.cpp']]],
+  ['simplify_5fgotos_19010',['simplify_gotos',['../utils_8cpp.html#a90cb59d025201658c14ea7cb25f17d35',1,'simplify_gotos(goto_programt &amp;goto_program, const namespacet &amp;ns):&#160;utils.cpp'],['../utils_8h.html#a90cb59d025201658c14ea7cb25f17d35',1,'simplify_gotos(goto_programt &amp;goto_program, const namespacet &amp;ns):&#160;utils.cpp']]],
   ['simplify_5fieee_5ffloat_5frelation_19011',['simplify_ieee_float_relation',['../classsimplify__exprt.html#af6f07602312c923c244e32a8010a9cff',1,'simplify_exprt']]],
   ['simplify_5fif_19012',['simplify_if',['../classsimplify__exprt.html#a4d16933a9b35d843f314cc51a76656ae',1,'simplify_exprt']]],
   ['simplify_5fif_5fbranch_19013',['simplify_if_branch',['../classsimplify__exprt.html#a97b9659e5ade01dd2268a332ebc884c7',1,'simplify_exprt']]],
