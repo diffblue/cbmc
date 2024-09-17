@@ -425,10 +425,24 @@ dfcc_instrument_loopt::add_step_instructions(
   const irep_idt &language_mode =
     dfcc_utilst::get_function_symbol(symbol_table, function_id).mode;
   {
-    // Assume the loop invariant after havocing the state.
-    code_assumet assumption{invariant};
-    assumption.add_source_location() = loop_head_location;
-    converter.goto_convert(assumption, step_instrs, language_mode);
+    // Assume the loop invariant after havocing the state; produce one
+    // assumption per conjunct to ease analysis of counterexamples, and possibly
+    // also improve solver performance (observed with Bitwuzla)
+    if(invariant.id() == ID_and)
+    {
+      for(const auto &op : invariant.operands())
+      {
+        code_assumet assumption{op};
+        assumption.add_source_location() = loop_head_location;
+        converter.goto_convert(assumption, step_instrs, language_mode);
+      }
+    }
+    else
+    {
+      code_assumet assumption{invariant};
+      assumption.add_source_location() = loop_head_location;
+      converter.goto_convert(assumption, step_instrs, language_mode);
+    }
   }
 
   {
@@ -506,10 +520,24 @@ void dfcc_instrument_loopt::add_body_instructions(
       "Check invariant after step for loop " +
       id2string(check_location.get_function()) + "." +
       std::to_string(cbmc_loop_id));
-    // Assume the loop invariant after havocing the state.
-    code_assertt assertion{invariant};
-    assertion.add_source_location() = check_location;
-    converter.goto_convert(assertion, pre_loop_latch_instrs, language_mode);
+    // Assert the loop invariant after havocing the state; produce one assertion
+    // per conjunct to ease analysis of counterexamples, and possibly also
+    // improve solver performance (observed with Bitwuzla)
+    if(invariant.id() == ID_and)
+    {
+      for(const auto &op : invariant.operands())
+      {
+        code_assertt assertion{op};
+        assertion.add_source_location() = check_location;
+        converter.goto_convert(assertion, pre_loop_latch_instrs, language_mode);
+      }
+    }
+    else
+    {
+      code_assertt assertion{invariant};
+      assertion.add_source_location() = check_location;
+      converter.goto_convert(assertion, pre_loop_latch_instrs, language_mode);
+    }
   }
 
   {
