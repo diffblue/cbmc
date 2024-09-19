@@ -1134,7 +1134,7 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
   }
 
   (void)*format;
-#  if defined(__aarch64__) || defined(_M_ARM64)
+#  if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg.__stack) <
         __CPROVER_OBJECT_SIZE(arg.__stack))
   {
@@ -1192,7 +1192,7 @@ __CPROVER_HIDE:;
   }
 
   (void)*format;
-#if defined(__aarch64__) || defined(_M_ARM64)
+#if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg.__stack) <
         __CPROVER_OBJECT_SIZE(arg.__stack))
   {
@@ -1250,7 +1250,7 @@ int __stdio_common_vfscanf(
   }
 
   (void)*format;
-#  if defined(__aarch64__) || defined(_M_ARM64)
+#  if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args.__stack) <
         __CPROVER_OBJECT_SIZE(args.__stack))
   {
@@ -1338,7 +1338,7 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
-#  if defined(__aarch64__) || defined(_M_ARM64)
+#  if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg.__stack) <
         __CPROVER_OBJECT_SIZE(arg.__stack))
   {
@@ -1382,7 +1382,7 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
-#if defined(__aarch64__) || defined(_M_ARM64)
+#if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg.__stack) <
         __CPROVER_OBJECT_SIZE(arg.__stack))
   {
@@ -1432,7 +1432,7 @@ int __stdio_common_vsscanf(
 
   (void)*s;
   (void)*format;
-#  if defined(__aarch64__) || defined(_M_ARM64)
+#  if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args.__stack) <
         __CPROVER_OBJECT_SIZE(args.__stack))
   {
@@ -1827,7 +1827,7 @@ int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
 {
   (void)*fmt;
 
-#if defined(__aarch64__) || defined(_M_ARM64)
+#if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap.__stack) <
         __CPROVER_OBJECT_SIZE(ap.__stack))
 
@@ -1887,7 +1887,7 @@ int __builtin___vsnprintf_chk(
   (void)bufsize;
   (void)*fmt;
 
-#if defined(__aarch64__) || defined(_M_ARM64)
+#if(defined(__aarch64__) || defined(_M_ARM64)) && !defined(__APPLE__)
   while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap.__stack) <
         __CPROVER_OBJECT_SIZE(ap.__stack))
 
