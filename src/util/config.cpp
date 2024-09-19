@@ -308,7 +308,10 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     break;
 
   case flavourt::VISUAL_STUDIO:
-    defines.push_back("_M_ARM");
+    if(subarch == "arm64")
+      defines.push_back("_M_ARM64");
+    else
+      defines.push_back("_M_ARM");
     break;
 
   case flavourt::CODEWARRIOR:

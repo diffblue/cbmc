@@ -1134,14 +1134,23 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
   }
 
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
+#  if defined(__aarch64__) || defined(_M_ARM64)
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg.__stack) <
+        __CPROVER_OBJECT_SIZE(arg.__stack))
+  {
+    void *a = va_arg(arg, void *);
+    __CPROVER_havoc_object(a);
+  }
+#  else
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
         __CPROVER_OBJECT_SIZE(arg))
   {
     void *a = va_arg(arg, void *);
     __CPROVER_havoc_object(a);
   }
+#  endif
 
-#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+#  ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(stream, "open"),
                    "vfscanf file must be open");
 #endif
@@ -1183,12 +1192,21 @@ __CPROVER_HIDE:;
   }
 
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
-        __CPROVER_OBJECT_SIZE(*(void **)&arg))
+#if defined(__aarch64__) || defined(_M_ARM64)
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg.__stack) <
+        __CPROVER_OBJECT_SIZE(arg.__stack))
   {
     void *a = va_arg(arg, void *);
     __CPROVER_havoc_object(a);
   }
+#else
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+        __CPROVER_OBJECT_SIZE(arg))
+  {
+    void *a = va_arg(arg, void *);
+    __CPROVER_havoc_object(a);
+  }
+#endif
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(
@@ -1232,12 +1250,21 @@ int __stdio_common_vfscanf(
   }
 
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&args) <
+#  if defined(__aarch64__) || defined(_M_ARM64)
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args.__stack) <
+        __CPROVER_OBJECT_SIZE(args.__stack))
+  {
+    void *a = va_arg(args, void *);
+    __CPROVER_havoc_object(a);
+  }
+#  else
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args) <
         __CPROVER_OBJECT_SIZE(args))
   {
     void *a = va_arg(args, void *);
     __CPROVER_havoc_object(a);
   }
+#  endif
 
 #  ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(
@@ -1311,12 +1338,21 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
+#  if defined(__aarch64__) || defined(_M_ARM64)
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg.__stack) <
+        __CPROVER_OBJECT_SIZE(arg.__stack))
+  {
+    void *a = va_arg(arg, void *);
+    __CPROVER_havoc_object(a);
+  }
+#  else
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
         __CPROVER_OBJECT_SIZE(arg))
   {
     void *a = va_arg(arg, void *);
     __CPROVER_havoc_object(a);
   }
+#  endif
 
   return result;
 }
@@ -1346,12 +1382,21 @@ __CPROVER_HIDE:;
   int result = __VERIFIER_nondet_int();
   (void)*s;
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&arg) <
-        __CPROVER_OBJECT_SIZE(*(void **)&arg))
+#if defined(__aarch64__) || defined(_M_ARM64)
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg.__stack) <
+        __CPROVER_OBJECT_SIZE(arg.__stack))
   {
     void *a = va_arg(arg, void *);
     __CPROVER_havoc_object(a);
   }
+#else
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(arg) <
+        __CPROVER_OBJECT_SIZE(arg))
+  {
+    void *a = va_arg(arg, void *);
+    __CPROVER_havoc_object(a);
+  }
+#endif
 
   return result;
 }
@@ -1387,12 +1432,21 @@ int __stdio_common_vsscanf(
 
   (void)*s;
   (void)*format;
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&args) <
+#  if defined(__aarch64__) || defined(_M_ARM64)
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args.__stack) <
+        __CPROVER_OBJECT_SIZE(args.__stack))
+  {
+    void *a = va_arg(args, void *);
+    __CPROVER_havoc_object(a);
+  }
+#  else
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(args) <
         __CPROVER_OBJECT_SIZE(args))
   {
     void *a = va_arg(args, void *);
     __CPROVER_havoc_object(a);
   }
+#  endif
 
   return result;
 }
@@ -1773,7 +1827,18 @@ int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
 {
   (void)*fmt;
 
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&ap) <
+#if defined(__aarch64__) || defined(_M_ARM64)
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap.__stack) <
+        __CPROVER_OBJECT_SIZE(ap.__stack))
+
+  {
+    (void)va_arg(ap, int);
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap.__stack),
+      "vsnprintf object overlap");
+  }
+#else
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap) <
         __CPROVER_OBJECT_SIZE(ap))
 
   {
@@ -1782,6 +1847,7 @@ int vsnprintf(char *str, size_t size, const char *fmt, va_list ap)
       __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap),
       "vsnprintf object overlap");
   }
+#endif
 
   size_t i = 0;
   for(; i < size; ++i)
@@ -1821,7 +1887,18 @@ int __builtin___vsnprintf_chk(
   (void)bufsize;
   (void)*fmt;
 
-  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(*(void **)&ap) <
+#if defined(__aarch64__) || defined(_M_ARM64)
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap.__stack) <
+        __CPROVER_OBJECT_SIZE(ap.__stack))
+
+  {
+    (void)va_arg(ap, int);
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap.__stack),
+      "vsnprintf object overlap");
+  }
+#else
+  while((__CPROVER_size_t)__CPROVER_POINTER_OFFSET(ap) <
         __CPROVER_OBJECT_SIZE(ap))
 
   {
@@ -1830,6 +1907,7 @@ int __builtin___vsnprintf_chk(
       __CPROVER_POINTER_OBJECT(str) != __CPROVER_POINTER_OBJECT(ap),
       "vsnprintf object overlap");
   }
+#endif
 
   size_t i = 0;
   for(; i < size; ++i)
