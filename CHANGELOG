@@ -1,3 +1,31 @@
+# CBMC 6.3.0
+
+This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR #8366) and for some CMake configurations (via PR #8435). Users of loop invariants with dynamic frames have two changes to their user experience:
+1) Users will no longer need to give unwinding specifications for `do { ... } while(0)` loops.
+2) Loop invariants that are conjunctions will be turned into more fine-grained properties to ease debugging of loop invariants when they aren't successfully proved.
+
+## What's Changed
+* Contracts: always remove spurious do {... } while(0) loops by @tautschnig in https://github.com/diffblue/cbmc/pull/8459
+* Contracts/DFCC: split conjunctions in loop invariants by @tautschnig in https://github.com/diffblue/cbmc/pull/8458
+
+## Bug Fixes
+* Do not define project(CBMC ...) twice to fix CMake failures by @tautschnig in https://github.com/diffblue/cbmc/pull/8435
+* Contracts: remove bound-var-rewrite by @tautschnig in https://github.com/diffblue/cbmc/pull/8430
+* introduce `zero_expr()` and `one_expr()` for number types by @kroening in https://github.com/diffblue/cbmc/pull/8441
+* Fix Alpine's assert-statement conversion special case by @tautschnig in https://github.com/diffblue/cbmc/pull/8438
+* Fix Python syntax error in doxygen markdown preprocessor by @tautschnig in https://github.com/diffblue/cbmc/pull/8440
+* Goto conversion: fix missing source locations by @tautschnig in https://github.com/diffblue/cbmc/pull/8444
+* copy constructors for exception classes by @kroening in https://github.com/diffblue/cbmc/pull/8391
+* jbmc, janalyzer: Remove unnecessary dynamic_cast by @tautschnig in https://github.com/diffblue/cbmc/pull/8418
+* Move is_null_pointer to constant_exprt by @tautschnig in https://github.com/diffblue/cbmc/pull/8445
+* add documentation of default for --max-nondet-array-length, see #8428 by @lks9 in https://github.com/diffblue/cbmc/pull/8432
+* Move make_with_expr to update_exprt by @tautschnig in https://github.com/diffblue/cbmc/pull/8448
+* Use boolean_negate for immediate simplification by @tautschnig in https://github.com/diffblue/cbmc/pull/8449
+* `format_expr` now prints `bv`-typed constants by @kroening in https://github.com/diffblue/cbmc/pull/8457
+* C library: fix use of va_list for AARCH64 by @tautschnig in https://github.com/diffblue/cbmc/pull/8366
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.2.0...cbmc-6.3.0
+
 # CBMC 6.2.0
 
 ## What's Changed
