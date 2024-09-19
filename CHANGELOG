@@ -1,3 +1,12 @@
+# CBMC 6.3.1
+
+This patch release addresses build failures on Apple Silicon (via PR #8461).
+
+## Bug Fixes
+* C library: Apple does not adhere to aarch64 ABI by @tautschnig in https://github.com/diffblue/cbmc/pull/8461
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.3.0...cbmc-6.3.1
+
 # CBMC 6.3.0
 
 This release addresses build failures on aarch64 (64-bit ARM) platforms (via PR #8366) and for some CMake configurations (via PR #8435). Users of loop invariants with dynamic frames have two changes to their user experience:
