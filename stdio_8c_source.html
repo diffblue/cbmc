@@ -1228,7 +1228,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01134"></a><span class="lineno"> 1134</span>&#160;  }</div>
 <div class="line"><a name="l01135"></a><span class="lineno"> 1135</span>&#160; </div>
 <div class="line"><a name="l01136"></a><span class="lineno"> 1136</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
-<div class="line"><a name="l01137"></a><span class="lineno"> 1137</span>&#160;<span class="preprocessor">#  if defined(__aarch64__) || defined(_M_ARM64)</span></div>
+<div class="line"><a name="l01137"></a><span class="lineno"> 1137</span>&#160;<span class="preprocessor">#  if(defined(__aarch64__) || defined(_M_ARM64)) &amp;&amp; !defined(__APPLE__)</span></div>
 <div class="line"><a name="l01138"></a><span class="lineno"> 1138</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(arg.__stack) &lt;</div>
 <div class="line"><a name="l01139"></a><span class="lineno"> 1139</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(arg.__stack))</div>
 <div class="line"><a name="l01140"></a><span class="lineno"> 1140</span>&#160;  {</div>
@@ -1286,7 +1286,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01192"></a><span class="lineno"> 1192</span>&#160;  }</div>
 <div class="line"><a name="l01193"></a><span class="lineno"> 1193</span>&#160; </div>
 <div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
-<div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;<span class="preprocessor">#if defined(__aarch64__) || defined(_M_ARM64)</span></div>
+<div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;<span class="preprocessor">#if(defined(__aarch64__) || defined(_M_ARM64)) &amp;&amp; !defined(__APPLE__)</span></div>
 <div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(arg.__stack) &lt;</div>
 <div class="line"><a name="l01197"></a><span class="lineno"> 1197</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(arg.__stack))</div>
 <div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160;  {</div>
@@ -1344,7 +1344,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;  }</div>
 <div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160; </div>
 <div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
-<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;<span class="preprocessor">#  if defined(__aarch64__) || defined(_M_ARM64)</span></div>
+<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;<span class="preprocessor">#  if(defined(__aarch64__) || defined(_M_ARM64)) &amp;&amp; !defined(__APPLE__)</span></div>
 <div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(args.__stack) &lt;</div>
 <div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(args.__stack))</div>
 <div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;  {</div>
@@ -1432,7 +1432,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;  <span class="keywordtype">int</span> result = <a class="code" href="stdio_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
 <div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;  (void)*s;</div>
 <div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
-<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;<span class="preprocessor">#  if defined(__aarch64__) || defined(_M_ARM64)</span></div>
+<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;<span class="preprocessor">#  if(defined(__aarch64__) || defined(_M_ARM64)) &amp;&amp; !defined(__APPLE__)</span></div>
 <div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(arg.__stack) &lt;</div>
 <div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(arg.__stack))</div>
 <div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;  {</div>
@@ -1476,7 +1476,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;  <span class="keywordtype">int</span> result = <a class="code" href="stdio_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a>();</div>
 <div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;  (void)*s;</div>
 <div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
-<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;<span class="preprocessor">#if defined(__aarch64__) || defined(_M_ARM64)</span></div>
+<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;<span class="preprocessor">#if(defined(__aarch64__) || defined(_M_ARM64)) &amp;&amp; !defined(__APPLE__)</span></div>
 <div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(arg.__stack) &lt;</div>
 <div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(arg.__stack))</div>
 <div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;  {</div>
@@ -1526,7 +1526,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160; </div>
 <div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;  (void)*s;</div>
 <div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;  (void)*<a class="code" href="format_8h.html#a74b453cb3c0deb818d6f2e0f683996ca">format</a>;</div>
-<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;<span class="preprocessor">#  if defined(__aarch64__) || defined(_M_ARM64)</span></div>
+<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;<span class="preprocessor">#  if(defined(__aarch64__) || defined(_M_ARM64)) &amp;&amp; !defined(__APPLE__)</span></div>
 <div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(args.__stack) &lt;</div>
 <div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(args.__stack))</div>
 <div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;  {</div>
@@ -1921,7 +1921,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01827"></a><span class="lineno"> 1827</span>&#160;{</div>
 <div class="line"><a name="l01828"></a><span class="lineno"> 1828</span>&#160;  (void)*fmt;</div>
 <div class="line"><a name="l01829"></a><span class="lineno"> 1829</span>&#160; </div>
-<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160;<span class="preprocessor">#if defined(__aarch64__) || defined(_M_ARM64)</span></div>
+<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160;<span class="preprocessor">#if(defined(__aarch64__) || defined(_M_ARM64)) &amp;&amp; !defined(__APPLE__)</span></div>
 <div class="line"><a name="l01831"></a><span class="lineno"> 1831</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(ap.__stack) &lt;</div>
 <div class="line"><a name="l01832"></a><span class="lineno"> 1832</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(ap.__stack))</div>
 <div class="line"><a name="l01833"></a><span class="lineno"> 1833</span>&#160; </div>
@@ -1981,7 +1981,7 @@ $(document).ready(function(){initNavTree('stdio_8c_source.html',''); initResizab
 <div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;  (void)bufsize;</div>
 <div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160;  (void)*fmt;</div>
 <div class="line"><a name="l01889"></a><span class="lineno"> 1889</span>&#160; </div>
-<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;<span class="preprocessor">#if defined(__aarch64__) || defined(_M_ARM64)</span></div>
+<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;<span class="preprocessor">#if(defined(__aarch64__) || defined(_M_ARM64)) &amp;&amp; !defined(__APPLE__)</span></div>
 <div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160;  <span class="keywordflow">while</span>((__CPROVER_size_t)<a class="code" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(ap.__stack) &lt;</div>
 <div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;        <a class="code" href="cprover__builtin__headers_8h.html#a38adef7c2c9358562c98c9f2b54115fd">__CPROVER_OBJECT_SIZE</a>(ap.__stack))</div>
 <div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160; </div>
