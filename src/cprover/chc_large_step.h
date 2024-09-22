@@ -20,6 +20,8 @@ private:
 public:
   ResolutionVisitor(chc_db & db) : m_db(db) {}
 
+  chc_db &giveme_new_db() { return m_new_db; }
+
   virtual void visit(const wto_singletont & s)
   {
     const symbol_exprt* symb = s.get();
@@ -39,23 +41,37 @@ public:
     resolve(head);
   }
 
-  std::vector<horn_clause> getClauses()
+  void populate_new_db()
   {
-    std::vector<horn_clause> all;
-    for (auto it = m_heads.begin(); it != m_heads.end(); it++)
+    std::vector<symbol_exprt> rels;
+    for (auto &clause : m_db)
     {
-      auto c = m_def.find(*it);
-      INVARIANT(c != m_def.end(), "No clauses");
-      all.insert(all.begin(), c->second.begin(), c->second.end());
+      if(clause.is_query())
+      {
+        clause.used_relations(m_db, std::back_inserter(rels));
+      }
     }
-    return all;
-  }
 
-  const std::vector<horn_clause>& getClauses(const symbol_exprt* symb)
-  {
-    auto it = m_def.find(symb->hash());
-    INVARIANT(it != m_def.end(), "No clauses");
-    return it->second;
+    std::set<std::size_t > preds_hash(m_heads.begin(), m_heads.end());
+    for (auto p : rels) {
+      preds_hash.insert(p.hash());
+    }
+
+    for (auto it : preds_hash)
+    {
+      auto c = m_def.find(it);
+      INVARIANT(c != m_def.end(), "No clauses");
+      for (auto clause : c->second)
+        m_new_db.add_clause(clause.get_chc());
+    }
+
+    for (auto &clause : m_db)
+    {
+      if(clause.is_query())
+      {
+        m_new_db.add_clause(clause.get_chc());
+      }
+    }
   }
 
 private:

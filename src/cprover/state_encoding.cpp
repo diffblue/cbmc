@@ -1261,22 +1261,12 @@ void large_step_encoding(const container_encoding_targett & small_step_container
     {
       db.add_state_pred(s);
     }
-
   }
   chc_graph chc_g(db);
   chc_g.build_graph();
 
   chc_wtot wto(chc_g);
   wto.build_wto();
-
-  SimpleVisitor v;
-  for (auto it = wto.begin(); it != wto.end(); it++)
-  {
-    auto x = (*it);
-    x->accept(&v);
-  }
-
-  std::cout << "\n";
 
   ResolutionVisitor rv(db);
   for (auto it = wto.begin(); it != wto.end(); it++)
@@ -1285,21 +1275,11 @@ void large_step_encoding(const container_encoding_targett & small_step_container
     x->accept(&rv);
   }
 
-  std::vector<horn_clause> all = rv.getClauses();
-  for (auto &clause : db) {
-    if (clause.is_query()) {
-      std::vector<symbol_exprt> rels;
-      clause.used_relations(db, std::back_inserter(rels));
-      for (auto pred : rels)
-      {
-        all.insert(all.end(), rv.getClauses(&pred).begin(), rv.getClauses(&pred).end());
-      }
-      all.push_back(clause.get_chc());
-    }
+  rv.populate_new_db();
 
-  }
-
-  for (auto ce : all)
+  container_encoding_targett container2;
+  std::vector<horn_clause> all2;
+  for (auto & ce : rv.giveme_new_db())
   {
     large_step_container << ce.get_chc();
   }
