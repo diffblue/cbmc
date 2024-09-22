@@ -76,6 +76,21 @@ public:
     return false;
   }
 
+  bool operator==(const horn_clause &other) const
+  {
+    return m_chc == other.m_chc;
+  }
+
+  bool operator!=(const horn_clause &other) const
+  {
+    return !(*this==other);
+  }
+
+  bool operator<(const horn_clause &other) const
+  {
+    return m_chc < other.m_chc;
+  }
+
   template <typename OutputIterator>
   void used_relations(chc_db &db, OutputIterator out) const;
   template <typename OutputIterator>
@@ -103,8 +118,8 @@ private:
 
   std::set<symbol_exprt> m_state_preds;
 
-  typedef std::set<horn_clause *> chc_sett;
-  typedef std::map<exprt, std::set<horn_clause *>> chc_indext;
+  typedef std::set<const horn_clause *> chc_sett;
+  typedef std::map<exprt, std::set<const horn_clause *>> chc_indext;
   chc_indext m_body_idx;
   chc_indext m_head_idx;
 
@@ -121,14 +136,14 @@ public:
   void build_indices();
   void reset_indices();
 
-  const std::set<horn_clause *> & use(const exprt & state) const {
+  const std::set<const horn_clause *> & use(const exprt & state) const {
     auto it = m_body_idx.find(state);
     if (it == m_body_idx.end())
       return m_empty_set;
     return it->second;
   }
 
-  const std::set<horn_clause *> & def(const exprt & state) const {
+  const std::set<const horn_clause *> & def(const exprt & state) const {
     auto it = m_head_idx.find(state);
     if (it == m_head_idx.end())
       return m_empty_set;
@@ -139,6 +154,9 @@ public:
   {
     if (f.is_true())
       return;
+    for (auto & c : m_clauses) {
+      if (c.get_chc()==f) return;
+    }
     m_clauses.push_back(horn_clause(f));
     reset_indices();
   }

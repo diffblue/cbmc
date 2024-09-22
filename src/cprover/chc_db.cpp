@@ -43,7 +43,7 @@ void chc_graph::build_graph()
   for (auto & sp : m_db.get_state_preds())
   {
     std::set<exprt> outgoing;
-    const std::set<horn_clause *> &uses = m_db.use(sp);
+    const std::set<const horn_clause *> &uses = m_db.use(sp);
     for (const horn_clause *r : uses) {
       const exprt * head = r->head();
       if (can_cast_expr<function_application_exprt>(*head))
@@ -54,7 +54,7 @@ void chc_graph::build_graph()
     m_outgoing.insert(std::make_pair(sp, outgoing));
 
     std::set<exprt> incoming;
-    const std::set<horn_clause *> &defs = m_db.def(sp);
+    const std::set<const horn_clause *> &defs = m_db.def(sp);
     chc_db::is_state_pred isStatePred(m_db);
     for (const horn_clause *r : defs) {
       std::set<symbol_exprt> symbols = find_symbols(*r->body());
