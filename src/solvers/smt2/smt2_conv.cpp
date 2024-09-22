@@ -723,7 +723,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
     type.id() == ID_integer || type.id() == ID_rational ||
     type.id() == ID_real || type.id() == ID_c_enum ||
     type.id() == ID_c_enum_tag || type.id() == ID_fixedbv ||
-    type.id() == ID_floatbv || type.id() == ID_c_bool)
+    type.id() == ID_floatbv || type.id() == ID_c_bool || type.id() == ID_range)
   {
     return parse_literal(src, type);
   }
@@ -2920,7 +2920,35 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(dest_type.id()==ID_range)
   {
-    SMT2_TODO("range typecast");
+    auto &dest_range_type = to_range_type(dest_type);
+    const auto dest_size =
+      dest_range_type.get_to() - dest_range_type.get_from() + 1;
+    const auto dest_width = address_bits(dest_size);
+    if(src_type.id() == ID_range)
+    {
+      auto &src_range_type = to_range_type(src_type);
+      const auto src_size =
+        src_range_type.get_to() - src_range_type.get_from() + 1;
+      const auto src_width = address_bits(src_size);
+      if(src_width < dest_width)
+      {
+        out << "((_ zero_extend " << dest_width - src_width << ") ";
+        convert_expr(src);
+        out << ')'; // zero_extend
+      }
+      else if(src_width > dest_width)
+      {
+        out << "((_ extract " << dest_width - 1 << " 0) ";
+        convert_expr(src);
+        out << ')'; // extract
+      }
+      else // src_width == dest_width
+      {
+        convert_expr(src);
+      }
+    }
+    else
+      SMT2_TODO("typecast from " + src_type.id_string() + " to range");
   }
   else if(dest_type.id()==ID_floatbv)
   {
@@ -3440,6 +3468,15 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     else
       out << value;
   }
+  else if(expr_type.id() == ID_range)
+  {
+    auto &range_type = to_range_type(expr_type);
+    const auto size = range_type.get_to() - range_type.get_from() + 1;
+    const auto width = address_bits(size);
+    const auto value_int = numeric_cast_v<mp_integer>(expr);
+    out << "(_ bv" << (value_int - range_type.get_from()) << " " << width
+        << ")";
+  }
   else
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
 }
@@ -3641,7 +3678,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
   }
   else if(
     expr.type().id() == ID_unsignedbv || expr.type().id() == ID_signedbv ||
-    expr.type().id() == ID_fixedbv)
+    expr.type().id() == ID_fixedbv || expr.type().id() == ID_range)
   {
     // These could be chained, i.e., need not be binary,
     // but at least MathSat doesn't like that.
@@ -5600,6 +5637,14 @@ void smt2_convt::convert_type(const typet &type)
   else if(type.id() == ID_state)
   {
     out << "state";
+  }
+  else if(type.id() == ID_range)
+  {
+    auto &range_type = to_range_type(type);
+    mp_integer size = range_type.get_to() - range_type.get_from() + 1;
+    if(size <= 0)
+      UNEXPECTEDCASE("unsuppored range type");
+    out << "(_ BitVec " << address_bits(size) << ")";
   }
   else
   {
