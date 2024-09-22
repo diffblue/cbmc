@@ -603,7 +603,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
-  if(expr.is_constant() && is_null_pointer(to_constant_expr(expr)))
+  if(expr.is_constant() && to_constant_expr(expr).is_null_pointer())
   {
     new_expr = typecast_exprt::conditional_cast(expr, type);
     return true;

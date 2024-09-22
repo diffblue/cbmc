@@ -41,7 +41,9 @@ static void append_safe_havoc_code_for_expr(
   // skip havocing only if all pointer derefs in the expression are valid
   // (to avoid spurious pointer deref errors)
   dest.add(goto_programt::make_goto(
-    skip_target, not_exprt{all_dereferences_are_valid(expr, ns)}, location));
+    skip_target,
+    boolean_negate(all_dereferences_are_valid(expr, ns)),
+    location));
 
   havoc_code_impl();
 
@@ -255,7 +257,7 @@ void insert_before_and_update_jumps(
   }
 }
 
-void simplify_gotos(goto_programt &goto_program, namespacet &ns)
+void simplify_gotos(goto_programt &goto_program, const namespacet &ns)
 {
   for(auto &instruction : goto_program.instructions)
   {
@@ -268,7 +270,7 @@ void simplify_gotos(goto_programt &goto_program, namespacet &ns)
 
 bool is_loop_free(
   const goto_programt &goto_program,
-  namespacet &ns,
+  const namespacet &ns,
   messaget &log)
 {
   // create cfg from instruction list
@@ -381,48 +383,6 @@ void widen_assigns(assignst &assigns, const namespacet &ns)
   assigns = result;
 }
 
-void add_quantified_variable(
-  symbol_table_baset &symbol_table,
-  exprt &expression,
-  const irep_idt &mode)
-{
-  auto visitor = [&symbol_table, &mode](exprt &expr) {
-    if(expr.id() != ID_exists && expr.id() != ID_forall)
-      return;
-    // When a quantifier expression is found, create a fresh symbol for each
-    // quantified variable and rewrite the expression to use those fresh
-    // symbols.
-    auto &quantifier_expression = to_quantifier_expr(expr);
-    std::vector<symbol_exprt> fresh_variables;
-    fresh_variables.reserve(quantifier_expression.variables().size());
-    for(const auto &quantified_variable : quantifier_expression.variables())
-    {
-      // 1. create fresh symbol
-      symbolt new_symbol = get_fresh_aux_symbol(
-        quantified_variable.type(),
-        id2string(quantified_variable.source_location().get_function()),
-        "tmp_cc",
-        quantified_variable.source_location(),
-        mode,
-        symbol_table);
-
-      // 2. add created fresh symbol to expression map
-      fresh_variables.push_back(new_symbol.symbol_expr());
-    }
-
-    // use fresh symbols
-    exprt where = quantifier_expression.instantiate(fresh_variables);
-
-    // recursively check for nested quantified formulae
-    add_quantified_variable(symbol_table, where, mode);
-
-    // replace previous variables and body
-    quantifier_expression.variables() = fresh_variables;
-    quantifier_expression.where() = std::move(where);
-  };
-  expression.visit_pre(visitor);
-}
-
 static void replace_history_parameter_rec(
   symbol_table_baset &symbol_table,
   exprt &expr,
@@ -475,8 +435,8 @@ static void replace_history_parameter_rec(
 
     // 2.2. Skip storing the history if the expression is invalid
     auto goto_instruction = history.add(goto_programt::make_incomplete_goto(
-      not_exprt{
-        all_dereferences_are_valid(parameter, namespacet(symbol_table))},
+      boolean_negate(
+        all_dereferences_are_valid(parameter, namespacet(symbol_table))),
       location));
 
     // 2.3. Add an assignment such that the value pointed to by the new

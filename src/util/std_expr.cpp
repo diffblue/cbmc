@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
+#include "config.h"
 #include "namespace.h"
 #include "pointer_expr.h"
 #include "range.h"
@@ -19,6 +20,22 @@ bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());
   return val.find_first_not_of('0')==std::string::npos;
+}
+
+bool constant_exprt::is_null_pointer() const
+{
+  if(type().id() != ID_pointer)
+    return false;
+
+  if(get_value() == ID_NULL)
+    return true;
+
+  // We used to support "0" (when NULL_is_zero), but really front-ends should
+  // resolve this and generate ID_NULL instead.
+  INVARIANT(
+    !value_is_zero_string() || !config.ansi_c.NULL_is_zero,
+    "front-end should use ID_NULL");
+  return false;
 }
 
 void constant_exprt::check(const exprt &expr, const validation_modet vm)
@@ -172,6 +189,37 @@ void let_exprt::validate(const exprt &expr, const validation_modet vm)
       binding.first.type() == binding.second.type(),
       "let bindings must be type consistent");
   }
+}
+
+with_exprt update_exprt::make_with_expr() const
+{
+  const exprt::operandst &designators = designator();
+  PRECONDITION(!designators.empty());
+
+  with_exprt result{exprt{}, exprt{}, exprt{}};
+  exprt *dest = &result;
+
+  for(const auto &expr : designators)
+  {
+    with_exprt tmp{exprt{}, exprt{}, exprt{}};
+
+    if(expr.id() == ID_index_designator)
+    {
+      tmp.where() = to_index_designator(expr).index();
+    }
+    else if(expr.id() == ID_member_designator)
+    {
+      // irep_idt component_name=
+      //  to_member_designator(*it).get_component_name();
+    }
+    else
+      UNREACHABLE;
+
+    *dest = tmp;
+    dest = &to_with_expr(*dest).new_value();
+  }
+
+  return result;
 }
 
 exprt binding_exprt::instantiate(const operandst &values) const

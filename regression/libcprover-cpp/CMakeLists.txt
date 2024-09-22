@@ -4,13 +4,13 @@ cprover_default_properties(api-binary-driver)
 target_include_directories(api-binary-driver
     PUBLIC
     ${CBMC_BINARY_DIR}
-    ${CBMC_SOURCE_DIR}
+    ${CBMC_SOURCE_DIR}/src
     # TODO: Should be fixed for the proper include form.
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/libcprover-cpp/)
 target_link_libraries(api-binary-driver goto-programs util langapi ansi-c cprover-api-cpp)
 
 # Enable test running
-set(test_pl_path "${CBMC_SOURCE_DIR}/../regression/test.pl")
+set(test_pl_path "${CBMC_SOURCE_DIR}/regression/test.pl")
 
 macro(add_test_pl_profile name cmdline flag profile)
     add_test(

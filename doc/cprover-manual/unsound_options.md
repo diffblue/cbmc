@@ -36,6 +36,9 @@ The following options will produce a warning when used with CBMC or JBMC:
 See [Understanding Loop Unwinding](../cbmc/unwinding/) for an elaboration of
 these options.
 
+For arrays with unknown length (e.g. input arrays), JBMC has a default limit that
+can be changed with the option `--max-nondet-array-length`.
+
 ### Experimental Options
 
 Be advised that the following command line options to `cbmc` and `goto-instrument`

@@ -628,12 +628,16 @@ int jbmc_parse_optionst::get_goto_program(
 
     // Move the model out of the local lazy_goto_model
     // and into the caller's goto_model
-    goto_model_ptr = lazy_goto_modelt::process_whole_model_and_freeze(
-      std::move(lazy_goto_model));
-    if(goto_model_ptr == nullptr)
+    auto final_goto_model_ptr =
+      lazy_goto_modelt::process_whole_model_and_freeze(
+        std::move(lazy_goto_model));
+    if(final_goto_model_ptr == nullptr)
       return CPROVER_EXIT_INTERNAL_ERROR;
 
-    goto_modelt &goto_model = dynamic_cast<goto_modelt &>(*goto_model_ptr);
+    goto_modelt &goto_model = *final_goto_model_ptr;
+    goto_model_ptr =
+      std::unique_ptr<abstract_goto_modelt>(final_goto_model_ptr.get());
+    final_goto_model_ptr.release();
 
     if(cmdline.isset("validate-goto-model"))
     {

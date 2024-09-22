@@ -24,6 +24,15 @@ public:
   class smt2_errort
   {
   public:
+    smt2_errort(smt2_errort &&) = default;
+
+    smt2_errort(const smt2_errort &other)
+    {
+      // ostringstream does not have a copy constructor
+      message << other.message.str();
+      line_no = other.line_no;
+    }
+
     smt2_errort(const std::string &_message, unsigned _line_no)
       : line_no(_line_no)
     {

@@ -6,7 +6,6 @@
 #include <util/config.h>
 #include <util/expr.h>
 #include <util/expr_cast.h>
-#include <util/expr_util.h>
 #include <util/floatbv_expr.h>
 #include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
@@ -329,7 +328,7 @@ struct sort_based_literal_convertert : public smt_sort_const_downcast_visitort
 
 static smt_termt convert_expr_to_smt(const constant_exprt &constant_literal)
 {
-  if(is_null_pointer(constant_literal))
+  if(constant_literal.is_null_pointer())
   {
     const size_t bit_width =
       type_checked_cast<pointer_typet>(constant_literal.type()).get_width();

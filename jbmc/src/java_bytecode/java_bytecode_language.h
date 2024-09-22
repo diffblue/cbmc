@@ -63,7 +63,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "transform `throw` instructions into `assert FALSE` followed by " \
   "`assume FALSE`.\n" \
   " {y--max-nondet-array-length} {uN} \t " \
-  "limit nondet (e.g. input) array size to <= {uN}\n" \
+  "limit nondet (e.g. input) array size to <= {uN} (default 5)\n" \
   " {y--max-nondet-tree-depth} {uN} \t " \
   "limit size of nondet (e.g. input) object tree; at level {uN} references " \
   "are set to null\n" \

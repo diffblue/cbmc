@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "type.h"
 
+class constant_exprt;
+
 /// Unbounded, signed integers (mathematical integers, not bitvectors)
 class integer_typet : public typet
 {
@@ -24,6 +26,9 @@ public:
   integer_typet() : typet(ID_integer)
   {
   }
+
+  constant_exprt zero_expr() const;
+  constant_exprt one_expr() const;
 };
 
 /// Natural numbers including zero (mathematical integers, not bitvectors)
@@ -33,6 +38,9 @@ public:
   natural_typet() : typet(ID_natural)
   {
   }
+
+  constant_exprt zero_expr() const;
+  constant_exprt one_expr() const;
 };
 
 /// Unbounded, signed rational numbers
@@ -42,6 +50,9 @@ public:
   rational_typet() : typet(ID_rational)
   {
   }
+
+  constant_exprt zero_expr() const;
+  constant_exprt one_expr() const;
 };
 
 /// Unbounded, signed real numbers
@@ -51,6 +62,9 @@ public:
   real_typet() : typet(ID_real)
   {
   }
+
+  constant_exprt zero_expr() const;
+  constant_exprt one_expr() const;
 };
 
 /// A type for mathematical functions (do not confuse with functions/methods

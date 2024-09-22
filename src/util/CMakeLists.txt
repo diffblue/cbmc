@@ -5,7 +5,7 @@ find_package(Git)
 if(GIT_FOUND)
   file(WRITE ${CMAKE_BINARY_DIR}/version.cmake
     "
-    file(STRINGS \${CBMC_SOURCE_DIR}/config.inc
+    file(STRINGS \${SRC}/src/config.inc
       config_inc_v REGEX \"CBMC_VERSION *= *[0-9\.]+\")
     string(REGEX REPLACE \"^CBMC_VERSION *= *\" \"\" CBMC_RELEASE \${config_inc_v})
     execute_process(
@@ -20,7 +20,7 @@ if(GIT_FOUND)
 else()
   file(WRITE ${CMAKE_BINARY_DIR}/version.cmake
     "
-    file(STRINGS \${CBMC_SOURCE_DIR}/config.inc
+    file(STRINGS \${SRC}/src/config.inc
       config_inc_v REGEX \"CBMC_VERSION *= *[0-9\.]+\")
     string(REGEX REPLACE \"^CBMC_VERSION *= *\" \"\" CBMC_RELEASE \${config_inc_v})
     set(GIT_INFO \"n/a\")
@@ -35,7 +35,7 @@ add_custom_target(
   generate_version_cpp
   BYPRODUCTS version.cpp
   COMMAND ${CMAKE_COMMAND}
-    -D CBMC_SOURCE_DIR=${CBMC_SOURCE_DIR}
+    -D SRC=${CBMC_SOURCE_DIR}
     -D CUR=${CMAKE_CURRENT_BINARY_DIR}
     -P ${CMAKE_BINARY_DIR}/version.cmake
 )
