@@ -17,10 +17,8 @@ private:
   std::unordered_map<std::size_t, std::vector<horn_clause>> m_def;
   std::set<std::size_t> m_heads;
 
-  unsigned m_id;
-
 public:
-  ResolutionVisitor(chc_db & db) : m_db(db), m_id(0) {}
+  ResolutionVisitor(chc_db & db) : m_db(db) {}
 
   virtual void visit(const wto_singletont & s)
   {
