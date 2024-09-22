@@ -113,106 +113,6 @@ private:
     }
   }
 
-  forall_exprt resolve_cls(const horn_clause & c1, const horn_clause & c2)
-  {
-    const exprt &body1 = *c1.body();
-    const exprt &head1 = *c1.head();
-    const exprt &body2 = *c2.body();
-    const exprt &head2 = *c2.head();
-
-    std::vector<function_application_exprt> use2;
-    c2.used_func_app(m_db,std::back_inserter(use2));
-
-    INVARIANT(use2.size() == 1, "Only handling linear case");
-    if (use2.size() != 1)
-      throw analysis_exceptiont("Resolution not possible");
-
-    function_application_exprt & body2_pred = use2[0];
-
-    const function_application_exprt *head1_pred = nullptr;
-    if (can_cast_expr<function_application_exprt>(*c1.head()))
-    {
-      head1_pred = &to_function_application_expr(head1);
-    }
-    if (head1_pred == nullptr)
-      throw analysis_exceptiont("Resolution not possible");
-
-    if (false)
-      std::cout << "Resolving: \n" << format(c1.get_chc()) << "\nAnd: \n"
-                << format(c2.get_chc()) << "\n";
-
-    std::set<symbol_exprt> all_vars(c1.get_chc().variables().begin(), c1.get_chc().variables().end());
-    all_vars.insert(c2.get_chc().variables().begin(), c2.get_chc().variables().end());
-
-    const function_application_exprt *body1_pred = nullptr;
-    exprt::operandst body_ops;
-    if (body1.id() == ID_and)
-    {
-      body1_pred = &to_function_application_expr(to_and_expr(body1).op0());
-      body_ops.push_back(to_and_expr(body1).op1());
-    }
-    else
-    {
-      body1_pred = &to_function_application_expr(body1);
-    }
-    exprt transformed_body = (can_cast_expr<and_exprt>(body2)) ? to_and_expr(body2).op1() : true_exprt();
-    exprt transformed_head = head2;
-    for (unsigned i=0; i < head1_pred->arguments().size(); i++)
-    {
-      const exprt &head_arg = head1_pred->arguments().at(i);
-      const symbol_exprt & body_arg = to_symbol_expr(body2_pred.arguments().at(i));
-      if ((head_arg.id() != ID_symbol) ||
-         (to_symbol_expr(head_arg).get_identifier() != body_arg.get_identifier()))
-      {
-        //std::cout << "body arg: " << format(body_arg) << " head arg: " << format(head_arg) << "\n";
-        std::string name = as_string(body_arg.get_identifier());
-        name = name + "__n" + std::to_string(m_id++);
-        symbol_exprt v(name, head_arg.type());
-        equal_exprt eq(v, head_arg);
-        std::cout << format(eq) << "\n";
-        all_vars.insert(v);
-        body_ops.push_back(eq);
-
-        std::map<irep_idt, exprt> subs;
-        subs.insert(std::make_pair(body_arg.get_identifier(), v));
-
-        if (!transformed_body.is_true()) {
-          std::optional<exprt> s = substitute_symbols(subs, transformed_body);
-          if (s.has_value())
-            transformed_body = std::move(s.value());
-        }
-        if (can_cast_expr<and_exprt>(body2)) {
-          //std::cout << "Body 2: " << format(to_and_expr(body2).op1()) << "\n";
-          std::optional<exprt> s = substitute_symbols(subs, to_and_expr(body2).op1());
-          if (s.has_value())
-          {
-            //std::cout << "Body 2 after: " << format(s.value()) << "\n";
-            body_ops.push_back(std::move(s.value()));
-          }
-        }
-
-        std::optional<exprt> s = substitute_symbols(subs, transformed_head);
-        if (s.has_value())
-        {
-          transformed_head = std::move(s.value());
-        }
-      }
-    }
-
-    if (body_ops.empty()) {
-      transformed_body = *body1_pred;
-    }
-    else
-    {
-      transformed_body = and_exprt(
-        *body1_pred, ((body_ops.size() > 1) ? std::move(and_exprt(body_ops)) :  std::move(body_ops[0])));
-    }
-
-    forall_exprt f(std::vector<symbol_exprt>(all_vars.begin(), all_vars.end()),
-                   implies_exprt(std::move(transformed_body), std::move(transformed_head)));
-    return f;
-  }
-
   forall_exprt resolve_cls2(const horn_clause & c1, const horn_clause & c2)
   {
     const exprt &body1 = *c1.body();
@@ -285,52 +185,8 @@ private:
       }
     }
 
-    /*for (unsigned i=0; i < head1_pred->arguments().size(); i++)
-    {
-      const exprt &head_arg = head1_pred->arguments().at(i);
-      const symbol_exprt & body_arg = to_symbol_expr(body2_pred.arguments().at(i));
-      if ((head_arg.id() != ID_symbol) ||
-         (to_symbol_expr(head_arg).get_identifier() != body_arg.get_identifier()))
-      {
-        std::cout << "body arg: " << format(body_arg) << " head arg: " << format(head_arg) << "\n";
-
-        std::map<irep_idt, exprt> subs;
-        subs.insert(std::make_pair(body_arg.get_identifier(), head_arg));
-
-        if (!transformed_body.is_true()) {
-          std::optional<exprt> s = substitute_symbols(subs, transformed_body);
-          if (s.has_value())
-            transformed_body = std::move(s.value());
-        }
-        if (can_cast_expr<and_exprt>(body2)) {
-          std::cout << "Body 2: " << format(to_and_expr(body2).op1()) << "\n";
-          std::optional<exprt> s = substitute_symbols(subs, to_and_expr(body2).op1());
-          if (s.has_value())
-          {
-            std::cout << "Body 2 after: " << format(s.value()) << "\n";
-            body_ops.push_back(std::move(s.value()));
-          }
-        }
-
-        std::optional<exprt> s = substitute_symbols(subs, transformed_head);
-        if (s.has_value())
-        {
-          transformed_head = std::move(s.value());
-        }
-      }
-    }*/
-
     body_ops.push_back(transformed_body);
    transformed_body = and_exprt(*body1_pred, std::move(and_exprt(body_ops)));
-
-//    if (body_ops.empty()) {
-//      transformed_body = *body1_pred;
-//    }
-//    else
-//    {
-//      transformed_body = and_exprt(
-//        *body1_pred, ((body_ops.size() > 1) ? std::move(and_exprt(body_ops)) :  std::move(body_ops[0])));
-//    }
 
     forall_exprt f(std::vector<symbol_exprt>(all_vars.begin(), all_vars.end()),
                    implies_exprt(std::move(transformed_body), std::move(transformed_head)));
