@@ -186,6 +186,19 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     type == ID_unsignedbv || type == ID_signedbv || type == ID_c_bool ||
     type == ID_c_bit_field)
     return os << *numeric_cast<mp_integer>(src);
+  else if(type == ID_bv)
+  {
+    // These do not have a numerical interpretation.
+    // We'll print the 0/1 bit pattern, starting with the bit
+    // that has the highest index.
+    auto width = to_bv_type(src.type()).get_width();
+    std::string result;
+    result.reserve(width);
+    auto &value = src.get_value();
+    for(std::size_t i = 0; i < width; i++)
+      result += get_bvrep_bit(value, width, width - i - 1) ? '1' : '0';
+    return os << result;
+  }
   else if(type == ID_integer || type == ID_natural || type == ID_range)
     return os << src.get_value();
   else if(type == ID_string)
@@ -194,7 +207,7 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     return os << ieee_floatt(src);
   else if(type == ID_pointer)
   {
-    if(is_null_pointer(src))
+    if(src.is_null_pointer())
       return os << ID_NULL;
     else if(
       src.get_value() == "INVALID" || src.get_value().starts_with("INVALID-"))

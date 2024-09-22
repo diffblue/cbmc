@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/expr_util.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
 #include <util/namespace.h>
@@ -621,7 +620,7 @@ void value_sett::get_value_set_rec(
   else if(expr.is_constant())
   {
     // check if NULL
-    if(is_null_pointer(to_constant_expr(expr)))
+    if(to_constant_expr(expr).is_null_pointer())
     {
       insert(
         dest,

@@ -6,7 +6,6 @@ main.c
 ^\[main.loop_assigns.\d+\] line 5 Check assigns clause inclusion for loop .*: SUCCESS$
 ^\[main.loop_invariant_base.\d+\] line 5 Check invariant before entry for loop .*: SUCCESS$
 ^\[main.loop_invariant_step.\d+\] line 5 Check invariant after step for loop .*: SUCCESS$
-^\[main.loop_step_unwinding.\d+\] line 5 Check step was unwound for loop .*: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

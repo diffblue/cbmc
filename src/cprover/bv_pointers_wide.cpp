@@ -387,7 +387,7 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
   {
     const constant_exprt &c = to_constant_expr(expr);
 
-    if(is_null_pointer(c))
+    if(c.is_null_pointer())
       return encode(pointer_logic.get_null_object(), type);
     else
     {

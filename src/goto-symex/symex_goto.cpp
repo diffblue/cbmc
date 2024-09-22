@@ -91,7 +91,7 @@ static std::optional<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
 
   if(
     skip_typecast(other_operand).id() != ID_address_of &&
-    (!constant_expr || !is_null_pointer(*constant_expr)))
+    (!constant_expr || !constant_expr->is_null_pointer()))
   {
     return {};
   }
@@ -279,7 +279,7 @@ void goto_symext::symex_goto(statet &state)
     {
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
-      exprt negated_guard = not_exprt{new_guard};
+      exprt negated_guard = boolean_negate(new_guard);
       do_simplify(negated_guard);
       log.statistics() << "replacing self-loop at "
                        << state.source.pc->source_location() << " by assume("
@@ -929,12 +929,7 @@ void goto_symext::loop_bound_exceeded(
 {
   const std::string loop_number = std::to_string(state.source.pc->loop_number);
 
-  exprt negated_cond;
-
-  if(guard.is_true())
-    negated_cond=false_exprt();
-  else
-    negated_cond=not_exprt(guard);
+  exprt negated_cond = boolean_negate(guard);
 
   if(symex_config.unwinding_assertions)
   {

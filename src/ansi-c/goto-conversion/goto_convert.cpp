@@ -1812,8 +1812,11 @@ void goto_convertt::generate_ifthenelse(
   if(
     is_empty(false_case) && true_case.instructions.size() == 2 &&
     true_case.instructions.front().is_assert() &&
-    true_case.instructions.front().condition().is_false() &&
+    simplify_expr(true_case.instructions.front().condition(), ns).is_false() &&
     true_case.instructions.front().labels.empty() &&
+    true_case.instructions.back().is_other() &&
+    true_case.instructions.back().get_other().get_statement() ==
+      ID_expression &&
     true_case.instructions.back().labels.empty())
   {
     true_case.instructions.front().condition_nonconst() = boolean_negate(guard);

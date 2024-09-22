@@ -199,13 +199,13 @@ void insert_before_and_update_jumps(
 
 /// Turns goto instructions `IF cond GOTO label` where the condition
 /// statically simplifies to `false` into SKIP instructions.
-void simplify_gotos(goto_programt &goto_program, namespacet &ns);
+void simplify_gotos(goto_programt &goto_program, const namespacet &ns);
 
 /// Returns true iff the given program is loop-free,
 /// i.e. if each SCC of its CFG contains a single element.
 bool is_loop_free(
   const goto_programt &goto_program,
-  namespacet &ns,
+  const namespacet &ns,
   messaget &log);
 
 /// Returns an \ref irep_idt that essentially says that
@@ -231,15 +231,6 @@ void infer_loop_assigns(
 /// then replace it by the entire underlying object. Otherwise, e.g. for a[i] or
 /// *(b+i) when `i` is a known constant, keep the expression in the result.
 void widen_assigns(assignst &assigns, const namespacet &ns);
-
-/// This function recursively searches \p expression to find nested or
-/// non-nested quantified expressions. When a quantified expression is found,
-/// a fresh quantified variable is added to the symbol table and \p expression
-/// is updated to use this fresh variable.
-void add_quantified_variable(
-  symbol_table_baset &symbol_table,
-  exprt &expression,
-  const irep_idt &mode);
 
 struct replace_history_parametert
 {

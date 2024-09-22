@@ -68,33 +68,7 @@ exprt make_binary(const exprt &expr)
 
 with_exprt make_with_expr(const update_exprt &src)
 {
-  const exprt::operandst &designator=src.designator();
-  PRECONDITION(!designator.empty());
-
-  with_exprt result{exprt{}, exprt{}, exprt{}};
-  exprt *dest=&result;
-
-  for(const auto &expr : designator)
-  {
-    with_exprt tmp{exprt{}, exprt{}, exprt{}};
-
-    if(expr.id() == ID_index_designator)
-    {
-      tmp.where() = to_index_designator(expr).index();
-    }
-    else if(expr.id() == ID_member_designator)
-    {
-      // irep_idt component_name=
-      //  to_member_designator(*it).get_component_name();
-    }
-    else
-      UNREACHABLE;
-
-    *dest=tmp;
-    dest=&to_with_expr(*dest).new_value();
-  }
-
-  return result;
+  return src.make_with_expr();
 }
 
 exprt is_not_zero(
@@ -369,20 +343,5 @@ exprt make_and(exprt a, exprt b)
 
 bool is_null_pointer(const constant_exprt &expr)
 {
-  if(expr.type().id() != ID_pointer)
-    return false;
-
-  if(expr.get_value() == ID_NULL)
-    return true;
-
-    // We used to support "0" (when NULL_is_zero), but really front-ends should
-    // resolve this and generate ID_NULL instead.
-#if 0
-  return config.ansi_c.NULL_is_zero && expr.value_is_zero_string();
-#else
-  INVARIANT(
-    !expr.value_is_zero_string() || !config.ansi_c.NULL_is_zero,
-    "front-end should use ID_NULL");
-  return false;
-#endif
+  return expr.is_null_pointer();
 }

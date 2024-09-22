@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
-#include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/fixedbv.h>
 #include <util/floatbv_expr.h>
@@ -1983,7 +1982,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    if(is_null_pointer(src))
+    if(src.is_null_pointer())
     {
       if(configuration.use_library_macros)
         dest = "NULL";

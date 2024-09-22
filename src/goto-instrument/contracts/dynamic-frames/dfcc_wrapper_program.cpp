@@ -555,13 +555,6 @@ void dfcc_wrapper_programt::encode_requires_clauses()
   {
     exprt requires_lmbd =
       to_lambda_expr(r).application(contract_lambda_parameters);
-    requires_lmbd.add_source_location() = r.source_location();
-    if(
-      has_subexpr(requires_lmbd, ID_exists) ||
-      has_subexpr(requires_lmbd, ID_forall))
-      add_quantified_variable(
-        goto_model.symbol_table, requires_lmbd, language_mode);
-
     source_locationt sl(r.source_location());
     if(statement_type == ID_assert)
     {
@@ -608,9 +601,6 @@ void dfcc_wrapper_programt::encode_ensures_clauses()
     exprt ensures = to_lambda_expr(e)
                       .application(contract_lambda_parameters)
                       .with_source_location(e);
-
-    if(has_subexpr(ensures, ID_exists) || has_subexpr(ensures, ID_forall))
-      add_quantified_variable(goto_model.symbol_table, ensures, language_mode);
 
     // this also rewrites ID_old expressions to fresh variables
     generate_history_variables_initialization(

@@ -121,7 +121,7 @@ std::string inv_object_storet::build_string(const exprt &expr) const
   if(expr.is_constant())
   {
     // NULL?
-    if(is_null_pointer(to_constant_expr(expr)))
+    if(to_constant_expr(expr).is_null_pointer())
       return "0";
 
     const auto i = numeric_cast<mp_integer>(expr);
