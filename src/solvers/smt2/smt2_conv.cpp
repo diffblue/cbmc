@@ -2476,6 +2476,11 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << ')';
     }
   }
+  else if(expr.id() == ID_cond)
+  {
+    // use the lowering
+    convert_expr(to_cond_expr(expr).lower());
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,
