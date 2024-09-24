@@ -20,7 +20,7 @@ SCENARIO(
 {
   // Arrange
   const typet char_type = unsignedbv_typet(16);
-  const typet int_type = signedbv_typet(32);
+  const auto int_type = signedbv_typet(32);
   const exprt index1 = from_integer(1, int_type);
   const exprt charx = from_integer('x', char_type);
   const exprt index4 = from_integer(4, int_type);
@@ -29,7 +29,7 @@ SCENARIO(
   const exprt char0 = from_integer('0', char_type);
   const exprt index2 = from_integer(2, int_type);
   const exprt charz = from_integer('z', char_type);
-  array_typet array_type(char_type, infinity_exprt(int_type));
+  array_typet array_type(char_type, int_type.largest_expr());
 
   // input_expr is
   // ARRAY_OF(0) WITH [1:=x] WITH [4:=y] WITH [100:=z]`

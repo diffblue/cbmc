@@ -223,10 +223,6 @@ exprt c_typecheck_baset::do_initializer_rec(
 
 void c_typecheck_baset::do_initializer(symbolt &symbol)
 {
-  // this one doesn't need initialization
-  if(symbol.name.starts_with(CPROVER_PREFIX "constant_infinity"))
-    return;
-
   if(symbol.is_type)
     return;
 

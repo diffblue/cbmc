@@ -56,7 +56,8 @@ array_poolt::get_length_if_exists(const array_string_exprt &s) const
 array_string_exprt
 array_poolt::fresh_string(const typet &index_type, const typet &char_type)
 {
-  array_typet array_type{char_type, infinity_exprt(index_type)};
+  array_typet array_type{
+    char_type, to_integer_bitvector_type(index_type).largest_expr()};
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
   arrays_of_pointers.emplace(
@@ -144,10 +145,7 @@ static void attempt_assign_length_from_type(
   // If we find a case where this is violated, try calling
   // attempt_assign_length_from_type on the true and false cases.
   const exprt &size_from_type = to_array_type(array_expr.type()).size();
-  const exprt &size_to_assign =
-    size_from_type != infinity_exprt(size_from_type.type())
-      ? size_from_type
-      : symbol_generator("string_length", array_expr.length_type());
+  const exprt &size_to_assign = size_from_type;
 
   const auto emplace_result =
     length_of_array.emplace(array_expr, size_to_assign);

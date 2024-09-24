@@ -1534,7 +1534,7 @@ void smt2_parsert::setup_sorts()
     // we can turn arrays that map an unsigned bitvector type
     // to something else into our 'array_typet'
     if(domain.id() == ID_unsignedbv)
-      return array_typet(range, infinity_exprt(domain));
+      return array_typet(range, to_unsignedbv_type(domain).largest_expr());
     else
       throw error("unsupported array sort");
   };

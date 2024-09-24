@@ -1680,9 +1680,6 @@ void goto_check_ct::bounds_check_index(
     // Linking didn't complete, we don't have a size.
     // Not clear what to do.
   }
-  else if(size.id() == ID_infinity)
-  {
-  }
   else if(
     expr.array().id() == ID_member &&
     (size.is_zero() || array_type.get_bool(ID_C_flexible_array_member)))

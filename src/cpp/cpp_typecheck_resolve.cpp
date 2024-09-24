@@ -821,11 +821,6 @@ exprt cpp_typecheck_resolvet::do_builtin(
 
     dest=type_exprt(typet(base_name));
   }
-  else if(base_name.starts_with("constant_infinity"))
-  {
-    // ok, but type missing
-    dest=exprt(ID_infinity, size_type());
-  }
   else if(base_name=="dump_scopes")
   {
     dest=exprt(ID_constant, typet(ID_empty));

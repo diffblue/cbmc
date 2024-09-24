@@ -581,10 +581,6 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
 
       size=tmp_size;
     }
-    else if(tmp_size.id()==ID_infinity)
-    {
-      size=tmp_size;
-    }
     else if(tmp_size.id()==ID_symbol &&
             tmp_size.type().get_bool(ID_C_constant))
     {

@@ -40,13 +40,13 @@ public:
   {
     return java_char_type();
   }
-  typet length_type() const
+  signedbv_typet length_type() const
   {
     return java_int_type();
   }
   array_typet array_type() const
   {
-    return array_typet(char_type(), infinity_exprt(length_type()));
+    return array_typet(char_type(), length_type().largest_expr());
   }
   refined_string_typet string_type() const
   {
@@ -54,7 +54,7 @@ public:
   }
   array_typet witness_type() const
   {
-    return array_typet(length_type(), infinity_exprt(length_type()));
+    return array_typet(length_type(), length_type().largest_expr());
   }
 };
 

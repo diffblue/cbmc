@@ -233,9 +233,6 @@ void cpp_typecheckt::zero_initializer(
     const array_typet &array_type=to_array_type(type);
     const exprt &size_expr=array_type.size();
 
-    if(size_expr.id()==ID_infinity)
-      return; // don't initialize
-
     const mp_integer size =
       numeric_cast_v<mp_integer>(to_constant_expr(size_expr));
     CHECK_RETURN(size>=0);

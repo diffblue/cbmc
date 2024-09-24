@@ -4110,7 +4110,6 @@ std::optional<std::string> expr2ct::convert_function(const exprt &src)
     {ID_get_must, CPROVER_PREFIX "get_must"},
     {ID_ieee_float_equal, "IEEE_FLOAT_EQUAL"},
     {ID_ieee_float_notequal, "IEEE_FLOAT_NOTEQUAL"},
-    {ID_infinity, "INFINITY"},
     {ID_is_dynamic_object, "IS_DYNAMIC_OBJECT"},
     {ID_is_invalid_pointer, "IS_INVALID_POINTER"},
     {ID_is_invalid_pointer, CPROVER_PREFIX "is_invalid_pointer"},

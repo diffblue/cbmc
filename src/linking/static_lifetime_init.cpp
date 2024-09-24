@@ -37,7 +37,6 @@ static std::optional<codet> static_lifetime_init(
 
   // special values
   if(
-    identifier == CPROVER_PREFIX "constant_infinity_uint" ||
     identifier == CPROVER_PREFIX "memory" || identifier == "__func__" ||
     identifier == "__FUNCTION__" || identifier == "__PRETTY_FUNCTION__" ||
     identifier == "argc'" || identifier == "argv'" || identifier == "envp'" ||

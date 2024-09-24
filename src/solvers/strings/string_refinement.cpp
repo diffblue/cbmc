@@ -768,7 +768,8 @@ string_refinementt::dec_solve(const exprt &assumption)
     const auto &witness_type = [&] {
       const auto &rtype = to_array_type(nc_axiom.s0.type());
       const typet &index_type = rtype.size().type();
-      return array_typet(index_type, infinity_exprt(index_type));
+      return array_typet(
+        index_type, to_integer_bitvector_type(index_type).largest_expr());
     }();
     not_contain_witnesses.emplace(
       nc_axiom, generator.fresh_symbol("not_contains_witness", witness_type));
@@ -1800,7 +1801,8 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
       string_refinement_invariantt("array-lists must have at least two "
                                    "operands"));
     const typet &char_type = expr.operands()[1].type();
-    array_typet arr_type(char_type, infinity_exprt(char_type));
+    array_typet arr_type(
+      char_type, to_integer_bitvector_type(char_type).largest_expr());
     exprt ret_expr = array_of_exprt(from_integer(0, char_type), arr_type);
 
     for(size_t i = 0; i < expr.operands().size(); i += 2)

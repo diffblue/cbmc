@@ -178,10 +178,6 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     typecheck_expr_side_effect(to_side_effect_expr(expr));
   else if(expr.is_constant())
     typecheck_expr_constant(expr);
-  else if(expr.id()==ID_infinity)
-  {
-    // ignore
-  }
   else if(expr.id()==ID_symbol)
     typecheck_expr_symbol(expr);
   else if(expr.id()==ID_unary_plus ||
@@ -883,13 +879,6 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     typecheck_expr(expr);
 
     // preserve location
-    expr.add_source_location()=source_location;
-  }
-  else if(identifier.starts_with(CPROVER_PREFIX "constant_infinity"))
-  {
-    expr=infinity_exprt(symbol.type);
-
-    // put it back
     expr.add_source_location()=source_location;
   }
   else if(identifier=="__func__" ||
@@ -4637,9 +4626,6 @@ protected:
   /// "constants"
   bool is_constant(const exprt &e) const
   {
-    if(e.id() == ID_infinity)
-      return true;
-
     if(e.is_constant())
       return true;
 

@@ -291,15 +291,18 @@ int pthread_mutex_destroy(pthread_mutex_t *mutex)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+// Clang refuses anything larger than SIZE_MAX/8, thus using - 4 in the shift
+// expression below
+__CPROVER_bool __CPROVER_threads_exited
+  [(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 4)];
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #if 0
   // Destructor support is disabled as it is too expensive due to its extensive
   // use of shared variables.
 __CPROVER_thread_local const void
-  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+  *__CPROVER_thread_keys[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 4)];
 __CPROVER_thread_local void (
-  *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
+  *__CPROVER_thread_key_dtors[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 4)])(void *);
 __CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
 #endif
 
@@ -337,7 +340,10 @@ void pthread_exit(void *value_ptr)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
-__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+// Clang refuses anything larger than SIZE_MAX/8, thus using - 4 in the shift
+// expression below
+__CPROVER_bool __CPROVER_threads_exited
+  [(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 4)];
 #ifndef LIBRARY_CHECK
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #endif
@@ -376,7 +382,8 @@ __CPROVER_HIDE:;
 #endif
 
 #ifdef __APPLE__
-__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+__CPROVER_bool __CPROVER_threads_exited
+  [(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)];
 #  ifndef LIBRARY_CHECK
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 unsigned long __CPROVER_next_thread_id = 0;
@@ -544,7 +551,10 @@ int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 
 /* FUNCTION: __spawned_thread */
 
-__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+// Clang refuses anything larger than SIZE_MAX/8, thus using - 4 in the shift
+// expression below
+__CPROVER_bool __CPROVER_threads_exited
+  [(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 4)];
 #ifndef LIBRARY_CHECK
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #endif
@@ -552,9 +562,9 @@ __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
   // Destructor support is disabled as it is too expensive due to its extensive
   // use of shared variables.
 __CPROVER_thread_local const void
-  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+  *__CPROVER_thread_keys[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)];
 __CPROVER_thread_local void (
-  *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
+  *__CPROVER_thread_key_dtors[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)])(void *);
 #endif
 __CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
 
@@ -618,7 +628,7 @@ __CPROVER_HIDE:;
 unsigned long __CPROVER_next_thread_id = 0;
 #  if 0
 __CPROVER_thread_local void (
-  *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
+  *__CPROVER_thread_key_dtors[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)])(void *);
 #  endif
 __CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
 #endif
@@ -952,12 +962,12 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-__CPROVER_thread_local const void
-  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+__CPROVER_thread_local const void *__CPROVER_thread_keys
+  [(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 1 - sizeof(void *))];
 #ifndef LIBRARY_CHECK
 #  if 0
 __CPROVER_thread_local void (
-  *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);
+  *__CPROVER_thread_key_dtors[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)])(void *);
 #  endif
 __CPROVER_thread_local unsigned long __CPROVER_next_thread_key = 0;
 #endif
@@ -984,8 +994,8 @@ __CPROVER_HIDE:;
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-__CPROVER_thread_local const void
-  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+__CPROVER_thread_local const void *__CPROVER_thread_keys
+  [(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 1 - sizeof(void *))];
 
 int pthread_key_delete(pthread_key_t key)
 {
@@ -1001,8 +1011,8 @@ __CPROVER_HIDE:;
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-__CPROVER_thread_local const void
-  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+__CPROVER_thread_local const void *__CPROVER_thread_keys
+  [(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 1 - sizeof(void *))];
 
 void *pthread_getspecific(pthread_key_t key)
 {
@@ -1017,8 +1027,8 @@ __CPROVER_HIDE:;
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-__CPROVER_thread_local const void
-  *__CPROVER_thread_keys[__CPROVER_constant_infinity_uint];
+__CPROVER_thread_local const void *__CPROVER_thread_keys
+  [(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 1 - sizeof(void *))];
 
 int pthread_setspecific(pthread_key_t key, const void *value)
 {

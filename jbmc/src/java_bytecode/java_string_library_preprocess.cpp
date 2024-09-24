@@ -450,7 +450,7 @@ refined_string_exprt java_string_library_preprocesst::replace_char_array(
     get_length(array, symbol_table), char_array, refined_string_type);
 
   const dereference_exprt inf_array(
-    char_array, array_typet(java_char_type(), infinity_exprt(java_int_type())));
+    char_array, array_typet(java_char_type(), java_int_type().largest_expr()));
 
   add_pointer_to_array_association(
     string_expr.content(), inf_array, symbol_table, loc, function_id, code);
@@ -619,7 +619,7 @@ exprt make_nondet_infinite_char_array(
   code_blockt &code)
 {
   const array_typet array_type(
-    java_char_type(), infinity_exprt(java_int_type()));
+    java_char_type(), java_int_type().largest_expr());
   const symbolt data_sym = fresh_java_symbol(
     pointer_type(array_type),
     "nondet_infinite_array_pointer",

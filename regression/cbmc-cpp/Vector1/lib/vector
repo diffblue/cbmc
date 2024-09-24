@@ -416,10 +416,10 @@ namespace std {
   #ifdef VERS1
   unsigned _version;
   #elif defined VERS2
-  unsigned _version[__CPROVER::constant_infinity_uint];
+  unsigned _version[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)];
   #endif
 
-  T _data[__CPROVER::constant_infinity_uint];
+  T _data[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)];
   };
 
 }
