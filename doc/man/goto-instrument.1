@@ -849,7 +849,7 @@ empty the function pointer is removed using the standard
 show the loops in the program
 .TP
 \fB\-\-unwind\fR \fInr\fR
-unwind nr times
+unwind all loops \fInr\fR times
 .TP
 \fB\-\-unwindset\fR [\fIT\fR:]\fIL\fR:\fIB\fR,...
 unwind loop \fIL\fR with a bound of \fIB\fR
@@ -860,13 +860,15 @@ unwind loop \fIL\fR with a bound of \fIB\fR
 read unwindset from file
 .TP
 \fB\-\-partial\-loops\fR
-permit paths with partial loops
+permit paths that execute loops only partially (up to the given unwinding bound)
+and then continue beyond the loop even when the loop condition would still hold
+(such paths may be spurious, resulting in false alarms)
 .TP
 \fB\-\-no\-unwinding\-assertions\fR
 do not generate unwinding assertions
 .TP
 \fB\-\-unwinding\-assertions\fR
-generate unwinding assertions (enabled by default; overrides
+generate unwinding assertions (which are enabled by default; overrides
 \fB\-\-no\-unwinding\-assertions\fR when both of these are given)
 .TP
 \fB\-\-continue\-as\-loops\fR
