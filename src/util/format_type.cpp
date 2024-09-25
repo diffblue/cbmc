@@ -98,6 +98,12 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
     return os << "\xe2\x84\xa4"; // u+2124, 'Z'
   else if(id == ID_natural)
     return os << "\xe2\x84\x95"; // u+2115, 'N'
+  else if(id == ID_range)
+  {
+    auto &range_type = to_range_type(type);
+    return os << "{ " << range_type.get_from() << ", ..., "
+              << range_type.get_to() << " }";
+  }
   else if(id == ID_rational)
     return os << "\xe2\x84\x9a"; // u+211A, 'Q'
   else if(id == ID_mathematical_function)

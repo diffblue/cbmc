@@ -144,6 +144,7 @@ SRC += analyses/ai/ai.cpp \
        util/format.cpp \
        util/format_expr.cpp \
        util/format_number_range.cpp \
+       util/format_type.cpp \
        util/get_base_name.cpp \
        util/graph.cpp \
        util/help_formatter.cpp \
