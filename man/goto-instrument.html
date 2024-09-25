@@ -626,7 +626,7 @@ void call(fptr_t fptr) {
 <dd><p>show the loops in the program</p>
 </dd>
 <dt><strong>--unwind</strong> <em>nr</em></dt>
-<dd><p>unwind nr times</p>
+<dd><p>unwind all loops <em>nr</em> times</p>
 </dd>
 <dt><strong>--unwindset</strong> [<em>T</em>:]<em>L</em>:<em>B</em>,...</dt>
 <dd><p>unwind loop <em>L</em> with a bound of <em>B</em> (optionally restricted to thread <em>T</em>) (use <strong>--show-loops</strong> to get the loop IDs)</p>
@@ -635,13 +635,13 @@ void call(fptr_t fptr) {
 <dd><p>read unwindset from file</p>
 </dd>
 <dt><strong>--partial-loops</strong></dt>
-<dd><p>permit paths with partial loops</p>
+<dd><p>permit paths that execute loops only partially (up to the given unwinding bound) and then continue beyond the loop even when the loop condition would still hold (such paths may be spurious, resulting in false alarms)</p>
 </dd>
 <dt><strong>--no-unwinding-assertions</strong></dt>
 <dd><p>do not generate unwinding assertions</p>
 </dd>
 <dt><strong>--unwinding-assertions</strong></dt>
-<dd><p>generate unwinding assertions (enabled by default; overrides <strong>--no-unwinding-assertions</strong> when both of these are given)</p>
+<dd><p>generate unwinding assertions (which are enabled by default; overrides <strong>--no-unwinding-assertions</strong> when both of these are given)</p>
 </dd>
 <dt><strong>--continue-as-loops</strong></dt>
 <dd><p>add loop for remaining iterations after unwound part</p>

@@ -235,10 +235,10 @@
 <dd><p>show the loops in the program</p>
 </dd>
 <dt><strong>--unwind</strong> nr</dt>
-<dd><p>unwind nr times</p>
+<dd><p>unwind all loops at most nr times</p>
 </dd>
-<dt><strong>--unwindset</strong> [T:]L:B,...</dt>
-<dd><p>unwind loop L with a bound of B (optionally restricted to thread T) (use <strong>--show-loops</strong> to get the loop IDs)</p>
+<dt><strong>--unwindset</strong> [<em>T</em>:]<em>L</em>:<em>B</em>,...</dt>
+<dd><p>unwind loop <em>L</em> with a bound of <em>B</em>, optionally restricted to thread <em>T</em>, and overriding what may be set as default unwinding via <strong>--unwind</strong> (use <strong>--show-loops</strong> to get the loop IDs)</p>
 </dd>
 <dt><strong>--incremental-loop</strong> L</dt>
 <dd><p>check properties after each unwinding of loop L (use <strong>--show-loops</strong> to get the loop IDs)</p>
@@ -259,13 +259,13 @@
 <dd><p>remove assignments unrelated to property</p>
 </dd>
 <dt><strong>--unwinding-assertions</strong></dt>
-<dd><p>generate unwinding assertions (cannot be used with <strong>--cover</strong>)</p>
+<dd><p>generate unwinding assertions (which are enabled by default; overrides <strong>--no-unwinding-assertions</strong> when both of these are given); cannot be used with <strong>--cover</strong></p>
 </dd>
 <dt><strong>--no-unwinding-assertions</strong></dt>
 <dd><p>do not generate unwinding assertions</p>
 </dd>
 <dt><strong>--partial-loops</strong></dt>
-<dd><p>permit paths with partial loops</p>
+<dd><p>permit paths that execute loops only partially (up to the given unwinding bound) and then continue beyond the loop even when the loop condition would still hold (such paths may be spurious, resulting in false alarms)</p>
 </dd>
 <dt><strong>--no-self-loops-to-assumptions</strong></dt>
 <dd><p>do not simplify while(1){} to assume(0)</p>
