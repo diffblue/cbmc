@@ -233,11 +233,11 @@ number of bytes:
 - `_Bool __CPROVER_w_ok(const void *p, size_t size)`
 
 At present, both primitives are equivalent as all memory in CBMC is considered
-both readable and writeable. If `p` is the null pointer, the primitives return
-false. If `p` is valid, the primitives return true if the memory segment
-starting at the pointer has at least the given size, and false otherwise. If `p`
-is neither null nor valid, the semantics is unspecified. It is valid to apply
-the primitive to pointers that point to within a memory object. For example:
+both readable and writeable. The primitives return true if `p` points to a live
+object and the object that `p` points into extends to at least `size` more
+bytes. Else, an assertion encompassing the primitive will be reported to fail.
+Do not use these primitives in assumptions when `p` can be not valid as such use
+can yield spurious verification results.
 
 ```C
 char *p = malloc(10);
