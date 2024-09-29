@@ -1,5 +1,8 @@
 var NAVTREEINDEX74 =
 {
+"cover__goals__report__util_8h.html":[9,0,2,11,8],
+"cover__goals__report__util_8h.html#aad0922f87a83a949e86aaa9bd829d592":[9,0,2,11,8,0],
+"cover__goals__report__util_8h_source.html":[9,0,2,11,8],
 "cover__goals__verifier__with__trace__storage_8h.html":[9,0,2,11,9],
 "cover__goals__verifier__with__trace__storage_8h_source.html":[9,0,2,11,9],
 "cover__instrument_8h.html":[9,0,2,15,21],
@@ -246,8 +249,5 @@ var NAVTREEINDEX74 =
 "cpp__typecheck_8h.html#ab233842332b3f6e0bba4bfc144b4a5ed":[9,0,2,5,51,4],
 "cpp__typecheck_8h_source.html":[9,0,2,5,51],
 "cpp__typecheck__bases_8cpp.html":[9,0,2,5,52],
-"cpp__typecheck__bases_8cpp_source.html":[9,0,2,5,52],
-"cpp__typecheck__code_8cpp.html":[9,0,2,5,53],
-"cpp__typecheck__code_8cpp_source.html":[9,0,2,5,53],
-"cpp__typecheck__compound__type_8cpp.html":[9,0,2,5,54]
+"cpp__typecheck__bases_8cpp_source.html":[9,0,2,5,52]
 };

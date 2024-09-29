@@ -141,8 +141,10 @@ Parameters</h2>
 <p><code>__CPROVER_loop_entry</code> takes a variable name that is in scope at the place of the loop contract.</p>
 <h2><a class="anchor" id="autotoc_md100"></a>
 Semantics</h2>
-<p><code>__CPROVER_loop_entry</code> takes a snapshot of the variable value right before the <b>first iteration</b> of the loop.</p>
-<h2><a class="anchor" id="autotoc_md101"></a>
+<p><code>__CPROVER_loop_entry</code> takes a snapshot of the variable value right before the <b>first iteration</b> of the loop. Caveat: to create a snapshot of an array, cast the array variable (which is a pointer per C's type system) to a pointer-to-array, and then dereference. </p><div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keywordtype">int</span> array_type[2];</div>
+<div class="line">array_type var;</div>
+<div class="line">__CPROVER_loop_invariant(<a class="code" href="cprover__builtin__headers_8h.html#a18bd108f1896778e24fbb282fa99121a">__CPROVER_loop_entry</a>(*(array_type*)var)[0] &lt;= 42)</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md101"></a>
 Example</h2>
 <p>In this example the loop invariant asserts that <code>x &lt;= 200</code> is upheld before and after every iteration of the <code>while</code> loop: </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> my_function()</div>
 <div class="line">{</div>

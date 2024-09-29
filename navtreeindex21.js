@@ -1,5 +1,8 @@
 var NAVTREEINDEX21 =
 {
+"classcounterexample__beautificationt.html#afe907170d0a94a10a21e431e76c0d775":[8,0,285,4],
+"classcout__message__handlert.html":[8,0,286],
+"classcout__message__handlert.html#aec33026b6397a156ef2f33be17b638b6":[8,0,286,0],
 "classcover__assertion__instrumentert.html":[8,0,287],
 "classcover__assertion__instrumentert.html#a5bd95c7c4eec47db1f1b9ba80c548028":[8,0,287,0],
 "classcover__assertion__instrumentert.html#ad887d48042149685b4fab8941888f7b3":[8,0,287,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX21 =
 "classcpp__idt.html#afc57fbfda25151c0a7f3c29b826bf888":[8,0,310,24],
 "classcpp__itemt.html":[8,0,311],
 "classcpp__itemt.html#a1192f490dc07dfca2be51a9f86451225":[8,0,311,11],
-"classcpp__itemt.html#a2f99251dfe7aaee3f6bb1c435b4ea96a":[8,0,311,19],
-"classcpp__itemt.html#a31e035708fab1a5dbf27222091b8c994":[8,0,311,14],
-"classcpp__itemt.html#a3206c255f913f0600215b1d755d1cfc5":[8,0,311,17],
-"classcpp__itemt.html#a602eff2fe17b66d7447677ab4b51b95f":[8,0,311,16]
+"classcpp__itemt.html#a2f99251dfe7aaee3f6bb1c435b4ea96a":[8,0,311,19]
 };
