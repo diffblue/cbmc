@@ -30,6 +30,7 @@ protected:
     partial_order_concurrencyt::event_it e1,
     partial_order_concurrencyt::event_it e2) const;
   void program_order(symex_target_equationt &equation);
+  void write_serialization_external(symex_target_equationt &equation) override;
 };
 
 #endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_TSO_H
