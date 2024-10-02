@@ -2476,6 +2476,18 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << ')';
     }
   }
+  else if(expr.id() == ID_old)
+  {
+    UNEXPECTEDCASE(
+      "Invalid usage of old expressions detected. old expressions must be "
+      "used in function contracts.");
+  }
+  else if(expr.id() == ID_loop_entry)
+  {
+    UNEXPECTEDCASE(
+      "Invalid usage of loop_entry expressions detected. loop_entry "
+      "expressions must be used in loop invariants.");
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,
