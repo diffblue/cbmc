@@ -111,6 +111,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
   {
     typecheck_vector_type(type);
   }
+  else if(type.id() == ID_mathematical_function)
+  {
+    typecheck_map_type(to_mathematical_function_type(type));
+  }
   else if(type.id()==ID_custom_unsignedbv ||
           type.id()==ID_custom_signedbv ||
           type.id()==ID_custom_floatbv ||
@@ -708,7 +712,6 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
     throw errort().with_location(source_location)
       << "type had size 0: '" << to_string(subtype) << "'";
   }
-
   // adjust by width of base type
   if(s % *sub_size != 0)
   {
@@ -724,6 +727,14 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
     c_index_type(), subtype, from_integer(s, signed_size_type()));
   new_type.size().add_source_location() = source_location;
   type = new_type.with_source_location(source_location);
+}
+
+void c_typecheck_baset::typecheck_map_type(mathematical_function_typet &type)
+{
+  for(auto &t : type.domain())
+    typecheck_type(t);
+
+  typecheck_type(type.codomain());
 }
 
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)

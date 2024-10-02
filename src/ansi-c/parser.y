@@ -206,6 +206,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token TOK_CPROVER_FLOATBV "__CPROVER_floatbv"
 %token TOK_CPROVER_FIXEDBV "__CPROVER_fixedbv"
+%token TOK_CPROVER_MAP "__CPROVER_map"
 %token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
 %token TOK_CPROVER_BOOL "__CPROVER_bool"
 %token TOK_CPROVER_THROW "__CPROVER_throw"
@@ -1111,6 +1112,7 @@ type_specifier:
         | typedef_type_specifier
         | typeof_type_specifier
         | atomic_type_specifier
+        | map_type_specifier
         ;
 
 declaration_qualifier_list:
@@ -1552,6 +1554,18 @@ elaborated_type_name:
 array_of_construct:
           TOK_ARRAY_OF '<' type_name '>'
         { $$=$1; stack_type($$).add_subtype().swap(parser_stack($2)); }
+        ;
+
+map_type_specifier:
+          TOK_CPROVER_MAP type_specifier TOK_ARROW type_specifier
+        {
+          $$=$1;
+          parser_stack($$).id(ID_mathematical_function);
+          irept domain;
+          domain.move_to_sub(parser_stack($2));
+          parser_stack($$).move_to_sub(domain);
+          mts($$, $4);
+        }
         ;
 
 pragma_packed:
