@@ -29,10 +29,18 @@ bool to_rational(const exprt &expr, rationalt &rational_value)
   if(!expr.is_constant())
     return true;
 
-  const std::string &value=expr.get_string(ID_value);
+  std::string value = expr.get_string(ID_value);
+  PRECONDITION(!value.empty());
 
   std::string no1, no2;
   char mode=0;
+
+  bool is_negative = false;
+  if(value[0] == '-')
+  {
+    is_negative = true;
+    value = value.substr(1);
+  }
 
   for(const char ch : value)
   {
@@ -54,20 +62,23 @@ bool to_rational(const exprt &expr, rationalt &rational_value)
       return true;
   }
 
+  if(is_negative)
+    rational_value = rationalt{-string2integer(no1)};
+  else
+    rational_value = rationalt{string2integer(no1)};
+
   switch(mode)
   {
   case 0:
-    rational_value=rationalt(string2integer(no1));
+    // do nothing
     break;
 
   case '.':
-    rational_value=rationalt(string2integer(no1));
     rational_value+=
       rationalt(string2integer(no2))/rationalt(power10(no2.size()));
     break;
 
   case '/':
-    rational_value=rationalt(string2integer(no1));
     rational_value/=rationalt(string2integer(no2));
     break;
 

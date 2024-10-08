@@ -177,6 +177,10 @@ constant_exprt from_integer(
     ieee_float.from_integer(int_value);
     return ieee_float.to_expr();
   }
+  else if(type_id == ID_rational)
+  {
+    return constant_exprt(integer2string(int_value), type);
+  }
   else
     PRECONDITION(false);
 }

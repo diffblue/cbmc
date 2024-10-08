@@ -29,6 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/range.h>
+#include <util/rational.h>
+#include <util/rational_tools.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -430,6 +432,26 @@ constant_exprt smt2_convt::parse_literal(
     }
     else
     {
+      std::size_t pos = s.find(".");
+      if(pos != std::string::npos)
+      {
+        // Decimal, return as rational
+        if(type.id() == ID_rational)
+        {
+          rationalt rational_value;
+          bool failed = to_rational(
+            constant_exprt{src.id(), rational_typet{}}, rational_value);
+          CHECK_RETURN(!failed);
+          return from_rational(rational_value);
+        }
+        else
+        {
+          UNREACHABLE_BECAUSE(
+            "smt2_convt::parse_literal parsed a number with a decimal point "
+            "as type " +
+            type.id_string());
+        }
+      }
       // Numeral
       value=string2integer(s);
     }
@@ -526,6 +548,11 @@ constant_exprt smt2_convt::parse_literal(
   else if(type.id() == ID_range)
   {
     return from_integer(value + to_range_type(type).get_from(), type);
+  }
+  else if(type.id() == ID_rational)
+  {
+    // TODO parse this literal back correctly.
+    return from_integer(value, type);
   }
   else
     UNREACHABLE_BECAUSE(
@@ -3167,6 +3194,19 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       convert_typecast(tmp);
     }
   }
+  else if(dest_type.id() == ID_rational)
+  {
+    if(src_type.id() == ID_signedbv)
+    {
+      // TODO: negative numbers
+      out << "(/ ";
+      convert_expr(src);
+      out << " 1)";
+    }
+    else
+      UNEXPECTEDCASE(
+        "Unknown typecast " + src_type.id_string() + " -> rational");
+  }
   else
     UNEXPECTEDCASE(
       "TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string());
@@ -3588,7 +3628,10 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     const bool negative = has_prefix(value, "-");
 
     if(negative)
+    {
       out << "(- ";
+      value = value.substr(1);
+    }
 
     size_t pos=value.find("/");
 
@@ -4189,6 +4232,16 @@ void smt2_convt::convert_div(const div_exprt &expr)
     // to ID_floatbv_div during symbolic execution, adding
     // the rounding mode.  See smt2_convt::convert_floatbv_div.
     UNREACHABLE;
+  }
+  else if(
+    expr.type().id() == ID_rational || expr.type().id() == ID_integer ||
+    expr.type().id() == ID_real)
+  {
+    out << "(/ ";
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
   }
   else
     UNEXPECTEDCASE("unsupported type for /: "+expr.type().id_string());

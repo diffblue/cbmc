@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecast.h"
 
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -17,10 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/rational.h>
+#include <util/rational_tools.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
 #include "c_qualifiers.h"
+
+#include <algorithm>
 
 bool c_implicit_typecast(
   exprt &expr,
@@ -775,6 +777,27 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
     else if(dest_type.id()==ID_bool)
     {
       expr=is_not_zero(expr, ns);
+    }
+    else if(dest_type.id() == ID_rational)
+    {
+      if(auto div_expr = expr_try_dynamic_cast<div_exprt>(expr))
+      {
+        auto op1 = numeric_cast<mp_integer>(div_expr->lhs());
+        auto op2 = numeric_cast<mp_integer>(div_expr->rhs());
+        if(op1.has_value() && op2.has_value())
+        {
+          rationalt numerator{*op1};
+          expr = from_rational(rationalt{*op1} / rationalt{*op2});
+          return;
+        }
+      }
+      else if(auto int_const = numeric_cast<mp_integer>(expr))
+      {
+        expr = from_integer(*int_const, dest_type);
+        return;
+      }
+
+      expr = typecast_exprt(expr, dest_type);
     }
     else
     {

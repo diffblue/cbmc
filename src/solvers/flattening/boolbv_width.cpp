@@ -206,6 +206,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   {
     cache_entry = defined_entryt{0};
   }
+  else if(type_id == ID_rational)
+  {
+    cache_entry = defined_entryt{1};
+  }
   else
   {
     UNIMPLEMENTED_FEATURE(
