@@ -40,6 +40,12 @@ public:
   /// but solver-specific representation.
   virtual exprt handle(const exprt &) = 0;
 
+  /// Make sure simplification steps internal to the decision procedure do not
+  /// result in variables being removed.
+  virtual void set_all_frozen()
+  {
+  }
+
   /// Result of running the decision procedure
   enum class resultt
   {

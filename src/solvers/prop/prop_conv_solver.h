@@ -54,7 +54,7 @@ public:
 
   void set_frozen(literalt);
   void set_frozen(const bvt &);
-  void set_all_frozen();
+  void set_all_frozen() override;
 
   literalt convert(const exprt &expr) override;
   bool is_in_conflict(const exprt &expr) const override;

@@ -42,11 +42,9 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
 {
   setup_symex(symex, ns, options, ui_message_handler);
 
-  // Freeze all symbols if we are using a prop_conv_solvert
-  prop_conv_solvert *prop_conv_solver = dynamic_cast<prop_conv_solvert *>(
-    &property_decider.get_decision_procedure());
-  if(prop_conv_solver != nullptr)
-    prop_conv_solver->set_all_frozen();
+  // Freeze all symbols (will be a no-op unless we are using a
+  // prop_conv_solvert)
+  property_decider.get_decision_procedure().set_all_frozen();
 }
 
 void output_incremental_status(
