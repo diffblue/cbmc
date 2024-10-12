@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
 #include <util/simplify_expr.h>
@@ -1317,12 +1318,24 @@ void goto_convertt::do_function_call_symbol(
         goto_programt::make_assignment(lhs, rhs, function.source_location()));
     }
 
-    code_assignt assign{
-      list_arg, plus_exprt{list_arg, from_integer(1, pointer_diff_type())}};
-    assign.rhs().set(
-      ID_C_va_arg_type, to_code_type(function.type()).return_type());
+    exprt rhs;
+    if(list_arg.type() == pointer_type(pointer_type(empty_typet{})))
+      rhs = plus_exprt{list_arg, from_integer(1, pointer_diff_type())};
+    else
+    {
+      // handle unexpected va_list types by just enforcing pointer increments by
+      // size-of-void*
+      rhs = typecast_exprt{
+        plus_exprt{
+          typecast_exprt{list_arg, pointer_type(char_type())},
+          from_integer(
+            *pointer_offset_size(pointer_type(empty_typet{}), ns),
+            pointer_diff_type())},
+        list_arg.type()};
+    }
+    rhs.set(ID_C_va_arg_type, to_code_type(function.type()).return_type());
     dest.add(goto_programt::make_assignment(
-      std::move(assign), function.source_location()));
+      list_arg, std::move(rhs), function.source_location()));
   }
   else if(identifier == "__builtin_va_copy")
   {

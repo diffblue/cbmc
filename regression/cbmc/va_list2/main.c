@@ -11,14 +11,16 @@ void my_f(int first, ...)
 
   int v;
   v=__builtin_va_arg(args, int);
-  assert(v==2);
+  assert(v == 1);
+  v = __builtin_va_arg(args, int);
+  assert(v == 0);
 
   __builtin_va_end(args);
 }
 
 int main()
 {
-  my_f(1, 2);
+  my_f(2, 1, 0);
 }
 
 #else
