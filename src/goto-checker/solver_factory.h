@@ -12,6 +12,7 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 #define CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 
+#include <goto-symex/solver_hardness.h> // IWYU pragma: keep
 #include <solvers/flattening/boolbv.h>
 #include <solvers/smt2/smt2_dec.h>
 
@@ -46,11 +47,17 @@ public:
       std::unique_ptr<stack_decision_proceduret> p1,
       std::unique_ptr<std::ofstream> p2);
     solvert(std::unique_ptr<boolbvt> p1, std::unique_ptr<propt> p2);
+    solvert(
+      std::unique_ptr<boolbvt> p1,
+      std::unique_ptr<propt> p2,
+      std::shared_ptr<solver_hardnesst> p3);
 
     stack_decision_proceduret &decision_procedure() const;
     boolbvt &boolbv_decision_procedure() const;
+    solver_hardnesst *hardness_collector() const;
 
   private:
+    std::shared_ptr<solver_hardnesst> hardness_ptr;
     // the objects are deleted in the opposite order they appear below
     std::unique_ptr<std::ofstream> ofstream_ptr;
     std::unique_ptr<propt> prop_ptr;

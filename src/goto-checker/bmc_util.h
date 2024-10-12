@@ -25,18 +25,12 @@ class decision_proceduret;
 class goto_symex_property_decidert;
 class goto_tracet;
 class memory_model_baset;
-class message_handlert;
 class namespacet;
 class optionst;
 class symex_bmct;
 class symex_target_equationt;
 struct trace_optionst;
 class ui_message_handlert;
-
-void convert_symex_target_equation(
-  symex_target_equationt &equation,
-  decision_proceduret &decision_procedure,
-  message_handlert &message_handler);
 
 /// Returns a function that checks whether an SSA step is an assertion
 /// with \p property_id. Usually used for `build_goto_trace`.
