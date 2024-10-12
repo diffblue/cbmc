@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/replace_symbol.h>
 #include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
@@ -125,6 +126,13 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(expr.id()==ID_initializer_list)
   {
     expr.type().id(ID_initializer_list);
+  }
+  else if(expr.id() == ID_const_cast ||
+     expr.id() == ID_dynamic_cast ||
+     expr.id() == ID_reinterpret_cast ||
+     expr.id() == ID_static_cast)
+  {
+    typecheck_cast_expr(expr);
   }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
@@ -966,13 +974,8 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   }
   else
   {
-    CHECK_RETURN(expr.type().id() == ID_struct);
-
-    struct_tag_typet tag(expr.type().get(ID_name));
-    tag.add_source_location() = expr.source_location();
-
     exprt e=expr;
-    new_temporary(e.source_location(), tag, e.operands(), expr);
+    new_temporary(e.source_location(), e.type(), e.operands(), expr);
   }
 }
 
@@ -1274,53 +1277,20 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
 
 void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
 {
-  side_effect_expr_function_callt e =
-    to_side_effect_expr_function_call(expr);
-
-  if(e.arguments().size() != 1)
+  if(expr.operands().size() != 1)
   {
     error().source_location=expr.find_source_location();
     error() << "cast expressions expect one operand" << eom;
     throw 0;
   }
 
-  exprt &f_op=e.function();
-  exprt &cast_op=e.arguments().front();
+  exprt &cast_op = to_unary_expr(expr).op();
 
   add_implicit_dereference(cast_op);
 
-  const irep_idt &id=
-  f_op.get_sub().front().get(ID_identifier);
+  const irep_idt &id = expr.id();
 
-  if(f_op.get_sub().size()!=2 ||
-     f_op.get_sub()[1].id()!=ID_template_args)
-  {
-    error().source_location=expr.find_source_location();
-    error() << id << " expects template argument" << eom;
-    throw 0;
-  }
-
-  irept &template_arguments=f_op.get_sub()[1].add(ID_arguments);
-
-  if(template_arguments.get_sub().size()!=1)
-  {
-    error().source_location=expr.find_source_location();
-    error() << id << " expects one template argument" << eom;
-    throw 0;
-  }
-
-  irept &template_arg=template_arguments.get_sub().front();
-
-  if(template_arg.id() != ID_type && template_arg.id() != ID_ambiguous)
-  {
-    error().source_location=expr.find_source_location();
-    error() << id << " expects a type as template argument" << eom;
-    throw 0;
-  }
-
-  typet &type=static_cast<typet &>(
-    template_arguments.get_sub().front().add(ID_type));
-
+  typet &type = expr.type();
   typecheck_type(type);
 
   source_locationt source_location=expr.source_location();
@@ -1411,21 +1381,6 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       name.add_source_location()=source_location;
 
       type=name;
-    }
-  }
-
-  if(expr.get_sub().size()>=1 &&
-     expr.get_sub().front().id()==ID_name)
-  {
-    const irep_idt &id=expr.get_sub().front().get(ID_identifier);
-
-    if(id==ID_const_cast ||
-       id==ID_dynamic_cast ||
-       id==ID_reinterpret_cast ||
-       id==ID_static_cast)
-    {
-      expr.id(ID_cast_expression);
-      return;
     }
   }
 
@@ -1553,14 +1508,6 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       throw 0;
     }
 
-    return;
-  }
-  else if(expr.function().id() == ID_cast_expression)
-  {
-    // These are not really function calls,
-    // but usually just type adjustments.
-    typecheck_cast_expr(expr);
-    add_implicit_dereference(expr);
     return;
   }
   else if(expr.function().id() == ID_cpp_dummy_destructor)
@@ -1824,6 +1771,71 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   CHECK_RETURN(expr.operands().size() == 2);
 
   add_implicit_dereference(expr);
+
+  if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
+  {
+    const auto &symbol = lookup(sym_expr->get_identifier());
+    if(symbol.is_macro)
+    {
+      // constexpr functions evaluated using a mini interpreter
+      const auto &code_type = to_code_type(symbol.type);
+      // PRECONDITION(code_type.return_type().id() != ID_empty);
+      PRECONDITION(expr.arguments().size() == code_type.parameters().size());
+      replace_symbolt value_map;
+      auto param_it = code_type.parameters().begin();
+      for(const auto &arg : expr.arguments())
+      {
+        value_map.insert(
+          symbol_exprt{param_it->get_identifier(), param_it->type()},
+          typecast_exprt::conditional_cast(arg, param_it->type()));
+        ++param_it;
+      }
+      const auto &block = to_code_block(to_code(symbol.value));
+      for(const auto &stmt : block.statements())
+      {
+        if(
+          auto return_stmt = expr_try_dynamic_cast<code_frontend_returnt>(stmt))
+        {
+          PRECONDITION(return_stmt->has_return_value());
+          exprt tmp = return_stmt->return_value();
+          value_map.replace(tmp);
+          expr.swap(tmp);
+          return;
+        }
+        else if(auto expr_stmt = expr_try_dynamic_cast<code_expressiont>(stmt))
+        {
+          // C++14 and later only
+          if(
+            auto assign = expr_try_dynamic_cast<side_effect_expr_assignt>(
+              expr_stmt->expression()))
+          {
+            PRECONDITION(assign->lhs().id() == ID_symbol);
+            exprt rhs = assign->rhs();
+            value_map.replace(rhs);
+            value_map.set(to_symbol_expr(assign->lhs()), rhs);
+          }
+          else
+            UNIMPLEMENTED_FEATURE(
+              "constexpr with " + expr_stmt->expression().pretty());
+        }
+        else if(stmt.get_statement() == ID_decl_block)
+        {
+          // C++14 and later only
+          for(const auto &expect_decl : stmt.operands())
+          {
+            PRECONDITION(to_code(expect_decl).get_statement() == ID_decl);
+            PRECONDITION(!to_code_frontend_decl(to_code(expect_decl))
+                            .initial_value()
+                            .has_value());
+          }
+        }
+        else
+        {
+          UNIMPLEMENTED_FEATURE("constexpr with " + stmt.pretty());
+        }
+      }
+    }
+  }
 
   // we will deal with some 'special' functions here
   exprt tmp=do_special_functions(expr);
