@@ -6,12 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/simplify_expr.h>
+#include <util/ssa_expr.h>
+
+#include "boolbv.h"
 
 /// A method to detect equivalence between experts that can contain typecast
 static bool expr_eq(const exprt &expr1, const exprt &expr2)
@@ -210,9 +211,6 @@ static std::optional<exprt> eager_quantifier_instantiation(
   mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
 
-  if(lb > ub)
-    return {};
-
   auto expr_simplified =
     quantifier_exprt(expr.id(), expr.variables(), where_simplified);
 
@@ -283,12 +281,119 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
   return quantifier_list.back().l;
 }
 
+/// Eliminate the quantifier in \p q_expr via E-matching in \p context_map.
+/// \return Quantifier-free expression, if quantifier elimination was
+///   successful, else nullopt.
+static std::optional<exprt> finish_one_quantifier(
+  const quantifier_exprt &q_expr,
+  const std::unordered_map<const exprt, bvt, irep_hash> &context_map)
+{
+  if(q_expr.variables().size() > 1)
+  {
+    // Rewrite Qx,y.P(x,y) as Qy.Qx.P(x,y), just like
+    // eager_quantifier_instantiation does.
+    auto new_variables = q_expr.variables();
+    new_variables.pop_back();
+    quantifier_exprt new_expression{
+      q_expr.id(),
+      q_expr.variables().back(),
+      quantifier_exprt{q_expr.id(), new_variables, q_expr.where()}};
+    return finish_one_quantifier(new_expression, context_map);
+  }
+
+  // find the contexts in which the bound variable is used
+  const irep_idt &bound_variable_id = q_expr.symbol().get_identifier();
+  bool required_context = false;
+  std::unordered_set<index_exprt, irep_hash> index_contexts;
+  auto context_finder =
+    [&bound_variable_id, &required_context, &index_contexts](const exprt &e) {
+      if(auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(e))
+      {
+        required_context |= bound_variable_id == symbol_expr->get_identifier();
+      }
+      else if(required_context)
+      {
+        if(auto index_expr = expr_try_dynamic_cast<index_exprt>(e))
+        {
+          index_contexts.insert(*index_expr);
+          required_context = false;
+        }
+      }
+    };
+  q_expr.where().visit_post(context_finder);
+  // make sure we found some context for instantiation
+  if(index_contexts.empty())
+    return {};
+
+  // match the contexts against expressions that we have cached
+  std::unordered_set<exprt, irep_hash> instantiation_candidates;
+  for(const auto &cache_entry : context_map)
+  {
+    // consider re-organizing the cache to use expression ids at the top level
+    if(auto index_expr = expr_try_dynamic_cast<index_exprt>(cache_entry.first))
+    {
+      for(const auto &index_context : index_contexts)
+      {
+        if(
+          auto ssa_context =
+            expr_try_dynamic_cast<ssa_exprt>(index_context.array()))
+        {
+          if(
+            auto ssa_array =
+              expr_try_dynamic_cast<ssa_exprt>(index_expr->array()))
+          {
+            if(
+              ssa_context->get_l1_object_identifier() ==
+              ssa_array->get_l1_object_identifier())
+            {
+              instantiation_candidates.insert(index_expr->index());
+              break;
+            }
+          }
+        }
+        else if(index_expr->array() == index_context.array())
+        {
+          instantiation_candidates.insert(index_expr->index());
+          break;
+        }
+      }
+    }
+  }
+
+  if(instantiation_candidates.empty())
+    return {};
+
+  exprt::operandst instantiations;
+  instantiations.reserve(instantiation_candidates.size());
+  for(const auto &e : instantiation_candidates)
+  {
+    exprt::operandst values{
+      {typecast_exprt::conditional_cast(e, q_expr.symbol().type())}};
+    instantiations.push_back(q_expr.instantiate(values));
+  }
+
+  if(q_expr.id() == ID_exists)
+    return disjunction(instantiations);
+  else
+    return conjunction(instantiations);
+}
+
 void boolbvt::finish_eager_conversion_quantifiers()
 {
-  if(quantifier_list.empty())
-    return;
-
-  // we do not yet have any elaborate post-processing
   for(const auto &q : quantifier_list)
-    conversion_failed(q.expr);
+  {
+    auto result_opt =
+      finish_one_quantifier(to_quantifier_expr(q.expr), bv_cache);
+    if(!result_opt.has_value())
+    {
+      conversion_failed(q.expr);
+      continue;
+    }
+
+    // Nested quantifiers may yield additional entries in quantifier_list via
+    // convert; the range-for remains safe to use as long as quantifier_list is
+    // a std::list.
+    literalt result_lit = convert(*result_opt);
+    prop.l_set_to_true(prop.lequal(q.l, result_lit));
+  }
 }
