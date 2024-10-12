@@ -19,8 +19,6 @@ Author: Daniel Kroening
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
-#include <goto-programs/adjust_float_expressions.h>
-
 #include "static_lifetime_init.h"
 
 static void get_symbols(
@@ -153,7 +151,7 @@ void remove_internal_symbols(
   special.insert(CPROVER_PREFIX "freeable");
   special.insert(CPROVER_PREFIX "is_freeable");
   special.insert(CPROVER_PREFIX "was_freed");
-  special.insert(rounding_mode_identifier());
+  special.insert(config.rounding_mode_identifier());
   special.insert("__new");
   special.insert("__new_array");
   special.insert("__placement_new");

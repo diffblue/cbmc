@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "adjust_float_expressions.h"
 
 #include <util/arith_tools.h>
-#include <util/cprover_prefix.h>
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/floatbv_expr.h>
 #include <util/ieee_float.h>
@@ -20,11 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 
 #include "goto_model.h"
-
-irep_idt rounding_mode_identifier()
-{
-  return CPROVER_PREFIX "rounding_mode";
-}
 
 /// Iterate over an expression and check it or any of its subexpressions are
 /// floating point operations that haven't been adjusted with a rounding mode
@@ -195,7 +190,7 @@ void adjust_float_expressions(exprt &expr, const namespacet &ns)
     return;
 
   symbol_exprt rounding_mode =
-    ns.lookup(rounding_mode_identifier()).symbol_expr();
+    ns.lookup(config.rounding_mode_identifier()).symbol_expr();
 
   rounding_mode.add_source_location() = expr.source_location();
 

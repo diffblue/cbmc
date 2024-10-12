@@ -1596,3 +1596,8 @@ mp_integer configt::max_malloc_size() const
   const auto bits_for_positive_offset = offset_bits - 1;
   return ((mp_integer)1) << (mp_integer)bits_for_positive_offset;
 }
+
+irep_idt configt::rounding_mode_identifier() const
+{
+  return CPROVER_PREFIX "rounding_mode";
+}

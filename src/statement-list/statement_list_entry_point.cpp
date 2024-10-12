@@ -18,7 +18,6 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
-#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_functions.h>
 
 #include <linking/static_lifetime_init.h>
@@ -142,7 +141,8 @@ generate_statement_list_init_function(symbol_table_baset &symbol_table)
 /// \param [out] symbol_table: Symbol table that should contain the symbol.
 static void generate_rounding_mode(symbol_table_baset &symbol_table)
 {
-  symbolt rounding_mode{rounding_mode_identifier(), signed_int_type(), ID_C};
+  symbolt rounding_mode{
+    config.rounding_mode_identifier(), signed_int_type(), ID_C};
   rounding_mode.is_thread_local = true;
   rounding_mode.is_static_lifetime = true;
   const constant_exprt rounding_val{
