@@ -106,6 +106,8 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
   }
   else if(id == ID_rational)
     return os << "\xe2\x84\x9a"; // u+211A, 'Q'
+  else if(id == ID_real)
+    return os << "\xe2\x84\x9d"; // u+211D, 'R'
   else if(id == ID_mathematical_function)
   {
     const auto &mathematical_function = to_mathematical_function_type(type);

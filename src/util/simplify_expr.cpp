@@ -1035,11 +1035,11 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
         return make_boolean_expr(int_value != 0);
       }
 
-      if(expr_type_id==ID_unsignedbv ||
-         expr_type_id==ID_signedbv ||
-         expr_type_id==ID_c_enum ||
-         expr_type_id==ID_c_bit_field ||
-         expr_type_id==ID_integer)
+      if(
+        expr_type_id == ID_unsignedbv || expr_type_id == ID_signedbv ||
+        expr_type_id == ID_c_enum || expr_type_id == ID_c_bit_field ||
+        expr_type_id == ID_integer || expr_type_id == ID_natural ||
+        expr_type_id == ID_rational || expr_type_id == ID_real)
       {
         return from_integer(int_value, expr_type);
       }
@@ -1188,6 +1188,11 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       {
         rationalt r(int_value);
         return from_rational(r);
+      }
+
+      if(expr_type_id == ID_real)
+      {
+        return from_integer(int_value, expr_type);
       }
     }
     else if(op_type_id==ID_fixedbv)

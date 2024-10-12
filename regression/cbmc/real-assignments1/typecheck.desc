@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-goto-functions
+^[[:space:]]*ASSIGN main::1::b := main::1::b \* cast\(100, ℝ\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+^[[:space:]]*ASSIGN main::1::b := main::1::b \* 100$
