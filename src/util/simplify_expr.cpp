@@ -2824,6 +2824,10 @@ simplify_exprt::simplify_node_preorder(const exprt &expr)
   {
     result = simplify_unary_pointer_predicate_preorder(to_unary_expr(expr));
   }
+  else if(expr.id() == ID_not)
+  {
+    result = simplify_not_preorder(to_not_expr(expr));
+  }
   else if(expr.has_operands())
   {
     std::optional<exprt::operandst> new_operands;
