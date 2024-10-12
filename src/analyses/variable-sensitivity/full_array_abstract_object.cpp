@@ -416,7 +416,8 @@ abstract_object_pointert full_array_abstract_objectt::visit_sub_elements(
 }
 
 exprt full_array_abstract_objectt::to_predicate_internal(
-  const exprt &name) const
+  const exprt &name,
+  const std::set<exprt> &scope) const
 {
   auto all_predicates = exprt::operandst{};
 
@@ -424,7 +425,7 @@ exprt full_array_abstract_objectt::to_predicate_internal(
   {
     auto ii = from_integer(field.first.to_long(), integer_typet());
     auto index = index_exprt(name, ii);
-    auto field_expr = field.second->to_predicate(index);
+    auto field_expr = field.second->to_predicate(index, scope);
 
     if(!field_expr.is_true())
       all_predicates.push_back(field_expr);

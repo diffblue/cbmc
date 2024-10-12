@@ -330,20 +330,19 @@ abstract_value_pointert value_set_abstract_objectt::constrain(
   return as_value(resolve_values(constrained_values));
 }
 
-exprt value_set_abstract_objectt::to_predicate_internal(const exprt &name) const
+exprt value_set_abstract_objectt::to_predicate_internal(
+  const exprt &name,
+  const std::set<exprt> &scope) const
 {
   auto compacted = non_destructive_compact(values);
   if(compacted.size() == 1)
-    return compacted.first()->to_predicate(name);
+    return compacted.first()->to_predicate(name, scope);
 
   auto all_predicates = exprt::operandst{};
-  std::transform(
-    compacted.begin(),
-    compacted.end(),
-    std::back_inserter(all_predicates),
-    [&name](const abstract_object_pointert &value) {
-      return value->to_predicate(name);
-    });
+  for(const auto &c : compacted)
+  {
+    all_predicates.push_back(c->to_predicate(name, scope));
+  }
   std::sort(all_predicates.begin(), all_predicates.end());
 
   return or_exprt(all_predicates);
