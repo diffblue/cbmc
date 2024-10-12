@@ -17,8 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
-#include <util/mathematical_expr.h>
-#include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
@@ -1095,34 +1093,6 @@ void goto_convertt::do_function_call_symbol(
       rhs = side_effect_expr_nondett(lhs.type(), function.source_location());
       rhs.set(ID_C_identifier, identifier);
     }
-
-    code_assignt assignment(lhs, rhs);
-    assignment.add_source_location() = function.source_location();
-    copy(assignment, ASSIGN, dest);
-  }
-  else if(identifier.starts_with(CPROVER_PREFIX "uninterpreted_"))
-  {
-    // make it a side effect if there is an LHS
-    if(lhs.is_nil())
-      return;
-
-    if(function.type().get_bool(ID_C_incomplete))
-    {
-      error().source_location = function.find_source_location();
-      error() << "'" << identifier << "' is not declared, "
-              << "missing type information required to construct call to "
-              << "uninterpreted function" << eom;
-      throw 0;
-    }
-
-    const code_typet &function_call_type = to_code_type(function.type());
-    mathematical_function_typet::domaint domain;
-    for(const auto &parameter : function_call_type.parameters())
-      domain.push_back(parameter.type());
-    mathematical_function_typet function_type{
-      domain, function_call_type.return_type()};
-    const function_application_exprt rhs(
-      symbol_exprt{function.get_identifier(), function_type}, arguments);
 
     code_assignt assignment(lhs, rhs);
     assignment.add_source_location() = function.source_location();
