@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/replace_symbol.h>
 #include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
@@ -1824,6 +1825,71 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   CHECK_RETURN(expr.operands().size() == 2);
 
   add_implicit_dereference(expr);
+
+  if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
+  {
+    const auto &symbol = lookup(sym_expr->get_identifier());
+    if(symbol.is_macro)
+    {
+      // constexpr functions evaluated using a mini interpreter
+      const auto &code_type = to_code_type(symbol.type);
+      // PRECONDITION(code_type.return_type().id() != ID_empty);
+      PRECONDITION(expr.arguments().size() == code_type.parameters().size());
+      replace_symbolt value_map;
+      auto param_it = code_type.parameters().begin();
+      for(const auto &arg : expr.arguments())
+      {
+        value_map.insert(
+          symbol_exprt{param_it->get_identifier(), param_it->type()},
+          typecast_exprt::conditional_cast(arg, param_it->type()));
+        ++param_it;
+      }
+      const auto &block = to_code_block(to_code(symbol.value));
+      for(const auto &stmt : block.statements())
+      {
+        if(
+          auto return_stmt = expr_try_dynamic_cast<code_frontend_returnt>(stmt))
+        {
+          PRECONDITION(return_stmt->has_return_value());
+          exprt tmp = return_stmt->return_value();
+          value_map.replace(tmp);
+          expr.swap(tmp);
+          return;
+        }
+        else if(auto expr_stmt = expr_try_dynamic_cast<code_expressiont>(stmt))
+        {
+          // C++14 and later only
+          if(
+            auto assign = expr_try_dynamic_cast<side_effect_expr_assignt>(
+              expr_stmt->expression()))
+          {
+            PRECONDITION(assign->lhs().id() == ID_symbol);
+            exprt rhs = assign->rhs();
+            value_map.replace(rhs);
+            value_map.set(to_symbol_expr(assign->lhs()), rhs);
+          }
+          else
+            UNIMPLEMENTED_FEATURE(
+              "constexpr with " + expr_stmt->expression().pretty());
+        }
+        else if(stmt.get_statement() == ID_decl_block)
+        {
+          // C++14 and later only
+          for(const auto &expect_decl : stmt.operands())
+          {
+            PRECONDITION(to_code(expect_decl).get_statement() == ID_decl);
+            PRECONDITION(!to_code_frontend_decl(to_code(expect_decl))
+                            .initial_value()
+                            .has_value());
+          }
+        }
+        else
+        {
+          UNIMPLEMENTED_FEATURE("constexpr with " + stmt.pretty());
+        }
+      }
+    }
+  }
 
   // we will deal with some 'special' functions here
   exprt tmp=do_special_functions(expr);
