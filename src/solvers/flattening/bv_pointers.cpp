@@ -696,8 +696,20 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
           prop.lor(in_bounds, prop.land(lhs_in_bounds, rhs_in_bounds));
       }
 
-      prop.l_set_to_true(prop.limplies(
-        prop.land(same_object_lit, in_bounds), bv_utils.equal(difference, bv)));
+      if(prop.cnf_handled_well())
+      {
+        for(std::size_t i = 0; i < width; ++i)
+        {
+          prop.lcnf({!same_object_lit, !in_bounds, !difference[i], bv[i]});
+          prop.lcnf({!same_object_lit, !in_bounds, difference[i], !bv[i]});
+        }
+      }
+      else
+      {
+        prop.l_set_to_true(prop.limplies(
+          prop.land(same_object_lit, in_bounds),
+          bv_utils.equal(difference, bv)));
+      }
     }
 
     return bv;
@@ -1070,10 +1082,18 @@ void bv_pointerst::finish_eager_conversion()
       replace_expr(replacements, is_not_dyn);
 
       PRECONDITION(postponed.bv.size() == 1);
-      prop.l_set_to_true(
-        prop.limplies(convert_bv(is_dyn)[0], postponed.bv.front()));
-      prop.l_set_to_true(
-        prop.limplies(convert_bv(is_not_dyn)[0], !postponed.bv.front()));
+      if(prop.cnf_handled_well())
+      {
+        prop.lcnf({!convert_bv(is_dyn)[0], postponed.bv.front()});
+        prop.lcnf({!convert_bv(is_not_dyn)[0], !postponed.bv.front()});
+      }
+      else
+      {
+        prop.l_set_to_true(
+          prop.limplies(convert_bv(is_dyn)[0], postponed.bv.front()));
+        prop.l_set_to_true(
+          prop.limplies(convert_bv(is_not_dyn)[0], !postponed.bv.front()));
+      }
     }
     else if(
       const auto postponed_object_size =
@@ -1120,7 +1140,10 @@ void bv_pointerst::finish_eager_conversion()
 #ifndef COMPACT_OBJECT_SIZE_EQ
         literalt l2 = bv_utils.equal(postponed.bv, size_bv);
 
-        prop.l_set_to_true(prop.limplies(l1, l2));
+        if(prop.cnf_handled_well())
+          prop.lcnf({!l1, l2});
+        else
+          prop.l_set_to_true(prop.limplies(l1, l2));
 #else
         for(std::size_t i = 0; i < postponed.bv.size(); ++i)
         {

@@ -492,8 +492,16 @@ bvt bv_utilst::adder_no_overflow(
     // we ignore the carry-out
     bvt sum = adder(op0, tmp_op, const_literal(subtract)).first;
 
-    prop.l_set_to_false(
-      prop.land(sign_the_same, prop.lxor(sign_bit(sum), old_sign)));
+    if(prop.cnf_handled_well())
+    {
+      prop.lcnf({!sign_the_same, !sign_bit(sum), old_sign});
+      prop.lcnf({!sign_the_same, sign_bit(sum), !old_sign});
+    }
+    else
+    {
+      prop.l_set_to_false(
+        prop.land(sign_the_same, prop.lxor(sign_bit(sum), old_sign)));
+    }
 
     return sum;
   }
@@ -596,7 +604,19 @@ bvt bv_utilst::negate(const bvt &bv)
 
 bvt bv_utilst::negate_no_overflow(const bvt &bv)
 {
-  prop.l_set_to_false(overflow_negate(bv));
+  if(prop.cnf_handled_well())
+  {
+    // inlined negation of overflow_negate
+    bvt should_be_zeros(bv);
+    should_be_zeros.pop_back();
+    should_be_zeros.push_back(!sign_bit(bv));
+    prop.lcnf(should_be_zeros);
+  }
+  else
+  {
+    prop.l_set_to_false(overflow_negate(bv));
+  }
+
   return negate(bv);
 }
 
@@ -994,7 +1014,12 @@ bvt bv_utilst::unsigned_multiplier_no_overflow(
       product = adder_no_overflow(product, tmpop);
 
       for(std::size_t idx=op1.size()-sum; idx<op1.size(); idx++)
-        prop.l_set_to_false(prop.land(op1[idx], op0[sum]));
+      {
+        if(prop.cnf_handled_well())
+          prop.lcnf({!op1[idx], !op0[sum]});
+        else
+          prop.l_set_to_false(prop.land(op1[idx], op0[sum]));
+      }
     }
 
   return product;
@@ -1039,7 +1064,10 @@ bvt bv_utilst::absolute_value(const bvt &bv)
 
 bvt bv_utilst::cond_negate_no_overflow(const bvt &bv, literalt cond)
 {
-  prop.l_set_to_true(prop.limplies(cond, !overflow_negate(bv)));
+  if(prop.cnf_handled_well())
+    prop.lcnf({!cond, !overflow_negate(bv)});
+  else
+    prop.l_set_to_true(prop.limplies(cond, !overflow_negate(bv)));
 
   return cond_negate(bv, cond);
 }
@@ -1214,21 +1242,45 @@ void bv_utilst::unsigned_divider(
 
   bvt sum = adder_no_overflow(product, rem);
 
-  literalt is_equal=equal(sum, op0);
-
-  prop.l_set_to_true(prop.limplies(is_not_zero, is_equal));
+  if(prop.cnf_handled_well())
+  {
+    for(std::size_t i = 0; i < width; ++i)
+    {
+      prop.lcnf({!is_not_zero, !sum[i], op0[i]});
+      prop.lcnf({!is_not_zero, sum[i], !op0[i]});
+    }
+  }
+  else
+  {
+    literalt is_equal = equal(sum, op0);
+    prop.l_set_to_true(prop.limplies(is_not_zero, is_equal));
+  }
 
   // op1!=0 => rem < op1
 
-  prop.l_set_to_true(
-    prop.limplies(
+  if(prop.cnf_handled_well())
+  {
+    prop.lcnf(
+      {!is_not_zero, lt_or_le(false, rem, op1, representationt::UNSIGNED)});
+  }
+  else
+  {
+    prop.l_set_to_true(prop.limplies(
       is_not_zero, lt_or_le(false, rem, op1, representationt::UNSIGNED)));
+  }
 
   // op1!=0 => res <= op0
 
-  prop.l_set_to_true(
-    prop.limplies(
+  if(prop.cnf_handled_well())
+  {
+    prop.lcnf(
+      {!is_not_zero, lt_or_le(true, res, op0, representationt::UNSIGNED)});
+  }
+  else
+  {
+    prop.l_set_to_true(prop.limplies(
       is_not_zero, lt_or_le(true, res, op0, representationt::UNSIGNED)));
+  }
 }
 
 

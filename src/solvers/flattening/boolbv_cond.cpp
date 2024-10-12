@@ -45,9 +45,19 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
       {
         const bvt &op = convert_bv(operand, bv.size());
 
-        literalt value_literal=bv_utils.equal(bv, op);
-
-        prop.l_set_to_true(prop.limplies(cond_literal, value_literal));
+        if(prop.cnf_handled_well())
+        {
+          for(std::size_t i = 0; i < bv.size(); ++i)
+          {
+            prop.lcnf({!cond_literal, !bv[i], op[i]});
+            prop.lcnf({!cond_literal, bv[i], !op[i]});
+          }
+        }
+        else
+        {
+          literalt value_literal = bv_utils.equal(bv, op);
+          prop.l_set_to_true(prop.limplies(cond_literal, value_literal));
+        }
       }
 
       condition=!condition;

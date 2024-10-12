@@ -251,7 +251,10 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
     for(unsigned i = 1; i < op_bv.size(); i++)
       b.push_back(prop.lequal(op_bv[0], op_bv[i]));
 
-    prop.l_set_to_true(prop.lor(b));
+    if(prop.cnf_handled_well())
+      prop.lcnf(b);
+    else
+      prop.l_set_to_true(prop.lor(b));
 
     return op_bv[0];
   }

@@ -629,9 +629,30 @@ bvt bv_pointers_widet::convert_bitvector(const exprt &expr)
           difference, element_size_bv, bv_utilst::representationt::SIGNED);
       }
 
-      prop.l_set_to_true(prop.limplies(
-        prop.land(same_object_lit, prop.land(lhs_in_bounds, rhs_in_bounds)),
-        bv_utils.equal(difference, bv)));
+      if(prop.cnf_handled_well())
+      {
+        for(std::size_t i = 0; i < width; ++i)
+        {
+          prop.lcnf(
+            {!same_object_lit,
+             !lhs_in_bounds,
+             !rhs_in_bounds,
+             !difference[i],
+             bv[i]});
+          prop.lcnf(
+            {!same_object_lit,
+             !lhs_in_bounds,
+             !rhs_in_bounds,
+             difference[i],
+             !bv[i]});
+        }
+      }
+      else
+      {
+        prop.l_set_to_true(prop.limplies(
+          prop.land(same_object_lit, prop.land(lhs_in_bounds, rhs_in_bounds)),
+          bv_utils.equal(difference, bv)));
+      }
     }
 
     return bv;
@@ -892,7 +913,10 @@ void bv_pointers_widet::do_postponed(const postponedt &postponed)
       if(!is_dynamic)
         l2 = !l2;
 
-      prop.l_set_to_true(prop.limplies(l1, l2));
+      if(prop.cnf_handled_well())
+        prop.lcnf({!l1, l2});
+      else
+        prop.l_set_to_true(prop.limplies(l1, l2));
     }
   }
   else if(
@@ -933,7 +957,10 @@ void bv_pointers_widet::do_postponed(const postponedt &postponed)
       literalt l1 = bv_utils.equal(bv, saved_bv);
       literalt l2 = bv_utils.equal(postponed.bv, size_bv);
 
-      prop.l_set_to_true(prop.limplies(l1, l2));
+      if(prop.cnf_handled_well())
+        prop.lcnf({!l1, l2});
+      else
+        prop.l_set_to_true(prop.limplies(l1, l2));
     }
   }
   else

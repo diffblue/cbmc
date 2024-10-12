@@ -68,8 +68,10 @@ bvt boolbvt::convert_case(const exprt &expr)
       {
         literalt value_literal=bv_utils.equal(bv, op);
 
-        prop.l_set_to_true(
-          prop.limplies(compare_literal, value_literal));
+        if(prop.cnf_handled_well())
+          prop.lcnf({!compare_literal, value_literal});
+        else
+          prop.l_set_to_true(prop.limplies(compare_literal, value_literal));
       }
 
       what=COMPARE;

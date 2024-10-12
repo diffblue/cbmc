@@ -65,8 +65,17 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       for(std::size_t i = 0; i < src_bv.size(); i++)
       {
         equal_exprt equality(index_casted, from_integer(i, index_type));
-        literalt equal = prop.lequal(literal, src_bv[i]);
-        prop.l_set_to_true(prop.limplies(convert(equality), equal));
+        if(prop.cnf_handled_well())
+        {
+          literalt index_eq = convert(equality);
+          prop.lcnf({!index_eq, !literal, src_bv[i]});
+          prop.lcnf({!index_eq, literal, !src_bv[i]});
+        }
+        else
+        {
+          literalt equal = prop.lequal(literal, src_bv[i]);
+          prop.l_set_to_true(prop.limplies(convert(equality), equal));
+        }
       }
 
       return literal;
