@@ -9,23 +9,29 @@
 #include <util/substitute_symbols.h>
 #include <util/format_expr.h>
 
-class ResolutionVisitor : public wto_element_visitort
+/*
+ * Traverses the clauses in order and resolving all predicates (symbols)
+ * that are not a head (e.g. a head of a loop).
+ * This is similar to variable elimination in SAT.
+ */
+class resolution_visitort : public wto_element_visitort
 {
 private:
-  chc_db & m_db;
-  chc_db m_new_db;
-  std::unordered_map<std::size_t, std::vector<horn_clause>> m_def;
-  std::set<std::size_t> m_heads;
+  chc_dbt & m_db;
+  chc_dbt m_new_db;
+  std::unordered_map<std::size_t, std::vector<horn_clauset>> m_def;
+  std::unordered_set<std::size_t> m_heads;
+  bool m_verbose;
 
 public:
-  ResolutionVisitor(chc_db & db) : m_db(db) {}
+  resolution_visitort(chc_dbt & db) : m_db(db), m_verbose(false) {}
 
-  chc_db &giveme_new_db() { return m_new_db; }
+  chc_dbt &giveme_new_db() { return m_new_db; }
 
   virtual void visit(const wto_singletont & s)
   {
     const symbol_exprt* symb = s.get();
-    resolve(symb);
+    eliminate(symb);
   }
 
   virtual void visit(const wto_componentt & comp)
@@ -38,7 +44,7 @@ public:
     {
       it->get()->accept(this);
     }
-    resolve(head);
+    eliminate(head);
   }
 
   void populate_new_db()
@@ -75,43 +81,41 @@ public:
   }
 
 private:
-  void resolve(const symbol_exprt *symb)
+  void eliminate(const symbol_exprt *symb)
   {
-    for (auto clause : m_db.def(*symb))
+    for (auto idx : m_db.def(*symb))
     {
+      auto & clause = m_db.get_clause(idx);
       std::vector<symbol_exprt> use;
-      if (false)
-      {
-        std::cout << "Clause: " << format(clause->get_chc()) << "\n";
-      }
-      clause->used_relations(m_db,std::back_inserter(use));
+
+      clause.used_relations(m_db,std::back_inserter(use));
       if (use.size() > 1) {
         throw incorrect_goto_program_exceptiont("Non-linear CHCs not supported yet");
       }
 
-      if (clause->is_fact())
+      if (clause.is_fact())
       {
         m_heads.insert(symb->hash());
-        std::vector<horn_clause> def_chcs;
-        def_chcs.push_back(clause->get_chc());
+        std::vector<horn_clauset> def_chcs;
+        def_chcs.push_back(clause.get_chc());
         m_def.insert(std::make_pair(symb->hash(), def_chcs));
       }
 
       for (auto & p : use)
       {
         auto it = m_def.find(p.hash());
-        std::vector<horn_clause> def_chcs;
+        std::vector<horn_clauset> def_chcs;
         if (it == m_def.end() || m_heads.find(p.hash()) != m_heads.end())
         {
-          def_chcs.push_back(*clause);
+          def_chcs.push_back(clause);
         }
         else
         {
           for (auto cls_it = it->second.begin(); cls_it != it->second.end(); cls_it++)
           {
-            forall_exprt resolvent = resolve_cls2((*cls_it), *clause);
-            if (false)
-              std::cout << "Result where:\n" << format(resolvent) << "\n";
+            forall_exprt resolvent = resolve_clauses((*cls_it), clause);
+            if (m_verbose)
+              std::cout << "Result:\n" << format(resolvent) << "\n";
             def_chcs.push_back(resolvent);
           }
         }
@@ -127,7 +131,7 @@ private:
     }
   }
 
-  forall_exprt resolve_cls2(const horn_clause & c1, const horn_clause & c2)
+  forall_exprt resolve_clauses(const horn_clauset & c1, const horn_clauset & c2)
   {
     const exprt &body1 = *c1.body();
     const exprt &head1 = *c1.head();
@@ -151,7 +155,7 @@ private:
     if (head1_pred == nullptr)
       throw analysis_exceptiont("Resolution not possible");
 
-    if (false)
+    if (m_verbose)
       std::cout << "Resolving: \n" << format(c1.get_chc()) << "\nAnd: \n"
                 << format(c2.get_chc()) << "\n";
 
@@ -179,9 +183,6 @@ private:
     if ((head_arg.id() != ID_symbol) ||
        (to_symbol_expr(head_arg).get_identifier() != body_arg.get_identifier()))
     {
-      //std::cout << "body arg: " << format(body_arg)
-      //          << " head arg: " << format(head_arg) << "\n";
-
       std::map<irep_idt, exprt> subs;
       subs.insert(std::make_pair(body_arg.get_identifier(), head_arg));
 
