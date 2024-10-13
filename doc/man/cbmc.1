@@ -389,13 +389,13 @@ sensitivity size for arrays to 0
 \fB\-\-show\-loops\fR
 show the loops in the program
 .TP
-\fB\-\-unwind\fR nr
-unwind nr times
+\fB\-\-unwind\fR \fInr\fR
+unwind all loops at most \fInr\fR times
 .TP
-\fB\-\-unwindset\fR [T:]L:B,...
-unwind loop L with a bound of B
-(optionally restricted to thread T)
-(use \fB\-\-show\-loops\fR to get the loop IDs)
+\fB\-\-unwindset\fR [\fIT\fR:]\fIL\fR:\fIB\fR,...
+unwind loop \fIL\fR with a bound of \fIB\fR, optionally restricted to thread
+\fIT\fR, and overriding what may be set as default unwinding via
+\fB\-\-unwind\fR (use \fB\-\-show\-loops\fR to get the loop IDs)
 .TP
 \fB\-\-incremental\-loop\fR L
 check properties after each unwinding
@@ -424,11 +424,14 @@ show the verification conditions
 remove assignments unrelated to property
 .TP
 \fB\-\-unwinding\-assertions\fR
-generate unwinding assertions (cannot be
-used with \fB\-\-cover\fR)
+generate unwinding assertions (which are enabled by default; overrides
+\fB\-\-no\-unwinding\-assertions\fR when both of these are given); cannot be
+used with \fB\-\-cover\fR
 .TP
 \fB\-\-partial\-loops\fR
-permit paths with partial loops
+permit paths that execute loops only partially (up to the given unwinding bound)
+and then continue beyond the loop even when the loop condition would still hold
+(such paths may be spurious, resulting in false alarms)
 .TP
 \fB\-\-no\-self\-loops\-to\-assumptions\fR
 do not simplify while(1){} to assume(0)

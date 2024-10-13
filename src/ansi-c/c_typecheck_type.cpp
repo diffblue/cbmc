@@ -1496,7 +1496,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
         << "bit field width is negative";
     }
 
-    type.set_width(numeric_cast_v<std::size_t>(i));
+    type.width(i);
     type.remove(ID_size);
   }
 
