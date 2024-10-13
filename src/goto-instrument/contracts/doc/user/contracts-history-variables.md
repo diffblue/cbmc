@@ -53,6 +53,13 @@ __CPROVER_loop_entry(*identifier*)
 
 ### Semantics
 `__CPROVER_loop_entry` takes a snapshot of the variable value right before the **first iteration** of the loop.
+Caveat: to create a snapshot of an array, cast the array variable (which is a
+pointer per C's type system) to a pointer-to-array, and then dereference.
+```c
+typedef int array_type[2];
+array_type var;
+__CPROVER_loop_invariant(__CPROVER_loop_entry(*(array_type*)var)[0] <= 42)
+```
 
 ### Example
 In this example the loop invariant asserts that `x <= 200` is upheld before and after every iteration of the `while` loop:

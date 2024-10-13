@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_types.h"
 
+#include "arith_tools.h"
 #include "c_types.h"
 #include "namespace.h"
 #include "std_expr.h"
@@ -152,6 +153,16 @@ bool is_rvalue_reference(const typet &type)
 {
   return type.id()==ID_pointer &&
          type.get_bool(ID_C_rvalue_reference);
+}
+
+std::size_t bitvector_typet::width() const
+{
+  return get_size_t(ID_width);
+}
+
+void bitvector_typet::width(const mp_integer &width)
+{
+  set_width(numeric_cast_v<std::size_t>(width));
 }
 
 void range_typet::set_from(const mp_integer &from)
