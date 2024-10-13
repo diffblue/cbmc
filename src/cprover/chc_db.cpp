@@ -6,46 +6,49 @@
 
 #include <iostream>
 
-chc_db::chc_sett chc_db::m_empty_set;
-std::set<exprt> chc_graph::m_expr_empty_set;
+chc_dbt::chc_sett chc_dbt::m_empty_set;
+std::unordered_set<exprt, irep_hash> chc_grapht::m_expr_empty_set;
 
-void chc_db::reset_indices()
+void chc_dbt::reset_indices()
 {
   m_body_idx.clear();
   m_head_idx.clear();
 }
 
-void chc_db::build_indices()
+void chc_dbt::build_indices()
 {
   reset_indices();
 
-  for (auto &r: m_clauses) {
+  for (std::size_t i = 0; i < m_clauses.size(); i++)
+  {
+    auto & r = m_clauses[i];
     if (!can_cast_expr<function_application_exprt>(*r.head()))
     {
       continue;
     }
     exprt func = to_function_application_expr(*r.head()).function();
-    m_head_idx[func].insert(&r);
+    m_head_idx[func].insert(i);
 
     std::vector<symbol_exprt> use;
     r.used_relations(*this,std::back_inserter(use));
     for (auto & symb : use)
     {
-      m_body_idx[symb].insert(&r);
+      m_body_idx[symb].insert(i);
     }
   }
 }
 
-void chc_graph::build_graph()
+void chc_grapht::build_graph()
 {
   m_db.build_indices();
 
   for (auto & sp : m_db.get_state_preds())
   {
-    std::set<exprt> outgoing;
-    const std::set<const horn_clause *> &uses = m_db.use(sp);
-    for (const horn_clause *r : uses) {
-      const exprt * head = r->head();
+    std::unordered_set<exprt, irep_hash> outgoing;
+    const chc_dbt::chc_sett &uses = m_db.use(sp);
+    for (auto idx: uses) {
+      const horn_clauset & r = m_db.get_clause(idx);
+      const exprt * head = r.head();
       if (can_cast_expr<function_application_exprt>(*head))
       {
         outgoing.insert(to_function_application_expr(*head).function());
@@ -53,11 +56,12 @@ void chc_graph::build_graph()
     }
     m_outgoing.insert(std::make_pair(sp, outgoing));
 
-    std::set<exprt> incoming;
-    const std::set<const horn_clause *> &defs = m_db.def(sp);
-    chc_db::is_state_pred isStatePred(m_db);
-    for (const horn_clause *r : defs) {
-      std::set<symbol_exprt> symbols = find_symbols(*r->body());
+    std::unordered_set<exprt, irep_hash> incoming;
+    const chc_dbt::chc_sett &defs = m_db.def(sp);
+    chc_dbt::is_state_pred isStatePred(m_db);
+    for (auto idx : defs) {
+      const horn_clauset & r = m_db.get_clause(idx);
+      std::set<symbol_exprt> symbols = find_symbols(*r.body());
       for (auto & s : symbols)
         if (isStatePred(s))
           incoming.insert(s);

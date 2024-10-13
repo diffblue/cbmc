@@ -15,15 +15,25 @@
 #include <set>
 #include <functional>
 
-class chc_db;
-class horn_clause
+class chc_dbt;
+
+/*
+ * A horn clause.
+ * This class is simply a wrapper around a forall_exprt with a few utilities:
+ * 1. Getting the body of a clause
+ * 2. Getting the head of a clause
+ * 3. Checking if a clause is a fact or a query
+ * 4. Getting used relations (the predicates) or function applications
+ *    (their instantiations) in a clause.
+ */
+class horn_clauset
 {
   forall_exprt m_chc;
 
 public:
-  horn_clause(forall_exprt f) : m_chc(f) {}
+  horn_clauset(forall_exprt f) : m_chc(f) {}
 
-  horn_clause(std::vector<symbol_exprt> & vars, exprt clause) : m_chc(vars, clause) {
+  horn_clauset(std::vector<symbol_exprt> & vars, exprt clause) : m_chc(vars, clause) {
 
   }
 
@@ -76,50 +86,51 @@ public:
     return false;
   }
 
-  bool operator==(const horn_clause &other) const
+  bool operator==(const horn_clauset &other) const
   {
     return m_chc == other.m_chc;
   }
 
-  bool operator!=(const horn_clause &other) const
+  bool operator!=(const horn_clauset &other) const
   {
     return !(*this==other);
   }
 
-  bool operator<(const horn_clause &other) const
+  bool operator<(const horn_clauset &other) const
   {
     return m_chc < other.m_chc;
   }
 
   template <typename OutputIterator>
-  void used_relations(chc_db &db, OutputIterator out) const;
+  void used_relations(chc_dbt &db, OutputIterator out) const;
   template <typename OutputIterator>
-  void used_func_app(chc_db &db, OutputIterator out) const;
+  void used_func_app(chc_dbt &db, OutputIterator out) const;
 };
 
 /*
  * A database of CHCs.
  * Uninterpreted relations need to be registered.
  */
-class chc_db
+class chc_dbt
 {
-  friend class horn_clause;
+  friend class horn_clauset;
 public:
   struct is_state_pred : public std::__unary_function<exprt, bool> {
-    const chc_db &m_db;
-    is_state_pred(const chc_db &db) : m_db(db) {}
+    const chc_dbt &m_db;
+    is_state_pred(const chc_dbt &db) : m_db(db) {}
 
     bool operator()(symbol_exprt state) { return m_db.has_state_pred(state); }
   };
 
+  typedef std::unordered_set<std::size_t> chc_sett;
+
 private:
-  using chcst = std::vector<horn_clause>;
+  using chcst = std::vector<horn_clauset>;
   chcst m_clauses;
 
-  std::set<symbol_exprt> m_state_preds;
+  std::unordered_set<symbol_exprt, irep_hash> m_state_preds;
 
-  typedef std::set<const horn_clause *> chc_sett;
-  typedef std::map<exprt, std::set<const horn_clause *>> chc_indext;
+  typedef std::map<exprt, chc_sett> chc_indext;
   chc_indext m_body_idx;
   chc_indext m_head_idx;
 
@@ -127,23 +138,23 @@ private:
   static chc_sett m_empty_set;
 
 public:
-  chc_db() {}
+  chc_dbt() {}
 
   void add_state_pred(const symbol_exprt & state) { m_state_preds.insert(state); }
-  const std::set<symbol_exprt> &get_state_preds() { return m_state_preds; }
+  const std::unordered_set<symbol_exprt, irep_hash> &get_state_preds() { return m_state_preds; }
   bool has_state_pred(const symbol_exprt & state) const { return m_state_preds.count(state) > 0; }
 
   void build_indices();
   void reset_indices();
 
-  const std::set<const horn_clause *> & use(const exprt & state) const {
+  const chc_sett & use(const exprt & state) const {
     auto it = m_body_idx.find(state);
     if (it == m_body_idx.end())
       return m_empty_set;
     return it->second;
   }
 
-  const std::set<const horn_clause *> & def(const exprt & state) const {
+  const chc_sett & def(const exprt & state) const {
     auto it = m_head_idx.find(state);
     if (it == m_head_idx.end())
       return m_empty_set;
@@ -157,8 +168,14 @@ public:
     for (auto & c : m_clauses) {
       if (c.get_chc()==f) return;
     }
-    m_clauses.push_back(horn_clause(f));
+    m_clauses.push_back(horn_clauset(f));
     reset_indices();
+  }
+
+  [[nodiscard]] const horn_clauset & get_clause(std::size_t idx) const
+  {
+    INVARIANT(idx < m_clauses.size(), "Index in range");
+    return m_clauses[idx];
   }
 
   chcst::iterator begin() { return m_clauses.begin(); }
@@ -168,13 +185,13 @@ public:
 };
 
 template <typename OutputIterator>
-void horn_clause::used_relations(chc_db &db, OutputIterator out) const
+void horn_clauset::used_relations(chc_dbt &db, OutputIterator out) const
 {
   const exprt *body = this->body();
   if (body == nullptr) return;
   std::set<symbol_exprt> symbols = find_symbols(*body);
 
-  chc_db::is_state_pred filter(db);
+  chc_dbt::is_state_pred filter(db);
   for (auto & symb : symbols) {
     if (filter(symb)) {
       *out = symb;
@@ -183,12 +200,12 @@ void horn_clause::used_relations(chc_db &db, OutputIterator out) const
 }
 
 template <typename OutputIterator>
-void horn_clause::used_func_app(chc_db &db, OutputIterator out) const
+void horn_clauset::used_func_app(chc_dbt &db, OutputIterator out) const
 {
   const exprt *body = this->body();
   if (body == nullptr) return;
 
-  std::set<function_application_exprt> funcs;
+  std::unordered_set<function_application_exprt, irep_hash> funcs;
   body->visit_pre([&funcs](const exprt &expr) {
                      if (can_cast_expr<function_application_exprt>(expr))
                      {
@@ -197,7 +214,7 @@ void horn_clause::used_func_app(chc_db &db, OutputIterator out) const
                      }
                    });
 
-  chc_db::is_state_pred filter(db);
+  chc_dbt::is_state_pred filter(db);
   for (auto & f : funcs) {
     if (filter(to_symbol_expr(f.function()))) {
       *out = f;
@@ -210,19 +227,19 @@ void horn_clause::used_func_app(chc_db &db, OutputIterator out) const
  * Uninterpreted relations are vertices, dependency is based on clauses:
  * relations in the body have an edge to the relation in the head.
  */
-class chc_graph
+class chc_grapht
 {
-  chc_db & m_db;
-  typedef std::map<exprt, std::set<exprt>> grapht;
+  chc_dbt & m_db;
+  typedef std::map<exprt, std::unordered_set<exprt, irep_hash>> grapht;
   grapht m_incoming;
   grapht m_outgoing;
   const symbol_exprt *m_entry;
 
   // representing the empty set
-  static std::set<exprt> m_expr_empty_set;
+  static std::unordered_set<exprt, irep_hash> m_expr_empty_set;
 
 public:
-  chc_graph(chc_db & db) : m_db(db), m_entry(nullptr) {}
+  chc_grapht(chc_dbt & db) : m_db(db), m_entry(nullptr) {}
 
   void build_graph();
 
@@ -231,14 +248,14 @@ public:
     INVARIANT(has_entry(), "Entry must exist.");
     return m_entry; }
 
-  const std::set<exprt> &outgoing(const symbol_exprt &state) const {
+  const std::unordered_set<exprt, irep_hash> &outgoing(const symbol_exprt &state) const {
     auto it = m_outgoing.find(state);
     if (it == m_outgoing.end())
       return m_expr_empty_set;
     return it->second;
   }
 
-  const std::set<exprt> &incoming(const symbol_exprt &state) const {
+  const std::unordered_set<exprt, irep_hash> &incoming(const symbol_exprt &state) const {
     auto it = m_incoming.find(state);
     if (it == m_incoming.end())
       return m_expr_empty_set;
