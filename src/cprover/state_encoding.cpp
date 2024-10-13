@@ -1238,7 +1238,7 @@ void variable_encoding(
 void large_step_encoding(const container_encoding_targett & small_step_container,
                          container_encoding_targett & large_step_container)
 {
-  chc_db db;
+  chc_dbt db;
   for (auto & clause : small_step_container.constraints) {
     if (!can_cast_expr<forall_exprt>(clause))
     {
@@ -1262,13 +1262,13 @@ void large_step_encoding(const container_encoding_targett & small_step_container
       db.add_state_pred(s);
     }
   }
-  chc_graph chc_g(db);
+  chc_grapht chc_g(db);
   chc_g.build_graph();
 
   chc_wtot wto(chc_g);
   wto.build_wto();
 
-  ResolutionVisitor rv(db);
+  resolution_visitort rv(db);
   for (auto it = wto.begin(); it != wto.end(); it++)
   {
     auto x = (*it);
@@ -1278,7 +1278,7 @@ void large_step_encoding(const container_encoding_targett & small_step_container
   rv.populate_new_db();
 
   container_encoding_targett container2;
-  std::vector<horn_clause> all2;
+  std::vector<horn_clauset> all2;
   for (auto & ce : rv.giveme_new_db())
   {
     large_step_container << ce.get_chc();
