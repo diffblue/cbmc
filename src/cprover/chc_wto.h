@@ -142,7 +142,7 @@ private:
   typedef std::unordered_map<std::size_t , std::vector<wto_componentt>>
     nested_components_t;
 
-  chc_graph & m_g;
+  chc_grapht & m_g;
 
   std::unordered_map<std::size_t, inf_numt> m_dfn;
   std::vector<const symbol_exprt*> m_stack;
@@ -239,7 +239,7 @@ private:
   }
 
 public:
-  chc_wtot(chc_graph & g) : m_g(g), m_cur_dfn_num(0) {}
+  chc_wtot(chc_grapht & g) : m_g(g), m_cur_dfn_num(0) {}
 
   void build_wto() {
     if (!m_g.has_entry())
@@ -276,7 +276,7 @@ public:
   }
 };
 
-class SimpleVisitor : public wto_element_visitort
+class simple_visitort : public wto_element_visitort
 {
   virtual void visit(const wto_singletont & s)
   {

@@ -8,23 +8,23 @@
 #include <iostream>
 #include <fstream>
 
-cutpoint_graph::~cutpoint_graph() {
+cutpoint_grapht::~cutpoint_grapht() {
   m_edges.clear();
   m_cps.clear();
   m_insts.clear();
 }
 
-void cutpoint_graph::run(const goto_functiont & goto_function)
+void cutpoint_grapht::run(const goto_functiont & goto_function)
 {
-  computeCutpoints (goto_function);
-  computeFwdReach (goto_function);
-  computeBwdReach (goto_function);
-  computeEdges (goto_function);
+  compute_cutpoints(goto_function);
+  compute_fwd_reach(goto_function);
+  compute_bwd_reach(goto_function);
+  compute_edges(goto_function);
 
-  toDot(goto_function, "cp.dot");
+  to_dot(goto_function, "cp.dot");
 }
 
-void cutpoint_graph::toDot(const goto_functiont & f, std::string filename)
+void cutpoint_grapht::to_dot(const goto_functiont & f, std::string filename)
 {
   std::ofstream out;
   out.open(filename);
@@ -35,7 +35,7 @@ void cutpoint_graph::toDot(const goto_functiont & f, std::string filename)
 
   for (auto cp : m_cps)
   {
-    cp->toDot(out, ns);
+    cp->to_dot(out, ns);
   }
 
   for (auto edge : m_edges)
@@ -62,7 +62,7 @@ void cutpoint_graph::toDot(const goto_functiont & f, std::string filename)
   out.close();
 }
 
-cutpoint_edge_ptr cutpoint_graph::getEdge(const cutpoint &s, const cutpoint &d)
+cutpoint_edge_ptr cutpoint_grapht::get_edge(const cutpointt &s, const cutpointt &d)
 {
   for (auto it = s.succ_begin (), end = s.succ_end (); it != end; ++it)
   {
@@ -73,7 +73,8 @@ cutpoint_edge_ptr cutpoint_graph::getEdge(const cutpoint &s, const cutpoint &d)
   return nullptr;
 }
 
-const cutpoint_edge_ptr cutpoint_graph::getEdge(const cutpoint &s, const cutpoint &d) const
+const cutpoint_edge_ptr
+cutpoint_grapht::getEdge(const cutpointt &s, const cutpointt &d) const
 {
   for (auto it = s.succ_begin (), end = s.succ_end (); it != end; ++it)
   {
@@ -84,20 +85,20 @@ const cutpoint_edge_ptr cutpoint_graph::getEdge(const cutpoint &s, const cutpoin
   return nullptr;
 }
 
-void cutpoint_graph::computeEdges (const goto_functiont &goto_function)
+void cutpoint_grapht::compute_edges(const goto_functiont &goto_function)
 {
   forall_goto_program_instructions(it, goto_function.body)
   {
-    if (isCutpoint(*it))
+    if (is_cutpoint(*it))
     {
       std::vector<bool> & reach = m_fwd[&(*it)];
-      cutpoint & cp = getCutpoint(*it);
+      cutpointt & cp = get_cutpoint(*it);
 
-      for (unsigned r = 0; r < reach.size(); r++)
+      for (std::size_t r = 0; r < reach.size(); r++)
       {
         if (reach[r] == true)
         {
-          cutpoint_edge_ptr edg = newEdge(cp, *m_cps[r]);
+          cutpoint_edge_ptr edg = create_edge(cp, *m_cps[r]);
           edg->push_back(&(*it));
         }
       }
@@ -112,7 +113,7 @@ void cutpoint_graph::computeEdges (const goto_functiont &goto_function)
         if (breach[i] == false) continue;
         for (int j = 0; j < freach.size(); j++) {
           if (freach[j] == false) continue;
-          cutpoint_edge_ptr edge = getEdge(*m_cps[i], *m_cps[j]);
+          cutpoint_edge_ptr edge = get_edge(*m_cps[i], *m_cps[j]);
           edge->push_back(&(*it));
         }
       }
@@ -120,11 +121,11 @@ void cutpoint_graph::computeEdges (const goto_functiont &goto_function)
   }
 }
 
-void cutpoint_graph::computeCutpoints(const goto_functiont &goto_function)
+void cutpoint_grapht::compute_cutpoints(const goto_functiont &goto_function)
 {
   m_cps.clear();
 
-  std::map<const goto_programt::instructiont*, unsigned> cp_map;
+  std::map<const goto_programt::instructiont*, std::size_t> cp_map;
 
   forall_goto_program_instructions(it, goto_function.body)
   {
@@ -163,14 +164,14 @@ void cutpoint_graph::computeCutpoints(const goto_functiont &goto_function)
     auto i = cp_map.find(&*it);
     if (i == cp_map.end()) continue;
     auto inst = i->first;
-    if (isCutpoint(*inst)) continue;
+    if (is_cutpoint(*inst)) continue;
 
-    m_cps.push_back(std::make_shared<cutpoint>(*this, m_cps.size(), *inst));
+    m_cps.push_back(std::make_shared<cutpointt>(*this, m_cps.size(), *inst));
     m_insts.insert(std::make_pair(inst, m_cps.back()));
   }
 }
 
-void cutpoint_graph::computeFwdReach (const goto_functiont &goto_function)
+void cutpoint_grapht::compute_fwd_reach(const goto_functiont &goto_function)
 {
 
   for (auto it = goto_function.body.instructions.rbegin(); it != goto_function.body.instructions.rend();)
@@ -179,14 +180,12 @@ void cutpoint_graph::computeFwdReach (const goto_functiont &goto_function)
     auto succs = goto_function.body.get_successors(itf);
     //if (succs.empty()) continue;
     auto inst = &*itf;
-    m_fwd.insert(std::make_pair(inst, reachability()));
-    reachability &r = m_fwd [inst];
-    std::cout << inst->to_string() << "\n";
-    if (succs.size() > 1) std::cout << "YAY\n";
+    m_fwd.insert(std::make_pair(inst, reachabilityt()));
+    reachabilityt &r = m_fwd [inst];
     for (auto succ : succs)
     {
-      if (isCutpoint(*succ))
-        r.set(getCutpoint(*succ).id());
+      if (is_cutpoint(*succ))
+        r.set(get_cutpoint(*succ).id());
       else
         r |= m_fwd[&*succ];
 
@@ -194,19 +193,19 @@ void cutpoint_graph::computeFwdReach (const goto_functiont &goto_function)
   }
 }
 
-void cutpoint_graph::computeBwdReach (const goto_functiont &goto_function)
+void cutpoint_grapht::compute_bwd_reach(const goto_functiont &goto_function)
 {
   forall_goto_program_instructions(it, goto_function.body)
   {
     auto inst = &*it;
-    m_bwd.insert(std::make_pair(inst, reachability()));
-    reachability &r = m_bwd[inst];
+    m_bwd.insert(std::make_pair(inst, reachabilityt()));
+    reachabilityt &r = m_bwd[inst];
     for(auto pred : it->incoming_edges)
     {
       if(pred->is_backwards_goto())
         continue;
-      if(isCutpoint(*pred))
-        r.set(getCutpoint(*pred).id());
+      if(is_cutpoint(*pred))
+        r.set(get_cutpoint(*pred).id());
       else
         r |= m_bwd[&*pred];
 
@@ -216,36 +215,16 @@ void cutpoint_graph::computeBwdReach (const goto_functiont &goto_function)
   for (auto & cp : m_cps)
   {
     auto & inst = cp->inst();
-    reachability &r = m_bwd [&inst];
+    reachabilityt &r = m_bwd [&inst];
 
     for (auto pred : inst.incoming_edges)
     {
       if (! pred->is_backwards_goto()) continue;
-      if (isCutpoint(*pred))
-        r.set(getCutpoint(*pred).id());
+      if (is_cutpoint(*pred))
+        r.set(get_cutpoint(*pred).id());
       else
         r |= m_bwd[&*pred];
     }
   }
 }
 
-bool cutpoint_graph::isFwdReach(const cutpoint &cp, const goto_programt::instructiont &inst) const
-{
-  if (&(cp.inst ()) == &inst) return true;
-
-  // The instruction is already a cut-point, but not the one testes.
-  // It is impossible to reach another cut-point without getting to it
-  if (isCutpoint(inst)) return false;
-
-  // In case the instruction is not a cut-point, retrieve the backward
-  // reachability info (cut-point backward reachability) and check if the
-  // cut-point is backward reachable. If it is, then the instruction
-  // is forward reachable from the given cp.
-  auto it = m_bwd.find (&inst);
-  INVARIANT(it != m_bwd.end (), "No back-reachability information");
-
-  unsigned sz = it->second.size ();
-  unsigned id = cp.id ();
-  if (sz == 0 || id >= sz) return false;
-  return (it->second)[id];
-}
