@@ -1497,6 +1497,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_floatbv_mult(to_ieee_float_op_expr(expr));
   }
+  else if(expr.id() == ID_floatbv_mod)
+  {
+    convert_floatbv_mod(to_binary_expr(expr));
+  }
   else if(expr.id() == ID_floatbv_rem)
   {
     convert_floatbv_rem(to_binary_expr(expr));
@@ -4115,6 +4119,33 @@ void smt2_convt::convert_floatbv_mult(const ieee_float_op_exprt &expr)
     convert_floatbv(expr);
 }
 
+void smt2_convt::convert_floatbv_mod(const binary_exprt &expr)
+{
+  DATA_INVARIANT(
+    expr.type().id() == ID_floatbv,
+    "type of ieee floating point expression shall be floatbv");
+
+  if(use_FPA_theory)
+  {
+    // x - round-to-zero(x / y) * y
+    out << "(fp.sub roundTowardZero ";
+    convert_expr(expr.lhs());
+    out << " ";
+    out << "(fp.mul roundTowardZero ";
+    out << "(fp.roundToIntegral roundTowardZero ";
+    out << "(fp.div roundTowardZero ";
+    convert_expr(expr.lhs());
+    out << " ";
+    convert_expr(expr.rhs());
+    out << "))"; // div, roundToIntegral
+    out << " ";
+    convert_expr(expr.rhs());
+    out << "))"; // mul, sub
+  }
+  else
+    convert_floatbv(expr);
+}
+
 void smt2_convt::convert_floatbv_rem(const binary_exprt &expr)
 {
   DATA_INVARIANT(
@@ -4131,11 +4162,7 @@ void smt2_convt::convert_floatbv_rem(const binary_exprt &expr)
     out << ")";
   }
   else
-  {
-    SMT2_TODO(
-      "smt2_convt::convert_floatbv_rem to be implemented when not using "
-      "FPA_theory");
-  }
+    convert_floatbv(expr);
 }
 
 void smt2_convt::convert_with(const with_exprt &expr)
@@ -5206,6 +5233,8 @@ void smt2_convt::find_symbols(const exprt &expr)
            expr.id() == ID_floatbv_minus ||
            expr.id() == ID_floatbv_mult ||
            expr.id() == ID_floatbv_div ||
+           expr.id() == ID_floatbv_mod ||
+           expr.id() == ID_floatbv_rem ||
            expr.id() == ID_floatbv_typecast ||
            expr.id() == ID_ieee_float_equal ||
            expr.id() == ID_ieee_float_notequal ||

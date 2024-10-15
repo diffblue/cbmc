@@ -542,6 +542,8 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
 
 bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 {
+  PRECONDITION(src1.size() == src2.size());
+
   /* The semantics of floating-point remainder implemented as below
      is the sensible one.  Unfortunately this is not the one required
      by IEEE-754 or fmod / remainder.  Martin has discussed the
@@ -550,12 +552,20 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
      hasn't found a good way to implement them in a solver.
      We have some approaches that are correct but they really
      don't scale. */
+  // TODO: is the above comment still true with
+  // from_signed_integer/to_signed_integer?
 
   const unbiased_floatt unpacked2 = unpack(src2);
 
   // stub: do (src2.infinity ? src1 : (src1/src2)*src2))
   return bv_utils.select(
-    unpacked2.infinity, src1, sub(src1, mul(div(src1, src2), src2)));
+    unpacked2.infinity,
+    src1,
+    sub(
+      src1,
+      mul(
+        from_signed_integer(to_signed_integer(div(src1, src2), src1.size())),
+        src2)));
 }
 
 bvt float_utilst::negate(const bvt &src)

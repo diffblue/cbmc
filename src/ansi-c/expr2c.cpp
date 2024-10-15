@@ -4102,6 +4102,7 @@ std::optional<std::string> expr2ct::convert_function(const exprt &src)
     {ID_separate, "SEPARATE"},
     {ID_floatbv_div, "FLOAT/"},
     {ID_floatbv_minus, "FLOAT-"},
+    {ID_floatbv_mod, "fmod"},
     {ID_floatbv_mult, "FLOAT*"},
     {ID_floatbv_plus, "FLOAT+"},
     {ID_floatbv_rem, "FLOAT%"},

@@ -351,7 +351,8 @@ void format_expr_configt::setup()
   expr_map[ID_floatbv_minus] = ternary_expr;
   expr_map[ID_floatbv_mult] = ternary_expr;
   expr_map[ID_floatbv_div] = ternary_expr;
-  expr_map[ID_floatbv_mod] = ternary_expr;
+  expr_map[ID_floatbv_mod] = binary_infix_expr;
+  expr_map[ID_floatbv_rem] = binary_infix_expr;
 
   expr_map[ID_constant] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {

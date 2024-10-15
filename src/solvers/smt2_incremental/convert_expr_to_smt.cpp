@@ -1640,9 +1640,9 @@ static smt_termt dispatch_expr_to_smt_conversion(
     return convert_expr_to_smt(*multiply, converted);
   }
 #if 0
-  else if(expr.id() == ID_floatbv_rem)
+  else if(expr.id() == ID_floatbv_mod || expr.id() == ID_floatbv_rem)
   {
-    convert_floatbv_rem(to_binary_expr(expr));
+    convert_floatbv_mod_rem(to_binary_expr(expr));
   }
 #endif
   if(const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr))
