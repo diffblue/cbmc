@@ -1,0 +1,10 @@
+CORE unix
+main.c
+--pointer-check --bounds-check --conversion-check
+^\[main.assertion.\d+\] line \d+ assertion !\(rc != -1\) || \(errno == 0\): SUCCESS$
+^\*\* 1 of \d+ failed .*$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^\*\*\*\* WARNING: no body for function syscall
