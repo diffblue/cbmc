@@ -2491,15 +2491,16 @@ static exprt lower_byte_update(
     exprt zero_extended;
     if(bit_width > update_size_bits)
     {
-      zero_extended = concatenation_exprt{
-        bv_typet{bit_width - update_size_bits}.all_zeros_expr(),
-        value,
-        bv_typet{bit_width}};
-
-      if(!is_little_endian)
-        to_concatenation_expr(zero_extended)
-          .op0()
-          .swap(to_concatenation_expr(zero_extended).op1());
+      if(is_little_endian)
+        zero_extended = zero_extend_exprt{value, bv_typet{bit_width}};
+      else
+      {
+        // Big endian -- the zero is added as LSB.
+        zero_extended = concatenation_exprt{
+          value,
+          bv_typet{bit_width - update_size_bits}.all_zeros_expr(),
+          bv_typet{bit_width}};
+      }
     }
     else
       zero_extended = value;

@@ -54,8 +54,7 @@ exprt update_bit_exprt::lower() const
     typecast_exprt(src(), src_bv_type), bitnot_exprt(mask_shifted));
 
   // zero-extend the replacement bit to match src
-  auto new_value_casted = typecast_exprt(
-    typecast_exprt(new_value(), unsignedbv_typet(width)), src_bv_type);
+  auto new_value_casted = zero_extend_exprt{new_value(), src_bv_type};
 
   // shift the replacement bits
   auto new_value_shifted = shl_exprt(new_value_casted, index());
@@ -85,7 +84,7 @@ exprt update_bits_exprt::lower() const
     bitand_exprt(typecast_exprt(src(), src_bv_type), mask_shifted);
 
   // zero-extend or shrink the replacement bits to match src
-  auto new_value_casted = typecast_exprt(new_value(), src_bv_type);
+  auto new_value_casted = zero_extend_exprt{new_value(), src_bv_type};
 
   // shift the replacement bits
   auto new_value_shifted = shl_exprt(new_value_casted, index());
@@ -278,4 +277,20 @@ exprt find_first_set_exprt::lower() const
   minus_exprt result{from_integer(int_width, x.type()), clz.lower()};
 
   return typecast_exprt::conditional_cast(result, type());
+}
+
+exprt zero_extend_exprt::lower() const
+{
+  const auto old_width = to_bitvector_type(op().type()).get_width();
+  const auto new_width = to_bitvector_type(type()).get_width();
+
+  if(new_width > old_width)
+  {
+    return concatenation_exprt{
+      bv_typet{new_width - old_width}.all_zeros_expr(), op(), type()};
+  }
+  else // new_width <= old_width
+  {
+    return extractbits_exprt{op(), integer_typet{}.zero_expr(), type()};
+  }
 }

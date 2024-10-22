@@ -3,6 +3,7 @@
 #include "smt2_incremental_decision_procedure.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/range.h>
@@ -291,6 +292,17 @@ static exprt lower_rw_ok_pointer_in_range(exprt expr, const namespacet &ns)
         expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
     {
       expr = simplify_expr(prophecy_pointer_in_range->lower(ns), ns);
+    }
+  });
+  return expr;
+}
+
+static exprt lower_zero_extend(exprt expr, const namespacet &ns)
+{
+  expr.visit_pre([](exprt &expr) {
+    if(auto zero_extend = expr_try_dynamic_cast<zero_extend_exprt>(expr))
+    {
+      expr = zero_extend->lower();
     }
   });
   return expr;
@@ -677,8 +689,10 @@ void smt2_incremental_decision_proceduret::define_object_properties()
 
 exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
 {
-  const exprt lowered = struct_encoding.encode(lower_enum(
-    lower_byte_operators(lower_rw_ok_pointer_in_range(expression, ns), ns),
+  const exprt lowered = struct_encoding.encode(lower_zero_extend(
+    lower_enum(
+      lower_byte_operators(lower_rw_ok_pointer_in_range(expression, ns), ns),
+      ns),
     ns));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     if(lowered != expression)

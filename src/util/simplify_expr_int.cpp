@@ -998,6 +998,18 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
 }
 
 simplify_exprt::resultt<>
+simplify_exprt::simplify_zero_extend(const zero_extend_exprt &expr)
+{
+  if(!can_cast_type<bitvector_typet>(expr.type()))
+    return unchanged(expr);
+
+  if(!can_cast_type<bitvector_typet>(expr.op().type()))
+    return unchanged(expr);
+
+  return changed(simplify_node(expr.lower()));
+}
+
+simplify_exprt::resultt<>
 simplify_exprt::simplify_shifts(const shift_exprt &expr)
 {
   if(!can_cast_type<bitvector_typet>(expr.type()))
