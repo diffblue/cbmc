@@ -33,9 +33,12 @@ public:
     const std::string &_notes,
     const std::string &_logic,
     solvert _solver,
-    message_handlert &_message_handler)
+    message_handlert &_message_handler,
+    const std::vector<std::string>& smt_solv_args = {})
     : smt2_convt(_ns, _benchmark, _notes, _logic, _solver, stringstream),
-      message_handler(_message_handler)
+      message_handler(_message_handler),
+      solver_args(smt_solv_args)
+
   {
   }
 
@@ -48,6 +51,10 @@ protected:
   /// Everything except the footer is cached, so that output files can be
   /// rewritten with varying footers.
   std::stringstream cached_output;
+
+  // CMD line arguments forwarded to the solver. Note that the arguments
+  // are solver specific and can differ from solver to solver (no checking is done).
+  std::vector<std::string> solver_args;
 
   resultt read_result(std::istream &in);
 };
