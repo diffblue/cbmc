@@ -29,6 +29,7 @@ static int isatty(int) { return 0; }
 #endif
 
 #include <util/string_constant.h>
+#include <util/string2int.h>
 #include <util/unicode.h>
 
 #include "preprocessor_line.h"
@@ -440,6 +441,20 @@ enable_or_disable ("enable"|"disable")
                     return TOK_SCANNER_ERROR;
                   }
                   PARSER.pragma_cprover_add_check(check_name, enable);
+                  PARSER.set_pragma_cprover();
+                }
+
+<CPROVER_PRAGMA>{ws}"unwind"{ws}{integer} {
+                  std::string tmp(yytext);
+                  std::string::size_type p = tmp.rfind('d') + 1;
+                  auto bound = string2optional_size_t(tmp.substr(p));
+                  if(!bound.has_value())
+                  {
+                    ansi_c_parser->parse_error(
+                      "Found invalid loop unwinding annotation " + tmp, "");
+                    return TOK_SCANNER_ERROR;
+                  }
+                  PARSER.pragma_cprover_add_unwind(*bound);
                   PARSER.set_pragma_cprover();
                 }
 

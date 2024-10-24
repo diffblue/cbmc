@@ -153,12 +153,18 @@ public:
   /// is already present at top of the stack
   bool pragma_cprover_clash(const irep_idt &name, bool enabled);
 
+  /// \brief Adds an unwinding bound to the CPROVER pragma stack
+  void pragma_cprover_add_unwind(size_t bound);
+
+  /// \brief Remove unwinding bounds from the CPROVER pragma stack
+  void pragma_cprover_consume_unwind();
+
   /// \brief Tags \ref source_location with
   /// the current CPROVER pragma stack
   void set_pragma_cprover();
 
 private:
-  std::list<std::map<const irep_idt, bool>> pragma_cprover_stack;
+  std::list<std::map<const irep_idt, size_t>> pragma_cprover_stack;
 };
 
 void ansi_c_scanner_init(ansi_c_parsert &);
