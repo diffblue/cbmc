@@ -401,9 +401,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
   else if(expr.id()==ID_struct)
   {
     mp_vectort dest;
-
-    if(!unbounded_size(expr.type()))
-      dest.reserve(numeric_cast_v<std::size_t>(get_size(expr.type())));
+    dest.reserve(numeric_cast_v<std::size_t>(get_size(expr.type())));
 
     bool error=false;
 
@@ -418,7 +416,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
 
       mp_vectort tmp = evaluate(op);
 
-      if(unbounded_size(op.type()) || tmp.size() == sub_size)
+      if(tmp.size() == sub_size)
       {
         for(std::size_t i=0; i<tmp.size(); i++)
           dest.push_back(tmp[i]);
@@ -871,17 +869,11 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
         }
         // we fail
       }
-      else if(!unbounded_size(expr.type()))
+      else
       {
         mp_vectort dest;
         dest.resize(numeric_cast_v<std::size_t>(get_size(expr.type())));
         read(address, dest);
-        return dest;
-      }
-      else
-      {
-        mp_vectort dest;
-        read_unbounded(address, dest);
         return dest;
       }
     }
@@ -928,11 +920,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
   {
     const auto &ty=to_array_type(expr.type());
 
-    mp_vectort size;
-    if(ty.size().id()==ID_infinity)
-      size.push_back(0);
-    else
-      size = evaluate(ty.size());
+    mp_vectort size = evaluate(ty.size());
 
     if(size.size()==1)
     {
@@ -954,7 +942,7 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
 
     const auto &subtype = to_array_type(expr.type()).element_type();
 
-    if(!new_value.empty() && where.size()==1 && !unbounded_size(subtype))
+    if(!new_value.empty() && where.size() == 1)
     {
       // Ignore indices < 0, which the string solver sometimes produces
       if(where[0]<0)
@@ -977,14 +965,6 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
   else if(expr.id()==ID_nil)
   {
     return {0};
-  }
-  else if(expr.id()==ID_infinity)
-  {
-    if(expr.type().id()==ID_signedbv)
-    {
-      output.warning() << "Infinite size arrays not supported" << messaget::eom;
-      return {};
-    }
   }
   output.error() << "!! failed to evaluate expression: "
                  << from_expr(ns, function->first, expr) << "\n"

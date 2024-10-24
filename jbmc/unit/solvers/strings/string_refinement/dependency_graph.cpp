@@ -21,7 +21,7 @@ Author: Diffblue Ltd.
 #include <java_bytecode/java_bytecode_language.h>
 #endif
 
-typet length_type()
+signedbv_typet length_type()
 {
   return signedbv_typet(32);
 }
@@ -29,7 +29,7 @@ typet length_type()
 /// Make a struct with a pointer content and an integer length
 struct_exprt make_string_argument(std::string name)
 {
-  const array_typet char_array(char_type(), infinity_exprt(length_type()));
+  const array_typet char_array(char_type(), length_type().largest_expr());
   struct_typet type(
     {{"length", length_type()}, {"content", pointer_type(char_array)}});
 

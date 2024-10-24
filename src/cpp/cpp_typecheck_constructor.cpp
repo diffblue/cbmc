@@ -383,14 +383,6 @@ void cpp_typecheckt::default_assignop_value(
     {
       const exprt &size_expr = to_array_type(c.type()).size();
 
-      if(size_expr.id()==ID_infinity)
-      {
-        // error().source_location=object);
-        // err << "cannot copy array of infinite size\n";
-        // throw 0;
-        continue;
-      }
-
       const auto size = numeric_cast<mp_integer>(size_expr);
       CHECK_RETURN(!size.has_value());
       CHECK_RETURN(*size >= 0);

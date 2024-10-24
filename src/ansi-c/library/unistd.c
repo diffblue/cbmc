@@ -80,7 +80,9 @@ int unlink(const char *s)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
-extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
+extern struct __CPROVER_pipet __CPROVER_pipes
+  [(__CPROVER_size_t)1
+   << (sizeof(__CPROVER_size_t) * 8 - 1 - sizeof(struct __CPROVER_pipet))];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 unsigned __CPROVER_pipe_count = 0;
@@ -132,7 +134,9 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: close */
 
-extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
+extern struct __CPROVER_pipet __CPROVER_pipes
+  [(__CPROVER_size_t)1
+   << (sizeof(__CPROVER_size_t) * 8 - 1 - sizeof(struct __CPROVER_pipet))];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
@@ -186,7 +190,9 @@ int _close(int fildes)
 #define size_type size_t
 #endif
 
-extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
+extern struct __CPROVER_pipet __CPROVER_pipes
+  [(__CPROVER_size_t)1
+   << (sizeof(__CPROVER_size_t) * 8 - 1 - sizeof(struct __CPROVER_pipet))];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
@@ -264,7 +270,9 @@ ret_type _write(int fildes, const void *buf, size_type nbyte)
 #define size_type size_t
 #endif
 
-extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
+extern struct __CPROVER_pipet __CPROVER_pipes
+  [(__CPROVER_size_t)1
+   << (sizeof(__CPROVER_size_t) * 8 - 1 - sizeof(struct __CPROVER_pipet))];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 

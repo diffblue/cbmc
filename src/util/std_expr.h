@@ -3092,16 +3092,6 @@ inline bool can_cast_expr<nil_exprt>(const exprt &base)
   return base.id() == ID_nil;
 }
 
-/// \brief An expression denoting infinity
-class infinity_exprt : public nullary_exprt
-{
-public:
-  explicit infinity_exprt(typet _type)
-    : nullary_exprt(ID_infinity, std::move(_type))
-  {
-  }
-};
-
 /// \brief A base class for variable bindings (quantifiers, let, lambda)
 class binding_exprt : public binary_exprt
 {

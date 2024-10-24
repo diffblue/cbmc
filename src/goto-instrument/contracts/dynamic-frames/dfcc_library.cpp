@@ -520,8 +520,7 @@ const symbolt &dfcc_libraryt::get_instrumented_functions_map_symbol()
   if(goto_model.symbol_table.has_symbol(map_name))
     return goto_model.symbol_table.lookup_ref(map_name);
 
-  auto map_type =
-    array_typet(unsigned_char_type(), infinity_exprt(size_type()));
+  auto map_type = array_typet(unsigned_char_type(), size_type().largest_expr());
 
   return dfcc_utilst::create_static_symbol(
     goto_model.symbol_table,

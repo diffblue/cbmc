@@ -16,8 +16,8 @@ Author: Diffblue Ltd.
 SCENARIO("substitute_array_list", "[core][solvers][strings][string_refinement]")
 {
   const typet char_type = unsignedbv_typet(16);
-  const typet int_type = signedbv_typet(32);
-  const array_typet array_type(char_type, infinity_exprt(int_type));
+  const auto int_type = signedbv_typet(32);
+  const array_typet array_type(char_type, int_type.largest_expr());
   const exprt index0 = from_integer(0, int_type);
   const exprt charx = from_integer('x', char_type);
   const exprt index1 = from_integer(1, int_type);

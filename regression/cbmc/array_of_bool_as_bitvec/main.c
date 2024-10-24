@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 __CPROVER_bool w[8];
-__CPROVER_bool v[__CPROVER_constant_infinity_uint];
+__CPROVER_bool v[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)];
 
 void main()
 {

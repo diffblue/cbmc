@@ -142,11 +142,10 @@ void ansi_c_internal_additions(std::string &code, bool support_float16_type)
     "typedef __typeof__(sizeof(int)) " CPROVER_PREFIX "size_t;\n"
     "typedef "+c_type_as_string(signed_size_type().get(ID_C_c_type))+
       " " CPROVER_PREFIX "ssize_t;\n"
-    "const unsigned " CPROVER_PREFIX "constant_infinity_uint;\n"
     "typedef void " CPROVER_PREFIX "integer;\n"
     "typedef void " CPROVER_PREFIX "rational;\n"
     "extern unsigned char " CPROVER_PREFIX "memory["
-      CPROVER_PREFIX "constant_infinity_uint];\n"
+      "(" CPROVER_PREFIX "size_t)1 << (sizeof(" CPROVER_PREFIX "_size_t) * 8 - 2)];\n"
 
     // malloc
     "const void *" CPROVER_PREFIX "deallocated=0;\n"
@@ -169,13 +168,13 @@ void ansi_c_internal_additions(std::string &code, bool support_float16_type)
   code+=
     // this is ANSI-C
     "extern " CPROVER_PREFIX "thread_local const char __func__["
-      CPROVER_PREFIX "constant_infinity_uint];\n"
+      "(" CPROVER_PREFIX "size_t)1 << (sizeof(" CPROVER_PREFIX "size_t) * 8 - 2)];\n"
 
     // this is GCC
     "extern " CPROVER_PREFIX "thread_local const char __FUNCTION__["
-      CPROVER_PREFIX "constant_infinity_uint];\n"
+      "(" CPROVER_PREFIX "size_t)1 << (sizeof(" CPROVER_PREFIX "size_t) * 8 - 2)];\n"
     "extern " CPROVER_PREFIX "thread_local const char __PRETTY_FUNCTION__["
-      CPROVER_PREFIX "constant_infinity_uint];\n"
+      "(" CPROVER_PREFIX "size_t)1 << (sizeof(" CPROVER_PREFIX "size_t) * 8 - 2)];\n"
 
     // float stuff
     "int " CPROVER_PREFIX "thread_local " +
