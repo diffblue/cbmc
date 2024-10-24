@@ -260,3 +260,32 @@ exprt binding_exprt::instantiate(const variablest &new_variables) const
     values.push_back(new_variable);
   return instantiate(values);
 }
+
+exprt cond_exprt::lower() const
+{
+  INVARIANT(
+    operands().size() % 2 == 0, "cond must have even number of operands");
+
+  exprt result = nil_exprt();
+
+  auto &operands = this->operands();
+
+  // functional version -- go backwards
+  for(std::size_t i = operands.size(); i != 0; i -= 2)
+  {
+    INVARIANT(
+      i >= 2,
+      "since the number of operands is even if i is nonzero it must be "
+      "greater than two");
+
+    const exprt &cond = operands[i - 2];
+    const exprt &value = operands[i - 1];
+
+    if(result.is_nil())
+      result = value;
+    else
+      result = if_exprt{cond, value, std::move(result)};
+  }
+
+  return result;
+}
