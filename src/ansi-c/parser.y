@@ -1243,7 +1243,37 @@ basic_type_specifier:
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
         {
-          $$=merge($1, $2);
+          // ignore packed or aligned attributes in this context (Clang warns
+          // that they will be ignored, GCC just silently ignores them)
+          if(parser_stack($1).id() == ID_packed ||
+             parser_stack($1).id() == ID_aligned)
+          {
+            $$=$2;
+          }
+          else if(parser_stack($1).id() == ID_merged_type)
+          {
+            auto &sub = parser_stack($1).get_sub();
+            irept::subt filtered_sub;
+            filtered_sub.reserve(sub.size());
+            for(const auto &s : sub)
+            {
+              if(s.id() != ID_packed && s.id() != ID_aligned)
+                filtered_sub.push_back(s);
+            }
+            if(filtered_sub.empty())
+              $$=$2;
+            else
+            {
+              if(filtered_sub.size() == 1)
+                parser_stack($1).swap(filtered_sub.front());
+              else
+                sub.swap(filtered_sub);
+
+              $$=merge($1, $2);
+            }
+          }
+          else
+            $$=merge($1, $2);
         }
         | sue_type_specifier storage_class gcc_type_attribute_opt
         {
