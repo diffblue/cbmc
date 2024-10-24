@@ -26,6 +26,8 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "state_encoding_targets.h"
 #include "variable_encoding.h"
 
+#include "chc_large_step.h"
+
 #include <algorithm>
 #include <iostream>
 
@@ -1233,6 +1235,56 @@ void variable_encoding(
   }
 }
 
+void large_step_encoding(const container_encoding_targett & small_step_container,
+                         container_encoding_targett & large_step_container)
+{
+  chc_dbt db;
+  for (auto & clause : small_step_container.constraints) {
+    if (!can_cast_expr<forall_exprt>(clause))
+    {
+      throw incorrect_goto_program_exceptiont("Not forall");
+    }
+    const forall_exprt& forall = to_forall_expr(clause);
+    db.add_clause(forall);
+
+    // For now add every function application as uninterpreted predicate.
+    std::set<symbol_exprt> symbols;
+    forall.visit_pre([&symbols](const exprt &expr) {
+                       if (can_cast_expr<function_application_exprt>(expr))
+                       {
+                         symbol_exprt s = to_symbol_expr(to_function_application_expr(expr).function());
+                         symbols.insert(s);
+                       }
+                     });
+
+    for (auto & s : symbols)
+    {
+      db.add_state_pred(s);
+    }
+  }
+  chc_grapht chc_g(db);
+  chc_g.build_graph();
+
+  chc_wtot wto(chc_g);
+  wto.build_wto();
+
+  resolution_visitort rv(db);
+  for (auto it = wto.begin(); it != wto.end(); it++)
+  {
+    auto x = (*it);
+    x->accept(&rv);
+  }
+
+  rv.populate_new_db();
+
+  container_encoding_targett container2;
+  std::vector<horn_clauset> all2;
+  for (auto & ce : rv.giveme_new_db())
+  {
+    large_step_container << ce.get_chc();
+  }
+}
+
 solver_resultt state_encoding_solver(
   const goto_modelt &goto_model,
   bool program_is_inlined,
@@ -1254,5 +1306,14 @@ solver_resultt state_encoding_solver(
   }
 #endif
 
+  if (solver_options.large_step) {
+    container_encoding_targett large_step_container;
+    large_step_encoding(container, large_step_container);
+
+    std::cout << "Solving large-step\n";
+    return solver(large_step_container.constraints, solver_options, ns);
+  }
+
+  std::cout << "Solving small-step\n";
   return solver(container.constraints, solver_options, ns);
 }

@@ -277,6 +277,7 @@ int cprover_parse_optionst::main()
 
     solver_options.trace = cmdline.isset("trace");
     solver_options.verbose = cmdline.isset("verbose");
+    solver_options.large_step = cmdline.isset("large-step");
 
     // solve
     auto result = state_encoding_solver(

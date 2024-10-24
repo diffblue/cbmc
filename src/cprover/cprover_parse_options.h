@@ -25,7 +25,9 @@ Author: Daniel Kroening, dkr@amazon.com
   "(show-goto-functions)(show-loops)(show-properties)"                         \
   "(show-functions-with-loops)"                                                \
   "(validate-goto-model)"                                                      \
+  "(large-step)"                                                               \
   "(verbose)"
+
 
 class cprover_parse_optionst
 {
