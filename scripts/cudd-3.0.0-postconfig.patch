@@ -1,0 +1,15 @@
+--- config.status~	2024-10-31 10:58:14.082473342 +0100
++++ config.status	2024-10-31 10:59:32.373999679 +0100
+@@ -891,9 +891,9 @@
+ S["HAVE_PDFLATEX_TRUE"]=""
+ S["MAKEINDEX"]="makeindex"
+ S["PDFLATEX"]="pdflatex"
+-S["HAVE_DOXYGEN_FALSE"]="#"
+-S["HAVE_DOXYGEN_TRUE"]=""
+-S["DOXYGEN"]="doxygen"
++S["HAVE_DOXYGEN_FALSE"]=""
++S["HAVE_DOXYGEN_TRUE"]="#"
++S["DOXYGEN"]=""
+ S["CROSS_COMPILING_FALSE"]=""
+ S["CROSS_COMPILING_TRUE"]="#"
+ S["CXXCPP"]="g++ -E"

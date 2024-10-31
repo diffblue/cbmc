@@ -122,8 +122,11 @@ if(DEFINED CMAKE_USE_CUDD)
 
     if(NOT EXISTS ${cudd_SOURCE_DIR}/Makefile)
         message(STATUS "Configuring Cudd-3.0.0")
-        execute_process(COMMAND ./configure WORKING_DIRECTORY ${cudd_SOURCE_DIR})
+        execute_process(COMMAND ./configure HAVE_DOXYGEN=FALSE WORKING_DIRECTORY ${cudd_SOURCE_DIR})
     endif()
+    message(STATUS "Patching Cudd-3.0.0")
+    execute_process(COMMAND patch -N -p0 -i ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cudd-3.0.0-postconfig.patch
+                    WORKING_DIRECTORY ${cudd_SOURCE_DIR})
     message(STATUS "Building Cudd-3.0.0")
     execute_process(COMMAND make WORKING_DIRECTORY ${cudd_SOURCE_DIR})
 
