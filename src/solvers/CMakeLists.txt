@@ -70,10 +70,15 @@ foreach(SOLVER ${sat_impl})
         # to 2 times)
         download_project(PROJ minisat2
             URL http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
-            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/minisat-2.2.1-patch
-            COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/minisat2_CMakeLists.txt CMakeLists.txt
+            PATCH_COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/minisat2_CMakeLists.txt CMakeLists.txt
             URL_MD5 27faa19ee0508660bd6fb7f894646d42
-        )
+            )
+        if (NOT EXISTS ${minisat2_SOURCE_DIR}/minisat/core/Solver.cc.orig)
+          message(STATUS "Patching minisat-2.2.1")
+          execute_process(
+              COMMAND patch -N -p1 -i ${CBMC_SOURCE_DIR}/scripts/minisat-2.2.1-patch
+              WORKING_DIRECTORY ${minisat2_SOURCE_DIR})
+        endif()
 
         add_subdirectory(${minisat2_SOURCE_DIR} ${minisat2_BINARY_DIR})
 
@@ -103,10 +108,15 @@ foreach(SOLVER ${sat_impl})
 
         download_project(PROJ glucose
             URL https://github.com/BrunoDutertre/glucose-syrup/archive/0bb2afd3b9baace6981cbb8b4a1c7683c44968b7.tar.gz
-            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/glucose-syrup-patch
-            COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/glucose_CMakeLists.txt CMakeLists.txt
+            PATCH_COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/glucose_CMakeLists.txt CMakeLists.txt
             URL_MD5 7c539c62c248b74210aef7414787323a
         )
+        if (NOT EXISTS ${glucose_SOURCE_DIR}/core/SolverTypes.h.orig)
+          message(STATUS "Patching glucose")
+          execute_process(
+            COMMAND patch -N -p1 -i ${CBMC_SOURCE_DIR}/scripts/glucose-syrup-patch
+            WORKING_DIRECTORY ${glucose_SOURCE_DIR})
+        endif()
 
         add_subdirectory(${glucose_SOURCE_DIR} ${glucose_BINARY_DIR})
 
@@ -122,11 +132,16 @@ foreach(SOLVER ${sat_impl})
 
         download_project(PROJ cadical
             URL https://github.com/arminbiere/cadical/archive/rel-2.0.0.tar.gz
-            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/cadical-2.0.0-patch
-            COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/cadical_CMakeLists.txt CMakeLists.txt
+            PATCH_COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/cadical_CMakeLists.txt CMakeLists.txt
             COMMAND ./configure
             URL_MD5 9fc2a66196b86adceb822a583318cc35
         )
+        if (NOT EXISTS ${cadical_SOURCE_DIR}/scripts/make-build-header.sh.orig)
+          message(STATUS "Patching cadical-2.0.0")
+          execute_process(
+            COMMAND patch -N -p1 -i ${CBMC_SOURCE_DIR}/scripts/cadical-2.0.0-patch
+            WORKING_DIRECTORY ${cadical_SOURCE_DIR})
+        endif()
 
         add_subdirectory(${cadical_SOURCE_DIR} ${cadical_BINARY_DIR})
 
@@ -145,10 +160,14 @@ foreach(SOLVER ${sat_impl})
 
         download_project(PROJ cadical
             URL https://github.com/arminbiere/cadical/archive/rel-2.0.0.tar.gz
-            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/cadical-2.0.0-patch
-            COMMAND ./configure
             URL_MD5 9fc2a66196b86adceb822a583318cc35
         )
+        if (NOT EXISTS ${cadical_SOURCE_DIR}/scripts/make-build-header.sh.orig)
+          message(STATUS "Patching cadical-2.0.0")
+          execute_process(
+            COMMAND patch -N -p1 -i ${CBMC_SOURCE_DIR}/scripts/cadical-2.0.0-patch
+            WORKING_DIRECTORY ${cadical_SOURCE_DIR})
+        endif()
 
         message(STATUS "Building CaDiCaL")
         execute_process(COMMAND make WORKING_DIRECTORY ${cadical_SOURCE_DIR})

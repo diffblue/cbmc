@@ -103,9 +103,10 @@ endif()
 
 set(enable_cbmc_tests on CACHE BOOL "Whether CBMC tests should be enabled")
 
-set(sat_impl "minisat2" CACHE STRING
-    "This setting controls the SAT library which is used. Valid values are
-    'minisat2', 'glucose', 'cadical', 'ipasir-cadical' or 'ipasir-custom'"
+set(sat_impl "minisat2;glucose,cadical" CACHE STRING
+    "This setting control the SAT libraries which are used. Valid values are
+'minisat2', 'glucose', 'cadical', 'ipasir-cadical' or 'ipasir-custom'.
+Use multiple solvers ; seperated"
 )
 
 if(${enable_cbmc_tests})
@@ -125,8 +126,9 @@ if(DEFINED CMAKE_USE_CUDD)
         execute_process(COMMAND ./configure HAVE_DOXYGEN=FALSE WORKING_DIRECTORY ${cudd_SOURCE_DIR})
     endif()
     message(STATUS "Patching Cudd-3.0.0")
-    execute_process(COMMAND patch -N -p0 -i ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cudd-3.0.0-postconfig.patch
-                    WORKING_DIRECTORY ${cudd_SOURCE_DIR})
+    execute_process(
+        COMMAND patch -N -p0 -i ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cudd-3.0.0-postconfig.patch
+        WORKING_DIRECTORY ${cudd_SOURCE_DIR})
     message(STATUS "Building Cudd-3.0.0")
     execute_process(COMMAND make WORKING_DIRECTORY ${cudd_SOURCE_DIR})
 
