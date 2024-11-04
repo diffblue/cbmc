@@ -92,19 +92,20 @@ void goto_statet::apply_condition(
     if(is_ssa_expr(rhs))
       std::swap(lhs, rhs);
 
-    if(is_ssa_expr(lhs) && goto_symex_can_forward_propagatet(ns)(rhs))
+    if(is_ssa_expr(lhs))
     {
       const ssa_exprt &ssa_lhs = to_ssa_expr(lhs);
       INVARIANT(
         !ssa_lhs.get_level_2().empty(),
         "apply_condition operand should be L2 renamed");
+      const ssa_exprt l1_lhs = remove_level_2(ssa_lhs);
 
       if(
-        previous_state.threads.size() == 1 ||
-        previous_state.write_is_shared(ssa_lhs, ns) !=
-          goto_symex_statet::write_is_shared_resultt::SHARED)
+        goto_symex_can_forward_propagatet(ns)(rhs) &&
+        (previous_state.threads.size() == 1 ||
+         previous_state.write_is_shared(ssa_lhs, ns) !=
+           goto_symex_statet::write_is_shared_resultt::SHARED))
       {
-        const ssa_exprt l1_lhs = remove_level_2(ssa_lhs);
         const irep_idt &l1_identifier = l1_lhs.get_identifier();
 
         level2.increase_generation(
@@ -117,6 +118,20 @@ void goto_statet::apply_condition(
           propagation.replace(l1_identifier, rhs);
 
         value_set.assign(l1_lhs, rhs, ns, true, false);
+      }
+      else if(is_ssa_expr(rhs))
+      {
+        const ssa_exprt &ssa_rhs = to_ssa_expr(rhs);
+        INVARIANT(
+          !ssa_rhs.get_level_2().empty(),
+          "apply_condition operand should be L2 renamed");
+        const ssa_exprt l1_rhs = remove_level_2(ssa_rhs);
+
+        // We have a condition a == b. Make both a's and b's value sets the
+        // union of their previous value sets (the last "true" argument makes
+        // sure we add rather than replace value sets).
+        value_set.assign(l1_lhs, l1_rhs, ns, true, true);
+        value_set.assign(l1_rhs, l1_lhs, ns, true, true);
       }
     }
   }
