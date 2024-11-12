@@ -112,3 +112,6 @@ add_test(
 )
 
 set_tests_properties(unit unit-xfail PROPERTIES LABELS "CORE;CBMC")
+
+set_property(DIRECTORY APPEND PROPERTY
+    ADDITIONAL_CLEAN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/gdb.txt")
