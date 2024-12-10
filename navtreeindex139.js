@@ -1,5 +1,8 @@
 var NAVTREEINDEX139 =
 {
+"structconfigt_1_1javat.html":[8,0,259,3],
+"structconfigt_1_1javat.html#a1481d4e9c977fbe5b7ed554085f89d86":[8,0,259,3,1],
+"structconfigt_1_1javat.html#a65a65c481bad2de7d876a4626b2dc840":[8,0,259,3,0],
 "structconfigt_1_1javat.html#ab0083debbb4cdbd9e9d7b091ef2f34a5":[8,0,259,3,3],
 "structconfigt_1_1javat.html#ada127905438ec147b1cad7ec582a8436":[8,0,259,3,2],
 "structconfigt_1_1verilogt.html":[8,0,259,4],
@@ -246,8 +249,5 @@ var NAVTREEINDEX139 =
 "structfloat__utilst_1_1rounding__mode__bitst.html#a7cbb9348f91220173fc24066063dfc8f":[8,0,485,1,4],
 "structfloat__utilst_1_1rounding__mode__bitst.html#ab1d3ea312c84fbb1b427434963958d78":[8,0,485,1,2],
 "structfloat__utilst_1_1rounding__mode__bitst.html#abcf15d7a0dca8a533887b74442b82731":[8,0,485,1,1],
-"structfloat__utilst_1_1unbiased__floatt.html":[8,0,485,2],
-"structfloat__utilst_1_1unpacked__floatt.html":[8,0,485,3],
-"structfloat__utilst_1_1unpacked__floatt.html#a4728c7786438e20a2284bb8c4e3baf7b":[8,0,485,3,4],
-"structfloat__utilst_1_1unpacked__floatt.html#a7bc539b236df3c645c9675ce408a3f13":[8,0,485,3,2]
+"structfloat__utilst_1_1unbiased__floatt.html":[8,0,485,2]
 };

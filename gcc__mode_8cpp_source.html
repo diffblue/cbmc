@@ -1072,184 +1072,182 @@ $(document).ready(function(){initNavTree('gcc__mode_8cpp_source.html',''); initR
 <div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;  <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;  {</div>
 <div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;    <span class="comment">// -c is not given</span></div>
-<div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="charliteral">&#39;o&#39;</span>))</div>
-<div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;      output_files.push_back(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="charliteral">&#39;o&#39;</span>));</div>
-<div class="line"><a name="l00987"></a><span class="lineno">  987</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00988"></a><span class="lineno">  988</span>&#160;      output_files.push_back(<span class="stringliteral">&quot;a.out&quot;</span>);</div>
-<div class="line"><a name="l00989"></a><span class="lineno">  989</span>&#160;  }</div>
-<div class="line"><a name="l00990"></a><span class="lineno">  990</span>&#160; </div>
-<div class="line"><a name="l00991"></a><span class="lineno">  991</span>&#160;  <span class="keywordflow">if</span>(output_files.empty() ||</div>
-<div class="line"><a name="l00992"></a><span class="lineno">  992</span>&#160;     (output_files.size()==1 &amp;&amp;</div>
-<div class="line"><a name="l00993"></a><span class="lineno">  993</span>&#160;      output_files.front()==<span class="stringliteral">&quot;/dev/null&quot;</span>))</div>
-<div class="line"><a name="l00994"></a><span class="lineno">  994</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classgcc__modet.html#a6591394c6cd06e92cf771c1b38ed92cf">run_gcc</a>(compiler);</div>
-<div class="line"><a name="l00995"></a><span class="lineno">  995</span>&#160; </div>
-<div class="line"><a name="l00996"></a><span class="lineno">  996</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{<a class="code" href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_message_handler</a>};</div>
-<div class="line"><a name="l00997"></a><span class="lineno">  997</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;Running &quot;</span> &lt;&lt; <a class="code" href="classgcc__modet.html#a04f9334b1ba6426c2863ea6f781889e0">native_tool_name</a> &lt;&lt; <span class="stringliteral">&quot; to generate hybrid binary&quot;</span></div>
-<div class="line"><a name="l00998"></a><span class="lineno">  998</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l00999"></a><span class="lineno">  999</span>&#160; </div>
-<div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;  <span class="comment">// save the goto-cc output files</span></div>
-<div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;  std::list&lt;std::string&gt; goto_binaries;</div>
-<div class="line"><a name="l01002"></a><span class="lineno"> 1002</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;std::string&gt;::const_iterator</div>
-<div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;      it=output_files.begin();</div>
-<div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;      it!=output_files.end();</div>
-<div class="line"><a name="l01005"></a><span class="lineno"> 1005</span>&#160;      it++)</div>
-<div class="line"><a name="l01006"></a><span class="lineno"> 1006</span>&#160;  {</div>
-<div class="line"><a name="l01007"></a><span class="lineno"> 1007</span>&#160;    std::string bin_name=*it+<a class="code" href="classgcc__modet.html#a4dcee02f9fda79e4c3003c30216f8daf">goto_binary_tmp_suffix</a>;</div>
-<div class="line"><a name="l01008"></a><span class="lineno"> 1008</span>&#160; </div>
-<div class="line"><a name="l01009"></a><span class="lineno"> 1009</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l01010"></a><span class="lineno"> 1010</span>&#160;    {</div>
-<div class="line"><a name="l01011"></a><span class="lineno"> 1011</span>&#160;      std::filesystem::rename(*it, bin_name);</div>
-<div class="line"><a name="l01012"></a><span class="lineno"> 1012</span>&#160;    }</div>
-<div class="line"><a name="l01013"></a><span class="lineno"> 1013</span>&#160;    <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::filesystem::filesystem_error &amp;e)</div>
-<div class="line"><a name="l01014"></a><span class="lineno"> 1014</span>&#160;    {</div>
-<div class="line"><a name="l01015"></a><span class="lineno"> 1015</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; e.what() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l01016"></a><span class="lineno"> 1016</span>&#160;      <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l01017"></a><span class="lineno"> 1017</span>&#160;    }</div>
+<div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;    output_files.push_back(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a890539c1468626e31f0e7048a778df28">value_opt</a>(<span class="charliteral">&#39;o&#39;</span>).value_or(<span class="stringliteral">&quot;a.out&quot;</span>));</div>
+<div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;  }</div>
+<div class="line"><a name="l00987"></a><span class="lineno">  987</span>&#160; </div>
+<div class="line"><a name="l00988"></a><span class="lineno">  988</span>&#160;  <span class="keywordflow">if</span>(output_files.empty() ||</div>
+<div class="line"><a name="l00989"></a><span class="lineno">  989</span>&#160;     (output_files.size()==1 &amp;&amp;</div>
+<div class="line"><a name="l00990"></a><span class="lineno">  990</span>&#160;      output_files.front()==<span class="stringliteral">&quot;/dev/null&quot;</span>))</div>
+<div class="line"><a name="l00991"></a><span class="lineno">  991</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classgcc__modet.html#a6591394c6cd06e92cf771c1b38ed92cf">run_gcc</a>(compiler);</div>
+<div class="line"><a name="l00992"></a><span class="lineno">  992</span>&#160; </div>
+<div class="line"><a name="l00993"></a><span class="lineno">  993</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{<a class="code" href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_message_handler</a>};</div>
+<div class="line"><a name="l00994"></a><span class="lineno">  994</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;Running &quot;</span> &lt;&lt; <a class="code" href="classgcc__modet.html#a04f9334b1ba6426c2863ea6f781889e0">native_tool_name</a> &lt;&lt; <span class="stringliteral">&quot; to generate hybrid binary&quot;</span></div>
+<div class="line"><a name="l00995"></a><span class="lineno">  995</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l00996"></a><span class="lineno">  996</span>&#160; </div>
+<div class="line"><a name="l00997"></a><span class="lineno">  997</span>&#160;  <span class="comment">// save the goto-cc output files</span></div>
+<div class="line"><a name="l00998"></a><span class="lineno">  998</span>&#160;  std::list&lt;std::string&gt; goto_binaries;</div>
+<div class="line"><a name="l00999"></a><span class="lineno">  999</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;std::string&gt;::const_iterator</div>
+<div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;      it=output_files.begin();</div>
+<div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;      it!=output_files.end();</div>
+<div class="line"><a name="l01002"></a><span class="lineno"> 1002</span>&#160;      it++)</div>
+<div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;  {</div>
+<div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;    std::string bin_name=*it+<a class="code" href="classgcc__modet.html#a4dcee02f9fda79e4c3003c30216f8daf">goto_binary_tmp_suffix</a>;</div>
+<div class="line"><a name="l01005"></a><span class="lineno"> 1005</span>&#160; </div>
+<div class="line"><a name="l01006"></a><span class="lineno"> 1006</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l01007"></a><span class="lineno"> 1007</span>&#160;    {</div>
+<div class="line"><a name="l01008"></a><span class="lineno"> 1008</span>&#160;      std::filesystem::rename(*it, bin_name);</div>
+<div class="line"><a name="l01009"></a><span class="lineno"> 1009</span>&#160;    }</div>
+<div class="line"><a name="l01010"></a><span class="lineno"> 1010</span>&#160;    <span class="keywordflow">catch</span>(<span class="keyword">const</span> std::filesystem::filesystem_error &amp;e)</div>
+<div class="line"><a name="l01011"></a><span class="lineno"> 1011</span>&#160;    {</div>
+<div class="line"><a name="l01012"></a><span class="lineno"> 1012</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Rename failed: &quot;</span> &lt;&lt; e.what() &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l01013"></a><span class="lineno"> 1013</span>&#160;      <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l01014"></a><span class="lineno"> 1014</span>&#160;    }</div>
+<div class="line"><a name="l01015"></a><span class="lineno"> 1015</span>&#160; </div>
+<div class="line"><a name="l01016"></a><span class="lineno"> 1016</span>&#160;    goto_binaries.push_back(bin_name);</div>
+<div class="line"><a name="l01017"></a><span class="lineno"> 1017</span>&#160;  }</div>
 <div class="line"><a name="l01018"></a><span class="lineno"> 1018</span>&#160; </div>
-<div class="line"><a name="l01019"></a><span class="lineno"> 1019</span>&#160;    goto_binaries.push_back(bin_name);</div>
-<div class="line"><a name="l01020"></a><span class="lineno"> 1020</span>&#160;  }</div>
-<div class="line"><a name="l01021"></a><span class="lineno"> 1021</span>&#160; </div>
-<div class="line"><a name="l01022"></a><span class="lineno"> 1022</span>&#160;  <span class="keywordtype">int</span> result=<a class="code" href="classgcc__modet.html#a6591394c6cd06e92cf771c1b38ed92cf">run_gcc</a>(compiler);</div>
-<div class="line"><a name="l01023"></a><span class="lineno"> 1023</span>&#160; </div>
-<div class="line"><a name="l01024"></a><span class="lineno"> 1024</span>&#160;  <span class="keywordflow">if</span>(result==0 &amp;&amp;</div>
-<div class="line"><a name="l01025"></a><span class="lineno"> 1025</span>&#160;     <a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="charliteral">&#39;T&#39;</span>) &amp;&amp;</div>
-<div class="line"><a name="l01026"></a><span class="lineno"> 1026</span>&#160;     goto_binaries.size()==1 &amp;&amp;</div>
-<div class="line"><a name="l01027"></a><span class="lineno"> 1027</span>&#160;     output_files.size()==1)</div>
-<div class="line"><a name="l01028"></a><span class="lineno"> 1028</span>&#160;  {</div>
-<div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;    <a class="code" href="classlinker__script__merget.html">linker_script_merget</a> ls_merge(</div>
-<div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;      output_files.front(),</div>
-<div class="line"><a name="l01031"></a><span class="lineno"> 1031</span>&#160;      goto_binaries.front(),</div>
-<div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160;      <a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>,</div>
-<div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160;      <a class="code" href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_message_handler</a>);</div>
-<div class="line"><a name="l01034"></a><span class="lineno"> 1034</span>&#160;    result=ls_merge.<a class="code" href="classlinker__script__merget.html#a318563243dd03e92ba0c570780bea54d">add_linker_script_definitions</a>();</div>
-<div class="line"><a name="l01035"></a><span class="lineno"> 1035</span>&#160;  }</div>
-<div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160; </div>
-<div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;  std::string native_tool;</div>
-<div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160; </div>
-<div class="line"><a name="l01039"></a><span class="lineno"> 1039</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="suffix_8h.html#a01816fa76558ff033b634a5d15c52014">has_suffix</a>(<a class="code" href="gcc__mode_8cpp.html#a2bb2f78833f79a447d79f84b302ae02f">linker_name</a>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>, <a class="code" href="classgoto__cc__modet.html#a9df4b86c1d238d0579929c5c49bddb00">base_name</a>), <span class="stringliteral">&quot;-ld&quot;</span>))</div>
-<div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;    native_tool=<a class="code" href="gcc__mode_8cpp.html#a2bb2f78833f79a447d79f84b302ae02f">linker_name</a>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>, <a class="code" href="classgoto__cc__modet.html#a9df4b86c1d238d0579929c5c49bddb00">base_name</a>);</div>
-<div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="suffix_8h.html#a01816fa76558ff033b634a5d15c52014">has_suffix</a>(<a class="code" href="gcc__mode_8cpp.html#a2d81b9ff02c6e80131c2184eaad379ae">compiler_name</a>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>, <a class="code" href="classgoto__cc__modet.html#a9df4b86c1d238d0579929c5c49bddb00">base_name</a>), <span class="stringliteral">&quot;-gcc&quot;</span>))</div>
-<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;    native_tool=<a class="code" href="gcc__mode_8cpp.html#a2d81b9ff02c6e80131c2184eaad379ae">compiler_name</a>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>, <a class="code" href="classgoto__cc__modet.html#a9df4b86c1d238d0579929c5c49bddb00">base_name</a>);</div>
-<div class="line"><a name="l01043"></a><span class="lineno"> 1043</span>&#160; </div>
-<div class="line"><a name="l01044"></a><span class="lineno"> 1044</span>&#160;  <span class="comment">// merge output from gcc with goto-binaries</span></div>
-<div class="line"><a name="l01045"></a><span class="lineno"> 1045</span>&#160;  <span class="comment">// using objcopy, or do cleanup if an earlier call failed</span></div>
-<div class="line"><a name="l01046"></a><span class="lineno"> 1046</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;std::string&gt;::const_iterator</div>
-<div class="line"><a name="l01047"></a><span class="lineno"> 1047</span>&#160;      it=output_files.begin();</div>
-<div class="line"><a name="l01048"></a><span class="lineno"> 1048</span>&#160;      it!=output_files.end();</div>
-<div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160;      it++)</div>
-<div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;  {</div>
-<div class="line"><a name="l01051"></a><span class="lineno"> 1051</span>&#160;    std::string goto_binary=*it+<a class="code" href="classgcc__modet.html#a4dcee02f9fda79e4c3003c30216f8daf">goto_binary_tmp_suffix</a>;</div>
-<div class="line"><a name="l01052"></a><span class="lineno"> 1052</span>&#160; </div>
-<div class="line"><a name="l01053"></a><span class="lineno"> 1053</span>&#160;    <span class="keywordflow">if</span>(result==0)</div>
-<div class="line"><a name="l01054"></a><span class="lineno"> 1054</span>&#160;      result = <a class="code" href="hybrid__binary_8cpp.html#a0fa730e142bdb86ede5d59b46aeeaa0b">hybrid_binary</a>(</div>
-<div class="line"><a name="l01055"></a><span class="lineno"> 1055</span>&#160;        native_tool,</div>
-<div class="line"><a name="l01056"></a><span class="lineno"> 1056</span>&#160;        goto_binary,</div>
-<div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;        *it,</div>
-<div class="line"><a name="l01058"></a><span class="lineno"> 1058</span>&#160;        compiler.<a class="code" href="classcompilet.html#ad50713d6289034c8a54511bbeff9e17e">mode</a> == <a class="code" href="classcompilet.html#a0205de2030e8e0c01f5a0e96855902e4a71ff08528cba9f23ce447521dfee9e5f">compilet::COMPILE_LINK_EXECUTABLE</a>,</div>
-<div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160;        <a class="code" href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_message_handler</a>);</div>
-<div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;  }</div>
+<div class="line"><a name="l01019"></a><span class="lineno"> 1019</span>&#160;  <span class="keywordtype">int</span> result=<a class="code" href="classgcc__modet.html#a6591394c6cd06e92cf771c1b38ed92cf">run_gcc</a>(compiler);</div>
+<div class="line"><a name="l01020"></a><span class="lineno"> 1020</span>&#160; </div>
+<div class="line"><a name="l01021"></a><span class="lineno"> 1021</span>&#160;  <span class="keywordflow">if</span>(result==0 &amp;&amp;</div>
+<div class="line"><a name="l01022"></a><span class="lineno"> 1022</span>&#160;     <a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="charliteral">&#39;T&#39;</span>) &amp;&amp;</div>
+<div class="line"><a name="l01023"></a><span class="lineno"> 1023</span>&#160;     goto_binaries.size()==1 &amp;&amp;</div>
+<div class="line"><a name="l01024"></a><span class="lineno"> 1024</span>&#160;     output_files.size()==1)</div>
+<div class="line"><a name="l01025"></a><span class="lineno"> 1025</span>&#160;  {</div>
+<div class="line"><a name="l01026"></a><span class="lineno"> 1026</span>&#160;    <a class="code" href="classlinker__script__merget.html">linker_script_merget</a> ls_merge(</div>
+<div class="line"><a name="l01027"></a><span class="lineno"> 1027</span>&#160;      output_files.front(),</div>
+<div class="line"><a name="l01028"></a><span class="lineno"> 1028</span>&#160;      goto_binaries.front(),</div>
+<div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;      <a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>,</div>
+<div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;      <a class="code" href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_message_handler</a>);</div>
+<div class="line"><a name="l01031"></a><span class="lineno"> 1031</span>&#160;    result=ls_merge.<a class="code" href="classlinker__script__merget.html#a318563243dd03e92ba0c570780bea54d">add_linker_script_definitions</a>();</div>
+<div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160;  }</div>
+<div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160; </div>
+<div class="line"><a name="l01034"></a><span class="lineno"> 1034</span>&#160;  std::string native_tool;</div>
+<div class="line"><a name="l01035"></a><span class="lineno"> 1035</span>&#160; </div>
+<div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="suffix_8h.html#a01816fa76558ff033b634a5d15c52014">has_suffix</a>(<a class="code" href="gcc__mode_8cpp.html#a2bb2f78833f79a447d79f84b302ae02f">linker_name</a>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>, <a class="code" href="classgoto__cc__modet.html#a9df4b86c1d238d0579929c5c49bddb00">base_name</a>), <span class="stringliteral">&quot;-ld&quot;</span>))</div>
+<div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;    native_tool=<a class="code" href="gcc__mode_8cpp.html#a2bb2f78833f79a447d79f84b302ae02f">linker_name</a>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>, <a class="code" href="classgoto__cc__modet.html#a9df4b86c1d238d0579929c5c49bddb00">base_name</a>);</div>
+<div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160;  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code" href="suffix_8h.html#a01816fa76558ff033b634a5d15c52014">has_suffix</a>(<a class="code" href="gcc__mode_8cpp.html#a2d81b9ff02c6e80131c2184eaad379ae">compiler_name</a>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>, <a class="code" href="classgoto__cc__modet.html#a9df4b86c1d238d0579929c5c49bddb00">base_name</a>), <span class="stringliteral">&quot;-gcc&quot;</span>))</div>
+<div class="line"><a name="l01039"></a><span class="lineno"> 1039</span>&#160;    native_tool=<a class="code" href="gcc__mode_8cpp.html#a2d81b9ff02c6e80131c2184eaad379ae">compiler_name</a>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>, <a class="code" href="classgoto__cc__modet.html#a9df4b86c1d238d0579929c5c49bddb00">base_name</a>);</div>
+<div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160; </div>
+<div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;  <span class="comment">// merge output from gcc with goto-binaries</span></div>
+<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;  <span class="comment">// using objcopy, or do cleanup if an earlier call failed</span></div>
+<div class="line"><a name="l01043"></a><span class="lineno"> 1043</span>&#160;  <span class="keywordflow">for</span>(std::list&lt;std::string&gt;::const_iterator</div>
+<div class="line"><a name="l01044"></a><span class="lineno"> 1044</span>&#160;      it=output_files.begin();</div>
+<div class="line"><a name="l01045"></a><span class="lineno"> 1045</span>&#160;      it!=output_files.end();</div>
+<div class="line"><a name="l01046"></a><span class="lineno"> 1046</span>&#160;      it++)</div>
+<div class="line"><a name="l01047"></a><span class="lineno"> 1047</span>&#160;  {</div>
+<div class="line"><a name="l01048"></a><span class="lineno"> 1048</span>&#160;    std::string goto_binary=*it+<a class="code" href="classgcc__modet.html#a4dcee02f9fda79e4c3003c30216f8daf">goto_binary_tmp_suffix</a>;</div>
+<div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160; </div>
+<div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;    <span class="keywordflow">if</span>(result==0)</div>
+<div class="line"><a name="l01051"></a><span class="lineno"> 1051</span>&#160;      result = <a class="code" href="hybrid__binary_8cpp.html#a0fa730e142bdb86ede5d59b46aeeaa0b">hybrid_binary</a>(</div>
+<div class="line"><a name="l01052"></a><span class="lineno"> 1052</span>&#160;        native_tool,</div>
+<div class="line"><a name="l01053"></a><span class="lineno"> 1053</span>&#160;        goto_binary,</div>
+<div class="line"><a name="l01054"></a><span class="lineno"> 1054</span>&#160;        *it,</div>
+<div class="line"><a name="l01055"></a><span class="lineno"> 1055</span>&#160;        compiler.<a class="code" href="classcompilet.html#ad50713d6289034c8a54511bbeff9e17e">mode</a> == <a class="code" href="classcompilet.html#a0205de2030e8e0c01f5a0e96855902e4a71ff08528cba9f23ce447521dfee9e5f">compilet::COMPILE_LINK_EXECUTABLE</a>,</div>
+<div class="line"><a name="l01056"></a><span class="lineno"> 1056</span>&#160;        <a class="code" href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_message_handler</a>);</div>
+<div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;  }</div>
+<div class="line"><a name="l01058"></a><span class="lineno"> 1058</span>&#160; </div>
+<div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160;  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;}</div>
 <div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160; </div>
-<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;}</div>
-<div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160; </div>
-<div class="line"><a name="l01065"></a><span class="lineno"><a class="line" href="classgcc__modet.html#abb6b294cd782fdea7229e8398375bf19"> 1065</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classgcc__modet.html#abb6b294cd782fdea7229e8398375bf19">gcc_modet::asm_output</a>(</div>
-<div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;  <span class="keywordtype">bool</span> act_as_bcc,</div>
-<div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;  <span class="keyword">const</span> std::list&lt;std::string&gt; &amp;preprocessed_source_files,</div>
-<div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcompilet.html">compilet</a> &amp;compiler)</div>
-<div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;{</div>
-<div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;  {</div>
-<div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;    <span class="keywordtype">bool</span> have_files=<span class="keyword">false</span>;</div>
-<div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160; </div>
-<div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;    <span class="keywordflow">for</span>(goto_cc_cmdlinet::parsed_argvt::const_iterator</div>
-<div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;        it=<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a437638b99fbd23fb6a23d84dc561c20a">parsed_argv</a>.begin();</div>
-<div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;        it!=<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a437638b99fbd23fb6a23d84dc561c20a">parsed_argv</a>.end();</div>
-<div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;        it++)</div>
-<div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;      <span class="keywordflow">if</span>(it-&gt;is_infile_name)</div>
-<div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;        have_files=<span class="keyword">true</span>;</div>
-<div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160; </div>
-<div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;    <span class="keywordflow">if</span>(!have_files)</div>
-<div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;      <span class="keywordflow">return</span> EX_OK;</div>
-<div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160;  }</div>
-<div class="line"><a name="l01083"></a><span class="lineno"> 1083</span>&#160; </div>
-<div class="line"><a name="l01084"></a><span class="lineno"> 1084</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{<a class="code" href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_message_handler</a>};</div>
-<div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160; </div>
-<div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classgcc__modet.html#ab4ec3aab140a9df0436172bcc3ddf0b6">produce_hybrid_binary</a>)</div>
-<div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160;  {</div>
-<div class="line"><a name="l01088"></a><span class="lineno"> 1088</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;Running &quot;</span> &lt;&lt; <a class="code" href="classgcc__modet.html#a04f9334b1ba6426c2863ea6f781889e0">native_tool_name</a></div>
-<div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;                &lt;&lt; <span class="stringliteral">&quot; to generate native asm output&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160; </div>
-<div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;    <span class="keywordtype">int</span> result=<a class="code" href="classgcc__modet.html#a6591394c6cd06e92cf771c1b38ed92cf">run_gcc</a>(compiler);</div>
-<div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;    <span class="keywordflow">if</span>(result!=0)</div>
-<div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;      <span class="comment">// native tool failed</span></div>
-<div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;      <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;  }</div>
-<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160; </div>
-<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;  std::map&lt;std::string, std::string&gt; output_files;</div>
-<div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160; </div>
-<div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="charliteral">&#39;o&#39;</span>))</div>
-<div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;  {</div>
-<div class="line"><a name="l01101"></a><span class="lineno"> 1101</span>&#160;    <span class="comment">// GCC --combine supports more than one source file</span></div>
-<div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;s : preprocessed_source_files)</div>
-<div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;      output_files.insert(std::make_pair(s, <a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="charliteral">&#39;o&#39;</span>)));</div>
-<div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;  }</div>
-<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;  {</div>
-<div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> std::string &amp;s : preprocessed_source_files)</div>
-<div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;      output_files.insert(</div>
-<div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;        std::make_pair(s, <a class="code" href="get__base__name_8cpp.html#aa4748fd30b535821cd99aecf509a8f33">get_base_name</a>(s, <span class="keyword">true</span>)+<span class="stringliteral">&quot;.s&quot;</span>));</div>
-<div class="line"><a name="l01110"></a><span class="lineno"> 1110</span>&#160;  }</div>
-<div class="line"><a name="l01111"></a><span class="lineno"> 1111</span>&#160; </div>
-<div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;  <span class="keywordflow">if</span>(output_files.empty() ||</div>
-<div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160;     (output_files.size()==1 &amp;&amp;</div>
-<div class="line"><a name="l01114"></a><span class="lineno"> 1114</span>&#160;      output_files.begin()-&gt;second==<span class="stringliteral">&quot;/dev/null&quot;</span>))</div>
-<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;    <span class="keywordflow">return</span> EX_OK;</div>
+<div class="line"><a name="l01062"></a><span class="lineno"><a class="line" href="classgcc__modet.html#abb6b294cd782fdea7229e8398375bf19"> 1062</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classgcc__modet.html#abb6b294cd782fdea7229e8398375bf19">gcc_modet::asm_output</a>(</div>
+<div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;  <span class="keywordtype">bool</span> act_as_bcc,</div>
+<div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;  <span class="keyword">const</span> std::list&lt;std::string&gt; &amp;preprocessed_source_files,</div>
+<div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;  <span class="keyword">const</span> <a class="code" href="classcompilet.html">compilet</a> &amp;compiler)</div>
+<div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;{</div>
+<div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;  {</div>
+<div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;    <span class="keywordtype">bool</span> have_files=<span class="keyword">false</span>;</div>
+<div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160; </div>
+<div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;    <span class="keywordflow">for</span>(goto_cc_cmdlinet::parsed_argvt::const_iterator</div>
+<div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;        it=<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a437638b99fbd23fb6a23d84dc561c20a">parsed_argv</a>.begin();</div>
+<div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160;        it!=<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classgoto__cc__cmdlinet.html#a437638b99fbd23fb6a23d84dc561c20a">parsed_argv</a>.end();</div>
+<div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;        it++)</div>
+<div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;      <span class="keywordflow">if</span>(it-&gt;is_infile_name)</div>
+<div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;        have_files=<span class="keyword">true</span>;</div>
+<div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160; </div>
+<div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;    <span class="keywordflow">if</span>(!have_files)</div>
+<div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;      <span class="keywordflow">return</span> EX_OK;</div>
+<div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;  }</div>
+<div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160; </div>
+<div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;  <a class="code" href="classmessaget.html">messaget</a> <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{<a class="code" href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_message_handler</a>};</div>
+<div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160; </div>
+<div class="line"><a name="l01083"></a><span class="lineno"> 1083</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classgcc__modet.html#ab4ec3aab140a9df0436172bcc3ddf0b6">produce_hybrid_binary</a>)</div>
+<div class="line"><a name="l01084"></a><span class="lineno"> 1084</span>&#160;  {</div>
+<div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160;    <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;Running &quot;</span> &lt;&lt; <a class="code" href="classgcc__modet.html#a04f9334b1ba6426c2863ea6f781889e0">native_tool_name</a></div>
+<div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;                &lt;&lt; <span class="stringliteral">&quot; to generate native asm output&quot;</span> &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160; </div>
+<div class="line"><a name="l01088"></a><span class="lineno"> 1088</span>&#160;    <span class="keywordtype">int</span> result=<a class="code" href="classgcc__modet.html#a6591394c6cd06e92cf771c1b38ed92cf">run_gcc</a>(compiler);</div>
+<div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;    <span class="keywordflow">if</span>(result!=0)</div>
+<div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160;      <span class="comment">// native tool failed</span></div>
+<div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;      <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;  }</div>
+<div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160; </div>
+<div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;  std::map&lt;std::string, std::string&gt; output_files;</div>
+<div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160; </div>
+<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">isset</a>(<span class="charliteral">&#39;o&#39;</span>))</div>
+<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;  {</div>
+<div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;    <span class="comment">// GCC --combine supports more than one source file</span></div>
+<div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;s : preprocessed_source_files)</div>
+<div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;      output_files.insert(std::make_pair(s, <a class="code" href="classgoto__cc__modet.html#a3746986389554b9de5ebd078878f170d">cmdline</a>.<a class="code" href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">get_value</a>(<span class="charliteral">&#39;o&#39;</span>)));</div>
+<div class="line"><a name="l01101"></a><span class="lineno"> 1101</span>&#160;  }</div>
+<div class="line"><a name="l01102"></a><span class="lineno"> 1102</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01103"></a><span class="lineno"> 1103</span>&#160;  {</div>
+<div class="line"><a name="l01104"></a><span class="lineno"> 1104</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">const</span> std::string &amp;s : preprocessed_source_files)</div>
+<div class="line"><a name="l01105"></a><span class="lineno"> 1105</span>&#160;      output_files.insert(</div>
+<div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;        std::make_pair(s, <a class="code" href="get__base__name_8cpp.html#aa4748fd30b535821cd99aecf509a8f33">get_base_name</a>(s, <span class="keyword">true</span>)+<span class="stringliteral">&quot;.s&quot;</span>));</div>
+<div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;  }</div>
+<div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160; </div>
+<div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;  <span class="keywordflow">if</span>(output_files.empty() ||</div>
+<div class="line"><a name="l01110"></a><span class="lineno"> 1110</span>&#160;     (output_files.size()==1 &amp;&amp;</div>
+<div class="line"><a name="l01111"></a><span class="lineno"> 1111</span>&#160;      output_files.begin()-&gt;second==<span class="stringliteral">&quot;/dev/null&quot;</span>))</div>
+<div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;    <span class="keywordflow">return</span> EX_OK;</div>
+<div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160; </div>
+<div class="line"><a name="l01114"></a><span class="lineno"> 1114</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;Appending preprocessed sources to generate hybrid asm output&quot;</span></div>
+<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160; </div>
-<div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;  <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.debug() &lt;&lt; <span class="stringliteral">&quot;Appending preprocessed sources to generate hybrid asm output&quot;</span></div>
-<div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160;              &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160; </div>
-<div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;so : output_files)</div>
-<div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;  {</div>
-<div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160;    std::ifstream is(so.first);</div>
-<div class="line"><a name="l01123"></a><span class="lineno"> 1123</span>&#160;    <span class="keywordflow">if</span>(!is.is_open())</div>
-<div class="line"><a name="l01124"></a><span class="lineno"> 1124</span>&#160;    {</div>
-<div class="line"><a name="l01125"></a><span class="lineno"> 1125</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Failed to open input source &quot;</span> &lt;&lt; so.first</div>
-<div class="line"><a name="l01126"></a><span class="lineno"> 1126</span>&#160;                  &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l01127"></a><span class="lineno"> 1127</span>&#160;      <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l01128"></a><span class="lineno"> 1128</span>&#160;    }</div>
-<div class="line"><a name="l01129"></a><span class="lineno"> 1129</span>&#160; </div>
-<div class="line"><a name="l01130"></a><span class="lineno"> 1130</span>&#160;    std::ofstream os(so.second, std::ios::app);</div>
-<div class="line"><a name="l01131"></a><span class="lineno"> 1131</span>&#160;    <span class="keywordflow">if</span>(!os.is_open())</div>
-<div class="line"><a name="l01132"></a><span class="lineno"> 1132</span>&#160;    {</div>
-<div class="line"><a name="l01133"></a><span class="lineno"> 1133</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Failed to open output file &quot;</span> &lt;&lt; so.second</div>
-<div class="line"><a name="l01134"></a><span class="lineno"> 1134</span>&#160;                  &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a name="l01135"></a><span class="lineno"> 1135</span>&#160;      <span class="keywordflow">return</span> 1;</div>
-<div class="line"><a name="l01136"></a><span class="lineno"> 1136</span>&#160;    }</div>
-<div class="line"><a name="l01137"></a><span class="lineno"> 1137</span>&#160; </div>
-<div class="line"><a name="l01138"></a><span class="lineno"> 1138</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>=act_as_bcc ? <span class="charliteral">&#39;:&#39;</span> : <span class="charliteral">&#39;#&#39;</span>;</div>
-<div class="line"><a name="l01139"></a><span class="lineno"> 1139</span>&#160; </div>
-<div class="line"><a name="l01140"></a><span class="lineno"> 1140</span>&#160;    os &lt;&lt; <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> &lt;&lt; <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> &lt;&lt; <span class="stringliteral">&quot; GOTO-CC&quot;</span> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l01141"></a><span class="lineno"> 1141</span>&#160; </div>
-<div class="line"><a name="l01142"></a><span class="lineno"> 1142</span>&#160;    std::string line;</div>
-<div class="line"><a name="l01143"></a><span class="lineno"> 1143</span>&#160; </div>
-<div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;    <span class="keywordflow">while</span>(std::getline(is, line))</div>
-<div class="line"><a name="l01145"></a><span class="lineno"> 1145</span>&#160;    {</div>
-<div class="line"><a name="l01146"></a><span class="lineno"> 1146</span>&#160;      os &lt;&lt; <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> &lt;&lt; <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> &lt;&lt; line &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
-<div class="line"><a name="l01147"></a><span class="lineno"> 1147</span>&#160;    }</div>
-<div class="line"><a name="l01148"></a><span class="lineno"> 1148</span>&#160;  }</div>
+<div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;so : output_files)</div>
+<div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160;  {</div>
+<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;    std::ifstream is(so.first);</div>
+<div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160;    <span class="keywordflow">if</span>(!is.is_open())</div>
+<div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;    {</div>
+<div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Failed to open input source &quot;</span> &lt;&lt; so.first</div>
+<div class="line"><a name="l01123"></a><span class="lineno"> 1123</span>&#160;                  &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l01124"></a><span class="lineno"> 1124</span>&#160;      <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l01125"></a><span class="lineno"> 1125</span>&#160;    }</div>
+<div class="line"><a name="l01126"></a><span class="lineno"> 1126</span>&#160; </div>
+<div class="line"><a name="l01127"></a><span class="lineno"> 1127</span>&#160;    std::ofstream os(so.second, std::ios::app);</div>
+<div class="line"><a name="l01128"></a><span class="lineno"> 1128</span>&#160;    <span class="keywordflow">if</span>(!os.is_open())</div>
+<div class="line"><a name="l01129"></a><span class="lineno"> 1129</span>&#160;    {</div>
+<div class="line"><a name="l01130"></a><span class="lineno"> 1130</span>&#160;      <a class="code" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.error() &lt;&lt; <span class="stringliteral">&quot;Failed to open output file &quot;</span> &lt;&lt; so.second</div>
+<div class="line"><a name="l01131"></a><span class="lineno"> 1131</span>&#160;                  &lt;&lt; <a class="code" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a name="l01132"></a><span class="lineno"> 1132</span>&#160;      <span class="keywordflow">return</span> 1;</div>
+<div class="line"><a name="l01133"></a><span class="lineno"> 1133</span>&#160;    }</div>
+<div class="line"><a name="l01134"></a><span class="lineno"> 1134</span>&#160; </div>
+<div class="line"><a name="l01135"></a><span class="lineno"> 1135</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>=act_as_bcc ? <span class="charliteral">&#39;:&#39;</span> : <span class="charliteral">&#39;#&#39;</span>;</div>
+<div class="line"><a name="l01136"></a><span class="lineno"> 1136</span>&#160; </div>
+<div class="line"><a name="l01137"></a><span class="lineno"> 1137</span>&#160;    os &lt;&lt; <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> &lt;&lt; <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> &lt;&lt; <span class="stringliteral">&quot; GOTO-CC&quot;</span> &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l01138"></a><span class="lineno"> 1138</span>&#160; </div>
+<div class="line"><a name="l01139"></a><span class="lineno"> 1139</span>&#160;    std::string line;</div>
+<div class="line"><a name="l01140"></a><span class="lineno"> 1140</span>&#160; </div>
+<div class="line"><a name="l01141"></a><span class="lineno"> 1141</span>&#160;    <span class="keywordflow">while</span>(std::getline(is, line))</div>
+<div class="line"><a name="l01142"></a><span class="lineno"> 1142</span>&#160;    {</div>
+<div class="line"><a name="l01143"></a><span class="lineno"> 1143</span>&#160;      os &lt;&lt; <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> &lt;&lt; <a class="code" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a> &lt;&lt; line &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
+<div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;    }</div>
+<div class="line"><a name="l01145"></a><span class="lineno"> 1145</span>&#160;  }</div>
+<div class="line"><a name="l01146"></a><span class="lineno"> 1146</span>&#160; </div>
+<div class="line"><a name="l01147"></a><span class="lineno"> 1147</span>&#160;  <span class="keywordflow">return</span> EX_OK;</div>
+<div class="line"><a name="l01148"></a><span class="lineno"> 1148</span>&#160;}</div>
 <div class="line"><a name="l01149"></a><span class="lineno"> 1149</span>&#160; </div>
-<div class="line"><a name="l01150"></a><span class="lineno"> 1150</span>&#160;  <span class="keywordflow">return</span> EX_OK;</div>
-<div class="line"><a name="l01151"></a><span class="lineno"> 1151</span>&#160;}</div>
-<div class="line"><a name="l01152"></a><span class="lineno"> 1152</span>&#160; </div>
-<div class="line"><a name="l01154"></a><span class="lineno"><a class="line" href="classgcc__modet.html#a7d24c87787bd2d81cf012425e0afd331"> 1154</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgcc__modet.html#a7d24c87787bd2d81cf012425e0afd331">gcc_modet::help_mode</a>()</div>
-<div class="line"><a name="l01155"></a><span class="lineno"> 1155</span>&#160;{</div>
-<div class="line"><a name="l01156"></a><span class="lineno"> 1156</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;goto-cc understands the options of &quot;</span></div>
-<div class="line"><a name="l01157"></a><span class="lineno"> 1157</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;gcc plus the following.\n\n&quot;</span>;</div>
-<div class="line"><a name="l01158"></a><span class="lineno"> 1158</span>&#160;}</div>
+<div class="line"><a name="l01151"></a><span class="lineno"><a class="line" href="classgcc__modet.html#a7d24c87787bd2d81cf012425e0afd331"> 1151</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classgcc__modet.html#a7d24c87787bd2d81cf012425e0afd331">gcc_modet::help_mode</a>()</div>
+<div class="line"><a name="l01152"></a><span class="lineno"> 1152</span>&#160;{</div>
+<div class="line"><a name="l01153"></a><span class="lineno"> 1153</span>&#160;  std::cout &lt;&lt; <span class="stringliteral">&quot;goto-cc understands the options of &quot;</span></div>
+<div class="line"><a name="l01154"></a><span class="lineno"> 1154</span>&#160;            &lt;&lt; <span class="stringliteral">&quot;gcc plus the following.\n\n&quot;</span>;</div>
+<div class="line"><a name="l01155"></a><span class="lineno"> 1155</span>&#160;}</div>
 <div class="ttc" id="aapi_8cpp_html_ad2957e882e3568503e4f786a480f2bfe"><div class="ttname"><a href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></div><div class="ttdeci">configt config</div><div class="ttdef"><b>Definition:</b> <a href="config_8cpp_source.html#l00025">config.cpp:25</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html"><div class="ttname"><a href="classcmdlinet.html">cmdlinet</a></div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8h_source.html#l00019">cmdline.h:20</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html_a0340b7d3ea2d96c8939e831433b7ad0d"><div class="ttname"><a href="classcmdlinet.html#a0340b7d3ea2d96c8939e831433b7ad0d">cmdlinet::get_value</a></div><div class="ttdeci">std::string get_value(char option) const</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00048">cmdline.cpp:48</a></div></div>
 <div class="ttc" id="aclasscmdlinet_html_a48cdeec07eb4cd4648b6b226544ec4da"><div class="ttname"><a href="classcmdlinet.html#a48cdeec07eb4cd4648b6b226544ec4da">cmdlinet::isset</a></div><div class="ttdeci">virtual bool isset(char option) const</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00030">cmdline.cpp:30</a></div></div>
-<div class="ttc" id="aclasscmdlinet_html_aee556e16ec27aa059b56dae3b8ca4818"><div class="ttname"><a href="classcmdlinet.html#aee556e16ec27aa059b56dae3b8ca4818">cmdlinet::get_values</a></div><div class="ttdeci">const std::list&lt; std::string &gt; &amp; get_values(const std::string &amp;option) const</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00109">cmdline.cpp:109</a></div></div>
+<div class="ttc" id="aclasscmdlinet_html_a890539c1468626e31f0e7048a778df28"><div class="ttname"><a href="classcmdlinet.html#a890539c1468626e31f0e7048a778df28">cmdlinet::value_opt</a></div><div class="ttdeci">std::optional&lt; std::string &gt; value_opt(char option) const</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00053">cmdline.cpp:53</a></div></div>
+<div class="ttc" id="aclasscmdlinet_html_aee556e16ec27aa059b56dae3b8ca4818"><div class="ttname"><a href="classcmdlinet.html#aee556e16ec27aa059b56dae3b8ca4818">cmdlinet::get_values</a></div><div class="ttdeci">const std::list&lt; std::string &gt; &amp; get_values(const std::string &amp;option) const</div><div class="ttdef"><b>Definition:</b> <a href="cmdline_8cpp_source.html#l00119">cmdline.cpp:119</a></div></div>
 <div class="ttc" id="aclasscompilet_html"><div class="ttname"><a href="classcompilet.html">compilet</a></div><div class="ttdef"><b>Definition:</b> <a href="compile_8h_source.html#l00031">compile.h:32</a></div></div>
 <div class="ttc" id="aclasscompilet_html_a0205de2030e8e0c01f5a0e96855902e4a111f4e1515dc75b67b32ce7f0894bd4e"><div class="ttname"><a href="classcompilet.html#a0205de2030e8e0c01f5a0e96855902e4a111f4e1515dc75b67b32ce7f0894bd4e">compilet::ASSEMBLE_ONLY</a></div><div class="ttdeci">@ ASSEMBLE_ONLY</div><div class="ttdef"><b>Definition:</b> <a href="compile_8h_source.html#l00040">compile.h:40</a></div></div>
 <div class="ttc" id="aclasscompilet_html_a0205de2030e8e0c01f5a0e96855902e4a31c711e064c328eba6540f5841f73c46"><div class="ttname"><a href="classcompilet.html#a0205de2030e8e0c01f5a0e96855902e4a31c711e064c328eba6540f5841f73c46">compilet::LINK_LIBRARY</a></div><div class="ttdeci">@ LINK_LIBRARY</div><div class="ttdef"><b>Definition:</b> <a href="compile_8h_source.html#l00041">compile.h:41</a></div></div>
@@ -1285,11 +1283,11 @@ $(document).ready(function(){initNavTree('gcc__mode_8cpp_source.html',''); initR
 <div class="ttc" id="aclassgcc__modet_html_a4dcee02f9fda79e4c3003c30216f8daf"><div class="ttname"><a href="classgcc__modet.html#a4dcee02f9fda79e4c3003c30216f8daf">gcc_modet::goto_binary_tmp_suffix</a></div><div class="ttdeci">const std::string goto_binary_tmp_suffix</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8h_source.html#l00045">gcc_mode.h:45</a></div></div>
 <div class="ttc" id="aclassgcc__modet_html_a6591394c6cd06e92cf771c1b38ed92cf"><div class="ttname"><a href="classgcc__modet.html#a6591394c6cd06e92cf771c1b38ed92cf">gcc_modet::run_gcc</a></div><div class="ttdeci">int run_gcc(const compilet &amp;compiler)</div><div class="ttdoc">call gcc with original command line</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8cpp_source.html#l00902">gcc_mode.cpp:902</a></div></div>
 <div class="ttc" id="aclassgcc__modet_html_a6ccc7d62c04aaf9bc31522037db20eba"><div class="ttname"><a href="classgcc__modet.html#a6ccc7d62c04aaf9bc31522037db20eba">gcc_modet::gcc_message_handler</a></div><div class="ttdeci">gcc_message_handlert gcc_message_handler</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8h_source.html#l00039">gcc_mode.h:39</a></div></div>
-<div class="ttc" id="aclassgcc__modet_html_a7d24c87787bd2d81cf012425e0afd331"><div class="ttname"><a href="classgcc__modet.html#a7d24c87787bd2d81cf012425e0afd331">gcc_modet::help_mode</a></div><div class="ttdeci">void help_mode() final</div><div class="ttdoc">display command line help</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8cpp_source.html#l01154">gcc_mode.cpp:1154</a></div></div>
+<div class="ttc" id="aclassgcc__modet_html_a7d24c87787bd2d81cf012425e0afd331"><div class="ttname"><a href="classgcc__modet.html#a7d24c87787bd2d81cf012425e0afd331">gcc_modet::help_mode</a></div><div class="ttdeci">void help_mode() final</div><div class="ttdoc">display command line help</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8cpp_source.html#l01151">gcc_mode.cpp:1151</a></div></div>
 <div class="ttc" id="aclassgcc__modet_html_a8925866951b5a720d9bc1b617b8148ee"><div class="ttname"><a href="classgcc__modet.html#a8925866951b5a720d9bc1b617b8148ee">gcc_modet::arch_map</a></div><div class="ttdeci">const std::map&lt; std::string, std::set&lt; std::string &gt; &gt; arch_map</div><div class="ttdoc">Associate CBMC architectures with processor names.</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8h_source.html#l00048">gcc_mode.h:48</a></div></div>
 <div class="ttc" id="aclassgcc__modet_html_ab01ff4eea4df5a155031338fa5186275"><div class="ttname"><a href="classgcc__modet.html#ab01ff4eea4df5a155031338fa5186275">gcc_modet::gcc_version</a></div><div class="ttdeci">gcc_versiont gcc_version</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8h_source.html#l00068">gcc_mode.h:68</a></div></div>
 <div class="ttc" id="aclassgcc__modet_html_ab4ec3aab140a9df0436172bcc3ddf0b6"><div class="ttname"><a href="classgcc__modet.html#ab4ec3aab140a9df0436172bcc3ddf0b6">gcc_modet::produce_hybrid_binary</a></div><div class="ttdeci">const bool produce_hybrid_binary</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8h_source.html#l00041">gcc_mode.h:41</a></div></div>
-<div class="ttc" id="aclassgcc__modet_html_abb6b294cd782fdea7229e8398375bf19"><div class="ttname"><a href="classgcc__modet.html#abb6b294cd782fdea7229e8398375bf19">gcc_modet::asm_output</a></div><div class="ttdeci">int asm_output(bool act_as_bcc, const std::list&lt; std::string &gt; &amp;preprocessed_source_files, const compilet &amp;compiler)</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8cpp_source.html#l01065">gcc_mode.cpp:1065</a></div></div>
+<div class="ttc" id="aclassgcc__modet_html_abb6b294cd782fdea7229e8398375bf19"><div class="ttname"><a href="classgcc__modet.html#abb6b294cd782fdea7229e8398375bf19">gcc_modet::asm_output</a></div><div class="ttdeci">int asm_output(bool act_as_bcc, const std::list&lt; std::string &gt; &amp;preprocessed_source_files, const compilet &amp;compiler)</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8cpp_source.html#l01062">gcc_mode.cpp:1062</a></div></div>
 <div class="ttc" id="aclassgcc__modet_html_ac0624a7335b7ce77e76f2ae5c8df08c0"><div class="ttname"><a href="classgcc__modet.html#ac0624a7335b7ce77e76f2ae5c8df08c0">gcc_modet::gcc_hybrid_binary</a></div><div class="ttdeci">int gcc_hybrid_binary(compilet &amp;compiler)</div><div class="ttdef"><b>Definition:</b> <a href="gcc__mode_8cpp_source.html#l00946">gcc_mode.cpp:946</a></div></div>
 <div class="ttc" id="aclassgcc__versiont_html_a49d997b97895026b551372244792b13c"><div class="ttname"><a href="classgcc__versiont.html#a49d997b97895026b551372244792b13c">gcc_versiont::get</a></div><div class="ttdeci">void get(const std::string &amp;executable)</div><div class="ttdef"><b>Definition:</b> <a href="gcc__version_8cpp_source.html#l00018">gcc_version.cpp:18</a></div></div>
 <div class="ttc" id="aclassgcc__versiont_html_a55a85e22a550a9e8ed4f878928966f69"><div class="ttname"><a href="classgcc__versiont.html#a55a85e22a550a9e8ed4f878928966f69">gcc_versiont::default_cxx_standard</a></div><div class="ttdeci">configt::cppt::cpp_standardt default_cxx_standard</div><div class="ttdef"><b>Definition:</b> <a href="gcc__version_8h_source.html#l00040">gcc_version.h:40</a></div></div>

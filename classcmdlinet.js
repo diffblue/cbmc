@@ -24,6 +24,8 @@ var classcmdlinet =
     [ "set", "classcmdlinet.html#abb46ce3a9964c020f286513f6fa70654", null ],
     [ "set", "classcmdlinet.html#a17ea4a01226663feb6e2f60a8ac3a6d8", null ],
     [ "set", "classcmdlinet.html#a9efb232dfe1d26a2caf31309298a2360", null ],
+    [ "value_opt", "classcmdlinet.html#a890539c1468626e31f0e7048a778df28", null ],
+    [ "value_opt", "classcmdlinet.html#a0e39c1cb90439b579cb6c56db2300030", null ],
     [ "args", "classcmdlinet.html#a71c26c279a95d2804eddf3772fb2ce88", null ],
     [ "options", "classcmdlinet.html#aa0bd525f4f7da48fe42cbe19784cca37", null ],
     [ "unknown_arg", "classcmdlinet.html#a268e7cb6f9cd518573ebe467bbf8742f", null ]
