@@ -1,5 +1,7 @@
 var NAVTREEINDEX23 =
 {
+"classcpp__tokent.html#af4ee841e7180a71fcd4fd34209605ebb":[8,0,331,5],
+"classcpp__tokent.html#afb533e5643147692ab58cd31ce77b6f9":[8,0,331,6],
 "classcpp__typecastt.html":[8,0,332],
 "classcpp__typecastt.html#a299a079ab1610122a654d44a551cafb0":[8,0,332,7],
 "classcpp__typecastt.html#a3b0f60e35c8abe2b659671693b31c49f":[8,0,332,4],
@@ -247,7 +249,5 @@ var NAVTREEINDEX23 =
 "classcpp__typecheckt_1_1instantiation__levelt.html":[8,0,335,0],
 "classcpp__typecheckt_1_1instantiation__levelt.html#a020184c3aaeb543330014aa09943fe97":[8,0,335,0,2],
 "classcpp__typecheckt_1_1instantiation__levelt.html#aa34eb6361f13e6a3db9e2c1a18f67dda":[8,0,335,0,0],
-"classcpp__typecheckt_1_1instantiation__levelt.html#ae7304c1f870332d74e2d96baa37aaff2":[8,0,335,0,1],
-"classcpp__typecheckt_1_1instantiationt.html":[8,0,335,1],
-"classcpp__typecheckt_1_1instantiationt.html#a52dde8dff113b9bf8c16767bff62a418":[8,0,335,1,0]
+"classcpp__typecheckt_1_1instantiation__levelt.html#ae7304c1f870332d74e2d96baa37aaff2":[8,0,335,0,1]
 };
