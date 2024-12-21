@@ -474,6 +474,8 @@ void ieee_floatt::build(
   const mp_integer &_fraction,
   const mp_integer &_exponent)
 {
+  PRECONDITION(rounding_mode != rounding_modet::NOT_SET);
+
   sign_flag=_fraction<0;
   fraction=_fraction;
   if(sign_flag)
@@ -488,6 +490,8 @@ void ieee_floatt::from_base10(
   const mp_integer &_fraction,
   const mp_integer &_exponent)
 {
+  PRECONDITION(rounding_mode != rounding_modet::NOT_SET);
+
   NaN_flag=infinity_flag=false;
   sign_flag=_fraction<0;
   fraction=_fraction;
@@ -584,6 +588,9 @@ void ieee_floatt::align()
     // we need to consider the rounding mode here
     switch(rounding_mode)
     {
+    case NOT_SET:
+      PRECONDITION(false);
+
     case UNKNOWN:
     case NONDETERMINISTIC:
     case ROUND_TO_EVEN:
@@ -660,6 +667,9 @@ void ieee_floatt::divide_and_round(
   {
     switch(rounding_mode)
     {
+    case NOT_SET:
+      PRECONDITION(false);
+
     case ROUND_TO_EVEN:
       {
         mp_integer divisor_middle = divisor / 2;
@@ -708,6 +718,7 @@ constant_exprt ieee_floatt::to_expr() const
 ieee_floatt &ieee_floatt::operator/=(const ieee_floatt &other)
 {
   PRECONDITION(other.spec.f == spec.f);
+  PRECONDITION(rounding_mode != rounding_modet::NOT_SET);
 
   // NaN/x = NaN
   if(NaN_flag)
@@ -782,6 +793,7 @@ ieee_floatt &ieee_floatt::operator/=(const ieee_floatt &other)
 ieee_floatt &ieee_floatt::operator*=(const ieee_floatt &other)
 {
   PRECONDITION(other.spec.f == spec.f);
+  PRECONDITION(rounding_mode != rounding_modet::NOT_SET);
 
   if(other.NaN_flag)
     make_NaN();
@@ -818,6 +830,8 @@ ieee_floatt &ieee_floatt::operator*=(const ieee_floatt &other)
 ieee_floatt &ieee_floatt::operator+=(const ieee_floatt &other)
 {
   PRECONDITION(other.spec == spec);
+  PRECONDITION(rounding_mode != rounding_modet::NOT_SET);
+
   ieee_floatt _other=other;
 
   if(other.NaN_flag)
@@ -1058,6 +1072,8 @@ bool ieee_floatt::ieee_not_equal(const ieee_floatt &other) const
 
 void ieee_floatt::change_spec(const ieee_float_spect &dest_spec)
 {
+  PRECONDITION(rounding_mode != rounding_modet::NOT_SET);
+
   mp_integer _exponent=exponent-spec.f;
   mp_integer _fraction=fraction;
 

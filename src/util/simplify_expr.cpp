@@ -70,6 +70,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_abs(const abs_exprt &expr)
 
     if(type.id()==ID_floatbv)
     {
+      // Does not need rounding
       ieee_floatt value(to_constant_expr(to_unary_expr(expr).op()));
       value.set_sign(false);
       return value.to_expr();
@@ -104,6 +105,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_sign(const sign_exprt &expr)
 
     if(type.id()==ID_floatbv)
     {
+      // Does not need rounding
       ieee_floatt value(to_constant_expr(expr.op()));
       return make_boolean_expr(value.get_sign());
     }
@@ -1179,7 +1181,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
         const floatbv_typet &f_expr_type=
           to_floatbv_type(expr_type);
 
-        ieee_floatt f(f_expr_type);
+        ieee_floatt f(f_expr_type, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
         f.from_integer(int_value);
 
         return f.to_expr();
@@ -1215,7 +1217,9 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     }
     else if(op_type_id==ID_floatbv)
     {
-      ieee_floatt f(to_constant_expr(expr.op()));
+      ieee_floatt f{
+        to_constant_expr(expr.op()),
+        ieee_floatt::rounding_modet::ROUND_TO_EVEN};
 
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv)
@@ -1233,7 +1237,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       {
         fixedbvt fixedbv;
         fixedbv.spec=fixedbv_spect(to_fixedbv_type(expr_type));
-        ieee_floatt factor(f.spec);
+        ieee_floatt factor(f.spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
         factor.from_integer(power(2, fixedbv.spec.get_fraction_bits()));
         f*=factor;
         fixedbv.set_value(f.to_integer());
@@ -1267,6 +1271,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       {
         const auto width = to_bv_type(op_type).get_width();
         const auto int_value = bvrep2integer(value, width, false);
+        // Does not need rounding.
         ieee_floatt ieee_float{to_floatbv_type(expr_type)};
         ieee_float.unpack(int_value);
         return ieee_float.to_expr();

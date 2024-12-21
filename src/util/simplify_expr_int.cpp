@@ -1889,7 +1889,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
     expr.op0().id() == ID_typecast && expr.op0().type().id() == ID_floatbv &&
     to_typecast_expr(expr.op0()).op().type().id() == ID_floatbv)
   {
-    ieee_floatt const_val(to_constant_expr(expr.op1()));
+    ieee_floatt const_val{
+      to_constant_expr(expr.op1()), ieee_floatt::rounding_modet::ROUND_TO_EVEN};
     ieee_floatt const_val_converted=const_val;
     const_val_converted.change_spec(ieee_float_spect(
       to_floatbv_type(to_typecast_expr(expr.op0()).op().type())));

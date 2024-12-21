@@ -41,6 +41,9 @@ public:
 
       switch(mode)
       {
+      case ieee_floatt::NOT_SET:
+        PRECONDITION(false);
+
       case ieee_floatt::ROUND_TO_EVEN:
         round_to_even=const_literal(true);
         break;

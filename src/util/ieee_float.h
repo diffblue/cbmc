@@ -121,22 +121,29 @@ public:
   // what is recommended in C11 5.2.4.2.2
   enum rounding_modet
   {
-    ROUND_TO_EVEN=0, ROUND_TO_MINUS_INF=1,
-    ROUND_TO_PLUS_INF=2,  ROUND_TO_ZERO=3,
-    UNKNOWN, NONDETERMINISTIC
+    ROUND_TO_EVEN = 0,
+    ROUND_TO_MINUS_INF = 1,
+    ROUND_TO_PLUS_INF = 2,
+    ROUND_TO_ZERO = 3,
+    UNKNOWN,
+    NONDETERMINISTIC,
+    NOT_SET
   };
 
   // A helper to turn a rounding mode into a constant bitvector expression
   static constant_exprt rounding_mode_expr(rounding_modet);
 
-  rounding_modet rounding_mode;
+  rounding_modet rounding_mode = rounding_modet::NOT_SET;
 
   ieee_float_spect spec;
 
-  explicit ieee_floatt(const ieee_float_spect &_spec):
-    rounding_mode(ROUND_TO_EVEN),
-    spec(_spec), sign_flag(false), exponent(0), fraction(0),
-    NaN_flag(false), infinity_flag(false)
+  explicit ieee_floatt(const ieee_float_spect &_spec)
+    : spec(_spec),
+      sign_flag(false),
+      exponent(0),
+      fraction(0),
+      NaN_flag(false),
+      infinity_flag(false)
   {
   }
 
@@ -151,26 +158,47 @@ public:
   {
   }
 
-  explicit ieee_floatt(const floatbv_typet &type):
-    rounding_mode(ROUND_TO_EVEN),
-    spec(ieee_float_spect(type)),
-    sign_flag(false),
-    exponent(0),
-    fraction(0),
-    NaN_flag(false),
-    infinity_flag(false)
+  explicit ieee_floatt(const floatbv_typet &type)
+    : spec(ieee_float_spect(type)),
+      sign_flag(false),
+      exponent(0),
+      fraction(0),
+      NaN_flag(false),
+      infinity_flag(false)
   {
   }
 
-  ieee_floatt():
-    rounding_mode(ROUND_TO_EVEN),
-    sign_flag(false), exponent(0), fraction(0),
-    NaN_flag(false), infinity_flag(false)
+  explicit ieee_floatt(
+    const floatbv_typet &type,
+    rounding_modet __rounding_mode)
+    : rounding_mode(__rounding_mode),
+      spec(ieee_float_spect(type)),
+      sign_flag(false),
+      exponent(0),
+      fraction(0),
+      NaN_flag(false),
+      infinity_flag(false)
   {
   }
 
-  explicit ieee_floatt(const constant_exprt &expr):
-    rounding_mode(ROUND_TO_EVEN)
+  ieee_floatt()
+    : sign_flag(false),
+      exponent(0),
+      fraction(0),
+      NaN_flag(false),
+      infinity_flag(false)
+  {
+  }
+
+  explicit ieee_floatt(const constant_exprt &expr)
+  {
+    from_expr(expr);
+  }
+
+  explicit ieee_floatt(
+    const constant_exprt &expr,
+    rounding_modet __rounding_mode)
+    : rounding_mode(__rounding_mode)
   {
     from_expr(expr);
   }

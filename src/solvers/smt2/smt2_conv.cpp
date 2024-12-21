@@ -3066,7 +3066,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     {
       constant_exprt val(irep_idt(), dest_type);
 
-      ieee_floatt a(dest_floatbv_type);
+      // The rounding mode doesn't matter for 0/1.
+      ieee_floatt a(dest_floatbv_type, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
 
       mp_integer significand;
       mp_integer exponent;
@@ -3464,7 +3465,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
          significands including the hidden bit.  Thus some encoding
          is needed to get to IEEE-754 style representations. */
 
-      ieee_floatt v=ieee_floatt(expr);
+      ieee_floatt v=ieee_floatt(expr); // no rounding needed
       size_t e=floatbv_type.get_e();
       size_t f=floatbv_type.get_f()+1;
 
@@ -3503,7 +3504,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     else
     {
       // produce corresponding bit-vector
-      const ieee_float_spect spec(floatbv_type);
+      const ieee_float_spect spec(floatbv_type); // no rounding needed
       const mp_integer v = bvrep2integer(expr.get_value(), spec.width(), false);
       out << "(_ bv" << v << " " << spec.width() << ")";
     }
