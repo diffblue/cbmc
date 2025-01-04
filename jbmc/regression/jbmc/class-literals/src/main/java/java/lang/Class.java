@@ -1,6 +1,6 @@
 package java.lang;
 
-public class Class {
+public class Class <T> {
 
   private String name;
 
@@ -43,4 +43,6 @@ public class Class {
   public boolean isLocalClass() { return isLocalClass; }
   public boolean isMemberClass() { return isMemberClass; }
   public boolean isEnum() { return isEnum; }
+
+  public boolean desiredAssertionStatus() { return true; }
 }
