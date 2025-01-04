@@ -1,6 +1,6 @@
 CORE
 catch1
---disable-uncaught-exception-check
+--disable-uncaught-exception-check -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
