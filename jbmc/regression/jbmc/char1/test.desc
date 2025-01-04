@@ -1,6 +1,6 @@
 CORE
 char1
---function char1.doit
+--function char1.doit -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
