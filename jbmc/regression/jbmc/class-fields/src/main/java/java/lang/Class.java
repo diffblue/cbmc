@@ -9,4 +9,7 @@ public class Class {
     org.cprover.CProver.assume(field == null);
   }
 
+  public boolean desiredAssertionStatus() {
+    return true;
+  }
 }
