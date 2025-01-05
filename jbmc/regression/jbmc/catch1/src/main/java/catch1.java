@@ -8,7 +8,7 @@ class some_exception2 extends some_exception1
 
 class catch1
 {
-  public static void main(String[] args)
+  public static void catchSuper() throws Throwable
   {
     try
     {
@@ -16,6 +16,18 @@ class catch1
     }
     
     catch(some_exception1 e)
+    {
+    }
+  }
+
+  public static void catchSub() throws Throwable
+  {
+    try
+    {
+      throw new some_exception1();
+    }
+
+    catch(some_exception2 e)
     {
     }
   }

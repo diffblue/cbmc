@@ -1,9 +1,9 @@
 CORE
-catch1
+catch1.catchSub
 -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\[.*\] line 15 no uncaught exception: FAILURE$
+^\[.*\] line 27 no uncaught exception: FAILURE$
 --
 ^warning: ignoring
