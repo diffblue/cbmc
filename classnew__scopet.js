@@ -24,7 +24,7 @@ var classnew__scopet =
     [ "is_named_scope", "classnew__scopet.html#aa505321d2de2fbc203035ea901c10872", null ],
     [ "is_template", "classnew__scopet.html#ada089793eea019a9caaf35a4ec9b2891", null ],
     [ "is_type", "classnew__scopet.html#afd5832556e96042fcca3c6ed8924b00f", null ],
-    [ "kind2string", "classnew__scopet.html#a11efd873136d4eb54a2959f72686d66b", null ],
+    [ "kind2string", "classnew__scopet.html#ac160e14049b4b4282864ff339e2cf4bd", null ],
     [ "print", "classnew__scopet.html#a843f778a3eeccf2862a0ea3e3309060f", null ],
     [ "print_rec", "classnew__scopet.html#a0329175bc6a2e97389b5e1a7350e5296", null ],
     [ "anon_count", "classnew__scopet.html#ab0406f1992856dd75c32105377b482e2", null ],

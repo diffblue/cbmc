@@ -1,10 +1,18 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/bdd/bdd_cudd.h" name="/home/runner/work/cbmc/cbmc/src/solvers/bdd/bdd_cudd.h">
-<area shape="rect" id="node1" title="Interface to Cudd BDD functions that are used in CBMC BDD functions should only be accessed through t..." alt="" coords="71,5,255,61"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,109,165,136"/>
-<area shape="rect" id="node3" href="$narrow_8h.html" title=" " alt="" coords="190,109,293,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="139,259,231,285"/>
-<area shape="rect" id="node5" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="242,184,334,211"/>
-<area shape="rect" id="node6" title=" " alt="" coords="255,259,321,285"/>
-<area shape="rect" id="node7" title=" " alt="" coords="345,259,420,285"/>
-<area shape="rect" id="node8" title=" " alt="" coords="444,259,503,285"/>
+<area shape="rect" id="Node000001" title="Interface to Cudd BDD functions that are used in CBMC BDD functions should only be accessed through t..." alt="" coords="71,5,255,60"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,108,165,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,62,107,99,103,96,137,58"/>
+<area shape="rect" id="Node000003" href="$narrow_8h.html" title=" " alt="" coords="190,108,293,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,58,223,96,219,99,185,62"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="139,255,231,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="239,135,197,243,192,241,234,133"/>
+<area shape="rect" id="Node000005" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="242,181,334,207"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="251,132,275,168,271,171,247,135"/>
+<area shape="poly" id="edge8_Node000005_Node000004" title=" " alt="" coords="273,209,215,249,212,244,270,204"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="255,255,321,280"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="291,207,291,241,285,241,285,207"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="345,255,420,280"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="305,205,358,244,355,248,302,209"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="444,255,503,280"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="319,204,432,247,430,252,317,209"/>
 </map>

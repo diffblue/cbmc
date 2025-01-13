@@ -1,18 +1,39 @@
 <map id="satcheck_minisat1_prooft" name="satcheck_minisat1_prooft">
-<area shape="rect" id="node1" title=" " alt="" coords="135,645,325,672"/>
-<area shape="rect" id="node2" href="$classsatcheck__minisat1t.html" title=" " alt="" coords="78,556,227,583"/>
-<area shape="rect" id="node3" href="$classsatcheck__minisat1__baset.html" title=" " alt="" coords="35,459,222,486"/>
-<area shape="rect" id="node4" href="$classcnf__solvert.html" title=" " alt="" coords="79,363,173,389"/>
-<area shape="rect" id="node5" href="$classcnft.html" title=" " alt="" coords="103,273,149,300"/>
-<area shape="rect" id="node6" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="97,184,153,211"/>
-<area shape="rect" id="node7" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="5,95,92,121"/>
-<area shape="rect" id="node8" title=" " alt="" coords="116,95,280,121"/>
-<area shape="rect" id="node15" href="$classclauset.html" title=" " alt="" coords="355,184,425,211"/>
-<area shape="rect" id="node9" title=" " alt="" coords="253,5,383,32"/>
-<area shape="rect" id="node14" title=" " alt="" coords="234,273,402,300"/>
-<area shape="rect" id="node16" title=" " alt="" coords="355,95,510,121"/>
-<area shape="rect" id="node10" href="$classminisat__prooft.html" title=" " alt="" coords="260,556,376,583"/>
-<area shape="rect" id="node11" title=" " alt="" coords="413,459,529,486"/>
-<area shape="rect" id="node12" href="$classresolution__prooft.html" title=" " alt="" coords="247,452,389,493"/>
-<area shape="rect" id="node13" href="$classresolution__prooft.html" title=" " alt="" coords="233,363,403,389"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="177,636,366,661"/>
+<area shape="rect" id="Node000002" href="$classsatcheck__minisat1t.html" title=" " alt="" coords="119,548,269,573"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,582,263,634,259,637,212,586"/>
+<area shape="rect" id="Node000003" href="$classsatcheck__minisat1__baset.html" title=" " alt="" coords="77,453,263,478"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="179,491,194,547,188,549,174,492"/>
+<area shape="rect" id="Node000004" href="$classcnf__solvert.html" title=" " alt="" coords="123,357,217,383"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="173,396,173,453,167,453,167,396"/>
+<area shape="rect" id="Node000005" href="$classcnft.html" title=" " alt="" coords="147,269,193,295"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="173,309,173,357,167,357,167,309"/>
+<area shape="rect" id="Node000006" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="142,181,198,207"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="173,221,173,269,167,269,167,221"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="116,93,280,119"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="191,132,187,143,176,182,171,180,182,142,186,131"/>
+<area shape="rect" id="Node000034" href="$classclauset.html" title=" " alt="" coords="347,181,417,207"/>
+<area shape="poly" id="edge14_Node000034_Node000007" title=" " alt="" coords="233,123,298,155,354,179,352,184,296,160,230,128"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="331,5,460,31"/>
+<area shape="poly" id="edge7_Node000007_Node000009" title=" " alt="" coords="353,38,306,57,222,96,220,91,304,52,351,33"/>
+<area shape="rect" id="Node000033" title=" " alt="" coords="367,269,535,295"/>
+<area shape="poly" id="edge18_Node000033_Node000009" title=" " alt="" coords="443,35,464,53,472,72,474,93,489,170,490,204,480,246,466,270,461,267,476,244,485,204,484,171,469,94,467,73,460,56,440,39"/>
+<area shape="rect" id="Node000035" title=" " alt="" coords="305,93,459,119"/>
+<area shape="poly" id="edge17_Node000035_Node000009" title=" " alt="" coords="394,44,386,93,381,92,389,44"/>
+<area shape="rect" id="Node000011" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="5,93,92,119"/>
+<area shape="poly" id="edge8_Node000006_Node000011" title=" " alt="" coords="78,125,155,179,152,183,75,129"/>
+<area shape="rect" id="Node000030" href="$classminisat__prooft.html" title=" " alt="" coords="301,548,417,573"/>
+<area shape="poly" id="edge9_Node000001_Node000030" title=" " alt="" coords="340,585,285,637,282,634,336,581"/>
+<area shape="rect" id="Node000031" title=" " alt="" coords="455,453,571,478"/>
+<area shape="poly" id="edge10_Node000030_Node000031" title=" " alt="" coords="504,492,493,510,477,526,449,542,419,552,417,547,447,537,474,522,489,507,500,489"/>
+<area shape="rect" id="Node000032" href="$classresolution__prooft.html" title=" " alt="" coords="288,445,431,485"/>
+<area shape="poly" id="edge11_Node000030_Node000032" title=" " alt="" coords="362,499,362,548,357,548,357,499"/>
+<area shape="poly" id="edge12_Node000032_Node000033" title=" " alt="" coords="399,302,358,325,340,340,326,359,320,380,324,403,334,425,346,444,342,447,329,428,319,405,315,380,321,356,336,336,355,320,397,297"/>
+<area shape="rect" id="Node000037" href="$classresolution__prooft.html" title=" " alt="" coords="389,357,559,383"/>
+<area shape="poly" id="edge20_Node000037_Node000033" title=" " alt="" coords="460,307,473,356,468,357,455,309"/>
+<area shape="poly" id="edge13_Node000033_Node000034" title=" " alt="" coords="397,217,415,244,439,267,435,271,411,247,392,220"/>
+<area shape="poly" id="edge15_Node000034_Node000035" title=" " alt="" coords="385,133,385,181,379,181,379,133"/>
+<area shape="rect" id="Node000036" href="$structclauset_1_1stept.html" title=" " alt="" coords="136,5,247,31"/>
+<area shape="poly" id="edge16_Node000035_Node000036" title=" " alt="" coords="189,44,190,57,195,67,207,74,234,80,305,92,304,97,232,85,205,79,191,71,184,58,183,45"/>
+<area shape="poly" id="edge19_Node000032_Node000037" title=" " alt="" coords="451,393,384,447,381,443,448,389"/>
 </map>

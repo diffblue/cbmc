@@ -1,19 +1,35 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/validation_interface.h" name="/home/runner/work/cbmc/cbmc/src/util/validation_interface.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1677,5,1861,61"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="546,109,751,165"/>
-<area shape="rect" id="node7" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1404,109,1632,165"/>
-<area shape="rect" id="node11" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1899,109,2142,165"/>
-<area shape="rect" id="node15" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="2549,109,2741,165"/>
-<area shape="rect" id="node3" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="5,221,268,262"/>
-<area shape="rect" id="node4" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="293,221,522,262"/>
-<area shape="rect" id="node5" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="546,213,751,269"/>
-<area shape="rect" id="node6" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="776,213,1039,269"/>
-<area shape="rect" id="node8" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="1063,213,1282,269"/>
-<area shape="rect" id="node9" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="1307,213,1492,269"/>
-<area shape="rect" id="node10" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1517,213,1759,269"/>
-<area shape="rect" id="node12" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="1783,213,2018,269"/>
-<area shape="rect" id="node13" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="2042,213,2242,269"/>
-<area shape="rect" id="node14" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2266,213,2525,269"/>
-<area shape="rect" id="node16" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="2549,213,2741,269"/>
-<area shape="rect" id="node17" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="2765,213,2957,269"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1251,5,1435,60"/>
+<area shape="rect" id="Node000002" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="221,108,413,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1237,47,414,127,413,122,1237,42"/>
+<area shape="rect" id="Node000005" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="979,108,1184,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1263,67,1150,110,1148,105,1261,62"/>
+<area shape="rect" id="Node000010" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1605,108,1833,163"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1449,60,1621,105,1620,111,1448,65"/>
+<area shape="rect" id="Node000014" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="2332,108,2575,163"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1449,41,2332,120,2331,126,1449,46"/>
+<area shape="rect" id="Node000003" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="5,211,197,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="250,171,159,213,156,208,248,166"/>
+<area shape="rect" id="Node000004" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="221,211,413,265"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="320,176,320,211,315,211,315,176"/>
+<area shape="rect" id="Node000006" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="438,218,701,258"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="966,162,666,221,665,215,965,157"/>
+<area shape="rect" id="Node000007" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="725,218,955,258"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="1007,170,886,220,884,215,1005,165"/>
+<area shape="rect" id="Node000008" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="979,211,1184,265"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="1084,176,1084,211,1079,211,1079,176"/>
+<area shape="rect" id="Node000009" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1209,211,1471,265"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="1162,165,1274,208,1272,213,1160,170"/>
+<area shape="rect" id="Node000011" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="1496,211,1715,265"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1680,174,1637,213,1633,209,1677,170"/>
+<area shape="rect" id="Node000012" href="$goto__analyzer__main_8cpp.html" title="Goto&#45;Analyser Main Module." alt="" coords="1739,211,1925,265"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="1760,170,1804,209,1801,213,1757,174"/>
+<area shape="rect" id="Node000013" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1949,211,2192,265"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="1824,164,1980,208,1978,213,1823,169"/>
+<area shape="rect" id="Node000015" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="2216,211,2451,265"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="2413,174,2366,213,2363,209,2410,169"/>
+<area shape="rect" id="Node000016" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="2475,211,2675,265"/>
+<area shape="poly" id="edge15_Node000014_Node000016" title=" " alt="" coords="2497,169,2545,209,2541,213,2494,174"/>
+<area shape="rect" id="Node000017" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2699,211,2957,265"/>
+<area shape="poly" id="edge16_Node000014_Node000017" title=" " alt="" coords="2565,164,2731,208,2730,213,2563,169"/>
 </map>

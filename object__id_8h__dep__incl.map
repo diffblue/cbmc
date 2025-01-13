@@ -1,7 +1,11 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/object_id.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/object_id.h">
-<area shape="rect" id="node1" title="Object Identifiers." alt="" coords="113,5,307,61"/>
-<area shape="rect" id="node2" href="$object__id_8cpp.html" title="Object Identifiers." alt="" coords="5,109,199,165"/>
-<area shape="rect" id="node3" href="$points__to_8h.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="223,109,416,165"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="65,213,323,269"/>
-<area shape="rect" id="node5" href="$points__to_8cpp.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="348,213,541,269"/>
+<area shape="rect" id="Node000001" title="Object Identifiers." alt="" coords="113,5,307,60"/>
+<area shape="rect" id="Node000002" href="$object__id_8cpp.html" title="Object Identifiers." alt="" coords="5,108,199,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,72,132,110,128,106,170,68"/>
+<area shape="rect" id="Node000003" href="$points__to_8h.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="223,108,416,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="251,68,293,106,289,110,247,72"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="65,211,323,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="277,174,228,213,225,208,274,169"/>
+<area shape="rect" id="Node000005" href="$points__to_8cpp.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="348,211,541,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="365,169,414,208,410,213,361,174"/>
 </map>

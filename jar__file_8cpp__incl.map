@@ -1,13 +1,24 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/jar_file.cpp" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/jar_file.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="309,5,528,61"/>
-<area shape="rect" id="node2" href="$jar__file_8h.html" title=" " alt="" coords="223,109,302,136"/>
-<area shape="rect" id="node9" title=" " alt="" coords="327,109,412,136"/>
-<area shape="rect" id="node10" title=" " alt="" coords="437,109,502,136"/>
-<area shape="rect" id="node11" title=" " alt="" coords="527,109,601,136"/>
-<area shape="rect" id="node3" href="$mz__zip__archive_8h.html" title=" " alt="" coords="66,184,201,211"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,259,64,285"/>
-<area shape="rect" id="node6" title=" " alt="" coords="225,184,300,211"/>
-<area shape="rect" id="node7" title=" " alt="" coords="325,184,449,211"/>
-<area shape="rect" id="node8" title=" " alt="" coords="473,184,535,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="95,259,172,285"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="309,5,528,60"/>
+<area shape="rect" id="Node000002" href="$jar__file_8h.html" title=" " alt="" coords="223,108,302,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="372,62,297,104,294,99,370,58"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="327,108,412,133"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="406,61,385,97,381,95,401,59"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="437,108,502,133"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="436,59,458,95,453,97,432,61"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="527,108,601,133"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="464,58,534,99,531,103,462,62"/>
+<area shape="rect" id="Node000003" href="$mz__zip__archive_8h.html" title=" " alt="" coords="66,181,201,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="243,136,168,177,166,172,241,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,255,64,280"/>
+<area shape="poly" id="edge6_Node000002_Node000004" title=" " alt="" coords="223,124,183,128,138,137,93,155,73,168,55,183,46,196,41,211,36,241,31,241,36,209,42,193,51,180,70,163,91,150,136,132,182,123,223,119"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="225,181,300,207"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="265,134,265,168,260,168,260,134"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="325,181,449,207"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="284,131,356,172,353,177,281,136"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="473,181,535,207"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="302,131,460,177,459,182,301,136"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="119,209,63,249,60,244,116,205"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="95,255,172,280"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="136,207,136,241,131,241,131,207"/>
 </map>

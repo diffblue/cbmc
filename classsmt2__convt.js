@@ -84,7 +84,7 @@ var classsmt2__convt =
     [ "push", "classsmt2__convt.html#a72b833b6a1717c21f747d9ae8abec9dd", null ],
     [ "set_converter", "classsmt2__convt.html#aadae8985c7936f99f548022c3dc97066", null ],
     [ "set_to", "classsmt2__convt.html#aa4a2b1dc9a0236c9d5c9094578be94f0", null ],
-    [ "to_smt2_symbol", "classsmt2__convt.html#afa6f58fef458eb37d180e9d44cb4bd5d", null ],
+    [ "to_smt2_symbol", "classsmt2__convt.html#af141b54025b5049f249872bc3e04694e", null ],
     [ "type2id", "classsmt2__convt.html#a64fa4a7e240cfd4fe4a659a30570f936", null ],
     [ "unflatten", "classsmt2__convt.html#a05da9436857d488b9c66ccdbf35a8194", null ],
     [ "use_array_theory", "classsmt2__convt.html#a06b8dece720bc9c30730f87054b6e058", null ],

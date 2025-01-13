@@ -7,7 +7,7 @@ var classnon__sharing__treet =
     [ "non_sharing_treet", "classnon__sharing__treet.html#a4e0f0243b6f2defddc7890e1573b2cdb", null ],
     [ "non_sharing_treet", "classnon__sharing__treet.html#a049e9eaeaa16c68639a719952f4d5d5f", null ],
     [ "non_sharing_treet", "classnon__sharing__treet.html#a2540dc3d031c97a7939a3593ef1e91e1", null ],
-    [ "read", "classnon__sharing__treet.html#a7ebea6abbe4d4ae2fbabd5e4fbb941fa", null ],
-    [ "write", "classnon__sharing__treet.html#ae0bc3e43f04101585de46cfa4f6cbc36", null ],
+    [ "read", "classnon__sharing__treet.html#a0b07da5acedcacb3aafd28f6e808afe0", null ],
+    [ "write", "classnon__sharing__treet.html#a618c42a6d32e53b55086b2159feed29d", null ],
     [ "data", "classnon__sharing__treet.html#ae0540ae1ea165492ae4e21a32e2629b0", null ]
 ];

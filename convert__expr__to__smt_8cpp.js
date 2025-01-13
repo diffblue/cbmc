@@ -2,9 +2,9 @@ var convert__expr__to__smt_8cpp =
 [
     [ "sort_based_cast_to_bit_vector_convertert", "structsort__based__cast__to__bit__vector__convertert.html", "structsort__based__cast__to__bit__vector__convertert" ],
     [ "sort_based_literal_convertert", "structsort__based__literal__convertert.html", "structsort__based__literal__convertert" ],
-    [ "at_scope_exitt", "structat__scope__exitt.html", "structat__scope__exitt" ],
+    [ "at_scope_exitt< functiont >", "structat__scope__exitt.html", "structat__scope__exitt" ],
     [ "sub_expression_mapt", "convert__expr__to__smt_8cpp.html#a8e696bd2d5f8fd0fba993cf587399f20", null ],
-    [ "at_scope_exit", "convert__expr__to__smt_8cpp.html#ac495613f13bab1346a8a0a75b95f1af2", null ],
+    [ "at_scope_exit", "convert__expr__to__smt_8cpp.html#ad52f8c7c22f15a315a3349d0f1861ca6", null ],
     [ "convert_array_update_to_smt", "convert__expr__to__smt_8cpp.html#a69c80d94e891764911197b76e52dc56e", null ],
     [ "convert_bit_vector_cast", "convert__expr__to__smt_8cpp.html#a4d9464a050ce46f8fe110323e5f41648", null ],
     [ "convert_c_bool_cast", "convert__expr__to__smt_8cpp.html#acd4c6145bbdfc630ef36d416d768cd20", null ],
@@ -90,12 +90,12 @@ var convert__expr__to__smt_8cpp =
     [ "convert_type_to_smt_sort", "convert__expr__to__smt_8cpp.html#ac198171e63f7727687ccd38ea799f70a", null ],
     [ "convert_type_to_smt_sort", "convert__expr__to__smt_8cpp.html#ab54130c24bec365e6443b95140f676b8", null ],
     [ "dispatch_expr_to_smt_conversion", "convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0", null ],
-    [ "extension_for_type", "convert__expr__to__smt_8cpp.html#a16546d182c0aefd461cafc27dcb9bd26", null ],
+    [ "extension_for_type", "convert__expr__to__smt_8cpp.html#a7d280750f51a6b6485e8787d149b53f2", null ],
     [ "filtered_visit_post", "convert__expr__to__smt_8cpp.html#a2325b851a0bc536e757f7a4f92bc5bec", null ],
     [ "lower_address_of_array_index", "convert__expr__to__smt_8cpp.html#a4a1246264a6dd3069e480a3610ed80e1", null ],
     [ "make_bitvector_resize_cast", "convert__expr__to__smt_8cpp.html#a6e0f50baf12a2db37a7cf0b7caa31e92", null ],
     [ "make_not_zero", "convert__expr__to__smt_8cpp.html#a902f906c119ae4b143c23bc8a3251dd9", null ],
     [ "most_significant_bit_is_set", "convert__expr__to__smt_8cpp.html#a68055c6868f80c64612c7d765aa04f36", null ],
     [ "operands_are_of_type", "convert__expr__to__smt_8cpp.html#adf1348cd9f8868b468b9a13dfebeeb2d", null ],
-    [ "try_relational_conversion", "convert__expr__to__smt_8cpp.html#a7faaab5c82d30f10cc47b427cbf6e087", null ]
+    [ "try_relational_conversion", "convert__expr__to__smt_8cpp.html#a53e2c9e8ebef3c25489528c1b84429ba", null ]
 ];

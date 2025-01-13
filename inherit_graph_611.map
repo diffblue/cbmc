@@ -1,5 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classpath__storaget.html" title="Storage for symbolic execution paths to be resumed later." alt="" coords="5,31,117,57"/>
-<area shape="rect" id="node2" href="$classpath__fifot.html" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="165,5,249,32"/>
-<area shape="rect" id="node3" href="$classpath__lifot.html" title="LIFO save queue: depth&#45;first search, try to finish paths." alt="" coords="165,56,249,83"/>
+<area shape="rect" id="Node000000" href="$classpath__enumeratort.html" title=" " alt="" coords="5,31,144,56"/>
+<area shape="rect" id="Node000001" href="$classall__paths__enumeratort.html" title=" " alt="" coords="192,5,361,31"/>
+<area shape="poly" id="edge438_Node000000_Node000001" title=" " alt="" coords="157,30,191,26,192,31,158,36"/>
+<area shape="rect" id="Node000002" href="$classsat__path__enumeratort.html" title=" " alt="" coords="193,55,360,80"/>
+<area shape="poly" id="edge439_Node000000_Node000002" title=" " alt="" coords="158,51,193,55,193,60,157,56"/>
 </map>

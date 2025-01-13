@@ -7,5 +7,5 @@ var rational_8h =
     [ "operator-", "rational_8h.html#ae2844c83be4b2d6e6d81641cb3fba4f5", null ],
     [ "operator-", "rational_8h.html#a2be7d40de400f9faf5df51bf29960f1b", null ],
     [ "operator/", "rational_8h.html#a312bb15a650dd790899e60e1fc758cdf", null ],
-    [ "operator<<", "rational_8h.html#ad4dcec4b2c62c5e6a59c5fa78583d59c", null ]
+    [ "operator<<", "rational_8h.html#ae97d2252694943416ba66f0f942c86c3", null ]
 ];

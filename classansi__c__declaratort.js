@@ -6,6 +6,6 @@ var classansi__c__declaratort =
     [ "get_name", "classansi__c__declaratort.html#af192a1a9e89c42f301805c3c7cfe1c6f", null ],
     [ "set_base_name", "classansi__c__declaratort.html#a5f526a07c5fcdf9551b3c85c77485482", null ],
     [ "set_name", "classansi__c__declaratort.html#a72e27e8361ee0f8b386d5d631a3c3216", null ],
-    [ "value", "classansi__c__declaratort.html#a2c3670c3cc8020b2fccadb247454200f", null ],
-    [ "value", "classansi__c__declaratort.html#a3481c8c265121d926b388b53401b9d8b", null ]
+    [ "value", "classansi__c__declaratort.html#a99f7a2e48ce8be90997d78092aadfab0", null ],
+    [ "value", "classansi__c__declaratort.html#aef70f191350d8ca5feb7c5209a4f9904", null ]
 ];

@@ -1,9 +1,16 @@
 <map id="vsd_configt" name="vsd_configt">
-<area shape="rect" id="node1" title=" " alt="" coords="152,335,248,361"/>
-<area shape="rect" id="node2" title=" " alt="" coords="179,109,314,136"/>
-<area shape="rect" id="node5" title=" " alt="" coords="13,215,176,256"/>
-<area shape="rect" id="node3" title=" " alt="" coords="194,13,233,39"/>
-<area shape="rect" id="node4" title=" " alt="" coords="259,13,298,39"/>
-<area shape="rect" id="node6" title=" " alt="" coords="31,109,118,136"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,5,144,47"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="152,332,248,357"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="179,108,314,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="278,141,289,156,306,198,314,235,309,270,289,310,271,327,249,337,247,332,268,322,285,306,304,269,308,235,301,200,284,159,274,144"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="13,213,176,253"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="178,140,143,159,120,186,105,214,100,211,116,182,140,155,176,136"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="194,13,233,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="216,51,222,83,238,106,233,109,218,85,211,52"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="259,13,298,38"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="273,52,253,109,248,107,268,50"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="90,266,91,287,98,307,109,318,122,326,153,337,151,342,120,331,106,322,94,309,85,288,85,266"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="31,108,118,133"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="77,147,79,172,90,212,85,213,73,172,71,148"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,5,144,45"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="77,59,77,108,72,108,72,59"/>
 </map>

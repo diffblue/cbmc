@@ -1,6 +1,9 @@
 <map id="taint_parse_treet::rulet" name="taint_parse_treet::rulet">
-<area shape="rect" id="node1" title=" " alt="" coords="47,215,188,256"/>
-<area shape="rect" id="node2" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,96,77,123"/>
-<area shape="rect" id="node3" title=" " alt="" coords="151,96,238,123"/>
-<area shape="rect" id="node4" title=" " alt="" coords="125,5,264,47"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="47,212,188,252"/>
+<area shape="rect" id="Node000002" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,95,77,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="38,134,37,161,45,187,55,199,69,210,66,214,52,203,40,189,32,161,33,134"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="151,95,238,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="191,135,182,162,168,190,145,214,141,210,163,186,177,160,186,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="125,5,264,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="197,59,197,94,192,94,192,59"/>
 </map>

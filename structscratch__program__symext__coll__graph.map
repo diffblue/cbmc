@@ -1,62 +1,158 @@
 <map id="scratch_program_symext" name="scratch_program_symext">
-<area shape="rect" id="node1" title=" " alt="" coords="2876,947,3063,974"/>
-<area shape="rect" id="node2" href="$classgoto__symext.html" title="The main class for the forward symbolic simulator." alt="" coords="2720,947,2827,974"/>
-<area shape="rect" id="node3" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1988,1182,2075,1209"/>
-<area shape="rect" id="node9" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="2369,1297,2527,1323"/>
-<area shape="rect" id="node23" href="$classshadow__memoryt.html" title="The shadow memory instrumentation performed during symbolic execution." alt="" coords="2379,947,2517,974"/>
-<area shape="rect" id="node43" href="$classsymex__target__equationt.html" title="Inheriting the interface of symex_targett this class represents the SSA form of the input program as ..." alt="" coords="2357,894,2539,921"/>
-<area shape="rect" id="node57" href="$classcomplexity__limitert.html" title="Symex complexity module." alt="" coords="2373,999,2523,1026"/>
-<area shape="rect" id="node4" href="$classmessage__handlert.html" title=" " alt="" coords="1563,1137,1706,1163"/>
-<area shape="rect" id="node5" title=" " alt="" coords="1013,1113,1200,1139"/>
-<area shape="rect" id="node6" title=" " alt="" coords="583,1007,712,1034"/>
-<area shape="rect" id="node55" title=" " alt="" coords="1029,1062,1184,1089"/>
-<area shape="rect" id="node56" title=" " alt="" coords="1029,1215,1184,1256"/>
-<area shape="rect" id="node59" title=" " alt="" coords="1927,942,2136,998"/>
-<area shape="rect" id="node7" title=" " alt="" coords="331,730,370,757"/>
-<area shape="rect" id="node20" title=" " alt="" coords="563,554,731,581"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1031,635,1183,676"/>
-<area shape="rect" id="node32" title=" " alt="" coords="580,701,715,727"/>
-<area shape="rect" id="node40" title=" " alt="" coords="569,611,726,638"/>
-<area shape="rect" id="node50" title=" " alt="" coords="593,894,701,921"/>
-<area shape="rect" id="node8" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1553,1359,1717,1386"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1961,1401,2102,1427"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1543,1411,1726,1452"/>
-<area shape="rect" id="node12" title=" " alt="" coords="1034,1411,1179,1452"/>
-<area shape="rect" id="node13" href="$classsource__locationt.html" title=" " alt="" coords="403,1382,532,1409"/>
-<area shape="rect" id="node14" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="221,1031,273,1058"/>
-<area shape="rect" id="node31" href="$classexprt.html" title="Base class for all expressions." alt="" coords="323,1031,379,1058"/>
-<area shape="rect" id="node46" title=" " alt="" coords="1030,136,1183,177"/>
-<area shape="rect" id="node15" href="$classsharing__treet.html" title=" " alt="" coords="5,1017,172,1073"/>
-<area shape="rect" id="node16" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1571,1187,1699,1214"/>
-<area shape="rect" id="node17" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1558,607,1711,634"/>
-<area shape="rect" id="node24" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1980,819,2083,846"/>
-<area shape="rect" id="node18" title=" " alt="" coords="1030,504,1183,545"/>
-<area shape="rect" id="node19" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="611,305,683,331"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1951,525,2112,581"/>
-<area shape="rect" id="node34" title=" " alt="" coords="1035,71,1178,112"/>
-<area shape="rect" id="node38" title=" " alt="" coords="1511,451,1759,507"/>
-<area shape="rect" id="node41" title=" " alt="" coords="1547,285,1722,327"/>
-<area shape="rect" id="node48" href="$class_s_s_a__stept.html" title="Single SSA step in the equation." alt="" coords="1591,957,1679,983"/>
-<area shape="rect" id="node54" href="$structsymex__targett_1_1sourcet.html" title="Identifies source in the context of symbolic execution." alt="" coords="1020,701,1193,727"/>
-<area shape="rect" id="node21" title=" " alt="" coords="331,510,370,537"/>
-<area shape="rect" id="node35" title=" " alt="" coords="556,58,739,85"/>
-<area shape="rect" id="node25" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1565,798,1705,825"/>
-<area shape="rect" id="node26" href="$classpath__storaget.html" title="Storage for symbolic execution paths to be resumed later." alt="" coords="2392,375,2504,402"/>
-<area shape="rect" id="node28" href="$classlocal__safe__pointerst.html" title="A very simple, cheap analysis to determine when dereference operations are trivially guarded by a che..." alt="" coords="1558,747,1711,774"/>
-<area shape="rect" id="node29" title=" " alt="" coords="977,751,1236,807"/>
-<area shape="rect" id="node30" title=" " alt="" coords="568,814,727,870"/>
-<area shape="rect" id="node49" title=" " alt="" coords="1039,995,1174,1022"/>
-<area shape="rect" id="node33" href="$classincremental__dirtyt.html" title="Wrapper for dirtyt that permits incremental population, ensuring each function is analysed exactly on..." alt="" coords="1960,122,2103,149"/>
-<area shape="rect" id="node36" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="1606,70,1663,97"/>
-<area shape="rect" id="node37" href="$classsymex__nondet__generatort.html" title="Functor generating fresh nondet symbols." alt="" coords="1935,349,2128,375"/>
-<area shape="rect" id="node39" title=" " alt="" coords="1018,569,1195,611"/>
-<area shape="rect" id="node42" href="$structguard__expr__managert.html" title="This is unused by this implementation of guards, but can be used by other implementations of the same..." alt="" coords="2365,1347,2531,1374"/>
-<area shape="rect" id="node44" href="$classsymex__targett.html" title="The interface of the target container for symbolic execution to record its symbolic steps into." alt="" coords="1973,769,2090,795"/>
-<area shape="rect" id="node45" href="$classmerge__irept.html" title=" " alt="" coords="1792,191,1893,218"/>
-<area shape="rect" id="node47" title=" " alt="" coords="1948,891,2115,918"/>
-<area shape="rect" id="node51" href="$classssa__exprt.html" title="Expression providing an SSA&#45;renamed symbol of expressions." alt="" coords="1064,1319,1149,1346"/>
-<area shape="rect" id="node52" href="$classsymbol__exprt.html" title="Expression to hold a symbol (variable)" alt="" coords="592,1323,703,1350"/>
-<area shape="rect" id="node53" title=" " alt="" coords="1063,945,1150,971"/>
-<area shape="rect" id="node58" href="$classsymex__complexity__limit__exceeded__actiont.html" title="Default heuristic transformation that cancels branches when complexity has been breached." alt="" coords="1543,1012,1726,1053"/>
-<area shape="rect" id="node60" href="$structsymex__configt.html" title="Configuration used for a symbolic execution." alt="" coords="2389,1398,2507,1425"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="2660,466,2847,491"/>
+<area shape="rect" id="Node000002" href="$classgoto__symext.html" title="The main class for the forward symbolic simulator." alt="" coords="2504,466,2611,491"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2624,476,2660,476,2660,481,2624,481"/>
+<area shape="rect" id="Node000003" href="$structsymex__configt.html" title="Configuration used for a symbolic execution." alt="" coords="2173,19,2291,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="2304,18,2349,17,2396,22,2442,36,2463,47,2482,62,2503,94,2519,141,2532,199,2542,262,2554,384,2558,466,2553,466,2549,384,2537,263,2527,200,2514,143,2498,96,2478,66,2460,52,2440,41,2395,27,2348,22,2304,23"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="395,351,467,377"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="480,358,502,351,521,337,536,311,540,285,537,258,530,232,523,205,521,178,527,151,545,125,585,91,623,71,662,62,701,61,786,72,835,77,889,80,2233,80,2271,84,2305,94,2338,110,2368,131,2395,156,2421,184,2464,248,2499,314,2526,377,2555,465,2550,467,2521,378,2494,316,2460,250,2416,188,2392,160,2364,135,2335,115,2303,99,2270,89,2233,85,889,85,835,83,786,77,701,66,662,67,625,76,588,96,549,128,531,153,526,178,529,204,535,230,542,257,546,285,541,312,525,340,505,355,482,363"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="814,137,967,177"/>
+<area shape="poly" id="edge9_Node000009_Node000004" title=" " alt="" coords="480,357,502,350,521,337,529,326,532,315,531,292,531,268,535,256,545,245,561,235,584,230,638,225,694,223,737,219,796,198,849,175,851,180,798,203,738,224,695,229,639,230,585,235,563,240,548,249,540,259,536,269,537,292,537,316,533,328,525,341,505,354,482,362"/>
+<area shape="rect" id="Node000017" href="$class_s_s_a__stept.html" title="Single SSA step in the equation." alt="" coords="1375,1026,1463,1051"/>
+<area shape="poly" id="edge29_Node000017_Node000004" title=" " alt="" coords="480,381,504,396,525,417,535,442,535,466,536,487,540,497,548,507,571,524,593,532,615,533,637,532,685,529,711,533,739,544,751,557,763,570,799,585,833,591,897,587,928,586,959,589,990,601,1022,625,1031,638,1036,651,1034,677,1033,702,1037,713,1046,725,1073,743,1100,751,1126,751,1154,746,1182,742,1211,740,1241,746,1272,762,1306,791,1334,826,1358,864,1377,902,1404,975,1417,1025,1412,1026,1399,976,1372,905,1353,866,1330,829,1302,795,1269,766,1239,751,1211,746,1182,747,1155,752,1127,756,1099,756,1071,748,1042,729,1032,716,1028,703,1029,677,1030,652,1027,640,1018,629,988,605,958,594,928,591,898,593,833,596,798,590,760,574,747,561,736,549,709,538,684,534,637,537,615,539,592,537,569,529,545,511,536,500,531,488,530,466,530,443,520,420,501,400,477,385"/>
+<area shape="rect" id="Node000018" href="$structsymex__targett_1_1sourcet.html" title="Identifies source in the context of symbolic execution." alt="" coords="804,639,977,665"/>
+<area shape="poly" id="edge22_Node000018_Node000004" title=" " alt="" coords="478,381,504,398,525,421,534,441,538,460,534,494,533,527,537,543,549,560,575,584,604,603,637,619,671,631,740,645,804,651,803,657,739,651,669,636,635,624,602,608,571,588,545,563,533,545,527,528,529,494,532,460,529,443,520,424,500,402,475,385"/>
+<area shape="rect" id="Node000054" title=" " alt="" coords="1735,570,1896,625"/>
+<area shape="poly" id="edge63_Node000054_Node000004" title=" " alt="" coords="475,381,501,397,525,417,533,429,536,440,540,449,548,458,567,467,590,473,647,480,786,480,858,479,925,481,981,491,1004,500,1022,511,1031,522,1035,534,1034,558,1034,580,1037,590,1046,599,1074,616,1099,625,1124,626,1149,622,1203,607,1235,601,1271,599,1734,595,1734,601,1271,604,1236,607,1205,613,1150,627,1124,631,1099,630,1071,621,1042,603,1033,593,1028,581,1029,558,1030,535,1026,525,1018,515,1001,504,980,496,924,487,858,484,786,485,647,486,589,479,565,472,545,462,535,452,531,442,528,431,521,420,498,401,472,386"/>
+<area shape="rect" id="Node000062" title=" " alt="" coords="819,228,962,268"/>
+<area shape="poly" id="edge75_Node000062_Node000004" title=" " alt="" coords="480,356,502,348,521,337,529,326,532,314,535,302,545,290,580,282,650,272,819,253,819,258,651,277,581,287,548,294,540,304,537,315,534,328,524,341,504,353,481,361"/>
+<area shape="rect" id="Node000063" title=" " alt="" coords="1295,430,1543,485"/>
+<area shape="poly" id="edge79_Node000063_Node000004" title=" " alt="" coords="481,362,877,375,1105,388,1199,397,1271,407,1296,415,1334,427,1332,432,1294,420,1270,412,1199,402,1104,393,876,380,481,368"/>
+<area shape="rect" id="Node000071" title=" " alt="" coords="1331,365,1506,405"/>
+<area shape="poly" id="edge86_Node000071_Node000004" title=" " alt="" coords="480,352,546,343,642,340,737,343,879,343,1020,347,1146,356,1271,369,1331,375,1331,380,1270,375,1145,362,1020,352,879,348,737,348,642,345,547,348,481,357"/>
+<area shape="rect" id="Node000005" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1342,202,1495,227"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1508,203,1541,187,1548,179,1552,170,1556,160,1565,151,1597,139,1625,139,1687,151,1870,179,2010,212,2148,255,2323,313,2407,336,2441,351,2482,377,2505,398,2525,422,2552,464,2547,467,2520,425,2501,402,2478,381,2439,355,2405,342,2322,319,2146,260,2008,217,1869,184,1686,156,1624,144,1598,144,1568,156,1560,163,1557,172,1553,182,1544,191,1510,207"/>
+<area shape="rect" id="Node000011" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1764,311,1867,337"/>
+<area shape="poly" id="edge15_Node000011_Node000005" title=" " alt="" coords="1484,228,1543,244,1711,293,1767,309,1765,314,1710,299,1542,249,1482,233"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="815,417,967,457"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="979,415,1018,397,1030,384,1042,370,1107,324,1162,295,1294,244,1358,225,1359,230,1296,249,1164,300,1110,329,1046,374,1034,388,1022,401,981,420"/>
+<area shape="poly" id="edge71_Node000054_Node000006" title=" " alt="" coords="981,456,1128,489,1295,523,1499,553,1735,584,1734,590,1499,558,1294,528,1126,495,980,461"/>
+<area shape="poly" id="edge84_Node000063_Node000006" title=" " alt="" coords="980,438,1294,450,1294,455,980,443"/>
+<area shape="poly" id="edge87_Node000071_Node000006" title=" " alt="" coords="980,417,1044,407,1196,393,1331,385,1331,391,1196,398,1044,412,981,422"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="115,470,154,495"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="166,465,186,459,241,450,312,444,486,436,814,434,814,439,486,441,313,449,241,455,187,464,168,470"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="347,302,515,327"/>
+<area shape="poly" id="edge11_Node000010_Node000007" title=" " alt="" coords="151,457,185,422,224,392,258,371,339,336,373,325,374,330,341,341,260,376,227,396,188,426,155,461"/>
+<area shape="rect" id="Node000050" title=" " alt="" coords="340,510,523,535"/>
+<area shape="poly" id="edge55_Node000050_Node000007" title=" " alt="" coords="159,502,188,519,226,529,266,533,343,533,343,538,266,539,225,534,186,524,157,507"/>
+<area shape="rect" id="Node000059" title=" " alt="" coords="364,769,499,794"/>
+<area shape="poly" id="edge69_Node000059_Node000007" title=" " alt="" coords="154,505,189,556,225,600,255,633,284,666,318,712,329,736,333,746,342,755,365,768,362,773,338,759,328,749,324,738,314,715,280,669,251,636,221,603,185,559,149,508"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="115,725,154,750"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="165,717,242,678,290,657,339,640,400,628,455,626,551,635,595,638,640,633,686,618,736,586,746,573,749,559,751,543,759,525,779,504,802,485,847,455,850,460,805,489,783,507,764,528,756,544,754,560,751,575,739,590,688,622,641,639,595,643,550,641,454,631,401,633,341,645,292,662,245,683,168,722"/>
+<area shape="poly" id="edge12_Node000010_Node000008" title=" " alt="" coords="136,710,153,600,167,544,184,505,200,489,217,480,251,473,284,465,299,457,314,442,322,429,325,416,324,390,324,364,328,350,338,337,353,325,357,330,342,341,333,353,329,365,329,390,330,417,327,431,318,446,302,461,286,470,252,478,219,485,204,494,189,508,172,545,158,601,142,711"/>
+<area shape="rect" id="Node000034" title=" " alt="" coords="377,967,485,993"/>
+<area shape="poly" id="edge33_Node000034_Node000008" title=" " alt="" coords="154,759,169,777,188,792,206,801,223,806,255,807,287,812,302,819,318,833,328,849,333,865,330,896,328,926,332,940,342,954,358,966,378,973,376,978,356,971,338,958,327,942,323,926,325,895,327,865,324,851,314,836,299,824,285,817,255,813,222,811,204,806,185,797,166,781,150,763"/>
+<area shape="rect" id="Node000025" title=" " alt="" coords="367,1302,496,1327"/>
+<area shape="poly" id="edge37_Node000025_Node000008" title=" " alt="" coords="140,763,153,882,167,958,189,1033,218,1114,243,1177,260,1204,280,1231,307,1258,341,1287,368,1301,365,1306,339,1292,303,1262,276,1235,255,1207,239,1179,213,1115,184,1034,162,959,147,883,135,764"/>
+<area shape="poly" id="edge70_Node000059_Node000008" title=" " alt="" coords="168,748,187,753,279,769,364,776,363,782,278,774,186,759,166,753"/>
+<area shape="rect" id="Node000070" title=" " alt="" coords="353,719,510,745"/>
+<area shape="poly" id="edge83_Node000070_Node000008" title=" " alt="" coords="168,734,352,731,352,736,168,739"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="981,147,1143,142,1218,146,1249,151,1272,159,1281,166,1285,174,1289,181,1296,187,1318,197,1343,205,1341,210,1317,202,1293,192,1285,184,1281,176,1277,169,1269,164,1247,157,1218,152,1143,147,982,153"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="444,289,484,234,512,206,545,184,578,170,613,160,684,147,753,144,814,146,814,151,753,149,685,152,614,165,580,175,548,189,516,210,488,238,448,292"/>
+<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="1880,319,1997,320,2150,332,2233,345,2318,363,2402,387,2481,419,2517,441,2544,464,2541,468,2513,445,2479,424,2400,392,2317,368,2232,350,2149,338,1997,326,1880,324"/>
+<area shape="rect" id="Node000075" href="$classshadow__memoryt.html" title="The shadow memory instrumentation performed during symbolic execution." alt="" coords="2163,533,2301,558"/>
+<area shape="poly" id="edge95_Node000075_Node000011" title=" " alt="" coords="1881,334,1903,345,1922,362,1935,385,1938,408,1931,452,1927,472,1926,492,1931,511,1946,530,1972,549,2003,561,2035,569,2068,571,2134,567,2188,555,2190,561,2134,572,2068,577,2034,574,2001,567,1970,554,1942,534,1926,514,1921,493,1922,472,1926,451,1933,408,1930,387,1918,366,1900,350,1878,339"/>
+<area shape="rect" id="Node000012" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="1349,315,1489,341"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="1503,324,1764,322,1764,327,1503,330"/>
+<area shape="rect" id="Node000013" href="$structguard__expr__managert.html" title="This is unused by this implementation of guards, but can be used by other implementations of the same..." alt="" coords="2149,417,2315,442"/>
+<area shape="poly" id="edge16_Node000002_Node000013" title=" " alt="" coords="2329,435,2480,456,2513,463,2511,469,2480,461,2328,440"/>
+<area shape="rect" id="Node000014" href="$classsymex__target__equationt.html" title="Inheriting the interface of symex_targett this class represents the SSA form of the input program as ..." alt="" coords="2141,837,2323,862"/>
+<area shape="poly" id="edge17_Node000002_Node000014" title=" " alt="" coords="2252,824,2543,490,2547,493,2256,828"/>
+<area shape="rect" id="Node000015" href="$classsymex__targett.html" title="The interface of the target container for symbolic execution to record its symbolic steps into." alt="" coords="1757,837,1874,862"/>
+<area shape="poly" id="edge18_Node000014_Node000015" title=" " alt="" coords="1888,847,2141,847,2141,852,1888,852"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="1732,917,1899,942"/>
+<area shape="poly" id="edge19_Node000014_Node000016" title=" " alt="" coords="1895,912,2165,859,2166,865,1896,917"/>
+<area shape="poly" id="edge20_Node000016_Node000017" title=" " alt="" coords="1475,1021,1767,939,1769,945,1477,1026"/>
+<area shape="poly" id="edge21_Node000017_Node000018" title=" " alt="" coords="992,657,1022,675,1032,688,1037,701,1037,726,1036,751,1039,764,1046,777,1072,806,1097,827,1122,841,1149,851,1206,871,1238,886,1272,907,1350,971,1407,1024,1403,1028,1347,975,1269,912,1235,890,1204,876,1147,856,1120,846,1094,831,1068,810,1042,780,1034,766,1031,752,1031,726,1031,702,1027,691,1018,679,989,662"/>
+<area shape="rect" id="Node000019" href="$classexprt.html" title="Base class for all expressions." alt="" coords="107,1071,163,1097"/>
+<area shape="poly" id="edge23_Node000017_Node000019" title=" " alt="" coords="177,1090,338,1120,442,1135,547,1147,602,1154,645,1162,686,1162,736,1147,743,1142,747,1136,752,1128,760,1122,813,1102,884,1086,1060,1061,1240,1046,1374,1038,1375,1043,1240,1051,1061,1067,885,1091,814,1107,763,1126,756,1132,752,1138,747,1146,739,1152,687,1167,644,1167,601,1159,546,1152,441,1141,337,1125,176,1095"/>
+<area shape="rect" id="Node000033" title=" " alt="" coords="823,995,958,1021"/>
+<area shape="poly" id="edge31_Node000033_Node000019" title=" " alt="" coords="176,1075,338,1050,546,1024,695,1013,823,1007,823,1013,695,1018,547,1029,338,1055,177,1080"/>
+<area shape="rect" id="Node000035" title=" " alt="" coords="813,1135,968,1161"/>
+<area shape="poly" id="edge35_Node000035_Node000019" title=" " alt="" coords="149,1108,165,1133,188,1154,224,1167,276,1175,416,1182,579,1178,737,1168,819,1158,820,1163,738,1173,579,1183,416,1187,275,1181,222,1172,185,1158,161,1136,145,1111"/>
+<area shape="rect" id="Node000057" title=" " alt="" coords="352,889,511,943"/>
+<area shape="poly" id="edge67_Node000057_Node000019" title=" " alt="" coords="147,1057,163,1033,185,1011,225,985,267,963,351,932,353,937,270,968,227,989,188,1015,167,1037,151,1060"/>
+<area shape="rect" id="Node000020" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="5,1071,57,1097"/>
+<area shape="poly" id="edge24_Node000019_Node000020" title=" " alt="" coords="71,1081,107,1081,107,1087,71,1087"/>
+<area shape="rect" id="Node000047" href="$classsource__locationt.html" title=" " alt="" coords="187,1430,316,1455"/>
+<area shape="poly" id="edge50_Node000047_Node000020" title=" " alt="" coords="50,1107,244,1428,240,1431,45,1110"/>
+<area shape="rect" id="Node000049" title=" " alt="" coords="814,833,967,873"/>
+<area shape="poly" id="edge53_Node000049_Node000020" title=" " alt="" coords="48,1059,104,993,143,957,185,926,225,904,259,891,340,875,469,857,600,848,718,846,814,847,814,853,718,851,600,854,470,862,340,880,260,896,228,908,188,930,146,961,108,997,52,1062"/>
+<area shape="rect" id="Node000027" href="$classssa__exprt.html" title="Expression providing an SSA&#45;renamed symbol of expressions." alt="" coords="848,1234,933,1259"/>
+<area shape="poly" id="edge25_Node000017_Node000027" title=" " alt="" coords="948,1250,1031,1257,1127,1260,1213,1253,1246,1245,1269,1233,1282,1217,1287,1201,1283,1167,1278,1130,1282,1110,1293,1090,1310,1073,1331,1060,1374,1044,1376,1049,1333,1065,1313,1077,1297,1094,1287,1112,1284,1130,1289,1166,1292,1202,1286,1220,1272,1237,1248,1250,1214,1259,1127,1265,1031,1263,947,1256"/>
+<area shape="rect" id="Node000028" href="$classsymbol__exprt.html" title="Expression to hold a symbol (variable)" alt="" coords="376,1407,487,1433"/>
+<area shape="poly" id="edge26_Node000027_Node000028" title=" " alt="" coords="496,1401,631,1360,694,1336,736,1313,743,1303,746,1292,750,1281,760,1270,780,1258,803,1250,847,1244,848,1249,804,1256,783,1263,763,1274,755,1283,752,1294,748,1305,739,1317,696,1341,633,1366,497,1406"/>
+<area shape="rect" id="Node000051" title=" " alt="" coords="813,1440,968,1480"/>
+<area shape="poly" id="edge57_Node000051_Node000028" title=" " alt="" coords="475,1435,510,1447,547,1456,617,1464,688,1467,813,1464,813,1469,688,1473,617,1470,546,1461,508,1452,473,1440"/>
+<area shape="rect" id="Node000031" title=" " alt="" coords="847,1185,934,1210"/>
+<area shape="poly" id="edge27_Node000017_Node000031" title=" " alt="" coords="948,1201,1031,1209,1126,1212,1213,1207,1246,1199,1269,1187,1278,1177,1282,1167,1282,1143,1281,1117,1284,1104,1293,1090,1310,1074,1331,1061,1374,1045,1376,1050,1333,1066,1314,1078,1297,1094,1289,1106,1286,1118,1288,1143,1288,1168,1283,1180,1272,1191,1248,1204,1213,1212,1126,1218,1030,1214,947,1207"/>
+<area shape="rect" id="Node000032" title=" " alt="" coords="362,1237,501,1277"/>
+<area shape="poly" id="edge28_Node000031_Node000032" title=" " alt="" coords="514,1243,546,1239,847,1200,847,1205,547,1244,514,1248"/>
+<area shape="poly" id="edge30_Node000017_Node000033" title=" " alt="" coords="972,1010,1375,1034,1374,1039,971,1015"/>
+<area shape="poly" id="edge38_Node000016_Node000034" title=" " alt="" coords="499,966,546,960,795,947,1135,937,1732,927,1732,933,1135,942,795,952,547,965,500,971"/>
+<area shape="poly" id="edge32_Node000033_Node000034" title=" " alt="" coords="499,979,738,991,823,998,823,1004,737,996,499,985"/>
+<area shape="poly" id="edge34_Node000017_Node000035" title=" " alt="" coords="982,1157,1061,1164,1145,1167,1220,1163,1248,1156,1269,1147,1279,1136,1281,1122,1283,1106,1293,1090,1311,1075,1332,1063,1374,1046,1376,1051,1334,1067,1314,1079,1297,1094,1288,1108,1287,1123,1284,1138,1272,1151,1250,1161,1220,1168,1145,1172,1061,1169,981,1162"/>
+<area shape="poly" id="edge36_Node000035_Node000025" title=" " alt="" coords="491,1296,522,1287,586,1273,637,1267,684,1254,709,1241,735,1221,744,1209,746,1197,750,1184,760,1171,785,1157,812,1149,814,1154,787,1162,763,1175,754,1186,752,1198,749,1211,739,1225,712,1245,686,1259,638,1272,586,1279,523,1292,493,1301"/>
+<area shape="rect" id="Node000040" title=" " alt="" coords="797,1283,984,1309"/>
+<area shape="poly" id="edge44_Node000040_Node000025" title=" " alt="" coords="510,1309,797,1297,797,1302,510,1314"/>
+<area shape="poly" id="edge58_Node000051_Node000025" title=" " alt="" coords="464,1333,503,1356,548,1378,616,1401,687,1420,814,1446,813,1451,686,1426,615,1406,546,1382,500,1361,461,1337"/>
+<area shape="rect" id="Node000073" title=" " alt="" coords="1711,1263,1920,1318"/>
+<area shape="poly" id="edge92_Node000073_Node000025" title=" " alt="" coords="510,1317,749,1332,1044,1344,1109,1351,1160,1359,1210,1361,1238,1355,1269,1344,1276,1339,1281,1333,1285,1326,1293,1320,1327,1309,1371,1301,1480,1290,1601,1286,1710,1286,1710,1291,1601,1291,1481,1296,1372,1306,1328,1314,1296,1325,1289,1330,1285,1336,1280,1343,1272,1349,1239,1360,1210,1366,1160,1365,1108,1356,1044,1349,748,1337,510,1323"/>
+<area shape="rect" id="Node000036" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1772,1189,1859,1214"/>
+<area shape="poly" id="edge59_Node000002_Node000036" title=" " alt="" coords="1871,1186,1988,1150,2054,1123,2116,1090,2238,1008,2285,972,2326,934,2363,893,2399,846,2478,723,2508,658,2530,591,2552,491,2557,492,2535,593,2513,660,2482,725,2404,849,2367,897,2330,938,2288,976,2241,1013,2119,1094,2056,1128,1990,1156,1873,1191"/>
+<area shape="poly" id="edge39_Node000014_Node000036" title=" " alt="" coords="1841,1178,2214,860,2217,864,1844,1182"/>
+<area shape="rect" id="Node000041" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="2153,1402,2311,1427"/>
+<area shape="poly" id="edge48_Node000041_Node000036" title=" " alt="" coords="1873,1215,1900,1229,1922,1250,1933,1270,1936,1289,1931,1325,1929,1359,1933,1375,1946,1390,1960,1399,1979,1405,2032,1414,2093,1417,2152,1416,2152,1422,2093,1422,2031,1419,1978,1410,1957,1403,1942,1394,1929,1377,1923,1360,1926,1325,1930,1289,1927,1272,1918,1254,1897,1234,1871,1219"/>
+<area shape="rect" id="Node000072" href="$classcomplexity__limitert.html" title="Symex complexity module." alt="" coords="2157,1219,2307,1245"/>
+<area shape="poly" id="edge89_Node000072_Node000036" title=" " alt="" coords="1873,1203,2157,1224,2156,1229,1872,1208"/>
+<area shape="poly" id="edge96_Node000075_Node000036" title=" " alt="" coords="1827,1175,1870,1079,1917,954,1924,925,1926,902,1930,878,1942,851,1962,820,1993,782,2073,695,2215,556,2219,560,2077,699,1997,785,1967,823,1946,853,1936,880,1932,902,1929,926,1923,955,1875,1081,1832,1177"/>
+<area shape="rect" id="Node000037" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1355,1234,1483,1259"/>
+<area shape="poly" id="edge40_Node000036_Node000037" title=" " alt="" coords="1496,1237,1686,1217,1771,1205,1772,1211,1687,1223,1497,1243"/>
+<area shape="rect" id="Node000038" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1337,1185,1501,1210"/>
+<area shape="poly" id="edge41_Node000036_Node000038" title=" " alt="" coords="1514,1197,1567,1197,1772,1199,1772,1204,1567,1203,1514,1202"/>
+<area shape="rect" id="Node000039" href="$classmessage__handlert.html" title=" " alt="" coords="1347,1103,1490,1129"/>
+<area shape="poly" id="edge42_Node000036_Node000039" title=" " alt="" coords="1473,1096,1508,1081,1541,1062,1552,1048,1565,1036,1599,1024,1627,1019,1655,1023,1688,1036,1712,1051,1734,1069,1769,1112,1795,1154,1811,1187,1806,1190,1791,1157,1765,1115,1730,1073,1709,1055,1685,1041,1654,1028,1627,1025,1600,1029,1568,1041,1556,1052,1544,1066,1510,1086,1475,1101"/>
+<area shape="poly" id="edge43_Node000039_Node000040" title=" " alt="" coords="998,1304,1076,1309,1156,1309,1224,1301,1250,1294,1269,1283,1279,1271,1284,1259,1283,1232,1280,1203,1284,1187,1293,1172,1308,1156,1326,1144,1363,1126,1366,1131,1328,1148,1311,1160,1297,1175,1289,1189,1286,1203,1288,1232,1289,1260,1284,1274,1272,1287,1252,1299,1225,1306,1156,1314,1076,1314,998,1310"/>
+<area shape="poly" id="edge45_Node000036_Node000041" title=" " alt="" coords="2180,1400,2049,1349,1985,1320,1942,1293,1934,1282,1929,1272,1926,1263,1918,1254,1887,1232,1854,1217,1856,1212,1890,1228,1922,1250,1930,1261,1934,1270,1938,1280,1946,1289,1988,1315,2051,1344,2182,1395"/>
+<area shape="rect" id="Node000042" title=" " alt="" coords="1745,1406,1886,1431"/>
+<area shape="poly" id="edge46_Node000041_Node000042" title=" " alt="" coords="1900,1416,2117,1415,2153,1414,2153,1419,2117,1420,1900,1421"/>
+<area shape="rect" id="Node000043" title=" " alt="" coords="1327,1399,1510,1439"/>
+<area shape="poly" id="edge47_Node000042_Node000043" title=" " alt="" coords="1524,1416,1744,1416,1744,1421,1524,1421"/>
+<area shape="poly" id="edge49_Node000041_Node000047" title=" " alt="" coords="330,1449,547,1472,762,1489,903,1501,1044,1509,1204,1511,1367,1507,1529,1497,1685,1484,1959,1452,2153,1425,2153,1430,1959,1458,1685,1489,1529,1502,1368,1512,1204,1516,1044,1515,902,1507,761,1495,546,1477,329,1454"/>
+<area shape="rect" id="Node000048" href="$classmerge__irept.html" title=" " alt="" coords="1576,699,1677,725"/>
+<area shape="poly" id="edge51_Node000014_Node000048" title=" " alt="" coords="1691,724,2175,834,2174,839,1690,729"/>
+<area shape="poly" id="edge52_Node000048_Node000049" title=" " alt="" coords="979,841,1000,832,1018,819,1027,805,1029,789,1031,772,1042,757,1085,736,1144,721,1216,712,1294,706,1452,703,1576,707,1576,712,1452,709,1294,711,1216,717,1145,727,1087,741,1046,761,1036,774,1034,790,1032,807,1022,823,1003,836,981,846"/>
+<area shape="poly" id="edge54_Node000049_Node000050" title=" " alt="" coords="476,540,503,559,525,585,532,606,535,633,534,697,535,759,540,783,548,799,579,808,647,819,814,842,813,847,647,824,578,813,545,803,535,785,530,759,529,697,529,633,527,607,520,588,499,563,473,544"/>
+<area shape="poly" id="edge76_Node000062_Node000050" title=" " alt="" coords="468,501,521,470,632,395,735,310,747,297,760,284,788,270,818,260,820,265,790,275,763,289,751,300,739,314,636,399,524,474,471,506"/>
+<area shape="poly" id="edge56_Node000002_Node000051" title=" " alt="" coords="982,1466,1275,1490,1465,1501,1668,1508,1868,1507,2053,1497,2135,1488,2209,1475,2271,1458,2321,1438,2383,1398,2404,1378,2422,1355,2450,1302,2477,1232,2497,1163,2513,1069,2535,842,2548,625,2553,492,2558,492,2553,625,2541,842,2518,1070,2502,1165,2483,1234,2454,1305,2426,1358,2408,1381,2386,1402,2324,1442,2273,1463,2210,1480,2136,1493,2053,1503,1868,1513,1668,1513,1465,1506,1274,1496,981,1472"/>
+<area shape="rect" id="Node000052" href="$classpath__storaget.html" title="Storage for symbolic execution paths to be resumed later." alt="" coords="2176,466,2288,491"/>
+<area shape="poly" id="edge60_Node000002_Node000052" title=" " alt="" coords="2302,476,2504,476,2504,481,2302,481"/>
+<area shape="rect" id="Node000053" href="$classsymex__nondet__generatort.html" title="Functor generating fresh nondet symbols." alt="" coords="1719,510,1912,535"/>
+<area shape="poly" id="edge61_Node000052_Node000053" title=" " alt="" coords="1925,511,2117,492,2176,484,2176,490,2118,497,1926,516"/>
+<area shape="poly" id="edge62_Node000052_Node000054" title=" " alt="" coords="1910,618,1961,623,2015,622,2068,611,2093,601,2116,587,2127,573,2128,556,2129,538,2139,518,2160,501,2184,489,2186,494,2163,506,2143,522,2135,539,2134,557,2132,575,2119,591,2095,606,2070,616,2016,628,1961,629,1909,623"/>
+<area shape="rect" id="Node000055" href="$classlocal__safe__pointerst.html" title="A very simple, cheap analysis to determine when dereference operations are trivially guarded by a che..." alt="" coords="1342,638,1495,663"/>
+<area shape="poly" id="edge64_Node000054_Node000055" title=" " alt="" coords="1509,647,1595,642,1686,631,1734,620,1735,625,1687,636,1596,647,1510,652"/>
+<area shape="rect" id="Node000056" title=" " alt="" coords="761,754,1020,809"/>
+<area shape="poly" id="edge65_Node000055_Node000056" title=" " alt="" coords="1013,744,1018,740,1027,726,1029,711,1031,695,1042,681,1065,669,1096,660,1174,649,1261,645,1342,645,1342,651,1262,651,1175,655,1097,665,1067,674,1046,685,1036,697,1034,711,1032,727,1022,743,1016,748"/>
+<area shape="poly" id="edge66_Node000056_Node000057" title=" " alt="" coords="524,909,575,903,630,891,685,873,736,848,743,842,747,835,760,819,782,806,785,811,763,823,752,838,747,845,739,853,687,878,632,896,576,908,525,915"/>
+<area shape="poly" id="edge68_Node000056_Node000059" title=" " alt="" coords="513,779,761,779,761,784,513,784"/>
+<area shape="rect" id="Node000060" href="$classincremental__dirtyt.html" title="Wrapper for dirtyt that permits incremental population, ensuring each function is analysed exactly on..." alt="" coords="1744,259,1887,285"/>
+<area shape="poly" id="edge72_Node000052_Node000060" title=" " alt="" coords="1886,286,1921,296,1980,313,2029,324,2073,343,2096,359,2119,382,2130,401,2131,419,2133,436,2143,451,2159,462,2177,469,2175,474,2156,467,2139,455,2128,437,2126,420,2125,403,2115,386,2092,364,2070,348,2027,329,1979,318,1919,301,1885,291"/>
+<area shape="rect" id="Node000061" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="1390,153,1447,178"/>
+<area shape="poly" id="edge73_Node000060_Node000061" title=" " alt="" coords="1461,162,1566,169,1627,179,1688,195,1720,208,1751,225,1799,257,1796,261,1748,230,1718,213,1686,200,1626,184,1565,175,1461,168"/>
+<area shape="poly" id="edge77_Node000060_Node000062" title=" " alt="" coords="976,248,1743,267,1743,273,976,253"/>
+<area shape="poly" id="edge74_Node000061_Node000062" title=" " alt="" coords="969,222,1044,204,1214,182,1390,165,1390,170,1214,188,1044,209,970,227"/>
+<area shape="poly" id="edge78_Node000052_Node000063" title=" " alt="" coords="1556,458,2176,475,2176,480,1556,464"/>
+<area shape="rect" id="Node000064" title=" " alt="" coords="802,689,979,729"/>
+<area shape="poly" id="edge80_Node000063_Node000064" title=" " alt="" coords="991,692,1018,674,1026,663,1030,653,1030,630,1030,607,1034,594,1042,582,1068,558,1097,536,1162,503,1229,481,1294,466,1295,472,1231,486,1164,508,1100,541,1072,562,1046,586,1038,597,1035,608,1035,630,1035,654,1031,666,1022,678,994,697"/>
+<area shape="rect" id="Node000065" href="$classlexical__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any lexical loops." alt="" coords="342,655,521,695"/>
+<area shape="poly" id="edge81_Node000064_Node000065" title=" " alt="" coords="534,679,738,693,802,699,802,704,737,699,534,684"/>
+<area shape="poly" id="edge82_Node000064_Node000070" title=" " alt="" coords="524,725,802,711,802,716,524,730"/>
+<area shape="poly" id="edge85_Node000052_Node000071" title=" " alt="" coords="1520,389,1790,412,1954,430,2118,452,2177,463,2176,469,2117,457,1953,435,1790,417,1520,394"/>
+<area shape="poly" id="edge88_Node000002_Node000072" title=" " alt="" coords="2321,1229,2363,1223,2405,1211,2445,1192,2478,1164,2486,1149,2494,1124,2508,1050,2531,842,2546,628,2553,492,2558,492,2551,628,2536,843,2513,1051,2499,1125,2491,1151,2482,1167,2448,1196,2407,1216,2364,1228,2321,1234"/>
+<area shape="poly" id="edge90_Node000072_Node000073" title=" " alt="" coords="1933,1271,2156,1240,2157,1245,1934,1277"/>
+<area shape="rect" id="Node000074" href="$classsymex__complexity__limit__exceeded__actiont.html" title="Default heuristic transformation that cancels branches when complexity has been breached." alt="" coords="1327,1335,1510,1375"/>
+<area shape="poly" id="edge93_Node000072_Node000074" title=" " alt="" coords="1524,1366,1610,1372,1711,1372,1816,1364,1869,1355,1919,1343,1931,1336,1943,1328,1991,1309,2029,1298,2116,1273,2199,1242,2201,1247,2118,1279,2030,1303,1992,1314,1945,1333,1934,1341,1921,1348,1870,1360,1817,1369,1711,1378,1610,1377,1523,1371"/>
+<area shape="poly" id="edge91_Node000073_Node000074" title=" " alt="" coords="1524,1343,1604,1334,1686,1321,1714,1315,1715,1321,1687,1327,1604,1340,1525,1349"/>
+<area shape="poly" id="edge94_Node000002_Node000075" title=" " alt="" coords="2314,529,2479,496,2509,489,2511,494,2481,501,2315,534"/>
 </map>

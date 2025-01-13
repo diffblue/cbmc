@@ -1,11 +1,19 @@
 <map id="smt_identifier_termt" name="smt_identifier_termt">
-<area shape="rect" id="node1" title="Stores identifiers in unescaped and unquoted form." alt="" coords="1345,127,1500,153"/>
-<area shape="rect" id="node2" href="$classsmt__termt.html" title=" " alt="" coords="1158,93,1249,120"/>
-<area shape="rect" id="node3" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="795,28,847,55"/>
-<area shape="rect" id="node4" href="$classsharing__treet.html" title=" " alt="" coords="431,7,597,63"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,14,187,55"/>
-<area shape="rect" id="node6" href="$classsmt__sortt_1_1storert.html" title=" " alt="" coords="754,86,889,127"/>
-<area shape="rect" id="node7" href="$classsmt__sortt_1_1storert.html" title="Class for adding the ability to up and down cast smt_sortt to and from irept." alt="" coords="447,87,581,129"/>
-<area shape="rect" id="node8" href="$classsmt__indext_1_1storert.html" title=" " alt="" coords="1111,147,1296,189"/>
-<area shape="rect" id="node9" href="$classsmt__indext_1_1storert.html" title="Class for adding the ability to up and down cast smt_indext to and from irept." alt="" coords="748,151,895,193"/>
+<area shape="rect" id="Node000001" title="Stores identifiers in unescaped and unquoted form." alt="" coords="1345,125,1500,150"/>
+<area shape="rect" id="Node000002" href="$classsmt__termt.html" title=" " alt="" coords="1158,93,1249,118"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1263,111,1345,123,1345,129,1262,117"/>
+<area shape="rect" id="Node000003" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="795,29,847,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="861,45,1158,95,1157,101,861,50"/>
+<area shape="rect" id="Node000004" href="$classsharing__treet.html" title=" " alt="" coords="431,7,597,62"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="611,34,795,38,795,43,611,39"/>
+<area shape="rect" id="Node000005" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,15,187,55"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="200,32,431,32,431,37,200,37"/>
+<area shape="rect" id="Node000006" href="$classsmt__sortt_1_1storert.html" title=" " alt="" coords="754,85,889,125"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="902,103,1158,103,1158,108,902,108"/>
+<area shape="rect" id="Node000007" href="$classsmt__sortt_1_1storert.html" title="Class for adding the ability to up and down cast smt_sortt to and from irept." alt="" coords="447,87,581,127"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="595,104,753,103,754,108,595,109"/>
+<area shape="rect" id="Node000008" href="$classsmt__indext_1_1storert.html" title=" " alt="" coords="1111,145,1296,185"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1310,149,1345,145,1345,150,1310,154"/>
+<area shape="rect" id="Node000009" href="$classsmt__indext_1_1storert.html" title="Class for adding the ability to up and down cast smt_indext to and from irept." alt="" coords="748,149,895,189"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="909,166,1111,164,1111,169,909,171"/>
 </map>

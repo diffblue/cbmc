@@ -1,8 +1,14 @@
 <map id="/home/runner/work/cbmc/cbmc/src/cbmc/c_test_input_generator.h" name="/home/runner/work/cbmc/cbmc/src/cbmc/c_test_input_generator.h">
-<area shape="rect" id="node1" title="Test Input Generator for C." alt="" coords="5,5,189,61"/>
-<area shape="rect" id="node2" title=" " alt="" coords="25,184,89,211"/>
-<area shape="rect" id="node3" href="$xml_8h.html" title=" " alt="" coords="95,109,179,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="113,184,156,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="180,184,231,211"/>
-<area shape="rect" id="node6" title=" " alt="" coords="255,184,313,211"/>
+<area shape="rect" id="Node000001" title="Test Input Generator for C." alt="" coords="5,5,189,60"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="25,181,89,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,61,66,169,61,167,88,60"/>
+<area shape="rect" id="Node000003" href="$xml_8h.html" title=" " alt="" coords="95,108,179,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="112,59,129,94,124,97,107,61"/>
+<area shape="poly" id="edge6_Node000003_Node000002" title=" " alt="" coords="126,135,82,174,79,170,123,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="113,181,156,207"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="140,134,138,168,133,168,134,134"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="180,181,231,207"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="150,132,187,169,183,173,147,136"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="255,181,313,207"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="162,131,249,173,247,178,160,136"/>
 </map>

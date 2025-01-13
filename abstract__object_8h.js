@@ -1,8 +1,8 @@
 var abstract__object_8h =
 [
     [ "abstract_objectt", "classabstract__objectt.html", "classabstract__objectt" ],
-    [ "combine_result", "structabstract__objectt_1_1combine__result.html", "structabstract__objectt_1_1combine__result" ],
-    [ "abstract_object_visitort", "structabstract__objectt_1_1abstract__object__visitort.html", "structabstract__objectt_1_1abstract__object__visitort" ],
+    [ "abstract_objectt::combine_result", "structabstract__objectt_1_1combine__result.html", "structabstract__objectt_1_1combine__result" ],
+    [ "abstract_objectt::abstract_object_visitort", "structabstract__objectt_1_1abstract__object__visitort.html", "structabstract__objectt_1_1abstract__object__visitort" ],
     [ "abstract_hashert", "structabstract__hashert.html", "structabstract__hashert" ],
     [ "abstract_equalert", "structabstract__equalert.html", "structabstract__equalert" ],
     [ "CLONE", "abstract__object_8h.html#a5d1b2bfd8f7bc991c358809a6f4f8688", null ],

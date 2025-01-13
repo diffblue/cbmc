@@ -1,11 +1,22 @@
 <map id="interval_domaint" name="interval_domaint">
-<area shape="rect" id="node1" title=" " alt="" coords="812,105,945,132"/>
-<area shape="rect" id="node2" href="$classai__domain__baset.html" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="545,47,678,73"/>
-<area shape="rect" id="node3" title=" " alt="" coords="528,173,695,214"/>
-<area shape="rect" id="node4" href="$classinterval__templatet.html" title=" " alt="" coords="157,151,339,177"/>
-<area shape="rect" id="node9" title=" " alt="" coords="537,98,686,139"/>
-<area shape="rect" id="node5" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="212,27,284,53"/>
-<area shape="rect" id="node6" title=" " alt="" coords="181,205,315,232"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,180,44,207"/>
-<area shape="rect" id="node8" title=" " alt="" coords="5,231,44,257"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="812,106,945,131"/>
+<area shape="rect" id="Node000002" href="$classai__domain__baset.html" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="545,49,678,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="687,74,789,96,822,103,821,109,787,101,686,79"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="537,173,686,213"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="696,167,832,129,833,134,697,172"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="212,151,284,177"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="298,174,340,191,352,201,364,210,407,219,453,221,498,218,538,211,539,216,498,223,453,227,407,225,362,214,349,206,337,196,296,179"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="528,99,695,139"/>
+<area shape="poly" id="edge9_Node000009_Node000004" title=" " alt="" coords="297,148,362,135,447,125,528,119,528,124,448,130,363,140,298,154"/>
+<area shape="rect" id="Node000005" href="$classinterval__templatet.html" title=" " alt="" coords="157,27,339,53"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="319,53,436,81,505,102,515,114,519,126,522,137,530,149,561,171,558,175,526,153,517,140,514,127,511,116,503,106,435,87,317,58"/>
+<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="317,22,361,18,410,18,459,26,505,44,515,54,519,64,523,74,530,83,549,96,547,101,526,87,518,76,514,66,511,57,503,49,458,31,410,23,362,23,318,28"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="181,206,315,231"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="282,236,320,255,363,269,403,278,434,282,465,280,503,269,528,258,552,243,589,211,593,215,555,248,531,263,505,275,466,285,434,287,402,283,362,275,318,260,280,241"/>
+<area shape="poly" id="edge11_Node000009_Node000006" title=" " alt="" coords="328,201,362,195,434,185,465,180,503,170,570,136,573,141,505,174,466,185,435,191,363,200,329,206"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,181,44,206"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="58,194,181,208,180,214,57,200"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,230,44,255"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="58,239,133,235,180,228,181,234,134,240,58,245"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="708,116,812,116,812,121,708,121"/>
 </map>

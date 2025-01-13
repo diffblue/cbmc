@@ -1,8 +1,18 @@
 <map id="sharing_mapt&lt; keyT, valueT, fail_if_equal, hashT, equalT &gt;" name="sharing_mapt&lt; keyT, valueT, fail_if_equal, hashT, equalT &gt;">
-<area shape="rect" id="node1" title="A map implemented as a tree where subtrees can be shared between different maps." alt="" coords="1553,51,1716,107"/>
-<area shape="rect" id="node2" href="$classsharing__nodet.html" title=" " alt="" coords="1301,58,1472,99"/>
-<area shape="rect" id="node3" href="$classsharing__nodet.html" title=" " alt="" coords="949,58,1113,99"/>
-<area shape="rect" id="node4" href="$classsmall__shared__n__way__ptrt.html" title=" " alt="" coords="655,29,868,129"/>
-<area shape="rect" id="node5" href="$classsmall__shared__n__way__ptrt.html" title="This class is similar to small_shared_ptrt and boost&#39;s intrusive_ptr." alt="" coords="267,58,425,99"/>
-<area shape="rect" id="node6" href="$classsmall__shared__n__way__pointee__baset.html" title=" " alt="" coords="5,58,205,99"/>
+<area shape="rect" id="Node000001" title="A map implemented as a tree where subtrees can be shared between different maps." alt="" coords="1557,109,1720,164"/>
+<area shape="rect" id="Node000002" href="$classsharing__nodet.html" title=" " alt="" coords="1305,117,1476,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1490,134,1557,134,1557,139,1490,139"/>
+<area shape="rect" id="Node000003" href="$classsmall__shared__n__way__ptrt.html" title=" " alt="" coords="662,37,869,151"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="883,94,1070,102,1282,118,1305,121,1305,126,1281,123,1070,108,883,100"/>
+<area shape="rect" id="Node000004" href="$classsmall__shared__n__way__pointee__baset.html" title=" " alt="" coords="5,133,205,173"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="155,124,285,66,366,38,449,17,501,7,542,3,584,6,635,17,681,35,679,40,634,22,583,11,543,8,502,13,450,22,367,43,287,71,157,129"/>
+<area shape="rect" id="Node000005" href="$classsmall__shared__n__way__ptrt.html" title="This class is similar to small_shared_ptrt and boost&#39;s intrusive_ptr." alt="" coords="267,133,425,173"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="219,150,266,150,266,155,219,155"/>
+<area shape="rect" id="Node000007" href="$classsmall__shared__n__way__ptrt.html" title=" " alt="" coords="659,175,872,274"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="185,174,267,197,358,220,450,234,542,239,635,234,658,233,659,238,635,239,542,244,449,239,357,225,266,202,183,179"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="439,136,449,134,662,105,662,110,450,139,440,141"/>
+<area shape="poly" id="edge9_Node000007_Node000005" title=" " alt="" coords="384,179,415,198,450,213,502,225,556,231,658,232,658,238,556,236,501,230,449,218,413,203,381,183"/>
+<area shape="rect" id="Node000006" href="$classsharing__nodet.html" title=" " alt="" coords="953,158,1117,198"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="1131,165,1281,147,1305,145,1305,150,1282,153,1132,170"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="885,201,953,190,953,195,886,207"/>
 </map>

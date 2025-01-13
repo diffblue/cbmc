@@ -15,7 +15,7 @@ var classpiped__processt =
     [ "can_receive", "classpiped__processt.html#a22880bf94089d7b9668f27a01c17f670", null ],
     [ "can_receive", "classpiped__processt.html#ae03cfd02d20fb6a7c411bb8e198d14c8", null ],
     [ "get_status", "classpiped__processt.html#af5e4d702df4db69b7ff4b3f56d78cfb2", null ],
-    [ "operator=", "classpiped__processt.html#a126214734eadf4eb3cb20bd30ed52f5c", null ],
+    [ "operator=", "classpiped__processt.html#aa6d56a2226e41d52f8692f7a6115a74d", null ],
     [ "receive", "classpiped__processt.html#a7219fa7d278e86c9e230ed58b8621ebc", null ],
     [ "send", "classpiped__processt.html#a754f475f19c676d80ee50053a9c65a7b", null ],
     [ "wait_receivable", "classpiped__processt.html#a5b21821ef7b39899ac2a21dbb57b07ba", null ],

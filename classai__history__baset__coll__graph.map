@@ -1,5 +1,7 @@
 <map id="ai_history_baset" name="ai_history_baset">
-<area shape="rect" id="node1" title="A history object is an abstraction / representation of the control&#45;flow part of a set of traces." alt="" coords="19,184,149,211"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,95,163,121"/>
-<area shape="rect" id="node3" title=" " alt="" coords="65,5,103,32"/>
+<area shape="rect" id="Node000001" title="A history object is an abstraction / representation of the control&#45;flow part of a set of traces." alt="" coords="19,181,149,207"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,163,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,133,87,181,81,181,81,133"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="65,5,103,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,45,87,93,81,93,81,45"/>
 </map>

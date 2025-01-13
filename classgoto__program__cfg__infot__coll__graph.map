@@ -1,8 +1,13 @@
 <map id="goto_program_cfg_infot" name="goto_program_cfg_infot">
-<area shape="rect" id="node1" title="For a goto program." alt="" coords="5,288,183,315"/>
-<area shape="rect" id="node2" href="$classcfg__infot.html" title="Stores information about a goto function computed from its CFG." alt="" coords="9,184,88,211"/>
-<area shape="rect" id="node3" title=" " alt="" coords="112,184,263,211"/>
-<area shape="rect" id="node4" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="106,95,178,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="202,95,311,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="237,5,276,32"/>
+<area shape="rect" id="Node000001" title="For a goto program." alt="" coords="5,284,183,309"/>
+<area shape="rect" id="Node000002" href="$classcfg__infot.html" title="Stores information about a goto function computed from its CFG." alt="" coords="9,181,88,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="62,218,91,283,86,285,57,221"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="112,181,263,207"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,219,107,286,103,282,165,215"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="106,93,178,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="156,130,170,156,183,180,178,182,165,159,151,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="202,93,311,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="241,131,199,182,195,179,236,128"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="237,5,276,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="259,45,259,93,254,93,254,45"/>
 </map>

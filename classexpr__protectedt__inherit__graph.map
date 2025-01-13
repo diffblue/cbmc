@@ -1,61 +1,121 @@
 <map id="expr_protectedt" name="expr_protectedt">
-<area shape="rect" id="node1" title="Base class for all expressions." alt="" coords="853,1516,979,1543"/>
-<area shape="rect" id="node6" href="$classalready__typechecked__exprt.html" title=" " alt="" coords="1031,750,1191,791"/>
-<area shape="rect" id="node7" href="$classbinary__exprt.html" title="A base class for binary expressions." alt="" coords="1059,867,1163,893"/>
-<area shape="rect" id="node42" href="$classextractbits__exprt.html" title="Extracts a sub&#45;range of a bit&#45;vector operand." alt="" coords="1045,1263,1178,1289"/>
-<area shape="rect" id="node43" href="$classindex__designatort.html" title=" " alt="" coords="1042,1313,1181,1340"/>
-<area shape="rect" id="node44" href="$classmember__designatort.html" title=" " alt="" coords="1032,1364,1191,1391"/>
-<area shape="rect" id="node45" href="$classmulti__ary__exprt.html" title="A base class for multi&#45;ary expressions Associativity is not specified." alt="" coords="1049,1415,1174,1441"/>
-<area shape="rect" id="node49" href="$classnondet__padding__exprt.html" title="This expression serves as a placeholder for the bits which have non deterministic value in a larger b..." alt="" coords="1028,1465,1195,1492"/>
-<area shape="rect" id="node50" href="$classnullary__exprt.html" title="An expression without operands." alt="" coords="1057,1516,1165,1543"/>
-<area shape="rect" id="node51" href="$classoverflow__result__exprt.html" title="An expression returning both the result of the arithmetic operation under wrap&#45;around semantics as we..." alt="" coords="1030,1567,1193,1593"/>
-<area shape="rect" id="node52" href="$classpredicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed." alt="" coords="1049,1617,1173,1644"/>
-<area shape="rect" id="node53" href="$classprophecy__pointer__in__range__exprt.html" title="pointer_in_range (see pointer_in_range_exprt) with prophecy expressions to encode whether a pointer r..." alt="" coords="1034,1669,1189,1710"/>
-<area shape="rect" id="node54" href="$classprophecy__r__or__w__ok__exprt.html" title="A base class for a predicate that indicates that an address range is ok to read or write or both." alt="" coords="1034,1734,1189,1775"/>
-<area shape="rect" id="node55" href="$classternary__exprt.html" title="An expression with three operands." alt="" coords="1056,816,1167,843"/>
-<area shape="rect" id="node56" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="1061,1800,1161,1827"/>
-<area shape="rect" id="node57" href="$classupdate__bit__exprt.html" title="Replaces a sub&#45;range of a bit&#45;vector operand." alt="" coords="1045,1851,1177,1877"/>
-<area shape="rect" id="node58" href="$classupdate__bits__exprt.html" title="Replaces a sub&#45;range of a bit&#45;vector operand." alt="" coords="1042,1901,1181,1928"/>
-<area shape="rect" id="node59" href="$classwith__exprt.html" title="Operator to update elements in structs and arrays." alt="" coords="1066,1952,1157,1979"/>
-<area shape="rect" id="node2" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,1516,804,1543"/>
-<area shape="rect" id="node3" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,1516,699,1543"/>
-<area shape="rect" id="node4" href="$classsharing__treet.html" title=" " alt="" coords="431,1501,597,1557"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,1509,187,1550"/>
-<area shape="rect" id="node8" href="$classallocate__exprt.html" title=" " alt="" coords="1278,5,1393,32"/>
-<area shape="rect" id="node9" href="$classallocate__state__exprt.html" title=" " alt="" coords="1258,56,1413,83"/>
-<area shape="rect" id="node10" href="$classbinary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly two argu..." alt="" coords="1249,107,1421,133"/>
-<area shape="rect" id="node11" href="$classbinding__exprt.html" title="A base class for variable bindings (quantifiers, let, lambda)" alt="" coords="1280,157,1391,184"/>
-<area shape="rect" id="node12" href="$classbyte__extract__exprt.html" title="Expression of type type extracted from some object op starting at position offset (given in number of..." alt="" coords="1263,208,1408,235"/>
-<area shape="rect" id="node13" href="$classcomplex__exprt.html" title="Complex constructor from a pair of numbers." alt="" coords="1276,259,1395,285"/>
-<area shape="rect" id="node14" href="$classconstant__interval__exprt.html" title="Represents an interval of values." alt="" coords="1247,309,1423,336"/>
-<area shape="rect" id="node15" href="$classcpp__static__assertt.html" title=" " alt="" coords="1265,360,1405,387"/>
-<area shape="rect" id="node16" href="$classdeallocate__state__exprt.html" title=" " alt="" coords="1250,411,1421,437"/>
-<area shape="rect" id="node17" href="$classdiv__exprt.html" title="Division." alt="" coords="1294,461,1377,488"/>
-<area shape="rect" id="node18" href="$classdynamic__object__exprt.html" title="Representation of heap&#45;allocated objects." alt="" coords="1252,512,1419,539"/>
-<area shape="rect" id="node19" href="$classelement__address__exprt.html" title="Operator to return the address of an array element relative to a base address." alt="" coords="1248,563,1423,589"/>
-<area shape="rect" id="node20" href="$classenter__scope__state__exprt.html" title=" " alt="" coords="1244,613,1427,640"/>
-<area shape="rect" id="node21" href="$classeuclidean__mod__exprt.html" title="Boute&#39;s Euclidean definition of Modulo – to match SMT&#45;LIB2." alt="" coords="1254,664,1417,691"/>
-<area shape="rect" id="node22" href="$classevaluate__exprt.html" title=" " alt="" coords="1275,715,1395,741"/>
-<area shape="rect" id="node23" href="$classexit__scope__state__exprt.html" title=" " alt="" coords="1249,765,1422,792"/>
-<area shape="rect" id="node24" href="$classfactorial__power__exprt.html" title="Falling factorial power." alt="" coords="1253,816,1417,843"/>
-<area shape="rect" id="node25" href="$classfloatbv__typecast__exprt.html" title="Semantic type conversion from/to floating&#45;point formats." alt="" coords="1250,867,1421,893"/>
-<area shape="rect" id="node26" href="$classfunction__application__exprt.html" title="Application of (mathematical) function." alt="" coords="1258,918,1413,959"/>
-<area shape="rect" id="node27" href="$classimplies__exprt.html" title="Boolean implication." alt="" coords="1280,984,1391,1011"/>
-<area shape="rect" id="node28" href="$classindex__exprt.html" title="Array index operator." alt="" coords="1286,1035,1385,1061"/>
-<area shape="rect" id="node29" href="$classlet__exprt.html" title="A let expression." alt="" coords="1295,1085,1375,1112"/>
-<area shape="rect" id="node30" href="$classminus__exprt.html" title="Binary minus." alt="" coords="1284,1136,1387,1163"/>
-<area shape="rect" id="node31" href="$classmod__exprt.html" title="Modulo defined as lhs&#45;(rhs * truncate(lhs/rhs))." alt="" coords="1289,1187,1381,1213"/>
-<area shape="rect" id="node32" href="$classnamed__term__exprt.html" title="Expression that introduces a new symbol that is equal to the operand." alt="" coords="1262,1237,1409,1264"/>
-<area shape="rect" id="node33" href="$classobject__descriptor__exprt.html" title="Split an expression into a base object and a (byte) offset." alt="" coords="1248,1288,1423,1315"/>
-<area shape="rect" id="node34" href="$classpower__exprt.html" title="Exponentiation." alt="" coords="1284,1339,1387,1365"/>
-<area shape="rect" id="node35" href="$classreplication__exprt.html" title="Bit&#45;vector replication." alt="" coords="1269,1389,1401,1416"/>
-<area shape="rect" id="node36" href="$classsaturating__minus__exprt.html" title="Saturating subtraction expression." alt="" coords="1247,1440,1423,1467"/>
-<area shape="rect" id="node37" href="$classsaturating__plus__exprt.html" title="The saturating plus expression." alt="" coords="1254,1491,1417,1517"/>
-<area shape="rect" id="node38" href="$classshift__exprt.html" title="A base class for shift and rotate operators." alt="" coords="1290,1541,1381,1568"/>
-<area shape="rect" id="node39" href="$classstate__cstrlen__exprt.html" title=" " alt="" coords="1262,1592,1409,1619"/>
-<area shape="rect" id="node40" href="$classstate__object__size__exprt.html" title=" " alt="" coords="1247,1643,1423,1669"/>
-<area shape="rect" id="node41" href="$classstate__type__compatible__exprt.html" title=" " alt="" coords="1250,1694,1421,1735"/>
-<area shape="rect" id="node46" href="$classand__exprt.html" title="Boolean AND." alt="" coords="1292,1760,1379,1787"/>
-<area shape="rect" id="node47" href="$classarray__exprt.html" title="Array constructor from list of elements." alt="" coords="1287,1811,1384,1837"/>
-<area shape="rect" id="node48" href="$classarray__list__exprt.html" title="Array constructor from a list of index&#45;element pairs Operands are index/value pairs,..." alt="" coords="1273,1861,1397,1888"/>
+<area shape="rect" id="Node000001" title="Base class for all expressions." alt="" coords="853,1140,979,1165"/>
+<area shape="rect" id="Node000006" href="$classalready__typechecked__exprt.html" title=" " alt="" coords="1031,730,1191,770"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="914,1126,918,1057,933,964,947,914,966,865,992,820,1026,780,1042,768,1046,772,1030,784,997,823,971,868,952,916,938,965,923,1058,920,1126"/>
+<area shape="rect" id="Node000007" href="$classbinary__exprt.html" title="A base class for binary expressions." alt="" coords="1059,844,1163,869"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="918,1126,927,1073,946,1007,960,972,978,938,1000,906,1026,879,1042,869,1058,862,1060,867,1044,873,1030,883,1004,910,983,940,965,974,951,1008,932,1075,923,1127"/>
+<area shape="rect" id="Node000075" href="$classextractbits__exprt.html" title="Extracts a sub&#45;range of a bit&#45;vector operand." alt="" coords="1045,893,1178,919"/>
+<area shape="poly" id="edge44_Node000001_Node000075" title=" " alt="" coords="920,1126,933,1083,954,1030,984,975,1004,950,1026,928,1045,916,1048,921,1030,932,1008,953,989,978,959,1032,938,1085,926,1127"/>
+<area shape="rect" id="Node000076" href="$classindex__designatort.html" title=" " alt="" coords="1042,943,1181,968"/>
+<area shape="poly" id="edge45_Node000001_Node000076" title=" " alt="" coords="924,1126,939,1092,961,1052,990,1012,1026,977,1047,966,1049,970,1030,981,994,1015,966,1055,944,1095,929,1128"/>
+<area shape="rect" id="Node000077" href="$classmember__designatort.html" title=" " alt="" coords="1032,992,1191,1017"/>
+<area shape="poly" id="edge46_Node000001_Node000077" title=" " alt="" coords="931,1127,970,1076,997,1049,1027,1026,1050,1015,1052,1020,1029,1031,1000,1053,974,1080,935,1130"/>
+<area shape="rect" id="Node000078" href="$classmulti__ary__exprt.html" title="A base class for multi&#45;ary expressions Associativity is not specified." alt="" coords="1049,1041,1174,1067"/>
+<area shape="poly" id="edge47_Node000001_Node000078" title=" " alt="" coords="942,1129,981,1102,1027,1076,1057,1064,1058,1069,1029,1080,984,1106,945,1134"/>
+<area shape="rect" id="Node000104" href="$classnondet__padding__exprt.html" title="This expression serves as a placeholder for the bits which have non deterministic value in a larger b..." alt="" coords="1028,1091,1195,1116"/>
+<area shape="poly" id="edge49_Node000001_Node000104" title=" " alt="" coords="979,1134,1060,1113,1061,1119,981,1139"/>
+<area shape="rect" id="Node000105" href="$classnullary__exprt.html" title="An expression without operands." alt="" coords="1057,1140,1165,1165"/>
+<area shape="poly" id="edge50_Node000001_Node000105" title=" " alt="" coords="993,1150,1057,1150,1057,1155,993,1155"/>
+<area shape="rect" id="Node000126" href="$classoverflow__result__exprt.html" title="An expression returning both the result of the arithmetic operation under wrap&#45;around semantics as we..." alt="" coords="1030,1189,1193,1215"/>
+<area shape="poly" id="edge51_Node000001_Node000126" title=" " alt="" coords="981,1166,1061,1187,1060,1192,979,1171"/>
+<area shape="rect" id="Node000127" href="$classpredicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed." alt="" coords="1049,1239,1173,1264"/>
+<area shape="poly" id="edge52_Node000001_Node000127" title=" " alt="" coords="945,1172,984,1199,1029,1225,1058,1236,1057,1241,1027,1230,981,1204,942,1176"/>
+<area shape="rect" id="Node000129" href="$classprophecy__pointer__in__range__exprt.html" title="pointer_in_range (see pointer_in_range_exprt) with prophecy expressions to encode whether a pointer r..." alt="" coords="1034,1289,1189,1329"/>
+<area shape="poly" id="edge53_Node000001_Node000129" title=" " alt="" coords="935,1175,975,1225,1001,1251,1030,1274,1050,1286,1047,1291,1026,1279,997,1255,971,1228,931,1178"/>
+<area shape="rect" id="Node000130" href="$classprophecy__r__or__w__ok__exprt.html" title="A base class for a predicate that indicates that an address range is ok to read or write or both." alt="" coords="1034,1353,1189,1393"/>
+<area shape="poly" id="edge54_Node000001_Node000130" title=" " alt="" coords="929,1178,943,1213,965,1256,994,1300,1030,1339,1047,1350,1044,1355,1026,1343,990,1304,961,1259,939,1216,924,1180"/>
+<area shape="rect" id="Node000133" href="$classternary__exprt.html" title="An expression with three operands." alt="" coords="1056,795,1167,820"/>
+<area shape="poly" id="edge55_Node000001_Node000133" title=" " alt="" coords="915,1126,921,1065,938,984,952,942,971,901,996,862,1026,829,1055,814,1057,818,1030,833,1000,866,976,903,957,944,943,986,927,1065,921,1126"/>
+<area shape="rect" id="Node000144" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="1061,1417,1161,1443"/>
+<area shape="poly" id="edge57_Node000001_Node000144" title=" " alt="" coords="924,1179,935,1227,955,1287,986,1349,1006,1378,1030,1403,1045,1413,1062,1420,1060,1425,1042,1417,1026,1407,1002,1381,981,1352,950,1289,930,1228,919,1180"/>
+<area shape="rect" id="Node000190" href="$classupdate__bit__exprt.html" title="Replaces a sub&#45;range of a bit&#45;vector operand." alt="" coords="1045,1467,1177,1492"/>
+<area shape="poly" id="edge58_Node000001_Node000190" title=" " alt="" coords="922,1179,930,1236,948,1310,962,1349,980,1387,1002,1422,1030,1453,1047,1465,1044,1469,1026,1457,998,1426,975,1389,957,1351,943,1311,924,1237,917,1179"/>
+<area shape="rect" id="Node000191" href="$classupdate__bits__exprt.html" title="Replaces a sub&#45;range of a bit&#45;vector operand." alt="" coords="1042,1516,1181,1541"/>
+<area shape="poly" id="edge59_Node000001_Node000191" title=" " alt="" coords="920,1179,925,1245,940,1332,954,1378,973,1424,998,1466,1030,1503,1046,1514,1043,1518,1026,1507,994,1469,969,1426,949,1380,935,1333,919,1245,915,1179"/>
+<area shape="rect" id="Node000192" href="$classwith__exprt.html" title="Operator to update elements in structs and arrays." alt="" coords="1066,1565,1157,1591"/>
+<area shape="poly" id="edge60_Node000001_Node000192" title=" " alt="" coords="924,1179,938,1264,961,1376,992,1484,1010,1525,1030,1552,1047,1563,1067,1570,1065,1575,1044,1568,1026,1556,1006,1527,987,1485,955,1378,932,1265,918,1180"/>
+<area shape="rect" id="Node000002" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,1140,804,1165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="818,1150,853,1150,853,1155,818,1155"/>
+<area shape="rect" id="Node000003" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,1140,699,1165"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="712,1150,748,1150,748,1155,712,1155"/>
+<area shape="rect" id="Node000004" href="$classsharing__treet.html" title=" " alt="" coords="431,1125,597,1180"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="611,1150,647,1150,647,1155,611,1155"/>
+<area shape="rect" id="Node000005" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,1133,187,1173"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="200,1150,431,1150,431,1155,200,1155"/>
+<area shape="rect" id="Node000008" href="$classallocate__exprt.html" title=" " alt="" coords="1278,5,1393,31"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="1175,844,1192,830,1199,795,1205,719,1211,498,1216,159,1218,124,1217,95,1223,68,1242,40,1258,28,1277,21,1279,25,1261,33,1246,44,1228,70,1223,96,1223,124,1221,159,1216,498,1210,719,1205,796,1197,833,1178,848"/>
+<area shape="rect" id="Node000009" href="$classallocate__state__exprt.html" title=" " alt="" coords="1258,55,1413,80"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="1175,844,1192,830,1199,798,1204,727,1210,523,1216,209,1218,173,1217,144,1223,117,1242,89,1257,78,1260,82,1246,93,1228,120,1223,145,1223,173,1221,209,1216,523,1209,727,1204,798,1197,833,1178,848"/>
+<area shape="rect" id="Node000010" href="$classbinary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly two argu..." alt="" coords="1249,104,1421,129"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="1174,844,1193,830,1199,816,1204,794,1211,729,1216,549,1214,367,1216,258,1218,223,1217,194,1223,167,1242,139,1257,127,1260,132,1246,143,1228,169,1223,194,1223,223,1221,258,1220,367,1221,549,1216,730,1209,795,1204,818,1197,833,1178,848"/>
+<area shape="rect" id="Node000034" href="$classbinding__exprt.html" title="A base class for variable bindings (quantifiers, let, lambda)" alt="" coords="1280,153,1391,179"/>
+<area shape="poly" id="edge10_Node000007_Node000034" title=" " alt="" coords="1174,844,1192,830,1203,797,1210,738,1215,574,1214,408,1216,309,1218,273,1217,244,1223,216,1242,188,1259,176,1279,168,1281,173,1262,180,1246,192,1228,219,1223,244,1223,273,1221,309,1219,408,1220,574,1215,739,1208,799,1197,833,1178,848"/>
+<area shape="rect" id="Node000040" href="$classbyte__extract__exprt.html" title="Expression of type type extracted from some object op starting at position offset (given in number of..." alt="" coords="1263,203,1408,228"/>
+<area shape="poly" id="edge11_Node000007_Node000040" title=" " alt="" coords="1174,844,1192,830,1202,801,1208,747,1214,599,1214,448,1216,358,1218,322,1217,293,1223,266,1242,237,1261,224,1264,228,1246,241,1228,268,1223,294,1223,322,1221,358,1219,448,1219,599,1214,747,1207,802,1197,833,1178,848"/>
+<area shape="rect" id="Node000041" href="$classcomplex__exprt.html" title="Complex constructor from a pair of numbers." alt="" coords="1276,252,1395,277"/>
+<area shape="poly" id="edge12_Node000007_Node000041" title=" " alt="" coords="1174,844,1192,830,1201,804,1207,756,1213,624,1214,489,1216,409,1218,373,1217,343,1223,315,1242,287,1257,275,1275,268,1277,273,1260,280,1246,290,1228,318,1223,343,1223,373,1221,409,1219,489,1218,624,1212,756,1206,805,1197,833,1178,848"/>
+<area shape="rect" id="Node000042" href="$classconstant__interval__exprt.html" title="Represents an interval of values." alt="" coords="1247,301,1423,327"/>
+<area shape="poly" id="edge13_Node000007_Node000042" title=" " alt="" coords="1174,844,1192,830,1200,807,1206,766,1211,651,1216,465,1218,427,1217,395,1222,366,1242,336,1257,325,1260,329,1246,340,1227,368,1222,396,1223,427,1221,465,1217,651,1211,766,1205,809,1197,833,1178,848"/>
+<area shape="rect" id="Node000043" href="$classcpp__static__assertt.html" title=" " alt="" coords="1265,351,1405,376"/>
+<area shape="poly" id="edge14_Node000007_Node000043" title=" " alt="" coords="1174,844,1193,830,1199,812,1204,778,1210,685,1216,534,1217,490,1215,454,1220,421,1228,404,1242,385,1264,370,1267,375,1246,389,1233,406,1225,422,1220,454,1223,490,1221,534,1216,685,1209,779,1204,813,1197,833,1178,848"/>
+<area shape="rect" id="Node000044" href="$classdeallocate__state__exprt.html" title=" " alt="" coords="1250,400,1421,425"/>
+<area shape="poly" id="edge15_Node000007_Node000044" title=" " alt="" coords="1175,844,1193,830,1204,807,1211,776,1215,699,1214,618,1216,557,1218,521,1218,491,1223,464,1242,435,1257,423,1260,428,1246,438,1228,466,1223,492,1223,521,1221,557,1219,618,1220,699,1216,777,1209,809,1197,833,1178,848"/>
+<area shape="rect" id="Node000045" href="$classdiv__exprt.html" title="Division." alt="" coords="1294,449,1377,475"/>
+<area shape="poly" id="edge16_Node000007_Node000045" title=" " alt="" coords="1174,844,1193,830,1206,801,1213,760,1215,657,1218,555,1226,514,1242,484,1266,468,1293,461,1294,466,1268,473,1246,488,1231,515,1223,556,1221,657,1218,760,1211,802,1197,833,1178,848"/>
+<area shape="rect" id="Node000046" href="$classdynamic__object__exprt.html" title="Representation of heap&#45;allocated objects." alt="" coords="1252,499,1419,524"/>
+<area shape="poly" id="edge17_Node000007_Node000046" title=" " alt="" coords="1174,843,1193,830,1200,817,1205,799,1211,754,1216,671,1218,631,1217,597,1221,566,1229,550,1242,533,1257,522,1260,526,1246,537,1234,553,1226,568,1222,598,1224,631,1221,671,1216,755,1210,800,1205,819,1197,833,1177,848"/>
+<area shape="rect" id="Node000047" href="$classelement__address__exprt.html" title="Operator to return the address of an array element relative to a base address." alt="" coords="1248,548,1423,573"/>
+<area shape="poly" id="edge18_Node000007_Node000047" title=" " alt="" coords="1175,843,1193,829,1205,813,1212,798,1215,767,1213,734,1216,692,1219,660,1219,634,1224,609,1242,583,1258,571,1261,576,1246,587,1229,611,1225,634,1225,661,1221,693,1218,734,1220,767,1217,799,1209,816,1197,833,1178,847"/>
+<area shape="rect" id="Node000048" href="$classenter__scope__state__exprt.html" title=" " alt="" coords="1244,597,1427,623"/>
+<area shape="poly" id="edge19_Node000007_Node000048" title=" " alt="" coords="1175,843,1193,830,1209,802,1212,776,1212,747,1216,712,1222,669,1228,651,1242,632,1259,620,1262,625,1246,636,1232,653,1227,670,1221,713,1217,748,1218,777,1214,804,1197,833,1178,847"/>
+<area shape="rect" id="Node000049" href="$classeuclidean__mod__exprt.html" title="Boute&#39;s Euclidean definition of Modulo – to match SMT&#45;LIB2." alt="" coords="1254,647,1417,672"/>
+<area shape="poly" id="edge20_Node000007_Node000049" title=" " alt="" coords="1175,842,1193,829,1206,811,1213,793,1216,756,1219,719,1227,700,1242,681,1260,670,1262,674,1246,685,1231,702,1224,720,1221,757,1218,795,1211,814,1197,833,1178,846"/>
+<area shape="rect" id="Node000050" href="$classevaluate__exprt.html" title=" " alt="" coords="1275,696,1395,721"/>
+<area shape="poly" id="edge21_Node000007_Node000050" title=" " alt="" coords="1175,852,1193,841,1204,830,1210,818,1217,793,1223,768,1230,755,1242,743,1271,727,1300,719,1302,724,1273,732,1246,747,1235,758,1228,770,1222,794,1215,820,1208,833,1196,845,1178,857"/>
+<area shape="poly" id="edge22_Node000007_Node000050" title=" " alt="" coords="1151,838,1173,830,1193,817,1204,806,1210,794,1217,769,1223,744,1230,731,1242,719,1274,703,1276,707,1246,723,1235,734,1228,746,1222,770,1215,796,1208,809,1196,821,1175,834,1152,843"/>
+<area shape="rect" id="Node000051" href="$classexit__scope__state__exprt.html" title=" " alt="" coords="1249,745,1422,771"/>
+<area shape="poly" id="edge23_Node000007_Node000051" title=" " alt="" coords="1176,838,1193,829,1208,817,1217,805,1227,792,1243,780,1268,768,1270,773,1245,784,1231,796,1221,808,1212,821,1196,834,1178,843"/>
+<area shape="rect" id="Node000052" href="$classfactorial__power__exprt.html" title="Falling factorial power." alt="" coords="1253,795,1417,820"/>
+<area shape="poly" id="edge24_Node000007_Node000052" title=" " alt="" coords="1176,840,1276,817,1277,823,1177,845"/>
+<area shape="rect" id="Node000053" href="$classfloatbv__mod__exprt.html" title="IEEE floating&#45;point mod." alt="" coords="1263,844,1407,869"/>
+<area shape="poly" id="edge25_Node000007_Node000053" title=" " alt="" coords="1177,854,1263,854,1263,859,1177,859"/>
+<area shape="rect" id="Node000054" href="$classfloatbv__rem__exprt.html" title="IEEE floating&#45;point rem." alt="" coords="1265,893,1406,919"/>
+<area shape="poly" id="edge26_Node000007_Node000054" title=" " alt="" coords="1177,868,1277,891,1276,896,1176,874"/>
+<area shape="rect" id="Node000055" href="$classfloatbv__typecast__exprt.html" title="Semantic type conversion from/to floating&#45;point formats." alt="" coords="1250,943,1421,968"/>
+<area shape="poly" id="edge27_Node000007_Node000055" title=" " alt="" coords="1178,870,1196,878,1212,891,1221,904,1231,916,1245,928,1274,940,1272,945,1243,932,1227,920,1217,907,1208,895,1193,883,1176,874"/>
+<area shape="rect" id="Node000056" href="$classfunction__application__exprt.html" title="Application of (mathematical) function." alt="" coords="1258,993,1413,1033"/>
+<area shape="poly" id="edge28_Node000007_Node000056" title=" " alt="" coords="1178,867,1196,879,1208,891,1216,904,1222,929,1229,953,1246,977,1265,990,1262,995,1242,981,1224,956,1217,930,1211,906,1204,894,1193,883,1175,872"/>
+<area shape="rect" id="Node000057" href="$classimplies__exprt.html" title="Boolean implication." alt="" coords="1280,1057,1391,1083"/>
+<area shape="poly" id="edge29_Node000007_Node000057" title=" " alt="" coords="1178,866,1197,879,1206,893,1213,913,1222,962,1231,1011,1238,1030,1246,1043,1262,1054,1281,1062,1279,1066,1259,1059,1242,1047,1233,1032,1226,1012,1217,963,1207,915,1201,895,1193,883,1175,870"/>
+<area shape="rect" id="Node000058" href="$classindex__exprt.html" title="Array index operator." alt="" coords="1286,1107,1385,1132"/>
+<area shape="poly" id="edge30_Node000007_Node000058" title=" " alt="" coords="1178,866,1197,879,1207,898,1214,923,1222,987,1229,1050,1236,1075,1246,1092,1264,1105,1286,1113,1285,1118,1262,1110,1242,1096,1231,1077,1224,1051,1217,988,1209,924,1203,900,1193,882,1175,870"/>
+<area shape="rect" id="Node000059" href="$classlet__exprt.html" title="A let expression." alt="" coords="1295,1156,1375,1181"/>
+<area shape="poly" id="edge31_Node000007_Node000059" title=" " alt="" coords="1178,865,1197,879,1209,902,1216,934,1222,1013,1227,1091,1234,1122,1246,1143,1269,1158,1296,1165,1294,1170,1267,1163,1242,1146,1229,1124,1222,1092,1216,1013,1211,935,1204,904,1193,882,1175,870"/>
+<area shape="rect" id="Node000060" href="$classminus__exprt.html" title="Binary minus." alt="" coords="1284,1205,1387,1231"/>
+<area shape="poly" id="edge32_Node000007_Node000060" title=" " alt="" coords="1178,865,1197,879,1205,893,1210,911,1216,956,1221,1038,1223,1084,1220,1122,1224,1157,1232,1174,1246,1192,1263,1205,1285,1212,1283,1217,1261,1210,1242,1196,1228,1177,1219,1158,1215,1123,1218,1084,1216,1038,1211,956,1205,912,1200,895,1193,882,1175,869"/>
+<area shape="rect" id="Node000061" href="$classmod__exprt.html" title="Modulo defined as lhs&#45;(rhs * truncate(lhs/rhs))." alt="" coords="1289,1255,1381,1280"/>
+<area shape="poly" id="edge33_Node000007_Node000061" title=" " alt="" coords="1178,865,1197,879,1212,911,1219,956,1220,1064,1219,1120,1222,1171,1230,1213,1237,1229,1246,1241,1266,1255,1290,1262,1288,1267,1264,1260,1242,1245,1232,1232,1225,1215,1216,1172,1214,1120,1214,1064,1213,956,1207,913,1193,882,1175,869"/>
+<area shape="rect" id="Node000062" href="$classnamed__term__exprt.html" title="Expression that introduces a new symbol that is equal to the operand." alt="" coords="1262,1304,1409,1329"/>
+<area shape="poly" id="edge34_Node000007_Node000062" title=" " alt="" coords="1178,865,1197,879,1204,899,1209,933,1215,1027,1221,1179,1224,1213,1223,1241,1229,1265,1246,1291,1263,1303,1260,1307,1242,1295,1224,1267,1218,1241,1218,1213,1216,1179,1210,1027,1204,934,1199,900,1193,882,1175,869"/>
+<area shape="rect" id="Node000063" href="$classobject__descriptor__exprt.html" title="Split an expression into a base object and a (byte) offset." alt="" coords="1248,1353,1423,1379"/>
+<area shape="poly" id="edge35_Node000007_Node000063" title=" " alt="" coords="1178,864,1197,879,1204,900,1210,936,1216,1034,1221,1193,1222,1237,1220,1274,1225,1306,1233,1323,1246,1340,1260,1351,1257,1355,1242,1344,1228,1325,1220,1308,1215,1274,1217,1237,1216,1193,1211,1034,1204,936,1199,901,1193,882,1174,868"/>
+<area shape="rect" id="Node000064" href="$classpower__exprt.html" title="Exponentiation." alt="" coords="1284,1403,1387,1428"/>
+<area shape="poly" id="edge36_Node000007_Node000064" title=" " alt="" coords="1178,864,1197,879,1206,907,1212,955,1217,1088,1218,1222,1221,1302,1225,1351,1231,1370,1246,1389,1264,1402,1284,1409,1283,1414,1261,1406,1242,1393,1226,1372,1220,1352,1216,1302,1213,1222,1212,1088,1207,956,1201,908,1192,882,1174,868"/>
+<area shape="rect" id="Node000065" href="$classreplication__exprt.html" title="Bit&#45;vector replication." alt="" coords="1269,1452,1401,1477"/>
+<area shape="poly" id="edge37_Node000007_Node000065" title=" " alt="" coords="1178,864,1197,879,1207,908,1213,958,1218,1095,1219,1234,1221,1317,1223,1354,1222,1384,1227,1411,1246,1439,1271,1455,1268,1459,1242,1443,1222,1413,1217,1384,1218,1354,1216,1317,1214,1234,1213,1095,1208,958,1202,909,1192,882,1174,868"/>
+<area shape="rect" id="Node000066" href="$classsaturating__minus__exprt.html" title="Saturating subtraction expression." alt="" coords="1247,1501,1423,1527"/>
+<area shape="poly" id="edge38_Node000007_Node000066" title=" " alt="" coords="1178,864,1197,879,1208,913,1215,972,1219,1134,1219,1297,1221,1395,1225,1447,1230,1467,1246,1488,1261,1499,1258,1503,1242,1492,1226,1469,1220,1448,1216,1395,1214,1297,1214,1134,1209,972,1203,914,1192,882,1174,868"/>
+<area shape="rect" id="Node000067" href="$classsaturating__plus__exprt.html" title="The saturating plus expression." alt="" coords="1254,1551,1417,1576"/>
+<area shape="poly" id="edge39_Node000007_Node000067" title=" " alt="" coords="1178,864,1197,879,1208,914,1215,974,1220,1141,1220,1309,1221,1410,1223,1449,1222,1480,1227,1508,1246,1538,1260,1548,1257,1553,1242,1541,1222,1510,1216,1481,1217,1449,1216,1410,1214,1309,1215,1141,1210,975,1203,915,1192,882,1174,868"/>
+<area shape="rect" id="Node000068" href="$classshift__exprt.html" title="A base class for shift and rotate operators." alt="" coords="1290,1600,1381,1625"/>
+<area shape="poly" id="edge40_Node000007_Node000068" title=" " alt="" coords="1178,864,1197,879,1204,895,1210,919,1217,990,1221,1184,1219,1379,1221,1497,1225,1547,1231,1566,1246,1587,1266,1600,1290,1607,1289,1613,1264,1605,1242,1591,1226,1569,1220,1548,1216,1497,1214,1379,1216,1184,1212,990,1205,920,1199,897,1193,882,1174,868"/>
+<area shape="rect" id="Node000072" href="$classstate__cstrlen__exprt.html" title=" " alt="" coords="1262,1649,1409,1675"/>
+<area shape="poly" id="edge41_Node000007_Node000072" title=" " alt="" coords="1178,864,1197,879,1204,914,1210,986,1216,1193,1221,1511,1223,1549,1222,1580,1227,1608,1246,1636,1264,1649,1260,1653,1242,1640,1222,1610,1216,1581,1217,1549,1216,1511,1211,1193,1204,986,1199,915,1192,882,1174,868"/>
+<area shape="rect" id="Node000073" href="$classstate__object__size__exprt.html" title=" " alt="" coords="1247,1699,1423,1724"/>
+<area shape="poly" id="edge42_Node000007_Node000073" title=" " alt="" coords="1178,864,1197,879,1205,918,1211,1000,1216,1234,1219,1470,1221,1594,1225,1645,1230,1665,1246,1685,1261,1696,1258,1701,1242,1689,1226,1667,1220,1646,1216,1594,1213,1470,1211,1234,1205,1000,1200,919,1192,882,1175,868"/>
+<area shape="rect" id="Node000074" href="$classstate__type__compatible__exprt.html" title=" " alt="" coords="1250,1749,1421,1789"/>
+<area shape="poly" id="edge43_Node000007_Node000074" title=" " alt="" coords="1178,864,1197,879,1205,919,1211,1002,1217,1242,1221,1609,1223,1647,1222,1678,1227,1705,1246,1735,1259,1746,1256,1750,1242,1738,1222,1707,1217,1678,1217,1647,1216,1609,1212,1242,1206,1002,1200,920,1192,882,1175,868"/>
+<area shape="rect" id="Node000079" href="$classand__exprt.html" title="Boolean AND." alt="" coords="1292,1813,1379,1839"/>
+<area shape="poly" id="edge48_Node000078_Node000079" title=" " alt="" coords="1188,1068,1197,1076,1205,1095,1211,1123,1216,1206,1212,1431,1207,1657,1210,1740,1215,1768,1221,1786,1235,1801,1252,1811,1292,1822,1291,1827,1250,1816,1231,1805,1216,1789,1209,1770,1205,1740,1201,1657,1206,1431,1210,1206,1205,1124,1200,1096,1192,1080,1184,1071"/>
+<area shape="poly" id="edge56_Node000133_Node000008" title=" " alt="" coords="1177,793,1193,780,1200,763,1205,733,1209,646,1202,408,1196,170,1201,84,1207,54,1217,35,1229,24,1245,17,1277,10,1278,16,1246,22,1232,28,1221,38,1212,55,1207,84,1202,170,1208,408,1215,647,1211,734,1205,764,1197,784,1181,797"/>
 </map>

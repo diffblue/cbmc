@@ -1,8 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/irep_hash_container.h" name="/home/runner/work/cbmc/cbmc/src/util/irep_hash_container.h">
-<area shape="rect" id="node1" title="IREP Hash Container." alt="" coords="123,5,307,61"/>
-<area shape="rect" id="node2" href="$irep__hash__container_8cpp.html" title="Hashing IREPs." alt="" coords="5,109,189,165"/>
-<area shape="rect" id="node3" href="$irep__serialization_8h.html" title="binary irep conversions with hashing" alt="" coords="213,117,451,158"/>
-<area shape="rect" id="node4" href="$read__bin__goto__object_8cpp.html" title="Read goto object files." alt="" coords="24,213,216,269"/>
-<area shape="rect" id="node5" href="$write__goto__binary_8cpp.html" title="Write GOTO binaries." alt="" coords="240,213,424,269"/>
-<area shape="rect" id="node6" href="$irep__serialization_8cpp.html" title="binary irep conversions with hashing" alt="" coords="449,221,701,262"/>
+<area shape="rect" id="Node000001" title="IREP Hash Container." alt="" coords="123,5,307,60"/>
+<area shape="rect" id="Node000002" href="$irep__hash__container_8cpp.html" title="Hashing IREPs." alt="" coords="5,108,189,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,71,130,110,126,106,172,67"/>
+<area shape="rect" id="Node000003" href="$irep__serialization_8h.html" title="binary irep conversions with hashing" alt="" coords="213,115,451,155"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="258,67,312,113,308,117,254,71"/>
+<area shape="rect" id="Node000004" href="$read__bin__goto__object_8cpp.html" title="Read goto object files." alt="" coords="24,211,216,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="281,164,176,213,174,208,279,159"/>
+<area shape="rect" id="Node000005" href="$write__goto__binary_8cpp.html" title="Write GOTO binaries." alt="" coords="240,211,424,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="335,169,335,210,329,210,329,169"/>
+<area shape="rect" id="Node000006" href="$irep__serialization_8cpp.html" title="binary irep conversions with hashing" alt="" coords="449,218,701,258"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="391,158,530,215,528,220,389,163"/>
 </map>

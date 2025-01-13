@@ -1,15 +1,31 @@
 <map id="binary_functional_enumeratort" name="binary_functional_enumeratort">
-<area shape="rect" id="node1" title="Enumerator that enumerates binary functional expressions." alt="" coords="5,677,228,704"/>
-<area shape="rect" id="node2" href="$classnon__leaf__enumeratort.html" title="Non&#45;leaf enumerator enumerates expressions of form f(a_1, a_2, ..., a_n) where a_i&#39;s are sub&#45;expressi..." alt="" coords="136,601,303,628"/>
-<area shape="rect" id="node3" href="$classenumerator__baset.html" title="A base class for expression enumerators." alt="" coords="277,525,418,552"/>
-<area shape="rect" id="node4" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="316,436,419,463"/>
-<area shape="rect" id="node5" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="451,332,591,359"/>
-<area shape="rect" id="node6" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="273,332,427,359"/>
-<area shape="rect" id="node7" title=" " alt="" coords="268,213,421,255"/>
-<area shape="rect" id="node8" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="61,102,133,129"/>
-<area shape="rect" id="node9" title=" " alt="" coords="261,102,429,129"/>
-<area shape="rect" id="node10" title=" " alt="" coords="524,5,563,32"/>
-<area shape="rect" id="node12" title=" " alt="" coords="453,95,605,136"/>
-<area shape="rect" id="node11" title=" " alt="" coords="300,5,339,32"/>
-<area shape="rect" id="node13" title=" " alt="" coords="191,161,299,188"/>
+<area shape="rect" id="Node000001" title="Enumerator that enumerates binary functional expressions." alt="" coords="292,668,515,693"/>
+<area shape="rect" id="Node000002" href="$classnon__leaf__enumeratort.html" title="Non&#45;leaf enumerator enumerates expressions of form f(a_1, a_2, ..., a_n) where a_i&#39;s are sub&#45;expressi..." alt="" coords="163,593,329,619"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="284,622,380,666,377,670,282,627"/>
+<area shape="rect" id="Node000003" href="$classenumerator__baset.html" title="A base class for expression enumerators." alt="" coords="175,519,317,544"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,558,249,593,243,593,243,558"/>
+<area shape="rect" id="Node000004" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="195,431,297,456"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="249,470,249,518,243,518,243,470"/>
+<area shape="rect" id="Node000005" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="112,328,252,353"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="199,364,241,429,236,432,194,366"/>
+<area shape="rect" id="Node000006" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="276,328,429,353"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="332,365,260,433,256,429,329,361"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="98,93,250,133"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="177,147,185,198,193,225,207,249,231,275,261,297,320,326,317,330,258,301,228,279,203,252,188,227,179,199,172,148"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="360,5,399,31"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="360,42,319,72,286,87,251,98,249,93,284,82,317,67,357,38"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="274,101,442,126"/>
+<area shape="poly" id="edge12_Node000012_Node000008" title=" " alt="" coords="387,44,386,70,370,102,365,99,381,69,382,44"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="136,5,175,31"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="157,45,159,69,167,92,162,94,154,70,152,45"/>
+<area shape="poly" id="edge13_Node000012_Node000009" title=" " alt="" coords="188,34,254,67,329,98,327,103,252,72,186,39"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="5,159,113,185"/>
+<area shape="poly" id="edge15_Node000013_Node000009" title=" " alt="" coords="124,31,103,41,85,56,72,82,64,111,61,159,56,159,59,110,67,80,81,53,100,36,122,26"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="276,211,429,251"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="355,264,355,327,350,327,350,264"/>
+<area shape="rect" id="Node000011" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="513,101,585,126"/>
+<area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="562,138,575,180,582,229,582,608,577,632,562,650,541,663,516,672,514,667,538,659,558,646,572,629,577,607,577,230,570,181,557,140"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="525,137,497,159,482,175,466,189,416,213,414,208,463,184,479,171,494,155,521,132"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="338,138,326,158,323,172,326,186,338,209,334,212,321,188,318,172,321,156,333,135"/>
+<area shape="poly" id="edge14_Node000002_Node000013" title=" " alt="" coords="62,199,62,288,62,532,64,548,71,561,94,581,126,594,163,601,162,606,125,599,91,586,66,565,59,550,57,533,57,288,57,199"/>
 </map>

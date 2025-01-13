@@ -1,11 +1,19 @@
 <map id="/home/runner/work/cbmc/cbmc/src/cprover/endianness_map_wide.h" name="/home/runner/work/cbmc/cbmc/src/cprover/endianness_map_wide.h">
-<area shape="rect" id="node1" title=" " alt="" coords="18,5,233,61"/>
-<area shape="rect" id="node2" href="$endianness__map_8h.html" title=" " alt="" coords="41,109,210,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,184,69,211"/>
-<area shape="rect" id="node4" title=" " alt="" coords="94,184,157,211"/>
-<area shape="rect" id="node5" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="181,184,273,211"/>
-<area shape="rect" id="node6" title=" " alt="" coords="54,259,119,285"/>
-<area shape="rect" id="node7" title=" " alt="" coords="144,259,219,285"/>
-<area shape="rect" id="node8" title=" " alt="" coords="243,259,301,285"/>
-<area shape="rect" id="node9" title=" " alt="" coords="326,259,418,285"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="18,5,233,60"/>
+<area shape="rect" id="Node000002" href="$endianness__map_8h.html" title=" " alt="" coords="41,108,210,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,60,128,94,123,94,123,60"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,69,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,135,64,175,61,170,110,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="94,181,157,207"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="128,134,128,168,123,168,123,134"/>
+<area shape="rect" id="Node000005" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="181,181,273,207"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="143,131,200,171,197,175,140,136"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="54,255,119,280"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="205,209,123,251,120,246,203,204"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="144,255,219,280"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="221,208,198,245,194,242,217,206"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="243,255,301,280"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="236,206,260,242,255,245,232,208"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="326,255,418,280"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="251,204,337,246,335,251,249,209"/>
 </map>

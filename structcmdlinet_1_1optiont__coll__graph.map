@@ -1,8 +1,14 @@
 <map id="cmdlinet::optiont" name="cmdlinet::optiont">
-<area shape="rect" id="node1" title=" " alt="" coords="143,288,277,315"/>
-<area shape="rect" id="node2" title=" " alt="" coords="189,109,276,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="62,199,227,225"/>
-<area shape="rect" id="node3" title=" " alt="" coords="163,5,302,47"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,109,113,136"/>
-<area shape="rect" id="node6" title=" " alt="" coords="40,13,79,39"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="143,284,277,309"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="189,108,276,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="253,143,259,157,259,172,253,218,238,261,222,285,218,282,233,259,248,217,254,172,254,158,248,146"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="62,196,227,221"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="210,144,193,159,157,198,153,194,189,155,206,140"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="163,5,302,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="235,59,235,108,230,108,230,59"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="164,231,203,282,199,285,160,234"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,108,113,133"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="57,147,58,159,63,171,76,184,94,194,91,198,73,188,58,173,53,161,52,147"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="40,13,79,38"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="62,52,62,108,57,108,57,52"/>
 </map>

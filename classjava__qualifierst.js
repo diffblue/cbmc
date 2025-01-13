@@ -5,7 +5,7 @@ var classjava__qualifierst =
     [ "clear", "classjava__qualifierst.html#aa5d4f76da9572be652c087ae6812de9e", null ],
     [ "clone", "classjava__qualifierst.html#a982bb493d1e45a5651ebb7373e2cd61d", null ],
     [ "count", "classjava__qualifierst.html#aa3a24c524f9c15afc9eaf5de3fc19b5e", null ],
-    [ "get_annotations", "classjava__qualifierst.html#ae8f3d13291ec06d4ee79248dcec726f2", null ],
+    [ "get_annotations", "classjava__qualifierst.html#a4f8946ad10a434bcfb7ad79ff3f143cf", null ],
     [ "is_subset_of", "classjava__qualifierst.html#a89a1295bedd68aff5c2a9b85164a0056", null ],
     [ "operator!=", "classjava__qualifierst.html#a880a165668005eda3df54b539e357f83", null ],
     [ "operator+=", "classjava__qualifierst.html#a0ae90595e0764b7c7b340eb551ae6d8e", null ],

@@ -1,5 +1,7 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/global_may_alias.h" name="/home/runner/work/cbmc/cbmc/src/analyses/global_may_alias.h">
-<area shape="rect" id="node1" title="Field&#45;insensitive, location&#45;sensitive, over&#45;approximative escape analysis." alt="" coords="129,5,320,61"/>
-<area shape="rect" id="node2" href="$global__may__alias_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive global may alias analysis." alt="" coords="5,109,196,165"/>
-<area shape="rect" id="node3" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="221,109,479,165"/>
+<area shape="rect" id="Node000001" title="Field&#45;insensitive, location&#45;sensitive, over&#45;approximative escape analysis." alt="" coords="129,5,320,60"/>
+<area shape="rect" id="Node000002" href="$global__may__alias_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive global may alias analysis." alt="" coords="5,108,196,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,71,135,110,131,106,180,67"/>
+<area shape="rect" id="Node000003" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="221,108,479,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,67,319,106,316,110,267,71"/>
 </map>

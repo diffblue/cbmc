@@ -1,6 +1,9 @@
 <map id="deserialization_exceptiont" name="deserialization_exceptiont">
-<area shape="rect" id="node1" title="Thrown when failing to deserialize a value from some low level format, like JSON or raw bytes." alt="" coords="5,261,200,288"/>
-<area shape="rect" id="node2" href="$classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project." alt="" coords="10,185,195,212"/>
-<area shape="rect" id="node3" title=" " alt="" coords="59,96,146,123"/>
-<area shape="rect" id="node4" title=" " alt="" coords="33,5,172,47"/>
+<area shape="rect" id="Node000001" title="Thrown when failing to deserialize a value from some low level format, like JSON or raw bytes." alt="" coords="5,257,200,283"/>
+<area shape="rect" id="Node000002" href="$classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project." alt="" coords="10,183,195,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,222,105,257,100,257,100,222"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="59,95,146,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,134,105,182,100,182,100,134"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="33,5,172,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="105,59,105,94,100,94,100,59"/>
 </map>

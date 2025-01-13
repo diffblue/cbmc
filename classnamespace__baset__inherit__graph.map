@@ -1,8 +1,13 @@
 <map id="namespace_baset" name="namespace_baset">
-<area shape="rect" id="node1" title="Basic interface for a namespace." alt="" coords="169,5,309,32"/>
-<area shape="rect" id="node2" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="188,80,291,107"/>
-<area shape="rect" id="node3" href="$classc__typecheck__baset.html" title=" " alt="" coords="82,155,229,181"/>
-<area shape="rect" id="node6" href="$classmulti__namespacet.html" title="A multi namespace is essentially a namespace, with a list of namespaces." alt="" coords="253,155,396,181"/>
-<area shape="rect" id="node4" href="$classansi__c__typecheckt.html" title=" " alt="" coords="5,229,148,256"/>
-<area shape="rect" id="node5" href="$classcpp__typecheckt.html" title=" " alt="" coords="172,229,296,256"/>
+<area shape="rect" id="Node000001" title="Basic interface for a namespace." alt="" coords="169,5,309,31"/>
+<area shape="rect" id="Node000002" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="188,79,291,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="242,44,242,79,237,79,237,44"/>
+<area shape="rect" id="Node000003" href="$classc__typecheck__baset.html" title=" " alt="" coords="82,152,229,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="217,115,171,154,167,150,214,111"/>
+<area shape="rect" id="Node000006" href="$classmulti__namespacet.html" title="A multi namespace is essentially a namespace, with a list of namespaces." alt="" coords="253,152,396,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="265,110,312,150,309,154,262,115"/>
+<area shape="rect" id="Node000004" href="$classansi__c__typecheckt.html" title=" " alt="" coords="5,225,148,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,189,91,227,88,223,131,185"/>
+<area shape="rect" id="Node000005" href="$classcpp__typecheckt.html" title=" " alt="" coords="172,225,296,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="180,185,223,223,219,227,176,189"/>
 </map>

@@ -1,7 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_loop_nesting_graph.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_loop_nesting_graph.h">
-<area shape="rect" id="node1" title="Builds a graph describing how loops are nested in a GOTO program." alt="" coords="186,5,385,76"/>
-<area shape="rect" id="node2" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="5,243,203,313"/>
-<area shape="rect" id="node3" href="$dfcc__infer__loop__assigns_8cpp.html" title=" " alt="" coords="237,243,445,313"/>
-<area shape="rect" id="node4" href="$dfcc__infer__loop__assigns_8h.html" title="Infer a set of assigns clause targets for a natural loop." alt="" coords="119,124,316,195"/>
-<area shape="rect" id="node5" href="$dfcc__loop__nesting__graph_8cpp.html" title=" " alt="" coords="391,124,606,195"/>
+<area shape="rect" id="Node000001" title="Builds a graph describing how loops are nested in a GOTO program." alt="" coords="186,5,385,75"/>
+<area shape="rect" id="Node000002" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="5,240,203,309"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,72,138,94,109,124,97,152,92,182,93,212,98,239,92,240,88,213,87,182,92,150,104,121,134,90,172,67"/>
+<area shape="rect" id="Node000003" href="$dfcc__infer__loop__assigns_8cpp.html" title=" " alt="" coords="237,240,445,309"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="316,86,331,122,342,184,345,240,339,240,337,185,325,123,311,88"/>
+<area shape="rect" id="Node000004" href="$dfcc__infer__loop__assigns_8h.html" title="Infer a set of assigns clause targets for a natural loop." alt="" coords="119,123,316,192"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="261,88,240,124,235,121,256,85"/>
+<area shape="rect" id="Node000005" href="$dfcc__loop__nesting__graph_8cpp.html" title=" " alt="" coords="391,123,606,192"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="361,79,438,120,435,125,358,84"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="176,204,139,242,135,238,172,200"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="266,200,307,238,303,242,262,204"/>
 </map>

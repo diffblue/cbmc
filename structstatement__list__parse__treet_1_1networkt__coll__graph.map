@@ -1,7 +1,12 @@
 <map id="statement_list_parse_treet::networkt" name="statement_list_parse_treet::networkt">
-<area shape="rect" id="node1" title="Representation of a network in Siemens TIA." alt="" coords="61,273,220,315"/>
-<area shape="rect" id="node2" title=" " alt="" coords="53,184,228,211"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,95,135,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="121,5,160,32"/>
-<area shape="rect" id="node5" title=" " alt="" coords="159,95,267,121"/>
+<area shape="rect" id="Node000001" title="Representation of a network in Siemens TIA." alt="" coords="61,269,220,309"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="53,181,228,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,220,143,269,138,269,138,220"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,93,135,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,128,108,156,131,179,127,183,104,159,83,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="121,5,160,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="121,42,108,56,80,95,75,92,104,53,117,38"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="159,93,267,119"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="162,40,173,53,205,91,201,95,169,56,158,43"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="196,131,173,159,153,183,149,179,169,156,192,128"/>
 </map>

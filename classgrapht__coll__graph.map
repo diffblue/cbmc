@@ -1,6 +1,9 @@
 <map id="grapht&lt; N &gt;" name="grapht&lt; N &gt;">
-<area shape="rect" id="node1" title="A generic directed graph with a parametric node type." alt="" coords="33,273,137,300"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,184,164,211"/>
-<area shape="rect" id="node3" title=" " alt="" coords="20,95,149,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="65,5,104,32"/>
+<area shape="rect" id="Node000001" title="A generic directed graph with a parametric node type." alt="" coords="33,269,137,295"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,181,164,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,221,87,269,82,269,82,221"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="20,93,149,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,133,87,181,82,181,82,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="65,5,104,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,45,87,93,82,93,82,45"/>
 </map>

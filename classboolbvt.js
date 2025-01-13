@@ -95,7 +95,7 @@ var classboolbvt =
     [ "finish_eager_conversion_quantifiers", "classboolbvt.html#a461f847e5b1d1c737d1ab2e39063ce45", null ],
     [ "fresh_binding", "classboolbvt.html#a3a209adfddec76c2df966f386abe8c15", null ],
     [ "get", "classboolbvt.html#a8f2eb906e533286456a7fbae76235319", null ],
-    [ "get_map", "classboolbvt.html#a3900e98f16540d0071e20e1e9ac9524f", null ],
+    [ "get_map", "classboolbvt.html#a871668ef0faeff6f09d4b17543d7523b", null ],
     [ "get_value", "classboolbvt.html#aef28c240526a8d9d5c9f24265c9483f2", null ],
     [ "get_value", "classboolbvt.html#a04c4f06ddb5cc56b57bb753b8d7092bd", null ],
     [ "handle", "classboolbvt.html#a713988a7c5457ec2d9aefd1452fd56f0", null ],

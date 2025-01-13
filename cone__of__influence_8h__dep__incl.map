@@ -1,19 +1,47 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/accelerate/cone_of_influence.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/accelerate/cone_of_influence.h">
-<area shape="rect" id="node1" title="Loop Acceleration." alt="" coords="1166,5,1393,61"/>
-<area shape="rect" id="node2" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="1183,228,1376,299"/>
-<area shape="rect" id="node3" href="$acceleration__utils_8h.html" title="Loop Acceleration." alt="" coords="901,109,1095,180"/>
-<area shape="rect" id="node7" href="$disjunctive__polynomial__acceleration_8h.html" title="Loop Acceleration." alt="" coords="909,228,1159,299"/>
-<area shape="rect" id="node8" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="909,347,1159,417"/>
-<area shape="rect" id="node9" href="$polynomial__accelerator_8h.html" title="Loop Acceleration." alt="" coords="623,235,885,291"/>
-<area shape="rect" id="node12" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="1497,354,1774,410"/>
-<area shape="rect" id="node13" href="$sat__path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="133,235,381,291"/>
-<area shape="rect" id="node15" href="$cone__of__influence_8cpp.html" title="Loop Acceleration." alt="" coords="1899,117,2142,173"/>
-<area shape="rect" id="node16" href="$overflow__instrumenter_8h.html" title="Loop Acceleration." alt="" coords="1459,117,1715,173"/>
-<area shape="rect" id="node4" href="$accelerate_8h.html" title="Loop Acceleration." alt="" coords="405,235,599,291"/>
-<area shape="rect" id="node5" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="491,473,684,529"/>
-<area shape="rect" id="node6" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="583,354,842,410"/>
-<area shape="rect" id="node10" href="$enumerating__loop__acceleration_8h.html" title="Loop Acceleration." alt="" coords="293,347,509,417"/>
-<area shape="rect" id="node11" href="$enumerating__loop__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="250,465,466,536"/>
-<area shape="rect" id="node14" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="5,354,268,410"/>
-<area shape="rect" id="node17" href="$overflow__instrumenter_8cpp.html" title="Loop Acceleration." alt="" coords="1452,235,1723,291"/>
+<area shape="rect" id="Node000001" title="Loop Acceleration." alt="" coords="1166,5,1393,60"/>
+<area shape="rect" id="Node000002" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="1183,225,1376,295"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1282,74,1282,225,1277,225,1277,74"/>
+<area shape="rect" id="Node000003" href="$acceleration__utils_8h.html" title="Loop Acceleration." alt="" coords="901,108,1095,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1199,67,1086,110,1085,105,1197,62"/>
+<area shape="rect" id="Node000007" href="$disjunctive__polynomial__acceleration_8h.html" title="Loop Acceleration." alt="" coords="909,225,1159,295"/>
+<area shape="poly" id="edge20_Node000001_Node000007" title=" " alt="" coords="1243,71,1073,227,1069,223,1239,67"/>
+<area shape="rect" id="Node000008" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="909,343,1159,412"/>
+<area shape="poly" id="edge19_Node000001_Node000008" title=" " alt="" coords="1318,68,1359,117,1394,175,1406,207,1410,238,1406,268,1391,296,1376,310,1354,321,1298,341,1229,356,1159,366,1158,361,1228,350,1296,336,1352,317,1373,305,1387,293,1401,266,1405,238,1401,208,1390,178,1354,120,1314,72"/>
+<area shape="rect" id="Node000009" href="$polynomial__accelerator_8h.html" title="Loop Acceleration." alt="" coords="623,233,885,287"/>
+<area shape="poly" id="edge27_Node000001_Node000009" title=" " alt="" coords="1153,40,1089,48,1022,61,954,82,891,110,853,137,820,171,772,234,768,231,816,167,850,133,889,106,953,77,1021,56,1088,43,1152,35"/>
+<area shape="rect" id="Node000012" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="1497,350,1774,405"/>
+<area shape="poly" id="edge26_Node000001_Node000012" title=" " alt="" coords="1406,37,1499,45,1593,59,1675,78,1706,91,1729,106,1767,149,1778,171,1784,194,1786,218,1783,243,1762,296,1735,328,1701,352,1698,347,1732,324,1757,293,1777,242,1781,218,1779,195,1773,173,1762,152,1726,110,1704,96,1673,83,1592,64,1498,51,1406,43"/>
+<area shape="rect" id="Node000013" href="$sat__path__enumerator_8h.html" title="Loop Acceleration." alt="" coords="133,233,381,287"/>
+<area shape="poly" id="edge28_Node000001_Node000013" title=" " alt="" coords="1153,53,988,77,807,111,678,141,551,174,341,235,339,230,550,169,677,135,805,105,987,72,1152,47"/>
+<area shape="rect" id="Node000015" href="$cone__of__influence_8cpp.html" title="Loop Acceleration." alt="" coords="1899,115,2142,170"/>
+<area shape="poly" id="edge18_Node000001_Node000015" title=" " alt="" coords="1407,43,1629,68,1881,105,1917,113,1916,118,1880,111,1628,73,1406,48"/>
+<area shape="rect" id="Node000016" href="$overflow__instrumenter_8h.html" title="Loop Acceleration." alt="" coords="1459,115,1715,170"/>
+<area shape="poly" id="edge21_Node000001_Node000016" title=" " alt="" coords="1368,62,1513,113,1512,118,1366,67"/>
+<area shape="poly" id="edge6_Node000003_Node000002" title=" " alt="" coords="1094,180,1198,223,1196,228,1092,185"/>
+<area shape="rect" id="Node000004" href="$accelerate_8h.html" title="Loop Acceleration." alt="" coords="405,233,599,287"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="889,167,756,194,612,228,585,235,584,230,611,223,755,189,888,162"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="1015,190,1026,224,1021,226,1010,192"/>
+<area shape="poly" id="edge9_Node000003_Node000009" title=" " alt="" coords="916,186,811,235,808,230,914,181"/>
+<area shape="poly" id="edge15_Node000003_Node000013" title=" " alt="" coords="888,158,660,186,394,228,359,235,358,230,394,223,659,181,888,153"/>
+<area shape="rect" id="Node000005" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="491,467,684,522"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="519,300,580,466,575,468,514,302"/>
+<area shape="rect" id="Node000006" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="583,350,842,405"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="563,292,666,348,663,352,561,296"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="1037,309,1037,342,1031,342,1031,309"/>
+<area shape="poly" id="edge10_Node000009_Node000008" title=" " alt="" coords="831,290,953,340,951,345,829,295"/>
+<area shape="rect" id="Node000010" href="$enumerating__loop__acceleration_8h.html" title="Loop Acceleration." alt="" coords="293,343,509,412"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="661,294,505,345,503,340,660,289"/>
+<area shape="poly" id="edge14_Node000009_Node000012" title=" " alt="" coords="874,287,898,292,1058,316,1219,336,1497,363,1496,368,1219,341,1058,322,898,297,873,293"/>
+<area shape="poly" id="edge12_Node000010_Node000005" title=" " alt="" coords="468,417,546,465,544,470,465,422"/>
+<area shape="rect" id="Node000011" href="$enumerating__loop__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="250,460,466,529"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="386,426,373,461,368,459,381,424"/>
+<area shape="poly" id="edge16_Node000013_Node000010" title=" " alt="" coords="301,294,360,340,357,344,298,298"/>
+<area shape="rect" id="Node000014" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="5,350,268,405"/>
+<area shape="poly" id="edge17_Node000013_Node000014" title=" " alt="" coords="221,299,166,352,162,348,218,295"/>
+<area shape="poly" id="edge23_Node000016_Node000002" title=" " alt="" coords="1506,177,1370,228,1369,223,1504,172"/>
+<area shape="poly" id="edge22_Node000016_Node000005" title=" " alt="" coords="1694,173,1730,195,1761,224,1796,272,1808,296,1816,320,1819,343,1816,367,1806,390,1788,414,1765,428,1729,441,1621,461,1477,476,1309,486,961,496,684,497,684,491,961,490,1309,481,1476,471,1620,456,1728,436,1763,424,1784,410,1801,388,1811,365,1814,343,1811,321,1803,298,1791,275,1757,227,1727,199,1691,178"/>
+<area shape="poly" id="edge25_Node000016_Node000012" title=" " alt="" coords="1683,174,1713,195,1738,224,1746,243,1749,260,1746,277,1738,296,1715,328,1685,352,1682,348,1711,324,1733,293,1741,275,1744,259,1741,244,1733,227,1710,199,1680,178"/>
+<area shape="rect" id="Node000017" href="$overflow__instrumenter_8cpp.html" title="Loop Acceleration." alt="" coords="1452,233,1723,287"/>
+<area shape="poly" id="edge24_Node000016_Node000017" title=" " alt="" coords="1590,184,1590,232,1585,232,1585,184"/>
 </map>

@@ -4,7 +4,7 @@ var classcpp__token__buffert =
     [ "tokenst", "classcpp__token__buffert.html#a6596ff1ebffb0bd3ca29cd1d4b3785c7", null ],
     [ "cpp_token_buffert", "classcpp__token__buffert.html#a30e1316b3b94f61f17c82b9b7fefa3e0", null ],
     [ "clear", "classcpp__token__buffert.html#a2947ba2fedd45e5cccab37ee4d433649", null ],
-    [ "current_token", "classcpp__token__buffert.html#a61f07c762f39faf21deca5bcbc8454a5", null ],
+    [ "current_token", "classcpp__token__buffert.html#accfb6709b42881ac8bbede54c735f2d5", null ],
     [ "get_token", "classcpp__token__buffert.html#aa7f63aa5616827042ea29c4d9b864e15", null ],
     [ "get_token", "classcpp__token__buffert.html#a2a3a9ab48433a3ac35cda54fa13d4904", null ],
     [ "Insert", "classcpp__token__buffert.html#ae2fcd61132082b3300f234c799e92543", null ],

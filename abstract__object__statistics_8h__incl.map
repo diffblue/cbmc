@@ -1,6 +1,10 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/variable&#45;sensitivity/abstract_object_statistics.h" name="/home/runner/work/cbmc/cbmc/src/analyses/variable&#45;sensitivity/abstract_object_statistics.h">
-<area shape="rect" id="node1" title="Statistics gathering for the variable senstivity domain." alt="" coords="5,5,208,76"/>
-<area shape="rect" id="node2" title=" " alt="" coords="27,199,98,225"/>
-<area shape="rect" id="node3" href="$memory__units_8h.html" title=" " alt="" coords="87,124,241,151"/>
-<area shape="rect" id="node4" title=" " alt="" coords="135,199,193,225"/>
+<area shape="rect" id="Node000001" title="Statistics gathering for the variable senstivity domain." alt="" coords="5,5,208,75"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="27,196,98,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,76,79,123,68,182,63,181,73,122,90,74"/>
+<area shape="rect" id="Node000003" href="$memory__units_8h.html" title=" " alt="" coords="87,123,241,148"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="130,73,152,109,147,112,125,76"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="149,150,92,190,89,186,146,146"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="135,196,193,221"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="167,148,167,182,161,182,161,148"/>
 </map>

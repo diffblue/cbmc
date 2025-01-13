@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/show_vcc.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/show_vcc.h">
-<area shape="rect" id="node1" title="Output of the verification conditions (VCCs)" alt="" coords="184,5,429,47"/>
-<area shape="rect" id="node2" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="5,95,189,165"/>
-<area shape="rect" id="node3" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="213,95,400,165"/>
-<area shape="rect" id="node4" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="425,102,629,158"/>
+<area shape="rect" id="Node000001" title="Output of the verification conditions (VCCs)" alt="" coords="184,5,429,45"/>
+<area shape="rect" id="Node000002" href="$multi__path__symex__only__checker_8cpp.html" title="Goto Checker using Multi&#45;Path Symbolic Execution only (no SAT solving)" alt="" coords="5,93,189,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="256,54,169,96,166,91,254,49"/>
+<area shape="rect" id="Node000003" href="$single__path__symex__only__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution only." alt="" coords="213,93,400,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="309,59,309,93,304,93,304,59"/>
+<area shape="rect" id="Node000004" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="425,101,629,155"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="361,49,470,98,468,103,359,53"/>
 </map>

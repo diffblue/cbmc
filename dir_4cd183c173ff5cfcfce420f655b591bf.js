@@ -18,25 +18,9 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
     [ "cover.cpp", "cover_8cpp.html", "cover_8cpp" ],
     [ "cover.h", "cover_8h.html", "cover_8h" ],
     [ "cover_basic_blocks.cpp", "cover__basic__blocks_8cpp.html", "cover__basic__blocks_8cpp" ],
-    [ "cover_basic_blocks.h", "cover__basic__blocks_8h.html", [
-      [ "cover_blocks_baset", "classcover__blocks__baset.html", "classcover__blocks__baset" ],
-      [ "cover_basic_blockst", "classcover__basic__blockst.html", "classcover__basic__blockst" ],
-      [ "block_infot", "structcover__basic__blockst_1_1block__infot.html", "structcover__basic__blockst_1_1block__infot" ],
-      [ "cover_basic_blocks_javat", "classcover__basic__blocks__javat.html", "classcover__basic__blocks__javat" ]
-    ] ],
+    [ "cover_basic_blocks.h", "cover__basic__blocks_8h.html", "cover__basic__blocks_8h" ],
     [ "cover_filter.cpp", "cover__filter_8cpp.html", null ],
-    [ "cover_filter.h", "cover__filter_8h.html", [
-      [ "function_filter_baset", "classfunction__filter__baset.html", "classfunction__filter__baset" ],
-      [ "goal_filter_baset", "classgoal__filter__baset.html", "classgoal__filter__baset" ],
-      [ "function_filterst", "classfunction__filterst.html", "classfunction__filterst" ],
-      [ "goal_filterst", "classgoal__filterst.html", "classgoal__filterst" ],
-      [ "internal_functions_filtert", "classinternal__functions__filtert.html", "classinternal__functions__filtert" ],
-      [ "file_filtert", "classfile__filtert.html", "classfile__filtert" ],
-      [ "single_function_filtert", "classsingle__function__filtert.html", "classsingle__function__filtert" ],
-      [ "include_pattern_filtert", "classinclude__pattern__filtert.html", "classinclude__pattern__filtert" ],
-      [ "trivial_functions_filtert", "classtrivial__functions__filtert.html", "classtrivial__functions__filtert" ],
-      [ "internal_goals_filtert", "classinternal__goals__filtert.html", "classinternal__goals__filtert" ]
-    ] ],
+    [ "cover_filter.h", "cover__filter_8h.html", "cover__filter_8h" ],
     [ "cover_instrument.h", "cover__instrument_8h.html", "cover__instrument_8h" ],
     [ "cover_instrument_assume.cpp", "cover__instrument__assume_8cpp.html", null ],
     [ "cover_instrument_branch.cpp", "cover__instrument__branch_8cpp.html", null ],
@@ -53,26 +37,14 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
     [ "dot.h", "dot_8h.html", "dot_8h" ],
     [ "dump_c.cpp", "dump__c_8cpp.html", "dump__c_8cpp" ],
     [ "dump_c.h", "dump__c_8h.html", "dump__c_8h" ],
-    [ "dump_c_class.h", "dump__c__class_8h.html", [
-      [ "dump_c_configurationt", "structdump__c__configurationt.html", "structdump__c__configurationt" ],
-      [ "dump_ct", "classdump__ct.html", "classdump__ct" ],
-      [ "typedef_infot", "structdump__ct_1_1typedef__infot.html", "structdump__ct_1_1typedef__infot" ]
-    ] ],
+    [ "dump_c_class.h", "dump__c__class_8h.html", "dump__c__class_8h" ],
     [ "full_slicer.cpp", "full__slicer_8cpp.html", "full__slicer_8cpp" ],
     [ "full_slicer.h", "full__slicer_8h.html", "full__slicer_8h" ],
-    [ "full_slicer_class.h", "full__slicer__class_8h.html", [
-      [ "full_slicert", "classfull__slicert.html", "classfull__slicert" ],
-      [ "cfg_nodet", "structfull__slicert_1_1cfg__nodet.html", "structfull__slicert_1_1cfg__nodet" ],
-      [ "assert_criteriont", "classassert__criteriont.html", "classassert__criteriont" ],
-      [ "in_function_criteriont", "classin__function__criteriont.html", "classin__function__criteriont" ],
-      [ "properties_criteriont", "classproperties__criteriont.html", "classproperties__criteriont" ]
-    ] ],
+    [ "full_slicer_class.h", "full__slicer__class_8h.html", "full__slicer__class_8h" ],
     [ "function.cpp", "function_8cpp.html", "function_8cpp" ],
     [ "function.h", "function_8h.html", "function_8h" ],
     [ "function_assigns.cpp", "function__assigns_8cpp.html", null ],
-    [ "function_assigns.h", "function__assigns_8h.html", [
-      [ "function_assignst", "classfunction__assignst.html", "classfunction__assignst" ]
-    ] ],
+    [ "function_assigns.h", "function__assigns_8h.html", "function__assigns_8h" ],
     [ "generate_function_bodies.cpp", "generate__function__bodies_8cpp.html", "generate__function__bodies_8cpp" ],
     [ "generate_function_bodies.h", "generate__function__bodies_8h.html", "generate__function__bodies_8h" ],
     [ "goto_instrument_languages.cpp", "goto__instrument__languages_8cpp.html", null ],
@@ -80,10 +52,7 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
     [ "goto_instrument_parse_options.cpp", "goto__instrument__parse__options_8cpp.html", null ],
     [ "goto_instrument_parse_options.h", "goto__instrument__parse__options_8h.html", "goto__instrument__parse__options_8h" ],
     [ "goto_program2code.cpp", "goto__program2code_8cpp.html", "goto__program2code_8cpp" ],
-    [ "goto_program2code.h", "goto__program2code_8h.html", [
-      [ "goto_program2codet", "classgoto__program2codet.html", "classgoto__program2codet" ],
-      [ "caset", "structgoto__program2codet_1_1caset.html", "structgoto__program2codet_1_1caset" ]
-    ] ],
+    [ "goto_program2code.h", "goto__program2code_8h.html", "goto__program2code_8h" ],
     [ "havoc_loops.cpp", "havoc__loops_8cpp.html", "havoc__loops_8cpp" ],
     [ "havoc_loops.h", "havoc__loops_8h.html", "havoc__loops_8h" ],
     [ "havoc_utils.cpp", "havoc__utils_8cpp.html", null ],
@@ -114,11 +83,7 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
     [ "race_check.h", "race__check_8h.html", "race__check_8h" ],
     [ "reachability_slicer.cpp", "reachability__slicer_8cpp.html", "reachability__slicer_8cpp" ],
     [ "reachability_slicer.h", "reachability__slicer_8h.html", "reachability__slicer_8h" ],
-    [ "reachability_slicer_class.h", "reachability__slicer__class_8h.html", [
-      [ "reachability_slicert", "classreachability__slicert.html", "classreachability__slicert" ],
-      [ "slicer_entryt", "structreachability__slicert_1_1slicer__entryt.html", "structreachability__slicert_1_1slicer__entryt" ],
-      [ "search_stack_entryt", "structreachability__slicert_1_1search__stack__entryt.html", "structreachability__slicert_1_1search__stack__entryt" ]
-    ] ],
+    [ "reachability_slicer_class.h", "reachability__slicer__class_8h.html", "reachability__slicer__class_8h" ],
     [ "remove_function.cpp", "remove__function_8cpp.html", "remove__function_8cpp" ],
     [ "remove_function.h", "remove__function_8h.html", "remove__function_8h" ],
     [ "replace_calls.cpp", "replace__calls_8cpp.html", null ],
@@ -130,9 +95,7 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
     [ "skip_loops.cpp", "skip__loops_8cpp.html", "skip__loops_8cpp" ],
     [ "skip_loops.h", "skip__loops_8h.html", "skip__loops_8h" ],
     [ "source_lines.cpp", "source__lines_8cpp.html", null ],
-    [ "source_lines.h", "source__lines_8h.html", [
-      [ "source_linest", "classsource__linest.html", "classsource__linest" ]
-    ] ],
+    [ "source_lines.h", "source__lines_8h.html", "source__lines_8h" ],
     [ "splice_call.cpp", "splice__call_8cpp.html", "splice__call_8cpp" ],
     [ "splice_call.h", "splice__call_8h.html", "splice__call_8h" ],
     [ "stack_depth.cpp", "stack__depth_8cpp.html", "stack__depth_8cpp" ],
@@ -144,10 +107,7 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
     [ "uninitialized.cpp", "uninitialized_8cpp.html", "uninitialized_8cpp" ],
     [ "uninitialized.h", "uninitialized_8h.html", "uninitialized_8h" ],
     [ "unwind.cpp", "unwind_8cpp.html", null ],
-    [ "unwind.h", "unwind_8h.html", [
-      [ "goto_unwindt", "classgoto__unwindt.html", "classgoto__unwindt" ],
-      [ "unwind_logt", "structgoto__unwindt_1_1unwind__logt.html", "structgoto__unwindt_1_1unwind__logt" ]
-    ] ],
+    [ "unwind.h", "unwind_8h.html", "unwind_8h" ],
     [ "unwindset.cpp", "unwindset_8cpp.html", null ],
     [ "unwindset.h", "unwindset_8h.html", "unwindset_8h" ],
     [ "value_set_fi_fp_removal.cpp", "value__set__fi__fp__removal_8cpp.html", "value__set__fi__fp__removal_8cpp" ],

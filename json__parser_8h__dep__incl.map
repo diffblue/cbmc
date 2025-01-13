@@ -1,19 +1,35 @@
 <map id="/home/runner/work/cbmc/cbmc/src/json/json_parser.h" name="/home/runner/work/cbmc/cbmc/src/json/json_parser.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1131,5,1337,47"/>
-<area shape="rect" id="node2" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="5,102,204,158"/>
-<area shape="rect" id="node3" href="$taint__parser_8cpp.html" title="Taint Parser." alt="" coords="229,102,413,158"/>
-<area shape="rect" id="node4" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="437,102,621,158"/>
-<area shape="rect" id="node5" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="645,95,850,165"/>
-<area shape="rect" id="node6" href="$contracts__wrangler_8h.html" title="Parse and annotate contracts." alt="" coords="875,102,1100,158"/>
-<area shape="rect" id="node12" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="1125,102,1343,158"/>
-<area shape="rect" id="node13" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="1368,109,1607,151"/>
-<area shape="rect" id="node14" href="$json__parser_8cpp.html" title=" " alt="" coords="1631,109,1851,151"/>
-<area shape="rect" id="node15" href="$json__symtab__language_8cpp.html" title=" " alt="" coords="1875,102,2143,158"/>
-<area shape="rect" id="node16" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="2167,102,2386,158"/>
-<area shape="rect" id="node17" href="$java__class__loader__limit_8cpp.html" title="limit class path loading" alt="" coords="2410,102,2629,158"/>
-<area shape="rect" id="node7" href="$contracts__wrangler_8cpp.html" title="Parse and annotate contracts." alt="" coords="735,213,975,269"/>
-<area shape="rect" id="node8" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="999,213,1242,269"/>
-<area shape="rect" id="node9" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="762,317,997,373"/>
-<area shape="rect" id="node10" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="1021,317,1221,373"/>
-<area shape="rect" id="node11" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1245,317,1503,373"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1131,5,1336,45"/>
+<area shape="rect" id="Node000002" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="5,101,224,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1117,30,945,33,725,44,481,63,357,78,236,96,202,103,201,98,236,91,356,73,480,58,724,38,945,28,1117,24"/>
+<area shape="rect" id="Node000003" href="$java__class__loader__limit_8cpp.html" title="limit class path loading" alt="" coords="248,101,467,155"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1117,33,826,52,652,70,479,96,446,103,444,98,478,91,652,65,826,47,1117,28"/>
+<area shape="rect" id="Node000004" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="491,101,690,155"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1117,38,922,60,812,76,703,96,673,103,672,98,702,91,811,71,922,54,1116,33"/>
+<area shape="rect" id="Node000005" href="$taint__parser_8cpp.html" title="Taint Parser." alt="" coords="715,101,899,155"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1118,50,1017,71,911,96,885,103,884,98,910,91,1016,66,1117,45"/>
+<area shape="rect" id="Node000006" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="923,101,1107,155"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1181,54,1073,103,1071,98,1179,49"/>
+<area shape="rect" id="Node000007" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="1131,93,1336,163"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1236,59,1236,93,1231,93,1231,59"/>
+<area shape="rect" id="Node000008" href="$contracts__wrangler_8h.html" title="Parse and annotate contracts." alt="" coords="1361,101,1586,155"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1292,48,1412,98,1410,103,1290,53"/>
+<area shape="rect" id="Node000014" href="$restrict__function__pointers_8cpp.html" title=" " alt="" coords="1611,101,1829,155"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1350,43,1470,64,1599,91,1629,98,1627,103,1598,96,1469,69,1349,48"/>
+<area shape="rect" id="Node000015" href="$json__symtab__language_8cpp.html" title=" " alt="" coords="1854,101,2122,155"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1350,33,1578,55,1710,71,1842,91,1880,98,1879,103,1841,96,1710,76,1577,60,1349,38"/>
+<area shape="rect" id="Node000016" href="$json__interface_8cpp.html" title="JSON Commandline Interface." alt="" coords="2146,108,2385,148"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1350,26,1506,32,1702,43,1919,62,2135,91,2202,105,2201,111,2134,96,1918,67,1702,48,1506,37,1350,31"/>
+<area shape="rect" id="Node000017" href="$json__parser_8cpp.html" title=" " alt="" coords="2409,108,2629,148"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1350,28,1894,50,2186,68,2306,79,2398,91,2461,105,2459,110,2397,96,2305,84,2185,74,1894,55,1350,33"/>
+<area shape="rect" id="Node000009" href="$contracts__wrangler_8cpp.html" title="Parse and annotate contracts." alt="" coords="1221,211,1461,265"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="1432,166,1375,212,1372,208,1429,162"/>
+<area shape="rect" id="Node000010" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="1485,211,1728,265"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="1518,162,1576,208,1572,212,1515,166"/>
+<area shape="rect" id="Node000011" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="1248,313,1483,368"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1532,273,1429,316,1427,311,1530,268"/>
+<area shape="rect" id="Node000012" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="1507,313,1707,368"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="1609,279,1609,313,1604,313,1604,279"/>
+<area shape="rect" id="Node000013" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1731,313,1989,368"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="1686,268,1795,311,1793,316,1684,273"/>
 </map>

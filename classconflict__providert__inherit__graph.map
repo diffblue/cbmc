@@ -1,12 +1,21 @@
 <map id="conflict_providert" name="conflict_providert">
-<area shape="rect" id="node1" title=" " alt="" coords="82,5,217,32"/>
-<area shape="rect" id="node2" href="$classprop__conv__solvert.html" title=" " alt="" coords="79,80,220,107"/>
-<area shape="rect" id="node3" href="$classequalityt.html" title=" " alt="" coords="109,155,189,181"/>
-<area shape="rect" id="node4" href="$classarrayst.html" title=" " alt="" coords="115,229,183,256"/>
-<area shape="rect" id="node5" href="$classboolbvt.html" title=" " alt="" coords="114,304,185,331"/>
-<area shape="rect" id="node6" href="$classbv__pointers__widet.html" title=" " alt="" coords="5,379,147,405"/>
-<area shape="rect" id="node7" href="$classbv__pointerst.html" title=" " alt="" coords="171,379,274,405"/>
-<area shape="rect" id="node8" href="$classbv__dimacst.html" title=" " alt="" coords="25,453,122,480"/>
-<area shape="rect" id="node9" href="$classbv__minimizing__dect.html" title=" " alt="" coords="146,453,299,480"/>
-<area shape="rect" id="node10" href="$classbv__refinementt.html" title=" " alt="" coords="323,453,445,480"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="82,5,217,31"/>
+<area shape="rect" id="Node000002" href="$classprop__conv__solvert.html" title=" " alt="" coords="79,79,220,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,44,152,79,147,79,147,44"/>
+<area shape="rect" id="Node000003" href="$classequalityt.html" title=" " alt="" coords="109,152,189,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="152,118,152,152,147,152,147,118"/>
+<area shape="rect" id="Node000004" href="$classarrayst.html" title=" " alt="" coords="115,225,183,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="152,191,152,225,147,225,147,191"/>
+<area shape="rect" id="Node000005" href="$classboolbvt.html" title=" " alt="" coords="114,299,185,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="152,264,152,299,147,299,147,264"/>
+<area shape="rect" id="Node000006" href="$classbv__pointers__widet.html" title=" " alt="" coords="5,372,147,397"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="129,336,90,374,86,370,126,332"/>
+<area shape="rect" id="Node000007" href="$classbv__pointerst.html" title=" " alt="" coords="171,372,274,397"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="173,332,213,370,209,374,169,336"/>
+<area shape="rect" id="Node000008" href="$classbv__dimacst.html" title=" " alt="" coords="25,445,122,471"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="188,406,99,448,97,443,185,401"/>
+<area shape="rect" id="Node000009" href="$classbv__minimizing__dect.html" title=" " alt="" coords="146,445,299,471"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="225,411,225,445,220,445,220,411"/>
+<area shape="rect" id="Node000010" href="$classbv__refinementt.html" title=" " alt="" coords="323,445,445,471"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="262,400,359,443,357,448,260,405"/>
 </map>

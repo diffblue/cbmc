@@ -8,11 +8,11 @@ var classreference__counting =
     [ "clear", "classreference__counting.html#a4f101a8916aaae4c2c1ee0d36b6dabf4", null ],
     [ "copy_from", "classreference__counting.html#aad9102edb0375eeb765743a8d7859a95", null ],
     [ "detach", "classreference__counting.html#ab24d3fb3a10504ce7587c00a56ce131d", null ],
-    [ "get_d", "classreference__counting.html#a3a968bd0c186ff083cd76c3de21098fc", null ],
-    [ "operator=", "classreference__counting.html#a6ab1bb409162fb223e76ff5b4bd45810", null ],
-    [ "read", "classreference__counting.html#a6c6abe90bbce056a0a56e149e6a0ca69", null ],
+    [ "get_d", "classreference__counting.html#a848f13aba87acac665687c12995d38b7", null ],
+    [ "operator=", "classreference__counting.html#af43283338c416d0f5fe675097684e288", null ],
+    [ "read", "classreference__counting.html#ae6a28795472019d5b62ecb425034f701", null ],
     [ "remove_ref", "classreference__counting.html#a66db6b8f3abc117c934812a1c1322e3e", null ],
     [ "swap", "classreference__counting.html#a7beab238180e3c47c123fe7ceef397ed", null ],
-    [ "write", "classreference__counting.html#af338a53962abe2d31cc9efec7ed93bda", null ],
+    [ "write", "classreference__counting.html#afbc953ef7fffcc59430283e35ff02dc4", null ],
     [ "d", "classreference__counting.html#a50b125faddca6b2d99120fa8c3e4e2b1", null ]
 ];

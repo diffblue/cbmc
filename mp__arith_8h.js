@@ -12,7 +12,7 @@ var mp__arith_8h =
     [ "logic_left_shift", "mp__arith_8h.html#a3569a22b1ebd31036965c35e425a7159", null ],
     [ "logic_right_shift", "mp__arith_8h.html#aaeb88a97c31a61bd4c528eb094d5574d", null ],
     [ "operator<<", "mp__arith_8h.html#ac98a461d462be040a036a62693ac5b0a", null ],
-    [ "operator<<", "mp__arith_8h.html#a1f0e17714626fdbdb4dd260fe7e40550", null ],
+    [ "operator<<", "mp__arith_8h.html#a921571075276493d861c282d18a9943b", null ],
     [ "operator>>", "mp__arith_8h.html#ab48cafe47df10af6f2bb07183892f0f4", null ],
     [ "rotate_left", "mp__arith_8h.html#acaf15a801500ddea070556dc37144fdc", null ],
     [ "rotate_right", "mp__arith_8h.html#aff4079d0cd2724edb250872abb1881ba", null ],

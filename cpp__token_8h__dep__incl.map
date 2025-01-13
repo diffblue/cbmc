@@ -1,9 +1,16 @@
 <map id="/home/runner/work/cbmc/cbmc/src/cpp/cpp_token.h" name="/home/runner/work/cbmc/cbmc/src/cpp/cpp_token.h">
-<area shape="rect" id="node1" title="C++ Parser: Token." alt="" coords="471,5,665,47"/>
-<area shape="rect" id="node2" href="$cpp__token__buffer_8h.html" title="C++ Parser: Token Buffer." alt="" coords="476,95,660,151"/>
-<area shape="rect" id="node3" href="$cpp__parser_8h.html" title="C++ Parser." alt="" coords="312,206,509,247"/>
-<area shape="rect" id="node6" href="$parse_8cpp.html" title="C++ Language Parsing." alt="" coords="499,303,683,344"/>
-<area shape="rect" id="node7" href="$cpp__token__buffer_8cpp.html" title="C++ Parser: Token Buffer." alt="" coords="605,199,789,255"/>
-<area shape="rect" id="node4" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="5,303,237,344"/>
-<area shape="rect" id="node5" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="262,303,474,344"/>
+<area shape="rect" id="Node000001" title="C++ Parser: Token." alt="" coords="471,5,665,45"/>
+<area shape="rect" id="Node000002" href="$cpp__token__buffer_8h.html" title="C++ Parser: Token Buffer." alt="" coords="476,93,660,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="571,59,571,93,565,93,565,59"/>
+<area shape="rect" id="Node000003" href="$cpp__parser_8h.html" title="C++ Parser." alt="" coords="312,203,509,243"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="517,158,442,205,439,201,514,153"/>
+<area shape="rect" id="Node000006" href="$parse_8cpp.html" title="C++ Language Parsing." alt="" coords="499,299,683,339"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="575,162,591,298,586,299,570,162"/>
+<area shape="rect" id="Node000007" href="$cpp__token__buffer_8cpp.html" title="C++ Parser: Token Buffer." alt="" coords="605,196,789,251"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="614,154,665,194,662,198,611,158"/>
+<area shape="rect" id="Node000004" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="5,299,237,339"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="340,250,181,301,179,296,339,245"/>
+<area shape="rect" id="Node000005" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="262,299,474,339"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="399,257,379,300,374,297,394,255"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="460,247,556,296,553,301,458,252"/>
 </map>

@@ -1,6 +1,10 @@
 <map id="rd_range_domain_factoryt" name="rd_range_domain_factoryt">
-<area shape="rect" id="node1" title="This ensures that all domains are constructed with the appropriate pointer back to the analysis engin..." alt="" coords="7,276,201,303"/>
-<area shape="rect" id="node2" href="$classai__domain__factoryt.html" title=" " alt="" coords="19,185,189,227"/>
-<area shape="rect" id="node3" href="$classai__domain__factory__baset.html" title=" " alt="" coords="5,5,192,32"/>
-<area shape="rect" id="node4" href="$classai__domain__factoryt.html" title=" " alt="" coords="121,81,269,123"/>
+<area shape="rect" id="Node000001" title="This ensures that all domains are constructed with the appropriate pointer back to the analysis engin..." alt="" coords="7,272,201,297"/>
+<area shape="rect" id="Node000002" href="$classai__domain__factoryt.html" title=" " alt="" coords="19,183,189,223"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,236,107,272,101,272,101,236"/>
+<area shape="rect" id="Node000003" href="$classai__domain__factory__baset.html" title=" " alt="" coords="5,5,192,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,44,106,183,101,183,97,45"/>
+<area shape="rect" id="Node000004" href="$classai__domain__factoryt.html" title=" " alt="" coords="121,80,269,120"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="125,37,174,78,170,82,121,41"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="171,132,123,184,119,181,167,128"/>
 </map>

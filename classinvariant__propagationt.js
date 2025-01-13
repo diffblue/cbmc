@@ -10,7 +10,7 @@ var classinvariant__propagationt =
     [ "get_objects", "classinvariant__propagationt.html#a6aa96e57e52acfdef994d1000c9c657d", null ],
     [ "get_objects_rec", "classinvariant__propagationt.html#ac7967c13577a9c5d33b9bce19c3c9b88", null ],
     [ "initialize", "classinvariant__propagationt.html#abdaf1a5a72909b04ecf9530e883393be", null ],
-    [ "lookup", "classinvariant__propagationt.html#a8438b4c0373dc11d30a8fbf62eb96112", null ],
+    [ "lookup", "classinvariant__propagationt.html#a75f86bb21bd69d75a21a711f7eb1a259", null ],
     [ "make_all_false", "classinvariant__propagationt.html#a54d2f7ccefbcf63ca1504399cdae5b89", null ],
     [ "make_all_true", "classinvariant__propagationt.html#a531bd844d7668e61f6e3b8e7e948f222", null ],
     [ "simplify", "classinvariant__propagationt.html#a8472cce28c346687d2be75a6e8985cc4", null ],

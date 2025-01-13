@@ -1,21 +1,9 @@
 var dir_807c5b2c83e0c14a10083f60cf67ca05 =
 [
-    [ "abstract_goto_model.h", "abstract__goto__model_8h.html", [
-      [ "abstract_goto_modelt", "classabstract__goto__modelt.html", "classabstract__goto__modelt" ]
-    ] ],
+    [ "abstract_goto_model.h", "abstract__goto__model_8h.html", "abstract__goto__model_8h" ],
     [ "adjust_float_expressions.cpp", "adjust__float__expressions_8cpp.html", "adjust__float__expressions_8cpp" ],
     [ "adjust_float_expressions.h", "adjust__float__expressions_8h.html", "adjust__float__expressions_8h" ],
-    [ "cfg.h", "cfg_8h.html", [
-      [ "empty_cfg_nodet", "classempty__cfg__nodet.html", null ],
-      [ "cfg_base_nodet", "structcfg__base__nodet.html", "structcfg__base__nodet" ],
-      [ "cfg_instruction_to_dense_integert", "classcfg__instruction__to__dense__integert.html", "classcfg__instruction__to__dense__integert" ],
-      [ "cfg_instruction_to_dense_integert< goto_programt::const_targett >", "classcfg__instruction__to__dense__integert_3_01goto__programt_1_1const__targett_01_4.html", "classcfg__instruction__to__dense__integert_3_01goto__programt_1_1const__targett_01_4" ],
-      [ "cfg_baset", "classcfg__baset.html", "classcfg__baset" ],
-      [ "entry_mapt", "classcfg__baset_1_1entry__mapt.html", "classcfg__baset_1_1entry__mapt" ],
-      [ "concurrent_cfg_baset", "classconcurrent__cfg__baset.html", "classconcurrent__cfg__baset" ],
-      [ "procedure_local_cfg_baset", "classprocedure__local__cfg__baset.html", "classprocedure__local__cfg__baset" ],
-      [ "procedure_local_concurrent_cfg_baset", "classprocedure__local__concurrent__cfg__baset.html", null ]
-    ] ],
+    [ "cfg.h", "cfg_8h.html", "cfg_8h" ],
     [ "class_hierarchy.cpp", "class__hierarchy_8cpp.html", "class__hierarchy_8cpp" ],
     [ "class_hierarchy.h", "class__hierarchy_8h.html", "class__hierarchy_8h" ],
     [ "class_identifier.cpp", "class__identifier_8cpp.html", "class__identifier_8cpp" ],
@@ -31,46 +19,27 @@ var dir_807c5b2c83e0c14a10083f60cf67ca05 =
     [ "goto_function.cpp", "goto__function_8cpp.html", "goto__function_8cpp" ],
     [ "goto_function.h", "goto__function_8h.html", "goto__function_8h" ],
     [ "goto_functions.cpp", "goto__functions_8cpp.html", null ],
-    [ "goto_functions.h", "goto__functions_8h.html", [
-      [ "goto_functionst", "classgoto__functionst.html", "classgoto__functionst" ]
-    ] ],
+    [ "goto_functions.h", "goto__functions_8h.html", "goto__functions_8h" ],
     [ "goto_inline.cpp", "goto__inline_8cpp.html", "goto__inline_8cpp" ],
     [ "goto_inline.h", "goto__inline_8h.html", "goto__inline_8h" ],
     [ "goto_inline_class.cpp", "goto__inline__class_8cpp.html", "goto__inline__class_8cpp" ],
-    [ "goto_inline_class.h", "goto__inline__class_8h.html", [
-      [ "goto_inlinet", "classgoto__inlinet.html", "classgoto__inlinet" ],
-      [ "goto_inline_logt", "classgoto__inlinet_1_1goto__inline__logt.html", "classgoto__inlinet_1_1goto__inline__logt" ],
-      [ "goto_inline_log_infot", "classgoto__inlinet_1_1goto__inline__logt_1_1goto__inline__log__infot.html", "classgoto__inlinet_1_1goto__inline__logt_1_1goto__inline__log__infot" ]
-    ] ],
+    [ "goto_inline_class.h", "goto__inline__class_8h.html", "goto__inline__class_8h" ],
     [ "goto_instruction_code.cpp", "goto__instruction__code_8cpp.html", "goto__instruction__code_8cpp" ],
     [ "goto_instruction_code.h", "goto__instruction__code_8h.html", "goto__instruction__code_8h" ],
-    [ "goto_model.h", "goto__model_8h.html", [
-      [ "goto_modelt", "classgoto__modelt.html", "classgoto__modelt" ],
-      [ "wrapper_goto_modelt", "classwrapper__goto__modelt.html", "classwrapper__goto__modelt" ],
-      [ "goto_model_functiont", "classgoto__model__functiont.html", "classgoto__model__functiont" ]
-    ] ],
+    [ "goto_model.h", "goto__model_8h.html", "goto__model_8h" ],
     [ "goto_program.cpp", "goto__program_8cpp.html", "goto__program_8cpp" ],
     [ "goto_program.h", "goto__program_8h.html", "goto__program_8h" ],
     [ "goto_trace.cpp", "goto__trace_8cpp.html", "goto__trace_8cpp" ],
     [ "goto_trace.h", "goto__trace_8h.html", "goto__trace_8h" ],
     [ "graphml_witness.cpp", "graphml__witness_8cpp.html", "graphml__witness_8cpp" ],
-    [ "graphml_witness.h", "graphml__witness_8h.html", [
-      [ "graphml_witnesst", "classgraphml__witnesst.html", "classgraphml__witnesst" ],
-      [ "pair_hash", "structgraphml__witnesst_1_1pair__hash.html", "structgraphml__witnesst_1_1pair__hash" ]
-    ] ],
+    [ "graphml_witness.h", "graphml__witness_8h.html", "graphml__witness_8h" ],
     [ "initialize_goto_model.cpp", "initialize__goto__model_8cpp.html", "initialize__goto__model_8cpp" ],
     [ "initialize_goto_model.h", "initialize__goto__model_8h.html", "initialize__goto__model_8h" ],
     [ "instrument_preconditions.cpp", "instrument__preconditions_8cpp.html", "instrument__preconditions_8cpp" ],
     [ "instrument_preconditions.h", "instrument__preconditions_8h.html", "instrument__preconditions_8h" ],
     [ "interpreter.cpp", "interpreter_8cpp.html", "interpreter_8cpp" ],
     [ "interpreter.h", "interpreter_8h.html", "interpreter_8h" ],
-    [ "interpreter_class.h", "interpreter__class_8h.html", [
-      [ "interpretert", "classinterpretert.html", "classinterpretert" ],
-      [ "function_assignmentt", "structinterpretert_1_1function__assignmentt.html", "structinterpretert_1_1function__assignmentt" ],
-      [ "function_assignments_contextt", "structinterpretert_1_1function__assignments__contextt.html", "structinterpretert_1_1function__assignments__contextt" ],
-      [ "memory_cellt", "classinterpretert_1_1memory__cellt.html", "classinterpretert_1_1memory__cellt" ],
-      [ "stack_framet", "classinterpretert_1_1stack__framet.html", "classinterpretert_1_1stack__framet" ]
-    ] ],
+    [ "interpreter_class.h", "interpreter__class_8h.html", "interpreter__class_8h" ],
     [ "interpreter_evaluate.cpp", "interpreter__evaluate_8cpp.html", null ],
     [ "json_expr.cpp", "json__expr_8cpp.html", "json__expr_8cpp" ],
     [ "json_expr.h", "json__expr_8h.html", "json__expr_8h" ],
@@ -91,9 +60,7 @@ var dir_807c5b2c83e0c14a10083f60cf67ca05 =
     [ "parameter_assignments.cpp", "parameter__assignments_8cpp.html", "parameter__assignments_8cpp" ],
     [ "parameter_assignments.h", "parameter__assignments_8h.html", "parameter__assignments_8h" ],
     [ "pointer_arithmetic.cpp", "pointer__arithmetic_8cpp.html", null ],
-    [ "pointer_arithmetic.h", "pointer__arithmetic_8h.html", [
-      [ "pointer_arithmetict", "structpointer__arithmetict.html", "structpointer__arithmetict" ]
-    ] ],
+    [ "pointer_arithmetic.h", "pointer__arithmetic_8h.html", "pointer__arithmetic_8h" ],
     [ "process_goto_program.cpp", "process__goto__program_8cpp.html", "process__goto__program_8cpp" ],
     [ "process_goto_program.h", "process__goto__program_8h.html", "process__goto__program_8h" ],
     [ "read_bin_goto_object.cpp", "read__bin__goto__object_8cpp.html", "read__bin__goto__object_8cpp" ],
@@ -137,13 +104,9 @@ var dir_807c5b2c83e0c14a10083f60cf67ca05 =
     [ "show_goto_functions.cpp", "show__goto__functions_8cpp.html", "show__goto__functions_8cpp" ],
     [ "show_goto_functions.h", "show__goto__functions_8h.html", "show__goto__functions_8h" ],
     [ "show_goto_functions_json.cpp", "show__goto__functions__json_8cpp.html", null ],
-    [ "show_goto_functions_json.h", "show__goto__functions__json_8h.html", [
-      [ "show_goto_functions_jsont", "classshow__goto__functions__jsont.html", "classshow__goto__functions__jsont" ]
-    ] ],
+    [ "show_goto_functions_json.h", "show__goto__functions__json_8h.html", "show__goto__functions__json_8h" ],
     [ "show_goto_functions_xml.cpp", "show__goto__functions__xml_8cpp.html", null ],
-    [ "show_goto_functions_xml.h", "show__goto__functions__xml_8h.html", [
-      [ "show_goto_functions_xmlt", "classshow__goto__functions__xmlt.html", "classshow__goto__functions__xmlt" ]
-    ] ],
+    [ "show_goto_functions_xml.h", "show__goto__functions__xml_8h.html", "show__goto__functions__xml_8h" ],
     [ "show_properties.cpp", "show__properties_8cpp.html", "show__properties_8cpp" ],
     [ "show_properties.h", "show__properties_8h.html", "show__properties_8h" ],
     [ "show_symbol_table.cpp", "show__symbol__table_8cpp.html", "show__symbol__table_8cpp" ],
@@ -155,9 +118,7 @@ var dir_807c5b2c83e0c14a10083f60cf67ca05 =
     [ "structured_trace_util.cpp", "structured__trace__util_8cpp.html", "structured__trace__util_8cpp" ],
     [ "structured_trace_util.h", "structured__trace__util_8h.html", "structured__trace__util_8h" ],
     [ "system_library_symbols.cpp", "system__library__symbols_8cpp.html", null ],
-    [ "system_library_symbols.h", "system__library__symbols_8h.html", [
-      [ "system_library_symbolst", "classsystem__library__symbolst.html", "classsystem__library__symbolst" ]
-    ] ],
+    [ "system_library_symbols.h", "system__library__symbols_8h.html", "system__library__symbols_8h" ],
     [ "validate_code.cpp", "validate__code_8cpp.html", "validate__code_8cpp" ],
     [ "validate_code.h", "validate__code_8h.html", "validate__code_8h" ],
     [ "validate_goto_model.cpp", "validate__goto__model_8cpp.html", "validate__goto__model_8cpp" ],

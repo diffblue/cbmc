@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['libcprover_2dcpp_20and_20modularisation_7',['libcprover-cpp and Modularisation',['../cpp-api-and-modularisation.html',1,'index']]]
+  ['decision_20records_0',['Architecture Decision Records',['../index.html',1,'']]],
+  ['definition_1',['Symex ready goto definition',['../symex-ready-goto.html',1,'index']]]
 ];

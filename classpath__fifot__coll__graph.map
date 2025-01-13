@@ -1,26 +1,70 @@
 <map id="path_fifot" name="path_fifot">
-<area shape="rect" id="node1" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="2228,524,2312,551"/>
-<area shape="rect" id="node2" href="$classpath__storaget.html" title="Storage for symbolic execution paths to be resumed later." alt="" coords="2067,393,2179,420"/>
-<area shape="rect" id="node3" title=" " alt="" coords="1701,193,1863,249"/>
-<area shape="rect" id="node4" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="514,253,586,280"/>
-<area shape="rect" id="node15" title=" " alt="" coords="926,18,1069,59"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1320,345,1568,401"/>
-<area shape="rect" id="node22" title=" " alt="" coords="910,422,1085,463"/>
-<area shape="rect" id="node5" href="$classlocal__safe__pointerst.html" title="A very simple, cheap analysis to determine when dereference operations are trivially guarded by a che..." alt="" coords="1367,128,1521,155"/>
-<area shape="rect" id="node6" title=" " alt="" coords="868,93,1127,149"/>
-<area shape="rect" id="node7" title=" " alt="" coords="471,60,629,116"/>
-<area shape="rect" id="node8" href="$classexprt.html" title="Base class for all expressions." alt="" coords="153,63,209,89"/>
-<area shape="rect" id="node9" title=" " alt="" coords="127,123,236,149"/>
-<area shape="rect" id="node10" title=" " alt="" coords="5,149,44,176"/>
-<area shape="rect" id="node11" title=" " alt="" coords="483,175,617,201"/>
-<area shape="rect" id="node13" title=" " alt="" coords="474,353,626,394"/>
-<area shape="rect" id="node16" title=" " alt="" coords="262,5,445,32"/>
-<area shape="rect" id="node12" title=" " alt="" coords="162,428,201,455"/>
-<area shape="rect" id="node21" title=" " alt="" coords="471,449,629,476"/>
-<area shape="rect" id="node24" title=" " alt="" coords="496,508,604,535"/>
-<area shape="rect" id="node14" href="$classincremental__dirtyt.html" title="Wrapper for dirtyt that permits incremental population, ensuring each function is analysed exactly on..." alt="" coords="1711,77,1853,104"/>
-<area shape="rect" id="node17" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="1415,77,1473,104"/>
-<area shape="rect" id="node18" href="$classsymex__nondet__generatort.html" title="Functor generating fresh nondet symbols." alt="" coords="1685,476,1879,503"/>
-<area shape="rect" id="node20" title=" " alt="" coords="909,487,1086,529"/>
-<area shape="rect" id="node23" title=" " alt="" coords="930,553,1065,580"/>
+<area shape="rect" id="Node000001" title="FIFO save queue: paths are resumed in the order that they were saved." alt="" coords="2756,70,2840,95"/>
+<area shape="rect" id="Node000002" href="$classpath__storaget.html" title="Storage for symbolic execution paths to be resumed later." alt="" coords="2595,321,2707,346"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2664,308,2787,94,2791,97,2668,310"/>
+<area shape="rect" id="Node000003" href="$classsymex__nondet__generatort.html" title="Functor generating fresh nondet symbols." alt="" coords="2186,223,2379,249"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="2391,248,2480,266,2572,292,2628,318,2626,323,2570,297,2479,271,2390,254"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="1872,339,2033,394"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="2047,363,2215,360,2407,352,2594,336,2595,342,2407,357,2215,365,2047,369"/>
+<area shape="rect" id="Node000005" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="1040,442,1112,467"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1125,447,1872,372,1872,377,1126,452"/>
+<area shape="rect" id="Node000024" title=" " alt="" coords="1429,541,1571,581"/>
+<area shape="poly" id="edge20_Node000024_Node000005" title=" " alt="" coords="1126,470,1230,503,1334,528,1429,546,1428,552,1333,533,1229,508,1124,475"/>
+<area shape="rect" id="Node000026" title=" " alt="" coords="2159,273,2407,327"/>
+<area shape="poly" id="edge25_Node000026_Node000005" title=" " alt="" coords="1111,433,1167,406,1240,374,1324,345,1410,324,1511,310,1615,300,1820,289,2007,287,2159,291,2158,296,2007,293,1820,294,1615,305,1512,315,1411,329,1325,350,1242,379,1169,411,1114,438"/>
+<area shape="rect" id="Node000034" title=" " alt="" coords="1413,477,1587,517"/>
+<area shape="poly" id="edge36_Node000034_Node000005" title=" " alt="" coords="1126,457,1230,468,1413,486,1412,492,1229,473,1126,462"/>
+<area shape="rect" id="Node000006" href="$classlocal__safe__pointerst.html" title="A very simple, cheap analysis to determine when dereference operations are trivially guarded by a che..." alt="" coords="1423,186,1577,211"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="1588,182,1647,178,1712,181,1779,192,1811,202,1841,216,1876,242,1904,274,1926,308,1942,338,1937,340,1922,310,1900,277,1872,246,1839,221,1809,207,1778,197,1712,186,1647,184,1589,187"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="947,190,1205,245"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1219,208,1423,199,1423,205,1219,214"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="542,266,701,321"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="714,279,922,248,953,242,954,247,923,253,715,285"/>
+<area shape="rect" id="Node000009" href="$classexprt.html" title="Base class for all expressions." alt="" coords="197,281,253,306"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="267,291,542,291,542,296,267,296"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="170,415,279,441"/>
+<area shape="poly" id="edge9_Node000008_Node000018" title=" " alt="" coords="293,436,341,440,395,439,449,432,502,415,533,396,560,371,601,319,605,323,564,375,536,400,504,420,451,437,395,445,341,445,293,442"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="5,447,44,473"/>
+<area shape="poly" id="edge10_Node000018_Node000019" title=" " alt="" coords="57,452,169,434,170,439,58,458"/>
+<area shape="rect" id="Node000020" title=" " alt="" coords="157,194,292,219"/>
+<area shape="poly" id="edge12_Node000020_Node000019" title=" " alt="" coords="38,434,87,357,155,266,206,218,210,221,159,270,91,360,43,437"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="1000,339,1152,379"/>
+<area shape="poly" id="edge15_Node000021_Node000019" title=" " alt="" coords="58,458,316,460,409,463,502,460,641,443,778,420,999,374,1000,379,779,426,641,449,503,465,409,468,316,465,58,463"/>
+<area shape="rect" id="Node000025" title=" " alt="" coords="740,542,923,567"/>
+<area shape="poly" id="edge22_Node000025_Node000019" title=" " alt="" coords="46,481,69,499,92,508,111,511,158,513,318,528,478,539,740,550,740,555,478,544,318,534,157,519,111,516,91,513,67,504,43,485"/>
+<area shape="poly" id="edge11_Node000007_Node000020" title=" " alt="" coords="306,205,947,213,947,218,306,210"/>
+<area shape="rect" id="Node000030" title=" " alt="" coords="534,123,709,149"/>
+<area shape="poly" id="edge31_Node000030_Node000020" title=" " alt="" coords="305,197,400,186,502,168,582,146,583,151,503,173,401,191,306,202"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="5,125,44,150"/>
+<area shape="poly" id="edge13_Node000020_Node000016" title=" " alt="" coords="51,156,69,168,113,185,158,195,157,201,112,190,67,173,48,161"/>
+<area shape="poly" id="edge16_Node000021_Node000016" title=" " alt="" coords="38,162,56,199,82,242,116,283,136,301,159,315,190,328,228,339,324,356,437,366,561,370,808,369,1000,361,1000,366,808,374,561,376,437,371,323,361,227,344,188,333,156,320,133,305,112,287,77,245,51,201,34,165"/>
+<area shape="poly" id="edge30_Node000030_Node000016" title=" " alt="" coords="58,135,534,134,534,139,58,140"/>
+<area shape="rect" id="Node000033" title=" " alt="" coords="331,73,488,98"/>
+<area shape="poly" id="edge33_Node000033_Node000016" title=" " alt="" coords="56,120,67,116,136,101,206,92,330,83,331,89,206,97,137,107,69,121,57,125"/>
+<area shape="rect" id="Node000036" title=" " alt="" coords="171,22,279,47"/>
+<area shape="poly" id="edge40_Node000036_Node000016" title=" " alt="" coords="32,111,46,86,66,65,91,51,118,41,170,32,171,38,119,46,93,56,70,69,50,89,37,114"/>
+<area shape="poly" id="edge14_Node000004_Node000021" title=" " alt="" coords="1166,357,1871,363,1871,369,1166,362"/>
+<area shape="poly" id="edge34_Node000026_Node000021" title=" " alt="" coords="1117,329,1169,301,1229,279,1316,265,1425,257,1549,254,1680,256,1936,266,2135,279,2159,281,2158,286,2134,284,1936,272,1680,261,1549,260,1425,262,1316,270,1230,284,1171,306,1119,334"/>
+<area shape="poly" id="edge37_Node000034_Node000021" title=" " alt="" coords="1166,380,1273,411,1388,448,1454,475,1452,480,1386,453,1271,416,1165,385"/>
+<area shape="rect" id="Node000022" href="$classincremental__dirtyt.html" title="Wrapper for dirtyt that permits incremental population, ensuring each function is analysed exactly on..." alt="" coords="2211,501,2354,526"/>
+<area shape="poly" id="edge17_Node000002_Node000022" title=" " alt="" coords="2357,525,2407,530,2463,528,2519,517,2545,507,2569,494,2587,479,2602,461,2625,419,2638,377,2645,346,2650,347,2643,379,2629,421,2607,464,2591,483,2572,498,2547,512,2520,523,2464,534,2407,535,2356,531"/>
+<area shape="rect" id="Node000023" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="1924,501,1981,526"/>
+<area shape="poly" id="edge18_Node000022_Node000023" title=" " alt="" coords="1995,511,2211,511,2211,516,1995,516"/>
+<area shape="poly" id="edge23_Node000022_Node000024" title=" " alt="" coords="1585,561,1793,562,1917,559,2041,551,2135,539,2220,523,2221,529,2136,544,2042,556,1917,564,1793,568,1585,567"/>
+<area shape="poly" id="edge19_Node000023_Node000024" title=" " alt="" coords="1585,547,1613,544,1923,513,1924,518,1614,549,1586,553"/>
+<area shape="poly" id="edge21_Node000024_Node000025" title=" " alt="" coords="936,553,1429,558,1429,563,936,558"/>
+<area shape="poly" id="edge24_Node000002_Node000026" title=" " alt="" coords="2420,310,2595,326,2594,331,2420,315"/>
+<area shape="rect" id="Node000027" title=" " alt="" coords="1864,121,2041,161"/>
+<area shape="poly" id="edge26_Node000026_Node000027" title=" " alt="" coords="2023,164,2080,192,2136,229,2148,244,2160,258,2182,270,2179,275,2157,262,2144,247,2133,233,2078,197,2021,169"/>
+<area shape="rect" id="Node000028" href="$classlexical__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any lexical loops." alt="" coords="1411,121,1589,161"/>
+<area shape="poly" id="edge27_Node000027_Node000028" title=" " alt="" coords="1603,139,1864,139,1864,144,1603,144"/>
+<area shape="rect" id="Node000029" href="$classloop__analysist.html" title=" " alt="" coords="991,133,1161,158"/>
+<area shape="poly" id="edge28_Node000028_Node000029" title=" " alt="" coords="1175,142,1411,140,1411,145,1175,147"/>
+<area shape="poly" id="edge29_Node000029_Node000030" title=" " alt="" coords="722,135,990,141,990,146,722,141"/>
+<area shape="poly" id="edge32_Node000027_Node000033" title=" " alt="" coords="502,82,830,81,1501,81,1599,85,1697,95,1864,121,1863,126,1696,100,1599,90,1501,87,830,87,502,88"/>
+<area shape="poly" id="edge35_Node000002_Node000034" title=" " alt="" coords="1601,487,1783,471,2025,444,2297,405,2435,382,2570,355,2611,344,2613,349,2571,360,2436,387,2298,411,2026,449,1784,476,1601,492"/>
+<area shape="rect" id="Node000035" title=" " alt="" coords="554,19,689,45"/>
+<area shape="poly" id="edge38_Node000001_Node000035" title=" " alt="" coords="702,29,1075,29,2652,29,2687,33,2721,43,2776,67,2774,72,2719,48,2686,38,2652,35,1075,35,702,35"/>
+<area shape="poly" id="edge39_Node000035_Node000036" title=" " alt="" coords="292,34,316,35,503,35,554,33,554,38,503,40,316,40,292,40"/>
+<area shape="poly" id="edge41_Node000035_Node000036" title=" " alt="" coords="292,22,316,20,409,17,503,20,554,23,553,28,503,25,409,22,316,25,292,27"/>
 </map>

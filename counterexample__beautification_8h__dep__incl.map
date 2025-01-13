@@ -1,7 +1,11 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/counterexample_beautification.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/counterexample_beautification.h">
-<area shape="rect" id="node1" title="Counterexample Beautification." alt="" coords="395,5,635,61"/>
-<area shape="rect" id="node2" href="$counterexample__beautification_8cpp.html" title="Counterexample Beautification using Incremental SAT." alt="" coords="5,117,260,173"/>
-<area shape="rect" id="node3" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="284,117,515,173"/>
-<area shape="rect" id="node4" href="$single__loop__incremental__symex__checker_8cpp.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="539,109,724,180"/>
-<area shape="rect" id="node5" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="749,117,983,173"/>
+<area shape="rect" id="Node000001" title="Counterexample Beautification." alt="" coords="395,5,635,60"/>
+<area shape="rect" id="Node000002" href="$counterexample__beautification_8cpp.html" title="Counterexample Beautification using Incremental SAT." alt="" coords="5,115,260,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="410,66,226,118,225,113,409,61"/>
+<area shape="rect" id="Node000003" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="284,115,515,170"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="478,72,429,117,426,113,475,68"/>
+<area shape="rect" id="Node000004" href="$single__loop__incremental__symex__checker_8cpp.html" title="Goto Checker using multi&#45;path symbolic execution with incremental unwinding of a specified loop." alt="" coords="539,108,724,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="556,68,597,106,593,110,552,72"/>
+<area shape="rect" id="Node000005" href="$single__path__symex__checker_8cpp.html" title="Goto Checker using Single Path Symbolic Execution." alt="" coords="749,115,983,170"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="614,61,782,113,780,118,613,67"/>
 </map>

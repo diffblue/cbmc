@@ -1,42 +1,81 @@
 <map id="/home/runner/work/cbmc/cbmc/src/linking/static_lifetime_init.h" name="/home/runner/work/cbmc/cbmc/src/linking/static_lifetime_init.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4215,5,4399,61"/>
-<area shape="rect" id="node2" href="$ansi__c__entry__point_8cpp.html" title=" " alt="" coords="5,117,189,173"/>
-<area shape="rect" id="node3" href="$ansi__c__internal__additions_8cpp.html" title=" " alt="" coords="213,117,400,173"/>
-<area shape="rect" id="node4" href="$goto__convert__functions_8cpp.html" title=" " alt="" coords="424,109,611,180"/>
-<area shape="rect" id="node5" href="$link__to__library_8cpp.html" title="Library Linking." alt="" coords="635,117,855,173"/>
-<area shape="rect" id="node6" href="$cpp__internal__additions_8cpp.html" title=" " alt="" coords="880,117,1075,173"/>
-<area shape="rect" id="node7" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="1099,124,1317,165"/>
-<area shape="rect" id="node8" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="1341,117,1525,173"/>
-<area shape="rect" id="node9" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1549,117,1733,173"/>
-<area shape="rect" id="node10" href="$symex__coverage_8cpp.html" title="Record and print code coverage of symbolic execution." alt="" coords="1757,117,1941,173"/>
-<area shape="rect" id="node11" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="1966,117,2159,173"/>
-<area shape="rect" id="node12" href="$call__sequences_8cpp.html" title="Printing function call sequences for Ofer." alt="" coords="2183,117,2377,173"/>
-<area shape="rect" id="node13" href="$dfcc_8cpp.html" title=" " alt="" coords="2401,109,2599,180"/>
-<area shape="rect" id="node14" href="$dfcc__library_8cpp.html" title=" " alt="" coords="2623,109,2820,180"/>
-<area shape="rect" id="node15" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="2844,109,3041,180"/>
-<area shape="rect" id="node16" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="3065,109,3263,180"/>
-<area shape="rect" id="node17" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="3287,117,3534,173"/>
-<area shape="rect" id="node18" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="3558,117,3751,173"/>
-<area shape="rect" id="node19" href="$cover__filter_8cpp.html" title="Filters for the Coverage Instrumentation." alt="" coords="3775,117,3969,173"/>
-<area shape="rect" id="node20" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="3993,117,4186,173"/>
-<area shape="rect" id="node21" href="$interrupt_8cpp.html" title="Interrupt Instrumentation." alt="" coords="4210,117,4403,173"/>
-<area shape="rect" id="node22" href="$mmio_8cpp.html" title="Memory&#45;mapped I/O Instrumentation for Goto Programs." alt="" coords="4427,117,4621,173"/>
-<area shape="rect" id="node23" href="$nondet__static_8cpp.html" title="Nondeterministically initializes global scope variables, except for constants (such as string literal..." alt="" coords="4645,117,4838,173"/>
-<area shape="rect" id="node24" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="4862,117,5055,173"/>
-<area shape="rect" id="node25" href="$stack__depth_8cpp.html" title="Stack depth checks." alt="" coords="5079,117,5273,173"/>
-<area shape="rect" id="node26" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="5297,117,5490,173"/>
-<area shape="rect" id="node27" href="$shared__buffers_8cpp.html" title=" " alt="" coords="5514,117,5707,173"/>
-<area shape="rect" id="node28" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="5731,117,5925,173"/>
-<area shape="rect" id="node29" href="$initialize__goto__model_8cpp.html" title="Get a Goto Program." alt="" coords="5949,117,6142,173"/>
-<area shape="rect" id="node30" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="6167,117,6351,173"/>
-<area shape="rect" id="node31" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="6375,117,6595,173"/>
-<area shape="rect" id="node32" href="$remove__internal__symbols_8cpp.html" title="Remove symbols that are internal only." alt="" coords="6620,117,6807,173"/>
-<area shape="rect" id="node33" href="$static__lifetime__init_8cpp.html" title=" " alt="" coords="6831,117,7015,173"/>
-<area shape="rect" id="node34" href="$statement__list__entry__point_8cpp.html" title="Statement List Language Entry Point." alt="" coords="7039,117,7267,173"/>
-<area shape="rect" id="node35" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="7292,117,7503,173"/>
-<area shape="rect" id="node36" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="7527,117,7745,173"/>
-<area shape="rect" id="node37" href="$java__entry__point_8cpp.html" title=" " alt="" coords="7769,117,7988,173"/>
-<area shape="rect" id="node38" href="$java__string__literals_8cpp.html" title=" " alt="" coords="8012,117,8231,173"/>
-<area shape="rect" id="node39" href="$remove__exceptions_8cpp.html" title="Remove exception handling." alt="" coords="8255,117,8473,173"/>
-<area shape="rect" id="node40" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="8497,117,8689,173"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="4272,5,4456,60"/>
+<area shape="rect" id="Node000002" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="5,115,216,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="4258,37,3431,41,2169,52,1523,61,945,74,494,90,334,100,228,111,193,118,192,113,228,105,334,95,494,85,945,68,1523,56,2169,46,3431,35,4258,32"/>
+<area shape="rect" id="Node000003" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="240,115,459,170"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="4258,37,3474,42,2290,54,1684,64,1142,76,720,92,570,101,471,111,434,118,433,113,470,105,570,95,719,86,1142,71,1684,58,2289,49,3474,37,4258,32"/>
+<area shape="rect" id="Node000004" href="$java__entry__point_8cpp.html" title=" " alt="" coords="483,115,701,170"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="4258,37,3517,43,2409,56,1844,65,1339,78,946,93,806,101,714,111,677,118,676,113,713,105,806,96,945,87,1339,72,1844,60,2409,50,3517,37,4258,32"/>
+<area shape="rect" id="Node000005" href="$java__string__literals_8cpp.html" title=" " alt="" coords="725,115,944,170"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="4258,37,3562,44,2530,57,1537,79,1172,94,1042,102,956,111,919,118,918,113,956,105,1042,97,1171,88,1537,74,2530,52,3562,38,4258,32"/>
+<area shape="rect" id="Node000006" href="$remove__exceptions_8cpp.html" title="Remove exception handling." alt="" coords="968,115,1187,170"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="4258,38,3606,45,2650,59,1734,81,1397,95,1199,111,1163,118,1162,113,1198,105,1397,89,1734,76,2650,54,3606,39,4258,32"/>
+<area shape="rect" id="Node000007" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1211,115,1403,170"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="4258,38,3646,44,2758,58,1910,80,1598,94,1415,111,1383,118,1382,113,1414,105,1598,89,1909,75,2758,53,3646,39,4258,32"/>
+<area shape="rect" id="Node000008" href="$ansi__c__entry__point_8cpp.html" title=" " alt="" coords="1427,115,1611,170"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="4258,38,3685,45,2862,59,2079,81,1792,95,1623,111,1592,118,1591,113,1622,105,1792,90,2079,76,2862,54,3685,40,4258,32"/>
+<area shape="rect" id="Node000009" href="$ansi__c__internal__additions_8cpp.html" title=" " alt="" coords="1635,115,1821,170"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="4258,38,3724,46,2968,61,2251,83,1989,96,1834,111,1802,118,1801,113,1833,105,1988,91,2251,78,2968,56,3724,41,4258,33"/>
+<area shape="rect" id="Node000010" href="$goto__convert__functions_8cpp.html" title=" " alt="" coords="1845,108,2032,177"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="4258,36,3807,37,3166,45,2831,54,2518,68,2248,86,2136,98,2044,111,2033,113,2032,108,2044,105,2136,92,2247,81,2517,62,2831,49,3166,40,3807,32,4258,31"/>
+<area shape="rect" id="Node000011" href="$link__to__library_8cpp.html" title="Library Linking." alt="" coords="2057,115,2277,170"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="4258,37,3849,42,3280,53,2985,62,2708,75,2470,91,2290,111,2253,118,2252,113,2289,105,2469,86,2708,70,2985,57,3280,48,3849,36,4258,32"/>
+<area shape="rect" id="Node000012" href="$cpp__internal__additions_8cpp.html" title=" " alt="" coords="2301,115,2496,170"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="4258,37,3889,42,3383,53,3121,63,2877,75,2667,91,2508,111,2476,118,2475,113,2508,105,2667,86,2877,70,3121,58,3383,48,3889,36,4258,32"/>
+<area shape="rect" id="Node000013" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="2520,123,2739,163"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="4259,38,3933,46,3498,59,3066,81,2887,95,2751,111,2688,125,2687,120,2750,105,2886,89,3066,75,3498,54,3933,40,4258,33"/>
+<area shape="rect" id="Node000014" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="2763,115,2947,170"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="4258,39,3971,46,3596,60,3227,81,3075,95,2959,111,2929,118,2927,113,2958,105,3074,89,3227,76,3596,54,3971,41,4258,33"/>
+<area shape="rect" id="Node000015" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="2971,115,3155,170"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="4258,40,4010,49,3696,64,3390,84,3263,97,3167,111,3137,118,3136,113,3166,105,3263,91,3389,79,3695,58,4010,44,4258,35"/>
+<area shape="rect" id="Node000016" href="$symex__coverage_8cpp.html" title="Record and print code coverage of symbolic execution." alt="" coords="3179,115,3363,170"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="4258,36,4088,40,3867,51,3621,73,3497,90,3375,111,3345,118,3344,113,3374,105,3496,84,3621,68,3867,46,4088,35,4258,31"/>
+<area shape="rect" id="Node000017" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="3387,115,3581,170"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="4258,40,4124,47,3957,60,3774,81,3593,111,3563,118,3561,113,3591,105,3774,75,3957,55,4124,42,4258,35"/>
+<area shape="rect" id="Node000018" href="$call__sequences_8cpp.html" title="Printing function call sequences for Ofer." alt="" coords="3605,115,3798,170"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="4259,46,4051,70,3930,88,3811,111,3782,118,3781,113,3810,105,3929,83,4050,64,4258,40"/>
+<area shape="rect" id="Node000019" href="$dfcc_8cpp.html" title=" " alt="" coords="3823,108,4020,177"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="4259,58,4033,111,4021,114,4019,109,4031,105,4258,53"/>
+<area shape="rect" id="Node000020" href="$dfcc__library_8cpp.html" title=" " alt="" coords="4044,108,4241,177"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="4299,69,4213,110,4211,105,4297,64"/>
+<area shape="rect" id="Node000021" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="4265,108,4463,177"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="4367,74,4367,108,4361,108,4361,74"/>
+<area shape="rect" id="Node000022" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="4487,108,4684,177"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="4431,64,4517,105,4515,110,4429,69"/>
+<area shape="rect" id="Node000023" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="4709,115,4955,170"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="4470,54,4697,105,4727,113,4726,118,4695,111,4469,59"/>
+<area shape="rect" id="Node000024" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="4979,115,5173,170"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="4470,39,4700,62,4835,81,4969,105,4998,113,4997,118,4967,111,4834,86,4700,67,4470,44"/>
+<area shape="rect" id="Node000025" href="$cover__filter_8cpp.html" title="Filters for the Coverage Instrumentation." alt="" coords="5197,115,5390,170"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="4470,34,4612,40,4791,53,4989,74,5186,105,5217,113,5215,118,5185,111,4988,79,4791,58,4612,45,4469,39"/>
+<area shape="rect" id="Node000026" href="$dump__c_8cpp.html" title="Dump Goto&#45;Program as C/C++ Source." alt="" coords="5414,115,5607,170"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="4470,31,4648,34,4881,45,5142,67,5274,84,5403,105,5435,113,5433,118,5402,111,5273,89,5141,73,4881,50,4648,39,4470,36"/>
+<area shape="rect" id="Node000027" href="$interrupt_8cpp.html" title="Interrupt Instrumentation." alt="" coords="5631,115,5825,170"/>
+<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="4470,34,4729,43,5061,58,5385,79,5519,91,5620,105,5652,113,5651,118,5620,111,5518,97,5384,84,5060,63,4729,48,4470,40"/>
+<area shape="rect" id="Node000028" href="$mmio_8cpp.html" title="Memory&#45;mapped I/O Instrumentation for Goto Programs." alt="" coords="5849,115,6042,170"/>
+<area shape="poly" id="edge27_Node000001_Node000028" title=" " alt="" coords="4470,33,4770,40,5165,54,5554,75,5715,89,5838,105,5870,113,5869,118,5837,111,5715,94,5554,81,5164,59,4770,46,4470,39"/>
+<area shape="rect" id="Node000029" href="$nondet__static_8cpp.html" title="Nondeterministically initializes global scope variables, except for constants (such as string literal..." alt="" coords="6066,115,6259,170"/>
+<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="4470,32,4809,38,5267,50,5723,72,5912,87,6055,105,6087,113,6086,118,6054,111,5911,92,5722,77,5267,56,4809,43,4470,38"/>
+<area shape="rect" id="Node000030" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="6283,115,6477,170"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="4470,32,4849,36,5370,47,5639,56,5892,69,6108,85,6272,105,6305,113,6304,118,6272,111,6108,90,5891,74,5639,62,5370,52,4849,41,4470,37"/>
+<area shape="rect" id="Node000031" href="$stack__depth_8cpp.html" title="Stack depth checks." alt="" coords="6501,115,6694,170"/>
+<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="4470,31,4887,34,5471,44,5775,53,6060,66,6305,83,6490,105,6522,113,6521,118,6489,111,6304,88,6059,71,5775,58,5471,49,4887,39,4470,37"/>
+<area shape="rect" id="Node000032" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="6718,115,6911,170"/>
+<area shape="poly" id="edge31_Node000001_Node000032" title=" " alt="" coords="4470,31,4926,32,5573,40,5911,49,6228,63,6501,81,6614,92,6707,105,6740,113,6739,118,6706,111,6613,98,6501,86,6228,68,5911,55,5573,46,4926,37,4470,36"/>
+<area shape="rect" id="Node000033" href="$shared__buffers_8cpp.html" title=" " alt="" coords="6935,115,7129,170"/>
+<area shape="poly" id="edge32_Node000001_Node000033" title=" " alt="" coords="4470,33,5010,41,5775,56,6501,78,6767,91,6924,105,6957,113,6956,118,6924,111,6767,96,6501,83,5775,61,5010,46,4470,38"/>
+<area shape="rect" id="Node000034" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="7153,115,7346,170"/>
+<area shape="poly" id="edge33_Node000001_Node000034" title=" " alt="" coords="4470,32,5050,40,5884,54,6678,76,6970,90,7142,105,7174,113,7173,118,7141,111,6969,95,6678,82,5884,60,5050,45,4470,38"/>
+<area shape="rect" id="Node000035" href="$initialize__goto__model_8cpp.html" title="Get a Goto Program." alt="" coords="7370,115,7563,170"/>
+<area shape="poly" id="edge34_Node000001_Node000035" title=" " alt="" coords="4470,32,5091,39,5993,53,6855,75,7172,89,7284,97,7359,105,7392,113,7391,118,7358,111,7284,102,7172,94,6855,80,5993,58,5091,44,4470,38"/>
+<area shape="rect" id="Node000036" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="7588,115,7772,170"/>
+<area shape="poly" id="edge35_Node000001_Node000036" title=" " alt="" coords="4470,32,5131,37,6101,50,6594,60,7033,72,7375,87,7496,96,7576,105,7609,113,7607,118,7576,111,7495,101,7374,93,7032,78,6593,65,6101,56,5131,43,4470,37"/>
+<area shape="rect" id="Node000037" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="7797,115,8017,170"/>
+<area shape="poly" id="edge36_Node000001_Node000037" title=" " alt="" coords="4470,32,5169,38,6204,52,7201,74,7568,88,7698,97,7784,105,7822,113,7821,118,7784,111,7697,102,7568,94,7201,79,6204,57,5169,44,4470,37"/>
+<area shape="rect" id="Node000038" href="$remove__internal__symbols_8cpp.html" title="Remove symbols that are internal only." alt="" coords="8041,115,8228,170"/>
+<area shape="poly" id="edge37_Node000001_Node000038" title=" " alt="" coords="4470,32,5214,36,6327,47,6894,57,7401,69,7797,85,7937,95,8030,105,8062,113,8061,118,8029,111,7936,100,7796,91,7401,75,6894,62,6327,52,5214,41,4470,37"/>
+<area shape="rect" id="Node000039" href="$static__lifetime__init_8cpp.html" title=" " alt="" coords="8252,115,8436,170"/>
+<area shape="poly" id="edge38_Node000001_Node000039" title=" " alt="" coords="4470,32,5251,35,6431,45,7033,55,7572,67,7993,84,8142,94,8240,105,8273,113,8271,118,8240,111,8141,99,7992,89,7572,73,7033,60,6430,51,5251,40,4470,37"/>
+<area shape="rect" id="Node000040" href="$statement__list__entry__point_8cpp.html" title="Statement List Language Entry Point." alt="" coords="8461,115,8689,170"/>
+<area shape="poly" id="edge39_Node000001_Node000040" title=" " alt="" coords="4470,32,5288,36,6533,48,7170,58,7741,71,8186,86,8344,95,8448,105,8487,113,8486,118,8448,111,8343,101,8186,92,7741,76,7170,63,6533,54,5288,42,4470,37"/>
 </map>

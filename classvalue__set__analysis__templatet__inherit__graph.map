@@ -1,8 +1,14 @@
 <map id="value_set_analysis_templatet&lt; VSDT &gt;" name="value_set_analysis_templatet&lt; VSDT &gt;">
-<area shape="rect" id="node1" title="This template class implements a data&#45;flow analysis which keeps track of what values different variab..." alt="" coords="5,323,164,364"/>
-<area shape="rect" id="node2" href="$classvalue__setst.html" title=" " alt="" coords="20,247,117,273"/>
-<area shape="rect" id="node3" href="$classait.html" title=" " alt="" coords="142,247,246,273"/>
-<area shape="rect" id="node4" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="68,81,280,108"/>
-<area shape="rect" id="node6" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="196,157,323,184"/>
-<area shape="rect" id="node5" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="135,5,213,32"/>
+<area shape="rect" id="Node000001" title="This template class implements a data&#45;flow analysis which keeps track of what values different variab..." alt="" coords="5,317,164,357"/>
+<area shape="rect" id="Node000002" href="$classvalue__setst.html" title=" " alt="" coords="20,243,117,268"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,281,84,317,78,318,71,282"/>
+<area shape="rect" id="Node000003" href="$classait.html" title=" " alt="" coords="142,243,246,268"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,278,112,319,109,315,166,274"/>
+<area shape="rect" id="Node000004" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="68,80,280,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="179,119,186,180,195,242,190,243,181,180,174,119"/>
+<area shape="rect" id="Node000006" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="196,155,323,180"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="200,112,247,152,244,156,196,116"/>
+<area shape="rect" id="Node000005" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="135,5,213,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="177,45,177,80,171,80,171,45"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="244,193,205,244,201,241,240,189"/>
 </map>

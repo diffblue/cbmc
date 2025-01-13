@@ -1,13 +1,26 @@
 <map id="function_indicest" name="function_indicest">
-<area shape="rect" id="node1" title="Helper class that maintains a map from function name to grapht node index and adds nodes to the graph..." alt="" coords="183,585,317,612"/>
-<area shape="rect" id="node2" href="$classcall__grapht_1_1directed__grapht.html" title="Directed graph representation of this call graph." alt="" coords="107,481,262,523"/>
-<area shape="rect" id="node3" href="$classgrapht.html" title=" " alt="" coords="5,385,196,411"/>
-<area shape="rect" id="node4" title=" " alt="" coords="39,184,197,211"/>
-<area shape="rect" id="node7" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="81,281,185,307"/>
-<area shape="rect" id="node5" title=" " alt="" coords="68,95,197,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="165,5,204,32"/>
-<area shape="rect" id="node10" title=" " alt="" coords="214,273,366,315"/>
-<area shape="rect" id="node8" title=" " alt="" coords="220,377,411,419"/>
-<area shape="rect" id="node9" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="458,281,530,307"/>
-<area shape="rect" id="node11" title=" " alt="" coords="273,184,312,211"/>
+<area shape="rect" id="Node000001" title="Helper class that maintains a map from function name to grapht node index and adds nodes to the graph..." alt="" coords="183,577,317,603"/>
+<area shape="rect" id="Node000002" href="$classcall__grapht_1_1directed__grapht.html" title="Directed graph representation of this call graph." alt="" coords="107,475,262,515"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,525,244,575,240,579,204,528"/>
+<area shape="rect" id="Node000003" href="$classgrapht.html" title=" " alt="" coords="5,379,196,405"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="121,414,171,473,167,476,117,417"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="39,181,197,207"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="83,216,51,239,38,254,27,270,23,286,24,301,38,331,62,357,86,377,82,381,58,361,34,334,19,302,18,285,22,268,33,250,48,235,80,211"/>
+<area shape="rect" id="Node000007" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="81,277,185,302"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="125,220,133,276,128,277,119,221"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="68,93,197,119"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="131,133,123,181,117,180,126,132"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="165,5,204,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="164,42,154,56,138,94,133,92,149,53,160,39"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="214,269,366,309"/>
+<area shape="poly" id="edge12_Node000010_Node000006" title=" " alt="" coords="209,39,219,53,237,94,246,128,252,163,263,206,285,268,280,270,258,207,247,164,241,129,232,96,214,56,205,42"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="127,316,107,380,102,379,122,315"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="220,372,411,412"/>
+<area shape="poly" id="edge13_Node000001_Node000008" title=" " alt="" coords="311,426,296,486,272,554,260,578,255,576,268,552,291,485,306,425"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="209,418,188,437,182,455,183,474,177,475,177,454,184,435,206,414"/>
+<area shape="rect" id="Node000009" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="458,277,530,302"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="489,316,480,334,466,350,440,367,412,378,410,374,438,362,463,346,476,331,484,314"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="291,323,294,347,305,371,300,373,289,349,285,324"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="273,181,312,207"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="295,220,293,269,288,269,289,220"/>
 </map>

@@ -16,7 +16,7 @@ var pthread__lib_8c =
     [ "pthread_cond_wait", "pthread__lib_8c.html#a907ae104b6dfd8fc12e23e84952aa7ca", null ],
     [ "pthread_create", "pthread__lib_8c.html#ae5d18438d4d20c8a2e42cd2500578d79", null ],
     [ "pthread_exit", "pthread__lib_8c.html#a090bdc13141e76205fab4cb3c5fab0e4", null ],
-    [ "pthread_getspecific", "pthread__lib_8c.html#a31469375891078185bda93f0e4411a2c", null ],
+    [ "pthread_getspecific", "pthread__lib_8c.html#acdf9f73a16ea40eba1bc174d38e76ca5", null ],
     [ "pthread_join", "pthread__lib_8c.html#aa79c99cc7b194918a2def257246f11c6", null ],
     [ "pthread_key_create", "pthread__lib_8c.html#af4b7ced8ecff505380fe8216244a3764", null ],
     [ "pthread_key_delete", "pthread__lib_8c.html#aee96306dc79294927ee840bb4de2244b", null ],

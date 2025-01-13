@@ -1,9 +1,16 @@
 <map id="loop_cfg_infot" name="loop_cfg_infot">
-<area shape="rect" id="node1" title=" " alt="" coords="75,377,190,404"/>
-<area shape="rect" id="node2" href="$classcfg__infot.html" title="Stores information about a goto function computed from its CFG." alt="" coords="5,288,84,315"/>
-<area shape="rect" id="node3" title=" " alt="" coords="83,184,225,225"/>
-<area shape="rect" id="node7" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="200,288,257,315"/>
-<area shape="rect" id="node4" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="86,95,158,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="183,95,365,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="255,5,293,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="75,372,190,397"/>
+<area shape="rect" id="Node000002" href="$classcfg__infot.html" title="Stores information about a goto function computed from its CFG." alt="" coords="5,284,84,309"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,317,122,370,119,373,64,321"/>
+<area shape="rect" id="Node000003" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="200,284,257,309"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="207,320,148,373,144,369,204,316"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="83,181,225,221"/>
+<area shape="poly" id="edge7_Node000001_Node000004" title=" " alt="" coords="153,235,137,372,131,372,148,235"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="180,231,221,282,217,285,176,234"/>
+<area shape="rect" id="Node000005" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="86,93,158,119"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="133,131,150,180,145,182,128,132"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="183,93,365,119"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="250,129,180,183,177,179,247,125"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="255,5,293,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="277,45,277,93,271,93,271,45"/>
 </map>

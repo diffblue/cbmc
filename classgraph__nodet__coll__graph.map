@@ -1,7 +1,11 @@
 <map id="graph_nodet&lt; E &gt;" name="graph_nodet&lt; E &gt;">
-<area shape="rect" id="node1" title="This class represents a node in a directed graph." alt="" coords="24,303,165,329"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,184,184,225"/>
-<area shape="rect" id="node3" title=" " alt="" coords="27,95,162,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="43,5,82,32"/>
-<area shape="rect" id="node5" title=" " alt="" coords="109,5,147,32"/>
+<area shape="rect" id="Node000001" title="This class represents a node in a directed graph." alt="" coords="24,299,165,324"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,181,184,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,235,97,298,92,298,92,235"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="27,93,162,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="97,132,97,181,92,181,92,132"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="43,5,82,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="63,44,66,68,83,91,79,95,62,70,57,45"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="109,5,147,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="121,45,102,94,97,92,116,43"/>
 </map>

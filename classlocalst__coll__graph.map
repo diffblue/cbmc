@@ -1,7 +1,11 @@
 <map id="localst" name="localst">
-<area shape="rect" id="node1" title=" " alt="" coords="44,288,109,315"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,184,148,225"/>
-<area shape="rect" id="node3" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="9,95,81,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="105,95,288,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="177,5,216,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="44,284,109,309"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,181,148,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,235,79,284,74,284,74,235"/>
+<area shape="rect" id="Node000003" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="9,93,81,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="56,131,73,180,68,182,50,132"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="105,93,288,119"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="172,129,103,183,99,179,169,125"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="177,5,216,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="199,45,199,93,194,93,194,45"/>
 </map>

@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/miniz/miniz.h" name="/home/runner/work/cbmc/cbmc/jbmc/src/miniz/miniz.h">
-<area shape="rect" id="node1" title=" " alt="" coords="169,5,381,47"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,95,69,121"/>
-<area shape="rect" id="node3" title=" " alt="" coords="93,95,168,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="193,95,263,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="287,95,358,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="382,95,453,121"/>
-<area shape="rect" id="node7" title=" " alt="" coords="477,95,544,121"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="169,5,381,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,69,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,48,83,92,82,87,217,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="93,93,168,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="241,48,165,89,163,84,239,43"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="193,93,263,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="266,47,244,83,240,80,261,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="287,93,358,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="289,44,311,80,306,83,284,47"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="382,93,453,119"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="310,43,386,84,383,89,308,48"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="477,93,544,119"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="332,43,465,87,464,92,330,48"/>
 </map>

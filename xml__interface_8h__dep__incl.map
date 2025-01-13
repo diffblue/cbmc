@@ -1,12 +1,21 @@
 <map id="/home/runner/work/cbmc/cbmc/src/xmllang/xml_interface.h" name="/home/runner/work/cbmc/cbmc/src/xmllang/xml_interface.h">
-<area shape="rect" id="node1" title="XML Interface." alt="" coords="815,5,999,61"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="546,109,751,165"/>
-<area shape="rect" id="node7" href="$xml__interface_8cpp.html" title="XML Interface." alt="" coords="815,109,999,165"/>
-<area shape="rect" id="node8" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1063,109,1255,165"/>
-<area shape="rect" id="node3" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="5,221,268,262"/>
-<area shape="rect" id="node4" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="293,221,522,262"/>
-<area shape="rect" id="node5" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="546,213,751,269"/>
-<area shape="rect" id="node6" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="776,213,1039,269"/>
-<area shape="rect" id="node9" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1063,213,1255,269"/>
-<area shape="rect" id="node10" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1279,213,1471,269"/>
+<area shape="rect" id="Node000001" title="XML Interface." alt="" coords="748,5,932,60"/>
+<area shape="rect" id="Node000002" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="221,108,413,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="735,57,414,118,413,113,734,52"/>
+<area shape="rect" id="Node000005" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="737,108,943,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="843,74,843,108,837,108,837,74"/>
+<area shape="rect" id="Node000010" href="$xml__interface_8cpp.html" title="XML Interface." alt="" coords="967,108,1151,163"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="910,63,1003,106,1001,110,908,68"/>
+<area shape="rect" id="Node000003" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="5,211,197,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="250,171,159,213,156,208,248,166"/>
+<area shape="rect" id="Node000004" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="221,211,413,265"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="320,176,320,211,315,211,315,176"/>
+<area shape="rect" id="Node000006" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="438,218,701,258"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="758,170,621,220,619,215,756,165"/>
+<area shape="rect" id="Node000007" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="725,218,955,258"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="843,177,843,218,837,218,837,177"/>
+<area shape="rect" id="Node000008" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="979,211,1184,265"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="916,165,1019,208,1017,213,914,170"/>
+<area shape="rect" id="Node000009" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1209,211,1471,265"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="957,160,1209,210,1208,215,956,166"/>
 </map>

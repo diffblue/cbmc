@@ -8,7 +8,7 @@ var classsmall__shared__n__way__pointee__baset =
     [ "is_derived", "classsmall__shared__n__way__pointee__baset.html#a3153d6b662c475b77aea44e1c24949f2", null ],
     [ "is_same_type", "classsmall__shared__n__way__pointee__baset.html#aeec02ae2c253a7fc1cf17d8b58131f1a", null ],
     [ "num_bits", "classsmall__shared__n__way__pointee__baset.html#ae24c6e562929161ee90cb9de849eed89", null ],
-    [ "operator=", "classsmall__shared__n__way__pointee__baset.html#a572403f683d97504bbe5d2726ea878ae", null ],
+    [ "operator=", "classsmall__shared__n__way__pointee__baset.html#ad38fedf144a53cf74dbd51cb01c2eb04", null ],
     [ "set_derived", "classsmall__shared__n__way__pointee__baset.html#a05653b872dff9f8ef4104dc2461d01aa", null ],
     [ "bit_width", "classsmall__shared__n__way__pointee__baset.html#a72c9ea3ef73966fd0bead41a66004fc5", null ],
     [ "type_bit_width", "classsmall__shared__n__way__pointee__baset.html#a13c1e38932c0139b39d6ce2d3393d02e", null ],

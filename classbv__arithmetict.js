@@ -18,7 +18,7 @@ var classbv__arithmetict =
     [ "operator-=", "classbv__arithmetict.html#ad28e0bb0efe3886c616c3ef9227443a1", null ],
     [ "operator/=", "classbv__arithmetict.html#aeba2795eb863dc2ee338224a9daa9e3e", null ],
     [ "operator<", "classbv__arithmetict.html#a19e8e20e301d032d2ebb713f2e14ac39", null ],
-    [ "operator<<", "classbv__arithmetict.html#ae9a15ca7dc4f6feb82ceeabae5e299bf", null ],
+    [ "operator<<", "classbv__arithmetict.html#a752ba433778faccb6372d04f1c75c771", null ],
     [ "operator<=", "classbv__arithmetict.html#a6e0c7bd5eae31fd2f724eaa676e9be06", null ],
     [ "operator==", "classbv__arithmetict.html#a03dd921bafa400156863684113a7b97e", null ],
     [ "operator==", "classbv__arithmetict.html#ab9def40e92cbc19e212a915ba4fbca19", null ],

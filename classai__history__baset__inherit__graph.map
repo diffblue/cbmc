@@ -1,6 +1,9 @@
 <map id="ai_history_baset" name="ai_history_baset">
-<area shape="rect" id="node1" title="A history object is an abstraction / representation of the control&#45;flow part of a set of traces." alt="" coords="5,56,135,83"/>
-<area shape="rect" id="node2" href="$classahistoricalt.html" title="The common case of history is to only care about where you are now, not how you got there!..." alt="" coords="227,5,322,32"/>
-<area shape="rect" id="node3" href="$classcall__stack__historyt.html" title="Records the call stack Care must be taken when using this on recursive code; it will need the domain ..." alt="" coords="203,56,347,83"/>
-<area shape="rect" id="node4" href="$classlocal__control__flow__historyt.html" title="Whether we track forwards and / or backwards jumps is compile&#45;time fixed as it does not need to be va..." alt="" coords="183,107,367,178"/>
+<area shape="rect" id="Node000001" title="A history object is an abstraction / representation of the control&#45;flow part of a set of traces." alt="" coords="5,55,135,80"/>
+<area shape="rect" id="Node000002" href="$classahistoricalt.html" title="The common case of history is to only care about where you are now, not how you got there!..." alt="" coords="227,5,322,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,49,226,27,228,32,137,54"/>
+<area shape="rect" id="Node000003" href="$classcall__stack__historyt.html" title="Records the call stack Care must be taken when using this on recursive code; it will need the domain ..." alt="" coords="203,55,347,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,65,202,65,202,70,148,70"/>
+<area shape="rect" id="Node000004" href="$classlocal__control__flow__historyt.html" title="Whether we track forwards and / or backwards jumps is compile&#45;time fixed as it does not need to be va..." alt="" coords="183,105,367,174"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="121,82,183,104,182,109,119,87"/>
 </map>

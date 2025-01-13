@@ -1,29 +1,22 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;harness" name="/home/runner/work/cbmc/cbmc/src/goto&#45;harness">
-<area shape="rect" id="node1" href="dir_4cd183c173ff5cfcfce420f655b591bf.html" title="goto&#45;instrument" alt="" coords="54,148,181,196"/>
-<area shape="rect" id="node2" href="dir_807c5b2c83e0c14a10083f60cf67ca05.html" title="goto&#45;programs" alt="" coords="146,244,265,292"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000024_000025.html" title="171" alt="" coords="165,218,190,232"/>
-<area shape="rect" id="node3" href="dir_b7878ad5ecbf2506f4125b9d34c97e45.html" title="util" alt="" coords="219,436,291,484"/>
-<area shape="rect" id="edge2-headlabel" href="dir_000024_000035.html" title="464" alt="" coords="190,431,216,446"/>
-<area shape="rect" id="node4" href="dir_da4c9dd239018fe26269ba2e1cf7c9a1.html" title="json" alt="" coords="249,340,321,388"/>
-<area shape="rect" id="edge3-headlabel" href="dir_000024_000028.html" title="1" alt="" coords="296,316,306,330"/>
-<area shape="rect" id="node6" href="dir_f88182c44268ef6b082d02d66ccc5f99.html" title="ansi&#45;c" alt="" coords="127,340,199,388"/>
-<area shape="rect" id="edge4-headlabel" href="dir_000024_000012.html" title="57" alt="" coords="144,312,161,327"/>
-<area shape="rect" id="edge9-headlabel" href="dir_000025_000035.html" title="309" alt="" coords="240,409,265,423"/>
-<area shape="rect" id="edge10-headlabel" href="dir_000025_000028.html" title="1" alt="" coords="256,313,265,328"/>
-<area shape="rect" id="edge11-headlabel" href="dir_000025_000012.html" title="8" alt="" coords="175,319,184,333"/>
-<area shape="rect" id="edge8-headlabel" href="dir_000028_000035.html" title="6" alt="" coords="271,414,281,429"/>
-<area shape="rect" id="node5" href="dir_e6e3ab3c817f1bda892a40cd9aa75888.html" title="json&#45;symtab&#45;language" alt="" coords="232,148,400,196"/>
-<area shape="rect" id="edge5-headlabel" href="dir_000052_000025.html" title="1" alt="" coords="247,231,256,246"/>
-<area shape="rect" id="edge6-headlabel" href="dir_000052_000035.html" title="12" alt="" coords="302,424,319,439"/>
-<area shape="rect" id="edge7-headlabel" href="dir_000052_000028.html" title="1" alt="" coords="296,316,305,331"/>
-<area shape="rect" id="edge12-headlabel" href="dir_000012_000025.html" title="22" alt="" coords="180,299,197,314"/>
-<area shape="rect" id="edge13-headlabel" href="dir_000012_000035.html" title="311" alt="" coords="213,410,238,424"/>
-<area shape="rect" id="node7" href="dir_9571ccb0afd832b53e4f5cd1bf134994.html" title="goto&#45;harness" alt="" coords="208,52,315,100"/>
-<area shape="rect" id="edge14-headlabel" href="dir_000022_000024.html" title="1" alt="" coords="168,138,177,152"/>
-<area shape="rect" id="edge15-headlabel" href="dir_000022_000025.html" title="7" alt="" coords="210,219,219,233"/>
-<area shape="rect" id="edge16-headlabel" href="dir_000022_000035.html" title="44" alt="" coords="302,425,319,440"/>
-<area shape="rect" id="edge17-headlabel" href="dir_000022_000028.html" title="1" alt="" coords="331,328,341,342"/>
-<area shape="rect" id="edge18-headlabel" href="dir_000022_000052.html" title="1" alt="" coords="296,121,305,135"/>
-<area shape="rect" id="edge19-headlabel" href="dir_000022_000012.html" title="3" alt="" coords="120,315,129,329"/>
-<area shape="rect" id="clust1" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html" title="src" alt="" coords="16,16,464,495"/>
+<area shape="rect" id="node1" href="dir_4cd183c173ff5cfcfce420f655b591bf.html" title="goto&#45;instrument" alt="" coords="27,125,154,151"/>
+<area shape="rect" id="node2" href="dir_807c5b2c83e0c14a10083f60cf67ca05.html" title="goto&#45;programs" alt="" coords="178,125,297,151"/>
+<area shape="rect" id="node3" href="dir_b7878ad5ecbf2506f4125b9d34c97e45.html" title="util" alt="" coords="321,125,364,151"/>
+<area shape="rect" id="node4" href="dir_da4c9dd239018fe26269ba2e1cf7c9a1.html" title="json" alt="" coords="389,125,438,151"/>
+<area shape="rect" id="node5" href="dir_e6e3ab3c817f1bda892a40cd9aa75888.html" title="json&#45;symtab&#45;language" alt="" coords="463,125,631,151"/>
+<area shape="rect" id="node6" href="dir_f88182c44268ef6b082d02d66ccc5f99.html" title="ansi&#45;c" alt="" coords="655,125,716,151"/>
+<area shape="rect" id="node7" href="dir_9571ccb0afd832b53e4f5cd1bf134994.html" title="goto&#45;harness" alt="" coords="324,52,431,77"/>
+<area shape="poly" id="edge1" href="dir_000027_000029.html" alt="" coords="332,80,151,125,150,119,331,75"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000027_000029.html" title="1" alt="" coords="152,122,161,136"/>
+<area shape="poly" id="edge2" href="dir_000027_000030.html" alt="" coords="356,80,273,121,271,117,354,75"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000027_000030.html" title="7" alt="" coords="276,117,285,132"/>
+<area shape="poly" id="edge3" href="dir_000027_000072.html" alt="" coords="374,79,357,114,352,112,369,76"/>
+<area shape="rect" id="edge3-headlabel" href="dir_000027_000072.html" title="44" alt="" coords="355,105,373,120"/>
+<area shape="poly" id="edge4" href="dir_000027_000040.html" alt="" coords="386,76,404,112,399,114,381,79"/>
+<area shape="rect" id="edge4-headlabel" href="dir_000027_000040.html" title="1" alt="" coords="402,98,411,113"/>
+<area shape="poly" id="edge5" href="dir_000027_000041.html" alt="" coords="406,75,507,117,505,122,404,80"/>
+<area shape="rect" id="edge5-headlabel" href="dir_000027_000041.html" title="1" alt="" coords="501,103,510,118"/>
+<area shape="poly" id="edge6" href="dir_000027_000002.html" alt="" coords="431,75,642,123,641,128,430,80"/>
+<area shape="rect" id="edge6-headlabel" href="dir_000027_000002.html" title="3" alt="" coords="634,109,644,123"/>
+<area shape="rect" id="clust1" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html" title="src" alt="" coords="16,16,727,161"/>
 </map>

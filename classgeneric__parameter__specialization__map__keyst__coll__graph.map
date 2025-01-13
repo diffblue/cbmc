@@ -1,14 +1,34 @@
 <map id="generic_parameter_specialization_map_keyst" name="generic_parameter_specialization_map_keyst">
-<area shape="rect" id="node1" title=" " alt="" coords="1959,142,2201,183"/>
-<area shape="rect" id="node2" href="$classgeneric__parameter__specialization__mapt.html" title="Author: Diffblue Ltd." alt="" coords="1367,149,1649,176"/>
-<area shape="rect" id="node3" title=" " alt="" coords="947,81,1129,137"/>
-<area shape="rect" id="node4" title=" " alt="" coords="645,14,816,55"/>
-<area shape="rect" id="node5" title=" " alt="" coords="217,21,340,48"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,72,44,99"/>
-<area shape="rect" id="node7" title=" " alt="" coords="449,79,579,105"/>
-<area shape="rect" id="node11" title=" " alt="" coords="203,123,355,165"/>
-<area shape="rect" id="node8" title=" " alt="" coords="630,166,831,237"/>
-<area shape="rect" id="node9" href="$structgeneric__parameter__specialization__mapt_1_1container__paramt.html" title="The index of the container and the type parameter inside that container." alt="" coords="157,189,400,230"/>
-<area shape="rect" id="node10" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="243,255,315,281"/>
-<area shape="rect" id="node12" title=" " alt="" coords="5,163,44,189"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="2519,138,2761,178"/>
+<area shape="rect" id="Node000002" href="$classgeneric__parameter__specialization__mapt.html" title="Author: Diffblue Ltd." alt="" coords="1927,145,2209,171"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2223,155,2518,155,2518,161,2223,161"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="699,65,900,134"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="914,102,1926,149,1926,154,913,107"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="313,5,385,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="399,20,525,35,675,61,699,66,698,72,674,66,524,40,399,25"/>
+<area shape="rect" id="Node000005" href="$structgeneric__parameter__specialization__mapt_1_1container__paramt.html" title="The index of the container and the type parameter inside that container." alt="" coords="228,55,471,95"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="485,80,699,91,698,97,485,85"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="273,130,425,170"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="440,152,552,152,614,148,674,139,707,131,709,137,675,145,614,153,552,157,440,158"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="41,113,79,139"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="94,126,273,141,273,146,93,131"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="41,204,79,229"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="92,207,272,165,274,170,93,212"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="285,201,414,227"/>
+<area shape="poly" id="edge14_Node000021_Node000008" title=" " alt="" coords="93,214,285,212,285,217,93,219"/>
+<area shape="rect" id="Node000023" title=" " alt="" coords="523,260,646,285"/>
+<area shape="poly" id="edge16_Node000023_Node000008" title=" " alt="" coords="93,223,139,234,245,249,350,259,523,268,523,274,350,264,244,254,138,239,92,229"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="1507,167,1689,221"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="1703,183,1926,166,1926,171,1703,189"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1153,231,1324,271"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="1337,243,1409,236,1482,225,1508,219,1509,224,1483,230,1409,241,1338,248"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="715,231,883,271"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="897,249,1153,249,1153,254,897,254"/>
+<area shape="rect" id="Node000012" href="$classreference__typet.html" title="The reference type." alt="" coords="287,303,412,328"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="426,324,482,329,545,329,610,322,674,306,685,298,697,288,737,269,739,274,700,292,689,302,676,311,611,327,545,334,482,334,426,330"/>
+<area shape="rect" id="Node000013" href="$classpointer__typet.html" title="The pointer type These are both &#39;bitvector_typet&#39; (they have a width) and &#39;type_with_subtypet&#39; (they ..." alt="" coords="5,303,115,328"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="129,313,286,313,286,318,129,318"/>
+<area shape="poly" id="edge17_Node000009_Node000021" title=" " alt="" coords="428,210,1506,193,1506,198,428,215"/>
+<area shape="poly" id="edge13_Node000011_Node000021" title=" " alt="" coords="428,219,495,225,715,242,715,248,494,230,428,224"/>
+<area shape="poly" id="edge15_Node000010_Node000023" title=" " alt="" coords="660,282,676,289,688,301,700,310,765,328,834,336,903,335,971,328,1036,315,1095,300,1188,269,1190,274,1096,305,1037,320,972,333,904,341,834,342,764,334,697,315,685,305,673,294,658,287"/>
 </map>

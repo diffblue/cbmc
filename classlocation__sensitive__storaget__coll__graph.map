@@ -1,11 +1,21 @@
 <map id="location_sensitive_storaget" name="location_sensitive_storaget">
-<area shape="rect" id="node1" title="The most conventional storage; one domain per location." alt="" coords="1140,139,1280,181"/>
-<area shape="rect" id="node2" href="$classtrace__map__storaget.html" title=" " alt="" coords="939,109,1091,136"/>
-<area shape="rect" id="node3" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="537,109,670,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="519,14,688,85"/>
-<area shape="rect" id="node5" title=" " alt="" coords="166,36,301,63"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,65,44,92"/>
-<area shape="rect" id="node9" title=" " alt="" coords="157,158,309,199"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,136,44,163"/>
-<area shape="rect" id="node8" title=" " alt="" coords="712,143,915,214"/>
+<area shape="rect" id="Node000001" title="The most conventional storage; one domain per location." alt="" coords="1140,139,1280,179"/>
+<area shape="rect" id="Node000002" href="$classtrace__map__storaget.html" title=" " alt="" coords="939,109,1091,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1096,134,1140,143,1139,148,1095,139"/>
+<area shape="rect" id="Node000003" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="537,109,670,134"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="684,119,938,119,938,124,684,124"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="519,15,688,84"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="702,63,915,100,948,106,947,111,914,105,701,68"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="166,37,301,62"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="314,47,518,47,518,52,314,52"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,65,44,90"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="58,70,166,56,166,61,58,76"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="157,156,309,196"/>
+<area shape="poly" id="edge9_Node000009_Node000006" title=" " alt="" coords="58,85,134,116,202,153,199,158,132,121,56,90"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,134,44,159"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="58,145,95,141,132,131,159,116,183,97,220,60,223,64,187,101,162,120,134,136,96,147,58,150"/>
+<area shape="poly" id="edge10_Node000009_Node000007" title=" " alt="" coords="50,166,69,176,113,185,157,185,157,190,112,190,67,181,47,170"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="712,141,915,211"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="928,168,1139,159,1140,164,929,174"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="323,173,712,173,712,179,323,179"/>
 </map>

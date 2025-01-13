@@ -1,7 +1,11 @@
 <map id="partial_order_concurrencyt::a_rect" name="partial_order_concurrencyt::a_rect">
-<area shape="rect" id="node1" title=" " alt="" coords="47,303,243,344"/>
-<area shape="rect" id="node2" title=" " alt="" coords="57,199,232,225"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,95,156,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="180,102,309,129"/>
-<area shape="rect" id="node5" title=" " alt="" coords="225,5,264,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="47,299,243,339"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="57,196,232,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,235,147,298,142,298,142,235"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,93,156,133"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,144,117,170,137,194,132,198,113,174,96,147"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="180,101,309,126"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="224,137,159,198,155,194,220,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="225,5,264,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="247,44,247,101,242,101,242,44"/>
 </map>

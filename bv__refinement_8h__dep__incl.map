@@ -1,17 +1,32 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/refinement/bv_refinement.h" name="/home/runner/work/cbmc/cbmc/src/solvers/refinement/bv_refinement.h">
-<area shape="rect" id="node1" title="Abstraction Refinement Loop." alt="" coords="346,5,557,61"/>
-<area shape="rect" id="node2" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="181,213,365,269"/>
-<area shape="rect" id="node3" href="$bv__refinement__loop_8cpp.html" title=" " alt="" coords="111,109,322,165"/>
-<area shape="rect" id="node4" href="$refine__arithmetic_8cpp.html" title=" " alt="" coords="346,109,557,165"/>
-<area shape="rect" id="node5" href="$refine__arrays_8cpp.html" title=" " alt="" coords="581,109,791,165"/>
-<area shape="rect" id="node6" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="815,109,999,165"/>
-<area shape="rect" id="node7" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="546,213,751,269"/>
-<area shape="rect" id="node12" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="815,213,999,269"/>
-<area shape="rect" id="node13" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1063,213,1255,269"/>
-<area shape="rect" id="node8" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="5,325,268,366"/>
-<area shape="rect" id="node9" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="293,325,522,366"/>
-<area shape="rect" id="node10" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="546,317,751,373"/>
-<area shape="rect" id="node11" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="776,317,1039,373"/>
-<area shape="rect" id="node14" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1063,317,1255,373"/>
-<area shape="rect" id="node15" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1279,317,1471,373"/>
+<area shape="rect" id="Node000001" title="Abstraction Refinement Loop." alt="" coords="320,5,531,60"/>
+<area shape="rect" id="Node000002" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="5,211,189,265"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="306,46,236,55,167,68,110,87,90,98,75,110,65,133,66,159,73,186,84,209,79,212,68,188,60,160,60,132,71,106,86,93,108,82,166,63,235,50,306,41"/>
+<area shape="rect" id="Node000003" href="$bv__refinement__loop_8cpp.html" title=" " alt="" coords="85,108,296,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="353,68,253,110,251,105,351,63"/>
+<area shape="rect" id="Node000004" href="$refine__arithmetic_8cpp.html" title=" " alt="" coords="320,108,531,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="428,74,428,108,423,108,423,74"/>
+<area shape="rect" id="Node000005" href="$refine__arrays_8cpp.html" title=" " alt="" coords="555,108,765,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="500,63,600,105,598,110,498,68"/>
+<area shape="rect" id="Node000006" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="789,108,973,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="545,55,778,105,790,108,788,113,777,111,544,60"/>
+<area shape="poly" id="edge14_Node000006_Node000002" title=" " alt="" coords="776,165,628,185,512,193,397,199,251,213,190,222,189,217,250,208,396,193,512,187,627,180,775,160"/>
+<area shape="rect" id="Node000007" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="263,211,455,265"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="776,166,603,199,456,224,455,219,602,194,775,160"/>
+<area shape="rect" id="Node000010" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="779,211,984,265"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="884,176,884,211,879,211,879,176"/>
+<area shape="rect" id="Node000015" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="1008,211,1192,265"/>
+<area shape="poly" id="edge15_Node000006_Node000015" title=" " alt="" coords="952,166,1044,208,1042,213,950,171"/>
+<area shape="rect" id="Node000008" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="47,313,239,368"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="291,273,200,316,198,311,289,269"/>
+<area shape="rect" id="Node000009" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="263,313,455,368"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="361,279,361,313,356,313,356,279"/>
+<area shape="rect" id="Node000011" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="479,321,742,361"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="799,273,662,323,661,318,797,268"/>
+<area shape="rect" id="Node000012" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="767,321,996,361"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="884,279,884,320,879,320,879,279"/>
+<area shape="rect" id="Node000013" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1020,313,1225,368"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="958,268,1061,311,1059,316,956,273"/>
+<area shape="rect" id="Node000014" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1250,313,1513,368"/>
+<area shape="poly" id="edge13_Node000010_Node000014" title=" " alt="" coords="998,263,1250,313,1249,318,997,268"/>
 </map>

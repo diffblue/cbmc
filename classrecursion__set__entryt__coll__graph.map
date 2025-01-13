@@ -1,7 +1,12 @@
 <map id="recursion_set_entryt" name="recursion_set_entryt">
-<area shape="rect" id="node1" title="Recursion&#45;set entry owner class." alt="" coords="5,288,160,315"/>
-<area shape="rect" id="node2" title=" " alt="" coords="134,184,277,225"/>
-<area shape="rect" id="node3" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,95,77,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="114,95,297,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="186,5,225,32"/>
+<area shape="rect" id="Node000001" title="Recursion&#45;set entry owner class." alt="" coords="5,284,160,309"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="134,181,277,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,232,99,286,96,282,168,228"/>
+<area shape="rect" id="Node000003" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,93,77,119"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="40,132,38,174,44,221,58,255,76,282,71,285,54,257,39,222,33,175,35,132"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="74,123,173,179,171,183,72,128"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="114,93,297,119"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="208,132,208,181,203,181,203,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="186,5,225,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="208,45,208,93,203,93,203,45"/>
 </map>

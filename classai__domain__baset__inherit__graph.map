@@ -1,16 +1,29 @@
 <map id="ai_domain_baset" name="ai_domain_baset">
-<area shape="rect" id="node1" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="5,299,139,326"/>
-<area shape="rect" id="node2" href="$classconstant__propagator__domaint.html" title=" " alt="" coords="215,5,371,47"/>
-<area shape="rect" id="node3" href="$classcustom__bitvector__domaint.html" title=" " alt="" coords="195,71,391,98"/>
-<area shape="rect" id="node4" href="$classdep__graph__domaint.html" title=" " alt="" coords="217,122,368,149"/>
-<area shape="rect" id="node5" href="$classescape__domaint.html" title=" " alt="" coords="228,173,357,199"/>
-<area shape="rect" id="node6" href="$classglobal__may__alias__domaint.html" title=" " alt="" coords="194,223,391,250"/>
-<area shape="rect" id="node7" href="$classinterval__domaint.html" title=" " alt="" coords="226,274,359,301"/>
-<area shape="rect" id="node8" href="$classinvariant__set__domaint.html" title=" " alt="" coords="209,325,377,351"/>
-<area shape="rect" id="node9" href="$classis__threaded__domaint.html" title=" " alt="" coords="213,375,372,402"/>
-<area shape="rect" id="node10" href="$classrd__range__domaint.html" title="Because the class is inherited from ai_domain_baset, its instance represents an element of a domain o..." alt="" coords="223,426,363,453"/>
-<area shape="rect" id="node11" href="$classuninitialized__domaint.html" title=" " alt="" coords="211,477,374,503"/>
-<area shape="rect" id="node12" href="$classvalue__set__domain__templatet.html" title="This is the domain for a value set analysis." alt="" coords="187,528,399,569"/>
-<area shape="rect" id="node13" href="$classvariable__sensitivity__domaint.html" title=" " alt="" coords="217,593,368,635"/>
-<area shape="rect" id="node14" href="$classvariable__sensitivity__dependence__domaint.html" title=" " alt="" coords="447,593,616,635"/>
+<area shape="rect" id="Node000001" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="5,293,139,318"/>
+<area shape="rect" id="Node000002" href="$classconstant__propagator__domaint.html" title=" " alt="" coords="215,5,371,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,278,87,230,108,171,140,109,161,80,185,55,213,38,216,43,188,59,165,84,144,112,113,173,92,232,81,279"/>
+<area shape="rect" id="Node000003" href="$classcustom__bitvector__domaint.html" title=" " alt="" coords="195,70,391,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="78,278,92,239,114,192,145,145,185,105,206,93,208,98,188,109,149,148,119,195,97,242,83,280"/>
+<area shape="rect" id="Node000004" href="$classdep__graph__domaint.html" title=" " alt="" coords="217,119,368,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="83,279,122,216,151,182,185,154,216,140,218,145,188,158,155,186,127,219,88,282"/>
+<area shape="rect" id="Node000005" href="$classescape__domaint.html" title=" " alt="" coords="228,169,357,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="91,280,132,240,158,220,186,203,227,188,228,193,188,208,161,224,135,244,95,284"/>
+<area shape="rect" id="Node000006" href="$classglobal__may__alias__domaint.html" title=" " alt="" coords="194,218,391,243"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="109,284,186,252,226,241,227,246,188,257,111,289"/>
+<area shape="rect" id="Node000007" href="$classinterval__domaint.html" title=" " alt="" coords="226,267,359,293"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="152,294,226,285,226,290,153,299"/>
+<area shape="rect" id="Node000008" href="$classinvariant__set__domaint.html" title=" " alt="" coords="209,317,377,342"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="153,311,209,318,208,323,152,317"/>
+<area shape="rect" id="Node000009" href="$classis__threaded__domaint.html" title=" " alt="" coords="213,366,372,391"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="113,321,188,351,232,363,231,369,186,356,111,326"/>
+<area shape="rect" id="Node000010" href="$classrd__range__domaint.html" title="Because the class is inherited from ai_domain_baset, its instance represents an element of a domain o..." alt="" coords="223,415,363,441"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="96,326,136,365,188,400,224,414,222,419,185,405,133,369,92,330"/>
+<area shape="rect" id="Node000011" href="$classuninitialized__domaint.html" title=" " alt="" coords="211,465,374,490"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="88,329,127,391,155,423,188,450,214,462,212,467,185,454,152,427,123,394,84,332"/>
+<area shape="rect" id="Node000012" href="$classvalue__set__domain__templatet.html" title="This is the domain for a value set analysis." alt="" coords="187,515,399,555"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="84,330,98,368,120,413,150,460,188,499,209,512,206,517,185,503,146,463,116,416,93,370,79,332"/>
+<area shape="rect" id="Node000013" href="$classvariable__sensitivity__domaint.html" title=" " alt="" coords="217,579,368,619"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="80,331,91,381,111,444,143,509,164,539,188,565,219,583,216,587,185,569,160,542,138,512,106,446,86,382,75,332"/>
+<area shape="rect" id="Node000014" href="$classvariable__sensitivity__dependence__domaint.html" title=" " alt="" coords="447,579,616,619"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="382,596,446,596,446,601,382,601"/>
 </map>

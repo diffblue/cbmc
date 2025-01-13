@@ -1,7 +1,7 @@
 var java__bytecode__parser_8cpp =
 [
     [ "java_bytecode_parsert", "classjava__bytecode__parsert.html", "classjava__bytecode__parsert" ],
-    [ "pool_entryt", "structjava__bytecode__parsert_1_1pool__entryt.html", "structjava__bytecode__parsert_1_1pool__entryt" ],
+    [ "java_bytecode_parsert::pool_entryt", "structjava__bytecode__parsert_1_1pool__entryt.html", "structjava__bytecode__parsert_1_1pool__entryt" ],
     [ "structured_pool_entryt", "classstructured__pool__entryt.html", "classstructured__pool__entryt" ],
     [ "class_infot", "classclass__infot.html", "classclass__infot" ],
     [ "name_and_type_infot", "classname__and__type__infot.html", "classname__and__type__infot" ],
@@ -68,6 +68,6 @@ var java__bytecode__parser_8cpp =
     [ "VTYPE_INFO_UNINIT", "java__bytecode__parser_8cpp.html#abc36a5ecb760e3420aabc6e643fe9cbe", null ],
     [ "VTYPE_INFO_UNINIT_THIS", "java__bytecode__parser_8cpp.html#acd6b42bd5b92a9dd7342ac87bc542a5a", null ],
     [ "get_method_handle_type", "java__bytecode__parser_8cpp.html#aa8c68c31c66f6b7e611d45748aa158a1", null ],
-    [ "java_bytecode_parse", "java__bytecode__parser_8cpp.html#a6c29e7f5d958a0c9754010c906851264", null ],
-    [ "java_bytecode_parse", "java__bytecode__parser_8cpp.html#ad1dba088bdf071dddf6eac5c75c39213", null ]
+    [ "java_bytecode_parse", "java__bytecode__parser_8cpp.html#aaf8db621deea0807685a340fc9d370b4", null ],
+    [ "java_bytecode_parse", "java__bytecode__parser_8cpp.html#a89779a45e10de1a880c8ef79dd20bfa6", null ]
 ];

@@ -1,10 +1,18 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/json_goto_trace.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/json_goto_trace.h">
-<area shape="rect" id="node1" title="Traces of GOTO Programs." alt="" coords="485,5,669,61"/>
-<area shape="rect" id="node2" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="5,109,189,165"/>
-<area shape="rect" id="node3" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="213,109,397,165"/>
-<area shape="rect" id="node4" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="421,109,605,165"/>
-<area shape="rect" id="node5" href="$interpreter_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="551,213,735,269"/>
-<area shape="rect" id="node6" href="$interpreter__class_8h.html" title="Interpreter for GOTO Programs." alt="" coords="680,109,864,165"/>
-<area shape="rect" id="node8" href="$json__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="888,109,1072,165"/>
-<area shape="rect" id="node7" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="759,213,945,269"/>
+<area shape="rect" id="Node000001" title="Traces of GOTO Programs." alt="" coords="485,5,669,60"/>
+<area shape="rect" id="Node000002" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="5,108,189,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="472,56,202,111,190,113,189,108,201,105,471,51"/>
+<area shape="rect" id="Node000003" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="213,108,397,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="495,67,377,110,375,105,493,62"/>
+<area shape="rect" id="Node000004" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="421,108,605,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="555,73,532,109,528,106,551,70"/>
+<area shape="rect" id="Node000005" href="$interpreter_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="551,211,735,265"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="603,71,620,107,635,162,642,210,637,211,629,163,615,109,598,73"/>
+<area shape="rect" id="Node000006" href="$interpreter__class_8h.html" title="Interpreter for GOTO Programs." alt="" coords="680,108,864,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="641,64,722,106,720,110,639,69"/>
+<area shape="rect" id="Node000008" href="$json__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="888,108,1072,163"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="683,57,877,105,888,108,887,113,875,111,682,63"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="729,173,678,213,675,208,726,169"/>
+<area shape="rect" id="Node000007" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="759,211,945,265"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="803,172,833,209,829,212,799,175"/>
 </map>

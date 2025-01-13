@@ -1,20 +1,48 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/goto_verifier.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/goto_verifier.h">
-<area shape="rect" id="node1" title="Goto Verifier Interface." alt="" coords="841,5,1025,61"/>
-<area shape="rect" id="node2" href="$all__properties__verifier_8h.html" title="Goto Verifier for Verifying all Properties." alt="" coords="203,117,387,173"/>
-<area shape="rect" id="node12" href="$all__properties__verifier__with__fault__localization_8h.html" title="Goto verifier for verifying all properties that stores traces and localizes faults." alt="" coords="628,109,816,180"/>
-<area shape="rect" id="node13" href="$all__properties__verifier__with__trace__storage_8h.html" title="Goto verifier for verifying all properties that stores traces." alt="" coords="1262,109,1446,180"/>
-<area shape="rect" id="node15" href="$cover__goals__verifier__with__trace__storage_8h.html" title="Goto verifier for covering goals that stores traces." alt="" coords="411,109,603,180"/>
-<area shape="rect" id="node16" href="$goto__verifier_8cpp.html" title="Goto Verifier Interface." alt="" coords="1470,117,1654,173"/>
-<area shape="rect" id="node17" href="$stop__on__fail__verifier_8h.html" title="Goto Verifier for stopping at the first failing property." alt="" coords="841,117,1025,173"/>
-<area shape="rect" id="node18" href="$stop__on__fail__verifier__with__fault__localization_8h.html" title="Goto Verifier for stopping at the first failing property and localizing the fault." alt="" coords="1049,109,1237,180"/>
-<area shape="rect" id="node3" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="619,228,825,284"/>
-<area shape="rect" id="node4" href="$cegis__verifier_8h.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="298,228,495,284"/>
-<area shape="rect" id="node11" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="849,228,1041,284"/>
-<area shape="rect" id="node5" href="$cegis__evaluator_8h.html" title="Evaluate if an expression is consistent with examples." alt="" coords="413,339,610,395"/>
-<area shape="rect" id="node8" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="945,339,1142,395"/>
-<area shape="rect" id="node9" href="$enumerative__loop__contracts__synthesizer_8h.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="178,332,389,403"/>
-<area shape="rect" id="node6" href="$cegis__evaluator_8cpp.html" title="Evaluate if an expression is consistent with examples." alt="" coords="527,458,725,514"/>
-<area shape="rect" id="node7" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="293,451,503,521"/>
-<area shape="rect" id="node10" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="5,458,268,514"/>
-<area shape="rect" id="node14" href="$api_8cpp.html" title=" " alt="" coords="1133,228,1317,284"/>
+<area shape="rect" id="Node000001" title="Goto Verifier Interface." alt="" coords="841,5,1025,60"/>
+<area shape="rect" id="Node000002" href="$all__properties__verifier_8h.html" title="Goto Verifier for Verifying all Properties." alt="" coords="209,115,393,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="827,46,630,70,517,88,405,111,378,118,376,113,404,105,516,83,629,65,826,41"/>
+<area shape="rect" id="Node000012" href="$all__properties__verifier__with__fault__localization_8h.html" title="Goto verifier for verifying all properties that stores traces and localizes faults." alt="" coords="417,108,605,177"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="828,59,619,111,606,114,605,109,617,105,827,54"/>
+<area shape="rect" id="Node000013" href="$all__properties__verifier__with__trace__storage_8h.html" title="Goto verifier for verifying all properties that stores traces." alt="" coords="1267,108,1451,177"/>
+<area shape="poly" id="edge15_Node000001_Node000013" title=" " alt="" coords="1039,53,1256,105,1268,109,1266,114,1255,111,1038,58"/>
+<area shape="rect" id="Node000015" href="$cover__goals__verifier__with__trace__storage_8h.html" title="Goto verifier for covering goals that stores traces." alt="" coords="1051,108,1243,177"/>
+<area shape="poly" id="edge20_Node000001_Node000015" title=" " alt="" coords="999,64,1082,105,1079,110,996,69"/>
+<area shape="rect" id="Node000016" href="$goto__verifier_8cpp.html" title="Goto Verifier Interface." alt="" coords="1475,115,1659,170"/>
+<area shape="poly" id="edge22_Node000001_Node000016" title=" " alt="" coords="1039,41,1237,65,1351,83,1464,105,1492,113,1490,118,1463,111,1350,88,1236,70,1038,46"/>
+<area shape="rect" id="Node000017" href="$stop__on__fail__verifier_8h.html" title="Goto Verifier for stopping at the first failing property." alt="" coords="630,115,814,170"/>
+<area shape="poly" id="edge23_Node000001_Node000017" title=" " alt="" coords="870,69,775,118,772,113,868,64"/>
+<area shape="rect" id="Node000018" href="$stop__on__fail__verifier__with__fault__localization_8h.html" title="Goto Verifier for stopping at the first failing property and localizing the fault." alt="" coords="839,108,1027,177"/>
+<area shape="poly" id="edge26_Node000001_Node000018" title=" " alt="" coords="935,74,935,108,930,108,930,74"/>
+<area shape="rect" id="Node000003" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="614,225,806,280"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,171,405,175,615,227,613,233,404,180,392,176"/>
+<area shape="rect" id="Node000004" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="830,225,1035,280"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="390,171,405,175,520,194,611,202,702,208,818,223,830,225,829,230,818,228,702,213,611,207,520,200,404,180,389,176"/>
+<area shape="rect" id="Node000005" href="$cegis__verifier_8h.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="298,225,495,280"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="336,179,375,223,371,227,332,183"/>
+<area shape="rect" id="Node000006" href="$cegis__evaluator_8h.html" title="Evaluate if an expression is consistent with examples." alt="" coords="413,335,610,390"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="437,288,485,333,481,337,433,292"/>
+<area shape="rect" id="Node000009" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="947,335,1145,390"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="509,270,948,342,947,348,508,275"/>
+<area shape="rect" id="Node000010" href="$enumerative__loop__contracts__synthesizer_8h.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="178,328,389,397"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="361,292,321,330,317,326,357,288"/>
+<area shape="rect" id="Node000007" href="$cegis__evaluator_8cpp.html" title="Evaluate if an expression is consistent with examples." alt="" coords="527,453,725,507"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="549,398,602,450,598,454,545,402"/>
+<area shape="rect" id="Node000008" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="293,445,503,515"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="478,401,433,447,429,443,474,398"/>
+<area shape="poly" id="edge10_Node000010_Node000008" title=" " alt="" coords="329,406,366,443,363,447,325,409"/>
+<area shape="rect" id="Node000011" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="5,453,268,507"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="231,408,172,455,168,451,228,404"/>
+<area shape="poly" id="edge13_Node000012_Node000003" title=" " alt="" coords="586,181,663,223,660,227,584,186"/>
+<area shape="poly" id="edge14_Node000012_Node000004" title=" " alt="" coords="619,175,830,225,829,231,618,180"/>
+<area shape="poly" id="edge16_Node000013_Node000003" title=" " alt="" coords="1254,180,1131,200,1035,207,939,212,818,228,807,230,806,225,818,223,938,207,1034,201,1131,194,1253,175"/>
+<area shape="poly" id="edge17_Node000013_Node000004" title=" " alt="" coords="1255,180,1036,233,1035,227,1254,175"/>
+<area shape="poly" id="edge18_Node000013_Node000009" title=" " alt="" coords="1365,191,1359,238,1350,261,1336,282,1295,316,1246,339,1195,354,1145,362,1144,356,1194,348,1244,334,1292,311,1332,278,1345,259,1353,237,1360,191"/>
+<area shape="rect" id="Node000014" href="$api_8cpp.html" title=" " alt="" coords="1138,225,1322,280"/>
+<area shape="poly" id="edge19_Node000013_Node000014" title=" " alt="" coords="1310,188,1263,227,1260,223,1307,184"/>
+<area shape="poly" id="edge21_Node000015_Node000004" title=" " alt="" coords="1070,186,986,228,984,223,1067,181"/>
+<area shape="poly" id="edge24_Node000017_Node000003" title=" " alt="" coords="720,184,716,225,710,225,715,184"/>
+<area shape="poly" id="edge25_Node000017_Node000004" title=" " alt="" coords="787,174,883,223,880,228,784,179"/>
+<area shape="poly" id="edge27_Node000018_Node000003" title=" " alt="" coords="852,186,765,228,763,223,850,181"/>
+<area shape="poly" id="edge28_Node000018_Node000004" title=" " alt="" coords="935,191,935,225,930,225,930,191"/>
 </map>

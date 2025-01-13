@@ -10,7 +10,7 @@ var classc__qualifierst =
     [ "count", "classc__qualifierst.html#ab8141cb4fbca5c34cd4f2bef7a4e1c74", null ],
     [ "is_subset_of", "classc__qualifierst.html#aac7728a0faed919fdf946cde36aa5292", null ],
     [ "operator!=", "classc__qualifierst.html#a34261312797e32877a9e999bd4740fd1", null ],
-    [ "operator+=", "classc__qualifierst.html#a2d14197b446ac3ddb973c0cf712e513a", null ],
+    [ "operator+=", "classc__qualifierst.html#a67b31efab8625d403598f1b62442480e", null ],
     [ "operator=", "classc__qualifierst.html#af5314be25cb1e62d7f2db5085671768e", null ],
     [ "operator==", "classc__qualifierst.html#afbb5adfd3b2e9e33da636179e11462f8", null ],
     [ "read", "classc__qualifierst.html#a3605bf6a339ff20e0f94ed7d4a0cb918", null ],

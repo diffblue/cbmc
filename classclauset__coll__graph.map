@@ -1,9 +1,16 @@
 <map id="clauset" name="clauset">
-<area shape="rect" id="node1" title=" " alt="" coords="170,273,239,300"/>
-<area shape="rect" id="node2" title=" " alt="" coords="37,184,191,211"/>
-<area shape="rect" id="node3" href="$structclauset_1_1stept.html" title=" " alt="" coords="5,95,116,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="159,95,288,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="216,184,380,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="204,5,243,32"/>
-<area shape="rect" id="node7" href="$classliteralt.html" title=" " alt="" coords="331,95,396,121"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="151,269,221,295"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="13,181,177,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,214,175,267,172,271,116,218"/>
+<area shape="rect" id="Node000003" href="$classliteralt.html" title=" " alt="" coords="5,93,71,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="37,132,42,156,53,169,67,179,64,183,49,173,37,159,31,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="113,93,243,119"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="154,129,137,145,106,183,102,179,133,141,150,125"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="202,181,357,207"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="204,126,267,179,264,183,201,130"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="159,5,197,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="181,45,181,93,175,93,175,45"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="262,219,233,247,204,271,200,267,230,243,258,215"/>
+<area shape="rect" id="Node000007" href="$structclauset_1_1stept.html" title=" " alt="" coords="285,93,396,119"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="330,133,313,159,293,183,289,179,309,156,326,130"/>
 </map>

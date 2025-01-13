@@ -1,7 +1,12 @@
 <map id="invariant_propagationt" name="invariant_propagationt">
-<area shape="rect" id="node1" title=" " alt="" coords="31,337,202,364"/>
-<area shape="rect" id="node2" href="$classait.html" title=" " alt="" coords="47,247,186,288"/>
-<area shape="rect" id="node3" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="5,81,217,108"/>
-<area shape="rect" id="node5" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="133,157,260,184"/>
-<area shape="rect" id="node4" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="73,5,150,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="31,332,202,357"/>
+<area shape="rect" id="Node000002" href="$classait.html" title=" " alt="" coords="47,243,186,283"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,296,119,332,114,332,114,296"/>
+<area shape="rect" id="Node000003" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="5,80,217,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="115,119,119,242,113,242,109,119"/>
+<area shape="rect" id="Node000005" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="133,155,260,180"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="137,112,184,152,181,156,134,116"/>
+<area shape="rect" id="Node000004" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="73,5,150,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="114,45,114,80,109,80,109,45"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="180,192,135,244,131,241,176,189"/>
 </map>

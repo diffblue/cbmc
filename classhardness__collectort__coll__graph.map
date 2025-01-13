@@ -1,6 +1,11 @@
 <map id="hardness_collectort" name="hardness_collectort">
-<area shape="rect" id="node1" title=" " alt="" coords="19,288,168,315"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,184,181,225"/>
-<area shape="rect" id="node3" title=" " alt="" coords="15,95,172,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="74,5,113,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="57,284,206,309"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="43,181,219,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,235,134,284,129,284,129,235"/>
+<area shape="rect" id="Node000003" href="$classclause__hardness__collectort.html" title=" " alt="" coords="5,93,204,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,131,128,180,123,182,109,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="229,93,386,119"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="275,127,168,184,166,179,272,123"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="288,5,327,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="310,45,310,93,305,93,305,45"/>
 </map>

@@ -8,7 +8,7 @@ var classboolbv__widtht =
     [ "~boolbv_widtht", "classboolbv__widtht.html#ab6023aaf2acb28f612dd668f9d2750ab", null ],
     [ "get_entry", "classboolbv__widtht.html#a32517a33a81c333bfd400eb525a3c957", null ],
     [ "get_member", "classboolbv__widtht.html#ade9b19b7d0aa9012fed4936571e5c06e", null ],
-    [ "get_width_opt", "classboolbv__widtht.html#a207aa9cfdb6a530e32f0a98bad547257", null ],
+    [ "get_width_opt", "classboolbv__widtht.html#ad92110fe177f7e57ee9fa6234fcb0eaf", null ],
     [ "operator()", "classboolbv__widtht.html#aac16b4a41bbaaedbb6ad8eeb43f9063a", null ],
     [ "cache", "classboolbv__widtht.html#a95724609ff1a46a57a81bcb02db2fe86", null ],
     [ "ns", "classboolbv__widtht.html#a283bc10216c0b5faab8645cb194957a3", null ]

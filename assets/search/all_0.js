@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['data_0',['data',['../structdata.html',1,'']]]
+  ['assets_0',['CProver assets',['../index.html',1,'']]]
 ];

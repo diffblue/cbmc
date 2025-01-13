@@ -1,8 +1,13 @@
 <map id="labelt" name="labelt">
-<area shape="rect" id="node1" title=" " alt="" coords="111,288,169,315"/>
-<area shape="rect" id="node2" title=" " alt="" coords="47,199,233,225"/>
-<area shape="rect" id="node3" title=" " alt="" coords="31,109,118,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,5,144,47"/>
-<area shape="rect" id="node5" title=" " alt="" coords="142,109,271,136"/>
-<area shape="rect" id="node6" title=" " alt="" coords="187,13,226,39"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="111,284,169,309"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="47,196,233,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,235,143,283,137,283,137,235"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="31,108,118,133"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="88,145,105,170,128,194,124,198,101,174,84,147"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,5,144,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="77,59,77,108,72,108,72,59"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="142,108,271,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="192,146,170,174,151,197,147,194,166,170,187,143"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="187,13,226,38"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="209,52,209,108,204,108,204,52"/>
 </map>

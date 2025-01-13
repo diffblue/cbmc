@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/accelerate/scratch_program.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/accelerate/scratch_program.h">
-<area shape="rect" id="node1" title="Loop Acceleration." alt="" coords="599,5,818,61"/>
-<area shape="rect" id="node2" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="5,117,199,173"/>
-<area shape="rect" id="node3" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="223,109,416,180"/>
-<area shape="rect" id="node4" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="440,109,689,180"/>
-<area shape="rect" id="node5" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="714,117,991,173"/>
-<area shape="rect" id="node6" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="1016,117,1279,173"/>
-<area shape="rect" id="node7" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="1303,117,1538,173"/>
+<area shape="rect" id="Node000001" title="Loop Acceleration." alt="" coords="599,5,818,60"/>
+<area shape="rect" id="Node000002" href="$accelerate_8cpp.html" title="Loop Acceleration." alt="" coords="5,115,199,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="586,50,408,74,211,111,183,118,181,113,209,105,407,69,586,44"/>
+<area shape="rect" id="Node000003" href="$acceleration__utils_8cpp.html" title="Loop Acceleration." alt="" coords="223,108,416,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="593,66,428,111,417,114,416,109,427,105,591,61"/>
+<area shape="rect" id="Node000004" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="440,108,689,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="664,70,611,110,608,105,661,66"/>
+<area shape="rect" id="Node000005" href="$polynomial__accelerator_8cpp.html" title="Loop Acceleration." alt="" coords="714,115,991,170"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="756,66,819,113,816,117,753,71"/>
+<area shape="rect" id="Node000006" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="1016,115,1279,170"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="829,61,1042,113,1040,118,828,66"/>
+<area shape="rect" id="Node000007" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="1303,115,1538,170"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="832,42,1047,67,1170,84,1292,105,1326,113,1325,118,1291,111,1169,90,1047,72,831,48"/>
 </map>

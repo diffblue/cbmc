@@ -1,8 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/prop/prop_conv.h" name="/home/runner/work/cbmc/cbmc/src/solvers/prop/prop_conv.h">
-<area shape="rect" id="node1" title=" " alt="" coords="13,5,197,61"/>
-<area shape="rect" id="node2" href="$stack__decision__procedure_8h.html" title="Decision procedure with incremental solving with contexts and assumptions." alt="" coords="20,109,189,151"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,199,68,225"/>
-<area shape="rect" id="node4" href="$decision__procedure_8h.html" title="Decision Procedure Interface." alt="" coords="93,199,253,225"/>
-<area shape="rect" id="node5" title=" " alt="" coords="98,273,162,300"/>
-<area shape="rect" id="node6" title=" " alt="" coords="186,273,245,300"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="13,5,197,60"/>
+<area shape="rect" id="Node000002" href="$stack__decision__procedure_8h.html" title="Decision procedure with incremental solving with contexts and assumptions." alt="" coords="20,108,189,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,60,107,94,102,94,102,60"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,196,68,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,150,58,187,54,184,86,146"/>
+<area shape="rect" id="Node000004" href="$decision__procedure_8h.html" title="Decision Procedure Interface." alt="" coords="93,196,253,221"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="123,146,156,184,152,187,119,150"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="98,269,162,295"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="168,223,146,259,142,256,163,220"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="186,269,245,295"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="182,220,204,256,199,259,177,223"/>
 </map>

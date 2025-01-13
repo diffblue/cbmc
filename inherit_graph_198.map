@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structdestructt_3_010_00_01pointee__baset_00_01_ts_8_8_8_01_4.html" title=" " alt="" coords="5,5,165,47"/>
+<area shape="rect" id="Node000000" href="$classdereference__callbackt.html" title="Base class for pointer value set analysis." alt="" coords="5,31,172,56"/>
+<area shape="rect" id="Node000001" href="$classgoto__program__dereferencet.html" title="Wrapper for functions removing dereferences in expressions contained in a goto program." alt="" coords="220,5,423,31"/>
+<area shape="poly" id="edge184_Node000000_Node000001" title=" " alt="" coords="186,30,219,26,220,32,186,35"/>
+<area shape="rect" id="Node000002" href="$classsymex__dereference__statet.html" title="Callback object that goto_symext::dereference_rec provides to value_set_dereferencet to provide value..." alt="" coords="223,55,419,80"/>
+<area shape="poly" id="edge185_Node000000_Node000002" title=" " alt="" coords="186,51,224,55,223,60,185,56"/>
 </map>

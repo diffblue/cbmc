@@ -1,7 +1,7 @@
 var java__static__initializers_8h =
 [
     [ "stub_global_initializer_factoryt", "classstub__global__initializer__factoryt.html", "classstub__global__initializer__factoryt" ],
-    [ "class_to_declared_symbols", "java__static__initializers_8h.html#ac07d176c89c0eed7b32a72bd964a1b97", null ],
+    [ "class_to_declared_symbols", "java__static__initializers_8h.html#a098b778a804955290e0716ce78c1f2d9", null ],
     [ "clinit_wrapper_name", "java__static__initializers_8h.html#ad60490e360af4ef3be7a91f21a10b4d0", null ],
     [ "create_static_initializer_symbols", "java__static__initializers_8h.html#a31b076a02d675f00e5f0a1c2c45243df", null ],
     [ "create_stub_global_initializers", "java__static__initializers_8h.html#a4084279b6ae824db7261cbff37e48cea", null ],

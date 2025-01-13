@@ -1,28 +1,55 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/json_irep.h" name="/home/runner/work/cbmc/cbmc/src/util/json_irep.h">
-<area shape="rect" id="node1" title="Util." alt="" coords="1861,5,2045,47"/>
-<area shape="rect" id="node2" href="$dependence__graph_8cpp.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="5,102,235,158"/>
-<area shape="rect" id="node3" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="259,95,485,165"/>
-<area shape="rect" id="node4" href="$static__verifier_8cpp.html" title=" " alt="" coords="509,102,693,158"/>
-<area shape="rect" id="node5" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="717,102,933,158"/>
-<area shape="rect" id="node6" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="957,102,1163,158"/>
-<area shape="rect" id="node7" href="$properties_8cpp.html" title="Properties." alt="" coords="1187,102,1371,158"/>
-<area shape="rect" id="node8" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1237,213,1421,269"/>
-<area shape="rect" id="node9" href="$goto__diff__base_8cpp.html" title="GOTO&#45;DIFF Base Class." alt="" coords="1445,102,1629,158"/>
-<area shape="rect" id="node10" href="$json__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="1653,102,1837,158"/>
-<area shape="rect" id="node17" href="$loop__ids_8cpp.html" title="Loop IDs." alt="" coords="1861,102,2045,158"/>
-<area shape="rect" id="node18" href="$show__goto__functions__json_8cpp.html" title="Goto Program." alt="" coords="2069,102,2293,158"/>
-<area shape="rect" id="node19" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="2317,102,2501,158"/>
-<area shape="rect" id="node20" href="$show__symbol__table_8cpp.html" title="Show the symbol table." alt="" coords="2525,102,2709,158"/>
-<area shape="rect" id="node21" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="2734,102,2938,158"/>
-<area shape="rect" id="node22" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="2962,102,3166,158"/>
-<area shape="rect" id="node23" href="$solver__hardness_8cpp.html" title=" " alt="" coords="3191,102,3401,158"/>
-<area shape="rect" id="node24" href="$json__symbol_8cpp.html" title=" " alt="" coords="3425,102,3625,158"/>
-<area shape="rect" id="node25" href="$json__irep_8cpp.html" title="Util." alt="" coords="3649,109,3847,151"/>
-<area shape="rect" id="node26" href="$ui__message_8cpp.html" title=" " alt="" coords="3872,109,4091,151"/>
-<area shape="rect" id="node11" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="1445,213,1629,269"/>
-<area shape="rect" id="node12" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1653,213,1837,269"/>
-<area shape="rect" id="node13" href="$interpreter_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="1783,317,1967,373"/>
-<area shape="rect" id="node14" href="$interpreter__class_8h.html" title="Interpreter for GOTO Programs." alt="" coords="1912,213,2096,269"/>
-<area shape="rect" id="node16" href="$json__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="2120,213,2304,269"/>
-<area shape="rect" id="node15" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="1991,317,2177,373"/>
+<area shape="rect" id="Node000001" title="Util." alt="" coords="1861,5,2045,45"/>
+<area shape="rect" id="Node000002" href="$dependence__graph_8cpp.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="5,101,235,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1847,30,1505,36,1043,47,583,67,392,80,247,96,210,103,209,98,246,91,391,75,582,61,1043,42,1505,30,1847,25"/>
+<area shape="rect" id="Node000003" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="259,93,485,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1848,31,1551,38,1162,51,778,70,619,82,498,96,486,98,485,93,497,91,618,77,777,64,1162,45,1551,33,1848,26"/>
+<area shape="rect" id="Node000004" href="$static__verifier_8cpp.html" title=" " alt="" coords="509,101,693,155"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1848,31,1590,38,1261,51,939,70,807,82,706,96,675,103,674,98,705,91,806,77,939,65,1261,46,1590,33,1847,26"/>
+<area shape="rect" id="Node000005" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="717,101,933,155"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1848,29,1675,32,1450,42,1198,62,1070,77,946,96,911,103,910,98,945,91,1070,72,1198,57,1449,37,1675,27,1848,24"/>
+<area shape="rect" id="Node000006" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="957,101,1163,155"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1847,32,1712,38,1544,49,1359,68,1175,96,1143,103,1142,98,1174,91,1358,63,1543,44,1712,32,1847,26"/>
+<area shape="rect" id="Node000007" href="$properties_8cpp.html" title="Properties." alt="" coords="1187,101,1371,155"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1848,36,1635,57,1512,74,1390,96,1360,103,1359,98,1389,91,1511,69,1635,52,1847,31"/>
+<area shape="rect" id="Node000008" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1237,211,1421,265"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1848,33,1737,40,1617,52,1509,70,1466,82,1435,95,1350,212,1346,209,1432,91,1464,77,1508,65,1616,46,1737,35,1847,28"/>
+<area shape="rect" id="Node000009" href="$goto__diff__base_8cpp.html" title="GOTO&#45;DIFF Base Class." alt="" coords="1445,101,1629,155"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1849,49,1642,96,1617,103,1615,98,1641,91,1848,44"/>
+<area shape="rect" id="Node000010" href="$json__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="1653,101,1837,155"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1903,54,1801,103,1798,98,1901,49"/>
+<area shape="rect" id="Node000017" href="$loop__ids_8cpp.html" title="Loop IDs." alt="" coords="1861,101,2045,155"/>
+<area shape="poly" id="edge18_Node000001_Node000017" title=" " alt="" coords="1956,59,1956,100,1951,100,1951,59"/>
+<area shape="rect" id="Node000018" href="$show__goto__functions__json_8cpp.html" title="Goto Program." alt="" coords="2069,101,2293,155"/>
+<area shape="poly" id="edge19_Node000001_Node000018" title=" " alt="" coords="2010,49,2123,98,2121,103,2008,53"/>
+<area shape="rect" id="Node000019" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="2317,101,2501,155"/>
+<area shape="poly" id="edge20_Node000001_Node000019" title=" " alt="" coords="2059,41,2178,62,2306,91,2332,98,2331,103,2305,96,2177,67,2058,46"/>
+<area shape="rect" id="Node000020" href="$show__symbol__table_8cpp.html" title="Show the symbol table." alt="" coords="2525,101,2709,155"/>
+<area shape="poly" id="edge21_Node000001_Node000020" title=" " alt="" coords="2059,31,2270,51,2393,68,2514,91,2542,98,2541,103,2513,96,2392,73,2270,56,2059,36"/>
+<area shape="rect" id="Node000021" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="2734,101,2938,155"/>
+<area shape="poly" id="edge22_Node000001_Node000021" title=" " alt="" coords="2059,27,2193,33,2359,44,2541,63,2722,91,2754,98,2753,103,2721,96,2540,68,2358,50,2193,38,2059,32"/>
+<area shape="rect" id="Node000022" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="2962,101,3166,155"/>
+<area shape="poly" id="edge23_Node000001_Node000022" title=" " alt="" coords="2059,23,2230,26,2453,36,2702,56,2828,71,2951,91,2984,98,2983,103,2950,96,2827,77,2701,61,2453,41,2230,32,2059,29"/>
+<area shape="rect" id="Node000023" href="$solver__hardness_8cpp.html" title=" " alt="" coords="3191,101,3401,155"/>
+<area shape="poly" id="edge24_Node000001_Node000023" title=" " alt="" coords="2059,27,2635,48,2950,67,3080,78,3179,91,3213,98,3212,103,3178,96,3079,83,2949,72,2635,53,2059,32"/>
+<area shape="rect" id="Node000024" href="$json__symbol_8cpp.html" title=" " alt="" coords="3425,101,3625,155"/>
+<area shape="poly" id="edge25_Node000001_Node000024" title=" " alt="" coords="2059,25,2356,31,2747,43,3133,63,3292,75,3414,91,3447,98,3446,103,3413,96,3292,81,3132,68,2747,49,2356,37,2059,31"/>
+<area shape="rect" id="Node000025" href="$json__irep_8cpp.html" title="Util." alt="" coords="3649,108,3847,148"/>
+<area shape="poly" id="edge26_Node000001_Node000025" title=" " alt="" coords="2059,25,2398,29,2854,39,3307,59,3495,73,3638,91,3696,105,3695,111,3637,96,3495,79,3307,64,2853,45,2398,34,2059,30"/>
+<area shape="rect" id="Node000026" href="$ui__message_8cpp.html" title=" " alt="" coords="3872,108,4091,148"/>
+<area shape="poly" id="edge27_Node000001_Node000026" title=" " alt="" coords="2059,24,2438,28,2958,38,3479,58,3696,73,3860,91,3925,105,3923,111,3860,96,3696,78,3479,63,2958,44,2437,33,2059,30"/>
+<area shape="poly" id="edge12_Node000010_Node000008" title=" " alt="" coords="1654,162,1642,165,1538,190,1434,213,1422,216,1421,211,1433,208,1537,185,1641,160,1652,157"/>
+<area shape="rect" id="Node000011" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="1445,211,1629,265"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1684,164,1589,213,1587,208,1681,159"/>
+<area shape="rect" id="Node000012" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1653,211,1837,265"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="1748,170,1748,210,1743,210,1743,170"/>
+<area shape="rect" id="Node000013" href="$interpreter_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="1783,313,1967,368"/>
+<area shape="poly" id="edge13_Node000010_Node000013" title=" " alt="" coords="1805,161,1830,183,1852,209,1864,235,1872,263,1877,313,1872,314,1866,264,1859,237,1847,212,1827,187,1802,165"/>
+<area shape="rect" id="Node000014" href="$interpreter__class_8h.html" title="Interpreter for GOTO Programs." alt="" coords="1912,211,2096,265"/>
+<area shape="poly" id="edge14_Node000010_Node000014" title=" " alt="" coords="1822,158,1942,208,1940,213,1820,163"/>
+<area shape="rect" id="Node000016" href="$json__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="2120,211,2304,265"/>
+<area shape="poly" id="edge17_Node000010_Node000016" title=" " alt="" coords="1836,156,1850,160,1922,176,1979,185,2109,208,2120,211,2119,216,2107,213,1978,191,1921,181,1849,165,1835,162"/>
+<area shape="poly" id="edge15_Node000014_Node000013" title=" " alt="" coords="1961,276,1910,315,1907,311,1958,271"/>
+<area shape="rect" id="Node000015" href="$interpreter__evaluate_8cpp.html" title="Interpreter for GOTO Programs." alt="" coords="1991,313,2177,368"/>
+<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="2035,274,2065,312,2061,315,2031,278"/>
 </map>

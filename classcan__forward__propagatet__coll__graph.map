@@ -1,12 +1,23 @@
 <map id="can_forward_propagatet" name="can_forward_propagatet">
-<area shape="rect" id="node1" title="Determine whether an expression is constant." alt="" coords="37,525,217,552"/>
-<area shape="rect" id="node2" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="75,436,178,463"/>
-<area shape="rect" id="node3" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="35,332,175,359"/>
-<area shape="rect" id="node4" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="199,332,353,359"/>
-<area shape="rect" id="node5" title=" " alt="" coords="109,213,262,255"/>
-<area shape="rect" id="node6" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,102,77,129"/>
-<area shape="rect" id="node7" title=" " alt="" coords="101,102,269,129"/>
-<area shape="rect" id="node8" title=" " alt="" coords="178,5,217,32"/>
-<area shape="rect" id="node10" title=" " alt="" coords="293,95,445,136"/>
-<area shape="rect" id="node9" title=" " alt="" coords="323,5,362,32"/>
+<area shape="rect" id="Node000001" title="Determine whether an expression is constant." alt="" coords="37,519,217,544"/>
+<area shape="rect" id="Node000002" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="75,431,178,456"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,470,129,518,124,518,124,470"/>
+<area shape="rect" id="Node000003" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="35,328,175,353"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,366,127,430,122,431,108,367"/>
+<area shape="rect" id="Node000004" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="199,328,353,353"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="249,363,145,433,142,428,246,359"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="293,93,445,133"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="375,147,375,182,371,224,360,266,341,306,327,320,310,330,307,325,324,316,336,302,355,264,366,223,370,182,370,147"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="178,5,217,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="209,42,216,56,227,67,254,80,294,92,292,97,252,85,224,71,212,59,204,45"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="101,101,269,126"/>
+<area shape="poly" id="edge10_Node000010_Node000006" title=" " alt="" coords="176,42,168,56,166,67,168,78,179,99,174,102,163,80,161,67,163,54,171,39"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="323,5,362,31"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="359,42,364,54,371,93,366,94,359,55,354,44"/>
+<area shape="poly" id="edge11_Node000010_Node000007" title=" " alt="" coords="316,41,267,72,209,103,207,98,264,67,313,36"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="109,211,262,251"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="187,264,191,284,199,302,214,316,232,325,230,330,211,320,195,306,185,286,182,265"/>
+<area shape="rect" id="Node000009" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,101,77,126"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="63,134,116,185,152,208,149,213,113,189,59,138"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="188,140,188,210,183,210,183,140"/>
 </map>

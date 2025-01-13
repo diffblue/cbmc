@@ -1,11 +1,23 @@
 <map id="java_boxed_type_infot" name="java_boxed_type_infot">
-<area shape="rect" id="node1" title="Return type for get_boxed_type_info_by_name." alt="" coords="219,603,388,629"/>
-<area shape="rect" id="node2" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="167,513,223,540"/>
-<area shape="rect" id="node3" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="169,437,221,464"/>
-<area shape="rect" id="node4" href="$classsharing__treet.html" title=" " alt="" coords="112,332,279,388"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="142,213,323,255"/>
-<area shape="rect" id="node6" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="155,95,366,136"/>
-<area shape="rect" id="node7" href="$structref__count__ift_3_01true_01_4.html" title=" " alt="" coords="5,5,164,32"/>
-<area shape="rect" id="node8" title=" " alt="" coords="189,5,341,32"/>
-<area shape="rect" id="node9" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="373,5,445,32"/>
+<area shape="rect" id="Node000001" title="Return type for get_boxed_type_info_by_name." alt="" coords="1879,33,2048,58"/>
+<area shape="rect" id="Node000002" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="305,22,377,47"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="390,28,495,21,619,17,1605,17,1750,23,1879,33,1878,39,1750,28,1605,23,619,23,495,26,391,33"/>
+<area shape="rect" id="Node000006" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="515,79,725,119"/>
+<area shape="poly" id="edge7_Node000006_Node000002" title=" " alt="" coords="391,43,532,76,531,81,389,48"/>
+<area shape="rect" id="Node000003" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="1576,58,1632,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1646,65,1854,51,1878,49,1878,54,1855,56,1646,71"/>
+<area shape="rect" id="Node000004" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1475,65,1527,90"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1540,72,1576,70,1576,75,1540,77"/>
+<area shape="rect" id="Node000005" href="$classsharing__treet.html" title=" " alt="" coords="1257,69,1424,123"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1438,82,1474,78,1475,83,1438,87"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="739,96,1257,94,1257,99,739,101"/>
+<area shape="rect" id="Node000011" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="831,139,1012,179"/>
+<area shape="poly" id="edge11_Node000011_Node000006" title=" " alt="" coords="691,120,750,136,831,149,830,154,749,141,690,125"/>
+<area shape="rect" id="Node000007" href="$structref__count__ift.html" title="Used in tree_nodet for activating or not reference counting." alt="" coords="248,86,433,111"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="447,96,514,96,514,101,447,101"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="265,135,417,161"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="426,130,514,115,515,120,427,136"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="5,135,135,161"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="148,145,264,145,264,151,148,151"/>
+<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="1025,157,1126,152,1231,136,1279,121,1280,126,1233,141,1126,157,1026,163"/>
 </map>

@@ -1,8 +1,13 @@
 <map id="rename_symbolt" name="rename_symbolt">
-<area shape="rect" id="node1" title=" " alt="" coords="33,332,165,359"/>
-<area shape="rect" id="node2" title=" " alt="" coords="19,213,178,255"/>
-<area shape="rect" id="node3" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,102,77,129"/>
-<area shape="rect" id="node4" title=" " alt="" coords="101,95,253,136"/>
-<area shape="rect" id="node5" title=" " alt="" coords="125,5,163,32"/>
-<area shape="rect" id="node6" title=" " alt="" coords="190,5,229,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="33,328,165,353"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="19,211,178,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,264,101,327,96,327,96,264"/>
+<area shape="rect" id="Node000003" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,101,77,126"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="49,139,65,185,82,209,78,212,60,188,44,141"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="101,93,253,133"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="159,146,130,188,114,212,109,209,126,185,155,143"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="125,5,163,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="149,44,155,68,166,92,162,94,149,70,143,45"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="190,5,229,31"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="204,44,186,94,181,92,198,43"/>
 </map>

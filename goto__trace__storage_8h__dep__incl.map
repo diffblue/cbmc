@@ -1,13 +1,26 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/goto_trace_storage.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/goto_trace_storage.h">
-<area shape="rect" id="node1" title="Goto Trace Storage." alt="" coords="537,5,721,61"/>
-<area shape="rect" id="node2" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="5,117,189,173"/>
-<area shape="rect" id="node3" href="$all__properties__verifier__with__fault__localization_8h.html" title="Goto verifier for verifying all properties that stores traces and localizes faults." alt="" coords="430,109,618,180"/>
-<area shape="rect" id="node6" href="$all__properties__verifier__with__trace__storage_8h.html" title="Goto verifier for verifying all properties that stores traces." alt="" coords="643,109,827,180"/>
-<area shape="rect" id="node9" href="$cover__goals__verifier__with__trace__storage_8h.html" title="Goto verifier for covering goals that stores traces." alt="" coords="213,109,405,180"/>
-<area shape="rect" id="node10" href="$goto__trace__storage_8cpp.html" title="Goto Trace Storage." alt="" coords="851,117,1035,173"/>
-<area shape="rect" id="node11" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1059,117,1243,173"/>
-<area shape="rect" id="node4" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="207,228,412,284"/>
-<area shape="rect" id="node5" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="436,228,628,284"/>
-<area shape="rect" id="node7" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="652,228,849,284"/>
-<area shape="rect" id="node8" href="$api_8cpp.html" title=" " alt="" coords="873,228,1057,284"/>
+<area shape="rect" id="Node000001" title="Goto Trace Storage." alt="" coords="537,5,721,60"/>
+<area shape="rect" id="Node000002" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="5,115,189,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="524,51,371,75,202,111,175,118,174,113,201,105,370,70,523,45"/>
+<area shape="rect" id="Node000003" href="$all__properties__verifier__with__fault__localization_8h.html" title="Goto verifier for verifying all properties that stores traces and localizes faults." alt="" coords="430,108,618,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="596,72,559,110,555,106,592,68"/>
+<area shape="rect" id="Node000006" href="$all__properties__verifier__with__trace__storage_8h.html" title="Goto verifier for verifying all properties that stores traces." alt="" coords="643,108,827,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="667,68,704,106,700,110,663,72"/>
+<area shape="rect" id="Node000009" href="$cover__goals__verifier__with__trace__storage_8h.html" title="Goto verifier for covering goals that stores traces." alt="" coords="213,108,405,177"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="539,67,407,111,405,106,537,62"/>
+<area shape="rect" id="Node000010" href="$goto__trace__storage_8cpp.html" title="Goto Trace Storage." alt="" coords="851,115,1035,170"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="719,62,867,113,866,118,718,67"/>
+<area shape="rect" id="Node000011" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1059,115,1243,170"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="735,46,884,71,1047,105,1074,113,1072,118,1046,111,883,76,735,51"/>
+<area shape="rect" id="Node000004" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="436,225,628,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="530,191,533,225,527,225,525,191"/>
+<area shape="rect" id="Node000005" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="207,225,412,280"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="446,186,363,228,360,223,444,181"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="661,186,583,227,580,223,659,181"/>
+<area shape="poly" id="edge7_Node000006_Node000005" title=" " alt="" coords="630,180,630,180,413,231,411,225,629,175,629,175"/>
+<area shape="rect" id="Node000007" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="652,225,849,280"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="744,190,749,225,744,226,739,191"/>
+<area shape="rect" id="Node000008" href="$api_8cpp.html" title=" " alt="" coords="873,225,1057,280"/>
+<area shape="poly" id="edge9_Node000006_Node000008" title=" " alt="" coords="820,181,911,223,908,228,818,186"/>
+<area shape="poly" id="edge11_Node000009_Node000005" title=" " alt="" coords="312,191,312,225,307,225,307,191"/>
 </map>

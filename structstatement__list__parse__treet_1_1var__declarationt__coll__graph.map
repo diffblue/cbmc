@@ -1,9 +1,15 @@
 <map id="statement_list_parse_treet::var_declarationt" name="statement_list_parse_treet::var_declarationt">
-<area shape="rect" id="node1" title="Struct for a single variable declaration in Statement List." alt="" coords="5,504,180,545"/>
-<area shape="rect" id="node2" href="$classsymbol__exprt.html" title="Expression to hold a symbol (variable)" alt="" coords="37,415,148,441"/>
-<area shape="rect" id="node3" href="$classnullary__exprt.html" title="An expression without operands." alt="" coords="39,339,147,365"/>
-<area shape="rect" id="node4" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="30,263,155,289"/>
-<area shape="rect" id="node5" href="$classexprt.html" title="Base class for all expressions." alt="" coords="65,187,121,213"/>
-<area shape="rect" id="node6" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="67,111,119,137"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title=" " alt="" coords="9,5,176,61"/>
+<area shape="rect" id="Node000001" title="Struct for a single variable declaration in Statement List." alt="" coords="5,496,180,536"/>
+<area shape="rect" id="Node000002" href="$classsymbol__exprt.html" title="Expression to hold a symbol (variable)" alt="" coords="37,408,148,433"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,447,95,496,90,496,90,447"/>
+<area shape="rect" id="Node000003" href="$classnullary__exprt.html" title="An expression without operands." alt="" coords="39,333,147,359"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,373,95,408,90,408,90,373"/>
+<area shape="rect" id="Node000004" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="30,259,155,284"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="95,298,95,333,90,333,90,298"/>
+<area shape="rect" id="Node000005" href="$classexprt.html" title="Base class for all expressions." alt="" coords="65,184,121,209"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="95,224,95,258,90,258,90,224"/>
+<area shape="rect" id="Node000006" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="67,109,119,135"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="95,149,95,184,90,184,90,149"/>
+<area shape="rect" id="Node000007" href="$classsharing__treet.html" title=" " alt="" coords="9,5,176,60"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="95,74,95,109,90,109,90,74"/>
 </map>

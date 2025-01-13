@@ -1,17 +1,35 @@
 <map id="hardness_collectort" name="hardness_collectort">
-<area shape="rect" id="node1" title=" " alt="" coords="5,211,155,238"/>
-<area shape="rect" id="node2" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="675,12,855,53"/>
-<area shape="rect" id="node4" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="671,88,858,129"/>
-<area shape="rect" id="node6" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="671,276,858,317"/>
-<area shape="rect" id="node8" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="671,360,858,401"/>
-<area shape="rect" id="node10" href="$classsatcheck__cadical__baset.html" title=" " alt="" coords="229,186,405,212"/>
-<area shape="rect" id="node13" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="207,84,426,111"/>
-<area shape="rect" id="node14" href="$classsatcheck__ipasirt.html" title="Interface for generic SAT solver interface IPASIR." alt="" coords="253,338,381,364"/>
-<area shape="rect" id="node15" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="204,287,429,314"/>
-<area shape="rect" id="node3" href="$classsatcheck__glucose__no__simplifiert.html" title=" " alt="" coords="957,12,1117,53"/>
-<area shape="rect" id="node5" href="$classsatcheck__glucose__simplifiert.html" title=" " alt="" coords="932,95,1143,122"/>
-<area shape="rect" id="node7" href="$classsatcheck__minisat__simplifiert.html" title=" " alt="" coords="933,283,1142,310"/>
-<area shape="rect" id="node9" href="$classsatcheck__minisat__no__simplifiert.html" title=" " alt="" coords="958,360,1117,401"/>
-<area shape="rect" id="node11" href="$classsatcheck__cadical__no__preprocessingt.html" title=" " alt="" coords="687,158,843,200"/>
-<area shape="rect" id="node12" href="$classsatcheck__cadical__preprocessingt.html" title=" " alt="" coords="647,224,883,251"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,211,155,237"/>
+<area shape="rect" id="Node000002" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="675,13,855,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,198,109,167,134,132,165,97,203,70,261,43,323,24,387,12,451,5,573,5,675,15,674,20,573,10,452,11,388,17,325,29,263,48,205,74,169,101,138,135,113,170,96,200"/>
+<area shape="rect" id="Node000004" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="671,88,858,128"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="118,203,158,185,203,171,329,144,455,126,573,114,671,108,671,114,573,120,456,131,330,149,205,176,160,190,120,208"/>
+<area shape="rect" id="Node000006" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="671,275,858,315"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="169,229,623,273,671,279,671,284,622,279,169,234"/>
+<area shape="rect" id="Node000008" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="671,359,858,399"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="95,248,112,278,137,314,168,347,205,372,265,395,329,411,394,419,459,421,581,413,682,396,683,401,582,418,459,426,394,424,328,416,264,401,203,377,164,351,133,317,108,281,91,250"/>
+<area shape="rect" id="Node000010" href="$classsatcheck__cadical__baset.html" title=" " alt="" coords="229,186,405,211"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="168,212,228,205,229,211,168,217"/>
+<area shape="rect" id="Node000013" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="207,85,426,110"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="98,198,132,161,177,127,228,107,230,112,180,132,136,165,102,201"/>
+<area shape="rect" id="Node000014" href="$classsatcheck__ipasirt.html" title="Interface for generic SAT solver interface IPASIR." alt="" coords="253,337,381,362"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="104,245,148,285,176,306,205,323,253,339,252,344,203,328,173,310,145,289,100,248"/>
+<area shape="rect" id="Node000015" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="204,287,429,313"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="119,240,180,265,250,285,249,290,178,270,117,245"/>
+<area shape="rect" id="Node000003" href="$classsatcheck__glucose__no__simplifiert.html" title=" " alt="" coords="957,13,1117,53"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="868,31,957,31,957,36,868,36"/>
+<area shape="rect" id="Node000005" href="$classsatcheck__glucose__simplifiert.html" title=" " alt="" coords="932,95,1143,121"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="872,105,932,105,932,111,872,111"/>
+<area shape="rect" id="Node000007" href="$classsatcheck__minisat__no__simplifiert.html" title=" " alt="" coords="958,275,1117,315"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="872,292,958,292,958,297,872,297"/>
+<area shape="rect" id="Node000009" href="$classsatcheck__minisat__simplifiert.html" title=" " alt="" coords="933,366,1142,391"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="872,376,933,376,933,381,872,381"/>
+<area shape="rect" id="Node000011" href="$classsatcheck__cadical__no__preprocessingt.html" title=" " alt="" coords="687,159,843,199"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="419,191,687,179,687,185,419,197"/>
+<area shape="rect" id="Node000012" href="$classsatcheck__cadical__preprocessingt.html" title=" " alt="" coords="647,223,883,249"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="419,204,647,223,646,229,418,210"/>
+<area shape="poly" id="edge13_Node000013_Node000002" title=" " alt="" coords="435,80,622,55,674,46,675,52,623,60,436,85"/>
+<area shape="poly" id="edge14_Node000013_Node000004" title=" " alt="" coords="440,100,453,100,671,104,671,110,453,105,440,105"/>
+<area shape="poly" id="edge17_Node000015_Node000006" title=" " alt="" coords="444,296,671,293,671,298,444,301"/>
+<area shape="poly" id="edge18_Node000015_Node000008" title=" " alt="" coords="404,312,672,360,671,365,403,318"/>
 </map>

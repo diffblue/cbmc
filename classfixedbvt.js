@@ -6,7 +6,7 @@ var classfixedbvt =
     [ "format", "classfixedbvt.html#a88a4dcceede2b49fee986ecdccdc37f1", null ],
     [ "from_expr", "classfixedbvt.html#a1ce783a7457f4714f57788c26a252563", null ],
     [ "from_integer", "classfixedbvt.html#a188c4c0883476f1d25e5df4e90568e83", null ],
-    [ "get_value", "classfixedbvt.html#af05ee090d99d9b44c9d0a88758ad07dc", null ],
+    [ "get_value", "classfixedbvt.html#a542d18dff0c5d8883a6dbfff6f97e266", null ],
     [ "is_zero", "classfixedbvt.html#ac866a34e524c987d14c76ff115e53534", null ],
     [ "negate", "classfixedbvt.html#a2cced7d9c336113543ce5f7db61011ea", null ],
     [ "operator!=", "classfixedbvt.html#aedce9e4bf5334f2ea3f2dffb623a2a78", null ],

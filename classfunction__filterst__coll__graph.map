@@ -1,8 +1,16 @@
 <map id="function_filterst" name="function_filterst">
-<area shape="rect" id="node1" title="A collection of function filters to be applied in conjunction." alt="" coords="119,404,243,431"/>
-<area shape="rect" id="node2" title=" " alt="" coords="69,300,294,341"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,196,192,237"/>
-<area shape="rect" id="node4" title=" " alt="" coords="32,95,189,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="181,5,219,32"/>
-<area shape="rect" id="node6" title=" " alt="" coords="225,145,354,172"/>
+<area shape="rect" id="Node000001" title="A collection of function filters to be applied in conjunction." alt="" coords="173,397,297,423"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="122,295,347,335"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,349,237,397,232,397,232,349"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="45,192,232,232"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="168,240,219,293,215,296,164,244"/>
+<area shape="rect" id="Node000004" href="$classfunction__filter__baset.html" title="Base class for filtering functions." alt="" coords="5,93,160,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="83,132,84,150,89,167,109,190,105,194,84,169,79,151,77,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="184,93,341,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="181,124,153,134,137,144,132,155,130,167,134,191,129,192,125,167,127,153,133,141,151,129,179,119"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="302,5,341,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="308,44,273,94,269,91,303,41"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="314,143,443,168"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="334,42,356,92,376,141,371,143,351,94,329,44"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="360,180,254,296,250,292,357,177"/>
 </map>

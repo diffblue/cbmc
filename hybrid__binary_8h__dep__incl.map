@@ -1,7 +1,11 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;cc/hybrid_binary.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;cc/hybrid_binary.h">
-<area shape="rect" id="node1" title="Create hybrid binary with goto&#45;binary section." alt="" coords="360,5,544,61"/>
-<area shape="rect" id="node2" href="$as__mode_8cpp.html" title="Assembler Mode." alt="" coords="5,117,232,158"/>
-<area shape="rect" id="node3" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="256,109,440,165"/>
-<area shape="rect" id="node4" href="$hybrid__binary_8cpp.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="464,109,648,165"/>
-<area shape="rect" id="node5" href="$ld__mode_8cpp.html" title="LD Mode." alt="" coords="673,117,895,158"/>
+<area shape="rect" id="Node000001" title="Create hybrid binary with goto&#45;binary section." alt="" coords="360,5,544,60"/>
+<area shape="rect" id="Node000002" href="$as__mode_8cpp.html" title="Assembler Mode." alt="" coords="5,115,232,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="353,66,182,118,180,113,351,61"/>
+<area shape="rect" id="Node000003" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="256,108,440,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="417,72,377,110,373,106,413,68"/>
+<area shape="rect" id="Node000004" href="$hybrid__binary_8cpp.html" title="Create hybrid binary with goto&#45;binary section." alt="" coords="464,108,648,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="491,68,531,106,527,110,487,72"/>
+<area shape="rect" id="Node000005" href="$ld__mode_8cpp.html" title="LD Mode." alt="" coords="673,115,895,155"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="552,61,722,113,721,118,551,66"/>
 </map>

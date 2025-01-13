@@ -11,7 +11,7 @@ var classexpanding__vectort =
     [ "clear", "classexpanding__vectort.html#ad0ef5098f021b01fce17978ef8096d57", null ],
     [ "end", "classexpanding__vectort.html#ad43fbf242a3996b43314b2ea4b9ea8da", null ],
     [ "end", "classexpanding__vectort.html#a9e71e7ff357aef98c948207115e5da36", null ],
-    [ "operator[]", "classexpanding__vectort.html#a9d6f0200c9af7537d4f13765c3c17364", null ],
+    [ "operator[]", "classexpanding__vectort.html#a5d2edd3f62523dcc2d742cf12ae9fe96", null ],
     [ "push_back", "classexpanding__vectort.html#a9ca7d2e4731e62136902dfc854d5111c", null ],
     [ "push_back", "classexpanding__vectort.html#a687f77708433726a119091eab24edea7", null ],
     [ "size", "classexpanding__vectort.html#a1368e83bb9b84a3341e43817a8ed7687", null ],

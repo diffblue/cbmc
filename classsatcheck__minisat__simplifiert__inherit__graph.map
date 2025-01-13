@@ -1,9 +1,17 @@
 <map id="satcheck_minisat_simplifiert" name="satcheck_minisat_simplifiert">
-<area shape="rect" id="node1" title=" " alt="" coords="23,413,233,440"/>
-<area shape="rect" id="node2" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="35,323,221,364"/>
-<area shape="rect" id="node3" href="$classcnf__solvert.html" title=" " alt="" coords="209,157,303,184"/>
-<area shape="rect" id="node7" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="51,233,277,260"/>
-<area shape="rect" id="node4" href="$classcnft.html" title=" " alt="" coords="233,81,279,108"/>
-<area shape="rect" id="node5" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="228,5,284,32"/>
-<area shape="rect" id="node6" href="$classhardness__collectort.html" title=" " alt="" coords="5,157,155,184"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="23,407,233,432"/>
+<area shape="rect" id="Node000002" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="35,317,221,357"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,371,131,406,125,406,125,371"/>
+<area shape="rect" id="Node000003" href="$classcnf__solvert.html" title=" " alt="" coords="209,155,303,180"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="276,190,291,213,303,240,307,268,304,282,297,295,285,304,268,312,222,325,221,320,266,307,282,300,293,292,299,280,301,268,298,242,286,215,272,193"/>
+<area shape="rect" id="Node000007" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="51,229,277,255"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="232,191,181,231,177,227,229,186"/>
+<area shape="rect" id="Node000004" href="$classcnft.html" title=" " alt="" coords="233,80,279,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="259,120,259,154,253,154,253,120"/>
+<area shape="rect" id="Node000005" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="228,5,284,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="259,45,259,80,253,80,253,45"/>
+<area shape="rect" id="Node000006" href="$classhardness__collectort.html" title=" " alt="" coords="5,155,155,180"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="61,192,43,222,40,238,43,254,53,272,67,289,99,315,95,319,63,292,49,275,37,256,34,238,38,220,57,189"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="106,187,152,227,149,231,102,191"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="141,266,132,280,128,298,128,317,122,317,122,298,127,278,136,263"/>
 </map>

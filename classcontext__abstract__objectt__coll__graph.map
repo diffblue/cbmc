@@ -1,10 +1,24 @@
 <map id="context_abstract_objectt" name="context_abstract_objectt">
-<area shape="rect" id="node1" title=" " alt="" coords="15,619,197,645"/>
-<area shape="rect" id="node2" href="$classabstract__objectt.html" title=" " alt="" coords="43,543,169,569"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,424,164,480"/>
-<area shape="rect" id="node4" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="189,439,245,465"/>
-<area shape="rect" id="node5" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="191,348,243,375"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title=" " alt="" coords="133,243,300,299"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="126,124,307,165"/>
-<area shape="rect" id="node8" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="111,5,322,47"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1723,52,1905,77"/>
+<area shape="rect" id="Node000002" href="$classabstract__objectt.html" title=" " alt="" coords="1547,52,1673,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1687,62,1722,62,1722,67,1687,67"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="1331,5,1489,60"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1504,45,1547,52,1546,57,1503,50"/>
+<area shape="rect" id="Node000004" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="1382,84,1438,109"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1451,87,1546,72,1547,77,1452,93"/>
+<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1229,84,1281,109"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1295,94,1382,94,1382,99,1295,99"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="1013,69,1180,124"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1194,94,1229,94,1229,99,1194,99"/>
+<area shape="rect" id="Node000007" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="272,77,483,117"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="496,79,506,78,642,70,748,67,854,69,990,78,1014,80,1013,86,989,83,854,75,748,72,642,75,507,83,497,84"/>
+<area shape="rect" id="Node000013" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="588,110,769,150"/>
+<area shape="poly" id="edge11_Node000013_Node000007" title=" " alt="" coords="496,107,588,117,587,123,496,112"/>
+<area shape="rect" id="Node000008" href="$structref__count__ift.html" title="Used in tree_nodet for activating or not reference counting." alt="" coords="5,35,191,60"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="184,60,272,75,271,81,183,65"/>
+<area shape="rect" id="Node000009" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="62,84,134,109"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="148,94,272,94,272,99,148,99"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="22,133,174,159"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="183,128,271,113,272,118,184,134"/>
+<area shape="poly" id="edge10_Node000006_Node000013" title=" " alt="" coords="783,122,989,107,1013,105,1013,110,990,113,783,128"/>
 </map>

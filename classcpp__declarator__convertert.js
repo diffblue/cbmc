@@ -3,7 +3,7 @@ var classcpp__declarator__convertert =
     [ "cpp_declarator_convertert", "classcpp__declarator__convertert.html#a9a52f3126a8a99e1e80790cc345911b6", null ],
     [ "check_array_types", "classcpp__declarator__convertert.html#a27b5c5ea07c1df8f1570c231cdab5296", null ],
     [ "combine_types", "classcpp__declarator__convertert.html#aa7cb380f4fa1cb1a1056da529fabd87a", null ],
-    [ "convert", "classcpp__declarator__convertert.html#a1d70c1a8381e8cb9cfb01ad19ae58e42", null ],
+    [ "convert", "classcpp__declarator__convertert.html#a8d5560d206c72e9e224fe0077eab3a58", null ],
     [ "convert", "classcpp__declarator__convertert.html#aaf3f55e56481b7bfebe79030b8a3ac12", null ],
     [ "convert_new_symbol", "classcpp__declarator__convertert.html#a3e9c1e4e3dad5949e2ec1dd907fd4dfc", null ],
     [ "enforce_rules", "classcpp__declarator__convertert.html#af65407ae6067f646eaa16c14119174f5", null ],

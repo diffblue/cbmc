@@ -1,6 +1,10 @@
 <map id="invalid_command_line_argument_exceptiont" name="invalid_command_line_argument_exceptiont">
-<area shape="rect" id="node1" title="Thrown when users pass incorrect command line arguments, for example passing no files to analysis or ..." alt="" coords="5,264,175,305"/>
-<area shape="rect" id="node2" href="$classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project." alt="" coords="188,187,373,213"/>
-<area shape="rect" id="node3" title=" " alt="" coords="52,96,139,123"/>
-<area shape="rect" id="node4" title=" " alt="" coords="26,5,165,47"/>
+<area shape="rect" id="Node000001" title="Thrown when users pass incorrect command line arguments, for example passing no files to analysis or ..." alt="" coords="5,261,175,301"/>
+<area shape="rect" id="Node000002" href="$classcprover__exception__baset.html" title="Base class for exceptions thrown in the cprover project." alt="" coords="188,185,373,210"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="242,218,135,264,133,259,240,213"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="52,95,139,120"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="95,134,90,183,90,212,92,261,86,261,85,212,85,183,89,133"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="133,123,258,182,255,187,131,128"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="26,5,165,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="98,59,98,94,93,94,93,59"/>
 </map>

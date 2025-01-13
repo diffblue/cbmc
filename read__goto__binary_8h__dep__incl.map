@@ -1,15 +1,27 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/read_goto_binary.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/read_goto_binary.h">
-<area shape="rect" id="node1" title="Read Goto Programs." alt="" coords="1371,5,1555,61"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="5,109,211,165"/>
-<area shape="rect" id="node3" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="235,117,453,158"/>
-<area shape="rect" id="node4" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="477,109,661,165"/>
-<area shape="rect" id="node5" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="686,109,925,165"/>
-<area shape="rect" id="node6" href="$goto__inspect__parse__options_8cpp.html" title=" " alt="" coords="949,109,1184,165"/>
-<area shape="rect" id="node7" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1208,109,1467,165"/>
-<area shape="rect" id="node8" href="$initialize__goto__model_8cpp.html" title="Get a Goto Program." alt="" coords="1491,109,1685,165"/>
-<area shape="rect" id="node9" href="$read__goto__binary_8cpp.html" title="Read Goto Programs." alt="" coords="1709,109,1893,165"/>
-<area shape="rect" id="node10" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1918,109,2181,165"/>
-<area shape="rect" id="node11" href="$api_8cpp.html" title=" " alt="" coords="2205,109,2389,165"/>
-<area shape="rect" id="node12" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="2413,109,2683,165"/>
-<area shape="rect" id="node13" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="2707,109,2925,165"/>
+<area shape="rect" id="Node000001" title="Read Goto Programs." alt="" coords="1352,5,1536,60"/>
+<area shape="rect" id="Node000002" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="5,108,224,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1338,38,1134,43,860,55,550,76,391,92,236,111,225,112,224,107,236,105,391,86,549,71,860,49,1134,38,1338,32"/>
+<area shape="rect" id="Node000003" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="248,108,453,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1338,40,1170,47,953,60,710,80,466,111,454,113,453,107,465,105,709,75,952,54,1170,41,1338,34"/>
+<area shape="rect" id="Node000004" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="477,115,696,155"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1339,44,1053,68,881,87,708,111,668,118,668,113,708,105,880,82,1053,63,1338,38"/>
+<area shape="rect" id="Node000005" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="720,108,904,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1339,48,1142,73,916,111,905,113,904,108,916,105,1141,68,1338,43"/>
+<area shape="rect" id="Node000006" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="929,108,1167,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1339,63,1152,110,1151,105,1338,58"/>
+<area shape="rect" id="Node000007" href="$goto__inspect__parse__options_8cpp.html" title=" " alt="" coords="1192,108,1427,163"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1399,70,1346,110,1343,106,1396,66"/>
+<area shape="rect" id="Node000008" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1451,108,1709,163"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1492,66,1546,106,1543,110,1489,70"/>
+<area shape="rect" id="Node000009" href="$initialize__goto__model_8cpp.html" title="Get a Goto Program." alt="" coords="1734,108,1927,163"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1550,59,1735,106,1733,112,1549,64"/>
+<area shape="rect" id="Node000010" href="$read__goto__binary_8cpp.html" title="Read Goto Programs." alt="" coords="1952,108,2136,163"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1550,44,1733,70,1940,105,1952,108,1951,113,1940,111,1732,75,1549,49"/>
+<area shape="rect" id="Node000011" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="2161,108,2423,163"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1550,40,1822,66,2148,105,2161,107,2160,113,2148,111,1821,71,1550,45"/>
+<area shape="rect" id="Node000012" href="$api_8cpp.html" title=" " alt="" coords="2448,108,2632,163"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1550,33,1721,39,1942,52,2189,73,2436,105,2448,107,2447,113,2436,111,2188,78,1941,57,1720,45,1550,39"/>
+<area shape="rect" id="Node000013" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="2656,108,2925,163"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1550,34,1752,41,2024,54,2333,75,2644,105,2656,107,2655,112,2644,111,2332,80,2024,59,1752,46,1549,39"/>
 </map>

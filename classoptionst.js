@@ -10,7 +10,7 @@ var classoptionst =
     [ "get_signed_int_option", "classoptionst.html#aed3e19b0f5f0805c8ce6195866f54f14", null ],
     [ "get_unsigned_int_option", "classoptionst.html#a06b66db4c5f8af288bd6bebb68011191", null ],
     [ "is_set", "classoptionst.html#a52c8fd8914e5c9b77eb2d23afe467db1", null ],
-    [ "operator=", "classoptionst.html#a7684859e6c7e005297e2f027560254b1", null ],
+    [ "operator=", "classoptionst.html#a53d9383f4159a14959df54a40770d030", null ],
     [ "output", "classoptionst.html#ad6fe03db1b49c682d978ddf3458cd9e2", null ],
     [ "set_option", "classoptionst.html#a7fce0de773f9300ee22af133039d2b30", null ],
     [ "set_option", "classoptionst.html#a0c11e226a8e950a20c95baa741ef9c35", null ],

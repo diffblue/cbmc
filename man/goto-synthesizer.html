@@ -1,144 +1,195 @@
 <h1>NAME</h1>
-<p>goto-synthesizer - Synthesize and apply loop contracts of goto binaries.</p>
+<p>goto-synthesizer - Synthesize and apply loop contracts of goto
+binaries.</p>
 <h1>SYNOPSIS</h1>
 <dl>
 <dt><strong>goto-synthesizer [-?] [-h] [--help]</strong></dt>
-<dd><p>show help</p>
+<dd>
+<p>show help</p>
 </dd>
 <dt><strong>goto-synthesizer --version</strong></dt>
-<dd><p>show version and exit</p>
+<dd>
+<p>show version and exit</p>
 </dd>
-<dt><strong>goto-synthesizer [options] <em>in</em> [<em>out</em>]</strong></dt>
-<dd><p>perform synthesis and loop-contracts transformation</p>
+<dt><strong>goto-synthesizer [options] <em>in</em>
+[<em>out</em>]</strong></dt>
+<dd>
+<p>perform synthesis and loop-contracts transformation</p>
 </dd>
 </dl>
 <h1>DESCRIPTION</h1>
-<p><strong>goto-synthesis</strong> reads a GOTO binary, performs loop-contracts synthesis and program transformation for the synthesized contracts, and then writes the resulting program as GOTO binary on disk.</p>
+<p><strong>goto-synthesis</strong> reads a GOTO binary, performs
+loop-contracts synthesis and program transformation for the synthesized
+contracts, and then writes the resulting program as GOTO binary on
+disk.</p>
 <h1>OPTIONS</h1>
 <dl>
 <dt><strong>-loop-contracts-no-unwind</strong></dt>
-<dd><p>do not unwind transformed loops after applying the synthesized loop contracts</p>
+<dd>
+<p>do not unwind transformed loops after applying the synthesized loop
+contracts</p>
 </dd>
 <dt><strong>--dump-loop-contracts</strong></dt>
-<dd><p>dump the synthesized loop contracts as JSON</p>
+<dd>
+<p>dump the synthesized loop contracts as JSON</p>
 </dd>
 <dt><strong>--json-utput</strong> <em>file</em></dt>
-<dd><p>specify the output destination of the loop-contracts JSON</p>
+<dd>
+<p>specify the output destination of the loop-contracts JSON</p>
 </dd>
 </dl>
-<h2>Accepts all of cbmc's options plus the following backend options:</h2>
+<h2>Accepts all of cbmc's options plus the following backend
+options:</h2>
 <dl>
 <dt><strong>--object-bits</strong> n</dt>
-<dd><p>number of bits used for object addresses</p>
+<dd>
+<p>number of bits used for object addresses</p>
 </dd>
 <dt><strong>--sat-solver</strong> solver</dt>
-<dd><p>use specified SAT solver</p>
+<dd>
+<p>use specified SAT solver</p>
 </dd>
 <dt><strong>--external-sat-solver</strong> cmd</dt>
-<dd><p>command to invoke SAT solver process</p>
+<dd>
+<p>command to invoke SAT solver process</p>
 </dd>
 <dt><strong>--no-sat-preprocessor</strong></dt>
-<dd><p>disable the SAT solver's simplifier</p>
+<dd>
+<p>disable the SAT solver's simplifier</p>
 </dd>
 <dt><strong>--dimacs</strong></dt>
-<dd><p>generate CNF in DIMACS format</p>
+<dd>
+<p>generate CNF in DIMACS format</p>
 </dd>
 <dt><strong>--beautify</strong></dt>
-<dd><p>beautify the counterexample (greedy heuristic)</p>
+<dd>
+<p>beautify the counterexample (greedy heuristic)</p>
 </dd>
 <dt><strong>--smt1</strong></dt>
-<dd><p>use default SMT1 solver (obsolete)</p>
+<dd>
+<p>use default SMT1 solver (obsolete)</p>
 </dd>
 <dt><strong>--smt2</strong></dt>
-<dd><p>use default SMT2 solver (Z3)</p>
+<dd>
+<p>use default SMT2 solver (Z3)</p>
 </dd>
 <dt><strong>--bitwuzla</strong></dt>
-<dd><p>use Bitwuzla</p>
+<dd>
+<p>use Bitwuzla</p>
 </dd>
 <dt><strong>--boolector</strong></dt>
-<dd><p>use Boolector</p>
+<dd>
+<p>use Boolector</p>
 </dd>
 <dt><strong>--cprover-smt2</strong></dt>
-<dd><p>use CPROVER SMT2 solver</p>
+<dd>
+<p>use CPROVER SMT2 solver</p>
 </dd>
 <dt><strong>--cvc3</strong></dt>
-<dd><p>use CVC3</p>
+<dd>
+<p>use CVC3</p>
 </dd>
 <dt><strong>--cvc4</strong></dt>
-<dd><p>use CVC4</p>
+<dd>
+<p>use CVC4</p>
 </dd>
 <dt><strong>--cvc5</strong></dt>
-<dd><p>use CVC5</p>
+<dd>
+<p>use CVC5</p>
 </dd>
 <dt><strong>--mathsat</strong></dt>
-<dd><p>use MathSAT</p>
+<dd>
+<p>use MathSAT</p>
 </dd>
 <dt><strong>--yices</strong></dt>
-<dd><p>use Yices</p>
+<dd>
+<p>use Yices</p>
 </dd>
 <dt><strong>--z3</strong></dt>
-<dd><p>use Z3</p>
+<dd>
+<p>use Z3</p>
 </dd>
 <dt><strong>--fpa</strong></dt>
-<dd><p>use theory of floating-point arithmetic</p>
+<dd>
+<p>use theory of floating-point arithmetic</p>
 </dd>
 <dt><strong>--refine</strong></dt>
-<dd><p>use refinement procedure (experimental)</p>
+<dd>
+<p>use refinement procedure (experimental)</p>
 </dd>
 <dt><strong>--refine-arrays</strong></dt>
-<dd><p>use refinement for arrays only</p>
+<dd>
+<p>use refinement for arrays only</p>
 </dd>
 <dt><strong>--refine-arithmetic</strong></dt>
-<dd><p>refinement of arithmetic expressions only</p>
+<dd>
+<p>refinement of arithmetic expressions only</p>
 </dd>
 <dt><strong>--max-node-refinement</strong></dt>
-<dd><p>maximum refinement iterations for arithmetic expressions</p>
+<dd>
+<p>maximum refinement iterations for arithmetic expressions</p>
 </dd>
 <dt><strong>--incremental-smt2-solver</strong> <em>cmd</em></dt>
-<dd><p>Use the incremental SMT backend where <em>cmd</em> is the command to invoke the SMT solver of choice.<br />
+<dd>
+<p>Use the incremental SMT backend where <em>cmd</em> is the command to
+invoke the SMT solver of choice.<br />
 Example invocations:<br />
 --incremental-smt2-solver 'z3 -smt2 -in' (use the Z3 solver).<br />
---incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' (use the CVC5 solver).</p>
+--incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' (use the
+CVC5 solver).</p>
 </dd>
 </dl>
 <p>Note that:<br />
-The solver name must be in the "PATH" or be an executable with full path.<br />
-The SMT solver should accept incremental SMTlib v2.6 formatted input from the stdin.<br />
+The solver name must be in the "PATH" or be an executable with full
+path.<br />
+The SMT solver should accept incremental SMTlib v2.6 formatted input
+from the stdin.<br />
 The SMT solver should support the QF_AUFBV logic.</p>
 <dl>
 <dt><strong>--outfile</strong> filename</dt>
-<dd><p>output formula to given file</p>
+<dd>
+<p>output formula to given file</p>
 </dd>
 <dt><strong>--dump-smt-formula</strong> filename</dt>
-<dd><p>output smt incremental formula to the given file</p>
+<dd>
+<p>output smt incremental formula to the given file</p>
 </dd>
 <dt><strong>--write-solver-stats-to</strong> json-file</dt>
-<dd><p>collect the solver query complexity</p>
+<dd>
+<p>collect the solver query complexity</p>
 </dd>
 <dt><strong>--arrays-uf-never</strong></dt>
-<dd><p>never turn arrays into uninterpreted functions</p>
+<dd>
+<p>never turn arrays into uninterpreted functions</p>
 </dd>
 <dt><strong>--arrays-uf-always</strong></dt>
-<dd><p>always turn arrays into uninterpreted functions</p>
+<dd>
+<p>always turn arrays into uninterpreted functions</p>
 </dd>
 </dl>
 <h2>User-interface options:</h2>
 <dl>
 <dt><strong>--xml-ui</strong></dt>
-<dd><p>use XML-formatted output</p>
+<dd>
+<p>use XML-formatted output</p>
 </dd>
 <dt><strong>--json-ui</strong></dt>
-<dd><p>use JSON-formatted output</p>
+<dd>
+<p>use JSON-formatted output</p>
 </dd>
 <dt><strong>--verbosity</strong> <em>n</em></dt>
-<dd><p>verbosity level</p>
+<dd>
+<p>verbosity level</p>
 </dd>
 </dl>
 <h1>ENVIRONMENT</h1>
-<p>All tools honor the TMPDIR environment variable when generating temporary files and directories.</p>
+<p>All tools honor the TMPDIR environment variable when generating
+temporary files and directories.</p>
 <h1>BUGS</h1>
-<p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
+<p>If you encounter a problem please create an issue at
+<strong>https://github.com/diffblue/cbmc/issues</strong></p>
 <h1>SEE ALSO</h1>
-<p><strong>cbmc</strong>(1), <strong>goto-cc</strong>(1) <strong>goto-instrument</strong>(1)</p>
+<p><strong>cbmc</strong>(1), <strong>goto-cc</strong>(1)
+<strong>goto-instrument</strong>(1)</p>
 <h1>COPYRIGHT</h1>
 <p>2022, Qinheping Hu</p>

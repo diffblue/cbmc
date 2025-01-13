@@ -1,18 +1,40 @@
 <map id="cover_location_instrumentert" name="cover_location_instrumentert">
-<area shape="rect" id="node1" title="Basic block coverage instrumenter." alt="" coords="1644,171,1857,197"/>
-<area shape="rect" id="node2" href="$classcover__instrumenter__baset.html" title="Base class for goto program coverage instrumenters." alt="" coords="1445,163,1595,205"/>
-<area shape="rect" id="node3" href="$classgoal__filterst.html" title="A collection of goal filters to be applied in conjunction." alt="" coords="1219,103,1318,129"/>
-<area shape="rect" id="node4" title=" " alt="" coords="868,70,1068,111"/>
-<area shape="rect" id="node5" title=" " alt="" coords="516,70,679,111"/>
-<area shape="rect" id="node6" title=" " alt="" coords="163,73,320,100"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,88,44,115"/>
-<area shape="rect" id="node8" title=" " alt="" coords="356,12,485,39"/>
-<area shape="rect" id="node14" title=" " alt="" coords="157,193,325,220"/>
-<area shape="rect" id="node16" title=" " alt="" coords="165,127,317,169"/>
-<area shape="rect" id="node9" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1217,171,1320,197"/>
-<area shape="rect" id="node10" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="898,141,1038,168"/>
-<area shape="rect" id="node11" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="891,192,1045,219"/>
-<area shape="rect" id="node12" title=" " alt="" coords="521,199,674,241"/>
-<area shape="rect" id="node13" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="205,259,277,285"/>
-<area shape="rect" id="node15" title=" " alt="" coords="5,224,44,251"/>
+<area shape="rect" id="Node000001" title="Basic block coverage instrumenter." alt="" coords="1644,119,1857,145"/>
+<area shape="rect" id="Node000002" href="$classcover__instrumenter__baset.html" title="Base class for goto program coverage instrumenters." alt="" coords="1445,112,1595,152"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1608,129,1644,129,1644,135,1608,135"/>
+<area shape="rect" id="Node000003" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="205,41,277,66"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="291,46,428,37,596,32,1270,32,1334,40,1395,60,1449,85,1490,110,1487,114,1446,90,1393,65,1333,45,1270,37,596,37,428,42,292,52"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="521,101,674,141"/>
+<area shape="poly" id="edge10_Node000010_Node000003" title=" " alt="" coords="291,65,350,80,521,109,520,114,349,85,290,70"/>
+<area shape="rect" id="Node000004" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1217,119,1320,145"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1334,129,1445,129,1445,135,1334,135"/>
+<area shape="rect" id="Node000005" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="898,101,1038,126"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1052,116,1217,126,1217,132,1051,121"/>
+<area shape="rect" id="Node000006" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="891,150,1045,175"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="1058,168,1125,168,1193,160,1243,142,1244,147,1194,165,1125,173,1058,173"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="165,163,317,203"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="331,178,891,162,891,167,331,183"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,86,44,111"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="57,114,69,120,174,160,173,165,67,125,55,119"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="157,113,325,138"/>
+<area shape="poly" id="edge12_Node000011_Node000008" title=" " alt="" coords="58,97,134,103,180,110,179,115,133,108,58,102"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="5,222,44,247"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="57,225,133,208,164,200,166,205,134,213,58,230"/>
+<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="46,210,67,194,99,179,132,166,156,148,188,136,190,141,159,153,135,170,101,184,69,198,49,215"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="163,295,320,321"/>
+<area shape="poly" id="edge19_Node000016_Node000009" title=" " alt="" coords="37,259,50,281,69,299,91,309,114,315,163,317,162,323,114,320,89,314,67,304,46,285,33,262"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="356,245,485,270"/>
+<area shape="poly" id="edge21_Node000017_Node000009" title=" " alt="" coords="58,241,68,243,145,251,223,255,356,257,355,262,223,261,145,256,68,248,57,246"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="688,129,891,151,890,157,687,134"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="339,126,492,125,520,124,521,129,492,131,339,131"/>
+<area shape="rect" id="Node000012" href="$classgoal__filterst.html" title="A collection of goal filters to be applied in conjunction." alt="" coords="1219,191,1318,217"/>
+<area shape="poly" id="edge14_Node000002_Node000012" title=" " alt="" coords="1326,185,1449,149,1450,155,1328,190"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="868,237,1068,277"/>
+<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="1081,235,1219,210,1220,215,1082,240"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="516,305,679,345"/>
+<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="692,312,843,288,898,275,900,280,845,293,693,318"/>
+<area shape="rect" id="Node000015" href="$classgoal__filter__baset.html" title="Base class for filtering goals." alt="" coords="176,345,307,370"/>
+<area shape="poly" id="edge17_Node000014_Node000015" title=" " alt="" coords="320,351,492,337,515,335,516,340,492,343,320,356"/>
+<area shape="poly" id="edge18_Node000014_Node000016" title=" " alt="" coords="334,310,516,319,515,324,334,315"/>
+<area shape="poly" id="edge20_Node000013_Node000017" title=" " alt="" coords="499,255,868,255,868,260,499,260"/>
 </map>

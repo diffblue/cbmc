@@ -1,8 +1,13 @@
 <map id="enumerator_baset" name="enumerator_baset">
-<area shape="rect" id="node1" title="A base class for expression enumerators." alt="" coords="5,81,147,108"/>
-<area shape="rect" id="node2" href="$classalternatives__enumeratort.html" title="Enumerators that enumerates expressions in the union of enumerated expressions of sub&#45;enumerators." alt="" coords="195,5,383,32"/>
-<area shape="rect" id="node3" href="$classleaf__enumeratort.html" title="Enumerator that enumerates leaf expressions from a given list." alt="" coords="221,56,356,83"/>
-<area shape="rect" id="node4" href="$classnon__leaf__enumeratort.html" title="Non&#45;leaf enumerator enumerates expressions of form f(a_1, a_2, ..., a_n) where a_i&#39;s are sub&#45;expressi..." alt="" coords="205,107,372,133"/>
-<area shape="rect" id="node6" href="$classrecursive__enumerator__placeholdert.html" title="Placeholders for actual enumerators, which represent nonterminals." alt="" coords="206,158,371,199"/>
-<area shape="rect" id="node5" href="$classbinary__functional__enumeratort.html" title="Enumerator that enumerates binary functional expressions." alt="" coords="431,107,653,133"/>
+<area shape="rect" id="Node000001" title="A base class for expression enumerators." alt="" coords="5,80,147,105"/>
+<area shape="rect" id="Node000002" href="$classalternatives__enumeratort.html" title="Enumerators that enumerates expressions in the union of enumerated expressions of sub&#45;enumerators." alt="" coords="195,5,383,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,72,194,39,232,28,233,33,196,45,117,76"/>
+<area shape="rect" id="Node000003" href="$classleaf__enumeratort.html" title="Enumerator that enumerates leaf expressions from a given list." alt="" coords="221,55,356,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,80,221,73,222,78,161,85"/>
+<area shape="rect" id="Node000004" href="$classnon__leaf__enumeratort.html" title="Non&#45;leaf enumerator enumerates expressions of form f(a_1, a_2, ..., a_n) where a_i&#39;s are sub&#45;expressi..." alt="" coords="205,104,372,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="160,99,206,105,205,110,160,105"/>
+<area shape="rect" id="Node000006" href="$classrecursive__enumerator__placeholdert.html" title="Placeholders for actual enumerators, which represent nonterminals." alt="" coords="206,154,371,194"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="121,108,196,138,231,151,229,156,194,143,119,113"/>
+<area shape="rect" id="Node000005" href="$classbinary__functional__enumeratort.html" title="Enumerator that enumerates binary functional expressions." alt="" coords="431,104,653,129"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="385,114,431,114,431,119,385,119"/>
 </map>

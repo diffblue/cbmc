@@ -1,5 +1,7 @@
 <map id="dep_nodet" name="dep_nodet">
-<area shape="rect" id="node1" title=" " alt="" coords="61,171,151,197"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="5,95,207,121"/>
-<area shape="rect" id="node3" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="35,5,177,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="61,168,151,193"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="5,93,207,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,133,109,168,103,168,103,133"/>
+<area shape="rect" id="Node000003" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="35,5,177,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,45,109,93,103,93,103,45"/>
 </map>

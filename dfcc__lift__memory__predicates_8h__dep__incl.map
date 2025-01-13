@@ -1,11 +1,20 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_lift_memory_predicates.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_lift_memory_predicates.h">
-<area shape="rect" id="node1" title="Collects all user&#45;defined predicates that call functions is_fresh, pointer_in_range,..." alt="" coords="296,5,523,76"/>
-<area shape="rect" id="node2" href="$dfcc_8cpp.html" title=" " alt="" coords="21,243,219,313"/>
-<area shape="rect" id="node3" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="157,131,397,187"/>
-<area shape="rect" id="node8" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="422,124,663,195"/>
-<area shape="rect" id="node9" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="688,124,891,195"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,250,485,306"/>
-<area shape="rect" id="node5" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,361,240,417"/>
-<area shape="rect" id="node6" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,361,464,417"/>
-<area shape="rect" id="node7" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,361,747,417"/>
+<area shape="rect" id="Node000001" title="Collects all user&#45;defined predicates that call functions is_fresh, pointer_in_range,..." alt="" coords="296,5,523,75"/>
+<area shape="rect" id="Node000002" href="$dfcc_8cpp.html" title=" " alt="" coords="21,240,219,309"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="283,55,246,65,209,79,176,99,147,124,131,151,122,181,119,212,119,240,114,240,113,212,117,180,126,149,143,121,173,94,207,74,244,59,282,49"/>
+<area shape="rect" id="Node000003" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="157,130,397,185"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="362,86,309,132,306,128,359,82"/>
+<area shape="rect" id="Node000008" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="422,123,663,192"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="460,82,505,120,502,124,457,86"/>
+<area shape="rect" id="Node000009" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="688,123,891,192"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="534,76,688,123,687,128,533,81"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="232,195,168,242,165,237,229,190"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,247,485,302"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="307,194,346,245,342,249,303,197"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,357,240,412"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="294,310,183,360,180,355,292,305"/>
+<area shape="rect" id="Node000006" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,357,464,412"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="367,316,367,357,361,357,361,316"/>
+<area shape="rect" id="Node000007" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,357,747,412"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="439,305,557,355,555,360,437,310"/>
 </map>

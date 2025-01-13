@@ -1,8 +1,13 @@
 <map id="trace_map_storaget" name="trace_map_storaget">
-<area shape="rect" id="node1" title=" " alt="" coords="792,41,944,68"/>
-<area shape="rect" id="node2" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="519,5,653,32"/>
-<area shape="rect" id="node3" title=" " alt="" coords="501,57,671,127"/>
-<area shape="rect" id="node4" title=" " alt="" coords="157,79,292,105"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,53,44,80"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,104,44,131"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="792,41,944,67"/>
+<area shape="rect" id="Node000002" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="519,5,653,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="667,26,792,42,791,47,666,31"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="501,55,671,125"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="684,75,791,61,792,66,684,80"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="157,77,292,103"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="306,87,501,87,501,93,306,93"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,52,44,77"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="58,66,157,79,157,84,57,71"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,101,44,127"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="58,111,133,106,168,100,169,105,134,111,58,116"/>
 </map>

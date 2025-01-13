@@ -1,6 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="5,35,139,61"/>
-<area shape="rect" id="node2" href="$classtrace__map__storaget.html" title=" " alt="" coords="187,35,339,61"/>
-<area shape="rect" id="node3" href="$classhistory__sensitive__storaget.html" title=" " alt="" coords="387,5,581,32"/>
-<area shape="rect" id="node4" href="$classlocation__sensitive__storaget.html" title="The most conventional storage; one domain per location." alt="" coords="414,57,554,98"/>
+<area shape="rect" id="Node000000" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="5,35,139,60"/>
+<area shape="rect" id="Node000001" href="$classtrace__map__storaget.html" title=" " alt="" coords="187,35,339,60"/>
+<area shape="poly" id="edge103_Node000000_Node000001" title=" " alt="" coords="153,45,186,45,186,50,153,50"/>
+<area shape="rect" id="Node000002" href="$classhistory__sensitive__storaget.html" title=" " alt="" coords="387,5,581,31"/>
+<area shape="poly" id="edge104_Node000001_Node000002" title=" " alt="" coords="352,33,388,28,388,33,353,38"/>
+<area shape="rect" id="Node000003" href="$classlocation__sensitive__storaget.html" title="The most conventional storage; one domain per location." alt="" coords="414,55,554,95"/>
+<area shape="poly" id="edge105_Node000001_Node000003" title=" " alt="" coords="353,56,414,64,414,69,352,61"/>
 </map>

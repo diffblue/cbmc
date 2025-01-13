@@ -1,13 +1,13 @@
 var annotated_dup =
 [
     [ "detail", "namespacedetail.html", [
-      [ "expr_try_dynamic_cast_return_typet", "structdetail_1_1expr__try__dynamic__cast__return__typet.html", "structdetail_1_1expr__try__dynamic__cast__return__typet" ],
+      [ "always_falset", "structdetail_1_1always__falset.html", null ],
       [ "expr_dynamic_cast_return_typet", "structdetail_1_1expr__dynamic__cast__return__typet.html", "structdetail_1_1expr__dynamic__cast__return__typet" ],
-      [ "always_falset", "structdetail_1_1always__falset.html", null ]
+      [ "expr_try_dynamic_cast_return_typet", "structdetail_1_1expr__try__dynamic__cast__return__typet.html", "structdetail_1_1expr__try__dynamic__cast__return__typet" ]
     ] ],
     [ "require_goto_statements", "namespacerequire__goto__statements.html", [
-      [ "pointer_assignment_locationt", "structrequire__goto__statements_1_1pointer__assignment__locationt.html", "structrequire__goto__statements_1_1pointer__assignment__locationt" ],
-      [ "no_decl_found_exceptiont", "classrequire__goto__statements_1_1no__decl__found__exceptiont.html", "classrequire__goto__statements_1_1no__decl__found__exceptiont" ]
+      [ "no_decl_found_exceptiont", "classrequire__goto__statements_1_1no__decl__found__exceptiont.html", "classrequire__goto__statements_1_1no__decl__found__exceptiont" ],
+      [ "pointer_assignment_locationt", "structrequire__goto__statements_1_1pointer__assignment__locationt.html", "structrequire__goto__statements_1_1pointer__assignment__locationt" ]
     ] ],
     [ "require_parse_tree", "namespacerequire__parse__tree.html", [
       [ "expected_instructiont", "structrequire__parse__tree_1_1expected__instructiont.html", "structrequire__parse__tree_1_1expected__instructiont" ]
@@ -15,10 +15,10 @@ var annotated_dup =
     [ "require_type", "namespacerequire__type.html", [
       [ "expected_type_argumentt", "structrequire__type_1_1expected__type__argumentt.html", "structrequire__type_1_1expected__type__argumentt" ]
     ] ],
-    [ "std", null, [
+    [ "std", "namespacestd.html", [
+      [ "hash< dstringt >", "structstd_1_1hash_3_01dstringt_01_4.html", "structstd_1_1hash_3_01dstringt_01_4" ],
       [ "hash< solver_hardnesst::hardness_ssa_keyt >", "structstd_1_1hash_3_01solver__hardnesst_1_1hardness__ssa__keyt_01_4.html", "structstd_1_1hash_3_01solver__hardnesst_1_1hardness__ssa__keyt_01_4" ],
       [ "hash< string_not_contains_constraintt >", "structstd_1_1hash_3_01string__not__contains__constraintt_01_4.html", "structstd_1_1hash_3_01string__not__contains__constraintt_01_4" ],
-      [ "hash< dstringt >", "structstd_1_1hash_3_01dstringt_01_4.html", "structstd_1_1hash_3_01dstringt_01_4" ],
       [ "hash<::symbol_exprt >", "structstd_1_1hash_3_1_1symbol__exprt_01_4.html", "structstd_1_1hash_3_1_1symbol__exprt_01_4" ]
     ] ],
     [ "__CPROVER_cegis_instructiont", "struct_____c_p_r_o_v_e_r__cegis__instructiont.html", "struct_____c_p_r_o_v_e_r__cegis__instructiont" ],
@@ -137,6 +137,8 @@ var annotated_dup =
     [ "binding_exprt", "classbinding__exprt.html", "classbinding__exprt" ],
     [ "bit_cast_exprt", "classbit__cast__exprt.html", "classbit__cast__exprt" ],
     [ "bitand_exprt", "classbitand__exprt.html", "classbitand__exprt" ],
+    [ "bitnand_exprt", "classbitnand__exprt.html", "classbitnand__exprt" ],
+    [ "bitnor_exprt", "classbitnor__exprt.html", "classbitnor__exprt" ],
     [ "bitnot_exprt", "classbitnot__exprt.html", "classbitnot__exprt" ],
     [ "bitor_exprt", "classbitor__exprt.html", "classbitor__exprt" ],
     [ "bitreverse_exprt", "classbitreverse__exprt.html", "classbitreverse__exprt" ],
@@ -502,6 +504,8 @@ var annotated_dup =
     [ "float_approximationt", "classfloat__approximationt.html", "classfloat__approximationt" ],
     [ "float_bvt", "classfloat__bvt.html", "classfloat__bvt" ],
     [ "float_utilst", "classfloat__utilst.html", "classfloat__utilst" ],
+    [ "floatbv_mod_exprt", "classfloatbv__mod__exprt.html", "classfloatbv__mod__exprt" ],
+    [ "floatbv_rem_exprt", "classfloatbv__rem__exprt.html", "classfloatbv__rem__exprt" ],
     [ "floatbv_typecast_exprt", "classfloatbv__typecast__exprt.html", "classfloatbv__typecast__exprt" ],
     [ "floatbv_typet", "classfloatbv__typet.html", "classfloatbv__typet" ],
     [ "flow_insensitive_abstract_domain_baset", "classflow__insensitive__abstract__domain__baset.html", "classflow__insensitive__abstract__domain__baset" ],
@@ -552,6 +556,7 @@ var annotated_dup =
     [ "generate_function_bodiest", "classgenerate__function__bodiest.html", "classgenerate__function__bodiest" ],
     [ "generic_parameter_specialization_map_keyst", "classgeneric__parameter__specialization__map__keyst.html", "classgeneric__parameter__specialization__map__keyst" ],
     [ "generic_parameter_specialization_mapt", "classgeneric__parameter__specialization__mapt.html", "classgeneric__parameter__specialization__mapt" ],
+    [ "get_or_create_reference_resultt", "structget__or__create__reference__resultt.html", "structget__or__create__reference__resultt" ],
     [ "get_typet", "structget__typet.html", "structget__typet" ],
     [ "get_virtual_calleest", "classget__virtual__calleest.html", "classget__virtual__calleest" ],
     [ "global_may_alias_analysist", "classglobal__may__alias__analysist.html", "classglobal__may__alias__analysist" ],
@@ -873,6 +878,7 @@ var annotated_dup =
     [ "named_term_exprt", "classnamed__term__exprt.html", "classnamed__term__exprt" ],
     [ "namespace_baset", "classnamespace__baset.html", "classnamespace__baset" ],
     [ "namespacet", "classnamespacet.html", "classnamespacet" ],
+    [ "nand_exprt", "classnand__exprt.html", "classnand__exprt" ],
     [ "natural_loops_templatet", "classnatural__loops__templatet.html", "classnatural__loops__templatet" ],
     [ "natural_loopst", "classnatural__loopst.html", null ],
     [ "natural_typet", "classnatural__typet.html", "classnatural__typet" ],
@@ -886,6 +892,7 @@ var annotated_dup =
     [ "nondet_padding_exprt", "classnondet__padding__exprt.html", "classnondet__padding__exprt" ],
     [ "nondet_symbol_exprt", "classnondet__symbol__exprt.html", "classnondet__symbol__exprt" ],
     [ "nondet_volatilet", "classnondet__volatilet.html", "classnondet__volatilet" ],
+    [ "nor_exprt", "classnor__exprt.html", "classnor__exprt" ],
     [ "not_exprt", "classnot__exprt.html", "classnot__exprt" ],
     [ "notequal_exprt", "classnotequal__exprt.html", "classnotequal__exprt" ],
     [ "null_message_handlert", "classnull__message__handlert.html", "classnull__message__handlert" ],
@@ -997,7 +1004,6 @@ var annotated_dup =
     [ "recursive_initialization_configt", "structrecursive__initialization__configt.html", "structrecursive__initialization__configt" ],
     [ "recursive_initializationt", "classrecursive__initializationt.html", "classrecursive__initializationt" ],
     [ "ref_count_ift", "structref__count__ift.html", null ],
-    [ "ref_count_ift< true >", "structref__count__ift_3_01true_01_4.html", "structref__count__ift_3_01true_01_4" ],
     [ "ref_expr_set_dt", "structref__expr__set__dt.html", "structref__expr__set__dt" ],
     [ "ref_expr_sett", "classref__expr__sett.html", "classref__expr__sett" ],
     [ "reference_allocationt", "classreference__allocationt.html", "classreference__allocationt" ],
@@ -1395,6 +1401,7 @@ var annotated_dup =
     [ "xml_parse_treet", "classxml__parse__treet.html", "classxml__parse__treet" ],
     [ "xml_parsert", "classxml__parsert.html", "classxml__parsert" ],
     [ "xmlt", "classxmlt.html", "classxmlt" ],
+    [ "xnor_exprt", "classxnor__exprt.html", "classxnor__exprt" ],
     [ "xor_exprt", "classxor__exprt.html", "classxor__exprt" ],
     [ "zero_extend_exprt", "classzero__extend__exprt.html", "classzero__extend__exprt" ],
     [ "zip_iteratort", "structzip__iteratort.html", "structzip__iteratort" ]

@@ -8,8 +8,8 @@ var classctokenitt =
     [ "operator!=", "classctokenitt.html#ad7c5fdeaa191eb5d06e5dd1d4ea80dff", null ],
     [ "operator*", "classctokenitt.html#aa8e5a0a26c9b46c8ce8027533b22ba05", null ],
     [ "operator++", "classctokenitt.html#a88c9d9c732fcff6eceab338d27880398", null ],
-    [ "operator+=", "classctokenitt.html#a6b9ad37e6c5d5478903a8bef9f54faa9", null ],
-    [ "operator->", "classctokenitt.html#a1c21b3467b0d42358304a29cf88c7e2a", null ],
+    [ "operator+=", "classctokenitt.html#a6208944fcb76eb417980e17939a30026", null ],
+    [ "operator->", "classctokenitt.html#a36964e92cbc23176959d09ae1eafca3d", null ],
     [ "pos", "classctokenitt.html#a44ec327de705d89603ca321d1d786c83", null ],
     [ "tokens", "classctokenitt.html#ae5a83cb6e19765256327cb8c24a7c83d", null ]
 ];

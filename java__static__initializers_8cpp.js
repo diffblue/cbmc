@@ -7,7 +7,7 @@ var java__static__initializers_8cpp =
     ] ],
     [ "add_new_variable_symbol", "java__static__initializers_8cpp.html#aedaa87937b5b43408909cf2381212af7", null ],
     [ "advance_to_next_key", "java__static__initializers_8cpp.html#ac717242b6f83a164e6c1fea7e47657f3", null ],
-    [ "class_to_declared_symbols", "java__static__initializers_8cpp.html#ac07d176c89c0eed7b32a72bd964a1b97", null ],
+    [ "class_to_declared_symbols", "java__static__initializers_8cpp.html#a098b778a804955290e0716ce78c1f2d9", null ],
     [ "clinit_already_run_variable_name", "java__static__initializers_8cpp.html#add72a7fd88fb215993ce9b0f55e8d406", null ],
     [ "clinit_function_name", "java__static__initializers_8cpp.html#ad9adedf694947e9d8032ba81e952a01c", null ],
     [ "clinit_local_init_complete_var_name", "java__static__initializers_8cpp.html#ae729f6d8610ce60b80ad8ece4ab95c67", null ],

@@ -1,8 +1,13 @@
 <map id="variable_sensitivity_dependence_grapht" name="variable_sensitivity_dependence_grapht">
-<area shape="rect" id="node1" title=" " alt="" coords="130,247,287,288"/>
-<area shape="rect" id="node2" href="$classai__three__way__merget.html" title=" " alt="" coords="30,171,193,197"/>
-<area shape="rect" id="node3" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="5,81,217,108"/>
-<area shape="rect" id="node4" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="73,5,150,32"/>
-<area shape="rect" id="node5" href="$classgrapht.html" title=" " alt="" coords="217,171,401,197"/>
-<area shape="rect" id="node6" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="257,81,361,108"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="130,243,287,283"/>
+<area shape="rect" id="Node000002" href="$classai__three__way__merget.html" title=" " alt="" coords="30,168,193,193"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,200,187,241,184,245,134,204"/>
+<area shape="rect" id="Node000003" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="5,80,217,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,119,114,167,109,167,109,119"/>
+<area shape="rect" id="Node000004" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="73,5,150,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="114,45,114,80,109,80,109,45"/>
+<area shape="rect" id="Node000005" href="$classgrapht.html" title=" " alt="" coords="217,168,401,193"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="285,204,234,245,231,241,282,200"/>
+<area shape="rect" id="Node000006" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="257,80,361,105"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="311,119,311,167,306,167,306,119"/>
 </map>

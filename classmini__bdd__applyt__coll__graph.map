@@ -1,17 +1,37 @@
 <map id="mini_bdd_applyt" name="mini_bdd_applyt">
-<area shape="rect" id="node1" title=" " alt="" coords="790,209,921,236"/>
-<area shape="rect" id="node2" title=" " alt="" coords="379,169,542,225"/>
-<area shape="rect" id="node3" href="$classmini__bddt.html" title=" " alt="" coords="29,95,116,121"/>
-<area shape="rect" id="node4" href="$classmini__bdd__nodet.html" title=" " alt="" coords="397,119,524,145"/>
-<area shape="rect" id="node5" href="$classmini__bdd__mgrt.html" title=" " alt="" coords="1084,177,1204,204"/>
-<area shape="rect" id="node6" title=" " alt="" coords="764,263,947,305"/>
-<area shape="rect" id="node9" title=" " alt="" coords="783,81,928,122"/>
-<area shape="rect" id="node7" href="$structmini__bdd__mgrt_1_1reverse__keyt.html" title=" " alt="" coords="355,251,567,277"/>
-<area shape="rect" id="node8" title=" " alt="" coords="5,291,140,317"/>
-<area shape="rect" id="node10" title=" " alt="" coords="407,61,515,88"/>
-<area shape="rect" id="node11" title=" " alt="" coords="772,371,939,413"/>
-<area shape="rect" id="node12" href="$structmini__bdd__mgrt_1_1var__table__entryt.html" title=" " alt="" coords="386,430,535,471"/>
-<area shape="rect" id="node13" title=" " alt="" coords="396,379,525,405"/>
-<area shape="rect" id="node14" title=" " alt="" coords="775,462,935,503"/>
-<area shape="rect" id="node15" title=" " alt="" coords="399,496,522,523"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="790,437,921,462"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="379,419,542,474"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="556,445,591,445,790,446,790,452,591,451,556,450"/>
+<area shape="rect" id="Node000003" href="$classmini__bddt.html" title=" " alt="" coords="29,290,116,315"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,320,165,347,277,389,380,421,378,427,275,394,163,352,107,324"/>
+<area shape="rect" id="Node000004" href="$classmini__bdd__nodet.html" title=" " alt="" coords="397,290,524,315"/>
+<area shape="poly" id="edge19_Node000004_Node000003" title=" " alt="" coords="130,300,397,300,397,305,130,305"/>
+<area shape="rect" id="Node000005" href="$classmini__bdd__mgrt.html" title=" " alt="" coords="1084,237,1204,262"/>
+<area shape="poly" id="edge11_Node000005_Node000003" title=" " alt="" coords="91,278,132,231,193,172,269,115,310,91,354,72,440,46,516,33,584,31,649,39,713,53,782,73,947,121,1007,136,1032,145,1062,162,1105,199,1135,235,1131,238,1101,203,1058,166,1029,150,1005,141,946,127,781,78,712,58,648,44,584,37,516,38,442,51,356,77,313,96,272,119,197,176,136,234,95,281"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="384,320,331,327,247,332,164,327,116,317,117,312,164,321,247,327,330,321,383,315"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="783,136,928,176"/>
+<area shape="poly" id="edge9_Node000012_Node000004" title=" " alt="" coords="536,283,565,265,573,253,576,242,579,229,589,217,609,204,627,197,661,193,696,193,739,188,792,174,793,179,741,193,697,199,661,198,628,202,611,209,592,221,584,231,581,243,578,256,568,269,538,287"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="764,488,947,528"/>
+<area shape="poly" id="edge14_Node000014_Node000004" title=" " alt="" coords="504,318,591,351,635,358,671,358,706,363,724,372,742,386,751,397,755,409,755,431,756,452,759,462,766,473,782,486,779,490,762,476,754,465,750,453,750,431,749,410,746,400,738,390,721,376,704,368,671,363,634,363,590,356,502,323"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="775,327,935,367"/>
+<area shape="poly" id="edge17_Node000018_Node000004" title=" " alt="" coords="538,309,776,335,775,340,537,314"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1070,259,947,269,525,301,524,296,946,264,1070,253"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="772,200,939,240"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="953,227,1084,241,1083,246,953,233"/>
+<area shape="rect" id="Node000007" href="$structmini__bdd__mgrt_1_1var__table__entryt.html" title=" " alt="" coords="386,215,535,255"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="549,234,641,234,740,231,772,228,772,233,740,236,641,239,549,239"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="396,135,525,161"/>
+<area shape="poly" id="edge7_Node000006_Node000010" title=" " alt="" coords="539,143,637,149,690,157,741,171,754,178,765,186,793,198,791,202,763,190,751,182,739,176,688,163,636,154,539,148"/>
+<area shape="poly" id="edge8_Node000005_Node000012" title=" " alt="" coords="942,174,1061,209,1118,234,1116,239,1059,215,941,179"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="407,86,515,111"/>
+<area shape="poly" id="edge10_Node000012_Node000013" title=" " alt="" coords="529,100,629,110,740,125,783,134,782,139,740,131,628,115,528,106"/>
+<area shape="poly" id="edge12_Node000005_Node000014" title=" " alt="" coords="933,480,945,472,978,448,1010,420,1064,359,1107,302,1133,261,1137,264,1111,305,1069,362,1013,423,982,452,948,477,936,484"/>
+<area shape="rect" id="Node000015" href="$structmini__bdd__mgrt_1_1reverse__keyt.html" title=" " alt="" coords="355,498,567,523"/>
+<area shape="poly" id="edge13_Node000014_Node000015" title=" " alt="" coords="581,507,764,506,764,511,581,513"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="5,515,140,541"/>
+<area shape="poly" id="edge20_Node000002_Node000016" title=" " alt="" coords="147,510,379,461,380,466,148,515"/>
+<area shape="poly" id="edge15_Node000014_Node000016" title=" " alt="" coords="154,540,239,552,342,563,454,567,566,563,676,547,775,525,776,531,677,552,567,568,454,573,342,568,238,557,153,545"/>
+<area shape="poly" id="edge16_Node000005_Node000018" title=" " alt="" coords="948,338,1004,327,1059,310,1098,286,1128,260,1132,264,1101,290,1061,314,1006,333,949,343"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="399,370,522,395"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="527,395,574,403,628,408,684,408,739,400,783,385,822,364,824,369,785,389,741,405,685,413,628,413,573,408,526,401"/>
 </map>

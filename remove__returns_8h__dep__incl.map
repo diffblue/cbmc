@@ -1,11 +1,19 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_returns.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_returns.h">
-<area shape="rect" id="node1" title="Replace function returns by assignments to global variables." alt="" coords="831,5,1015,61"/>
-<area shape="rect" id="node2" href="$static__simplifier_8cpp.html" title=" " alt="" coords="5,109,189,165"/>
-<area shape="rect" id="node3" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="213,109,472,165"/>
-<area shape="rect" id="node4" href="$replace__calls_8cpp.html" title="Replace calls Replaces calls to given functions with calls to other given functions." alt="" coords="497,109,690,165"/>
-<area shape="rect" id="node5" href="$process__goto__program_8cpp.html" title="Get a Goto Program." alt="" coords="714,109,915,165"/>
-<area shape="rect" id="node6" href="$remove__returns_8cpp.html" title="Replace function returns by assignments to global variables." alt="" coords="940,109,1124,165"/>
-<area shape="rect" id="node7" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="1148,109,1359,165"/>
-<area shape="rect" id="node8" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1383,109,1575,165"/>
-<area shape="rect" id="node9" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1599,109,1783,165"/>
+<area shape="rect" id="Node000001" title="Replace function returns by assignments to global variables." alt="" coords="787,5,971,60"/>
+<area shape="rect" id="Node000002" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="5,108,216,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="774,45,524,70,376,89,228,111,217,113,216,107,228,105,375,83,524,65,773,40"/>
+<area shape="rect" id="Node000003" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="240,108,432,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="773,53,618,78,445,111,433,113,432,108,443,105,617,73,773,47"/>
+<area shape="rect" id="Node000004" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="456,108,640,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="781,66,635,110,633,105,779,61"/>
+<area shape="rect" id="Node000005" href="$static__simplifier_8cpp.html" title=" " alt="" coords="664,108,848,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="838,71,790,110,786,106,834,67"/>
+<area shape="rect" id="Node000006" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="872,108,1131,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="923,67,971,106,968,110,920,71"/>
+<area shape="rect" id="Node000007" href="$replace__calls_8cpp.html" title="Replace calls Replaces calls to given functions with calls to other given functions." alt="" coords="1155,108,1349,163"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="985,60,1156,105,1154,111,983,65"/>
+<area shape="rect" id="Node000008" href="$process__goto__program_8cpp.html" title="Get a Goto Program." alt="" coords="1373,108,1574,163"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="985,45,1162,71,1362,105,1373,108,1372,113,1361,111,1161,76,984,51"/>
+<area shape="rect" id="Node000009" href="$remove__returns_8cpp.html" title="Replace function returns by assignments to global variables." alt="" coords="1599,108,1783,163"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="985,38,1258,61,1423,80,1587,105,1599,108,1598,113,1586,111,1422,86,1258,66,984,43"/>
 </map>

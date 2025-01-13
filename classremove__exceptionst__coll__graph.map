@@ -1,18 +1,41 @@
 <map id="remove_exceptionst" name="remove_exceptionst">
-<area shape="rect" id="node1" title="Lowers high&#45;level exception descriptions into low&#45;level operations suitable for symex and other analy..." alt="" coords="1852,111,2007,137"/>
-<area shape="rect" id="node2" href="$classmessage__handlert.html" title=" " alt="" coords="1089,17,1232,44"/>
-<area shape="rect" id="node3" title=" " alt="" coords="515,5,701,32"/>
-<area shape="rect" id="node4" title=" " alt="" coords="177,60,306,87"/>
-<area shape="rect" id="node10" title=" " alt="" coords="523,60,693,87"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,128,44,155"/>
-<area shape="rect" id="node11" title=" " alt="" coords="174,111,309,137"/>
-<area shape="rect" id="node15" title=" " alt="" coords="157,272,325,299"/>
-<area shape="rect" id="node16" title=" " alt="" coords="165,323,317,365"/>
-<area shape="rect" id="node6" href="$classclass__hierarchyt.html" title="Non&#45;graph&#45;based representation of the class hierarchy." alt="" coords="1571,111,1699,137"/>
-<area shape="rect" id="node7" title=" " alt="" coords="1256,103,1403,145"/>
-<area shape="rect" id="node8" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="205,189,277,216"/>
-<area shape="rect" id="node14" title=" " alt="" coords="531,251,685,293"/>
-<area shape="rect" id="node9" href="$classclass__hierarchyt_1_1entryt.html" title=" " alt="" coords="891,60,1065,87"/>
-<area shape="rect" id="node12" title=" " alt="" coords="5,287,44,313"/>
-<area shape="rect" id="node13" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="901,259,1055,285"/>
+<area shape="rect" id="Node000001" title="Lowers high&#45;level exception descriptions into low&#45;level operations suitable for symex and other analy..." alt="" coords="1852,111,2007,136"/>
+<area shape="rect" id="Node000002" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="901,261,1055,287"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1068,257,1851,133,1852,138,1069,262"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="165,323,317,363"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="331,339,503,333,701,318,814,302,914,284,915,289,815,307,702,323,503,338,331,345"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,285,44,311"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="58,311,69,315,117,327,166,335,165,340,116,332,67,321,56,316"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="157,273,325,299"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="58,296,133,294,157,292,157,298,133,299,58,301"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="174,111,309,136"/>
+<area shape="poly" id="edge19_Node000014_Node000004" title=" " alt="" coords="36,272,49,252,66,235,84,224,100,220,115,216,132,207,144,191,155,175,185,152,214,134,217,138,188,156,159,179,148,195,135,211,117,221,101,225,86,229,70,239,54,256,41,275"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,127,44,152"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="32,165,44,209,55,232,70,252,85,263,100,267,116,270,135,280,147,295,159,309,179,321,176,326,156,313,143,298,132,284,115,275,99,272,83,268,66,256,51,235,39,211,27,166"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="58,150,102,170,135,189,148,207,159,224,190,250,220,271,217,275,187,255,155,228,144,210,132,193,99,174,55,154"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="177,59,306,84"/>
+<area shape="poly" id="edge17_Node000013_Node000005" title=" " alt="" coords="53,116,67,109,122,90,176,78,177,83,123,95,69,114,55,121"/>
+<area shape="poly" id="edge20_Node000014_Node000005" title=" " alt="" coords="58,134,174,126,174,131,58,140"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="531,254,685,294"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="699,271,901,271,901,277,699,277"/>
+<area shape="rect" id="Node000007" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="205,189,277,215"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="279,219,313,235,350,247,444,264,531,271,531,276,443,270,349,253,311,239,276,224"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1256,103,1403,143"/>
+<area shape="poly" id="edge12_Node000010_Node000007" title=" " alt="" coords="291,196,1256,126,1256,131,291,201"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="523,60,693,85"/>
+<area shape="poly" id="edge15_Node000012_Node000007" title=" " alt="" coords="290,182,570,83,572,88,291,187"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="340,292,349,293,420,296,490,293,530,287,531,293,491,298,420,301,349,298,339,298"/>
+<area shape="rect" id="Node000009" href="$classclass__hierarchyt.html" title="Non&#45;graph&#45;based representation of the class hierarchy." alt="" coords="1571,111,1699,136"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="1713,121,1852,121,1852,126,1713,126"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="1416,121,1570,121,1570,126,1416,126"/>
+<area shape="rect" id="Node000011" href="$classclass__hierarchyt_1_1entryt.html" title=" " alt="" coords="891,60,1065,85"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="1079,82,1232,103,1256,107,1255,113,1232,109,1079,87"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="707,71,725,71,867,71,890,71,890,76,867,77,725,77,707,77"/>
+<area shape="poly" id="edge16_Node000012_Node000013" title=" " alt="" coords="320,69,523,70,522,75,320,74"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="515,5,701,31"/>
+<area shape="poly" id="edge23_Node000016_Node000013" title=" " alt="" coords="319,55,349,50,514,27,515,32,350,55,320,60"/>
+<area shape="poly" id="edge18_Node000010_Node000014" title=" " alt="" coords="322,121,1256,121,1256,126,322,126"/>
+<area shape="rect" id="Node000015" href="$classmessage__handlert.html" title=" " alt="" coords="1089,17,1232,43"/>
+<area shape="poly" id="edge21_Node000001_Node000015" title=" " alt="" coords="1246,34,1506,59,1667,78,1828,101,1869,108,1868,113,1828,106,1666,84,1506,65,1245,39"/>
+<area shape="poly" id="edge22_Node000015_Node000016" title=" " alt="" coords="715,18,1089,26,1089,31,715,23"/>
 </map>

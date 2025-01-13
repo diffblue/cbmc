@@ -1,5 +1,7 @@
 <map id="dereference_callbackt" name="dereference_callbackt">
-<area shape="rect" id="node1" title="Base class for pointer value set analysis." alt="" coords="135,5,302,32"/>
-<area shape="rect" id="node2" href="$classgoto__program__dereferencet.html" title="Wrapper for functions removing dereferences in expressions contained in a goto program." alt="" coords="5,80,208,107"/>
-<area shape="rect" id="node3" href="$classsymex__dereference__statet.html" title="Callback object that goto_symext::dereference_rec provides to value_set_dereferencet to provide value..." alt="" coords="233,80,429,107"/>
+<area shape="rect" id="Node000001" title="Base class for pointer value set analysis." alt="" coords="135,5,302,31"/>
+<area shape="rect" id="Node000002" href="$classgoto__program__dereferencet.html" title="Wrapper for functions removing dereferences in expressions contained in a goto program." alt="" coords="5,79,208,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,40,126,81,124,76,187,36"/>
+<area shape="rect" id="Node000003" href="$classsymex__dereference__statet.html" title="Callback object that goto_symext::dereference_rec provides to value_set_dereferencet to provide value..." alt="" coords="233,79,429,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="250,36,314,76,311,81,247,40"/>
 </map>

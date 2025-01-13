@@ -1,17 +1,12 @@
 var dir_da802c983406fb26f369155f623f1f7c =
 [
     [ "c_defines.cpp", "c__defines_8cpp.html", null ],
-    [ "c_defines.h", "c__defines_8h.html", [
-      [ "c_definest", "classc__definest.html", "classc__definest" ],
-      [ "definet", "structc__definest_1_1definet.html", "structc__definest_1_1definet" ]
-    ] ],
+    [ "c_defines.h", "c__defines_8h.html", "c__defines_8h" ],
     [ "c_wrangler.cpp", "c__wrangler_8cpp.html", "c__wrangler_8cpp" ],
     [ "c_wrangler.h", "c__wrangler_8h.html", "c__wrangler_8h" ],
     [ "crangler_main.cpp", "crangler__main_8cpp.html", "crangler__main_8cpp" ],
     [ "crangler_parse_options.cpp", "crangler__parse__options_8cpp.html", null ],
-    [ "crangler_parse_options.h", "crangler__parse__options_8h.html", [
-      [ "crangler_parse_optionst", "classcrangler__parse__optionst.html", "classcrangler__parse__optionst" ]
-    ] ],
+    [ "crangler_parse_options.h", "crangler__parse__options_8h.html", "crangler__parse__options_8h" ],
     [ "cscanner.cpp", "cscanner_8cpp.html", "cscanner_8cpp" ],
     [ "cscanner.h", "cscanner_8h.html", "cscanner_8h" ],
     [ "ctoken.cpp", "ctoken_8cpp.html", "ctoken_8cpp" ],

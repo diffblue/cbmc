@@ -1,12 +1,23 @@
 <map id="class_hierarchy_grapht" name="class_hierarchy_grapht">
-<area shape="rect" id="node1" title="Class hierarchy, represented using grapht and therefore suitable for use with generic graph algorithm..." alt="" coords="119,497,291,524"/>
-<area shape="rect" id="node2" href="$classgrapht.html" title=" " alt="" coords="17,407,197,448"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,206,164,233"/>
-<area shape="rect" id="node6" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="101,303,205,329"/>
-<area shape="rect" id="node4" title=" " alt="" coords="20,102,149,129"/>
-<area shape="rect" id="node5" title=" " alt="" coords="113,5,152,32"/>
-<area shape="rect" id="node9" title=" " alt="" coords="187,95,339,136"/>
-<area shape="rect" id="node7" title=" " alt="" coords="209,199,398,240"/>
-<area shape="rect" id="node8" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="430,102,502,129"/>
-<area shape="rect" id="node10" title=" " alt="" coords="257,5,296,32"/>
+<area shape="rect" id="Node000001" title="Class hierarchy, represented using grapht and therefore suitable for use with generic graph algorithm..." alt="" coords="119,491,291,516"/>
+<area shape="rect" id="Node000002" href="$classgrapht.html" title=" " alt="" coords="17,401,197,441"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,448,192,488,189,493,139,452"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,203,164,229"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="69,241,50,280,45,302,47,323,67,366,92,400,88,403,63,368,42,325,40,301,45,278,65,239"/>
+<area shape="rect" id="Node000006" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="101,299,205,324"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="103,238,146,297,142,300,99,241"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="20,101,149,126"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,140,87,203,82,203,82,140"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="113,5,152,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="104,38,88,56,83,79,85,100,79,100,78,78,84,53,100,34"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="187,93,339,133"/>
+<area shape="poly" id="edge11_Node000009_Node000005" title=" " alt="" coords="160,37,201,67,236,91,233,95,198,72,157,41"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="122,334,111,349,105,375,106,401,101,401,100,375,106,347,118,331"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="209,196,398,236"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="303,250,294,310,277,378,245,444,215,492,210,489,240,441,271,376,289,309,298,249"/>
+<area shape="rect" id="Node000008" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="430,101,502,126"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="461,140,452,158,438,174,418,188,396,198,394,194,416,183,435,170,447,155,456,138"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="263,146,267,171,283,194,279,197,262,173,258,147"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="257,5,296,31"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="276,44,269,94,263,93,270,44"/>
 </map>

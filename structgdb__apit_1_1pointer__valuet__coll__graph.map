@@ -1,6 +1,10 @@
 <map id="gdb_apit::pointer_valuet" name="gdb_apit::pointer_valuet">
-<area shape="rect" id="node1" title="Data associated with the value of a pointer, i.e." alt="" coords="5,277,185,304"/>
-<area shape="rect" id="node2" href="$structgdb__apit_1_1memory__addresst.html" title="Memory address imbued with the explicit boolean data indicating if the address is null or not." alt="" coords="164,187,368,213"/>
-<area shape="rect" id="node3" title=" " alt="" coords="52,96,139,123"/>
-<area shape="rect" id="node4" title=" " alt="" coords="26,5,165,47"/>
+<area shape="rect" id="Node000001" title="Data associated with the value of a pointer, i.e." alt="" coords="5,275,185,300"/>
+<area shape="rect" id="Node000002" href="$structgdb__apit_1_1memory__addresst.html" title="Memory address imbued with the explicit boolean data indicating if the address is null or not." alt="" coords="164,185,368,210"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,219,119,277,116,272,230,214"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="52,95,139,120"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="94,134,91,171,90,212,96,274,91,275,85,212,85,170,89,133"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="131,124,245,182,242,187,129,129"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="26,5,165,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="98,59,98,94,93,94,93,59"/>
 </map>

@@ -11,8 +11,8 @@ var properties_8cpp =
     [ "json", "properties_8cpp.html#ab36680245c3a3e38ca90fd64747b77fd", null ],
     [ "json", "properties_8cpp.html#a3956db87b4c264a219fb7b8a5a5eca4b", null ],
     [ "json", "properties_8cpp.html#ae75b84acb7f17968ef7c04dfa67321dd", null ],
-    [ "operator&=", "properties_8cpp.html#ae6e06d79a28e14e69c1512d80d110cee", null ],
-    [ "operator|=", "properties_8cpp.html#a18b93e15a37c307602d776115d4cc312", null ],
+    [ "operator&=", "properties_8cpp.html#a253151830891acc3430826f41914d0ba", null ],
+    [ "operator|=", "properties_8cpp.html#a3ee37e0283b3830ce9cc5b8103a57bcf", null ],
     [ "result_to_exit_code", "properties_8cpp.html#ab91b7ed2a40f68e03cd81db61d5acc2b", null ],
     [ "update_properties_from_goto_model", "properties_8cpp.html#a8a47fc8fe5da96f27e636c7df3563d41", null ],
     [ "xml", "properties_8cpp.html#acd585c0c596ee5156e84358863fb8794", null ]

@@ -1,9 +1,15 @@
 <map id="interpretert::stack_framet" name="interpretert::stack_framet">
-<area shape="rect" id="node1" title=" " alt="" coords="109,303,247,344"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,199,183,240"/>
-<area shape="rect" id="node3" title=" " alt="" coords="207,199,389,240"/>
-<area shape="rect" id="node4" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="211,102,283,129"/>
-<area shape="rect" id="node5" title=" " alt="" coords="307,95,459,136"/>
-<area shape="rect" id="node6" title=" " alt="" coords="331,5,369,32"/>
-<area shape="rect" id="node7" title=" " alt="" coords="396,5,435,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="109,299,247,339"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,196,183,236"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,246,132,273,156,297,152,300,128,276,109,250"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="207,196,389,236"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="269,247,236,277,205,301,202,297,232,273,266,243"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="211,101,283,126"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="262,137,291,195,286,197,257,139"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="307,93,459,133"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="360,146,316,198,312,194,356,142"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="331,5,369,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="355,44,361,68,372,92,368,94,355,70,349,45"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="396,5,435,31"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="410,44,392,94,387,92,404,43"/>
 </map>

@@ -1,6 +1,6 @@
 var require__type_8h =
 [
-    [ "expected_type_argumentt", "structrequire__type_1_1expected__type__argumentt.html", "structrequire__type_1_1expected__type__argumentt" ],
+    [ "require_type::expected_type_argumentt", "structrequire__type_1_1expected__type__argumentt.html", "structrequire__type_1_1expected__type__argumentt" ],
     [ "expected_type_argumentst", "require__type_8h.html#a5900d1bbcd30965f7b26713a744ef690", null ],
     [ "java_lambda_method_handlest", "require__type_8h.html#a676721b0d74262be085f8d95e252437c", null ],
     [ "type_argument_kindt", "require__type_8h.html#af2a04dc283f58952d8e792b52697fafa", [

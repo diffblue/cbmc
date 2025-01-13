@@ -1,9 +1,16 @@
 <map id="dependence_grapht" name="dependence_grapht">
-<area shape="rect" id="node1" title=" " alt="" coords="184,323,335,349"/>
-<area shape="rect" id="node2" href="$classait.html" title=" " alt="" coords="59,247,257,273"/>
-<area shape="rect" id="node3" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="5,81,217,108"/>
-<area shape="rect" id="node5" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="133,157,260,184"/>
-<area shape="rect" id="node4" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="73,5,150,32"/>
-<area shape="rect" id="node6" href="$classgrapht.html" title=" " alt="" coords="282,247,445,273"/>
-<area shape="rect" id="node7" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="311,157,415,184"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="184,317,335,343"/>
+<area shape="rect" id="Node000002" href="$classait.html" title=" " alt="" coords="59,243,257,268"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,274,244,315,241,319,184,278"/>
+<area shape="rect" id="Node000003" href="$classai__recursive__interproceduralt.html" title=" " alt="" coords="5,80,217,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,119,117,148,123,179,137,214,153,241,148,244,133,216,118,181,112,149,109,119"/>
+<area shape="rect" id="Node000005" href="$classait.html" title="ait supplies three of the four components needed: an abstract interpreter (in this case handling func..." alt="" coords="133,155,260,180"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="137,112,184,152,181,156,134,116"/>
+<area shape="rect" id="Node000004" href="$classai__baset.html" title="This is the basic interface of the abstract interpreter with default implementations of the core func..." alt="" coords="73,5,150,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="114,45,114,80,109,80,109,45"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="188,194,166,243,161,241,183,191"/>
+<area shape="rect" id="Node000006" href="$classgrapht.html" title=" " alt="" coords="282,243,445,268"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="337,278,278,319,274,315,334,274"/>
+<area shape="rect" id="Node000007" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="311,155,415,180"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="366,194,366,242,361,242,361,194"/>
 </map>

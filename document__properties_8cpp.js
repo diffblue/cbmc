@@ -1,8 +1,8 @@
 var document__properties_8cpp =
 [
     [ "document_propertiest", "classdocument__propertiest.html", "classdocument__propertiest" ],
-    [ "linet", "structdocument__propertiest_1_1linet.html", "structdocument__propertiest_1_1linet" ],
-    [ "doc_claimt", "structdocument__propertiest_1_1doc__claimt.html", "structdocument__propertiest_1_1doc__claimt" ],
+    [ "document_propertiest::linet", "structdocument__propertiest_1_1linet.html", "structdocument__propertiest_1_1linet" ],
+    [ "document_propertiest::doc_claimt", "structdocument__propertiest_1_1doc__claimt.html", "structdocument__propertiest_1_1doc__claimt" ],
     [ "MAXWIDTH", "document__properties_8cpp.html#ac101c663138f79260b6d5ea00140fa22", null ],
     [ "document_properties_html", "document__properties_8cpp.html#ae53f643ce65e210b4992c554e6eaf3f7", null ],
     [ "document_properties_latex", "document__properties_8cpp.html#a3b216937e18c5f01ed38354ec37f8882", null ],

@@ -1,8 +1,13 @@
 <map id="languaget" name="languaget">
-<area shape="rect" id="node1" title=" " alt="" coords="5,107,92,133"/>
-<area shape="rect" id="node2" href="$classansi__c__languaget.html" title=" " alt="" coords="167,5,302,32"/>
-<area shape="rect" id="node3" href="$classcpp__languaget.html" title=" " alt="" coords="176,56,293,83"/>
-<area shape="rect" id="node4" href="$classjava__bytecode__languaget.html" title=" " alt="" coords="140,107,329,133"/>
-<area shape="rect" id="node5" href="$classjson__symtab__languaget.html" title=" " alt="" coords="146,157,323,184"/>
-<area shape="rect" id="node6" href="$classstatement__list__languaget.html" title="Implements the language interface for the Statement List language." alt="" coords="141,208,329,235"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,92,129"/>
+<area shape="rect" id="Node000002" href="$classansi__c__languaget.html" title=" " alt="" coords="167,5,302,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,92,101,65,139,40,167,28,169,33,141,44,104,69,73,96"/>
+<area shape="rect" id="Node000003" href="$classcpp__languaget.html" title=" " alt="" coords="176,55,293,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="105,98,139,89,182,77,184,83,141,94,106,103"/>
+<area shape="rect" id="Node000004" href="$classjava__bytecode__languaget.html" title=" " alt="" coords="140,104,329,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="105,114,140,114,140,119,105,119"/>
+<area shape="rect" id="Node000005" href="$classjson__symtab__languaget.html" title=" " alt="" coords="146,153,323,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="106,129,186,151,185,156,104,134"/>
+<area shape="rect" id="Node000006" href="$classstatement__list__languaget.html" title="Implements the language interface for the Statement List language." alt="" coords="141,203,329,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="73,137,104,163,141,188,173,200,171,205,139,192,101,168,70,141"/>
 </map>

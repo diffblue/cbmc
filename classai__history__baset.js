@@ -13,7 +13,7 @@ var classai__history__baset =
     [ "ai_history_baset", "classai__history__baset.html#a767f4488fd51174e7d9da3507bd2e233", null ],
     [ "ai_history_baset", "classai__history__baset.html#a20dcff0219f779096def9f0bf6c3de34", null ],
     [ "~ai_history_baset", "classai__history__baset.html#ad33cdc480f1476c050662a1dbeaf9ead", null ],
-    [ "current_location", "classai__history__baset.html#acbb878ef254715151ee9a683c125746b", null ],
+    [ "current_location", "classai__history__baset.html#a04894475f22b2b72ada771db679ed48d", null ],
     [ "operator<", "classai__history__baset.html#a46bc5de818cae9c74f77c2388420feb7", null ],
     [ "operator==", "classai__history__baset.html#aa5fdb73e85267899b9b1915ba4807ec2", null ],
     [ "output", "classai__history__baset.html#a48980471e072f4ef0f4b81e24647c0ae", null ],

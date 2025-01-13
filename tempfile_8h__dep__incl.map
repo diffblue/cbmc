@@ -1,13 +1,23 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/tempfile.h" name="/home/runner/work/cbmc/cbmc/src/util/tempfile.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1085,5,1269,47"/>
-<area shape="rect" id="node2" href="$c__preprocess_8cpp.html" title=" " alt="" coords="5,102,248,143"/>
-<area shape="rect" id="node3" href="$gcc__version_8cpp.html" title=" " alt="" coords="272,102,507,143"/>
-<area shape="rect" id="node4" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="531,102,749,143"/>
-<area shape="rect" id="node5" href="$goto__cc__cmdline_8cpp.html" title="Command line interpretation for goto&#45;cc." alt="" coords="773,95,957,151"/>
-<area shape="rect" id="node6" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="981,95,1165,151"/>
-<area shape="rect" id="node7" href="$ms__cl__version_8cpp.html" title=" " alt="" coords="1189,95,1373,151"/>
-<area shape="rect" id="node8" href="$read__goto__binary_8cpp.html" title="Read Goto Programs." alt="" coords="1397,95,1581,151"/>
-<area shape="rect" id="node9" href="$external__sat_8cpp.html" title="Allows call an external SAT solver to allow faster integration of newer SAT solvers." alt="" coords="1605,95,1789,151"/>
-<area shape="rect" id="node10" href="$smt2__dec_8cpp.html" title=" " alt="" coords="1813,95,1997,151"/>
-<area shape="rect" id="node11" href="$tempfile_8cpp.html" title=" " alt="" coords="2021,102,2216,143"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1085,5,1269,45"/>
+<area shape="rect" id="Node000002" href="$c__preprocess_8cpp.html" title=" " alt="" coords="5,101,248,141"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1072,33,711,52,486,71,260,96,215,103,214,98,260,91,486,65,711,47,1072,28"/>
+<area shape="rect" id="Node000003" href="$gcc__version_8cpp.html" title=" " alt="" coords="272,101,507,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1072,37,819,59,669,76,519,96,477,103,476,98,518,91,668,71,819,54,1071,32"/>
+<area shape="rect" id="Node000004" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="531,101,749,141"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1072,45,762,96,725,103,724,98,761,91,1071,39"/>
+<area shape="rect" id="Node000005" href="$goto__cc__cmdline_8cpp.html" title="Command line interpretation for goto&#45;cc." alt="" coords="773,93,957,148"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1102,52,954,96,952,91,1101,47"/>
+<area shape="rect" id="Node000006" href="$linker__script__merge_8cpp.html" title=" " alt="" coords="981,93,1165,148"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1148,56,1104,95,1101,91,1144,52"/>
+<area shape="rect" id="Node000007" href="$ms__cl__version_8cpp.html" title=" " alt="" coords="1189,93,1373,148"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1210,52,1254,91,1250,95,1207,56"/>
+<area shape="rect" id="Node000008" href="$read__goto__binary_8cpp.html" title="Read Goto Programs." alt="" coords="1397,93,1581,148"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1254,47,1402,91,1401,96,1253,52"/>
+<area shape="rect" id="Node000009" href="$external__sat_8cpp.html" title="Allows call an external SAT solver to allow faster integration of newer SAT solvers." alt="" coords="1605,93,1789,148"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1283,38,1431,61,1594,91,1606,93,1604,98,1593,96,1430,66,1282,44"/>
+<area shape="rect" id="Node000010" href="$smt2__dec_8cpp.html" title=" " alt="" coords="1813,93,1997,148"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1283,31,1521,52,1662,69,1802,91,1814,93,1813,98,1801,96,1661,74,1521,57,1283,36"/>
+<area shape="rect" id="Node000011" href="$tempfile_8cpp.html" title=" " alt="" coords="2021,101,2216,141"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1283,27,1609,46,1809,64,2010,91,2047,98,2046,103,2009,96,1809,70,1608,51,1283,33"/>
 </map>

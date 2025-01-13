@@ -1,6 +1,9 @@
 <map id="goto_symext" name="goto_symext">
-<area shape="rect" id="node1" title="The main class for the forward symbolic simulator." alt="" coords="131,5,237,32"/>
-<area shape="rect" id="node2" href="$structscratch__program__symext.html" title=" " alt="" coords="5,80,192,107"/>
-<area shape="rect" id="node3" href="$classsymex__bmct.html" title=" " alt="" coords="216,80,323,107"/>
-<area shape="rect" id="node4" href="$classsymex__bmc__incremental__one__loopt.html" title=" " alt="" coords="176,155,363,196"/>
+<area shape="rect" id="Node000001" title="The main class for the forward symbolic simulator." alt="" coords="131,5,237,31"/>
+<area shape="rect" id="Node000002" href="$structscratch__program__symext.html" title=" " alt="" coords="5,79,192,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,41,114,80,111,76,158,37"/>
+<area shape="rect" id="Node000003" href="$classsymex__bmct.html" title=" " alt="" coords="216,79,323,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,37,257,76,254,80,206,41"/>
+<area shape="rect" id="Node000004" href="$classsymex__bmc__incremental__one__loopt.html" title=" " alt="" coords="176,152,363,192"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="272,118,272,152,267,152,267,118"/>
 </map>

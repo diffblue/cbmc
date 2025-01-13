@@ -1,8 +1,13 @@
 <map id="function_filter_baset" name="function_filter_baset">
-<area shape="rect" id="node1" title="Base class for filtering functions." alt="" coords="5,115,160,141"/>
-<area shape="rect" id="node2" href="$classfile__filtert.html" title=" " alt="" coords="251,5,335,32"/>
-<area shape="rect" id="node3" href="$classinclude__pattern__filtert.html" title="Filters functions that match the provided pattern." alt="" coords="210,56,375,83"/>
-<area shape="rect" id="node4" href="$classinternal__functions__filtert.html" title="Filters out CPROVER internal functions." alt="" coords="223,107,362,149"/>
-<area shape="rect" id="node5" href="$classsingle__function__filtert.html" title=" " alt="" coords="211,173,374,200"/>
-<area shape="rect" id="node6" href="$classtrivial__functions__filtert.html" title="Filters out trivial functions." alt="" coords="208,224,377,251"/>
+<area shape="rect" id="Node000001" title="Base class for filtering functions." alt="" coords="5,112,160,137"/>
+<area shape="rect" id="Node000002" href="$classfile__filtert.html" title=" " alt="" coords="251,5,335,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,101,153,70,207,40,250,25,251,30,209,44,156,74,112,106"/>
+<area shape="rect" id="Node000003" href="$classinclude__pattern__filtert.html" title="Filters functions that match the provided pattern." alt="" coords="210,55,375,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="142,106,245,77,246,83,144,111"/>
+<area shape="rect" id="Node000004" href="$classinternal__functions__filtert.html" title="Filters out CPROVER internal functions." alt="" coords="223,105,362,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,122,223,122,223,127,174,127"/>
+<area shape="rect" id="Node000005" href="$classsingle__function__filtert.html" title=" " alt="" coords="211,169,374,195"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="144,138,246,167,245,172,142,144"/>
+<area shape="rect" id="Node000006" href="$classtrivial__functions__filtert.html" title="Filters out trivial functions." alt="" coords="208,219,377,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="113,144,157,174,209,204,242,216,240,221,207,208,154,179,110,148"/>
 </map>

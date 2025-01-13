@@ -1,14 +1,30 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/qbf/qbf_skizzo.h" name="/home/runner/work/cbmc/cbmc/src/solvers/qbf/qbf_skizzo.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,189,61"/>
-<area shape="rect" id="node2" href="$qdimacs__cnf_8h.html" title=" " alt="" coords="40,109,155,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="156,572,220,599"/>
-<area shape="rect" id="node4" href="$dimacs__cnf_8h.html" title=" " alt="" coords="80,184,224,225"/>
-<area shape="rect" id="node5" href="$cnf__clause__list_8h.html" title="CNF Generation." alt="" coords="137,273,268,300"/>
-<area shape="rect" id="node6" title=" " alt="" coords="131,348,173,375"/>
-<area shape="rect" id="node7" href="$threeval_8h.html" title=" " alt="" coords="131,497,245,524"/>
-<area shape="rect" id="node8" href="$cnf_8h.html" title="CNF Generation, via Tseitin." alt="" coords="275,348,328,375"/>
-<area shape="rect" id="node9" href="$prop_8h.html" title=" " alt="" coords="255,423,401,449"/>
-<area shape="rect" id="node10" href="$src_2util_2message_8h.html" title=" " alt="" coords="269,497,387,524"/>
-<area shape="rect" id="node11" href="$literal_8h.html" title=" " alt="" coords="412,497,484,524"/>
-<area shape="rect" id="node12" title=" " alt="" coords="508,497,575,524"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,189,60"/>
+<area shape="rect" id="Node000002" href="$qdimacs__cnf_8h.html" title=" " alt="" coords="40,108,155,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,60,100,94,95,94,95,60"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="156,563,220,588"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,135,64,196,51,237,45,281,45,430,48,451,56,471,82,506,116,534,151,554,148,559,113,538,78,509,51,473,43,452,40,430,40,281,45,236,59,194,88,132"/>
+<area shape="rect" id="Node000004" href="$dimacs__cnf_8h.html" title=" " alt="" coords="80,181,224,221"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="108,132,133,168,129,172,103,135"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="142,223,112,280,101,316,96,354,96,430,101,474,122,513,140,535,161,553,157,557,136,538,118,516,96,476,91,430,91,354,96,315,108,278,137,220"/>
+<area shape="rect" id="Node000005" href="$cnf__clause__list_8h.html" title="CNF Generation." alt="" coords="137,269,268,295"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="167,220,190,256,185,259,162,223"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="131,343,173,368"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="196,297,170,333,166,330,192,293"/>
+<area shape="rect" id="Node000007" href="$threeval_8h.html" title=" " alt="" coords="131,489,245,515"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="205,295,192,475,187,475,199,295"/>
+<area shape="rect" id="Node000008" href="$cnf_8h.html" title="CNF Generation, via Tseitin." alt="" coords="275,343,328,368"/>
+<area shape="poly" id="edge9_Node000005_Node000008" title=" " alt="" coords="220,293,276,332,273,337,217,297"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="191,515,191,549,185,549,185,515"/>
+<area shape="rect" id="Node000009" href="$prop_8h.html" title=" " alt="" coords="255,416,401,441"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="308,367,321,402,316,404,303,369"/>
+<area shape="poly" id="edge13_Node000009_Node000007" title=" " alt="" coords="307,444,224,485,222,481,304,439"/>
+<area shape="rect" id="Node000010" href="$src_2util_2message_8h.html" title=" " alt="" coords="269,489,387,515"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="331,442,331,476,325,476,325,442"/>
+<area shape="rect" id="Node000036" href="$literal_8h.html" title=" " alt="" coords="412,489,484,515"/>
+<area shape="poly" id="edge14_Node000009_Node000036" title=" " alt="" coords="349,439,418,480,415,484,346,444"/>
+<area shape="rect" id="Node000037" title=" " alt="" coords="508,489,575,515"/>
+<area shape="poly" id="edge16_Node000009_Node000037" title=" " alt="" coords="363,439,496,483,494,488,361,444"/>
+<area shape="poly" id="edge12_Node000010_Node000003" title=" " alt="" coords="307,517,224,559,222,554,304,512"/>
+<area shape="poly" id="edge15_Node000036_Node000003" title=" " alt="" coords="413,516,234,564,233,559,411,511"/>
 </map>

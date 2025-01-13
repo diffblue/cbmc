@@ -1,9 +1,18 @@
 <map id="save_scopet" name="save_scopet">
-<area shape="rect" id="node1" title=" " alt="" coords="5,206,108,233"/>
-<area shape="rect" id="node2" href="$classnew__scopet.html" title=" " alt="" coords="109,95,207,121"/>
-<area shape="rect" id="node3" title=" " alt="" coords="215,199,362,240"/>
-<area shape="rect" id="node4" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="275,5,347,32"/>
-<area shape="rect" id="node5" title=" " alt="" coords="385,95,520,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="381,5,420,32"/>
-<area shape="rect" id="node7" title=" " alt="" coords="447,5,485,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,203,108,229"/>
+<area shape="rect" id="Node000002" href="$classnew__scopet.html" title=" " alt="" coords="109,93,207,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,119,76,129,60,144,54,158,52,174,56,203,51,204,47,174,49,157,56,141,73,125,94,114"/>
+<area shape="poly" id="edge9_Node000002_Node000002" title=" " alt="" coords="222,97,234,106,226,114,208,117,207,111,223,109,229,106,219,102"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="215,196,362,236"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="151,132,149,152,155,171,167,183,182,193,216,206,214,211,179,198,164,187,150,173,144,153,146,132"/>
+<area shape="rect" id="Node000003" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="275,5,347,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="280,40,180,95,178,91,277,35"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="316,44,318,103,310,173,301,197,296,195,305,171,312,103,311,44"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="262,187,222,145,183,121,185,117,225,141,266,183"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="385,93,520,119"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="425,128,319,198,316,193,422,124"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="381,5,420,31"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="410,43,422,68,442,92,438,95,417,71,405,45"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="447,5,485,31"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="465,44,457,93,452,92,460,44"/>
 </map>

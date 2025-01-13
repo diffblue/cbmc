@@ -4,6 +4,6 @@ var classhistory__sensitive__storaget =
     [ "abstract_state_before", "classhistory__sensitive__storaget.html#ae029a12da8f5dbb51443eb52bb41e7c2", null ],
     [ "abstract_state_before", "classhistory__sensitive__storaget.html#a3348e8ab3275cbf46a2bc2a16cdc963c", null ],
     [ "clear", "classhistory__sensitive__storaget.html#a23a66cd545c18cdbb771d4cf3fe41345", null ],
-    [ "get_state", "classhistory__sensitive__storaget.html#a63b269987716e7e3cc56be9a2e9c81b4", null ],
+    [ "get_state", "classhistory__sensitive__storaget.html#ad87abe9798a08db182080524a6ad5457", null ],
     [ "domain_map", "classhistory__sensitive__storaget.html#a6581c92acc9773c285c44f229ee7b8c8", null ]
 ];

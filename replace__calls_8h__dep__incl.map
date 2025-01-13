@@ -1,8 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/replace_calls.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/replace_calls.h">
-<area shape="rect" id="node1" title="Replace calls to given functions with calls to other given functions." alt="" coords="389,5,582,61"/>
-<area shape="rect" id="node2" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,109,485,165"/>
-<area shape="rect" id="node6" href="$replace__calls_8cpp.html" title="Replace calls Replaces calls to given functions with calls to other given functions." alt="" coords="510,109,703,165"/>
-<area shape="rect" id="node3" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,213,240,269"/>
-<area shape="rect" id="node4" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,213,464,269"/>
-<area shape="rect" id="node5" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,213,747,269"/>
+<area shape="rect" id="Node000001" title="Replace calls to given functions with calls to other given functions." alt="" coords="389,5,582,60"/>
+<area shape="rect" id="Node000002" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,108,485,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="445,71,397,110,394,106,441,67"/>
+<area shape="rect" id="Node000006" href="$replace__calls_8cpp.html" title="Replace calls Replaces calls to given functions with calls to other given functions." alt="" coords="510,108,703,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="529,67,577,106,573,110,526,71"/>
+<area shape="rect" id="Node000003" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,211,240,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,170,187,213,185,208,288,165"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,211,464,265"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="367,176,367,211,361,211,361,176"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,211,747,265"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="443,165,552,208,550,213,441,170"/>
 </map>

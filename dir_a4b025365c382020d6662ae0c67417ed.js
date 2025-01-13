@@ -4,9 +4,7 @@ var dir_a4b025365c382020d6662ae0c67417ed =
     [ "call_graph_test_utils.h", "call__graph__test__utils_8h.html", "call__graph__test__utils_8h" ],
     [ "expr_query.h", "expr__query_8h.html", "expr__query_8h" ],
     [ "free_form_cmdline.cpp", "free__form__cmdline_8cpp.html", null ],
-    [ "free_form_cmdline.h", "free__form__cmdline_8h.html", [
-      [ "free_form_cmdlinet", "classfree__form__cmdlinet.html", "classfree__form__cmdlinet" ]
-    ] ],
+    [ "free_form_cmdline.h", "free__form__cmdline_8h.html", "free__form__cmdline_8h" ],
     [ "get_goto_model_from_c.cpp", "get__goto__model__from__c_8cpp.html", "get__goto__model__from__c_8cpp" ],
     [ "get_goto_model_from_c.h", "get__goto__model__from__c_8h.html", "get__goto__model__from__c_8h" ],
     [ "invariant.cpp", "unit_2testing-utils_2invariant_8cpp.html", "unit_2testing-utils_2invariant_8cpp" ],

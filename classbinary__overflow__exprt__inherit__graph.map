@@ -1,13 +1,23 @@
 <map id="binary_overflow_exprt" name="binary_overflow_exprt">
-<area shape="rect" id="node1" title="A Boolean expression returning true, iff operation kind would result in an overflow when applied to o..." alt="" coords="280,483,447,509"/>
-<area shape="rect" id="node8" href="$classminus__overflow__exprt.html" title=" " alt="" coords="5,557,172,584"/>
-<area shape="rect" id="node9" href="$classmult__overflow__exprt.html" title=" " alt="" coords="196,557,352,584"/>
-<area shape="rect" id="node10" href="$classplus__overflow__exprt.html" title=" " alt="" coords="376,557,529,584"/>
-<area shape="rect" id="node11" href="$classshl__overflow__exprt.html" title=" " alt="" coords="553,557,699,584"/>
-<area shape="rect" id="node2" href="$classbinary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly two argu..." alt="" coords="277,408,449,435"/>
-<area shape="rect" id="node3" href="$classbinary__exprt.html" title="A base class for binary expressions." alt="" coords="311,333,415,360"/>
-<area shape="rect" id="node4" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="301,259,426,285"/>
-<area shape="rect" id="node5" href="$classexprt.html" title="Base class for all expressions." alt="" coords="335,184,391,211"/>
-<area shape="rect" id="node6" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="337,109,389,136"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title=" " alt="" coords="280,5,447,61"/>
+<area shape="rect" id="Node000001" title="A Boolean expression returning true, iff operation kind would result in an overflow when applied to o..." alt="" coords="280,475,447,500"/>
+<area shape="rect" id="Node000009" href="$classminus__overflow__exprt.html" title=" " alt="" coords="5,548,172,573"/>
+<area shape="poly" id="edge7_Node000001_Node000009" title=" " alt="" coords="307,506,134,550,132,545,305,501"/>
+<area shape="rect" id="Node000010" href="$classmult__overflow__exprt.html" title=" " alt="" coords="196,548,352,573"/>
+<area shape="poly" id="edge8_Node000001_Node000010" title=" " alt="" coords="340,511,290,550,287,546,337,506"/>
+<area shape="rect" id="Node000011" href="$classplus__overflow__exprt.html" title=" " alt="" coords="376,548,529,573"/>
+<area shape="poly" id="edge9_Node000001_Node000011" title=" " alt="" coords="390,506,440,546,436,550,387,511"/>
+<area shape="rect" id="Node000012" href="$classshl__overflow__exprt.html" title=" " alt="" coords="553,548,699,573"/>
+<area shape="poly" id="edge10_Node000001_Node000012" title=" " alt="" coords="419,501,584,545,583,550,418,506"/>
+<area shape="rect" id="Node000002" href="$classbinary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly two argu..." alt="" coords="277,401,449,427"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="366,440,366,475,361,475,361,440"/>
+<area shape="rect" id="Node000003" href="$classbinary__exprt.html" title="A base class for binary expressions." alt="" coords="311,328,415,353"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="366,367,366,401,361,401,361,367"/>
+<area shape="rect" id="Node000004" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="301,255,426,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="366,294,366,328,361,328,361,294"/>
+<area shape="rect" id="Node000005" href="$classexprt.html" title="Base class for all expressions." alt="" coords="335,181,391,207"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="366,220,366,255,361,255,361,220"/>
+<area shape="rect" id="Node000006" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="337,108,389,133"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="366,147,366,181,361,181,361,147"/>
+<area shape="rect" id="Node000007" href="$classsharing__treet.html" title=" " alt="" coords="280,5,447,60"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="366,74,366,108,361,108,361,74"/>
 </map>

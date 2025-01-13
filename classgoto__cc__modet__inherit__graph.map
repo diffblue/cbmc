@@ -1,10 +1,17 @@
 <map id="goto_cc_modet" name="goto_cc_modet">
-<area shape="rect" id="node1" title=" " alt="" coords="351,5,472,32"/>
-<area shape="rect" id="node2" href="$classarmcc__modet.html" title=" " alt="" coords="5,80,116,107"/>
-<area shape="rect" id="node3" href="$classas__modet.html" title=" " alt="" coords="140,80,227,107"/>
-<area shape="rect" id="node4" href="$classcw__modet.html" title=" " alt="" coords="251,80,340,107"/>
-<area shape="rect" id="node5" href="$classgcc__modet.html" title=" " alt="" coords="365,80,458,107"/>
-<area shape="rect" id="node6" href="$classld__modet.html" title=" " alt="" coords="482,80,565,107"/>
-<area shape="rect" id="node7" href="$classms__cl__modet.html" title=" " alt="" coords="589,80,698,107"/>
-<area shape="rect" id="node8" href="$classms__link__modet.html" title=" " alt="" coords="722,80,845,107"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="351,5,472,31"/>
+<area shape="rect" id="Node000002" href="$classarmcc__modet.html" title=" " alt="" coords="5,79,116,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="342,36,117,81,116,76,341,31"/>
+<area shape="rect" id="Node000003" href="$classas__modet.html" title=" " alt="" coords="140,79,227,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="362,37,221,81,219,76,361,32"/>
+<area shape="rect" id="Node000004" href="$classcw__modet.html" title=" " alt="" coords="251,79,340,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="383,40,316,81,313,76,380,35"/>
+<area shape="rect" id="Node000005" href="$classgcc__modet.html" title=" " alt="" coords="365,79,458,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="414,44,414,79,409,79,409,44"/>
+<area shape="rect" id="Node000006" href="$classld__modet.html" title=" " alt="" coords="482,79,565,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="443,36,506,76,504,81,440,40"/>
+<area shape="rect" id="Node000007" href="$classms__cl__modet.html" title=" " alt="" coords="589,79,698,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="462,32,607,76,605,81,461,37"/>
+<area shape="rect" id="Node000008" href="$classms__link__modet.html" title=" " alt="" coords="722,79,845,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="485,31,724,76,723,81,484,36"/>
 </map>

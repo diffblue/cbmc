@@ -1,11 +1,11 @@
 var c__wrangler_8cpp =
 [
     [ "c_wranglert", "structc__wranglert.html", "structc__wranglert" ],
-    [ "function_contract_clauset", "structc__wranglert_1_1function__contract__clauset.html", "structc__wranglert_1_1function__contract__clauset" ],
-    [ "loop_contract_clauset", "structc__wranglert_1_1loop__contract__clauset.html", "structc__wranglert_1_1loop__contract__clauset" ],
-    [ "assertiont", "structc__wranglert_1_1assertiont.html", "structc__wranglert_1_1assertiont" ],
-    [ "functiont", "structc__wranglert_1_1functiont.html", "structc__wranglert_1_1functiont" ],
-    [ "objectt", "structc__wranglert_1_1objectt.html", "structc__wranglert_1_1objectt" ],
+    [ "c_wranglert::function_contract_clauset", "structc__wranglert_1_1function__contract__clauset.html", "structc__wranglert_1_1function__contract__clauset" ],
+    [ "c_wranglert::loop_contract_clauset", "structc__wranglert_1_1loop__contract__clauset.html", "structc__wranglert_1_1loop__contract__clauset" ],
+    [ "c_wranglert::assertiont", "structc__wranglert_1_1assertiont.html", "structc__wranglert_1_1assertiont" ],
+    [ "c_wranglert::functiont", "structc__wranglert_1_1functiont.html", "structc__wranglert_1_1functiont" ],
+    [ "c_wranglert::objectt", "structc__wranglert_1_1objectt.html", "structc__wranglert_1_1objectt" ],
     [ "c_wrangler", "c__wrangler_8cpp.html#aa691fe9114f326d21b23726ea55683fa", null ],
     [ "get_defines", "c__wrangler_8cpp.html#a5b7157e4d7e9b7f0d1de2a9b4fa66ed1", null ],
     [ "mangle", "c__wrangler_8cpp.html#af1f86346b5c933712cf1ee9e8f442e7f", null ],

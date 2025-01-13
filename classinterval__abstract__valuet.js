@@ -10,7 +10,7 @@ var classinterval__abstract__valuet =
     [ "index_range_implementation", "classinterval__abstract__valuet.html#a770a1c2ad661372537a0fb477cd8eb49", null ],
     [ "internal_equality", "classinterval__abstract__valuet.html#a407d2c7bb675d18726e903559b639798", null ],
     [ "internal_hash", "classinterval__abstract__valuet.html#acb960374597d42240e5a6f5680f306f5", null ],
-    [ "make_interval", "classinterval__abstract__valuet.html#ad03b22bf6791eb37230c3a9b77af0733", null ],
+    [ "make_interval", "classinterval__abstract__valuet.html#a110b02d26494cd5c69be7d5939d42702", null ],
     [ "meet_with_value", "classinterval__abstract__valuet.html#aab7323c493bc33d8ae832f3b55b6ea00", null ],
     [ "merge_with_value", "classinterval__abstract__valuet.html#a064b41c71791c3bf26aef3bf731e5a25", null ],
     [ "mutable_clone", "classinterval__abstract__valuet.html#a352116489591fe75d2362fa9e8f10bf6", null ],

@@ -1,12 +1,24 @@
 <map id="single_value_index_ranget" name="single_value_index_ranget">
-<area shape="rect" id="node1" title=" " alt="" coords="63,603,209,644"/>
-<area shape="rect" id="node2" href="$classindex__range__implementationt.html" title=" " alt="" coords="5,513,224,540"/>
-<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="248,513,304,540"/>
-<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="250,437,302,464"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="193,332,359,388"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="185,213,367,255"/>
-<area shape="rect" id="node7" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="171,95,381,136"/>
-<area shape="rect" id="node8" href="$structref__count__ift_3_01true_01_4.html" title=" " alt="" coords="17,5,175,32"/>
-<area shape="rect" id="node9" title=" " alt="" coords="200,5,352,32"/>
-<area shape="rect" id="node10" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="376,5,448,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1881,22,2028,62"/>
+<area shape="rect" id="Node000002" href="$classindex__range__implementationt.html" title=" " alt="" coords="1573,5,1792,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1806,26,1881,33,1881,38,1806,32"/>
+<area shape="rect" id="Node000003" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1655,55,1711,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1724,62,1857,51,1881,49,1881,54,1858,57,1725,67"/>
+<area shape="rect" id="Node000004" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1472,55,1524,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1538,65,1654,65,1654,70,1538,70"/>
+<area shape="rect" id="Node000005" href="$classsharing__treet.html" title=" " alt="" coords="1256,40,1423,95"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1437,65,1472,65,1472,70,1437,70"/>
+<area shape="rect" id="Node000006" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="515,47,725,87"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="739,49,749,49,885,41,991,38,1097,40,1232,49,1256,51,1256,56,1232,54,1096,45,991,43,885,46,750,54,739,55"/>
+<area shape="rect" id="Node000012" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="831,81,1012,121"/>
+<area shape="poly" id="edge11_Node000012_Node000006" title=" " alt="" coords="739,78,831,88,830,93,738,83"/>
+<area shape="rect" id="Node000007" href="$structref__count__ift.html" title="Used in tree_nodet for activating or not reference counting." alt="" coords="248,5,433,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="427,30,515,46,514,51,426,36"/>
+<area shape="rect" id="Node000008" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="305,55,377,80"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="390,65,514,65,514,70,390,70"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="265,104,417,129"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="426,99,514,83,515,89,427,104"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="5,104,135,129"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="148,114,264,114,264,119,148,119"/>
+<area shape="poly" id="edge10_Node000005_Node000012" title=" " alt="" coords="1025,93,1232,78,1256,76,1256,81,1232,83,1026,98"/>
 </map>

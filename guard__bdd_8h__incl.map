@@ -1,13 +1,23 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/guard_bdd.h" name="/home/runner/work/cbmc/cbmc/src/analyses/guard_bdd.h">
-<area shape="rect" id="node1" title="Guard Data Structure Implementation using BDDs." alt="" coords="35,5,265,47"/>
-<area shape="rect" id="node2" href="$bdd_8h.html" title="Choice between the different interface to BDD libraries." alt="" coords="81,95,219,121"/>
-<area shape="rect" id="node3" href="$bdd__mini_b_d_d_8h.html" title="Interface to miniBDD functions that are used in CBMC BDD functions should only be accessed through th..." alt="" coords="89,169,211,196"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,251,129,278"/>
-<area shape="rect" id="node5" href="$mini_b_d_d_8h.html" title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes." alt="" coords="153,244,312,285"/>
-<area shape="rect" id="node6" title=" " alt="" coords="21,333,63,360"/>
-<area shape="rect" id="node7" title=" " alt="" coords="87,333,138,360"/>
-<area shape="rect" id="node8" title=" " alt="" coords="163,333,220,360"/>
-<area shape="rect" id="node9" title=" " alt="" coords="245,333,303,360"/>
-<area shape="rect" id="node10" title=" " alt="" coords="328,333,391,360"/>
-<area shape="rect" id="node11" title=" " alt="" coords="415,333,517,360"/>
+<area shape="rect" id="Node000001" title="Guard Data Structure Implementation using BDDs." alt="" coords="35,5,265,45"/>
+<area shape="rect" id="Node000002" href="$bdd_8h.html" title="Choice between the different interface to BDD libraries." alt="" coords="81,93,219,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,46,153,79,147,79,147,46"/>
+<area shape="rect" id="Node000003" href="$bdd__mini_b_d_d_8h.html" title="Interface to miniBDD functions that are used in CBMC BDD functions should only be accessed through th..." alt="" coords="89,167,211,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="153,119,153,153,147,153,147,119"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,247,129,273"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="140,194,91,240,88,236,136,190"/>
+<area shape="rect" id="Node000005" href="$mini_b_d_d_8h.html" title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes." alt="" coords="153,240,312,280"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="164,190,205,229,201,233,160,194"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="21,328,63,353"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="188,282,77,328,75,323,186,278"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="87,328,138,353"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="205,282,143,323,140,318,202,278"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="163,328,220,353"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="225,281,206,317,202,314,220,279"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="245,328,303,353"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="245,279,264,314,259,317,240,281"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="328,328,391,353"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="265,278,331,319,328,323,262,282"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="415,328,517,353"/>
+<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="289,277,420,321,418,326,288,283"/>
 </map>

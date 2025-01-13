@@ -4,7 +4,7 @@ var classarray__poolt =
     [ "created_strings", "classarray__poolt.html#afd81c8918b5b1bb1ffc178a174b972a5", null ],
     [ "find", "classarray__poolt.html#af0240cbd1849d8ee26de0e6d4d5bb4f7", null ],
     [ "fresh_string", "classarray__poolt.html#aeda80ff4aea1ab69f0f10b48149f379f", null ],
-    [ "get_arrays_of_pointers", "classarray__poolt.html#a103dc41eefc9e1c54475c8cf0c391a3d", null ],
+    [ "get_arrays_of_pointers", "classarray__poolt.html#a86229bbb3cca3e4969ea456691536b31", null ],
     [ "get_length_if_exists", "classarray__poolt.html#a599a5de25f963f91dc97a4cf0010fc4e", null ],
     [ "get_or_create_length", "classarray__poolt.html#a70c342c8834e76fee4707c91fd81d23e", null ],
     [ "insert", "classarray__poolt.html#a993fe9bbf405bdf90814e9b5f5960886", null ],

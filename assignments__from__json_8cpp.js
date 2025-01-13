@@ -1,11 +1,28 @@
 var assignments__from__json_8cpp =
 [
     [ "object_creation_infot", "structobject__creation__infot.html", "structobject__creation__infot" ],
-    [ "element_type_from_array_type", "assignments__from__json_8cpp.html#a70d98ffa4205bee56e87103d7aa3249c", null ],
+    [ "get_or_create_reference_resultt", "structget__or__create__reference__resultt.html", "structget__or__create__reference__resultt" ],
+    [ "assign_array_data_component_from_json", "assignments__from__json_8cpp.html#a00cd1ef90c22b87ea12c2d564f9170ae", null ],
+    [ "assign_det_length_array_from_json", "assignments__from__json_8cpp.html#a7fe6129ff8f849fbd7e7997a76baaac1", null ],
+    [ "assign_enum_from_json", "assignments__from__json_8cpp.html#afeaaf2c9791efc67155355d629eae084", null ],
+    [ "assign_from_json", "assignments__from__json_8cpp.html#adc3a79527bc14884f08ecef901937cbe", null ],
+    [ "assign_from_json_rec", "assignments__from__json_8cpp.html#ac721bf9c7907cdc3a302f751e21d22e9", null ],
+    [ "assign_non_enum_pointer_from_json", "assignments__from__json_8cpp.html#af152a5c76f52ee8c78dd08765196998b", null ],
+    [ "assign_nondet_length_array_from_json", "assignments__from__json_8cpp.html#a478ae17ff98c591ed4f96c8187ec962f", null ],
+    [ "assign_null", "assignments__from__json_8cpp.html#a038484071adc18ad6e9d244ec4c72bb6", null ],
+    [ "assign_pointer_from_json", "assignments__from__json_8cpp.html#a31ed5fe8e7cf4cadef86753e3d341ef4", null ],
+    [ "assign_pointer_with_given_type_from_json", "assignments__from__json_8cpp.html#ab68e9ae27b6f0f7c24b5dae83d1f2e30", null ],
+    [ "assign_primitive_from_json", "assignments__from__json_8cpp.html#abe37728a4f16cce9746388108fa9d824", null ],
+    [ "assign_reference_from_json", "assignments__from__json_8cpp.html#a2736fbd5003a0e7ed5fcac3832eca837", null ],
+    [ "assign_string_from_json", "assignments__from__json_8cpp.html#ad255aa7c89bf236e27c0b3144df312c3", null ],
+    [ "assign_struct_components_from_json", "assignments__from__json_8cpp.html#aa7b40157df640f68d7ba6fd260514e8c", null ],
+    [ "assign_struct_from_json", "assignments__from__json_8cpp.html#ac92bcdfc34afe6029eac83ba79f4d7a5", null ],
+    [ "element_type_from_array_type", "assignments__from__json_8cpp.html#a3dafabd375c6f50544c2fa3cb2f9b876", null ],
     [ "followed_class_type", "assignments__from__json_8cpp.html#a2bcaa10bbe1163fa29d7958e8a11db6c", null ],
     [ "get_enum_id", "assignments__from__json_8cpp.html#a4969415db571496d7312dce2df54b75d", null ],
     [ "get_id_or_reference_value", "assignments__from__json_8cpp.html#a3b676c4ba71977f626c51ced8aa075a8", null ],
-    [ "get_type", "assignments__from__json_8cpp.html#a19642122fa63c27d0f931d0edc4cd76a", null ],
+    [ "get_or_create_reference", "assignments__from__json_8cpp.html#ab773d3d33694bd5cf362a1a48b94e479", null ],
+    [ "get_type", "assignments__from__json_8cpp.html#a7a95a65e77b1f26c3a7ab55de9337327", null ],
     [ "get_untyped", "assignments__from__json_8cpp.html#a93485d106b775089cb7a764c6aa4f2e0", null ],
     [ "get_untyped_array", "assignments__from__json_8cpp.html#abf13f67d33bcc47ea8f679816972aa14", null ],
     [ "get_untyped_primitive", "assignments__from__json_8cpp.html#a95106a6a6b27f89f134e29cea231743f", null ],
@@ -15,5 +32,6 @@ var assignments__from__json_8cpp =
     [ "has_nondet_length", "assignments__from__json_8cpp.html#a46ea9983ba2ce9c9013d0a9e9985772a", null ],
     [ "is_enum_with_type_equal_to_declaring_type", "assignments__from__json_8cpp.html#a5c76aa6635d3a662f9f2ba10d5347738", null ],
     [ "is_reference", "assignments__from__json_8cpp.html#a6b055c274a7b9f71152e595d19001f40", null ],
-    [ "runtime_type", "assignments__from__json_8cpp.html#adc14485aea123724dd6d238dc0fd4bfc", null ]
+    [ "nondet_length", "assignments__from__json_8cpp.html#a0d6e693bcc0b4c9c0c07cc1284c190c1", null ],
+    [ "runtime_type", "assignments__from__json_8cpp.html#a02397c722097a548695ae9fb9f18a8b8", null ]
 ];

@@ -1,14 +1,25 @@
 <map id="message_handlert" name="message_handlert">
-<area shape="rect" id="node1" title=" " alt="" coords="5,157,148,184"/>
-<area shape="rect" id="node2" href="$classapi__message__handlert.html" title=" " alt="" coords="211,5,380,32"/>
-<area shape="rect" id="node3" href="$classconsole__message__handlert.html" title=" " alt="" coords="196,56,395,83"/>
-<area shape="rect" id="node6" href="$classinlining__decoratort.html" title="Decorator for a message_handlert used during function inlining that collect names of GOTO functions c..." alt="" coords="223,107,367,133"/>
-<area shape="rect" id="node7" href="$classnull__message__handlert.html" title=" " alt="" coords="209,157,382,184"/>
-<area shape="rect" id="node8" href="$classsmt2__message__handlert.html" title=" " alt="" coords="204,208,387,235"/>
-<area shape="rect" id="node9" href="$classstream__message__handlert.html" title=" " alt="" coords="198,259,393,285"/>
-<area shape="rect" id="node12" href="$classui__message__handlert.html" title=" " alt="" coords="215,309,376,336"/>
-<area shape="rect" id="node4" href="$classcl__message__handlert.html" title=" " alt="" coords="451,31,611,57"/>
-<area shape="rect" id="node5" href="$classgcc__message__handlert.html" title=" " alt="" coords="446,81,617,108"/>
-<area shape="rect" id="node10" href="$classcerr__message__handlert.html" title=" " alt="" coords="444,233,619,260"/>
-<area shape="rect" id="node11" href="$classcout__message__handlert.html" title=" " alt="" coords="443,284,620,311"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,153,148,179"/>
+<area shape="rect" id="Node000002" href="$classapi__message__handlert.html" title=" " alt="" coords="211,5,380,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,140,134,89,163,62,195,40,220,28,223,33,197,44,166,66,138,93,96,144"/>
+<area shape="rect" id="Node000003" href="$classconsole__message__handlert.html" title=" " alt="" coords="196,55,395,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="104,143,145,115,195,89,228,78,230,83,197,94,148,120,107,147"/>
+<area shape="rect" id="Node000006" href="$classinlining__decoratort.html" title="Decorator for a message_handlert used during function inlining that collect names of GOTO functions c..." alt="" coords="223,104,367,129"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="146,148,238,127,239,132,147,153"/>
+<area shape="rect" id="Node000007" href="$classnull__message__handlert.html" title=" " alt="" coords="209,153,382,179"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="162,163,208,163,208,169,162,169"/>
+<area shape="rect" id="Node000008" href="$classsmt2__message__handlert.html" title=" " alt="" coords="204,203,387,228"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="147,179,239,200,238,205,146,184"/>
+<area shape="rect" id="Node000009" href="$classstream__message__handlert.html" title=" " alt="" coords="198,252,393,277"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="107,184,149,212,197,237,234,249,232,254,195,242,146,216,104,189"/>
+<area shape="rect" id="Node000012" href="$classui__message__handlert.html" title=" " alt="" coords="215,301,376,327"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="96,188,138,239,166,266,197,288,223,299,220,304,195,292,163,270,134,243,92,192"/>
+<area shape="rect" id="Node000004" href="$classcl__message__handlert.html" title=" " alt="" coords="451,31,611,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="408,53,451,49,452,54,409,59"/>
+<area shape="rect" id="Node000005" href="$classgcc__message__handlert.html" title=" " alt="" coords="446,80,617,105"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="409,77,446,81,446,86,408,82"/>
+<area shape="rect" id="Node000010" href="$classcerr__message__handlert.html" title=" " alt="" coords="444,227,619,252"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="406,250,443,246,444,251,407,255"/>
+<area shape="rect" id="Node000011" href="$classcout__message__handlert.html" title=" " alt="" coords="443,276,620,301"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="407,273,443,277,442,282,406,279"/>
 </map>

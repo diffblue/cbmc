@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['solvers_45949',['solvers',['../group__solvers.html',1,'']]]
+  ['langapi_0',['langapi',['../group__langapi.html',1,'']]],
+  ['linking_1',['linking',['../group__linking.html',1,'']]]
 ];

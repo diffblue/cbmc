@@ -12,5 +12,5 @@ var classjava__method__typet =
     [ "set_is_synthetic", "classjava__method__typet.html#ad112ba0e1af36bb810bc8e4fb2b238c1", null ],
     [ "set_is_varargs", "classjava__method__typet.html#a8a7c557e67dacf3b6534a2dfb18bca1f", null ],
     [ "set_native", "classjava__method__typet.html#af38dd45ee5d615be659e1dc1b787ed75", null ],
-    [ "throws_exceptions", "classjava__method__typet.html#a279c83048af348bc2481e4dee05d7f0a", null ]
+    [ "throws_exceptions", "classjava__method__typet.html#a248dc1ec981088b650b8ad97614ff792", null ]
 ];

@@ -5,7 +5,7 @@ var classcnf__clause__listt =
     [ "~cnf_clause_listt", "classcnf__clause__listt.html#a52c2a60f5d3227c06e347c7df165069b", null ],
     [ "copy_to", "classcnf__clause__listt.html#a9f63a8d0fa9db81f89eadb6f01aa3279", null ],
     [ "do_prop_solve", "classcnf__clause__listt.html#a6e80a63b7265b1c5beddd7bd2b520904", null ],
-    [ "get_clauses", "classcnf__clause__listt.html#afce30511654d6a7ad6815b31057a84aa", null ],
+    [ "get_clauses", "classcnf__clause__listt.html#a124ca0a96f3ca9687abf82945621aeb0", null ],
     [ "hash", "classcnf__clause__listt.html#ae96f22993482f7cbfd664067fa5184aa", null ],
     [ "hash_clause", "classcnf__clause__listt.html#a75e6e04e3c482a285dad6d3d6050811f", null ],
     [ "l_get", "classcnf__clause__listt.html#a054636797ddeb05aff4ce5002e85f4ef", null ],

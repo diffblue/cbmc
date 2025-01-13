@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/invariant_utils.h" name="/home/runner/work/cbmc/cbmc/src/util/invariant_utils.h">
-<area shape="rect" id="node1" title=" " alt="" coords="245,5,429,61"/>
-<area shape="rect" id="node2" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="5,109,220,165"/>
-<area shape="rect" id="node3" href="$invariant__utils_8cpp.html" title="Invariant helper utilities." alt="" coords="245,109,429,165"/>
-<area shape="rect" id="node4" href="$simple__method__stubbing_8cpp.html" title="Java simple opaque stub generation." alt="" coords="453,109,671,165"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="264,5,448,60"/>
+<area shape="rect" id="Node000002" href="$simple__method__stubbing_8cpp.html" title="Java simple opaque stub generation." alt="" coords="5,108,224,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="282,68,179,110,177,105,280,63"/>
+<area shape="rect" id="Node000003" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="249,108,463,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="359,74,359,108,353,108,353,74"/>
+<area shape="rect" id="Node000004" href="$invariant__utils_8cpp.html" title="Invariant helper utilities." alt="" coords="488,108,672,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="428,63,523,106,521,110,426,68"/>
 </map>

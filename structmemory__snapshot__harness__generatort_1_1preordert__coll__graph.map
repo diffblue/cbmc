@@ -1,8 +1,14 @@
 <map id="memory_snapshot_harness_generatort::preordert&lt; Key &gt;" name="memory_snapshot_harness_generatort::preordert&lt; Key &gt;">
-<area shape="rect" id="node1" title="Simple structure for linearising posets." alt="" coords="57,288,258,344"/>
-<area shape="rect" id="node2" title=" " alt="" coords="37,184,161,211"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,95,115,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="98,5,137,32"/>
-<area shape="rect" id="node5" title=" " alt="" coords="139,95,307,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="203,5,242,32"/>
+<area shape="rect" id="Node000001" title="Simple structure for linearising posets." alt="" coords="66,284,267,339"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="139,93,307,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,133,217,192,200,261,188,285,183,283,195,259,212,191,219,132"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="98,5,137,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="144,37,210,91,207,95,140,41"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,93,115,119"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="98,43,88,56,67,94,62,92,83,53,94,39"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="203,5,242,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="225,45,225,93,220,93,220,45"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="37,181,161,207"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="115,217,153,282,149,285,110,220"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="73,130,96,180,91,182,68,132"/>
 </map>

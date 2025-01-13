@@ -1,9 +1,15 @@
 <map id="java_implicitly_generic_class_typet" name="java_implicitly_generic_class_typet">
-<area shape="rect" id="node1" title="Type to hold a Java class that is implicitly generic, e.g., an inner class of a generic outer class o..." alt="" coords="5,453,179,495"/>
-<area shape="rect" id="node2" href="$classjava__class__typet.html" title=" " alt="" coords="27,379,157,405"/>
-<area shape="rect" id="node3" href="$classclass__typet.html" title="Class type." alt="" coords="44,304,140,331"/>
-<area shape="rect" id="node4" href="$classstruct__typet.html" title="Structure type, corresponds to C style structs." alt="" coords="42,229,142,256"/>
-<area shape="rect" id="node5" href="$classstruct__union__typet.html" title="Base type for structs and unions." alt="" coords="21,155,163,181"/>
-<area shape="rect" id="node6" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="64,80,120,107"/>
-<area shape="rect" id="node7" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="66,5,118,32"/>
+<area shape="rect" id="Node000001" title="Type to hold a Java class that is implicitly generic, e.g., an inner class of a generic outer class o..." alt="" coords="5,445,179,485"/>
+<area shape="rect" id="Node000002" href="$classjava__class__typet.html" title=" " alt="" coords="27,372,157,397"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,411,95,445,89,445,89,411"/>
+<area shape="rect" id="Node000003" href="$classclass__typet.html" title="Class type." alt="" coords="44,299,140,324"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,338,95,372,89,372,89,338"/>
+<area shape="rect" id="Node000004" href="$classstruct__typet.html" title="Structure type, corresponds to C style structs." alt="" coords="42,225,142,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="95,264,95,299,89,299,89,264"/>
+<area shape="rect" id="Node000005" href="$classstruct__union__typet.html" title="Base type for structs and unions." alt="" coords="21,152,163,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="95,191,95,225,89,225,89,191"/>
+<area shape="rect" id="Node000006" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="64,79,120,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="95,118,95,152,89,152,89,118"/>
+<area shape="rect" id="Node000007" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="66,5,118,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="95,44,95,79,89,79,89,44"/>
 </map>

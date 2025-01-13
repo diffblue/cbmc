@@ -1,9 +1,16 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_calls_no_body.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_calls_no_body.h">
-<area shape="rect" id="node1" title="Remove calls to functions without a body." alt="" coords="406,5,591,61"/>
-<area shape="rect" id="node2" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,213,264,269"/>
-<area shape="rect" id="node3" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="256,109,499,165"/>
-<area shape="rect" id="node6" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="523,109,717,165"/>
-<area shape="rect" id="node7" href="$remove__calls__no__body_8cpp.html" title="Remove calls to functions without a body." alt="" coords="741,109,941,165"/>
-<area shape="rect" id="node4" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="288,213,523,269"/>
-<area shape="rect" id="node5" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="547,213,747,269"/>
+<area shape="rect" id="Node000001" title="Remove calls to functions without a body." alt="" coords="406,5,591,60"/>
+<area shape="rect" id="Node000002" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,211,264,265"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="393,53,318,75,280,91,245,110,216,133,191,160,152,212,148,209,187,157,213,129,243,106,278,86,316,70,391,48"/>
+<area shape="rect" id="Node000003" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="256,108,499,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="458,71,411,110,407,106,455,67"/>
+<area shape="rect" id="Node000006" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="523,108,717,163"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="543,67,590,106,587,110,539,71"/>
+<area shape="rect" id="Node000007" href="$remove__calls__no__body_8cpp.html" title="Remove calls to functions without a body." alt="" coords="741,108,941,163"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="602,61,753,105,751,111,600,66"/>
+<area shape="poly" id="edge5_Node000003_Node000002" title=" " alt="" coords="303,170,199,213,197,208,301,165"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="288,211,523,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="391,175,401,210,395,211,386,177"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="547,211,747,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="461,165,577,208,576,213,459,170"/>
 </map>

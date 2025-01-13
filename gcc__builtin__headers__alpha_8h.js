@@ -45,5 +45,5 @@ var gcc__builtin__headers__alpha_8h =
     [ "__builtin_alpha_zap", "gcc__builtin__headers__alpha_8h.html#aa29a411cc8e54d9aa49c3714af471d80", null ],
     [ "__builtin_alpha_zapnot", "gcc__builtin__headers__alpha_8h.html#a7ca59b89c7a8de3f77dd20b4cb78157f", null ],
     [ "__builtin_set_thread_pointer", "gcc__builtin__headers__alpha_8h.html#ab4007ded2f32d79cd1f6dae0aaa3554c", null ],
-    [ "__builtin_thread_pointer", "gcc__builtin__headers__alpha_8h.html#af435c3d190c2c8d6be05a36d9d4f496e", null ]
+    [ "__builtin_thread_pointer", "gcc__builtin__headers__alpha_8h.html#ac55d2d1386e60e7567c5f66b074b8c90", null ]
 ];

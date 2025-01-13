@@ -6,9 +6,9 @@ var java__string__library__preprocess_8cpp =
     [ "add_pointer_to_array_association", "java__string__library__preprocess_8cpp.html#ad79c644455ba86884f995a597b543817", null ],
     [ "code_assign_function_application", "java__string__library__preprocess_8cpp.html#a39325c600735c1d2a2c3ffeaaf203095", null ],
     [ "get_data", "java__string__library__preprocess_8cpp.html#a6470734fd999c4d6721d4e09936ac390", null ],
-    [ "get_data_type", "java__string__library__preprocess_8cpp.html#a34353516b6455a1368a3813278e500ae", null ],
+    [ "get_data_type", "java__string__library__preprocess_8cpp.html#a51fa779ea8eebfce5d4fa4db4f04440c", null ],
     [ "get_length", "java__string__library__preprocess_8cpp.html#a6dd4959b3c706c55a780396434485270", null ],
-    [ "get_length_type", "java__string__library__preprocess_8cpp.html#ac65927e5e6efc662fccccfd3c5aa8ca1", null ],
+    [ "get_length_type", "java__string__library__preprocess_8cpp.html#add865257744b1f50e1a1d6fff87ad12c", null ],
     [ "get_tag", "java__string__library__preprocess_8cpp.html#a00b3f4a5cc83580971c78c103a72e8bc", null ],
     [ "make_nondet_infinite_char_array", "java__string__library__preprocess_8cpp.html#a7201122e161d707ca0f09a700b5067a9", null ],
     [ "string_length_type", "java__string__library__preprocess_8cpp.html#a279f941079e7df1daa71c64d92c16c70", null ]

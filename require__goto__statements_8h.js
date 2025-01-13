@@ -1,7 +1,7 @@
 var require__goto__statements_8h =
 [
-    [ "pointer_assignment_locationt", "structrequire__goto__statements_1_1pointer__assignment__locationt.html", "structrequire__goto__statements_1_1pointer__assignment__locationt" ],
-    [ "no_decl_found_exceptiont", "classrequire__goto__statements_1_1no__decl__found__exceptiont.html", "classrequire__goto__statements_1_1no__decl__found__exceptiont" ],
+    [ "require_goto_statements::pointer_assignment_locationt", "structrequire__goto__statements_1_1pointer__assignment__locationt.html", "structrequire__goto__statements_1_1pointer__assignment__locationt" ],
+    [ "require_goto_statements::no_decl_found_exceptiont", "classrequire__goto__statements_1_1no__decl__found__exceptiont.html", "classrequire__goto__statements_1_1no__decl__found__exceptiont" ],
     [ "find_function_calls", "require__goto__statements_8h.html#a1b546adf84c819ba957a867c7df0ccd9", null ],
     [ "find_pointer_assignments", "require__goto__statements_8h.html#a59ef94d79018a3bf3ae8507ad8781503", null ],
     [ "find_pointer_assignments", "require__goto__statements_8h.html#a930e20f0930649f44ef80331ffb4cbe5", null ],

@@ -1,6 +1,9 @@
 <map id="can_forward_propagatet" name="can_forward_propagatet">
-<area shape="rect" id="node1" title="Determine whether an expression is constant." alt="" coords="5,78,185,105"/>
-<area shape="rect" id="node2" href="$classconstant__propagator__can__forward__propagatet.html" title=" " alt="" coords="235,5,421,47"/>
-<area shape="rect" id="node3" href="$classgoto__symex__can__forward__propagatet.html" title=" " alt="" coords="233,71,423,112"/>
-<area shape="rect" id="node4" href="$classhavoc__utils__can__forward__propagatet.html" title="A class containing utility functions for havocing expressions." alt="" coords="237,136,419,177"/>
+<area shape="rect" id="Node000001" title="Determine whether an expression is constant." alt="" coords="5,77,185,102"/>
+<area shape="rect" id="Node000002" href="$classconstant__propagator__can__forward__propagatet.html" title=" " alt="" coords="235,5,421,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,70,254,43,255,48,156,76"/>
+<area shape="rect" id="Node000003" href="$classgoto__symex__can__forward__propagatet.html" title=" " alt="" coords="233,69,423,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,87,233,87,233,92,199,92"/>
+<area shape="rect" id="Node000004" href="$classhavoc__utils__can__forward__propagatet.html" title="A class containing utility functions for havocing expressions." alt="" coords="237,133,419,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="156,103,255,131,254,136,155,108"/>
 </map>

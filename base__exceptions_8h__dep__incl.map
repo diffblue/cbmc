@@ -1,7 +1,11 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/base_exceptions.h" name="/home/runner/work/cbmc/cbmc/src/util/base_exceptions.h">
-<area shape="rect" id="node1" title="Generic exception types primarily designed for use with invariants." alt="" coords="345,5,579,47"/>
-<area shape="rect" id="node2" href="$reaching__definitions_8cpp.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="5,95,212,151"/>
-<area shape="rect" id="node3" href="$cpp__instantiate__template_8cpp.html" title="C++ Language Type Checking." alt="" coords="236,95,451,151"/>
-<area shape="rect" id="node4" href="$cpp__typecheck__template_8cpp.html" title="C++ Language Type Checking." alt="" coords="475,95,687,151"/>
-<area shape="rect" id="node5" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="711,95,909,151"/>
+<area shape="rect" id="Node000001" title="Generic exception types primarily designed for use with invariants." alt="" coords="345,5,579,45"/>
+<area shape="rect" id="Node000002" href="$reaching__definitions_8cpp.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="5,93,212,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="378,51,209,96,207,91,377,46"/>
+<area shape="rect" id="Node000003" href="$cpp__instantiate__template_8cpp.html" title="C++ Language Type Checking." alt="" coords="236,93,451,148"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="429,56,378,95,375,91,426,52"/>
+<area shape="rect" id="Node000004" href="$cpp__typecheck__template_8cpp.html" title="C++ Language Type Checking." alt="" coords="475,93,687,148"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="498,52,549,91,546,95,495,56"/>
+<area shape="rect" id="Node000005" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="711,93,909,148"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="546,46,713,91,711,96,545,51"/>
 </map>

@@ -1,10 +1,20 @@
 <map id="symbol_tablet" name="symbol_tablet">
-<area shape="rect" id="node1" title="The symbol table." alt="" coords="79,440,193,467"/>
-<area shape="rect" id="node2" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="293,348,446,375"/>
-<area shape="rect" id="node3" title=" " alt="" coords="87,213,241,255"/>
-<area shape="rect" id="node4" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="197,102,269,129"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,102,173,129"/>
-<area shape="rect" id="node6" title=" " alt="" coords="143,5,182,32"/>
-<area shape="rect" id="node8" title=" " alt="" coords="293,95,445,136"/>
-<area shape="rect" id="node7" title=" " alt="" coords="297,5,335,32"/>
+<area shape="rect" id="Node000001" title="The symbol table." alt="" coords="79,436,193,461"/>
+<area shape="rect" id="Node000002" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="293,345,446,370"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="327,377,167,438,165,433,325,373"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="293,93,445,133"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="372,147,372,344,367,344,367,147"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="143,5,182,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="178,41,190,55,204,67,237,78,294,92,292,97,235,83,201,72,186,59,174,44"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,101,173,126"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="145,42,133,56,99,102,95,99,129,53,141,39"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="297,5,335,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="332,41,361,92,356,94,327,44"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="291,41,238,72,190,90,143,103,142,98,188,85,236,67,288,37"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="87,211,241,251"/>
+<area shape="poly" id="edge10_Node000001_Node000006" title=" " alt="" coords="154,264,136,328,134,357,136,387,138,436,133,436,131,387,129,357,131,328,149,263"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="180,262,193,283,211,302,257,320,330,342,329,347,256,325,208,306,189,287,175,265"/>
+<area shape="rect" id="Node000007" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="197,101,269,126"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="228,140,206,188,186,212,182,209,202,185,224,138"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="71,138,57,162,56,174,60,185,72,199,89,209,86,214,69,203,55,188,50,175,52,160,66,135"/>
 </map>

@@ -1,11 +1,22 @@
 <map id="subsumed_patht" name="subsumed_patht">
-<area shape="rect" id="node1" title=" " alt="" coords="93,603,224,629"/>
-<area shape="rect" id="node2" title=" " alt="" coords="72,484,245,511"/>
-<area shape="rect" id="node3" href="$classpath__nodet.html" title=" " alt="" coords="49,395,143,421"/>
-<area shape="rect" id="node4" href="$classexprt.html" title="Base class for all expressions." alt="" coords="68,305,124,332"/>
-<area shape="rect" id="node5" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="70,229,122,256"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title=" " alt="" coords="13,124,179,180"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,5,187,47"/>
-<area shape="rect" id="node8" title=" " alt="" coords="167,395,275,421"/>
-<area shape="rect" id="node9" title=" " alt="" coords="202,305,241,332"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1796,66,1927,91"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="1497,66,1671,91"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1684,76,1796,76,1796,81,1684,81"/>
+<area shape="rect" id="Node000003" href="$classpath__nodet.html" title=" " alt="" coords="1240,41,1335,66"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1349,56,1497,69,1497,74,1348,61"/>
+<area shape="rect" id="Node000004" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1064,41,1120,66"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1134,51,1240,51,1240,56,1134,56"/>
+<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="963,41,1015,66"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1028,51,1064,51,1064,56,1028,56"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="747,26,913,81"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="927,51,963,51,963,56,927,56"/>
+<area shape="rect" id="Node000007" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="5,39,216,79"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="230,41,240,40,376,33,481,31,723,40,747,42,746,47,723,45,481,36,376,38,240,45,230,46"/>
+<area shape="rect" id="Node000013" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="321,72,503,112"/>
+<area shape="poly" id="edge8_Node000013_Node000007" title=" " alt="" coords="230,69,321,79,321,85,229,74"/>
+<area shape="poly" id="edge7_Node000006_Node000013" title=" " alt="" coords="516,86,616,79,722,69,746,66,747,71,723,75,617,85,516,91"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="1233,90,1341,115"/>
+<area shape="poly" id="edge9_Node000002_Node000014" title=" " alt="" coords="1355,101,1473,96,1522,89,1523,94,1474,101,1355,106"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="1073,90,1111,115"/>
+<area shape="poly" id="edge10_Node000014_Node000012" title=" " alt="" coords="1125,100,1233,100,1233,105,1125,105"/>
 </map>

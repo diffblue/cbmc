@@ -1,8 +1,16 @@
 <map id="code_with_references_listt" name="code_with_references_listt">
-<area shape="rect" id="node1" title="Wrapper around a list of shared pointer to code_with_referencest objects, which provides a nicer inte..." alt="" coords="86,404,250,445"/>
-<area shape="rect" id="node2" title=" " alt="" coords="49,300,287,341"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,196,171,237"/>
-<area shape="rect" id="node4" title=" " alt="" coords="16,95,173,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="166,5,205,32"/>
-<area shape="rect" id="node6" title=" " alt="" coords="221,145,329,172"/>
+<area shape="rect" id="Node000001" title="Wrapper around a list of shared pointer to code_with_referencest objects, which provides a nicer inte..." alt="" coords="163,397,327,437"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="125,295,364,335"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="247,349,247,397,242,397,242,349"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="69,192,234,232"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,240,229,293,225,296,176,244"/>
+<area shape="rect" id="Node000004" href="$classcode__with__referencest.html" title="Base class for code which can contain references which can get replaced before generating actual code..." alt="" coords="5,93,175,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="92,132,95,150,102,167,123,190,119,193,97,169,90,151,87,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="199,93,357,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="193,124,165,133,148,144,143,155,142,167,146,192,141,192,136,167,138,153,144,141,162,129,191,119"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="317,5,356,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="323,44,288,94,284,91,319,41"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="340,143,448,168"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="350,42,371,92,392,141,387,143,366,94,345,44"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="375,180,265,296,261,292,372,176"/>
 </map>

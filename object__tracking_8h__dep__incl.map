@@ -1,12 +1,26 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/smt2_incremental/object_tracking.h" name="/home/runner/work/cbmc/cbmc/src/solvers/smt2_incremental/object_tracking.h">
-<area shape="rect" id="node1" title="Data structures and algorithms used by smt2_incremental_decision_proceduret to track data about the o..." alt="" coords="586,5,809,61"/>
-<area shape="rect" id="node2" href="$convert__expr__to__smt_8h.html" title=" " alt="" coords="374,228,570,299"/>
-<area shape="rect" id="node7" href="$object__tracking_8cpp.html" title=" " alt="" coords="801,117,1039,173"/>
-<area shape="rect" id="node8" href="$smt2__incremental__decision__procedure_8h.html" title="Decision procedure with incremental SMT2 solving." alt="" coords="696,228,925,299"/>
-<area shape="rect" id="node10" href="$type__size__mapping_8h.html" title="Utilities for making a map of types to associated sizes." alt="" coords="541,109,725,180"/>
-<area shape="rect" id="node3" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="214,347,410,417"/>
-<area shape="rect" id="node4" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="643,347,872,417"/>
-<area shape="rect" id="node5" href="$smt__object__size_8cpp.html" title=" " alt="" coords="5,347,189,417"/>
-<area shape="rect" id="node6" href="$type__size__mapping_8cpp.html" title=" " alt="" coords="435,347,619,417"/>
-<area shape="rect" id="node9" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="896,354,1080,410"/>
+<area shape="rect" id="Node000001" title="Data structures and algorithms used by smt2_incremental_decision_proceduret to track data about the o..." alt="" coords="586,5,809,60"/>
+<area shape="rect" id="Node000002" href="$convert__expr__to__smt_8h.html" title=" " alt="" coords="374,225,570,295"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="592,68,560,86,531,110,511,137,497,167,480,226,474,225,492,165,507,134,527,106,557,82,590,63"/>
+<area shape="rect" id="Node000007" href="$object__tracking_8cpp.html" title=" " alt="" coords="801,115,1039,170"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="765,64,867,113,865,118,763,69"/>
+<area shape="rect" id="Node000008" href="$smt2__incremental__decision__procedure_8h.html" title="Decision procedure with incremental SMT2 solving." alt="" coords="696,225,925,295"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="721,71,740,107,797,224,792,226,735,109,716,73"/>
+<area shape="rect" id="Node000010" href="$type__size__mapping_8h.html" title="Utilities for making a map of types to associated sizes." alt="" coords="541,108,725,177"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="677,74,656,109,651,106,672,71"/>
+<area shape="rect" id="Node000003" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="214,343,410,412"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="416,305,361,344,357,340,413,301"/>
+<area shape="rect" id="Node000004" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="643,343,872,412"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="569,297,675,340,673,345,567,302"/>
+<area shape="rect" id="Node000005" href="$smt__object__size_8cpp.html" title=" " alt="" coords="5,343,189,412"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="361,297,202,345,191,349,189,344,201,340,360,292"/>
+<area shape="rect" id="Node000006" href="$type__size__mapping_8cpp.html" title=" " alt="" coords="435,343,619,412"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="496,306,513,341,508,344,492,309"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="792,309,775,344,771,341,787,306"/>
+<area shape="rect" id="Node000009" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="896,350,1080,405"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="875,300,949,348,946,352,872,304"/>
+<area shape="poly" id="edge11_Node000010_Node000002" title=" " alt="" coords="577,188,521,227,518,223,574,183"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="646,190,662,241,686,293,704,318,723,341,719,344,699,322,682,296,657,243,641,191"/>
+<area shape="poly" id="edge14_Node000010_Node000006" title=" " alt="" coords="624,191,607,242,585,296,555,344,551,341,580,293,602,241,619,190"/>
+<area shape="poly" id="edge13_Node000010_Node000008" title=" " alt="" coords="698,183,760,223,757,227,695,187"/>
 </map>

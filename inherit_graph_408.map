@@ -1,3 +1,102 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classidentity__functort.html" title="Identity functor. When we use C++20 this can be replaced with std::identity." alt="" coords="5,5,136,32"/>
+<area shape="rect" id="Node000000" href="$classhardness__collectort.html" title=" " alt="" coords="204,408,353,433"/>
+<area shape="rect" id="Node000001" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="424,482,604,522"/>
+<area shape="poly" id="edge288_Node000000_Node000001" title=" " alt="" coords="324,436,402,466,443,479,441,484,400,471,322,441"/>
+<area shape="rect" id="Node000004" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="421,546,607,586"/>
+<area shape="poly" id="edge290_Node000000_Node000004" title=" " alt="" coords="301,442,345,488,372,511,403,532,428,544,426,548,400,536,369,516,341,492,297,446"/>
+<area shape="rect" id="Node000006" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="421,610,607,650"/>
+<area shape="poly" id="edge292_Node000000_Node000006" title=" " alt="" coords="293,445,310,479,334,520,365,561,403,596,423,608,421,612,400,600,361,565,330,523,305,482,288,447"/>
+<area shape="rect" id="Node000008" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="421,219,607,259"/>
+<area shape="poly" id="edge294_Node000000_Node000008" title=" " alt="" coords="315,399,351,368,367,342,373,318,380,294,400,269,419,257,422,261,403,273,385,296,378,319,371,344,355,372,318,403"/>
+<area shape="rect" id="Node000013" href="$classsatcheck__cadical__baset.html" title=" " alt="" coords="426,432,602,457"/>
+<area shape="poly" id="edge296_Node000000_Node000013" title=" " alt="" coords="368,427,426,433,425,438,367,432"/>
+<area shape="rect" id="Node000016" href="$classsatcheck__glucose__baset.html" title=" " alt="" coords="405,284,623,309"/>
+<area shape="poly" id="edge299_Node000000_Node000016" title=" " alt="" coords="311,398,352,368,374,342,384,330,400,318,427,307,429,312,403,323,388,334,378,345,355,372,314,403"/>
+<area shape="rect" id="Node000017" href="$classsatcheck__ipasirt.html" title="Interface for generic SAT solver interface IPASIR." alt="" coords="450,333,578,359"/>
+<area shape="poly" id="edge300_Node000000_Node000017" title=" " alt="" coords="318,400,401,367,449,355,450,360,402,373,320,405"/>
+<area shape="rect" id="Node000023" href="$classsatcheck__minisat2__baset.html" title=" " alt="" coords="401,383,627,408"/>
+<area shape="poly" id="edge301_Node000000_Node000023" title=" " alt="" coords="367,409,401,405,402,410,367,414"/>
+<area shape="rect" id="Node000002" href="$classsatcheck__glucose__no__simplifiert.html" title=" " alt="" coords="713,489,873,529"/>
+<area shape="poly" id="edge289_Node000001_Node000002" title=" " alt="" coords="618,502,713,504,712,509,618,507"/>
+<area shape="rect" id="Node000005" href="$classsatcheck__glucose__simplifiert.html" title=" " alt="" coords="687,553,898,579"/>
+<area shape="poly" id="edge291_Node000004_Node000005" title=" " alt="" coords="621,563,687,563,687,569,621,569"/>
+<area shape="rect" id="Node000007" href="$classsatcheck__minisat__no__simplifiert.html" title=" " alt="" coords="713,606,872,646"/>
+<area shape="poly" id="edge293_Node000006_Node000007" title=" " alt="" coords="621,626,713,624,713,630,621,631"/>
+<area shape="rect" id="Node000009" href="$classsatcheck__minisat__simplifiert.html" title=" " alt="" coords="688,227,897,252"/>
+<area shape="poly" id="edge295_Node000008_Node000009" title=" " alt="" coords="621,237,688,237,688,242,621,242"/>
+<area shape="rect" id="Node000014" href="$classsatcheck__cadical__no__preprocessingt.html" title=" " alt="" coords="715,425,871,465"/>
+<area shape="poly" id="edge297_Node000013_Node000014" title=" " alt="" coords="616,442,715,442,715,447,616,447"/>
+<area shape="rect" id="Node000015" href="$classsatcheck__cadical__preprocessingt.html" title=" " alt="" coords="675,375,911,400"/>
+<area shape="poly" id="edge298_Node000013_Node000015" title=" " alt="" coords="589,427,730,397,731,403,590,432"/>
+<area shape="rect" id="Node000046" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="5,721,61,747"/>
+<area shape="rect" id="Node000025" href="$classcnft.html" title=" " alt="" coords="109,721,156,747"/>
+<area shape="poly" id="edge302_Node000046_Node000025" title=" " alt="" coords="75,731,109,731,109,737,75,737"/>
+<area shape="rect" id="Node000026" href="$classcnf__clause__listt.html" title=" " alt="" coords="217,721,340,747"/>
+<area shape="poly" id="edge303_Node000025_Node000026" title=" " alt="" coords="170,731,217,731,217,737,170,737"/>
+<area shape="rect" id="Node000003" href="$classcnf__solvert.html" title=" " alt="" coords="231,333,326,359"/>
+<area shape="poly" id="edge322_Node000025_Node000003" title=" " alt="" coords="130,708,132,647,140,566,149,522,162,477,179,434,202,394,223,372,247,357,250,361,226,376,206,397,184,436,167,479,154,523,146,567,137,648,136,708"/>
+<area shape="rect" id="Node000045" href="$classdimacs__cnf__dumpt.html" title=" " alt="" coords="206,771,351,796"/>
+<area shape="poly" id="edge340_Node000025_Node000045" title=" " alt="" coords="170,744,205,757,239,768,237,773,203,762,168,749"/>
+<area shape="rect" id="Node000027" href="$classcnf__clause__list__assignmentt.html" title=" " alt="" coords="411,696,617,721"/>
+<area shape="poly" id="edge304_Node000026_Node000027" title=" " alt="" coords="354,723,410,717,411,722,354,729"/>
+<area shape="rect" id="Node000029" href="$classdimacs__cnft.html" title=" " alt="" coords="464,757,564,783"/>
+<area shape="poly" id="edge306_Node000026_Node000029" title=" " alt="" coords="354,743,464,760,463,765,354,748"/>
+<area shape="rect" id="Node000043" href="$classsatcheck__zchaff__baset.html" title=" " alt="" coords="429,831,599,856"/>
+<area shape="poly" id="edge320_Node000026_Node000043" title=" " alt="" coords="338,749,355,757,379,775,403,793,479,828,476,833,400,798,376,779,352,762,335,754"/>
+<area shape="rect" id="Node000028" href="$classexternal__satt.html" title=" " alt="" coords="739,671,847,696"/>
+<area shape="poly" id="edge305_Node000027_Node000028" title=" " alt="" coords="631,695,738,686,739,691,632,701"/>
+<area shape="rect" id="Node000030" href="$classpbs__dimacs__cnft.html" title=" " alt="" coords="727,720,858,745"/>
+<area shape="poly" id="edge307_Node000029_Node000030" title=" " alt="" coords="577,759,727,739,727,744,578,764"/>
+<area shape="rect" id="Node000031" href="$classqdimacs__cnft.html" title=" " alt="" coords="739,769,847,795"/>
+<area shape="poly" id="edge308_Node000029_Node000031" title=" " alt="" coords="578,770,739,777,738,782,578,775"/>
+<area shape="rect" id="Node000042" href="$classsatcheck__zcoret.html" title=" " alt="" coords="729,819,856,844"/>
+<area shape="poly" id="edge319_Node000029_Node000042" title=" " alt="" coords="578,782,675,805,729,816,728,821,674,810,577,787"/>
+<area shape="rect" id="Node000032" href="$classqbf__quantort.html" title=" " alt="" coords="1001,769,1106,795"/>
+<area shape="poly" id="edge309_Node000031_Node000032" title=" " alt="" coords="861,779,1001,779,1001,785,861,785"/>
+<area shape="rect" id="Node000033" href="$classqbf__qubet.html" title=" " alt="" coords="1010,819,1097,844"/>
+<area shape="poly" id="edge310_Node000031_Node000033" title=" " alt="" coords="861,792,1010,821,1009,826,860,797"/>
+<area shape="rect" id="Node000034" href="$classqbf__skizzot.html" title=" " alt="" coords="1005,868,1101,893"/>
+<area shape="poly" id="edge311_Node000031_Node000034" title=" " alt="" coords="861,787,887,794,912,805,928,817,937,830,946,843,960,854,982,864,1006,871,1004,876,980,869,957,859,942,846,933,833,924,821,909,810,885,799,860,792"/>
+<area shape="rect" id="Node000035" href="$classqbf__squolemt.html" title=" " alt="" coords="998,671,1109,696"/>
+<area shape="poly" id="edge312_Node000031_Node000035" title=" " alt="" coords="860,773,885,766,909,756,924,744,933,731,942,718,957,705,997,689,999,694,960,710,946,722,937,734,928,748,912,760,887,771,861,778"/>
+<area shape="rect" id="Node000036" href="$classqdimacs__coret.html" title=" " alt="" coords="995,720,1112,745"/>
+<area shape="poly" id="edge313_Node000031_Node000036" title=" " alt="" coords="860,767,994,741,995,746,861,772"/>
+<area shape="rect" id="Node000037" href="$classqbf__bdd__certificatet.html" title=" " alt="" coords="1213,769,1363,795"/>
+<area shape="poly" id="edge314_Node000036_Node000037" title=" " alt="" coords="1126,745,1227,767,1226,772,1125,750"/>
+<area shape="rect" id="Node000040" href="$classqbf__qube__coret.html" title=" " alt="" coords="1227,671,1349,696"/>
+<area shape="poly" id="edge317_Node000036_Node000040" title=" " alt="" coords="1125,715,1226,693,1227,699,1126,720"/>
+<area shape="rect" id="Node000041" href="$classqbf__squolem__coret.html" title=" " alt="" coords="1215,720,1361,745"/>
+<area shape="poly" id="edge318_Node000036_Node000041" title=" " alt="" coords="1126,730,1215,730,1215,735,1126,735"/>
+<area shape="rect" id="Node000038" href="$classqbf__bdd__coret.html" title=" " alt="" coords="1436,744,1551,769"/>
+<area shape="poly" id="edge315_Node000037_Node000038" title=" " alt="" coords="1377,768,1435,761,1436,766,1378,774"/>
+<area shape="rect" id="Node000039" href="$classqbf__skizzo__coret.html" title=" " alt="" coords="1428,793,1559,819"/>
+<area shape="poly" id="edge316_Node000037_Node000039" title=" " alt="" coords="1377,790,1428,796,1427,801,1377,795"/>
+<area shape="rect" id="Node000044" href="$classsatcheck__zchafft.html" title=" " alt="" coords="727,868,858,893"/>
+<area shape="poly" id="edge321_Node000043_Node000044" title=" " alt="" coords="612,854,727,869,727,875,612,859"/>
+<area shape="poly" id="edge323_Node000003_Node000001" title=" " alt="" coords="317,364,355,393,370,414,378,433,387,450,403,467,425,480,423,484,400,471,382,453,373,435,366,417,351,397,314,368"/>
+<area shape="poly" id="edge324_Node000003_Node000004" title=" " alt="" coords="320,363,339,377,355,394,367,413,374,432,377,467,382,500,390,516,403,532,422,545,419,550,400,536,385,519,377,501,372,468,368,433,362,415,351,397,336,381,317,368"/>
+<area shape="poly" id="edge325_Node000003_Node000006" title=" " alt="" coords="322,363,340,377,356,394,370,422,377,449,376,500,375,524,377,548,385,572,403,596,422,610,419,615,399,600,381,574,372,549,369,525,370,500,371,450,365,424,351,397,336,381,319,368"/>
+<area shape="poly" id="edge326_Node000003_Node000008" title=" " alt="" coords="307,323,350,295,400,269,432,257,434,262,402,274,353,300,310,328"/>
+<area shape="poly" id="edge330_Node000003_Node000013" title=" " alt="" coords="312,364,362,395,402,417,442,429,440,434,400,422,359,399,309,368"/>
+<area shape="poly" id="edge331_Node000003_Node000016" title=" " alt="" coords="339,331,452,307,453,312,340,336"/>
+<area shape="poly" id="edge332_Node000003_Node000017" title=" " alt="" coords="340,343,450,343,450,349,340,349"/>
+<area shape="poly" id="edge338_Node000003_Node000023" title=" " alt="" coords="340,356,453,380,452,385,339,361"/>
+<area shape="rect" id="Node000010" href="$classsatcheck__booleforce__baset.html" title=" " alt="" coords="436,105,592,145"/>
+<area shape="poly" id="edge327_Node000003_Node000010" title=" " alt="" coords="287,319,303,283,328,238,360,193,400,154,434,137,437,141,403,159,364,196,332,241,308,285,292,322"/>
+<area shape="rect" id="Node000018" href="$classsatcheck__lingelingt.html" title=" " alt="" coords="440,169,588,195"/>
+<area shape="poly" id="edge333_Node000003_Node000018" title=" " alt="" coords="292,320,335,262,365,231,400,205,438,189,440,194,403,210,369,235,339,265,296,323"/>
+<area shape="rect" id="Node000019" href="$classsatcheck__minisat1__baset.html" title=" " alt="" coords="421,5,607,31"/>
+<area shape="poly" id="edge334_Node000003_Node000019" title=" " alt="" coords="280,319,289,261,309,185,325,145,345,107,369,71,400,40,419,28,422,32,403,44,374,74,349,109,330,148,314,187,294,262,285,320"/>
+<area shape="rect" id="Node000024" href="$classsatcheck__picosatt.html" title=" " alt="" coords="445,55,583,80"/>
+<area shape="poly" id="edge339_Node000003_Node000024" title=" " alt="" coords="282,319,295,270,317,208,351,144,373,116,400,91,420,78,443,70,445,75,423,83,403,95,377,119,356,147,322,210,300,271,287,320"/>
+<area shape="rect" id="Node000011" href="$classsatcheck__booleforce__coret.html" title=" " alt="" coords="715,81,871,121"/>
+<area shape="poly" id="edge328_Node000010_Node000011" title=" " alt="" coords="606,114,714,105,715,110,606,119"/>
+<area shape="rect" id="Node000012" href="$classsatcheck__booleforcet.html" title=" " alt="" coords="712,145,873,171"/>
+<area shape="poly" id="edge329_Node000010_Node000012" title=" " alt="" coords="606,133,712,146,712,151,605,138"/>
+<area shape="rect" id="Node000020" href="$classsatcheck__minisat1t.html" title=" " alt="" coords="718,5,867,31"/>
+<area shape="poly" id="edge335_Node000019_Node000020" title=" " alt="" coords="621,15,718,15,718,21,621,21"/>
+<area shape="rect" id="Node000021" href="$classsatcheck__minisat1__prooft.html" title=" " alt="" coords="959,5,1148,31"/>
+<area shape="poly" id="edge336_Node000020_Node000021" title=" " alt="" coords="881,15,959,15,959,21,881,21"/>
+<area shape="rect" id="Node000022" href="$classsatcheck__minisat1__coret.html" title=" " alt="" coords="1196,5,1380,31"/>
+<area shape="poly" id="edge337_Node000021_Node000022" title=" " alt="" coords="1161,15,1196,15,1196,21,1161,21"/>
 </map>

@@ -1,12 +1,30 @@
 <map id="jar_filet" name="jar_filet">
-<area shape="rect" id="node1" title="Class representing a .jar archive." alt="" coords="170,407,241,433"/>
-<area shape="rect" id="node2" title=" " alt="" coords="103,213,265,255"/>
-<area shape="rect" id="node3" title=" " alt="" coords="31,117,118,143"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,5,144,47"/>
-<area shape="rect" id="node5" title=" " alt="" coords="143,109,295,151"/>
-<area shape="rect" id="node6" title=" " alt="" coords="199,13,238,39"/>
-<area shape="rect" id="node7" title=" " alt="" coords="322,13,361,39"/>
-<area shape="rect" id="node10" title=" " alt="" coords="319,117,476,143"/>
-<area shape="rect" id="node8" href="$classmz__zip__archivet.html" title="Thin object&#45;oriented wrapper around the MZ Zip library Zip file reader and extractor." alt="" coords="333,317,461,344"/>
-<area shape="rect" id="node9" title=" " alt="" coords="316,213,479,255"/>
+<area shape="rect" id="Node000001" title="Class representing a .jar archive." alt="" coords="360,621,431,647"/>
+<area shape="rect" id="Node000002" href="$classmz__zip__archivet.html" title="Thin object&#45;oriented wrapper around the MZ Zip library Zip file reader and extractor." alt="" coords="226,533,354,559"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="313,567,345,595,379,619,375,623,342,599,310,571"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="174,431,337,471"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="270,483,288,532,283,534,265,485"/>
+<area shape="rect" id="Node000004" href="$classmz__zip__archive__statet.html" title=" " alt="" coords="18,335,186,361"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="132,366,228,428,225,433,129,370"/>
+<area shape="rect" id="Node000005" href="$structmz__zip__archive.html" title=" " alt="" coords="41,233,163,258"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="105,272,105,335,99,335,99,272"/>
+<area shape="rect" id="Node000006" href="$structmz__zip__internal__state__tag.html" title=" " alt="" coords="5,137,199,163"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="105,176,105,233,99,233,99,176"/>
+<area shape="rect" id="Node000007" href="$structmz__zip__array.html" title=" " alt="" coords="47,5,157,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="105,44,105,137,99,137,99,44"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="210,335,367,361"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="283,375,264,431,259,430,278,373"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="307,233,345,258"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="316,272,307,290,294,336,289,334,302,288,311,269"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="391,328,543,368"/>
+<area shape="poly" id="edge14_Node000013_Node000009" title=" " alt="" coords="351,265,398,302,435,326,433,330,395,306,348,269"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="386,431,549,471"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="471,485,465,540,457,570,444,599,432,613,419,623,415,619,429,609,440,596,452,569,460,539,466,484"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="600,335,687,361"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="638,375,629,393,616,409,584,428,550,441,548,436,582,423,612,405,625,390,634,372"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="574,225,713,265"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="646,279,646,335,641,335,641,279"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="470,382,470,431,465,431,465,382"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="448,233,487,258"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="470,272,470,328,465,328,465,272"/>
 </map>

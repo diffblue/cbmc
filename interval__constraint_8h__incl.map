@@ -1,12 +1,23 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/interval_constraint.h" name="/home/runner/work/cbmc/cbmc/src/util/interval_constraint.h">
-<area shape="rect" id="node1" title=" " alt="" coords="205,5,389,61"/>
-<area shape="rect" id="node2" href="$integer__interval_8h.html" title=" " alt="" coords="229,109,366,136"/>
-<area shape="rect" id="node3" href="$interval__template_8h.html" title=" " alt="" coords="129,184,279,211"/>
-<area shape="rect" id="node8" href="$mp__arith_8h.html" title=" " alt="" coords="379,184,471,211"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,259,91,285"/>
-<area shape="rect" id="node5" title=" " alt="" coords="279,333,343,360"/>
-<area shape="rect" id="node6" title=" " alt="" coords="166,259,242,285"/>
-<area shape="rect" id="node7" href="$threeval_8h.html" title=" " alt="" coords="267,259,355,285"/>
-<area shape="rect" id="node9" title=" " alt="" coords="429,259,488,285"/>
-<area shape="rect" id="node10" title=" " alt="" coords="512,259,637,285"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="205,5,389,60"/>
+<area shape="rect" id="Node000002" href="$integer__interval_8h.html" title=" " alt="" coords="229,108,366,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="300,60,300,94,295,94,295,60"/>
+<area shape="rect" id="Node000003" href="$interval__template_8h.html" title=" " alt="" coords="129,181,279,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="284,135,232,175,228,171,281,131"/>
+<area shape="rect" id="Node000008" href="$mp__arith_8h.html" title=" " alt="" coords="379,181,471,207"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="319,131,393,172,391,177,317,136"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,255,91,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="180,209,87,251,85,246,178,204"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="279,328,343,353"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="190,209,174,224,159,242,151,261,152,270,156,278,178,301,206,317,236,327,265,333,264,338,235,332,203,322,174,305,151,282,146,271,146,260,154,239,170,220,186,205"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="166,255,242,280"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="207,207,207,241,201,241,201,207"/>
+<area shape="rect" id="Node000007" href="$threeval_8h.html" title=" " alt="" coords="267,255,355,280"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="223,204,283,245,280,249,220,209"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="313,280,313,314,308,314,308,280"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="420,208,369,282,334,320,330,317,365,278,416,205"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="429,255,488,280"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="433,206,450,241,445,243,428,208"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="512,255,637,280"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="450,204,539,246,537,251,448,209"/>
 </map>

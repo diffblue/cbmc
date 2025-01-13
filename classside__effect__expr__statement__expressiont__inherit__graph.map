@@ -1,8 +1,13 @@
 <map id="side_effect_expr_statement_expressiont" name="side_effect_expr_statement_expressiont">
-<area shape="rect" id="node1" title="A side_effect_exprt that contains a statement." alt="" coords="5,457,208,499"/>
-<area shape="rect" id="node2" href="$classside__effect__exprt.html" title="An expression containing a side effect." alt="" coords="39,381,174,408"/>
-<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="79,305,135,332"/>
-<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="81,229,133,256"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="23,124,190,180"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="16,5,197,47"/>
+<area shape="rect" id="Node000001" title="A side_effect_exprt that contains a statement." alt="" coords="5,451,208,491"/>
+<area shape="rect" id="Node000002" href="$classside__effect__exprt.html" title="An expression containing a side effect." alt="" coords="39,376,174,401"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,415,109,451,104,451,104,415"/>
+<area shape="rect" id="Node000003" href="$classexprt.html" title="Base class for all expressions." alt="" coords="79,301,135,327"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,341,109,376,104,376,104,341"/>
+<area shape="rect" id="Node000004" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="81,227,133,252"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="109,266,109,301,104,301,104,266"/>
+<area shape="rect" id="Node000005" href="$classsharing__treet.html" title=" " alt="" coords="23,123,190,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="109,191,109,226,104,226,104,191"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="16,5,197,45"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="109,59,109,122,104,122,104,59"/>
 </map>

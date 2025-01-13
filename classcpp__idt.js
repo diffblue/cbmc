@@ -17,7 +17,7 @@ var classcpp__idt =
     ] ],
     [ "cpp_idt", "classcpp__idt.html#aabdf2ef0d9ae240dd782e4b66e344da3", null ],
     [ "clear", "classcpp__idt.html#a29d9533b8fd07c4db9aaa27fff602baf", null ],
-    [ "get_parent", "classcpp__idt.html#a3a9c430505cf8912f1a946e802673734", null ],
+    [ "get_parent", "classcpp__idt.html#a4f7bd62cda143959400aae7c97685b24", null ],
     [ "is_class", "classcpp__idt.html#ac3734f873c6c13ef7a231149fb0a7925", null ],
     [ "is_enum", "classcpp__idt.html#adcc3b9d74e28988521e81efe073c2dbe", null ],
     [ "is_namespace", "classcpp__idt.html#a3cc7c59ecc5a7850c46b7423e3854928", null ],

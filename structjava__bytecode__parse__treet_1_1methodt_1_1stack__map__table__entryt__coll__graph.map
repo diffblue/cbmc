@@ -1,7 +1,11 @@
 <map id="java_bytecode_parse_treet::methodt::stack_map_table_entryt" name="java_bytecode_parse_treet::methodt::stack_map_table_entryt">
-<area shape="rect" id="node1" title=" " alt="" coords="95,347,261,403"/>
-<area shape="rect" id="node2" title=" " alt="" coords="89,228,267,269"/>
-<area shape="rect" id="node3" href="$structjava__bytecode__parse__treet_1_1methodt_1_1verification__type__infot.html" title=" " alt="" coords="5,95,209,151"/>
-<area shape="rect" id="node4" title=" " alt="" coords="233,109,363,136"/>
-<area shape="rect" id="node5" title=" " alt="" coords="279,5,317,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="95,343,261,397"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="89,225,267,265"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,279,181,342,175,342,175,279"/>
+<area shape="rect" id="Node000003" href="$structjava__bytecode__parse__treet_1_1methodt_1_1verification__type__infot.html" title=" " alt="" coords="5,93,209,148"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="132,159,169,224,165,226,127,162"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="233,108,363,133"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="279,145,223,203,199,227,195,223,219,199,275,141"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="279,5,317,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="301,45,301,108,295,108,295,45"/>
 </map>

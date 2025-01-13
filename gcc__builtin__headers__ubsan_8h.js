@@ -68,7 +68,7 @@ var gcc__builtin__headers__ubsan_8h =
     [ "__builtin___hwasan_store8", "gcc__builtin__headers__ubsan_8h.html#a2e36b1a5c7db06ea846c702483e44af1", null ],
     [ "__builtin___hwasan_store8_noabort", "gcc__builtin__headers__ubsan_8h.html#afec240fc0f61469c39432c9530293c1d", null ],
     [ "__builtin___hwasan_tag_mismatch4", "gcc__builtin__headers__ubsan_8h.html#a88f28fb0804b6b8faa1975447b84325c", null ],
-    [ "__builtin___hwasan_tag_pointer", "gcc__builtin__headers__ubsan_8h.html#a50f5176aeea75a726de5dfdd9e6d4eaa", null ],
+    [ "__builtin___hwasan_tag_pointer", "gcc__builtin__headers__ubsan_8h.html#a02214dd0863b508a152446ccc08a043c", null ],
     [ "__builtin___sanitizer_cov_trace_cmp1", "gcc__builtin__headers__ubsan_8h.html#a4c49b97c8b76f3a101061782fc6304a4", null ],
     [ "__builtin___sanitizer_cov_trace_cmp2", "gcc__builtin__headers__ubsan_8h.html#ac7ec68769e038707d2516775c1247ed1", null ],
     [ "__builtin___sanitizer_cov_trace_cmp4", "gcc__builtin__headers__ubsan_8h.html#a7b24e2d9d663e55c96ff6a072653337e", null ],

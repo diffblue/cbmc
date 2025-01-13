@@ -1,7 +1,12 @@
 <map id="local_control_flow_decisiont" name="local_control_flow_decisiont">
-<area shape="rect" id="node1" title="Records all local control&#45;flow decisions up to a limit of number of histories per location." alt="" coords="841,37,980,79"/>
-<area shape="rect" id="node2" title=" " alt="" coords="498,5,649,47"/>
-<area shape="rect" id="node3" title=" " alt="" coords="461,71,685,112"/>
-<area shape="rect" id="node4" title=" " alt="" coords="115,78,272,105"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,78,44,105"/>
+<area shape="rect" id="Node000001" title="Records all local control&#45;flow decisions up to a limit of number of histories per location." alt="" coords="321,75,460,115"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="659,45,883,85"/>
+<area shape="poly" id="edge3_Node000003_Node000001" title=" " alt="" coords="473,86,658,71,659,77,474,91"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,75,156,115"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,92,321,92,321,97,170,97"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="708,93,635,112,564,117,493,112,460,109,461,103,494,107,564,112,634,107,707,87"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="312,7,469,33"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="483,28,659,49,658,55,483,34"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="61,7,100,33"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="114,17,312,17,312,23,114,23"/>
 </map>

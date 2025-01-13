@@ -11,16 +11,9 @@ var dir_19373f467389307dc54ab8a6e9e19559 =
     [ "smt2", "dir_d04af94a51ee9b3893e12d8dab362bda.html", "dir_d04af94a51ee9b3893e12d8dab362bda" ],
     [ "smt2_incremental", "dir_87ec3d57b8dc96609a95189b1ea15a24.html", "dir_87ec3d57b8dc96609a95189b1ea15a24" ],
     [ "strings", "dir_fb43b298f453a3e0e36cbec7baf05559.html", "dir_fb43b298f453a3e0e36cbec7baf05559" ],
-    [ "conflict_provider.h", "conflict__provider_8h.html", [
-      [ "conflict_providert", "classconflict__providert.html", "classconflict__providert" ]
-    ] ],
+    [ "conflict_provider.h", "conflict__provider_8h.html", "conflict__provider_8h" ],
     [ "decision_procedure.cpp", "decision__procedure_8cpp.html", null ],
     [ "decision_procedure.h", "decision__procedure_8h.html", "decision__procedure_8h" ],
-    [ "hardness_collector.h", "hardness__collector_8h.html", [
-      [ "clause_hardness_collectort", "classclause__hardness__collectort.html", "classclause__hardness__collectort" ],
-      [ "hardness_collectort", "classhardness__collectort.html", "classhardness__collectort" ]
-    ] ],
-    [ "stack_decision_procedure.h", "stack__decision__procedure_8h.html", [
-      [ "stack_decision_proceduret", "classstack__decision__proceduret.html", "classstack__decision__proceduret" ]
-    ] ]
+    [ "hardness_collector.h", "hardness__collector_8h.html", "hardness__collector_8h" ],
+    [ "stack_decision_procedure.h", "stack__decision__procedure_8h.html", "stack__decision__procedure_8h" ]
 ];

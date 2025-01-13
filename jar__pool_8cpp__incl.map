@@ -1,12 +1,24 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/jar_pool.cpp" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/jar_pool.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="61,5,280,61"/>
-<area shape="rect" id="node2" href="$jar__pool_8h.html" title=" " alt="" coords="87,109,174,136"/>
-<area shape="rect" id="node5" href="$jar__file_8h.html" title=" " alt="" coords="210,184,289,211"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,184,56,211"/>
-<area shape="rect" id="node4" title=" " alt="" coords="115,333,173,360"/>
-<area shape="rect" id="node6" href="$mz__zip__archive_8h.html" title=" " alt="" coords="182,259,317,285"/>
-<area shape="rect" id="node8" title=" " alt="" coords="341,259,416,285"/>
-<area shape="rect" id="node9" title=" " alt="" coords="441,259,565,285"/>
-<area shape="rect" id="node10" title=" " alt="" coords="589,259,651,285"/>
-<area shape="rect" id="node7" title=" " alt="" coords="211,333,288,360"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="61,5,280,60"/>
+<area shape="rect" id="Node000002" href="$jar__pool_8h.html" title=" " alt="" coords="87,108,174,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,61,144,97,139,94,156,59"/>
+<area shape="rect" id="Node000005" href="$jar__file_8h.html" title=" " alt="" coords="210,181,289,207"/>
+<area shape="poly" id="edge12_Node000001_Node000005" title=" " alt="" coords="186,59,240,168,235,170,181,61"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,56,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="116,136,60,175,57,171,113,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="115,328,173,353"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="134,134,145,314,140,314,129,134"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="151,131,219,172,217,176,148,136"/>
+<area shape="poly" id="edge9_Node000005_Node000004" title=" " alt="" coords="228,209,199,229,172,256,157,286,150,315,145,314,152,284,167,253,195,225,225,204"/>
+<area shape="rect" id="Node000006" href="$mz__zip__archive_8h.html" title=" " alt="" coords="182,255,317,280"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="252,207,252,241,247,241,247,207"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="341,255,416,280"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="271,204,346,245,344,250,269,209"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="441,255,565,280"/>
+<area shape="poly" id="edge10_Node000005_Node000009" title=" " alt="" coords="290,204,449,248,448,254,288,209"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="589,255,651,280"/>
+<area shape="poly" id="edge11_Node000005_Node000010" title=" " alt="" coords="289,199,413,220,576,252,575,257,412,225,288,204"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="234,282,174,323,171,318,231,278"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="211,328,288,353"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="252,280,252,314,247,314,247,280"/>
 </map>

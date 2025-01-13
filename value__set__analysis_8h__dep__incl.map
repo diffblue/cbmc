@@ -1,7 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/pointer&#45;analysis/value_set_analysis.h" name="/home/runner/work/cbmc/cbmc/src/pointer&#45;analysis/value_set_analysis.h">
-<area shape="rect" id="node1" title="Value Set Propagation." alt="" coords="230,5,423,61"/>
-<area shape="rect" id="node2" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,213,264,269"/>
-<area shape="rect" id="node3" href="$show__value__sets_8cpp.html" title="Show Value Sets." alt="" coords="293,213,486,269"/>
-<area shape="rect" id="node4" href="$show__value__sets_8h.html" title="Show Value Sets." alt="" coords="163,109,357,165"/>
-<area shape="rect" id="node5" href="$value__set__analysis_8cpp.html" title="Value Set Propagation." alt="" coords="433,109,626,165"/>
+<area shape="rect" id="Node000001" title="Value Set Propagation." alt="" coords="230,5,423,60"/>
+<area shape="rect" id="Node000002" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,211,264,265"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,62,182,82,153,110,140,133,134,160,133,210,128,210,129,159,135,131,149,106,179,77,216,57"/>
+<area shape="rect" id="Node000003" href="$show__value__sets_8cpp.html" title="Show Value Sets." alt="" coords="293,211,486,265"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="354,71,372,107,385,162,391,210,385,211,380,162,367,109,350,73"/>
+<area shape="rect" id="Node000004" href="$show__value__sets_8h.html" title="Show Value Sets." alt="" coords="163,108,357,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="304,73,280,109,275,106,299,70"/>
+<area shape="rect" id="Node000005" href="$value__set__analysis_8cpp.html" title="Value Set Propagation." alt="" coords="433,108,626,163"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="393,64,478,106,475,110,390,68"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="218,174,169,213,166,208,215,169"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="306,169,357,208,354,213,303,173"/>
 </map>

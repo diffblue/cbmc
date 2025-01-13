@@ -1,13 +1,31 @@
 <map id="dfcc_loop_nesting_graph_nodet" name="dfcc_loop_nesting_graph_nodet">
-<area shape="rect" id="node1" title="A graph node that stores information about a natural loop." alt="" coords="1557,54,1740,95"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="1259,14,1419,55"/>
-<area shape="rect" id="node3" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="860,21,1001,48"/>
-<area shape="rect" id="node4" title=" " alt="" coords="500,14,679,55"/>
-<area shape="rect" id="node5" title=" " alt="" coords="157,21,292,48"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,47,44,73"/>
-<area shape="rect" id="node11" title=" " alt="" coords="170,80,279,107"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,116,44,143"/>
-<area shape="rect" id="node10" title=" " alt="" coords="527,101,652,128"/>
-<area shape="rect" id="node8" href="$classloop__templatet.html" title=" " alt="" coords="1249,79,1428,150"/>
-<area shape="rect" id="node9" href="$classloop__templatet.html" title="A loop, specified as a set of instructions." alt="" coords="843,101,1019,128"/>
+<area shape="rect" id="Node000001" title="A graph node that stores information about a natural loop." alt="" coords="1665,162,1848,202"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="1367,201,1527,241"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1540,206,1664,191,1665,196,1541,212"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="580,223,759,263"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="772,234,811,233,1119,223,1367,219,1367,224,1119,229,811,238,772,240"/>
+<area shape="rect" id="Node000007" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="968,265,1109,291"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="773,257,811,262,968,273,968,278,810,267,772,263"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="172,231,307,256"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="321,241,580,241,580,246,321,246"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,116,44,141"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="57,145,135,193,159,209,202,228,200,233,156,214,132,198,55,149"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="185,80,294,105"/>
+<area shape="poly" id="edge12_Node000011_Node000005" title=" " alt="" coords="57,121,184,99,185,104,58,126"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,180,44,205"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="57,208,69,213,121,227,172,235,171,240,120,232,67,218,55,213"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="607,135,732,160"/>
+<area shape="poly" id="edge15_Node000013_Node000006" title=" " alt="" coords="58,188,606,149,607,154,58,193"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="1123,271,1224,262,1333,247,1375,238,1376,243,1334,253,1224,268,1123,276"/>
+<area shape="rect" id="Node000008" href="$classloop__templatet.html" title=" " alt="" coords="1357,107,1536,177"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="1550,153,1665,168,1665,173,1549,158"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="552,56,787,111"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="800,72,915,69,1049,71,1192,80,1334,99,1357,105,1356,110,1333,105,1192,85,1049,76,915,75,800,78"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="157,5,321,31"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="335,21,429,30,528,45,570,53,568,59,528,50,428,36,335,27"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="308,91,528,89,552,88,552,93,528,94,308,96"/>
+<area shape="poly" id="edge16_Node000013_Node000011" title=" " alt="" coords="308,104,346,110,486,128,607,140,606,145,485,133,345,115,307,109"/>
+<area shape="rect" id="Node000012" href="$classloop__templatet.html" title="A loop, specified as a set of instructions." alt="" coords="951,135,1127,160"/>
+<area shape="poly" id="edge13_Node000008_Node000012" title=" " alt="" coords="1141,145,1333,143,1357,143,1357,148,1333,149,1141,150"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="745,145,950,145,950,150,745,150"/>
 </map>

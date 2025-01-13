@@ -1,10 +1,17 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/simplify_utils.h" name="/home/runner/work/cbmc/cbmc/src/util/simplify_utils.h">
-<area shape="rect" id="node1" title=" " alt="" coords="731,5,915,61"/>
-<area shape="rect" id="node2" href="$abstract__environment_8cpp.html" title=" " alt="" coords="5,109,275,165"/>
-<area shape="rect" id="node3" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="299,109,498,165"/>
-<area shape="rect" id="node4" href="$simplify__expr_8cpp.html" title=" " alt="" coords="523,109,707,165"/>
-<area shape="rect" id="node5" href="$simplify__expr__floatbv_8cpp.html" title=" " alt="" coords="731,109,915,165"/>
-<area shape="rect" id="node6" href="$simplify__expr__int_8cpp.html" title=" " alt="" coords="939,109,1123,165"/>
-<area shape="rect" id="node7" href="$simplify__expr__struct_8cpp.html" title=" " alt="" coords="1147,109,1331,165"/>
-<area shape="rect" id="node8" href="$simplify__utils_8cpp.html" title=" " alt="" coords="1355,109,1539,165"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="731,5,915,60"/>
+<area shape="rect" id="Node000002" href="$abstract__environment_8cpp.html" title=" " alt="" coords="5,108,275,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="717,50,287,111,275,112,275,107,286,105,717,45"/>
+<area shape="rect" id="Node000003" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="299,108,498,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="718,61,499,113,498,108,717,56"/>
+<area shape="rect" id="Node000004" href="$simplify__expr_8cpp.html" title=" " alt="" coords="523,108,707,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="757,68,670,110,668,106,755,63"/>
+<area shape="rect" id="Node000005" href="$simplify__expr__floatbv_8cpp.html" title=" " alt="" coords="731,108,915,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="825,74,825,108,820,108,820,74"/>
+<area shape="rect" id="Node000006" href="$simplify__expr__int_8cpp.html" title=" " alt="" coords="939,108,1123,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="890,63,978,106,975,110,888,68"/>
+<area shape="rect" id="Node000007" href="$simplify__expr__struct_8cpp.html" title=" " alt="" coords="1147,108,1331,163"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="929,56,1135,105,1147,108,1146,113,1134,111,927,61"/>
+<area shape="rect" id="Node000008" href="$simplify__utils_8cpp.html" title=" " alt="" coords="1355,108,1539,163"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="929,43,1122,69,1343,105,1355,108,1354,113,1342,111,1121,74,928,48"/>
 </map>

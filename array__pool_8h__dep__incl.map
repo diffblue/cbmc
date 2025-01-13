@@ -1,35 +1,72 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/strings/array_pool.h" name="/home/runner/work/cbmc/cbmc/src/solvers/strings/array_pool.h">
-<area shape="rect" id="node1" title="Associates arrays and length to pointers, so that the string refinement can transform builtin functio..." alt="" coords="1449,5,1633,61"/>
-<area shape="rect" id="node2" href="$array__pool_8cpp.html" title=" " alt="" coords="1337,109,1521,165"/>
-<area shape="rect" id="node3" href="$string__constraint__generator_8h.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="1545,109,1761,165"/>
-<area shape="rect" id="node4" href="$string__builtin__function_8cpp.html" title=" " alt="" coords="29,339,228,395"/>
-<area shape="rect" id="node5" href="$string__builtin__function_8h.html" title=" " alt="" coords="510,221,694,277"/>
-<area shape="rect" id="node9" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="873,458,1057,514"/>
-<area shape="rect" id="node25" href="$string__constraint__generator__code__points_8cpp.html" title="Generates string constraints for Java functions dealing with code points." alt="" coords="977,213,1182,284"/>
-<area shape="rect" id="node26" href="$string__constraint__generator__comparison_8cpp.html" title="Generates string constraints for function comparing strings, such as: equals, equalsIgnoreCase,..." alt="" coords="1206,213,1411,284"/>
-<area shape="rect" id="node27" href="$string__constraint__generator__constants_8cpp.html" title="Generates string constraints for constant strings." alt="" coords="1435,213,1641,284"/>
-<area shape="rect" id="node28" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="1665,213,1870,284"/>
-<area shape="rect" id="node29" href="$string__constraint__generator__indexof_8cpp.html" title="Generates string constraints for the family of indexOf and lastIndexOf java functions." alt="" coords="1894,213,2099,284"/>
-<area shape="rect" id="node30" href="$string__constraint__generator__main_8cpp.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="2123,213,2329,284"/>
-<area shape="rect" id="node31" href="$string__constraint__generator__testing_8cpp.html" title="Generates string constraints for string functions that return Boolean values." alt="" coords="2353,213,2558,284"/>
-<area shape="rect" id="node32" href="$string__constraint__generator__transformation_8cpp.html" title="Generates string constraints for string transformations, that is, functions taking one string and ret..." alt="" coords="2582,213,2787,284"/>
-<area shape="rect" id="node33" href="$string__constraint__generator__valueof_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="2811,213,3017,284"/>
-<area shape="rect" id="node6" href="$string__dependencies_8h.html" title="Keeps track of dependencies between strings." alt="" coords="718,339,902,395"/>
-<area shape="rect" id="node19" href="$string__format__builtin__function_8h.html" title="Built&#45;in function for String.format." alt="" coords="251,339,486,395"/>
-<area shape="rect" id="node21" href="$string__insertion__builtin__function_8h.html" title=" " alt="" coords="510,332,694,403"/>
-<area shape="rect" id="node7" href="$string__dependencies_8cpp.html" title=" " alt="" coords="209,577,395,633"/>
-<area shape="rect" id="node8" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="665,577,849,633"/>
-<area shape="rect" id="node10" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="1597,577,1802,633"/>
-<area shape="rect" id="node15" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="873,577,1057,633"/>
-<area shape="rect" id="node16" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1081,577,1273,633"/>
-<area shape="rect" id="node11" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="1297,695,1560,737"/>
-<area shape="rect" id="node12" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1585,695,1814,737"/>
-<area shape="rect" id="node13" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1838,688,2043,744"/>
-<area shape="rect" id="node14" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="2068,688,2331,744"/>
-<area shape="rect" id="node17" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="865,688,1057,744"/>
-<area shape="rect" id="node18" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1081,688,1273,744"/>
-<area shape="rect" id="node20" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5,458,255,514"/>
-<area shape="rect" id="node22" href="$string__concatenation__builtin__function_8h.html" title="Builtin functions for string concatenations." alt="" coords="329,451,539,521"/>
-<area shape="rect" id="node24" href="$string__insertion__builtin__function_8cpp.html" title=" " alt="" coords="563,451,747,521"/>
-<area shape="rect" id="node23" href="$string__concatenation__builtin__function_8cpp.html" title="Builtin functions for string concatenations." alt="" coords="419,569,630,640"/>
+<area shape="rect" id="Node000001" title="Associates arrays and length to pointers, so that the string refinement can transform builtin functio..." alt="" coords="1449,5,1633,60"/>
+<area shape="rect" id="Node000002" href="$array__pool_8cpp.html" title=" " alt="" coords="1337,108,1521,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1503,71,1460,110,1456,106,1499,67"/>
+<area shape="rect" id="Node000003" href="$string__constraint__generator_8h.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="1545,108,1761,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1582,67,1625,106,1622,110,1578,71"/>
+<area shape="rect" id="Node000004" href="$string__builtin__function_8cpp.html" title=" " alt="" coords="29,335,228,390"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1531,165,1374,180,1239,183,1120,180,1010,174,900,170,783,173,652,185,499,213,408,239,319,272,178,338,176,333,317,267,406,234,497,208,651,180,783,167,900,165,1010,169,1121,175,1239,178,1373,175,1531,160"/>
+<area shape="rect" id="Node000005" href="$string__builtin__function_8h.html" title=" " alt="" coords="510,218,694,273"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="1531,165,1359,186,1225,195,1091,201,921,213,695,236,694,231,920,208,1091,196,1224,190,1359,181,1530,160"/>
+<area shape="rect" id="Node000009" href="$string__refinement_8h.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="873,453,1057,507"/>
+<area shape="poly" id="edge37_Node000003_Node000009" title=" " alt="" coords="1531,165,1224,176,1056,188,997,199,978,205,967,213,948,239,937,270,932,303,932,337,942,401,957,452,952,453,937,402,927,337,927,302,932,269,943,237,963,209,975,201,996,194,1055,183,1224,171,1531,160"/>
+<area shape="rect" id="Node000025" href="$string__constraint__generator__code__points_8cpp.html" title="Generates string constraints for Java functions dealing with code points." alt="" coords="977,211,1182,280"/>
+<area shape="poly" id="edge28_Node000003_Node000025" title=" " alt="" coords="1531,166,1435,180,1361,188,1287,196,1195,213,1183,216,1182,211,1193,208,1286,191,1360,182,1435,174,1530,160"/>
+<area shape="rect" id="Node000026" href="$string__constraint__generator__comparison_8cpp.html" title="Generates string constraints for function comparing strings, such as: equals, equalsIgnoreCase,..." alt="" coords="1206,211,1411,280"/>
+<area shape="poly" id="edge29_Node000003_Node000026" title=" " alt="" coords="1557,169,1413,214,1411,209,1555,164"/>
+<area shape="rect" id="Node000027" href="$string__constraint__generator__constants_8cpp.html" title="Generates string constraints for constant strings." alt="" coords="1435,211,1641,280"/>
+<area shape="poly" id="edge30_Node000003_Node000027" title=" " alt="" coords="1616,175,1576,212,1572,209,1612,171"/>
+<area shape="rect" id="Node000028" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="1665,211,1870,280"/>
+<area shape="poly" id="edge31_Node000003_Node000028" title=" " alt="" coords="1693,171,1733,209,1730,212,1689,175"/>
+<area shape="rect" id="Node000029" href="$string__constraint__generator__indexof_8cpp.html" title="Generates string constraints for the family of indexOf and lastIndexOf java functions." alt="" coords="1894,211,2099,280"/>
+<area shape="poly" id="edge32_Node000003_Node000029" title=" " alt="" coords="1750,164,1894,209,1893,214,1749,169"/>
+<area shape="rect" id="Node000030" href="$string__constraint__generator__main_8cpp.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="2123,211,2329,280"/>
+<area shape="poly" id="edge33_Node000003_Node000030" title=" " alt="" coords="1775,150,1936,174,2112,208,2124,211,2122,216,2111,213,1935,179,1774,155"/>
+<area shape="rect" id="Node000031" href="$string__constraint__generator__testing_8cpp.html" title="Generates string constraints for string functions that return Boolean values." alt="" coords="2353,211,2558,280"/>
+<area shape="poly" id="edge34_Node000003_Node000031" title=" " alt="" coords="1775,141,2036,163,2189,182,2341,208,2353,211,2352,216,2340,213,2188,188,2035,168,1774,146"/>
+<area shape="rect" id="Node000032" href="$string__constraint__generator__transformation_8cpp.html" title="Generates string constraints for string transformations, that is, functions taking one string and ret..." alt="" coords="2582,211,2787,280"/>
+<area shape="poly" id="edge35_Node000003_Node000032" title=" " alt="" coords="1774,136,1934,142,2133,154,2352,176,2570,208,2582,210,2581,216,2570,213,2351,181,2133,160,1933,147,1774,141"/>
+<area shape="rect" id="Node000033" href="$string__constraint__generator__valueof_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="2811,211,3017,280"/>
+<area shape="poly" id="edge36_Node000003_Node000033" title=" " alt="" coords="1774,133,1971,136,2227,146,2513,169,2658,186,2800,208,2812,210,2811,216,2799,213,2658,192,2513,174,2227,152,1971,141,1774,139"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="497,271,240,331,214,338,212,333,239,325,496,266"/>
+<area shape="rect" id="Node000006" href="$string__dependencies_8h.html" title="Keeps track of dependencies between strings." alt="" coords="718,335,902,390"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="662,277,764,333,761,338,660,282"/>
+<area shape="rect" id="Node000019" href="$string__format__builtin__function_8h.html" title="Built&#45;in function for String.format." alt="" coords="251,335,486,390"/>
+<area shape="poly" id="edge20_Node000005_Node000019" title=" " alt="" coords="538,281,423,338,421,333,536,276"/>
+<area shape="rect" id="Node000021" href="$string__insertion__builtin__function_8h.html" title=" " alt="" coords="510,328,694,397"/>
+<area shape="poly" id="edge23_Node000005_Node000021" title=" " alt="" coords="605,286,605,328,599,328,599,286"/>
+<area shape="rect" id="Node000007" href="$string__dependencies_8cpp.html" title=" " alt="" coords="203,570,390,625"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="811,404,806,433,797,463,782,492,761,517,730,533,689,544,587,554,482,558,402,565,375,572,373,567,402,560,482,552,587,549,688,539,728,528,758,513,778,489,792,461,801,432,805,404"/>
+<area shape="rect" id="Node000008" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="654,570,838,625"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="817,404,817,457,813,487,806,516,791,546,772,572,768,568,786,543,801,514,808,486,811,457,812,404"/>
+<area shape="poly" id="edge9_Node000006_Node000009" title=" " alt="" coords="858,396,931,450,928,454,855,400"/>
+<area shape="poly" id="edge19_Node000009_Node000008" title=" " alt="" coords="904,516,797,572,795,568,902,511"/>
+<area shape="rect" id="Node000010" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="1374,570,1566,625"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="1071,503,1374,572,1373,577,1070,508"/>
+<area shape="rect" id="Node000013" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="862,570,1067,625"/>
+<area shape="poly" id="edge13_Node000009_Node000013" title=" " alt="" coords="967,521,967,570,962,570,962,521"/>
+<area shape="rect" id="Node000018" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="1091,570,1275,625"/>
+<area shape="poly" id="edge18_Node000009_Node000018" title=" " alt="" coords="1028,511,1135,568,1132,572,1025,516"/>
+<area shape="rect" id="Node000011" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1374,680,1566,735"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="1473,639,1473,680,1467,680,1467,639"/>
+<area shape="rect" id="Node000012" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1590,680,1782,735"/>
+<area shape="poly" id="edge12_Node000010_Node000012" title=" " alt="" coords="1536,629,1635,677,1632,682,1534,633"/>
+<area shape="rect" id="Node000014" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="833,687,1096,727"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="967,639,967,687,962,687,962,639"/>
+<area shape="rect" id="Node000015" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1121,687,1350,727"/>
+<area shape="poly" id="edge15_Node000013_Node000015" title=" " alt="" coords="1044,627,1189,685,1187,690,1042,632"/>
+<area shape="rect" id="Node000016" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="317,680,522,735"/>
+<area shape="poly" id="edge16_Node000013_Node000016" title=" " alt="" coords="867,631,851,635,762,651,693,660,623,668,534,683,523,685,522,680,534,677,622,663,692,655,761,646,849,629,866,625"/>
+<area shape="rect" id="Node000017" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="547,680,809,735"/>
+<area shape="poly" id="edge17_Node000013_Node000017" title=" " alt="" coords="883,632,749,682,747,677,881,627"/>
+<area shape="poly" id="edge21_Node000019_Node000007" title=" " alt="" coords="342,403,319,446,310,479,304,512,299,570,294,569,299,511,305,477,314,444,338,400"/>
+<area shape="rect" id="Node000020" href="$string__format__builtin__function_8cpp.html" title="Built&#45;in function for String.format." alt="" coords="5,453,255,507"/>
+<area shape="poly" id="edge22_Node000019_Node000020" title=" " alt="" coords="303,398,186,455,183,450,301,393"/>
+<area shape="rect" id="Node000022" href="$string__concatenation__builtin__function_8h.html" title="Builtin functions for string concatenations." alt="" coords="329,445,539,515"/>
+<area shape="poly" id="edge24_Node000021_Node000022" title=" " alt="" coords="543,407,485,447,482,443,540,403"/>
+<area shape="rect" id="Node000024" href="$string__insertion__builtin__function_8cpp.html" title=" " alt="" coords="563,445,747,515"/>
+<area shape="poly" id="edge27_Node000021_Node000024" title=" " alt="" coords="626,409,642,444,637,446,621,411"/>
+<area shape="poly" id="edge26_Node000022_Node000007" title=" " alt="" coords="385,526,330,572,326,568,382,522"/>
+<area shape="rect" id="Node000023" href="$string__concatenation__builtin__function_8cpp.html" title="Builtin functions for string concatenations." alt="" coords="414,563,625,632"/>
+<area shape="poly" id="edge25_Node000022_Node000023" title=" " alt="" coords="469,524,497,561,492,564,465,528"/>
 </map>

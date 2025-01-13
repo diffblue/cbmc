@@ -1,9 +1,15 @@
 <map id="java_bytecode_parse_treet::methodt::exceptiont" name="java_bytecode_parse_treet::methodt::exceptiont">
-<area shape="rect" id="node1" title=" " alt="" coords="5,519,205,560"/>
-<area shape="rect" id="node2" href="$classstruct__tag__typet.html" title="A struct tag type, i.e., struct_typet with an identifier." alt="" coords="41,429,169,456"/>
-<area shape="rect" id="node3" href="$classstruct__or__union__tag__typet.html" title="A struct or union tag type." alt="" coords="30,339,181,380"/>
-<area shape="rect" id="node4" href="$classtag__typet.html" title="A tag&#45;based type, i.e., typet with an identifier." alt="" coords="63,263,147,289"/>
-<area shape="rect" id="node5" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="77,187,133,213"/>
-<area shape="rect" id="node6" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="79,111,131,137"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title=" " alt="" coords="22,5,189,61"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,511,205,551"/>
+<area shape="rect" id="Node000002" href="$classstruct__tag__typet.html" title="A struct tag type, i.e., struct_typet with an identifier." alt="" coords="41,423,169,448"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,462,108,510,103,510,103,462"/>
+<area shape="rect" id="Node000003" href="$classstruct__or__union__tag__typet.html" title="A struct or union tag type." alt="" coords="30,333,181,373"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="108,387,108,422,103,422,103,387"/>
+<area shape="rect" id="Node000004" href="$classtag__typet.html" title="A tag&#45;based type, i.e., typet with an identifier." alt="" coords="63,259,147,284"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="108,298,108,333,103,333,103,298"/>
+<area shape="rect" id="Node000005" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="77,184,133,209"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="108,224,108,258,103,258,103,224"/>
+<area shape="rect" id="Node000006" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="79,109,131,135"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="108,149,108,184,103,184,103,149"/>
+<area shape="rect" id="Node000007" href="$classsharing__treet.html" title=" " alt="" coords="22,5,189,60"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="108,74,108,109,103,109,103,74"/>
 </map>

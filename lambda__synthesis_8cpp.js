@@ -10,16 +10,16 @@ var lambda__synthesis_8cpp =
     [ "create_invokedynamic_synthetic_classes", "lambda__synthesis_8cpp.html#a3c857093f4f7f4a2e8f9b1694ec33678", null ],
     [ "escape_symbol_special_chars", "lambda__synthesis_8cpp.html#a83d1a5fce97943cc281ffd6883e25521", null ],
     [ "get_interface_methods", "lambda__synthesis_8cpp.html#aeaf3e3773ec724f081c4385faa7f565c", null ],
-    [ "get_lambda_method_handle", "lambda__synthesis_8cpp.html#a42b6888a2e952e7192925ab3b6b0a54a", null ],
-    [ "get_or_create_method_symbol", "lambda__synthesis_8cpp.html#a3cdca6ebf3ba4e914dcbabff67911c92", null ],
-    [ "get_unboxing_method", "lambda__synthesis_8cpp.html#ac3d8593a5181d8344c6d7b4f831ca9fb", null ],
+    [ "get_lambda_method_handle", "lambda__synthesis_8cpp.html#ac2cc0595a1bfdbe53721cbc9d3362c4e", null ],
+    [ "get_or_create_method_symbol", "lambda__synthesis_8cpp.html#aa03ff1fbcd2dd8b7ef0d900cc2253e24", null ],
+    [ "get_unboxing_method", "lambda__synthesis_8cpp.html#a732e705f0a6a5254ea109db0285fd633", null ],
     [ "implemented_method_symbol", "lambda__synthesis_8cpp.html#a074f6cb5b6ef5a5dfeaacc7c26eac129", null ],
     [ "instantiate_new_object", "lambda__synthesis_8cpp.html#a489b6784fff51e2a324b0413a6cf5eff", null ],
     [ "invokedynamic_synthetic_constructor", "lambda__synthesis_8cpp.html#a480779899884dd745fc86e260d614fb9", null ],
     [ "invokedynamic_synthetic_method", "lambda__synthesis_8cpp.html#ab057e07cdafe680654405e5bc742224a", null ],
-    [ "lambda_method_handle", "lambda__synthesis_8cpp.html#a341494ae394aec32e5b6514bac7d448d", null ],
+    [ "lambda_method_handle", "lambda__synthesis_8cpp.html#a3e9a9c385a9a2a2e4ffbe93689039d24", null ],
     [ "lambda_synthetic_class_name", "lambda__synthesis_8cpp.html#ac3ce321b26acf18779d8c45fdfc871e6", null ],
     [ "make_function_expr", "lambda__synthesis_8cpp.html#a30594cc7fb635998a61c5f96adea7635", null ],
     [ "synthetic_class_symbol", "lambda__synthesis_8cpp.html#a23994f3d3e5cb862b313646015d7dd97", null ],
-    [ "try_get_unique_unimplemented_method", "lambda__synthesis_8cpp.html#aab291c051945af2177ab1e85cad8528f", null ]
+    [ "try_get_unique_unimplemented_method", "lambda__synthesis_8cpp.html#a5b864a7082f6ae0d44ae25d6d05e49e2", null ]
 ];

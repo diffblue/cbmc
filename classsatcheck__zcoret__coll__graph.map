@@ -1,21 +1,42 @@
 <map id="satcheck_zcoret" name="satcheck_zcoret">
-<area shape="rect" id="node1" title=" " alt="" coords="693,777,820,804"/>
-<area shape="rect" id="node2" href="$classdimacs__cnft.html" title=" " alt="" coords="631,688,731,715"/>
-<area shape="rect" id="node3" href="$classcnf__clause__listt.html" title=" " alt="" coords="619,599,742,625"/>
-<area shape="rect" id="node4" href="$classcnft.html" title=" " alt="" coords="581,509,628,536"/>
-<area shape="rect" id="node5" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="537,420,593,447"/>
-<area shape="rect" id="node6" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="233,331,320,357"/>
-<area shape="rect" id="node9" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="199,420,357,447"/>
-<area shape="rect" id="node7" href="$classmessage__handlert.html" title=" " alt="" coords="5,95,148,121"/>
-<area shape="rect" id="node8" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="172,95,336,121"/>
-<area shape="rect" id="node10" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="361,95,489,121"/>
-<area shape="rect" id="node11" title=" " alt="" coords="483,331,647,357"/>
-<area shape="rect" id="node12" href="$classliteralt.html" title=" " alt="" coords="513,95,579,121"/>
-<area shape="rect" id="node13" title=" " alt="" coords="639,95,768,121"/>
-<area shape="rect" id="node15" title=" " alt="" coords="689,331,811,357"/>
-<area shape="rect" id="node14" title=" " alt="" coords="755,5,793,32"/>
-<area shape="rect" id="node16" title=" " alt="" coords="792,95,900,121"/>
-<area shape="rect" id="node17" title=" " alt="" coords="755,688,913,715"/>
-<area shape="rect" id="node18" title=" " alt="" coords="779,599,889,625"/>
-<area shape="rect" id="node19" title=" " alt="" coords="815,509,853,536"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="316,768,443,793"/>
+<area shape="rect" id="Node000002" href="$classdimacs__cnft.html" title=" " alt="" coords="253,680,353,705"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="325,714,371,766,367,769,321,718"/>
+<area shape="rect" id="Node000003" href="$classcnf__clause__listt.html" title=" " alt="" coords="242,592,365,617"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="306,631,306,679,301,679,301,631"/>
+<area shape="rect" id="Node000004" href="$classcnft.html" title=" " alt="" coords="232,504,279,529"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="271,540,299,590,294,593,266,543"/>
+<area shape="rect" id="Node000005" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="225,416,281,441"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="256,455,258,503,252,504,251,455"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="52,328,216,353"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="163,359,238,414,235,418,160,364"/>
+<area shape="rect" id="Node000007" href="$classliteralt.html" title=" " alt="" coords="5,93,71,119"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="34,133,28,169,26,214,32,260,39,282,51,302,65,316,82,326,80,330,62,320,47,306,35,285,27,262,20,214,23,168,29,132"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="113,93,243,119"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="149,129,138,144,129,168,123,195,121,248,127,294,134,327,128,328,121,295,116,248,118,194,124,167,133,141,145,126"/>
+<area shape="rect" id="Node000029" title=" " alt="" coords="257,328,379,353"/>
+<area shape="poly" id="edge16_Node000029_Node000008" title=" " alt="" coords="204,127,215,141,225,165,229,187,230,226,232,263,238,282,251,302,265,316,283,326,280,330,262,320,247,306,233,284,226,264,224,226,224,187,220,167,210,144,200,130"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="229,5,268,31"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="229,42,216,56,188,95,183,92,212,53,225,38"/>
+<area shape="rect" id="Node000030" title=" " alt="" coords="267,93,375,119"/>
+<area shape="poly" id="edge18_Node000030_Node000009" title=" " alt="" coords="270,40,281,53,313,91,309,95,277,56,266,43"/>
+<area shape="rect" id="Node000010" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="451,328,537,353"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="450,360,395,380,282,420,280,415,393,375,448,355"/>
+<area shape="rect" id="Node000015" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="400,416,559,441"/>
+<area shape="poly" id="edge14_Node000015_Node000010" title=" " alt="" coords="445,362,428,379,426,388,431,397,454,414,451,418,427,401,421,389,424,376,441,358"/>
+<area shape="rect" id="Node000011" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="399,93,527,119"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="469,132,495,327,490,328,464,133"/>
+<area shape="rect" id="Node000012" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="552,93,716,119"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="626,132,587,211,560,259,529,306,509,329,505,326,525,302,555,257,582,209,621,130"/>
+<area shape="rect" id="Node000013" href="$classmessage__handlert.html" title=" " alt="" coords="740,93,883,119"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="811,133,803,172,788,219,764,267,747,288,727,306,693,321,643,331,538,340,537,335,643,325,692,316,725,302,743,284,759,264,783,217,798,171,806,132"/>
+<area shape="poly" id="edge13_Node000010_Node000015" title=" " alt="" coords="489,403,493,392,493,354,499,354,498,392,494,405"/>
+<area shape="poly" id="edge15_Node000003_Node000029" title=" " alt="" coords="319,367,307,592,301,592,314,367"/>
+<area shape="poly" id="edge17_Node000029_Node000030" title=" " alt="" coords="323,133,321,328,315,328,318,133"/>
+<area shape="rect" id="Node000031" title=" " alt="" coords="377,680,536,705"/>
+<area shape="poly" id="edge19_Node000001_Node000031" title=" " alt="" coords="439,718,392,769,388,766,435,714"/>
+<area shape="rect" id="Node000032" title=" " alt="" coords="402,592,511,617"/>
+<area shape="poly" id="edge20_Node000031_Node000032" title=" " alt="" coords="459,631,459,679,454,679,454,631"/>
+<area shape="rect" id="Node000033" title=" " alt="" coords="437,504,476,529"/>
+<area shape="poly" id="edge21_Node000032_Node000033" title=" " alt="" coords="459,543,459,591,454,591,454,543"/>
 </map>

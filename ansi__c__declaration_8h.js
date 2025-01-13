@@ -2,8 +2,8 @@ var ansi__c__declaration_8h =
 [
     [ "ansi_c_declaratort", "classansi__c__declaratort.html", "classansi__c__declaratort" ],
     [ "ansi_c_declarationt", "classansi__c__declarationt.html", "classansi__c__declarationt" ],
-    [ "to_ansi_c_declaration", "ansi__c__declaration_8h.html#a55ad2f2fc5ab1e08e0afd26f10e0a785", null ],
-    [ "to_ansi_c_declaration", "ansi__c__declaration_8h.html#abd2ad6cf8237a12b0b1836234a0c5797", null ],
-    [ "to_ansi_c_declarator", "ansi__c__declaration_8h.html#a7a97c3241def67eab1d469a659b39ab8", null ],
-    [ "to_ansi_c_declarator", "ansi__c__declaration_8h.html#a15575dd788a7e6a750ae0dbcccc54e5d", null ]
+    [ "to_ansi_c_declaration", "ansi__c__declaration_8h.html#a18cc5b674e34f0e7579d9c21c2611f98", null ],
+    [ "to_ansi_c_declaration", "ansi__c__declaration_8h.html#a64e7a58cd2e306cdce59677390212998", null ],
+    [ "to_ansi_c_declarator", "ansi__c__declaration_8h.html#ab2b0bb4b9db664e32e0055c68bc1ff10", null ],
+    [ "to_ansi_c_declarator", "ansi__c__declaration_8h.html#a2bedf97444f4ca5b367dced25a84d279", null ]
 ];

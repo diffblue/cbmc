@@ -1,9 +1,15 @@
 <map id="uninitialized_domaint" name="uninitialized_domaint">
-<area shape="rect" id="node1" title=" " alt="" coords="156,273,319,300"/>
-<area shape="rect" id="node2" href="$classai__domain__baset.html" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="5,184,139,211"/>
-<area shape="rect" id="node3" title=" " alt="" coords="163,184,312,211"/>
-<area shape="rect" id="node4" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="156,95,228,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="252,95,361,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="287,5,326,32"/>
-<area shape="rect" id="node7" href="$classtvt.html" title=" " alt="" coords="336,184,376,211"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="156,269,319,295"/>
+<area shape="rect" id="Node000002" href="$classai__domain__baset.html" title="The interface offered by a domain, allows code to manipulate domains without knowing their exact type..." alt="" coords="5,181,139,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,211,216,267,214,271,105,215"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="163,181,312,207"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="240,221,240,269,235,269,235,221"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="156,93,228,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="206,130,220,156,233,180,228,182,215,159,201,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="252,93,361,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="291,131,249,182,245,179,286,128"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="287,5,326,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="309,45,309,93,304,93,304,45"/>
+<area shape="rect" id="Node000007" href="$classtvt.html" title=" " alt="" coords="336,181,376,207"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="348,221,329,247,307,262,284,272,282,267,304,257,325,243,344,218"/>
 </map>

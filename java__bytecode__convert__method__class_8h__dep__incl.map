@@ -1,9 +1,16 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_bytecode_convert_method_class.h" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_bytecode_convert_method_class.h">
-<area shape="rect" id="node1" title="JAVA Bytecode Language Conversion." alt="" coords="270,5,557,61"/>
-<area shape="rect" id="node2" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="5,213,267,269"/>
-<area shape="rect" id="node3" href="$java__bytecode__convert__method_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="290,109,537,165"/>
-<area shape="rect" id="node7" href="$java__local__variable__table_8cpp.html" title="Java local variable table processing." alt="" coords="561,109,780,165"/>
-<area shape="rect" id="node4" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="291,213,535,269"/>
-<area shape="rect" id="node5" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="560,213,779,269"/>
-<area shape="rect" id="node6" href="$lambda__synthesis_8cpp.html" title="Java lambda code synthesis." alt="" coords="803,213,1021,269"/>
+<area shape="rect" id="Node000001" title="JAVA Bytecode Language Conversion." alt="" coords="270,5,557,60"/>
+<area shape="rect" id="Node000002" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="5,211,267,265"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="348,69,280,110,215,163,163,212,159,209,212,159,277,106,346,64"/>
+<area shape="rect" id="Node000003" href="$java__bytecode__convert__method_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="290,108,537,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="416,74,416,108,411,108,411,74"/>
+<area shape="rect" id="Node000007" href="$java__local__variable__table_8cpp.html" title="Java local variable table processing." alt="" coords="561,108,780,163"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="494,62,605,105,603,110,492,67"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="329,170,209,213,207,208,328,165"/>
+<area shape="rect" id="Node000004" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="291,211,535,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="416,176,416,211,411,211,411,176"/>
+<area shape="rect" id="Node000005" href="$java__bytecode__language_8cpp.html" title=" " alt="" coords="560,211,779,265"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="494,165,604,208,602,213,492,170"/>
+<area shape="rect" id="Node000006" href="$lambda__synthesis_8cpp.html" title="Java lambda code synthesis." alt="" coords="803,211,1021,265"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="551,160,791,208,803,210,802,216,790,213,550,166"/>
 </map>

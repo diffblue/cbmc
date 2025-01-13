@@ -1,12 +1,21 @@
 <map id="cover_instrumenter_baset" name="cover_instrumenter_baset">
-<area shape="rect" id="node1" title="Base class for goto program coverage instrumenters." alt="" coords="5,201,155,242"/>
-<area shape="rect" id="node2" href="$classcover__assertion__instrumentert.html" title="Assertion coverage instrumenter." alt="" coords="203,5,424,32"/>
-<area shape="rect" id="node3" href="$classcover__assume__instrumentert.html" title=" " alt="" coords="207,56,419,83"/>
-<area shape="rect" id="node4" href="$classcover__branch__instrumentert.html" title="Branch coverage instrumenter." alt="" coords="211,107,416,133"/>
-<area shape="rect" id="node5" href="$classcover__condition__instrumentert.html" title="Condition coverage instrumenter." alt="" coords="203,157,424,184"/>
-<area shape="rect" id="node6" href="$classcover__cover__instrumentert.html" title="__CPROVER_cover coverage instrumenter" alt="" coords="215,208,412,235"/>
-<area shape="rect" id="node7" href="$classcover__decision__instrumentert.html" title="Decision coverage instrumenter." alt="" coords="206,259,421,285"/>
-<area shape="rect" id="node8" href="$classcover__location__instrumentert.html" title="Basic block coverage instrumenter." alt="" coords="207,309,420,336"/>
-<area shape="rect" id="node9" href="$classcover__mcdc__instrumentert.html" title="MC/DC coverage instrumenter." alt="" coords="215,360,411,387"/>
-<area shape="rect" id="node10" href="$classcover__path__instrumentert.html" title="Path coverage instrumenter." alt="" coords="218,411,409,437"/>
+<area shape="rect" id="Node000001" title="Base class for goto program coverage instrumenters." alt="" coords="5,195,155,235"/>
+<area shape="rect" id="Node000002" href="$classcover__assertion__instrumentert.html" title="Assertion coverage instrumenter." alt="" coords="203,5,424,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,181,110,148,134,109,164,71,201,40,224,28,226,33,204,44,168,75,138,112,115,150,97,184"/>
+<area shape="rect" id="Node000003" href="$classcover__assume__instrumentert.html" title=" " alt="" coords="207,55,419,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="101,182,144,134,171,109,201,89,228,78,230,83,204,94,174,114,148,137,105,186"/>
+<area shape="rect" id="Node000004" href="$classcover__branch__instrumentert.html" title="Branch coverage instrumenter." alt="" coords="211,104,416,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="118,185,157,160,202,138,237,127,239,132,204,143,160,165,121,189"/>
+<area shape="rect" id="Node000005" href="$classcover__condition__instrumentert.html" title="Condition coverage instrumenter." alt="" coords="203,153,424,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="168,194,252,176,253,181,169,199"/>
+<area shape="rect" id="Node000006" href="$classcover__cover__instrumentert.html" title="__CPROVER_cover coverage instrumenter" alt="" coords="215,203,412,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="169,213,215,213,215,218,169,218"/>
+<area shape="rect" id="Node000007" href="$classcover__decision__instrumentert.html" title="Decision coverage instrumenter." alt="" coords="206,252,421,277"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="169,231,253,249,252,255,168,237"/>
+<area shape="rect" id="Node000008" href="$classcover__location__instrumentert.html" title="Basic block coverage instrumenter." alt="" coords="207,301,420,327"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="122,241,160,265,204,286,243,299,241,304,202,291,158,270,119,245"/>
+<area shape="rect" id="Node000009" href="$classcover__mcdc__instrumentert.html" title="MC/DC coverage instrumenter." alt="" coords="215,351,411,376"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="106,245,148,293,175,316,204,336,233,348,231,353,201,340,172,320,144,296,102,248"/>
+<area shape="rect" id="Node000010" href="$classcover__path__instrumentert.html" title="Path coverage instrumenter." alt="" coords="218,400,409,425"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="98,246,115,280,139,318,168,354,204,385,229,397,226,402,201,390,165,358,134,321,110,282,93,249"/>
 </map>

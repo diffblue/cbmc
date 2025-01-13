@@ -1,12 +1,22 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_contract_handler.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_contract_handler.h">
-<area shape="rect" id="node1" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="221,5,419,76"/>
-<area shape="rect" id="node2" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="121,250,361,306"/>
-<area shape="rect" id="node8" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="221,124,419,195"/>
-<area shape="rect" id="node9" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="443,124,640,195"/>
-<area shape="rect" id="node3" href="$dfcc_8cpp.html" title=" " alt="" coords="21,361,219,432"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,369,485,425"/>
-<area shape="rect" id="node5" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,480,240,536"/>
-<area shape="rect" id="node6" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,480,464,536"/>
-<area shape="rect" id="node7" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,480,747,536"/>
-<area shape="rect" id="node10" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="443,243,640,313"/>
+<area shape="rect" id="Node000001" title="Specialisation of dfcc_contract_handlert for contracts." alt="" coords="221,5,419,75"/>
+<area shape="rect" id="Node000002" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="121,247,361,302"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="244,85,226,103,212,124,204,155,206,188,216,219,228,246,223,248,211,221,201,189,198,154,207,122,222,100,241,81"/>
+<area shape="rect" id="Node000008" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="221,123,419,192"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="323,89,323,122,317,122,317,89"/>
+<area shape="rect" id="Node000009" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="443,123,640,192"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="398,79,478,120,475,125,396,83"/>
+<area shape="rect" id="Node000003" href="$dfcc_8cpp.html" title=" " alt="" coords="21,357,219,427"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="206,313,158,359,154,355,202,309"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,365,485,419"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="281,309,338,362,334,366,277,313"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,475,240,529"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="294,427,183,477,180,472,292,423"/>
+<area shape="rect" id="Node000006" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,475,464,529"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="367,434,367,474,361,474,361,434"/>
+<area shape="rect" id="Node000007" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,475,747,529"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="439,422,557,472,555,477,437,427"/>
+<area shape="poly" id="edge9_Node000009_Node000002" title=" " alt="" coords="442,199,310,250,309,245,440,194"/>
+<area shape="rect" id="Node000010" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="443,240,640,309"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="544,206,544,240,539,240,539,206"/>
 </map>

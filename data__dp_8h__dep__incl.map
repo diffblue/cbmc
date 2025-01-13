@@ -1,13 +1,24 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/wmm/data_dp.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/wmm/data_dp.h">
-<area shape="rect" id="node1" title="data dependencies" alt="" coords="253,5,447,61"/>
-<area shape="rect" id="node2" href="$data__dp_8cpp.html" title="data dependencies" alt="" coords="145,109,339,165"/>
-<area shape="rect" id="node3" href="$event__graph_8h.html" title="graph of abstract events" alt="" coords="363,109,556,165"/>
-<area shape="rect" id="node4" href="$cycle__collection_8cpp.html" title="collection of cycles in graph of abstract events" alt="" coords="5,213,204,269"/>
-<area shape="rect" id="node5" href="$event__graph_8cpp.html" title="graph of abstract events" alt="" coords="228,213,421,269"/>
-<area shape="rect" id="node6" href="$goto2graph_8h.html" title="Instrumenter." alt="" coords="497,213,691,269"/>
-<area shape="rect" id="node8" href="$instrumenter__pensieve_8h.html" title="Instrumenter." alt="" coords="243,317,473,373"/>
-<area shape="rect" id="node11" href="$pair__collection_8cpp.html" title="collection of pairs (for Pensieve&#39;s static delay&#45;set analysis) in graph of abstract events" alt="" coords="715,213,908,269"/>
-<area shape="rect" id="node7" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="497,317,691,373"/>
-<area shape="rect" id="node9" href="$instrumenter__strategies_8cpp.html" title="Strategies for picking the abstract events to instrument." alt="" coords="715,317,966,373"/>
-<area shape="rect" id="node10" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="991,317,1184,373"/>
+<area shape="rect" id="Node000001" title="data dependencies" alt="" coords="253,5,447,60"/>
+<area shape="rect" id="Node000002" href="$data__dp_8cpp.html" title="data dependencies" alt="" coords="145,108,339,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="313,72,272,110,268,106,310,68"/>
+<area shape="rect" id="Node000003" href="$event__graph_8h.html" title="graph of abstract events" alt="" coords="363,108,556,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="391,68,433,106,429,110,387,72"/>
+<area shape="rect" id="Node000004" href="$cycle__collection_8cpp.html" title="collection of cycles in graph of abstract events" alt="" coords="5,211,204,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="355,169,198,213,196,208,353,164"/>
+<area shape="rect" id="Node000005" href="$event__graph_8cpp.html" title="graph of abstract events" alt="" coords="228,211,421,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="415,173,362,213,358,208,412,169"/>
+<area shape="rect" id="Node000006" href="$goto2graph_8h.html" title="Instrumenter." alt="" coords="497,211,691,265"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="507,169,560,208,557,213,504,173"/>
+<area shape="rect" id="Node000008" href="$instrumenter__pensieve_8h.html" title="Instrumenter." alt="" coords="243,313,473,368"/>
+<area shape="poly" id="edge10_Node000003_Node000008" title=" " alt="" coords="460,177,452,221,435,267,416,293,394,315,390,311,412,290,430,264,447,220,454,176"/>
+<area shape="rect" id="Node000011" href="$pair__collection_8cpp.html" title="collection of pairs (for Pensieve&#39;s static delay&#45;set analysis) in graph of abstract events" alt="" coords="715,211,908,265"/>
+<area shape="poly" id="edge11_Node000003_Node000011" title=" " alt="" coords="565,164,720,208,719,213,563,169"/>
+<area shape="rect" id="Node000007" href="$goto2graph_8cpp.html" title="Turns a goto&#45;program into an abstract event graph." alt="" coords="497,313,691,368"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="597,279,597,313,591,313,591,279"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="521,273,421,316,418,311,519,268"/>
+<area shape="rect" id="Node000009" href="$instrumenter__strategies_8cpp.html" title="Strategies for picking the abstract events to instrument." alt="" coords="715,313,966,368"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="672,268,777,311,775,316,670,273"/>
+<area shape="rect" id="Node000010" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="991,313,1184,368"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="705,263,844,287,979,311,991,313,990,319,977,316,843,292,704,268"/>
 </map>

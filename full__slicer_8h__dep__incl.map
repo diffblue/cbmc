@@ -1,9 +1,16 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/full_slicer.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/full_slicer.h">
-<area shape="rect" id="node1" title="Slicing." alt="" coords="286,5,479,61"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="5,109,211,165"/>
-<area shape="rect" id="node3" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="151,213,345,269"/>
-<area shape="rect" id="node4" href="$full__slicer__class_8h.html" title="Goto Program Slicing." alt="" coords="286,109,479,165"/>
-<area shape="rect" id="node6" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="504,109,763,165"/>
-<area shape="rect" id="node7" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="787,109,979,165"/>
-<area shape="rect" id="node5" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="369,213,562,269"/>
+<area shape="rect" id="Node000001" title="Slicing." alt="" coords="367,5,561,60"/>
+<area shape="rect" id="Node000002" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="5,108,197,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="357,66,197,111,195,105,356,61"/>
+<area shape="rect" id="Node000003" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="221,108,427,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="418,70,362,110,359,106,415,66"/>
+<area shape="rect" id="Node000004" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="367,211,561,265"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="467,74,467,210,461,210,461,74"/>
+<area shape="rect" id="Node000005" href="$full__slicer__class_8h.html" title="Goto Program Slicing." alt="" coords="502,108,695,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="512,66,565,106,562,110,509,70"/>
+<area shape="rect" id="Node000007" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="720,108,979,163"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="574,60,750,105,748,111,573,65"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="554,173,501,213,498,208,551,169"/>
+<area shape="rect" id="Node000006" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="585,211,778,265"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="631,172,662,209,658,212,627,175"/>
 </map>

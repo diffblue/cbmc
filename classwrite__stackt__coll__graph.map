@@ -1,8 +1,16 @@
 <map id="write_stackt" name="write_stackt">
-<area shape="rect" id="node1" title=" " alt="" coords="116,404,219,431"/>
-<area shape="rect" id="node2" title=" " alt="" coords="61,300,274,341"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,196,172,237"/>
-<area shape="rect" id="node4" title=" " alt="" coords="18,95,175,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="164,5,203,32"/>
-<area shape="rect" id="node6" title=" " alt="" coords="204,145,333,172"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="179,397,281,423"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="123,295,337,335"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,349,233,397,227,397,227,349"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="56,192,223,232"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="167,240,215,293,211,296,163,244"/>
+<area shape="rect" id="Node000004" href="$classwrite__stack__entryt.html" title=" " alt="" coords="5,93,148,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="80,132,83,150,90,167,111,190,107,194,85,169,78,151,75,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="173,93,330,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="161,124,137,144,132,155,131,167,135,191,129,192,126,167,127,153,133,141,158,120"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="291,5,329,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="297,44,262,94,257,91,292,41"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="303,143,432,168"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="323,42,344,92,365,141,360,143,340,94,318,44"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="350,180,249,296,245,293,346,177"/>
 </map>

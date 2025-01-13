@@ -1,20 +1,37 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/help_formatter.h" name="/home/runner/work/cbmc/cbmc/src/util/help_formatter.h">
-<area shape="rect" id="node1" title="Help Formatter." alt="" coords="1835,5,2056,47"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="5,95,211,151"/>
-<area shape="rect" id="node3" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="235,95,426,151"/>
-<area shape="rect" id="node4" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="450,95,649,151"/>
-<area shape="rect" id="node5" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="673,95,916,151"/>
-<area shape="rect" id="node6" href="$goto__bmc__parse__options_8cpp.html" title=" " alt="" coords="940,95,1124,151"/>
-<area shape="rect" id="node7" href="$goto__cc__mode_8cpp.html" title="Command line option container." alt="" coords="1148,95,1332,151"/>
-<area shape="rect" id="node8" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1356,95,1540,151"/>
-<area shape="rect" id="node9" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="1565,95,1803,151"/>
-<area shape="rect" id="node10" href="$goto__inspect__parse__options_8cpp.html" title=" " alt="" coords="1828,95,2063,151"/>
-<area shape="rect" id="node11" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2087,95,2345,151"/>
-<area shape="rect" id="node12" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="2370,95,2633,151"/>
-<area shape="rect" id="node13" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="2657,95,2927,151"/>
-<area shape="rect" id="node14" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="2951,95,3190,151"/>
-<area shape="rect" id="node15" href="$help__formatter_8cpp.html" title=" " alt="" coords="3214,102,3450,143"/>
-<area shape="rect" id="node16" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="3473,95,3684,151"/>
-<area shape="rect" id="node17" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="3708,95,3900,151"/>
-<area shape="rect" id="node18" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="3924,95,4108,151"/>
+<area shape="rect" id="Node000001" title="Help Formatter." alt="" coords="1788,5,2009,45"/>
+<area shape="rect" id="Node000002" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="5,93,216,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1774,31,1434,39,988,51,549,70,367,82,228,96,216,98,216,92,228,91,366,77,549,65,988,46,1434,33,1774,26"/>
+<area shape="rect" id="Node000003" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="240,93,432,148"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1774,32,1091,53,717,72,562,83,444,96,433,98,432,93,444,91,562,78,717,66,1091,48,1774,27"/>
+<area shape="rect" id="Node000004" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="456,93,640,148"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1774,28,1561,30,1282,39,968,59,808,75,652,96,641,98,640,93,652,91,808,70,967,54,1281,34,1561,25,1774,23"/>
+<area shape="rect" id="Node000005" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="664,93,869,148"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1774,31,1599,37,1376,48,1129,67,882,96,870,98,869,93,881,91,1128,62,1375,42,1598,31,1774,26"/>
+<area shape="rect" id="Node000006" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="894,93,1085,148"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1774,34,1465,53,1280,71,1096,96,1086,98,1085,93,1096,91,1280,66,1465,48,1774,28"/>
+<area shape="rect" id="Node000007" href="$crangler__parse__options_8cpp.html" title="CRANGLER Command Line Option Processing." alt="" coords="1109,93,1307,148"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1775,40,1562,62,1320,96,1308,98,1307,93,1320,91,1561,56,1774,34"/>
+<area shape="rect" id="Node000008" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1332,93,1575,148"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1796,51,1576,97,1574,91,1795,46"/>
+<area shape="rect" id="Node000009" href="$goto__bmc__parse__options_8cpp.html" title=" " alt="" coords="1599,93,1783,148"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1845,53,1750,96,1748,91,1843,49"/>
+<area shape="rect" id="Node000010" href="$goto__cc__mode_8cpp.html" title="Command line option container." alt="" coords="1807,93,1991,148"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1901,59,1901,93,1896,93,1896,59"/>
+<area shape="rect" id="Node000011" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2015,93,2199,148"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1954,49,2049,91,2047,96,1952,53"/>
+<area shape="rect" id="Node000012" href="$goto__harness__parse__options_8cpp.html" title=" " alt="" coords="2223,93,2462,148"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="2002,46,2224,92,2223,97,2001,51"/>
+<area shape="rect" id="Node000013" href="$goto__inspect__parse__options_8cpp.html" title=" " alt="" coords="2487,93,2721,148"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="2023,35,2235,58,2475,91,2487,93,2486,98,2474,96,2234,63,2023,41"/>
+<area shape="rect" id="Node000014" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2745,93,3004,148"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="2023,30,2345,51,2540,68,2734,91,2745,92,2745,98,2733,96,2539,74,2345,57,2023,35"/>
+<area shape="rect" id="Node000015" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="3029,93,3291,148"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="2024,27,2216,33,2463,45,2739,63,3016,91,3029,92,3028,98,3016,96,2739,69,2463,50,2215,38,2024,32"/>
+<area shape="rect" id="Node000016" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="3316,93,3585,148"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="2023,25,2261,28,2579,39,2940,58,3124,73,3304,91,3316,92,3315,97,3304,96,3124,78,2940,64,2579,44,2261,34,2023,30"/>
+<area shape="rect" id="Node000017" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="3610,93,3849,148"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="2023,26,2823,48,3271,66,3456,78,3598,91,3610,92,3609,98,3597,96,3456,83,3270,72,2823,53,2023,32"/>
+<area shape="rect" id="Node000018" href="$help__formatter_8cpp.html" title=" " alt="" coords="3873,101,4109,141"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="2023,26,2418,32,2948,44,3476,64,3695,76,3862,91,3909,98,3908,103,3861,96,3695,81,3475,69,2948,50,2418,37,2023,31"/>
 </map>

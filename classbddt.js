@@ -20,8 +20,8 @@ var classbddt =
     [ "is_false", "classbddt.html#abf2e27999717a18b327440cfb2b86dac", null ],
     [ "is_true", "classbddt.html#a8b9b5614a78c85143b94bdde28116b69", null ],
     [ "is_true", "classbddt.html#a8b9b5614a78c85143b94bdde28116b69", null ],
-    [ "operator=", "classbddt.html#a84049d2d11c51df9a64face433112150", null ],
-    [ "operator=", "classbddt.html#ae22bfc6042386d6263e35ad3a86ee59d", null ],
+    [ "operator=", "classbddt.html#a1f5c3ead42573c088d142e2b0987a020", null ],
+    [ "operator=", "classbddt.html#a6911da6c87b0cdacccf34b1c52da6f6a", null ],
     [ "bdd_managert", "classbddt.html#ab0e8649bbedff64a91a832a2c57be2f9", null ],
     [ "bdd", "classbddt.html#aec7a44fe908e7c97e6eed719cfd7fffa", null ]
 ];

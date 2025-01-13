@@ -1,36 +1,79 @@
 <map id="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/c_object_factory_parameters.h" name="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/c_object_factory_parameters.h">
-<area shape="rect" id="node1" title=" " alt="" coords="4771,5,4957,61"/>
-<area shape="rect" id="node2" href="$ansi__c__language_8h.html" title=" " alt="" coords="2584,117,2768,173"/>
-<area shape="rect" id="node16" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="4217,332,4476,388"/>
-<area shape="rect" id="node27" href="$c__nondet__symbol__factory_8cpp.html" title="C Nondet Symbol Factory." alt="" coords="4557,117,4747,173"/>
-<area shape="rect" id="node28" href="$c__object__factory__parameters_8cpp.html" title=" " alt="" coords="4771,117,4957,173"/>
-<area shape="rect" id="node29" href="$cpp__language_8h.html" title="C++ Language Module." alt="" coords="459,124,677,165"/>
-<area shape="rect" id="node31" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="4981,124,5200,165"/>
-<area shape="rect" id="node32" href="$dfcc_8cpp.html" title=" " alt="" coords="5224,109,5421,180"/>
-<area shape="rect" id="node33" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="5445,109,5643,180"/>
-<area shape="rect" id="node34" href="$dfcc__library_8cpp.html" title=" " alt="" coords="5667,109,5864,180"/>
-<area shape="rect" id="node3" href="$ansi__c__language_8cpp.html" title=" " alt="" coords="3505,228,3689,284"/>
-<area shape="rect" id="node4" href="$ansi-c_2cprover__library_8cpp.html" title=" " alt="" coords="3713,228,3897,284"/>
-<area shape="rect" id="node5" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="919,339,1182,381"/>
-<area shape="rect" id="node6" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="1336,228,1541,284"/>
-<area shape="rect" id="node10" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="4290,228,4481,284"/>
-<area shape="rect" id="node11" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="571,228,789,284"/>
-<area shape="rect" id="node12" href="$goto__cc__languages_8cpp.html" title="Language Registration." alt="" coords="813,228,997,284"/>
-<area shape="rect" id="node13" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="363,228,547,284"/>
-<area shape="rect" id="node14" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="1566,228,1813,284"/>
-<area shape="rect" id="node15" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="3735,332,3969,388"/>
-<area shape="rect" id="node17" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="3972,228,4215,284"/>
-<area shape="rect" id="node19" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="1837,228,2030,284"/>
-<area shape="rect" id="node20" href="$goto__synthesizer__languages_8cpp.html" title="Language Registration." alt="" coords="1022,228,1261,284"/>
-<area shape="rect" id="node21" href="$api_8cpp.html" title=" " alt="" coords="2055,228,2239,284"/>
-<area shape="rect" id="node22" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="2263,228,2532,284"/>
-<area shape="rect" id="node23" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="2557,228,2795,284"/>
-<area shape="rect" id="node24" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="2820,228,3031,284"/>
-<area shape="rect" id="node25" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="3055,228,3247,284"/>
-<area shape="rect" id="node26" href="$get__goto__model__from__c_8cpp.html" title=" " alt="" coords="3271,228,3481,284"/>
-<area shape="rect" id="node7" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1724,339,1953,381"/>
-<area shape="rect" id="node8" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1207,332,1412,388"/>
-<area shape="rect" id="node9" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1437,332,1699,388"/>
-<area shape="rect" id="node18" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="3993,332,4193,388"/>
-<area shape="rect" id="node30" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="5,235,237,277"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="4744,5,4929,60"/>
+<area shape="rect" id="Node000002" href="$ansi__c__language_8h.html" title=" " alt="" coords="2494,115,2678,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="4730,42,2678,140,2678,134,4729,36"/>
+<area shape="rect" id="Node000018" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="4362,328,4620,383"/>
+<area shape="poly" id="edge43_Node000001_Node000018" title=" " alt="" coords="4730,48,4667,58,4604,72,4552,89,4533,99,4519,110,4502,135,4490,162,4483,192,4480,223,4481,281,4488,328,4482,328,4476,282,4474,223,4478,191,4485,161,4498,132,4516,106,4530,94,4550,84,4603,66,4666,53,4730,43"/>
+<area shape="rect" id="Node000027" href="$c__nondet__symbol__factory_8cpp.html" title="C Nondet Symbol Factory." alt="" coords="4529,115,4720,170"/>
+<area shape="poly" id="edge29_Node000001_Node000027" title=" " alt="" coords="4774,69,4677,118,4675,113,4771,64"/>
+<area shape="rect" id="Node000028" href="$c__object__factory__parameters_8cpp.html" title=" " alt="" coords="4744,115,4929,170"/>
+<area shape="poly" id="edge30_Node000001_Node000028" title=" " alt="" coords="4839,74,4839,115,4834,115,4834,74"/>
+<area shape="rect" id="Node000029" href="$cpp__language_8h.html" title="C++ Language Module." alt="" coords="450,123,668,163"/>
+<area shape="poly" id="edge31_Node000001_Node000029" title=" " alt="" coords="4730,39,668,141,668,136,4730,34"/>
+<area shape="rect" id="Node000031" href="$compile_8cpp.html" title="Compile and link source and object files." alt="" coords="4954,123,5172,163"/>
+<area shape="poly" id="edge39_Node000001_Node000031" title=" " alt="" coords="4905,64,5024,120,5022,125,4903,68"/>
+<area shape="rect" id="Node000032" href="$dfcc_8cpp.html" title=" " alt="" coords="5196,108,5394,177"/>
+<area shape="poly" id="edge40_Node000001_Node000032" title=" " alt="" coords="4943,52,5059,76,5185,105,5197,109,5195,114,5184,111,5058,81,4942,57"/>
+<area shape="rect" id="Node000033" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="5418,108,5615,177"/>
+<area shape="poly" id="edge41_Node000001_Node000033" title=" " alt="" coords="4943,40,5158,64,5282,82,5406,105,5418,108,5417,113,5405,111,5282,87,5157,69,4942,45"/>
+<area shape="rect" id="Node000034" href="$dfcc__library_8cpp.html" title=" " alt="" coords="5639,108,5836,177"/>
+<area shape="poly" id="edge42_Node000001_Node000034" title=" " alt="" coords="4943,35,5080,42,5251,55,5440,75,5627,105,5639,108,5638,113,5626,111,5439,81,5251,60,5080,47,4942,40"/>
+<area shape="rect" id="Node000003" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="3243,225,3454,280"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="2692,152,2939,180,3231,223,3243,225,3242,230,3230,228,2938,185,2691,157"/>
+<area shape="rect" id="Node000004" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="3478,225,3670,280"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="2692,146,3037,170,3251,193,3466,223,3478,225,3477,230,3465,228,3251,198,3037,176,2691,152"/>
+<area shape="rect" id="Node000005" href="$ansi__c__language_8cpp.html" title=" " alt="" coords="3694,225,3878,280"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="2692,143,2879,149,3125,163,3403,186,3544,203,3682,223,3694,225,3693,230,3681,228,3543,208,3402,192,3125,168,2878,155,2691,149"/>
+<area shape="rect" id="Node000006" href="$ansi-c_2cprover__library_8cpp.html" title=" " alt="" coords="3902,225,4086,280"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="2691,141,2911,145,3209,157,3548,181,3721,200,3890,223,3902,225,3901,230,3889,228,3720,205,3547,187,3208,162,2911,150,2691,147"/>
+<area shape="rect" id="Node000007" href="$cbmc__languages_8cpp.html" title="Language Registration." alt="" coords="893,335,1156,375"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="2480,149,2189,157,1820,172,1642,183,1487,196,1367,211,1326,219,1299,228,1282,239,1273,253,1263,268,1247,282,1181,315,1113,338,1111,333,1179,310,1244,278,1259,264,1269,250,1279,235,1296,223,1324,214,1366,205,1486,190,1642,178,1820,167,2188,152,2480,144"/>
+<area shape="rect" id="Node000008" href="$cbmc__parse__options_8h.html" title="CBMC Command Line Option Processing." alt="" coords="1310,225,1515,280"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="2480,150,2299,157,2062,172,1795,195,1527,228,1516,230,1515,225,1526,223,1795,189,2061,166,2299,152,2480,144"/>
+<area shape="rect" id="Node000012" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="1540,225,1730,280"/>
+<area shape="poly" id="edge12_Node000002_Node000012" title=" " alt="" coords="2480,152,2149,177,1946,199,1742,228,1731,230,1730,225,1741,223,1945,193,2149,171,2479,147"/>
+<area shape="rect" id="Node000013" href="$goto__analyzer__languages_8cpp.html" title="Language Registration." alt="" coords="336,225,555,280"/>
+<area shape="poly" id="edge13_Node000002_Node000013" title=" " alt="" coords="2480,149,2082,157,1529,173,974,197,742,211,567,228,556,230,555,224,567,223,742,206,973,191,1529,168,2082,152,2480,143"/>
+<area shape="rect" id="Node000014" href="$goto__cc__languages_8cpp.html" title="Language Registration." alt="" coords="579,225,763,280"/>
+<area shape="poly" id="edge14_Node000002_Node000014" title=" " alt="" coords="2480,149,2118,157,1626,173,1134,196,930,211,775,228,764,230,763,225,774,223,929,206,1134,191,1626,167,2118,152,2479,143"/>
+<area shape="rect" id="Node000015" href="$goto__diff__languages_8cpp.html" title="Language Registration." alt="" coords="787,225,971,280"/>
+<area shape="poly" id="edge15_Node000002_Node000015" title=" " alt="" coords="2480,149,2156,159,1724,176,1296,199,1118,213,983,228,972,230,971,225,982,223,1118,207,1296,193,1724,170,2156,154,2480,144"/>
+<area shape="rect" id="Node000016" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="1754,225,2001,280"/>
+<area shape="poly" id="edge16_Node000002_Node000016" title=" " alt="" coords="2480,160,2264,189,2013,228,2002,230,2001,225,2012,223,2264,184,2480,155"/>
+<area shape="rect" id="Node000017" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="3879,328,4114,383"/>
+<area shape="poly" id="edge17_Node000002_Node000017" title=" " alt="" coords="2691,143,3046,151,3502,166,3720,177,3905,190,4037,205,4078,214,4099,223,4109,237,4111,251,4100,281,4079,309,4052,330,4049,326,4075,305,4095,279,4105,251,4104,239,4096,227,4077,219,4037,210,3904,195,3720,182,3502,171,3046,156,2691,148"/>
+<area shape="poly" id="edge18_Node000002_Node000018" title=" " alt="" coords="2691,143,3110,152,3667,169,4168,192,4335,207,4388,215,4416,223,4442,245,4462,272,4486,327,4481,329,4457,275,4438,248,4414,228,4387,220,4335,212,4167,198,3667,174,3110,158,2691,149"/>
+<area shape="rect" id="Node000019" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="4160,225,4403,280"/>
+<area shape="poly" id="edge19_Node000002_Node000019" title=" " alt="" coords="2692,142,2948,147,3308,159,3722,183,3934,201,4142,223,4160,225,4160,230,4141,228,3933,206,3721,189,3307,165,2948,152,2691,147"/>
+<area shape="rect" id="Node000021" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="2025,225,2218,280"/>
+<area shape="poly" id="edge23_Node000002_Node000021" title=" " alt="" coords="2481,171,2231,228,2219,231,2218,226,2230,223,2479,165"/>
+<area shape="rect" id="Node000022" href="$goto__synthesizer__languages_8cpp.html" title="Language Registration." alt="" coords="996,225,1234,280"/>
+<area shape="poly" id="edge24_Node000002_Node000022" title=" " alt="" coords="2480,149,2257,155,1953,169,1605,193,1254,228,1235,231,1234,225,1253,223,1605,187,1952,164,2257,150,2480,143"/>
+<area shape="rect" id="Node000023" href="$api_8cpp.html" title=" " alt="" coords="2243,225,2427,280"/>
+<area shape="poly" id="edge25_Node000002_Node000023" title=" " alt="" coords="2513,178,2397,228,2395,223,2510,173"/>
+<area shape="rect" id="Node000024" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="2451,225,2720,280"/>
+<area shape="poly" id="edge26_Node000002_Node000024" title=" " alt="" coords="2588,184,2588,225,2583,225,2583,184"/>
+<area shape="rect" id="Node000025" href="$symtab2gb__parse__options_8cpp.html" title=" " alt="" coords="2745,225,2984,280"/>
+<area shape="poly" id="edge27_Node000002_Node000025" title=" " alt="" coords="2667,172,2798,223,2796,228,2665,177"/>
+<area shape="rect" id="Node000026" href="$get__goto__model__from__c_8cpp.html" title=" " alt="" coords="3008,225,3219,280"/>
+<area shape="poly" id="edge28_Node000002_Node000026" title=" " alt="" coords="2692,162,2995,223,3009,226,3008,231,2994,228,2691,167"/>
+<area shape="poly" id="edge8_Node000008_Node000007" title=" " alt="" coords="1299,286,1098,338,1096,333,1297,281"/>
+<area shape="rect" id="Node000009" href="$cbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="1698,335,1927,375"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="1529,280,1738,333,1737,338,1528,286"/>
+<area shape="rect" id="Node000010" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1180,328,1386,383"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="1370,290,1318,330,1315,326,1366,286"/>
+<area shape="rect" id="Node000011" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="1410,328,1673,383"/>
+<area shape="poly" id="edge11_Node000008_Node000011" title=" " alt="" coords="1458,286,1509,326,1506,330,1455,290"/>
+<area shape="poly" id="edge20_Node000019_Node000017" title=" " alt="" coords="4196,287,4071,330,4070,325,4194,282"/>
+<area shape="poly" id="edge22_Node000019_Node000018" title=" " alt="" coords="4349,283,4437,326,4435,330,4347,288"/>
+<area shape="rect" id="Node000020" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="4138,328,4338,383"/>
+<area shape="poly" id="edge21_Node000019_Node000020" title=" " alt="" coords="4267,294,4251,329,4247,327,4262,292"/>
+<area shape="poly" id="edge32_Node000029_Node000007" title=" " alt="" coords="436,147,318,153,194,166,136,176,86,190,46,207,19,227,11,240,8,253,11,265,19,278,35,289,62,299,143,315,252,328,380,337,654,348,892,351,892,357,654,353,379,343,251,333,142,321,60,304,33,294,16,282,6,268,3,253,6,238,16,224,44,202,84,185,135,171,193,161,318,147,436,142"/>
+<area shape="poly" id="edge34_Node000029_Node000013" title=" " alt="" coords="531,174,475,227,471,223,527,170"/>
+<area shape="poly" id="edge35_Node000029_Node000014" title=" " alt="" coords="590,170,645,223,642,227,587,174"/>
+<area shape="poly" id="edge36_Node000029_Node000015" title=" " alt="" coords="629,165,802,223,800,228,627,170"/>
+<area shape="poly" id="edge37_Node000029_Node000017" title=" " alt="" coords="457,169,393,188,340,214,323,229,314,244,314,260,326,278,363,283,461,290,805,301,1880,323,3879,350,3879,355,1879,329,805,307,460,295,362,289,323,282,309,262,309,243,319,225,338,210,391,183,455,163"/>
+<area shape="poly" id="edge38_Node000029_Node000022" title=" " alt="" coords="671,163,983,223,996,225,995,230,982,228,670,168"/>
+<area shape="rect" id="Node000030" href="$cpp__language_8cpp.html" title="C++ Language Module." alt="" coords="30,233,262,273"/>
+<area shape="poly" id="edge33_Node000029_Node000030" title=" " alt="" coords="474,169,218,235,217,230,473,164"/>
 </map>

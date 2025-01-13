@@ -1,7 +1,11 @@
 <map id="consolet::redirectt" name="consolet::redirectt">
-<area shape="rect" id="node1" title=" " alt="" coords="21,352,161,379"/>
-<area shape="rect" id="node2" title=" " alt="" coords="39,248,143,275"/>
-<area shape="rect" id="node3" title=" " alt="" coords="18,157,163,199"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,81,176,108"/>
-<area shape="rect" id="node5" title=" " alt="" coords="37,5,144,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="21,347,161,372"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="39,244,143,269"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,283,93,347,88,347,88,283"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="18,155,163,195"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,208,93,244,88,244,88,208"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,80,176,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="93,119,93,155,88,155,88,119"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="37,5,144,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="93,45,93,80,88,80,88,45"/>
 </map>

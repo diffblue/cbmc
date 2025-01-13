@@ -1,10 +1,19 @@
 <map id="goto_functiont" name="goto_functiont">
-<area shape="rect" id="node1" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="54,363,170,389"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,184,176,211"/>
-<area shape="rect" id="node3" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="16,95,88,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="151,95,281,121"/>
-<area shape="rect" id="node7" title=" " alt="" coords="233,184,407,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="267,5,306,32"/>
-<area shape="rect" id="node8" title=" " alt="" coords="305,95,413,121"/>
-<area shape="rect" id="node6" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="261,273,379,300"/>
+<area shape="rect" id="Node000001" title="A goto function, consisting of function body (see body) and parameter identifiers (see parameter_iden..." alt="" coords="54,357,170,383"/>
+<area shape="rect" id="Node000002" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="261,269,379,295"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="280,302,141,360,139,355,278,298"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="233,181,407,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="323,221,323,269,317,269,317,221"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="151,93,281,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="238,127,268,155,302,179,299,183,265,159,234,131"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,181,176,207"/>
+<area shape="poly" id="edge9_Node000007_Node000004" title=" " alt="" coords="188,128,163,145,108,183,105,179,160,140,185,124"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="267,5,306,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="267,42,254,56,226,95,221,92,250,53,263,38"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="305,93,413,119"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="308,40,319,53,351,91,347,95,315,56,304,43"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="350,132,328,182,323,180,345,130"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="96,220,105,294,113,357,108,357,100,295,91,221"/>
+<area shape="rect" id="Node000008" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="16,93,88,119"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="52,132,56,156,64,169,75,179,72,183,60,172,51,158,46,133"/>
 </map>

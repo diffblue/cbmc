@@ -16,7 +16,7 @@ var classjson__objectt =
     [ "find", "classjson__objectt.html#a8290edbb00e42a71d3b98dd4ffdd0094", null ],
     [ "find", "classjson__objectt.html#a7f5f8b8cfc0f3b2df114524f8b4901f4", null ],
     [ "insert", "classjson__objectt.html#a9e4d266c7e63cdad07bda41102022dc0", null ],
-    [ "operator[]", "classjson__objectt.html#aec1db1ceefee239a3d36fa82705b788d", null ],
-    [ "operator[]", "classjson__objectt.html#ad20ca1ae2664a42af088aa8b15010758", null ],
+    [ "operator[]", "classjson__objectt.html#a77483a32b95b763c77280a8ce230aa9d", null ],
+    [ "operator[]", "classjson__objectt.html#a723c13177f563acd4948f13d15df93b0", null ],
     [ "size", "classjson__objectt.html#ab530d8e842340287f1982bf34bcda976", null ]
 ];

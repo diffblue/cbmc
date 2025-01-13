@@ -1,7 +1,11 @@
 <map id="memory_model_baset" name="memory_model_baset">
-<area shape="rect" id="node1" title=" " alt="" coords="19,80,187,107"/>
-<area shape="rect" id="node3" href="$classmemory__model__sct.html" title=" " alt="" coords="28,155,179,181"/>
-<area shape="rect" id="node2" href="$classpartial__order__concurrencyt.html" title="Base class for implementing memory models via additional constraints for SSA equations." alt="" coords="5,5,201,32"/>
-<area shape="rect" id="node4" href="$classmemory__model__tsot.html" title=" " alt="" coords="25,229,182,256"/>
-<area shape="rect" id="node5" href="$classmemory__model__psot.html" title=" " alt="" coords="23,304,183,331"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="19,79,187,104"/>
+<area shape="rect" id="Node000003" href="$classmemory__model__sct.html" title=" " alt="" coords="28,152,179,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="106,118,106,152,101,152,101,118"/>
+<area shape="rect" id="Node000002" href="$classpartial__order__concurrencyt.html" title="Base class for implementing memory models via additional constraints for SSA equations." alt="" coords="5,5,201,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,44,106,79,101,79,101,44"/>
+<area shape="rect" id="Node000004" href="$classmemory__model__tsot.html" title=" " alt="" coords="25,225,182,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="106,191,106,225,101,225,101,191"/>
+<area shape="rect" id="Node000005" href="$classmemory__model__psot.html" title=" " alt="" coords="23,299,183,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="106,264,106,299,101,299,101,264"/>
 </map>

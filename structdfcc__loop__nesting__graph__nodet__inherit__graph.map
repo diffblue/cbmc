@@ -1,5 +1,7 @@
 <map id="dfcc_loop_nesting_graph_nodet" name="dfcc_loop_nesting_graph_nodet">
-<area shape="rect" id="node1" title="A graph node that stores information about a natural loop." alt="" coords="5,185,188,227"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="17,95,177,136"/>
-<area shape="rect" id="node3" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="26,5,167,32"/>
+<area shape="rect" id="Node000001" title="A graph node that stores information about a natural loop." alt="" coords="5,183,188,223"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="17,93,177,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,147,99,183,94,183,94,147"/>
+<area shape="rect" id="Node000003" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="26,5,167,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="99,44,99,93,94,93,94,44"/>
 </map>

@@ -1,7 +1,11 @@
 <map id="natural_loops_templatet&lt; P, T, C &gt;" name="natural_loops_templatet&lt; P, T, C &gt;">
-<area shape="rect" id="node1" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="225,85,407,126"/>
-<area shape="rect" id="node3" href="$classnatural__loops__templatet.html" title=" " alt="" coords="653,13,907,83"/>
-<area shape="rect" id="node5" href="$classnatural__loops__templatet.html" title=" " alt="" coords="670,107,890,178"/>
-<area shape="rect" id="node2" href="$classloop__analysist.html" title=" " alt="" coords="5,92,176,119"/>
-<area shape="rect" id="node4" href="$classnatural__loopst.html" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;" alt="" coords="956,35,1071,61"/>
+<area shape="rect" id="Node000001" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="225,85,407,125"/>
+<area shape="rect" id="Node000003" href="$classnatural__loops__templatet.html" title=" " alt="" coords="653,15,907,84"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="420,87,430,85,653,59,654,65,431,91,421,92"/>
+<area shape="rect" id="Node000005" href="$classnatural__loops__templatet.html" title=" " alt="" coords="670,108,890,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="407,125,431,129,554,140,670,142,670,148,554,145,430,135,406,131"/>
+<area shape="rect" id="Node000002" href="$classloop__analysist.html" title=" " alt="" coords="5,93,176,118"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,103,225,103,225,108,190,108"/>
+<area shape="rect" id="Node000004" href="$classnatural__loopst.html" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;" alt="" coords="956,37,1071,62"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="920,47,956,47,956,52,920,52"/>
 </map>

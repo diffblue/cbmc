@@ -1,12 +1,24 @@
 <map id="arrayst::array_equalityt" name="arrayst::array_equalityt">
-<area shape="rect" id="node1" title=" " alt="" coords="220,617,395,644"/>
-<area shape="rect" id="node2" href="$classexprt.html" title="Base class for all expressions." alt="" coords="237,513,293,540"/>
-<area shape="rect" id="node3" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="239,437,291,464"/>
-<area shape="rect" id="node4" href="$classsharing__treet.html" title=" " alt="" coords="181,332,348,388"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="174,213,355,255"/>
-<area shape="rect" id="node6" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="159,95,370,136"/>
-<area shape="rect" id="node7" href="$structref__count__ift_3_01true_01_4.html" title=" " alt="" coords="5,5,164,32"/>
-<area shape="rect" id="node8" title=" " alt="" coords="189,5,341,32"/>
-<area shape="rect" id="node9" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="365,5,437,32"/>
-<area shape="rect" id="node10" href="$classliteralt.html" title=" " alt="" coords="317,513,383,540"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1704,36,1879,61"/>
+<area shape="rect" id="Node000002" href="$classliteralt.html" title=" " alt="" coords="1573,5,1639,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1653,23,1715,33,1714,39,1652,28"/>
+<area shape="rect" id="Node000003" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1578,65,1634,91"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1647,76,1680,74,1749,59,1750,64,1680,79,1648,82"/>
+<area shape="rect" id="Node000004" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1472,65,1524,91"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1538,75,1578,75,1578,81,1538,81"/>
+<area shape="rect" id="Node000005" href="$classsharing__treet.html" title=" " alt="" coords="1256,51,1423,105"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1437,75,1472,75,1472,81,1437,81"/>
+<area shape="rect" id="Node000006" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="515,58,725,98"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="739,60,749,59,885,51,991,48,1097,51,1232,59,1256,62,1256,67,1232,65,1096,56,991,54,885,57,750,65,739,65"/>
+<area shape="rect" id="Node000012" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="831,91,1012,131"/>
+<area shape="poly" id="edge11_Node000012_Node000006" title=" " alt="" coords="739,88,831,99,830,104,738,94"/>
+<area shape="rect" id="Node000007" href="$structref__count__ift.html" title="Used in tree_nodet for activating or not reference counting." alt="" coords="248,16,433,41"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="427,41,515,57,514,62,426,46"/>
+<area shape="rect" id="Node000008" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="305,65,377,91"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="390,75,514,75,514,81,390,81"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="265,115,417,140"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="426,110,514,94,515,99,427,115"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="5,115,135,140"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="148,125,264,125,264,130,148,130"/>
+<area shape="poly" id="edge10_Node000005_Node000012" title=" " alt="" coords="1025,104,1232,89,1256,86,1256,91,1232,94,1026,109"/>
 </map>

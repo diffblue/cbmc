@@ -1,21 +1,52 @@
 <map id="concurrency_instrumentationt" name="concurrency_instrumentationt">
-<area shape="rect" id="node1" title=" " alt="" coords="2245,195,2463,221"/>
-<area shape="rect" id="node2" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="1989,117,2104,144"/>
-<area shape="rect" id="node3" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1668,21,1821,48"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1325,95,1478,137"/>
-<area shape="rect" id="node5" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="990,160,1062,187"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1328,213,1475,254"/>
-<area shape="rect" id="node18" title=" " alt="" coords="1324,321,1479,362"/>
-<area shape="rect" id="node6" title=" " alt="" coords="942,84,1110,111"/>
-<area shape="rect" id="node7" title=" " alt="" coords="757,84,795,111"/>
-<area shape="rect" id="node9" title=" " alt="" coords="950,13,1102,54"/>
-<area shape="rect" id="node17" title=" " alt="" coords="959,220,1093,247"/>
-<area shape="rect" id="node8" title=" " alt="" coords="757,175,795,201"/>
-<area shape="rect" id="node10" href="$classvalue__setst.html" title=" " alt="" coords="1998,169,2095,196"/>
-<area shape="rect" id="node12" href="$classconcurrency__instrumentationt_1_1shared__vart.html" title=" " alt="" coords="917,323,1135,365"/>
-<area shape="rect" id="node13" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="748,365,804,392"/>
-<area shape="rect" id="node19" href="$classconcurrency__instrumentationt_1_1thread__local__vart.html" title=" " alt="" coords="917,398,1135,439"/>
-<area shape="rect" id="node14" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,365,699,392"/>
-<area shape="rect" id="node15" href="$classsharing__treet.html" title=" " alt="" coords="431,351,597,407"/>
-<area shape="rect" id="node16" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,358,187,399"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="2533,257,2751,282"/>
+<area shape="rect" id="Node000002" href="$classvalue__setst.html" title=" " alt="" coords="2239,151,2337,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2351,171,2427,186,2510,208,2568,231,2617,254,2615,259,2566,236,2509,213,2426,191,2350,176"/>
+<area shape="rect" id="Node000003" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="2231,201,2345,226"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="2359,222,2561,254,2560,259,2358,227"/>
+<area shape="rect" id="Node000004" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="1912,162,2065,187"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="2080,184,2231,203,2230,209,2079,189"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="1188,128,1340,168"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1354,149,1912,169,1912,175,1354,154"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="964,102,1003,127"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1017,116,1188,136,1187,142,1016,121"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1180,73,1348,98"/>
+<area shape="poly" id="edge10_Node000010_Node000006" title=" " alt="" coords="1016,107,1090,96,1180,88,1180,93,1091,101,1017,112"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="1375,254,1510,279"/>
+<area shape="poly" id="edge24_Node000021_Node000006" title=" " alt="" coords="1006,136,1044,172,1067,190,1092,204,1164,231,1240,249,1313,259,1375,263,1375,269,1312,264,1239,254,1163,236,1090,209,1064,194,1040,176,1003,140"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="964,238,1003,263"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="1016,254,1082,260,1119,257,1155,247,1184,231,1209,210,1247,167,1251,170,1213,214,1187,235,1157,252,1120,262,1082,265,1016,260"/>
+<area shape="poly" id="edge11_Node000010_Node000007" title=" " alt="" coords="1014,230,1089,187,1124,172,1138,165,1154,153,1161,143,1165,134,1169,124,1178,114,1211,96,1213,100,1182,118,1174,127,1170,136,1166,146,1158,157,1141,170,1126,177,1092,192,1016,235"/>
+<area shape="poly" id="edge25_Node000021_Node000007" title=" " alt="" coords="1016,260,1052,271,1091,280,1167,287,1243,286,1375,275,1375,280,1243,292,1166,292,1090,285,1050,276,1014,265"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="1537,63,1691,103"/>
+<area shape="poly" id="edge12_Node000003_Node000008" title=" " alt="" coords="1705,84,1856,97,1978,117,2098,147,2188,176,2212,185,2248,198,2246,203,2210,191,2186,181,2097,152,1977,122,1856,103,1704,89"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="1665,106,1715,127,1802,145,1912,162,1911,167,1801,150,1714,132,1663,111"/>
+<area shape="rect" id="Node000009" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,351,77,377"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="45,337,64,256,81,206,104,156,132,108,168,69,189,54,211,42,236,35,263,32,1265,32,1338,35,1411,43,1538,64,1537,69,1410,48,1338,40,1265,37,263,37,237,40,213,47,191,58,172,73,137,111,108,158,86,208,69,258,50,338"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="2215,301,2361,341"/>
+<area shape="poly" id="edge14_Node000011_Node000009" title=" " alt="" coords="91,355,171,348,263,344,1990,344,2108,339,2214,328,2215,334,2109,344,1990,349,263,349,172,353,92,361"/>
+<area shape="rect" id="Node000016" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="159,393,369,433"/>
+<area shape="poly" id="edge20_Node000016_Node000009" title=" " alt="" coords="92,375,102,377,161,391,160,396,101,383,91,380"/>
+<area shape="rect" id="Node000022" title=" " alt="" coords="2211,409,2365,449"/>
+<area shape="poly" id="edge27_Node000022_Node000009" title=" " alt="" coords="60,387,92,431,138,480,166,502,196,520,228,532,263,536,1990,536,2028,533,2066,527,2140,503,2205,474,2254,447,2256,452,2207,479,2142,508,2068,532,2029,539,1990,541,262,541,227,537,194,524,163,506,134,484,88,434,56,390"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="1361,82,1537,81,1537,86,1362,87"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="2375,306,2554,279,2555,285,2376,311"/>
+<area shape="rect" id="Node000012" href="$classconcurrency__instrumentationt_1_1shared__vart.html" title=" " alt="" coords="1880,384,2097,424"/>
+<area shape="poly" id="edge15_Node000011_Node000012" title=" " alt="" coords="2110,395,2186,377,2224,360,2258,339,2261,344,2227,365,2188,383,2111,400"/>
+<area shape="rect" id="Node000013" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="1586,427,1642,453"/>
+<area shape="poly" id="edge16_Node000012_Node000013" title=" " alt="" coords="1655,433,1880,412,1880,417,1656,439"/>
+<area shape="rect" id="Node000023" href="$classconcurrency__instrumentationt_1_1thread__local__vart.html" title=" " alt="" coords="1880,448,2097,488"/>
+<area shape="poly" id="edge29_Node000023_Node000013" title=" " alt="" coords="1656,445,1715,453,1880,463,1879,469,1714,459,1655,450"/>
+<area shape="rect" id="Node000014" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1238,427,1290,453"/>
+<area shape="poly" id="edge17_Node000013_Node000014" title=" " alt="" coords="1304,437,1586,437,1586,443,1304,443"/>
+<area shape="rect" id="Node000015" href="$classsharing__treet.html" title=" " alt="" coords="900,413,1067,467"/>
+<area shape="poly" id="edge18_Node000014_Node000015" title=" " alt="" coords="1081,437,1238,437,1238,443,1081,443"/>
+<area shape="poly" id="edge19_Node000015_Node000016" title=" " alt="" coords="383,413,612,419,876,429,900,431,900,436,876,435,611,424,383,418"/>
+<area shape="rect" id="Node000020" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="475,461,656,501"/>
+<area shape="poly" id="edge22_Node000020_Node000016" title=" " alt="" coords="324,436,394,459,475,472,474,478,393,464,323,441"/>
+<area shape="poly" id="edge21_Node000015_Node000020" title=" " alt="" coords="670,475,770,469,876,459,899,455,900,460,876,464,770,475,670,481"/>
+<area shape="poly" id="edge23_Node000011_Node000021" title=" " alt="" coords="1524,254,1652,244,1818,239,1910,241,2003,247,2096,258,2187,275,2220,285,2251,299,2249,304,2219,290,2186,280,2096,263,2003,252,1909,246,1818,244,1652,249,1524,260"/>
+<area shape="poly" id="edge30_Node000022_Node000021" title=" " alt="" coords="1524,269,1681,281,1873,300,2056,326,2131,341,2188,358,2231,380,2266,407,2263,411,2228,385,2186,362,2130,346,2055,331,1872,306,1681,287,1524,275"/>
+<area shape="poly" id="edge26_Node000001_Node000022" title=" " alt="" coords="2345,401,2612,280,2614,285,2347,406"/>
+<area shape="poly" id="edge28_Node000022_Node000023" title=" " alt="" coords="2110,450,2210,437,2211,442,2111,455"/>
 </map>

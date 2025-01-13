@@ -1,11 +1,19 @@
 <map id="functionst::function_infot" name="functionst::function_infot">
-<area shape="rect" id="node1" title=" " alt="" coords="86,545,234,587"/>
-<area shape="rect" id="node2" title=" " alt="" coords="81,441,239,483"/>
-<area shape="rect" id="node3" href="$classfunction__application__exprt.html" title="Application of (mathematical) function." alt="" coords="5,323,160,364"/>
-<area shape="rect" id="node4" href="$classbinary__exprt.html" title="A base class for binary expressions." alt="" coords="31,233,135,260"/>
-<area shape="rect" id="node5" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="20,157,145,184"/>
-<area shape="rect" id="node6" href="$classexprt.html" title="Base class for all expressions." alt="" coords="55,81,111,108"/>
-<area shape="rect" id="node7" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="57,5,109,32"/>
-<area shape="rect" id="node8" title=" " alt="" coords="184,330,293,357"/>
-<area shape="rect" id="node9" title=" " alt="" coords="219,233,258,260"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="86,537,234,577"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="81,435,239,475"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,489,163,537,157,537,157,489"/>
+<area shape="rect" id="Node000003" href="$classfunction__application__exprt.html" title="Application of (mathematical) function." alt="" coords="5,317,160,357"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,368,149,433,145,436,101,370"/>
+<area shape="rect" id="Node000004" href="$classbinary__exprt.html" title="A base class for binary expressions." alt="" coords="31,229,135,255"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="85,268,85,317,80,317,80,268"/>
+<area shape="rect" id="Node000005" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="20,155,145,180"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="85,194,85,229,80,229,80,194"/>
+<area shape="rect" id="Node000006" href="$classexprt.html" title="Base class for all expressions." alt="" coords="55,80,111,105"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="85,120,85,154,80,154,80,120"/>
+<area shape="rect" id="Node000007" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="57,5,109,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="85,45,85,80,80,80,80,45"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="184,325,293,350"/>
+<area shape="poly" id="edge7_Node000002_Node000016" title=" " alt="" coords="225,363,175,436,171,433,221,360"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="219,229,258,255"/>
+<area shape="poly" id="edge8_Node000016_Node000017" title=" " alt="" coords="241,268,241,325,236,325,236,268"/>
 </map>

@@ -1,18 +1,37 @@
 <map id="path_acceleratort" name="path_acceleratort">
-<area shape="rect" id="node1" title=" " alt="" coords="338,723,474,749"/>
-<area shape="rect" id="node2" title=" " alt="" coords="547,527,681,553"/>
-<area shape="rect" id="node3" href="$classexprt.html" title="Base class for all expressions." alt="" coords="463,437,519,464"/>
-<area shape="rect" id="node11" href="$classpath__nodet.html" title=" " alt="" coords="428,527,523,553"/>
-<area shape="rect" id="node4" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="465,348,517,375"/>
-<area shape="rect" id="node5" href="$classsharing__treet.html" title=" " alt="" coords="408,243,575,299"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="401,124,582,165"/>
-<area shape="rect" id="node7" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="386,5,597,47"/>
-<area shape="rect" id="node8" title=" " alt="" coords="559,437,669,464"/>
-<area shape="rect" id="node9" title=" " alt="" coords="595,348,633,375"/>
-<area shape="rect" id="node10" title=" " alt="" coords="319,617,493,644"/>
-<area shape="rect" id="node12" title=" " alt="" coords="159,437,267,464"/>
-<area shape="rect" id="node15" title=" " alt="" coords="72,527,247,553"/>
-<area shape="rect" id="node13" title=" " alt="" coords="117,348,156,375"/>
-<area shape="rect" id="node16" title=" " alt="" coords="5,437,135,464"/>
-<area shape="rect" id="node14" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="156,617,275,644"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="2049,121,2185,146"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="1719,121,1892,146"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1906,131,2049,131,2049,136,1906,136"/>
+<area shape="rect" id="Node000003" href="$classpath__nodet.html" title=" " alt="" coords="1455,98,1549,123"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1564,113,1718,124,1718,130,1563,118"/>
+<area shape="rect" id="Node000004" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1165,78,1221,103"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1235,98,1282,107,1373,112,1454,110,1454,116,1373,117,1281,112,1234,104"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="1435,49,1569,74"/>
+<area shape="poly" id="edge17_Node000017_Node000004" title=" " alt="" coords="1234,84,1434,65,1434,70,1234,89"/>
+<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="963,78,1015,103"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1028,88,1165,88,1165,93,1028,93"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="747,63,913,118"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="927,88,963,88,963,93,927,93"/>
+<area shape="rect" id="Node000007" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="5,76,216,116"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="230,78,240,77,376,70,481,68,723,77,747,79,746,84,723,83,481,74,376,76,240,83,230,83"/>
+<area shape="rect" id="Node000013" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="321,109,503,149"/>
+<area shape="poly" id="edge8_Node000013_Node000007" title=" " alt="" coords="230,106,321,117,321,122,229,112"/>
+<area shape="poly" id="edge7_Node000006_Node000013" title=" " alt="" coords="516,123,616,117,722,107,746,103,747,109,723,112,617,122,516,128"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="1139,181,1247,206"/>
+<area shape="poly" id="edge9_Node000002_Node000014" title=" " alt="" coords="1260,182,1281,180,1718,138,1719,143,1282,185,1261,188"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="1415,211,1589,237"/>
+<area shape="poly" id="edge15_Node000016_Node000014" title=" " alt="" coords="1260,197,1415,213,1414,218,1260,203"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="969,205,1008,230"/>
+<area shape="poly" id="edge10_Node000014_Node000012" title=" " alt="" coords="1021,211,1138,197,1139,202,1022,216"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1128,230,1257,255"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="1022,225,1039,229,1128,239,1128,244,1038,235,1020,230"/>
+<area shape="rect" id="Node000015" href="$classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function." alt="" coords="1746,194,1865,219"/>
+<area shape="poly" id="edge11_Node000001_Node000015" title=" " alt="" coords="1878,195,1949,183,2025,165,2086,143,2088,149,2026,171,1950,188,1879,200"/>
+<area shape="poly" id="edge12_Node000015_Node000016" title=" " alt="" coords="1603,216,1746,207,1746,213,1603,221"/>
+<area shape="poly" id="edge13_Node000016_Node000011" title=" " alt="" coords="1271,242,1390,239,1430,234,1431,239,1391,244,1271,247"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1583,64,1784,81,2026,111,2064,118,2063,123,2025,116,1784,86,1583,69"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="1138,7,1247,33"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="1261,26,1435,50,1434,55,1260,32"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="969,7,1008,33"/>
+<area shape="poly" id="edge19_Node000018_Node000019" title=" " alt="" coords="1022,17,1138,17,1138,23,1022,23"/>
 </map>

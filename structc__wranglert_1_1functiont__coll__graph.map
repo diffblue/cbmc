@@ -1,13 +1,27 @@
 <map id="c_wranglert::functiont" name="c_wranglert::functiont">
-<area shape="rect" id="node1" title=" " alt="" coords="1197,143,1361,169"/>
-<area shape="rect" id="node2" title=" " alt="" coords="833,61,1019,102"/>
-<area shape="rect" id="node3" href="$structc__wranglert_1_1loop__contract__clauset.html" title=" " alt="" coords="393,10,588,51"/>
-<area shape="rect" id="node4" title=" " alt="" coords="193,111,280,137"/>
-<area shape="rect" id="node9" href="$structc__wranglert_1_1assertiont.html" title=" " alt="" coords="405,111,576,137"/>
-<area shape="rect" id="node11" href="$structc__wranglert_1_1function__contract__clauset.html" title=" " alt="" coords="411,247,570,289"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,103,144,145"/>
-<area shape="rect" id="node6" title=" " alt="" coords="426,161,555,188"/>
-<area shape="rect" id="node8" title=" " alt="" coords="835,135,1017,177"/>
-<area shape="rect" id="node10" title=" " alt="" coords="820,211,1032,253"/>
-<area shape="rect" id="node7" title=" " alt="" coords="217,161,256,188"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1197,143,1361,169"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="820,61,1032,101"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1035,102,1219,141,1218,146,1034,107"/>
+<area shape="rect" id="Node000003" href="$structc__wranglert_1_1function__contract__clauset.html" title=" " alt="" coords="411,5,570,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="584,27,686,34,796,48,849,59,848,64,796,53,686,40,584,32"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="193,114,280,139"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="254,101,276,79,303,60,356,40,411,28,412,34,358,45,305,65,279,83,258,105"/>
+<area shape="rect" id="Node000009" href="$structc__wranglert_1_1loop__contract__clauset.html" title=" " alt="" coords="393,107,588,147"/>
+<area shape="poly" id="edge9_Node000009_Node000004" title=" " alt="" coords="294,124,393,124,393,129,294,129"/>
+<area shape="rect" id="Node000011" href="$structc__wranglert_1_1assertiont.html" title=" " alt="" coords="405,257,576,282"/>
+<area shape="poly" id="edge13_Node000011_Node000004" title=" " alt="" coords="269,146,282,161,290,178,293,193,296,206,306,219,328,235,353,247,406,261,404,267,351,252,325,240,302,223,291,209,288,194,285,180,278,164,265,150"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,107,144,147"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="157,124,193,124,193,129,157,129"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="426,174,555,199"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="566,169,586,157,594,146,597,135,601,123,611,112,639,104,691,96,820,85,820,90,691,102,641,109,613,117,605,126,602,137,599,149,590,161,569,173"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="833,136,1019,176"/>
+<area shape="poly" id="edge10_Node000008_Node000006" title=" " alt="" coords="569,186,677,185,796,177,832,172,833,178,796,183,677,190,569,191"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="835,212,1017,252"/>
+<area shape="poly" id="edge14_Node000010_Node000006" title=" " alt="" coords="569,199,612,205,728,217,835,225,834,230,728,223,612,211,568,204"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="217,174,256,199"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="270,184,426,184,426,189,270,189"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1033,153,1197,153,1197,159,1033,159"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="602,131,833,147,832,152,601,137"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="1030,207,1219,166,1220,171,1031,212"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="590,278,690,282,743,280,796,273,838,263,877,250,879,255,839,268,796,279,744,285,690,287,590,283"/>
 </map>

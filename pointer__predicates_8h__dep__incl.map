@@ -1,33 +1,63 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/pointer_predicates.h" name="/home/runner/work/cbmc/cbmc/src/util/pointer_predicates.h">
-<area shape="rect" id="node1" title="Various predicates over pointers in programs." alt="" coords="3286,5,3470,61"/>
-<area shape="rect" id="node2" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="5,117,217,173"/>
-<area shape="rect" id="node3" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="241,117,459,173"/>
-<area shape="rect" id="node4" href="$axioms_8cpp.html" title="Axioms." alt="" coords="483,124,699,165"/>
-<area shape="rect" id="node5" href="$bv__pointers__wide_8cpp.html" title=" " alt="" coords="724,117,941,173"/>
-<area shape="rect" id="node6" href="$c__safety__checks_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="965,117,1161,173"/>
-<area shape="rect" id="node7" href="$instrument__contracts_8cpp.html" title="Instrument Contracts." alt="" coords="1185,117,1397,173"/>
-<area shape="rect" id="node8" href="$may__be__same__object_8cpp.html" title="May Be Same Object." alt="" coords="1422,117,1606,173"/>
-<area shape="rect" id="node9" href="$simplify__state__expr_8cpp.html" title="Simplify State Expressions." alt="" coords="1631,117,1824,173"/>
-<area shape="rect" id="node10" href="$dfcc_8cpp.html" title=" " alt="" coords="1849,109,2046,180"/>
-<area shape="rect" id="node11" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2070,109,2267,180"/>
-<area shape="rect" id="node12" href="$dfcc__library_8cpp.html" title=" " alt="" coords="2291,109,2489,180"/>
-<area shape="rect" id="node13" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="2513,109,2710,180"/>
-<area shape="rect" id="node14" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="2735,109,2933,180"/>
-<area shape="rect" id="node15" href="$utils_8cpp.html" title=" " alt="" coords="2957,117,3151,173"/>
-<area shape="rect" id="node16" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="3175,117,3368,173"/>
-<area shape="rect" id="node17" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="3393,117,3577,173"/>
-<area shape="rect" id="node18" href="$mm__io_8cpp.html" title="Perform Memory&#45;mapped I/O instrumentation." alt="" coords="3601,117,3785,173"/>
-<area shape="rect" id="node19" href="$string__abstraction_8cpp.html" title="String Abstraction." alt="" coords="3809,117,3993,173"/>
-<area shape="rect" id="node20" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4017,117,4232,173"/>
-<area shape="rect" id="node21" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="4257,117,4454,173"/>
-<area shape="rect" id="node22" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="4478,109,4689,180"/>
-<area shape="rect" id="node23" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4713,117,4915,173"/>
-<area shape="rect" id="node24" href="$bv__pointers_8cpp.html" title=" " alt="" coords="4939,117,5140,173"/>
-<area shape="rect" id="node25" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="5164,117,5365,173"/>
-<area shape="rect" id="node26" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="5390,117,5574,173"/>
-<area shape="rect" id="node27" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5599,109,5795,180"/>
-<area shape="rect" id="node28" href="$object__tracking_8cpp.html" title=" " alt="" coords="5819,117,6057,173"/>
-<area shape="rect" id="node29" href="$pointer__expr_8cpp.html" title=" " alt="" coords="6082,117,6266,173"/>
-<area shape="rect" id="node30" href="$pointer__predicates_8cpp.html" title="Various predicates over pointers in programs." alt="" coords="6290,117,6474,173"/>
-<area shape="rect" id="node31" href="$simplify__expr__pointer_8cpp.html" title=" " alt="" coords="6498,117,6682,173"/>
+<area shape="rect" id="Node000001" title="Various predicates over pointers in programs." alt="" coords="3286,5,3470,60"/>
+<area shape="rect" id="Node000002" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="5,115,217,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="3272,38,2623,44,1672,58,761,80,426,94,229,111,194,118,193,113,228,105,426,89,761,75,1672,53,2623,39,3272,32"/>
+<area shape="rect" id="Node000003" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="241,115,459,170"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="3272,38,2668,46,1794,61,959,83,652,96,472,111,435,118,434,113,471,105,652,91,959,77,1794,55,2668,40,3272,33"/>
+<area shape="rect" id="Node000004" href="$axioms_8cpp.html" title="Axioms." alt="" coords="483,123,699,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="3272,36,2761,36,2020,44,1631,53,1265,67,949,86,819,97,712,111,649,125,647,120,711,105,819,92,949,80,1265,61,1631,48,2020,39,2761,31,3272,31"/>
+<area shape="rect" id="Node000005" href="$bv__pointers__wide_8cpp.html" title=" " alt="" coords="724,115,941,170"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="3272,37,2803,38,2132,48,1780,57,1451,70,1167,88,953,111,917,118,916,113,952,105,1167,82,1451,64,1780,51,2132,42,2803,33,3272,31"/>
+<area shape="rect" id="Node000006" href="$c__safety__checks_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="965,115,1161,170"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="3272,37,2841,39,2234,48,1917,57,1621,70,1366,88,1173,111,1140,118,1139,113,1172,105,1365,83,1620,65,1917,52,2233,43,2841,33,3272,31"/>
+<area shape="rect" id="Node000007" href="$instrument__contracts_8cpp.html" title="Instrument Contracts." alt="" coords="1185,115,1397,170"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="3272,37,2882,42,2344,54,2065,63,1805,76,1580,91,1410,111,1375,118,1374,113,1410,105,1580,86,1804,70,2065,58,2344,48,2882,37,3272,32"/>
+<area shape="rect" id="Node000008" href="$may__be__same__object_8cpp.html" title="May Be Same Object." alt="" coords="1422,115,1606,170"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="3272,37,2920,42,2442,54,2195,63,1965,76,1768,91,1618,111,1587,118,1586,113,1618,105,1767,86,1965,70,2195,58,2441,48,2920,37,3272,32"/>
+<area shape="rect" id="Node000009" href="$simplify__state__expr_8cpp.html" title="Simplify State Expressions." alt="" coords="1631,115,1824,170"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="3273,38,2960,45,2546,58,2136,80,1966,94,1837,111,1805,118,1804,113,1836,105,1965,89,2135,74,2545,53,2960,40,3272,33"/>
+<area shape="rect" id="Node000010" href="$dfcc_8cpp.html" title=" " alt="" coords="1849,108,2046,177"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="3272,39,3001,48,2651,62,2308,83,2166,96,2058,111,2047,113,2045,108,2058,105,2166,91,2308,78,2651,57,3001,43,3272,34"/>
+<area shape="rect" id="Node000011" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2070,108,2267,177"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="3272,36,3085,39,2837,49,2559,71,2418,89,2280,111,2268,113,2267,108,2279,105,2417,83,2558,66,2837,44,3085,33,3272,31"/>
+<area shape="rect" id="Node000012" href="$dfcc__library_8cpp.html" title=" " alt="" coords="2291,108,2489,177"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="3272,39,3120,44,2927,57,2714,78,2501,111,2489,113,2488,108,2500,105,2714,73,2927,51,3120,39,3272,33"/>
+<area shape="rect" id="Node000013" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="2513,108,2710,177"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="3273,43,3021,65,2871,85,2723,111,2711,113,2709,108,2721,105,2870,79,3020,60,3272,37"/>
+<area shape="rect" id="Node000014" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="2735,108,2933,177"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="3273,51,3117,76,2945,111,2934,113,2933,108,2944,105,3117,71,3272,46"/>
+<area shape="rect" id="Node000015" href="$utils_8cpp.html" title=" " alt="" coords="2957,115,3151,170"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="3287,67,3133,118,3132,113,3286,62"/>
+<area shape="rect" id="Node000016" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="3175,115,3368,170"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="3344,72,3299,117,3296,113,3340,68"/>
+<area shape="rect" id="Node000017" href="$graphml__witness_8cpp.html" title="Witnesses for Traces and Proofs." alt="" coords="3393,115,3577,170"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="3416,68,3460,113,3457,117,3412,72"/>
+<area shape="rect" id="Node000018" href="$mm__io_8cpp.html" title="Perform Memory&#45;mapped I/O instrumentation." alt="" coords="3601,115,3785,170"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="3468,62,3617,113,3615,118,3467,67"/>
+<area shape="rect" id="Node000019" href="$string__abstraction_8cpp.html" title="String Abstraction." alt="" coords="3809,115,3993,170"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="3484,46,3633,71,3797,105,3824,113,3822,118,3796,111,3632,76,3483,51"/>
+<area shape="rect" id="Node000020" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4017,115,4232,170"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="3484,39,3723,62,3865,81,4005,105,4037,113,4036,118,4004,111,3864,87,3723,68,3483,44"/>
+<area shape="rect" id="Node000021" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="4257,115,4454,170"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="3484,33,3634,39,3825,52,4035,73,4245,105,4277,113,4275,118,4244,111,4034,78,3824,57,3634,45,3484,39"/>
+<area shape="rect" id="Node000022" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="4478,108,4689,177"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="3484,31,3670,35,3915,46,4190,68,4330,84,4466,105,4478,108,4477,113,4466,111,4329,90,4189,73,3914,51,3670,40,3484,37"/>
+<area shape="rect" id="Node000023" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="4713,115,4915,170"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="3484,34,3755,43,4106,57,4450,78,4593,91,4701,105,4734,113,4733,118,4700,111,4592,96,4450,84,4106,63,3755,48,3484,39"/>
+<area shape="rect" id="Node000024" href="$bv__pointers_8cpp.html" title=" " alt="" coords="4939,115,5140,170"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="3484,33,3797,40,4214,53,4627,75,4798,89,4928,105,4961,113,4960,118,4927,111,4797,94,4626,80,4214,59,3797,45,3483,38"/>
+<area shape="rect" id="Node000025" href="$pointer__logic_8cpp.html" title="Pointer Logic." alt="" coords="5164,115,5365,170"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="3484,32,3839,38,4321,50,4802,72,5002,87,5153,105,5186,113,5185,118,5152,111,5001,92,4802,77,4321,55,3839,43,3484,38"/>
+<area shape="rect" id="Node000026" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="5390,115,5574,170"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="3484,31,3879,34,4427,44,4711,54,4977,67,5206,84,5378,105,5410,113,5409,118,5378,111,5205,89,4976,72,4711,59,4427,50,3879,40,3483,37"/>
+<area shape="rect" id="Node000027" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="5599,108,5795,177"/>
+<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="3484,31,3916,33,4524,43,4841,52,5138,65,5393,83,5586,105,5599,108,5598,113,5586,111,5393,88,5137,71,4841,58,4524,48,3916,39,3484,37"/>
+<area shape="rect" id="Node000028" href="$object__tracking_8cpp.html" title=" " alt="" coords="5819,115,6057,170"/>
+<area shape="poly" id="edge27_Node000001_Node000028" title=" " alt="" coords="3484,31,3954,34,4626,45,4978,54,5308,67,5593,84,5808,105,5847,113,5846,118,5807,111,5592,89,5308,72,4978,59,4626,50,3954,40,3484,37"/>
+<area shape="rect" id="Node000029" href="$pointer__expr_8cpp.html" title=" " alt="" coords="6082,115,6266,170"/>
+<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="3484,32,4048,40,4855,54,5623,76,5904,90,6070,105,6102,113,6101,118,6070,111,5904,95,5623,81,4855,60,4048,45,3484,38"/>
+<area shape="rect" id="Node000030" href="$pointer__predicates_8cpp.html" title="Various predicates over pointers in programs." alt="" coords="6290,115,6474,170"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="3484,32,4088,39,4960,53,5793,75,6098,89,6206,97,6278,105,6310,113,6309,118,6278,111,6206,102,6098,94,5792,80,4960,58,4088,44,3484,38"/>
+<area shape="rect" id="Node000031" href="$simplify__expr__pointer_8cpp.html" title=" " alt="" coords="6498,115,6682,170"/>
+<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="3484,32,4125,38,5063,51,5538,61,5962,73,6292,88,6409,96,6486,105,6519,113,6517,118,6486,111,6408,102,6291,93,5962,78,5538,66,5063,56,4125,43,3484,37"/>
 </map>

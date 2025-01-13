@@ -1,19 +1,40 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model_tso.cpp" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model_tso.cpp">
-<area shape="rect" id="node1" title="Memory model for partial order concurrency." alt="" coords="121,5,346,61"/>
-<area shape="rect" id="node2" href="$memory__model__tso_8h.html" title="Memory models for partial order concurrency." alt="" coords="151,109,315,136"/>
-<area shape="rect" id="node16" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="49,184,138,211"/>
-<area shape="rect" id="node17" href="$simplify__expr_8h.html" title=" " alt="" coords="340,109,487,136"/>
-<area shape="rect" id="node3" href="$memory__model__sc_8h.html" title="Memory models for partial order concurrency." alt="" coords="206,184,365,211"/>
-<area shape="rect" id="node4" href="$memory__model_8h.html" title="Memory models for partial order concurrency." alt="" coords="239,259,377,285"/>
-<area shape="rect" id="node5" href="$partial__order__concurrency_8h.html" title="Add constraints to equation encoding partial orders on events." alt="" coords="286,333,487,360"/>
-<area shape="rect" id="node6" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="303,408,491,435"/>
-<area shape="rect" id="node7" title=" " alt="" coords="421,483,507,509"/>
-<area shape="rect" id="node8" title=" " alt="" coords="593,557,657,584"/>
-<area shape="rect" id="node9" title=" " alt="" coords="197,483,240,509"/>
-<area shape="rect" id="node10" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="36,557,153,584"/>
-<area shape="rect" id="node11" href="$merge__irep_8h.html" title=" " alt="" coords="264,483,397,509"/>
-<area shape="rect" id="node12" href="$src_2util_2message_8h.html" title=" " alt="" coords="531,483,650,509"/>
-<area shape="rect" id="node13" href="$narrow_8h.html" title=" " alt="" coords="94,483,173,509"/>
-<area shape="rect" id="node14" href="$ssa__step_8h.html" title=" " alt="" coords="776,483,867,509"/>
-<area shape="rect" id="node15" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="718,557,842,584"/>
+<area shape="rect" id="Node000001" title="Memory model for partial order concurrency." alt="" coords="121,5,346,60"/>
+<area shape="rect" id="Node000002" href="$memory__model__tso_8h.html" title="Memory models for partial order concurrency." alt="" coords="151,108,315,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,60,236,94,231,94,231,60"/>
+<area shape="rect" id="Node000039" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="49,181,138,207"/>
+<area shape="poly" id="edge19_Node000001_Node000039" title=" " alt="" coords="194,62,166,84,141,110,120,139,106,169,101,167,116,137,137,106,163,80,191,58"/>
+<area shape="rect" id="Node000065" href="$simplify__expr_8h.html" title=" " alt="" coords="340,108,487,133"/>
+<area shape="poly" id="edge21_Node000001_Node000065" title=" " alt="" coords="289,58,378,100,376,105,287,62"/>
+<area shape="rect" id="Node000003" href="$memory__model__sc_8h.html" title="Memory models for partial order concurrency." alt="" coords="206,181,365,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="244,132,271,169,267,172,240,135"/>
+<area shape="rect" id="Node000004" href="$memory__model_8h.html" title="Memory models for partial order concurrency." alt="" coords="239,255,377,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="292,206,303,241,298,242,287,208"/>
+<area shape="rect" id="Node000005" href="$partial__order__concurrency_8h.html" title="Add constraints to equation encoding partial orders on events." alt="" coords="286,328,487,353"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="322,278,366,317,362,321,319,282"/>
+<area shape="rect" id="Node000006" href="$symex__target__equation_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="303,401,491,427"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="391,353,396,387,391,388,386,354"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="421,475,507,500"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="410,425,446,463,442,466,406,429"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="593,548,657,573"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="492,422,594,440,636,454,663,473,670,490,668,507,649,539,644,536,663,506,665,490,659,476,634,459,593,445,491,427"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="197,475,240,500"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="370,429,254,475,252,470,368,424"/>
+<area shape="rect" id="Node000010" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="36,548,153,573"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="303,423,238,429,172,440,117,455,97,465,83,476,77,489,76,504,84,535,79,536,71,505,72,488,79,473,94,461,115,450,171,435,237,424,303,417"/>
+<area shape="rect" id="Node000015" href="$merge__irep_8h.html" title=" " alt="" coords="264,475,397,500"/>
+<area shape="poly" id="edge10_Node000006_Node000015" title=" " alt="" coords="388,429,353,466,349,463,384,425"/>
+<area shape="rect" id="Node000032" href="$src_2util_2message_8h.html" title=" " alt="" coords="531,475,650,500"/>
+<area shape="poly" id="edge11_Node000006_Node000032" title=" " alt="" coords="429,424,547,467,546,472,427,429"/>
+<area shape="rect" id="Node000031" href="$narrow_8h.html" title=" " alt="" coords="94,475,173,500"/>
+<area shape="poly" id="edge14_Node000006_Node000031" title=" " alt="" coords="356,429,187,474,186,469,354,424"/>
+<area shape="rect" id="Node000037" href="$ssa__step_8h.html" title=" " alt="" coords="776,475,867,500"/>
+<area shape="poly" id="edge16_Node000006_Node000037" title=" " alt="" coords="468,424,758,472,763,473,762,478,757,477,467,429"/>
+<area shape="rect" id="Node000060" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="718,548,842,573"/>
+<area shape="poly" id="edge18_Node000006_Node000060" title=" " alt="" coords="492,420,588,437,638,452,685,472,729,503,763,536,760,539,726,507,683,477,636,457,586,443,491,425"/>
+<area shape="poly" id="edge13_Node000032_Node000008" title=" " alt="" coords="599,499,616,534,611,537,594,502"/>
+<area shape="poly" id="edge12_Node000032_Node000010" title=" " alt="" coords="531,501,519,503,167,552,167,547,518,497,531,496"/>
+<area shape="poly" id="edge15_Node000031_Node000010" title=" " alt="" coords="129,502,110,537,105,535,125,499"/>
+<area shape="poly" id="edge17_Node000037_Node000060" title=" " alt="" coords="817,502,796,537,791,535,812,499"/>
+<area shape="poly" id="edge20_Node000039_Node000010" title=" " alt="" coords="82,209,60,231,36,262,16,299,10,319,8,339,8,415,14,451,31,485,52,514,73,537,69,540,48,517,26,487,9,453,3,416,3,339,5,318,11,297,31,259,56,227,78,205"/>
 </map>

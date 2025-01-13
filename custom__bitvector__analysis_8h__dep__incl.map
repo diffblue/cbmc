@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/custom_bitvector_analysis.h" name="/home/runner/work/cbmc/cbmc/src/analyses/custom_bitvector_analysis.h">
-<area shape="rect" id="node1" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="221,5,420,61"/>
-<area shape="rect" id="node2" href="$custom__bitvector__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="5,109,204,165"/>
-<area shape="rect" id="node3" href="$taint__analysis_8cpp.html" title="Taint Analysis." alt="" coords="229,109,413,165"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="437,109,695,165"/>
+<area shape="rect" id="Node000001" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="221,5,420,60"/>
+<area shape="rect" id="Node000002" href="$custom__bitvector__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="5,108,204,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="253,68,162,110,160,106,251,63"/>
+<area shape="rect" id="Node000003" href="$taint__analysis_8cpp.html" title="Taint Analysis." alt="" coords="229,108,413,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="323,74,323,108,318,108,318,74"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="437,108,695,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="398,63,503,105,501,110,396,68"/>
 </map>

@@ -10,6 +10,6 @@ var goto__rw_8h =
     [ "goto_rw", "goto__rw_8h.html#a987f4a8e2ba7aaad3b000f2d1059a133", null ],
     [ "goto_rw", "goto__rw_8h.html#a2b28462b8f307d2b69ec8d1cb6825c66", null ],
     [ "goto_rw", "goto__rw_8h.html#a345313bf346cc5719ccb3e1dc59f97e8", null ],
-    [ "operator<<", "goto__rw_8h.html#a264cf734ce978ef087320f381bcd5795", null ],
-    [ "operator<<", "goto__rw_8h.html#af8d8dff9a4c1b6c4b86b9a3cabf67ec0", null ]
+    [ "operator<<", "goto__rw_8h.html#acfeaf5c618ef4ef2a7ac3db6afc5546e", null ],
+    [ "operator<<", "goto__rw_8h.html#a83443f87416e2f2caa7bc86c50eede2f", null ]
 ];

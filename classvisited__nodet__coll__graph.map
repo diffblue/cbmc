@@ -1,4 +1,16 @@
 <map id="visited_nodet&lt; E &gt;" name="visited_nodet&lt; E &gt;">
-<area shape="rect" id="node1" title="A node type with an extra bit." alt="" coords="5,81,153,108"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="9,5,150,32"/>
+<area shape="rect" id="Node000001" title="A node type with an extra bit." alt="" coords="21,465,169,491"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="24,391,165,416"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,430,97,465,92,465,92,430"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,184,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="92,235,88,279,88,328,95,390,90,391,83,328,83,279,87,235"/>
+<area shape="rect" id="Node000007" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="119,301,260,326"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="122,230,181,299,177,302,118,234"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="27,93,162,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="97,132,97,181,92,181,92,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="43,5,82,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="63,44,66,68,83,91,79,95,62,70,57,45"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="109,5,147,31"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="121,45,102,94,97,92,116,43"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="169,337,109,392,106,388,165,333"/>
 </map>

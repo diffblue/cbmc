@@ -1,12 +1,21 @@
 <map id="class_typet" name="class_typet">
-<area shape="rect" id="node1" title="Class type." alt="" coords="122,533,218,560"/>
-<area shape="rect" id="node8" href="$classjava__class__typet.html" title=" " alt="" coords="105,609,235,636"/>
-<area shape="rect" id="node2" href="$classstruct__typet.html" title="Structure type, corresponds to C style structs." alt="" coords="120,457,220,484"/>
-<area shape="rect" id="node3" href="$classstruct__union__typet.html" title="Base type for structs and unions." alt="" coords="99,381,241,408"/>
-<area shape="rect" id="node4" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="142,305,198,332"/>
-<area shape="rect" id="node5" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="144,229,196,256"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title=" " alt="" coords="87,124,253,180"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="79,5,261,47"/>
-<area shape="rect" id="node9" href="$classjava__generic__class__typet.html" title="Class to hold a class with generics, extends the java class type with a vector of java generic type p..." alt="" coords="5,685,151,727"/>
-<area shape="rect" id="node10" href="$classjava__implicitly__generic__class__typet.html" title="Type to hold a Java class that is implicitly generic, e.g., an inner class of a generic outer class o..." alt="" coords="175,685,349,727"/>
+<area shape="rect" id="Node000001" title="Class type." alt="" coords="122,525,218,551"/>
+<area shape="rect" id="Node000008" href="$classjava__class__typet.html" title=" " alt="" coords="105,600,235,625"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="173,565,173,600,167,600,167,565"/>
+<area shape="rect" id="Node000002" href="$classstruct__typet.html" title="Structure type, corresponds to C style structs." alt="" coords="120,451,220,476"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,490,173,525,167,525,167,490"/>
+<area shape="rect" id="Node000003" href="$classstruct__union__typet.html" title="Base type for structs and unions." alt="" coords="99,376,241,401"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,416,173,450,167,450,167,416"/>
+<area shape="rect" id="Node000004" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="142,301,198,327"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="173,341,173,376,167,376,167,341"/>
+<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="144,227,196,252"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="173,266,173,301,167,301,167,266"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="87,123,253,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="173,191,173,226,167,226,167,191"/>
+<area shape="rect" id="Node000007" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="79,5,261,45"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="173,59,173,122,167,122,167,59"/>
+<area shape="rect" id="Node000009" href="$classjava__generic__class__typet.html" title="Class to hold a class with generics, extends the java class type with a vector of java generic type p..." alt="" coords="5,675,151,715"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="148,636,101,677,98,673,145,632"/>
+<area shape="rect" id="Node000010" href="$classjava__implicitly__generic__class__typet.html" title="Type to hold a Java class that is implicitly generic, e.g., an inner class of a generic outer class o..." alt="" coords="175,675,349,715"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="195,632,242,673,239,677,192,636"/>
 </map>

@@ -1,8 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/cprover/endianness_map_wide.h" name="/home/runner/work/cbmc/cbmc/src/cprover/endianness_map_wide.h">
-<area shape="rect" id="node1" title=" " alt="" coords="383,5,597,61"/>
-<area shape="rect" id="node2" href="$bv__pointers__wide_8h.html" title=" " alt="" coords="261,109,479,165"/>
-<area shape="rect" id="node6" href="$endianness__map__wide_8cpp.html" title=" " alt="" coords="503,109,717,165"/>
-<area shape="rect" id="node3" href="$bv__pointers__wide_8cpp.html" title=" " alt="" coords="5,213,223,269"/>
-<area shape="rect" id="node4" href="$counterexample__found_8cpp.html" title="Counterexample Found." alt="" coords="247,213,493,269"/>
-<area shape="rect" id="node5" href="$inductiveness_8cpp.html" title="Inductiveness." alt="" coords="517,221,775,262"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="383,5,597,60"/>
+<area shape="rect" id="Node000002" href="$bv__pointers__wide_8h.html" title=" " alt="" coords="261,108,479,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="450,71,403,110,400,106,446,67"/>
+<area shape="rect" id="Node000006" href="$endianness__map__wide_8cpp.html" title=" " alt="" coords="503,108,717,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="534,67,580,106,577,110,530,71"/>
+<area shape="rect" id="Node000003" href="$bv__pointers__wide_8cpp.html" title=" " alt="" coords="5,211,223,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="292,170,182,213,180,208,290,165"/>
+<area shape="rect" id="Node000004" href="$counterexample__found_8cpp.html" title="Counterexample Found." alt="" coords="247,211,493,265"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="373,176,373,211,367,211,367,176"/>
+<area shape="rect" id="Node000005" href="$inductiveness_8cpp.html" title="Inductiveness." alt="" coords="517,218,775,258"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="455,165,595,215,593,220,453,170"/>
 </map>

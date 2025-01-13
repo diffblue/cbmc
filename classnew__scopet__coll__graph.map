@@ -1,8 +1,16 @@
 <map id="new_scopet" name="new_scopet">
-<area shape="rect" id="node1" title=" " alt="" coords="5,95,104,121"/>
-<area shape="rect" id="node2" title=" " alt="" coords="112,184,259,225"/>
-<area shape="rect" id="node3" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="172,5,244,32"/>
-<area shape="rect" id="node4" title=" " alt="" coords="282,95,417,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="278,5,317,32"/>
-<area shape="rect" id="node6" title=" " alt="" coords="343,5,382,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,93,104,119"/>
+<area shape="poly" id="edge8_Node000001_Node000001" title=" " alt="" coords="119,97,131,106,122,114,104,117,104,111,120,109,125,106,116,102"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="112,181,259,221"/>
+<area shape="poly" id="edge4_Node000003_Node000001" title=" " alt="" coords="48,132,47,145,52,156,64,169,78,179,113,192,111,196,76,183,60,173,47,159,42,145,43,131"/>
+<area shape="rect" id="Node000002" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="172,5,244,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,40,77,95,74,91,174,35"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="211,44,209,97,201,158,195,182,190,180,196,157,203,96,205,44"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,174,118,145,78,121,80,117,122,140,158,170"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="282,93,417,119"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="319,128,220,183,217,179,316,123"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="278,5,317,31"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="307,43,318,68,338,92,334,95,314,71,302,45"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="343,5,382,31"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="361,44,354,93,349,92,356,44"/>
 </map>

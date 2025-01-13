@@ -6,8 +6,8 @@ var classsmall__shared__pointeet =
     [ "~small_shared_pointeet", "classsmall__shared__pointeet.html#a15af7de0a5f61c8ada78a0661fce048c", null ],
     [ "decrement_use_count", "classsmall__shared__pointeet.html#a64dd7f26535bbe4c6afcdfbde764deba", null ],
     [ "increment_use_count", "classsmall__shared__pointeet.html#afa77c62468a7eb845b6fadffcde86ae6", null ],
-    [ "operator=", "classsmall__shared__pointeet.html#a76158f53b08554dc9da7cdca49d17b00", null ],
-    [ "operator=", "classsmall__shared__pointeet.html#a3b1e2b3e25606dd1735ffc44521e60c3", null ],
+    [ "operator=", "classsmall__shared__pointeet.html#a5e47d52be8b903acb36c98282c5803e7", null ],
+    [ "operator=", "classsmall__shared__pointeet.html#a25e84a93c10999033a6c32f7e802beb3", null ],
     [ "use_count", "classsmall__shared__pointeet.html#a54c92f85896b2f56886e386d76dc9dd7", null ],
     [ "use_count_", "classsmall__shared__pointeet.html#a90e078c41759a502bc12d8c52f872b08", null ]
 ];

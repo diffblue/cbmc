@@ -1,5 +1,7 @@
 <map id="symex_bmct" name="symex_bmct">
-<area shape="rect" id="node1" title=" " alt="" coords="45,80,152,107"/>
-<area shape="rect" id="node3" href="$classsymex__bmc__incremental__one__loopt.html" title=" " alt="" coords="5,155,192,196"/>
-<area shape="rect" id="node2" href="$classgoto__symext.html" title="The main class for the forward symbolic simulator." alt="" coords="45,5,152,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="45,79,152,104"/>
+<area shape="rect" id="Node000003" href="$classsymex__bmc__incremental__one__loopt.html" title=" " alt="" coords="5,152,192,192"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="101,118,101,152,96,152,96,118"/>
+<area shape="rect" id="Node000002" href="$classgoto__symext.html" title="The main class for the forward symbolic simulator." alt="" coords="45,5,152,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,44,101,79,96,79,96,44"/>
 </map>

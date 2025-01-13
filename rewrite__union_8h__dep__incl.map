@@ -1,7 +1,11 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/rewrite_union.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/rewrite_union.h">
-<area shape="rect" id="node1" title="Symbolic Execution." alt="" coords="405,5,589,61"/>
-<area shape="rect" id="node2" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,109,264,165"/>
-<area shape="rect" id="node3" href="$process__goto__program_8cpp.html" title="Get a Goto Program." alt="" coords="289,109,490,165"/>
-<area shape="rect" id="node4" href="$rewrite__union_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="515,109,699,165"/>
-<area shape="rect" id="node5" href="$build__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="723,109,925,165"/>
+<area shape="rect" id="Node000001" title="Symbolic Execution." alt="" coords="405,5,589,60"/>
+<area shape="rect" id="Node000002" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,108,264,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="392,66,230,110,229,105,391,61"/>
+<area shape="rect" id="Node000003" href="$process__goto__program_8cpp.html" title="Get a Goto Program." alt="" coords="289,108,490,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="461,72,419,110,416,106,457,68"/>
+<area shape="rect" id="Node000004" href="$rewrite__union_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="515,108,699,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="538,68,580,106,576,110,534,72"/>
+<area shape="rect" id="Node000005" href="$build__goto__trace_8cpp.html" title="Traces of GOTO Programs." alt="" coords="723,108,925,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="596,62,740,105,738,110,595,67"/>
 </map>

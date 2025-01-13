@@ -1,6 +1,9 @@
 <map id="cfg_base_nodet&lt; T, I &gt;" name="cfg_base_nodet&lt; T, I &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="59,185,234,212"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="5,95,165,136"/>
-<area shape="rect" id="node3" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="15,5,156,32"/>
-<area shape="rect" id="node4" title=" " alt="" coords="190,102,229,129"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="59,183,234,208"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="5,93,165,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,142,140,181,136,184,106,146"/>
+<area shape="rect" id="Node000003" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="15,5,156,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="88,44,88,93,83,93,83,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="190,101,229,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="194,139,158,184,154,181,190,135"/>
 </map>

@@ -3,7 +3,7 @@ var classgraphml__witnesst =
     [ "pair_hash", "structgraphml__witnesst_1_1pair__hash.html", "structgraphml__witnesst_1_1pair__hash" ],
     [ "graphml_witnesst", "classgraphml__witnesst.html#a6f92778fd2a6b90856532115e3164786", null ],
     [ "convert_assign_rec", "classgraphml__witnesst.html#aadae9bc7565bd3c049adeb75d4ebd4ec", null ],
-    [ "graph", "classgraphml__witnesst.html#a0d5cabe7148673d7202a78204da4a89f", null ],
+    [ "graph", "classgraphml__witnesst.html#a57f89d28d95a749e065a2c09e1146bd9", null ],
     [ "hash_combine", "classgraphml__witnesst.html#a335edb57f3ee64c893d01219f775232c", null ],
     [ "operator()", "classgraphml__witnesst.html#a4e118b6bb18753c57fb33c4d8316f5aa", null ],
     [ "operator()", "classgraphml__witnesst.html#a46f226bddaccb65dc36aa08c0d4fff62", null ],

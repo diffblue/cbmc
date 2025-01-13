@@ -1,6 +1,9 @@
 <map id="satcheck_lingelingt" name="satcheck_lingelingt">
-<area shape="rect" id="node1" title=" " alt="" coords="5,229,153,256"/>
-<area shape="rect" id="node2" href="$classcnf__solvert.html" title=" " alt="" coords="32,155,127,181"/>
-<area shape="rect" id="node3" href="$classcnft.html" title=" " alt="" coords="56,80,103,107"/>
-<area shape="rect" id="node4" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="51,5,107,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,225,153,251"/>
+<area shape="rect" id="Node000002" href="$classcnf__solvert.html" title=" " alt="" coords="32,152,127,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,191,82,225,77,225,77,191"/>
+<area shape="rect" id="Node000003" href="$classcnft.html" title=" " alt="" coords="56,79,103,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="82,118,82,152,77,152,77,118"/>
+<area shape="rect" id="Node000004" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="51,5,107,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="82,44,82,79,77,79,77,44"/>
 </map>

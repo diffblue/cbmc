@@ -1,0 +1,42 @@
+<map id="get_or_create_reference_resultt" name="get_or_create_reference_resultt">
+<area shape="rect" id="Node000001" title=" " alt="" coords="2441,129,2621,169"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="2156,85,2327,139"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2341,122,2442,135,2441,140,2340,127"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="1880,19,1967,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1981,41,2133,77,2157,84,2155,89,2131,83,1980,47"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="1447,5,1585,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1599,24,1880,29,1880,34,1599,29"/>
+<area shape="rect" id="Node000005" href="$structobject__creation__referencet.html" title="Information to store when several references point to the same Java object." alt="" coords="1825,75,2021,101"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="2035,94,2156,103,2155,108,2035,99"/>
+<area shape="rect" id="Node000006" href="$classexprt.html" title="Base class for all expressions." alt="" coords="1488,70,1544,95"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1558,81,1825,84,1825,89,1558,86"/>
+<area shape="rect" id="Node000007" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1085,67,1137,93"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1151,78,1488,80,1488,85,1151,83"/>
+<area shape="rect" id="Node000008" href="$classsharing__treet.html" title=" " alt="" coords="747,53,913,107"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="927,77,1085,77,1085,83,927,83"/>
+<area shape="rect" id="Node000009" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="5,65,216,105"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="230,67,240,67,376,60,481,58,723,67,747,68,746,74,723,72,481,63,376,65,240,72,230,73"/>
+<area shape="rect" id="Node000015" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="321,99,503,139"/>
+<area shape="poly" id="edge10_Node000015_Node000009" title=" " alt="" coords="230,96,321,106,321,111,229,101"/>
+<area shape="poly" id="edge9_Node000008_Node000015" title=" " alt="" coords="516,112,616,106,722,96,746,93,747,98,723,101,617,111,516,118"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="1035,123,1187,163"/>
+<area shape="poly" id="edge11_Node000002_Node000016" title=" " alt="" coords="1201,138,2156,112,2156,117,1201,143"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="811,131,849,157"/>
+<area shape="poly" id="edge12_Node000016_Node000017" title=" " alt="" coords="863,141,1035,140,1035,146,863,147"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="811,237,849,262"/>
+<area shape="poly" id="edge13_Node000016_Node000014" title=" " alt="" coords="861,235,1057,160,1059,165,863,240"/>
+<area shape="rect" id="Node000022" title=" " alt="" coords="1033,237,1190,262"/>
+<area shape="poly" id="edge19_Node000022_Node000014" title=" " alt="" coords="863,247,1032,247,1032,252,863,252"/>
+<area shape="rect" id="Node000023" title=" " alt="" coords="1257,282,1365,307"/>
+<area shape="poly" id="edge21_Node000023_Node000014" title=" " alt="" coords="863,254,938,267,1112,283,1256,290,1256,296,1112,288,937,272,862,259"/>
+<area shape="rect" id="Node000018" href="$classcode__with__references__listt.html" title="Wrapper around a list of shared pointer to code_with_referencest objects, which provides a nicer inte..." alt="" coords="2159,165,2323,205"/>
+<area shape="poly" id="edge14_Node000001_Node000018" title=" " alt="" coords="2337,171,2417,161,2440,158,2441,164,2418,167,2337,177"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="1804,189,2043,229"/>
+<area shape="poly" id="edge15_Node000018_Node000019" title=" " alt="" coords="2056,197,2159,189,2160,194,2056,202"/>
+<area shape="rect" id="Node000020" title=" " alt="" coords="1433,189,1599,229"/>
+<area shape="poly" id="edge16_Node000019_Node000020" title=" " alt="" coords="1612,207,1804,207,1804,212,1612,212"/>
+<area shape="rect" id="Node000021" href="$classcode__with__referencest.html" title="Base class for code which can contain references which can get replaced before generating actual code..." alt="" coords="1027,187,1196,213"/>
+<area shape="poly" id="edge17_Node000020_Node000021" title=" " alt="" coords="1210,200,1433,205,1433,210,1210,205"/>
+<area shape="poly" id="edge18_Node000020_Node000022" title=" " alt="" coords="1203,241,1401,224,1433,220,1433,225,1402,229,1204,247"/>
+<area shape="poly" id="edge20_Node000019_Node000023" title=" " alt="" coords="1378,289,1485,281,1606,268,1725,248,1833,227,1834,232,1726,254,1607,273,1486,286,1378,294"/>
+</map>

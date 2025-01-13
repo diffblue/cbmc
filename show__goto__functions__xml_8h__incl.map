@@ -1,8 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/show_goto_functions_xml.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/show_goto_functions_xml.h">
-<area shape="rect" id="node1" title="Goto Program." alt="" coords="33,5,239,61"/>
-<area shape="rect" id="node2" href="$xml_8h.html" title=" " alt="" coords="94,109,178,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,184,48,211"/>
-<area shape="rect" id="node4" title=" " alt="" coords="72,184,123,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="147,184,205,211"/>
-<area shape="rect" id="node6" title=" " alt="" coords="229,184,293,211"/>
+<area shape="rect" id="Node000001" title="Goto Program." alt="" coords="33,5,239,60"/>
+<area shape="rect" id="Node000002" href="$xml_8h.html" title=" " alt="" coords="94,108,178,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,60,139,94,133,94,133,60"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,48,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,136,58,176,55,171,117,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="72,181,123,207"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="132,135,112,171,108,168,127,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="147,181,205,207"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="145,132,165,168,160,171,140,135"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="229,181,293,207"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="157,131,230,172,228,177,155,136"/>
 </map>

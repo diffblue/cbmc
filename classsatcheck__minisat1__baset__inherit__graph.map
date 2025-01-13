@@ -1,9 +1,15 @@
 <map id="satcheck_minisat1_baset" name="satcheck_minisat1_baset">
-<area shape="rect" id="node1" title=" " alt="" coords="7,229,193,256"/>
-<area shape="rect" id="node5" href="$classsatcheck__minisat1t.html" title=" " alt="" coords="25,304,175,331"/>
-<area shape="rect" id="node2" href="$classcnf__solvert.html" title=" " alt="" coords="53,155,147,181"/>
-<area shape="rect" id="node3" href="$classcnft.html" title=" " alt="" coords="77,80,123,107"/>
-<area shape="rect" id="node4" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="72,5,128,32"/>
-<area shape="rect" id="node6" href="$classsatcheck__minisat1__prooft.html" title=" " alt="" coords="5,379,195,405"/>
-<area shape="rect" id="node7" href="$classsatcheck__minisat1__coret.html" title=" " alt="" coords="8,453,192,480"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="7,225,193,251"/>
+<area shape="rect" id="Node000005" href="$classsatcheck__minisat1t.html" title=" " alt="" coords="25,299,175,324"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="103,264,103,299,97,299,97,264"/>
+<area shape="rect" id="Node000002" href="$classcnf__solvert.html" title=" " alt="" coords="53,152,147,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,191,103,225,97,225,97,191"/>
+<area shape="rect" id="Node000003" href="$classcnft.html" title=" " alt="" coords="77,79,123,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="103,118,103,152,97,152,97,118"/>
+<area shape="rect" id="Node000004" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="72,5,128,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="103,44,103,79,97,79,97,44"/>
+<area shape="rect" id="Node000006" href="$classsatcheck__minisat1__prooft.html" title=" " alt="" coords="5,372,195,397"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="103,338,103,372,97,372,97,338"/>
+<area shape="rect" id="Node000007" href="$classsatcheck__minisat1__coret.html" title=" " alt="" coords="8,445,192,471"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="103,411,103,445,97,445,97,411"/>
 </map>

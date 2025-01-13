@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;diff/change_impact.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;diff/change_impact.h">
-<area shape="rect" id="node1" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="219,5,413,61"/>
-<area shape="rect" id="node2" href="$change__impact_8cpp.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="5,109,200,165"/>
-<area shape="rect" id="node3" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="224,109,408,165"/>
-<area shape="rect" id="node4" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="432,109,616,165"/>
+<area shape="rect" id="Node000001" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="213,5,408,60"/>
+<area shape="rect" id="Node000002" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="5,108,189,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="244,68,154,110,152,106,242,63"/>
+<area shape="rect" id="Node000003" href="$change__impact_8cpp.html" title="Data and control&#45;dependencies of syntactic diff." alt="" coords="213,108,408,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="313,74,313,108,308,108,308,74"/>
+<area shape="rect" id="Node000004" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="432,108,616,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="379,63,470,106,467,110,377,68"/>
 </map>

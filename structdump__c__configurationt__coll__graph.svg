@@ -9,21 +9,24 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 26)">
 <title>dump_c_configurationt</title>
 <!-- Node1 -->
-<g id="node1" class="node">
+<g id="Node000001" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Used for configuring the behaviour of dump_c.">
-<polygon fill="#bfbfbf" stroke="black" points="0,-1.5 0,-20.5 128,-20.5 128,-1.5 0,-1.5"/>
+<g id="a_Node000001"><a xlink:title="Used for configuring the behaviour of dump_c.">
+<polygon fill="#999999" stroke="#666666" points="128,-20.5 0,-20.5 0,-1.5 128,-1.5 128,-20.5"/>
 <text text-anchor="middle" x="64" y="-8.5" font-family="Helvetica,sans-Serif" font-size="10.00">dump_c_configurationt</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node1 -->
-<g id="edge1" class="edge">
+<g id="edge1_Node000001_Node000001" class="edge">
 <title>Node1&#45;&gt;Node1</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M138.51,-13.63C143.18,-13.01 146,-12.14 146,-11 146,-9.18 138.79,-8.03 128.29,-7.53"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="137.97,-10.16 128.29,-14.47 138.54,-17.14 137.97,-10.16"/>
-<text text-anchor="middle" x="211" y="-14" font-family="Helvetica,sans-Serif" font-size="10.00"> default_configuration</text>
-<text text-anchor="middle" x="211" y="-3" font-family="Helvetica,sans-Serif" font-size="10.00">type_header_configuration</text>
+<g id="a_edge1_Node000001_Node000001"><a xlink:title=" ">
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M138.51,-13.37C143.18,-12.81 146,-12.02 146,-11 146,-9.37 138.79,-8.32 128.29,-7.88"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="138,-9.9 128.29,-14.12 138.52,-16.88 138,-9.9"/>
+</a>
+</g>
+<text text-anchor="middle" x="211" y="-14" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> default_configuration</text>
+<text text-anchor="middle" x="211" y="-3" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">type_header_configuration</text>
 </g>
 </g>
 </svg>

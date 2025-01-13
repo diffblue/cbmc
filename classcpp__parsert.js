@@ -2,7 +2,7 @@ var classcpp__parsert =
 [
     [ "cpp_parsert", "classcpp__parsert.html#aca8bbca52a9f482a4af49a820cbc3ea9", null ],
     [ "add_location", "classcpp__parsert.html#a48ebcb082ed16e22a2a935d24eb19648", null ],
-    [ "current_token", "classcpp__parsert.html#a52428f0b86c9e707c8b21de42b7f204c", null ],
+    [ "current_token", "classcpp__parsert.html#a02a4c171f1c2e964be520d5c7248bfc9", null ],
     [ "parse", "classcpp__parsert.html#a7cfbdd5e36ba8f0ced2de7057a57a50a", null ],
     [ "asm_block_following", "classcpp__parsert.html#a02134378b20db2468e5d0905c23e4933", null ],
     [ "mode", "classcpp__parsert.html#a9fa4466208a60391ee1a7988636005eb", null ],

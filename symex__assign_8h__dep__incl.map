@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/symex_assign.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/symex_assign.h">
-<area shape="rect" id="node1" title="Symbolic Execution of assignments." alt="" coords="585,5,800,61"/>
-<area shape="rect" id="node2" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="5,109,204,165"/>
-<area shape="rect" id="node3" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="228,109,443,165"/>
-<area shape="rect" id="node4" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="467,109,681,165"/>
-<area shape="rect" id="node5" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="705,109,920,165"/>
-<area shape="rect" id="node6" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="944,109,1159,165"/>
-<area shape="rect" id="node7" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="1183,109,1397,165"/>
+<area shape="rect" id="Node000001" title="Symbolic Execution of assignments." alt="" coords="585,5,800,60"/>
+<area shape="rect" id="Node000002" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="5,108,204,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="572,53,403,78,216,111,205,113,204,108,215,105,402,73,571,47"/>
+<area shape="rect" id="Node000003" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="228,108,443,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="587,66,429,111,428,105,586,61"/>
+<area shape="rect" id="Node000004" href="$symex__clean__expr_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="467,108,681,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="653,71,607,110,603,106,650,67"/>
+<area shape="rect" id="Node000005" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="705,108,920,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="736,67,783,106,780,110,733,71"/>
+<area shape="rect" id="Node000006" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="944,108,1159,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="800,61,959,105,957,111,799,66"/>
+<area shape="rect" id="Node000007" href="$symex__start__thread_8cpp.html" title="Symbolic Execution." alt="" coords="1183,108,1397,163"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="814,48,984,73,1172,105,1183,107,1182,113,1171,111,983,79,813,53"/>
 </map>

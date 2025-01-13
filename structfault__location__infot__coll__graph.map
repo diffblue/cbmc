@@ -1,8 +1,13 @@
 <map id="fault_location_infot" name="fault_location_infot">
-<area shape="rect" id="node1" title=" " alt="" coords="800,58,948,85"/>
-<area shape="rect" id="node2" title=" " alt="" coords="515,36,705,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="157,5,308,47"/>
-<area shape="rect" id="node4" title=" " alt="" coords="165,102,300,129"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,77,44,103"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,127,44,154"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="800,58,948,83"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="515,36,705,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="719,68,800,68,800,73,719,73"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="157,5,308,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="322,32,491,52,515,55,514,60,490,57,321,38"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="165,102,300,127"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="314,119,400,119,490,111,523,103,524,108,491,116,400,125,314,124"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,77,44,102"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="58,91,165,104,165,109,57,96"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,126,44,151"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="58,136,133,131,172,125,172,130,134,136,58,141"/>
 </map>

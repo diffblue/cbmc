@@ -7,7 +7,7 @@ var classevent__grapht_1_1graph__explorert =
     [ "extract_cycle", "classevent__grapht_1_1graph__explorert.html#a813f1f2f99cda65002fe467f6ac52074", null ],
     [ "filter_thin_air", "classevent__grapht_1_1graph__explorert.html#ac1b1c0f4d6500a1f6d113720a613784b", null ],
     [ "filtering", "classevent__grapht_1_1graph__explorert.html#a685b3b4a21e398ca76178fd0ac8cdb29", null ],
-    [ "order_filtering", "classevent__grapht_1_1graph__explorert.html#ac0aea5a57e7bd897d3cbcafe58c5880e", null ],
+    [ "order_filtering", "classevent__grapht_1_1graph__explorert.html#a2a2160e5c9f8895ef81bb8da21db1092", null ],
     [ "cycle_nb", "classevent__grapht_1_1graph__explorert.html#ae5ec145f78aa0878cab58cc48d69a05a", null ],
     [ "egraph", "classevent__grapht_1_1graph__explorert.html#a207fbfbe0280a996ac04aad69c73538b", null ],
     [ "events_per_thread", "classevent__grapht_1_1graph__explorert.html#a9a56c4f252c568be042edc344f8cb715", null ],

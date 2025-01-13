@@ -10,7 +10,7 @@ var classstring__refinementt =
     [ "decision_procedure_text", "classstring__refinementt.html#a083a457556ee99b0ce241a5c2a3db2a8", null ],
     [ "get", "classstring__refinementt.html#ac5296b634b2451a0a9859f62a2dddca6", null ],
     [ "set_to", "classstring__refinementt.html#aab339349e5c6a8cb3c8f61010f04b5ca", null ],
-    [ "instantiate_not_contains", "classstring__refinementt.html#adbcbc6bd9456a022cc47c360af88a5cc", null ],
+    [ "instantiate_not_contains", "classstring__refinementt.html#ae93037dd0377f937e79b7085146bc56f", null ],
     [ "axioms", "classstring__refinementt.html#a37fa353a4270173a8e0debb28dc25244", null ],
     [ "config_", "classstring__refinementt.html#a86d5253ccf988d73c1a807b93c06fbdc", null ],
     [ "current_constraints", "classstring__refinementt.html#ae869b4cfb8b365957ae07cd5a808df36", null ],

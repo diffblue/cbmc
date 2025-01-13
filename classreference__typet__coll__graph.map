@@ -1,9 +1,18 @@
 <map id="reference_typet" name="reference_typet">
-<area shape="rect" id="node1" title="The reference type." alt="" coords="33,533,159,560"/>
-<area shape="rect" id="node2" href="$classpointer__typet.html" title="The pointer type These are both &#39;bitvector_typet&#39; (they have a width) and &#39;type_with_subtypet&#39; (they ..." alt="" coords="41,457,151,484"/>
-<area shape="rect" id="node3" href="$classbitvector__typet.html" title="Base class of fixed&#45;width bit&#45;vector types." alt="" coords="35,381,157,408"/>
-<area shape="rect" id="node4" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="68,305,124,332"/>
-<area shape="rect" id="node5" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="70,229,122,256"/>
-<area shape="rect" id="node6" href="$classsharing__treet.html" title=" " alt="" coords="13,124,179,180"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,5,187,47"/>
+<area shape="rect" id="Node000001" title="The reference type." alt="" coords="1499,41,1624,66"/>
+<area shape="rect" id="Node000002" href="$classpointer__typet.html" title="The pointer type These are both &#39;bitvector_typet&#39; (they have a width) and &#39;type_with_subtypet&#39; (they ..." alt="" coords="1340,41,1449,66"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1463,51,1498,51,1498,56,1463,56"/>
+<area shape="rect" id="Node000003" href="$classbitvector__typet.html" title="Base class of fixed&#45;width bit&#45;vector types." alt="" coords="1169,41,1291,66"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1304,51,1340,51,1340,56,1304,56"/>
+<area shape="rect" id="Node000004" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="1064,41,1120,66"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1133,51,1169,51,1169,56,1133,56"/>
+<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="963,41,1015,66"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1028,51,1064,51,1064,56,1028,56"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="747,26,913,81"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="927,51,963,51,963,56,927,56"/>
+<area shape="rect" id="Node000007" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="5,39,216,79"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="230,41,240,40,376,33,481,31,723,40,747,42,746,47,723,45,481,36,376,38,240,45,230,46"/>
+<area shape="rect" id="Node000013" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="321,72,503,112"/>
+<area shape="poly" id="edge8_Node000013_Node000007" title=" " alt="" coords="230,69,321,79,321,85,229,74"/>
+<area shape="poly" id="edge7_Node000006_Node000013" title=" " alt="" coords="516,86,616,79,722,69,746,66,747,71,723,75,617,85,516,91"/>
 </map>

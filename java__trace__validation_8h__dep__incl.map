@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_trace_validation.h" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/java_trace_validation.h">
-<area shape="rect" id="node1" title=" " alt="" coords="455,5,674,61"/>
-<area shape="rect" id="node2" href="$java__multi__path__symex__checker_8cpp.html" title=" " alt="" coords="5,109,271,165"/>
-<area shape="rect" id="node3" href="$java__single__path__symex__checker_8cpp.html" title=" " alt="" coords="295,109,565,165"/>
-<area shape="rect" id="node4" href="$java__trace__validation_8cpp.html" title=" " alt="" coords="590,109,809,165"/>
-<area shape="rect" id="node5" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="833,109,1025,165"/>
-<area shape="rect" id="node6" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="725,213,917,269"/>
-<area shape="rect" id="node7" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="941,213,1133,269"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="455,5,674,60"/>
+<area shape="rect" id="Node000002" href="$java__multi__path__symex__checker_8cpp.html" title=" " alt="" coords="5,108,271,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="442,65,250,111,248,105,441,60"/>
+<area shape="rect" id="Node000003" href="$java__single__path__symex__checker_8cpp.html" title=" " alt="" coords="295,108,565,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="520,70,467,110,464,106,517,66"/>
+<area shape="rect" id="Node000004" href="$java__trace__validation_8cpp.html" title=" " alt="" coords="590,108,809,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="612,66,666,106,662,110,609,70"/>
+<area shape="rect" id="Node000005" href="$jbmc__parse__options_8h.html" title="JBMC Command Line Option Processing." alt="" coords="833,108,1025,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="674,61,835,105,833,111,672,66"/>
+<area shape="rect" id="Node000006" href="$jbmc__main_8cpp.html" title="CBMC Main Module." alt="" coords="725,211,917,265"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="892,174,851,213,847,209,888,170"/>
+<area shape="rect" id="Node000007" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="941,211,1133,265"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="969,170,1010,209,1007,213,965,174"/>
 </map>

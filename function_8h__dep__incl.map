@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/function.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/function.h">
-<area shape="rect" id="node1" title="Function Entering and Exiting." alt="" coords="223,5,416,61"/>
-<area shape="rect" id="node2" href="$branch_8cpp.html" title="Branch Instrumentation." alt="" coords="5,109,199,165"/>
-<area shape="rect" id="node3" href="$function_8cpp.html" title="Function Entering and Exiting." alt="" coords="223,109,416,165"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="441,109,699,165"/>
+<area shape="rect" id="Node000001" title="Function Entering and Exiting." alt="" coords="223,5,416,60"/>
+<area shape="rect" id="Node000002" href="$branch_8cpp.html" title="Branch Instrumentation." alt="" coords="5,108,199,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,68,160,110,158,106,249,63"/>
+<area shape="rect" id="Node000003" href="$function_8cpp.html" title="Function Entering and Exiting." alt="" coords="223,108,416,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="322,74,322,108,317,108,317,74"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="441,108,699,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="398,62,506,105,504,110,396,67"/>
 </map>

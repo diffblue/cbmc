@@ -1,9 +1,15 @@
 <map id="qbf_bdd_coret" name="qbf_bdd_coret">
-<area shape="rect" id="node1" title=" " alt="" coords="23,453,138,480"/>
-<area shape="rect" id="node2" href="$classqbf__bdd__certificatet.html" title=" " alt="" coords="5,379,156,405"/>
-<area shape="rect" id="node3" href="$classqdimacs__coret.html" title=" " alt="" coords="22,304,139,331"/>
-<area shape="rect" id="node4" href="$classqdimacs__cnft.html" title=" " alt="" coords="27,229,135,256"/>
-<area shape="rect" id="node5" href="$classdimacs__cnft.html" title=" " alt="" coords="31,155,131,181"/>
-<area shape="rect" id="node6" href="$classcnf__clause__listt.html" title=" " alt="" coords="19,80,142,107"/>
-<area shape="rect" id="node7" href="$classcnft.html" title=" " alt="" coords="57,5,104,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="23,445,138,471"/>
+<area shape="rect" id="Node000002" href="$classqbf__bdd__certificatet.html" title=" " alt="" coords="5,372,156,397"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,411,83,445,78,445,78,411"/>
+<area shape="rect" id="Node000003" href="$classqdimacs__coret.html" title=" " alt="" coords="22,299,139,324"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,338,83,372,78,372,78,338"/>
+<area shape="rect" id="Node000004" href="$classqdimacs__cnft.html" title=" " alt="" coords="27,225,135,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="83,264,83,299,78,299,78,264"/>
+<area shape="rect" id="Node000005" href="$classdimacs__cnft.html" title=" " alt="" coords="31,152,131,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="83,191,83,225,78,225,78,191"/>
+<area shape="rect" id="Node000006" href="$classcnf__clause__listt.html" title=" " alt="" coords="19,79,142,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="83,118,83,152,78,152,78,118"/>
+<area shape="rect" id="Node000007" href="$classcnft.html" title=" " alt="" coords="57,5,104,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="83,44,83,79,78,79,78,44"/>
 </map>

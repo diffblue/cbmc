@@ -1,8 +1,14 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/bdd/bdd.h" name="/home/runner/work/cbmc/cbmc/src/solvers/bdd/bdd.h">
-<area shape="rect" id="node1" title="Choice between the different interface to BDD libraries." alt="" coords="135,5,338,47"/>
-<area shape="rect" id="node2" href="$guard__bdd_8h.html" title="Guard Data Structure Implementation using BDDs." alt="" coords="5,102,236,143"/>
-<area shape="rect" id="node4" href="$bdd__expr_8h.html" title="Conversion between exprt and miniBDD." alt="" coords="261,95,445,151"/>
-<area shape="rect" id="node3" href="$guard__bdd_8cpp.html" title="Implementation of guards using BDDs." alt="" coords="34,199,221,255"/>
-<area shape="rect" id="node5" href="$bv__pointers_8cpp.html" title=" " alt="" coords="248,199,449,255"/>
-<area shape="rect" id="node6" href="$bdd__expr_8cpp.html" title="Conversion between exprt and miniBDD." alt="" coords="474,199,658,255"/>
+<area shape="rect" id="Node000001" title="Choice between the different interface to BDD libraries." alt="" coords="135,5,338,45"/>
+<area shape="rect" id="Node000002" href="$guard__bdd_8h.html" title="Guard Data Structure Implementation using BDDs." alt="" coords="5,101,236,141"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,56,146,103,142,99,201,52"/>
+<area shape="rect" id="Node000004" href="$bdd__expr_8h.html" title="Conversion between exprt and miniBDD." alt="" coords="261,93,445,148"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="273,52,322,91,318,95,269,56"/>
+<area shape="rect" id="Node000003" href="$guard__bdd_8cpp.html" title="Implementation of guards using BDDs." alt="" coords="34,196,221,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="125,154,128,196,123,196,120,155"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="283,156,187,198,185,194,281,151"/>
+<area shape="rect" id="Node000005" href="$bv__pointers_8cpp.html" title=" " alt="" coords="248,196,449,251"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="354,162,352,196,347,196,348,162"/>
+<area shape="rect" id="Node000006" href="$bdd__expr_8cpp.html" title="Conversion between exprt and miniBDD." alt="" coords="474,196,658,251"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="421,151,512,194,509,198,419,156"/>
 </map>

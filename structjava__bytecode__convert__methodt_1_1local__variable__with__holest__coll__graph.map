@@ -1,11 +1,19 @@
 <map id="java_bytecode_convert_methodt::local_variable_with_holest" name="java_bytecode_convert_methodt::local_variable_with_holest">
-<area shape="rect" id="node1" title=" " alt="" coords="939,90,1121,146"/>
-<area shape="rect" id="node2" title=" " alt="" coords="649,60,851,101"/>
-<area shape="rect" id="node3" href="$structjava__bytecode__convert__methodt_1_1holet.html" title=" " alt="" coords="257,5,431,47"/>
-<area shape="rect" id="node4" title=" " alt="" coords="279,73,409,99"/>
-<area shape="rect" id="node5" title=" " alt="" coords="55,73,94,99"/>
-<area shape="rect" id="node6" href="$structjava__bytecode__parse__treet_1_1methodt_1_1local__variablet.html" title=" " alt="" coords="669,126,831,182"/>
-<area shape="rect" id="node7" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="308,134,380,161"/>
-<area shape="rect" id="node8" title=" " alt="" coords="301,185,387,211"/>
-<area shape="rect" id="node9" title=" " alt="" coords="5,177,144,219"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="939,71,1121,125"/>
+<area shape="rect" id="Node000002" href="$structjava__bytecode__parse__treet_1_1methodt_1_1local__variablet.html" title=" " alt="" coords="669,35,831,89"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="845,72,939,84,938,89,845,77"/>
+<area shape="rect" id="Node000003" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="308,5,380,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,20,626,45,669,50,668,55,625,50,393,26"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="301,55,387,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="401,64,669,60,669,66,401,69"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,47,144,87"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="158,65,300,65,300,70,158,70"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="649,114,851,154"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="864,117,938,107,939,112,865,122"/>
+<area shape="rect" id="Node000007" href="$structjava__bytecode__convert__methodt_1_1holet.html" title=" " alt="" coords="257,111,431,151"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="444,129,649,131,649,136,444,135"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="279,179,409,204"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="423,186,519,180,625,166,686,151,687,157,626,171,520,185,423,192"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="55,179,94,204"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="108,189,279,189,279,194,108,194"/>
 </map>

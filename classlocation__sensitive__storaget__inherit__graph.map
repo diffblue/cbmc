@@ -1,5 +1,7 @@
 <map id="location_sensitive_storaget" name="location_sensitive_storaget">
-<area shape="rect" id="node1" title="The most conventional storage; one domain per location." alt="" coords="11,155,151,196"/>
-<area shape="rect" id="node2" href="$classtrace__map__storaget.html" title=" " alt="" coords="5,80,157,107"/>
-<area shape="rect" id="node3" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="15,5,148,32"/>
+<area shape="rect" id="Node000001" title="The most conventional storage; one domain per location." alt="" coords="11,152,151,192"/>
+<area shape="rect" id="Node000002" href="$classtrace__map__storaget.html" title=" " alt="" coords="5,79,157,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,118,84,152,79,152,79,118"/>
+<area shape="rect" id="Node000003" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="15,5,148,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="84,44,84,79,79,79,79,44"/>
 </map>

@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['dynamic_20frame_20condition_20checking_20_28dfcc_29_45929',['Dynamic Frame Condition Checking (DFCC)',['../group__dfcc-module.html',1,'']]]
+  ['dfcc_0',['Dynamic Frame Condition Checking (DFCC)',['../group__dfcc-module.html',1,'']]],
+  ['diff_1',['goto-diff',['../group__goto-diff.html',1,'']]],
+  ['dynamic_20frame_20condition_20checking_20dfcc_2',['Dynamic Frame Condition Checking (DFCC)',['../group__dfcc-module.html',1,'']]]
 ];

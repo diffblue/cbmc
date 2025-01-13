@@ -1,7 +1,11 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model_tso.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model_tso.h">
-<area shape="rect" id="node1" title="Memory models for partial order concurrency." alt="" coords="223,5,449,61"/>
-<area shape="rect" id="node2" href="$memory__model__pso_8h.html" title="Memory models for partial order concurrency." alt="" coords="99,109,325,165"/>
-<area shape="rect" id="node5" href="$memory__model__tso_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="349,109,574,165"/>
-<area shape="rect" id="node3" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="5,213,189,269"/>
-<area shape="rect" id="node4" href="$memory__model__pso_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="214,213,439,269"/>
+<area shape="rect" id="Node000001" title="Memory models for partial order concurrency." alt="" coords="223,5,449,60"/>
+<area shape="rect" id="Node000002" href="$memory__model__pso_8h.html" title="Memory models for partial order concurrency." alt="" coords="99,108,325,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="294,71,246,110,243,106,291,67"/>
+<area shape="rect" id="Node000005" href="$memory__model__tso_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="349,108,574,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="381,67,430,106,427,110,378,71"/>
+<area shape="rect" id="Node000003" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="5,211,189,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,174,129,213,126,209,170,170"/>
+<area shape="rect" id="Node000004" href="$memory__model__pso_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="214,211,439,265"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="254,170,298,209,295,213,251,174"/>
 </map>

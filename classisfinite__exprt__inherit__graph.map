@@ -1,9 +1,15 @@
 <map id="isfinite_exprt" name="isfinite_exprt">
-<area shape="rect" id="node1" title="Evaluates to true if the operand is finite." alt="" coords="36,483,143,509"/>
-<area shape="rect" id="node2" href="$classunary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly one argu..." alt="" coords="5,408,173,435"/>
-<area shape="rect" id="node3" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="39,333,139,360"/>
-<area shape="rect" id="node4" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="27,259,152,285"/>
-<area shape="rect" id="node5" href="$classexprt.html" title="Base class for all expressions." alt="" coords="61,184,117,211"/>
-<area shape="rect" id="node6" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="63,109,115,136"/>
-<area shape="rect" id="node7" href="$classsharing__treet.html" title=" " alt="" coords="6,5,173,61"/>
+<area shape="rect" id="Node000001" title="Evaluates to true if the operand is finite." alt="" coords="36,475,143,500"/>
+<area shape="rect" id="Node000002" href="$classunary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly one argu..." alt="" coords="5,401,173,427"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,440,92,475,87,475,87,440"/>
+<area shape="rect" id="Node000003" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="39,328,139,353"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="92,367,92,401,87,401,87,367"/>
+<area shape="rect" id="Node000004" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="27,255,152,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="92,294,92,328,87,328,87,294"/>
+<area shape="rect" id="Node000005" href="$classexprt.html" title="Base class for all expressions." alt="" coords="61,181,117,207"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="92,220,92,255,87,255,87,220"/>
+<area shape="rect" id="Node000006" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="63,108,115,133"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="92,147,92,181,87,181,87,147"/>
+<area shape="rect" id="Node000007" href="$classsharing__treet.html" title=" " alt="" coords="6,5,173,60"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="92,74,92,108,87,108,87,74"/>
 </map>

@@ -1,8 +1,34 @@
 <map id="cover_instrumenterst" name="cover_instrumenterst">
-<area shape="rect" id="node1" title="A collection of instrumenters to be run." alt="" coords="87,424,249,451"/>
-<area shape="rect" id="node2" title=" " alt="" coords="73,305,263,361"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,200,176,241"/>
-<area shape="rect" id="node4" title=" " alt="" coords="20,95,177,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="163,5,202,32"/>
-<area shape="rect" id="node6" title=" " alt="" coords="202,147,331,173"/>
+<area shape="rect" id="Node000001" title="A collection of instrumenters to be run." alt="" coords="2221,263,2383,289"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="1888,249,2077,303"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2091,273,2221,273,2221,279,2091,279"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="1604,224,1775,264"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1789,252,1888,263,1887,268,1788,257"/>
+<area shape="rect" id="Node000004" href="$classcover__instrumenter__baset.html" title="Base class for goto program coverage instrumenters." alt="" coords="1384,153,1533,193"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1538,195,1624,221,1622,226,1537,200"/>
+<area shape="rect" id="Node000005" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="48,53,120,78"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="133,56,268,40,351,34,433,32,1154,32,1197,36,1239,45,1280,60,1318,77,1386,116,1434,151,1431,155,1383,121,1316,82,1278,64,1237,50,1196,41,1154,37,433,37,351,40,269,46,134,61"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="358,136,511,176"/>
+<area shape="poly" id="edge10_Node000012_Node000005" title=" " alt="" coords="134,75,358,134,357,139,133,81"/>
+<area shape="rect" id="Node000006" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1101,137,1204,162"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="1218,152,1384,165,1384,170,1218,157"/>
+<area shape="rect" id="Node000007" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="737,87,877,113"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="891,96,981,101,1078,116,1127,134,1125,139,1077,121,981,106,890,102"/>
+<area shape="rect" id="Node000008" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="730,137,883,162"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="897,147,1101,147,1101,152,897,152"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="359,72,511,112"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="525,98,683,119,755,134,754,139,682,124,524,103"/>
+<area shape="poly" id="edge9_Node000008_Node000012" title=" " alt="" coords="525,152,730,148,730,153,525,157"/>
+<area shape="rect" id="Node000014" href="$classgoal__filterst.html" title="A collection of goal filters to be applied in conjunction." alt="" coords="1103,189,1202,214"/>
+<area shape="poly" id="edge11_Node000004_Node000014" title=" " alt="" coords="1215,195,1360,184,1383,181,1384,187,1360,189,1216,201"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="707,187,907,227"/>
+<area shape="poly" id="edge12_Node000014_Node000015" title=" " alt="" coords="920,202,1103,199,1103,205,920,208"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="353,205,516,245"/>
+<area shape="poly" id="edge13_Node000015_Node000016" title=" " alt="" coords="529,218,706,209,707,214,530,223"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="5,311,163,337"/>
+<area shape="poly" id="edge16_Node000003_Node000018" title=" " alt="" coords="177,333,299,344,433,349,1460,349,1490,347,1520,340,1576,317,1625,289,1662,262,1665,266,1628,293,1579,322,1521,345,1491,352,1460,355,433,355,298,349,176,338"/>
+<area shape="poly" id="edge14_Node000016_Node000018" title=" " alt="" coords="142,305,361,243,363,248,144,310"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="370,282,499,307"/>
+<area shape="poly" id="edge17_Node000002_Node000019" title=" " alt="" coords="513,294,805,299,1691,299,1793,295,1888,286,1888,291,1793,300,1691,304,805,304,513,300"/>
+<area shape="poly" id="edge15_Node000015_Node000019" title=" " alt="" coords="513,284,595,271,682,252,760,224,762,229,683,257,596,277,513,289"/>
 </map>

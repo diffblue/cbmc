@@ -1,21 +1,45 @@
 <map id="complexity_limitert" name="complexity_limitert">
-<area shape="rect" id="node1" title="Symex complexity module." alt="" coords="1777,425,1928,452"/>
-<area shape="rect" id="node2" href="$classsymex__complexity__limit__exceeded__actiont.html" title="Default heuristic transformation that cancels branches when complexity has been breached." alt="" coords="992,438,1175,479"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1343,487,1552,543"/>
-<area shape="rect" id="node3" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1404,332,1491,359"/>
-<area shape="rect" id="node9" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1773,159,1932,185"/>
-<area shape="rect" id="node4" href="$classmessage__handlert.html" title=" " alt="" coords="1012,387,1155,413"/>
-<area shape="rect" id="node5" title=" " alt="" coords="583,436,769,463"/>
-<area shape="rect" id="node6" title=" " alt="" coords="183,476,313,503"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,476,44,503"/>
-<area shape="rect" id="node8" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1001,336,1165,363"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1377,112,1518,139"/>
-<area shape="rect" id="node11" title=" " alt="" coords="992,85,1175,126"/>
-<area shape="rect" id="node12" title=" " alt="" coords="603,87,749,129"/>
-<area shape="rect" id="node13" title=" " alt="" coords="163,95,333,121"/>
-<area shape="rect" id="node14" href="$classsource__locationt.html" title=" " alt="" coords="1383,39,1512,65"/>
-<area shape="rect" id="node15" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1057,27,1109,53"/>
-<area shape="rect" id="node16" href="$classsharing__treet.html" title=" " alt="" coords="593,7,759,63"/>
-<area shape="rect" id="node17" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="157,14,339,55"/>
-<area shape="rect" id="node18" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1019,151,1147,177"/>
+<area shape="rect" id="Node000001" title="Symex complexity module." alt="" coords="1949,469,2100,494"/>
+<area shape="rect" id="Node000002" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="1576,355,1663,381"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1677,381,1979,466,1977,471,1676,386"/>
+<area shape="rect" id="Node000009" href="$classmessaget_1_1mstreamt.html" title=" " alt="" coords="1945,233,2104,258"/>
+<area shape="poly" id="edge13_Node000009_Node000002" title=" " alt="" coords="1650,346,1695,320,1747,296,1849,268,1945,251,1946,257,1850,273,1749,301,1697,325,1652,350"/>
+<area shape="rect" id="Node000003" href="$classmessaget_1_1eomt.html" title=" " alt="" coords="1191,359,1319,385"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1333,369,1491,368,1576,366,1576,372,1491,373,1333,375"/>
+<area shape="rect" id="Node000004" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="1173,310,1337,335"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1351,332,1576,360,1576,365,1351,337"/>
+<area shape="rect" id="Node000005" href="$classmessage__handlert.html" title=" " alt="" coords="1184,409,1327,434"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1340,409,1490,389,1575,374,1576,379,1491,395,1341,415"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="755,407,941,433"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="955,418,1184,418,1183,424,955,423"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="355,438,485,463"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="498,442,754,424,755,429,499,448"/>
+<area shape="rect" id="Node000023" title=" " alt="" coords="1515,454,1724,509"/>
+<area shape="poly" id="edge22_Node000023_Node000007" title=" " alt="" coords="499,450,1515,476,1514,481,499,455"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="91,438,130,463"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="144,448,355,448,355,453,144,453"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="2000,269,1964,294,1922,316,1853,338,1782,354,1663,368,1663,363,1781,349,1852,333,1920,311,1962,289,1997,264"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1549,199,1690,225"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="1704,216,1945,236,1945,242,1703,222"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1164,133,1347,173"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1361,153,1425,158,1491,168,1542,181,1587,197,1585,202,1541,186,1490,173,1425,164,1360,158"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="775,136,921,176"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="934,153,1164,151,1164,157,934,158"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="335,143,505,169"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="519,153,775,153,775,159,519,159"/>
+<area shape="rect" id="Node000015" href="$classsource__locationt.html" title=" " alt="" coords="1555,90,1684,115"/>
+<area shape="poly" id="edge14_Node000009_Node000015" title=" " alt="" coords="1671,118,1988,230,1986,235,1669,123"/>
+<area shape="rect" id="Node000016" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="1229,79,1281,105"/>
+<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="1295,90,1554,98,1554,103,1295,96"/>
+<area shape="rect" id="Node000017" href="$classsharing__treet.html" title=" " alt="" coords="765,57,931,111"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="945,83,1229,89,1229,94,945,89"/>
+<area shape="rect" id="Node000018" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="5,29,216,69"/>
+<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="229,37,336,32,462,31,597,36,731,49,765,56,764,61,730,55,597,41,462,36,336,38,230,43"/>
+<area shape="rect" id="Node000022" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="329,72,511,112"/>
+<area shape="poly" id="edge19_Node000022_Node000018" title=" " alt="" coords="230,68,240,69,329,80,329,86,240,75,229,73"/>
+<area shape="poly" id="edge18_Node000017_Node000022" title=" " alt="" coords="524,87,764,83,764,88,525,93"/>
+<area shape="poly" id="edge20_Node000001_Node000023" title=" " alt="" coords="1738,479,1949,479,1949,484,1738,484"/>
+<area shape="rect" id="Node000024" href="$classsymex__complexity__limit__exceeded__actiont.html" title="Default heuristic transformation that cancels branches when complexity has been breached." alt="" coords="1164,524,1347,564"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="1361,544,1531,544,1628,541,1724,533,1856,514,1969,491,1970,497,1857,519,1724,539,1628,546,1531,549,1361,550"/>
+<area shape="poly" id="edge21_Node000023_Node000024" title=" " alt="" coords="1360,528,1490,507,1514,502,1515,507,1491,512,1361,533"/>
 </map>

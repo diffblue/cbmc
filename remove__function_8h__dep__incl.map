@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/remove_function.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/remove_function.h">
-<area shape="rect" id="node1" title="Remove function definition." alt="" coords="256,5,449,61"/>
-<area shape="rect" id="node2" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="5,109,199,165"/>
-<area shape="rect" id="node3" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="223,109,482,165"/>
-<area shape="rect" id="node4" href="$remove__function_8cpp.html" title="Remove function definition." alt="" coords="507,109,700,165"/>
+<area shape="rect" id="Node000001" title="Remove function definition." alt="" coords="256,5,449,60"/>
+<area shape="rect" id="Node000002" href="$aggressive__slicer_8cpp.html" title="Aggressive program slicer." alt="" coords="5,108,199,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="276,67,168,110,166,105,274,62"/>
+<area shape="rect" id="Node000003" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="223,108,482,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="355,74,355,108,350,108,350,74"/>
+<area shape="rect" id="Node000004" href="$remove__function_8cpp.html" title="Remove function definition." alt="" coords="507,108,700,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="431,62,539,105,537,110,429,67"/>
 </map>

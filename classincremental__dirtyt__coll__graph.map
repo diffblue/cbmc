@@ -1,8 +1,14 @@
 <map id="incremental_dirtyt" name="incremental_dirtyt">
-<area shape="rect" id="node1" title="Wrapper for dirtyt that permits incremental population, ensuring each function is analysed exactly on..." alt="" coords="5,377,148,404"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,184,148,225"/>
-<area shape="rect" id="node6" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="255,288,312,315"/>
-<area shape="rect" id="node3" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="9,95,81,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="105,95,288,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="177,5,216,32"/>
+<area shape="rect" id="Node000001" title="Wrapper for dirtyt that permits incremental population, ensuring each function is analysed exactly on..." alt="" coords="5,372,148,397"/>
+<area shape="rect" id="Node000002" href="$classdirtyt.html" title="Dirty variables are ones which have their address taken so we can&#39;t reliably work out where they may ..." alt="" coords="255,284,312,309"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="244,317,106,374,104,369,242,312"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,148,221"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="75,235,71,309,78,372,72,372,66,309,69,235"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="132,224,259,281,257,286,130,229"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="9,93,81,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="56,131,73,180,68,182,50,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="105,93,288,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="172,129,103,183,99,179,169,125"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="177,5,216,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="199,45,199,93,194,93,194,45"/>
 </map>

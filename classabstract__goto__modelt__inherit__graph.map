@@ -1,6 +1,9 @@
 <map id="abstract_goto_modelt" name="abstract_goto_modelt">
-<area shape="rect" id="node1" title="Abstract interface to eager or lazy GOTO models." alt="" coords="121,5,285,32"/>
-<area shape="rect" id="node2" href="$classgoto__modelt.html" title=" " alt="" coords="5,80,109,107"/>
-<area shape="rect" id="node3" href="$classlazy__goto__modelt.html" title="A GOTO model that produces function bodies on demand." alt="" coords="133,80,272,107"/>
-<area shape="rect" id="node4" href="$classwrapper__goto__modelt.html" title="Class providing the abstract GOTO model interface onto an unrelated symbol table and goto_functionst." alt="" coords="297,80,461,107"/>
+<area shape="rect" id="Node000001" title="Abstract interface to eager or lazy GOTO models." alt="" coords="121,5,285,31"/>
+<area shape="rect" id="Node000002" href="$classgoto__modelt.html" title=" " alt="" coords="5,79,109,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,39,82,81,80,76,166,34"/>
+<area shape="rect" id="Node000003" href="$classlazy__goto__modelt.html" title="A GOTO model that produces function bodies on demand." alt="" coords="133,79,272,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,44,205,79,200,79,200,44"/>
+<area shape="rect" id="Node000004" href="$classwrapper__goto__modelt.html" title="Class providing the abstract GOTO model interface onto an unrelated symbol table and goto_functionst." alt="" coords="297,79,461,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="245,33,351,76,349,81,243,38"/>
 </map>

@@ -1,10 +1,18 @@
 <map id="value_set_fit::entryt" name="value_set_fit::entryt">
-<area shape="rect" id="node1" title=" " alt="" coords="904,83,1056,110"/>
-<area shape="rect" id="node2" href="$classreference__counting.html" title=" " alt="" coords="627,17,775,59"/>
-<area shape="rect" id="node3" href="$classreference__counting_1_1dt.html" title=" " alt="" coords="93,5,240,47"/>
-<area shape="rect" id="node5" href="$classreference__counting.html" title=" " alt="" coords="301,40,448,81"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,13,44,39"/>
-<area shape="rect" id="node6" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="665,83,737,110"/>
-<area shape="rect" id="node7" title=" " alt="" coords="657,134,744,161"/>
-<area shape="rect" id="node8" title=" " alt="" coords="305,127,444,168"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="904,83,1056,109"/>
+<area shape="rect" id="Node000002" href="$classreference__counting.html" title=" " alt="" coords="627,19,775,59"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="789,54,918,81,917,86,787,59"/>
+<area shape="rect" id="Node000003" href="$classreference__counting_1_1dt.html" title=" " alt="" coords="93,5,240,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="254,20,277,20,440,19,603,24,627,26,626,31,603,29,440,24,277,25,254,25"/>
+<area shape="rect" id="Node000005" href="$classreference__counting.html" title=" " alt="" coords="301,40,448,80"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="254,37,302,45,301,50,253,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,13,44,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="58,23,93,23,93,28,58,28"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="461,52,626,41,626,46,462,57"/>
+<area shape="rect" id="Node000006" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="665,83,737,109"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="751,93,904,93,904,99,751,99"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="657,133,744,158"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="757,134,880,113,917,106,918,111,880,119,758,139"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="305,125,444,165"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="458,143,657,143,657,148,458,148"/>
 </map>

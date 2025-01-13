@@ -1,13 +1,26 @@
 <map id="havoc_if_validt" name="havoc_if_validt">
-<area shape="rect" id="node1" title="A class that overrides the low&#45;level havocing functions in the base utility class,..." alt="" coords="112,676,233,703"/>
-<area shape="rect" id="node2" href="$classhavoc__utilst.html" title=" " alt="" coords="253,600,354,627"/>
-<area shape="rect" id="node3" href="$classhavoc__utils__can__forward__propagatet.html" title="A class containing utility functions for havocing expressions." alt="" coords="212,496,395,537"/>
-<area shape="rect" id="node4" href="$classcan__forward__propagatet.html" title="Determine whether an expression is constant." alt="" coords="195,407,375,433"/>
-<area shape="rect" id="node5" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="108,317,211,344"/>
-<area shape="rect" id="node6" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="5,213,145,240"/>
-<area shape="rect" id="node7" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="169,213,323,240"/>
-<area shape="rect" id="node8" title=" " alt="" coords="87,95,240,136"/>
-<area shape="rect" id="node9" title=" " alt="" coords="265,95,417,136"/>
-<area shape="rect" id="node10" title=" " alt="" coords="377,5,416,32"/>
-<area shape="rect" id="node11" title=" " alt="" coords="399,407,509,433"/>
+<area shape="rect" id="Node000001" title="A class that overrides the low&#45;level havocing functions in the base utility class,..." alt="" coords="227,667,349,692"/>
+<area shape="rect" id="Node000002" href="$classhavoc__utilst.html" title=" " alt="" coords="168,592,269,617"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="241,626,279,664,275,668,238,630"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,401,115,427"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="56,441,52,484,55,507,64,528,84,551,111,569,140,583,169,592,167,597,138,588,108,574,81,555,59,531,50,508,46,484,51,440"/>
+<area shape="rect" id="Node000005" href="$classhavoc__utils__can__forward__propagatet.html" title="A class containing utility functions for havocing expressions." alt="" coords="127,489,310,529"/>
+<area shape="poly" id="edge12_Node000005_Node000003" title=" " alt="" coords="92,431,188,487,185,491,90,436"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="62,5,101,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="75,45,67,77,63,112,63,327,63,401,57,401,57,327,57,112,61,76,70,43"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="103,93,255,133"/>
+<area shape="poly" id="edge10_Node000010_Node000004" title=" " alt="" coords="105,38,161,91,157,95,101,42"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="221,543,221,592,216,592,216,543"/>
+<area shape="rect" id="Node000006" href="$classcan__forward__propagatet.html" title="Determine whether an expression is constant." alt="" coords="141,401,321,427"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="230,441,224,489,218,489,225,440"/>
+<area shape="rect" id="Node000007" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="266,313,369,339"/>
+<area shape="poly" id="edge13_Node000001_Node000007" title=" " alt="" coords="338,349,354,378,361,412,361,606,357,627,345,644,313,669,310,664,341,640,352,624,356,606,356,413,349,380,333,352"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="298,350,245,403,241,399,294,346"/>
+<area shape="rect" id="Node000008" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="119,211,259,236"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="216,242,304,311,301,315,213,247"/>
+<area shape="rect" id="Node000009" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="283,211,437,236"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="352,250,325,314,320,312,347,248"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="221,139,296,184,339,208,337,213,293,189,218,143"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="283,93,437,133"/>
+<area shape="poly" id="edge11_Node000009_Node000012" title=" " alt="" coords="363,147,363,210,357,210,357,147"/>
 </map>

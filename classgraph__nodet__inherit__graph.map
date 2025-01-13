@@ -1,17 +1,33 @@
 <map id="graph_nodet&lt; E &gt;" name="graph_nodet&lt; E &gt;">
-<area shape="rect" id="node1" title="This class represents a node in a directed graph." alt="" coords="5,355,147,381"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="382,78,546,119"/>
-<area shape="rect" id="node4" href="$classgraph__nodet.html" title=" " alt="" coords="384,190,544,231"/>
-<area shape="rect" id="node10" href="$classgraph__nodet.html" title=" " alt="" coords="363,355,565,381"/>
-<area shape="rect" id="node12" href="$classgraph__nodet.html" title=" " alt="" coords="371,406,557,447"/>
-<area shape="rect" id="node14" href="$classgraph__nodet.html" title=" " alt="" coords="363,472,565,499"/>
-<area shape="rect" id="node3" href="$structvs__dep__nodet.html" title=" " alt="" coords="650,5,762,32"/>
-<area shape="rect" id="node5" href="$classabstract__eventt.html" title=" " alt="" coords="644,56,768,83"/>
-<area shape="rect" id="node6" href="$structcfg__base__nodet.html" title=" " alt="" coords="619,107,793,133"/>
-<area shape="rect" id="node7" href="$classclass__hierarchy__graph__nodet.html" title="Class hierarchy graph node: simply contains a class identifier." alt="" coords="623,158,789,199"/>
-<area shape="rect" id="node8" href="$structdfcc__loop__nesting__graph__nodet.html" title="A graph node that stores information about a natural loop." alt="" coords="615,223,797,265"/>
-<area shape="rect" id="node9" href="$classscope__treet_1_1scope__nodet.html" title=" " alt="" coords="634,289,778,330"/>
-<area shape="rect" id="node11" href="$structdep__nodet.html" title=" " alt="" coords="661,355,751,381"/>
-<area shape="rect" id="node13" href="$structcall__grapht_1_1function__nodet.html" title="Node of the directed graph representation of this call graph." alt="" coords="629,406,783,447"/>
-<area shape="rect" id="node15" href="$structxml__graph__nodet.html" title=" " alt="" coords="639,472,773,499"/>
+<area shape="rect" id="Node000001" title="This class represents a node in a directed graph." alt="" coords="5,361,147,387"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="57,347,63,338,76,335,87,337,94,344,95,353,92,362,87,360,90,352,89,346,85,342,76,340,66,343,62,350"/>
+<area shape="poly" id="edge12_Node000001_Node000001" title=" " alt="" coords="44,351,40,337,44,324,56,314,76,311,99,316,111,329,110,346,98,363,94,360,105,344,106,330,96,320,76,316,58,319,48,327,45,337,49,350"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="384,137,544,177"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="105,351,169,309,306,233,420,174,423,179,308,238,172,314,108,356"/>
+<area shape="rect" id="Node000008" href="$classgraph__nodet.html" title=" " alt="" coords="371,297,557,337"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="146,356,170,351,371,324,371,329,171,357,147,361"/>
+<area shape="rect" id="Node000010" href="$classgraph__nodet.html" title=" " alt="" coords="363,361,565,387"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="160,371,363,371,363,377,160,377"/>
+<area shape="rect" id="Node000012" href="$classgraph__nodet.html" title=" " alt="" coords="382,411,546,451"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="147,387,171,391,382,420,381,425,170,397,146,392"/>
+<area shape="rect" id="Node000014" href="$classgraph__nodet.html" title=" " alt="" coords="363,476,565,501"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="104,394,135,416,172,436,219,452,268,464,363,479,362,485,267,469,217,457,170,440,133,421,101,398"/>
+<area shape="rect" id="Node000003" href="$classabstract__eventt.html" title=" " alt="" coords="644,5,768,31"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="494,125,547,81,613,40,643,28,645,33,616,44,551,85,498,129"/>
+<area shape="rect" id="Node000004" href="$structcfg__base__nodet.html" title=" " alt="" coords="619,55,793,80"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="520,128,614,90,654,78,656,83,616,95,522,133"/>
+<area shape="rect" id="Node000005" href="$classclass__hierarchy__graph__nodet.html" title="Class hierarchy graph node: simply contains a class identifier." alt="" coords="623,105,789,145"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="558,142,622,133,623,138,558,147"/>
+<area shape="rect" id="Node000006" href="$structdfcc__loop__nesting__graph__nodet.html" title="A graph node that stores information about a natural loop." alt="" coords="615,169,797,209"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="558,166,615,174,614,179,557,172"/>
+<area shape="rect" id="Node000007" href="$classscope__treet_1_1scope__nodet.html" title=" " alt="" coords="634,233,778,273"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="523,180,616,218,647,230,645,235,614,223,521,185"/>
+<area shape="rect" id="Node000009" href="$structcall__grapht_1_1function__nodet.html" title="Node of the directed graph representation of this call graph." alt="" coords="629,297,783,337"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="570,314,628,314,628,319,570,319"/>
+<area shape="rect" id="Node000011" href="$structdep__nodet.html" title=" " alt="" coords="661,361,751,387"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="578,371,661,371,661,377,578,377"/>
+<area shape="rect" id="Node000013" href="$structvs__dep__nodet.html" title=" " alt="" coords="650,419,762,444"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="560,429,650,429,650,434,560,434"/>
+<area shape="rect" id="Node000015" href="$structxml__graph__nodet.html" title=" " alt="" coords="639,476,773,501"/>
+<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="579,486,638,486,638,491,579,491"/>
 </map>

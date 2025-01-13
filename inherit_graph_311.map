@@ -1,3 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classfunction__indicest.html" title="Helper class that maintains a map from function name to grapht node index and adds nodes to the graph..." alt="" coords="5,5,139,32"/>
+<area shape="rect" id="Node000000" href="$classfunction__filter__baset.html" title="Base class for filtering functions." alt="" coords="5,112,160,137"/>
+<area shape="rect" id="Node000001" href="$classfile__filtert.html" title=" " alt="" coords="251,5,335,31"/>
+<area shape="poly" id="edge223_Node000000_Node000001" title=" " alt="" coords="109,101,153,70,207,40,250,25,251,30,209,44,156,74,112,106"/>
+<area shape="rect" id="Node000002" href="$classinclude__pattern__filtert.html" title="Filters functions that match the provided pattern." alt="" coords="210,55,375,80"/>
+<area shape="poly" id="edge224_Node000000_Node000002" title=" " alt="" coords="142,106,245,77,246,83,144,111"/>
+<area shape="rect" id="Node000003" href="$classinternal__functions__filtert.html" title="Filters out CPROVER internal functions." alt="" coords="223,105,362,145"/>
+<area shape="poly" id="edge225_Node000000_Node000003" title=" " alt="" coords="174,122,223,122,223,127,174,127"/>
+<area shape="rect" id="Node000004" href="$classsingle__function__filtert.html" title=" " alt="" coords="211,169,374,195"/>
+<area shape="poly" id="edge226_Node000000_Node000004" title=" " alt="" coords="144,138,246,167,245,172,142,144"/>
+<area shape="rect" id="Node000005" href="$classtrivial__functions__filtert.html" title="Filters out trivial functions." alt="" coords="208,219,377,244"/>
+<area shape="poly" id="edge227_Node000000_Node000005" title=" " alt="" coords="113,144,157,174,209,204,242,216,240,221,207,208,154,179,110,148"/>
 </map>

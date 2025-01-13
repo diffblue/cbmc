@@ -10,7 +10,7 @@ var classansi__c__languaget =
     [ "generate_support_functions", "classansi__c__languaget.html#ae239512878d53bf405f2ab312196d19c", null ],
     [ "id", "classansi__c__languaget.html#afd31793f3a43bd5559021b18cf77db56", null ],
     [ "modules_provided", "classansi__c__languaget.html#ab54b2c9c325adde755affdf751f37765", null ],
-    [ "new_language", "classansi__c__languaget.html#a85154c1d399ecd6613174e99407dae1b", null ],
+    [ "new_language", "classansi__c__languaget.html#af7c9b9c5f3b1b3a7b0a2c6730c96d129", null ],
     [ "parse", "classansi__c__languaget.html#afd5954e85339cd6a6baf2e459980e56c", null ],
     [ "preprocess", "classansi__c__languaget.html#ae1b3e8976d65c8170df3eb9a647e4998", null ],
     [ "set_language_options", "classansi__c__languaget.html#a9009f03056ae98f55844de8873a282e9", null ],

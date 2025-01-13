@@ -15,7 +15,7 @@ var classacceleration__utilst =
     [ "do_nonrecursive", "classacceleration__utilst.html#a35233f04c4be9dcb2c3ec9becdd1d1d1", null ],
     [ "ensure_no_overflows", "classacceleration__utilst.html#abd40a3905e6cb68fada4d9d0a0de0f04", null ],
     [ "expr2poly", "classacceleration__utilst.html#a4d71813a2cba99d7c13c85896979799d", null ],
-    [ "extract_polynomial", "classacceleration__utilst.html#a44189c6ee65b9620bbf9a72d58428be9", null ],
+    [ "extract_polynomial", "classacceleration__utilst.html#ac6a222b552a60ca31508a3cf2afba00e", null ],
     [ "find_modified", "classacceleration__utilst.html#aadf47a1b0128bba1b8bbdfb81fd41ab7", null ],
     [ "find_modified", "classacceleration__utilst.html#a0bbef98a8716f313c11f9b57e5cc65f9", null ],
     [ "find_modified", "classacceleration__utilst.html#a04f3aad4ab108ea1782b5305adebf680", null ],

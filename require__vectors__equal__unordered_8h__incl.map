@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/unit/testing&#45;utils/require_vectors_equal_unordered.h" name="/home/runner/work/cbmc/cbmc/unit/testing&#45;utils/require_vectors_equal_unordered.h">
-<area shape="rect" id="node1" title=" " alt="" coords="104,5,359,61"/>
-<area shape="rect" id="node2" href="$use__catch_8h.html" title=" " alt="" coords="67,109,249,136"/>
-<area shape="rect" id="node7" title=" " alt="" coords="273,109,336,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,191,129,218"/>
-<area shape="rect" id="node4" href="$smt__to__smt2__string_8h.html" title="Streaming SMT data structures to a string based output stream." alt="" coords="153,184,344,225"/>
-<area shape="rect" id="node5" title=" " alt="" coords="174,273,238,300"/>
-<area shape="rect" id="node6" title=" " alt="" coords="262,273,321,300"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="104,5,359,60"/>
+<area shape="rect" id="Node000002" href="$use__catch_8h.html" title=" " alt="" coords="67,108,249,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,62,179,99,175,96,207,58"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="273,108,336,133"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="256,58,288,96,284,99,252,62"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,189,129,214"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="146,136,93,182,89,178,143,131"/>
+<area shape="rect" id="Node000004" href="$smt__to__smt2__string_8h.html" title="Streaming SMT data structures to a string based output stream." alt="" coords="153,181,344,221"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="173,131,218,170,215,174,170,136"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="174,269,238,295"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="241,223,221,259,216,256,236,220"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="262,269,321,295"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="261,220,281,256,276,259,257,223"/>
 </map>

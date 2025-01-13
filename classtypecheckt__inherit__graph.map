@@ -1,9 +1,15 @@
 <map id="typecheckt" name="typecheckt">
-<area shape="rect" id="node1" title=" " alt="" coords="304,80,399,107"/>
-<area shape="rect" id="node3" href="$classc__typecheck__baset.html" title=" " alt="" coords="82,155,229,181"/>
-<area shape="rect" id="node6" href="$classjava__bytecode__typecheckt.html" title=" " alt="" coords="253,155,449,181"/>
-<area shape="rect" id="node7" href="$classstatement__list__typecheckt.html" title="Class for encapsulating the current state of the type check." alt="" coords="474,155,669,181"/>
-<area shape="rect" id="node2" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="308,5,395,32"/>
-<area shape="rect" id="node4" href="$classansi__c__typecheckt.html" title=" " alt="" coords="5,229,148,256"/>
-<area shape="rect" id="node5" href="$classcpp__typecheckt.html" title=" " alt="" coords="172,229,296,256"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="304,79,399,104"/>
+<area shape="rect" id="Node000003" href="$classc__typecheck__baset.html" title=" " alt="" coords="82,152,229,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="308,111,188,154,186,149,306,106"/>
+<area shape="rect" id="Node000006" href="$classjava__bytecode__typecheckt.html" title=" " alt="" coords="253,152,449,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="354,118,354,152,349,152,349,118"/>
+<area shape="rect" id="Node000007" href="$classstatement__list__typecheckt.html" title="Class for encapsulating the current state of the type check." alt="" coords="474,152,669,177"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="401,106,537,149,535,154,399,111"/>
+<area shape="rect" id="Node000002" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="308,5,395,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="354,44,354,79,349,79,349,44"/>
+<area shape="rect" id="Node000004" href="$classansi__c__typecheckt.html" title=" " alt="" coords="5,225,148,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,189,91,227,88,223,131,185"/>
+<area shape="rect" id="Node000005" href="$classcpp__typecheckt.html" title=" " alt="" coords="172,225,296,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="180,185,223,223,219,227,176,189"/>
 </map>

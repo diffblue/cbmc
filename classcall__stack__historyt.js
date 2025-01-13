@@ -6,7 +6,7 @@ var classcall__stack__historyt =
     [ "call_stack_historyt", "classcall__stack__historyt.html#a73a5d6aec81e89f79b302353354983c8", null ],
     [ "call_stack_historyt", "classcall__stack__historyt.html#afe0377937d41c3e822c5cf0ec013a66f", null ],
     [ "call_stack_historyt", "classcall__stack__historyt.html#a12addf6386e5daa68fe34280ec2d8c98", null ],
-    [ "current_location", "classcall__stack__historyt.html#a727bb2a8e6e8e071f632b0e31196e286", null ],
+    [ "current_location", "classcall__stack__historyt.html#a49cae6a4dad8ca5ae9f3224f8239c4a6", null ],
     [ "has_recursion_limit", "classcall__stack__historyt.html#a7a8a1df346914141b80606834feef628", null ],
     [ "operator<", "classcall__stack__historyt.html#a2f04d7927835339b30030f34067c4f9b", null ],
     [ "operator==", "classcall__stack__historyt.html#ad5e141a5683bb67aba8a4fc72c515974", null ],

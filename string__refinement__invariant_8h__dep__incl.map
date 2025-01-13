@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/strings/string_refinement_invariant.h" name="/home/runner/work/cbmc/cbmc/src/solvers/strings/string_refinement_invariant.h">
-<area shape="rect" id="node1" title=" " alt="" coords="228,5,447,61"/>
-<area shape="rect" id="node2" href="$string__constraint__generator__indexof_8cpp.html" title="Generates string constraints for the family of indexOf and lastIndexOf java functions." alt="" coords="5,109,211,180"/>
-<area shape="rect" id="node3" href="$string__constraint__generator__main_8cpp.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="235,109,440,180"/>
-<area shape="rect" id="node4" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="464,117,648,173"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="228,5,447,60"/>
+<area shape="rect" id="Node000002" href="$string__constraint__generator__indexof_8cpp.html" title="Generates string constraints for the family of indexOf and lastIndexOf java functions." alt="" coords="5,108,211,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="270,68,181,110,178,105,268,64"/>
+<area shape="rect" id="Node000003" href="$string__constraint__generator__main_8cpp.html" title="Generates string constraints to link results from string functions with their arguments." alt="" coords="235,108,440,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="340,74,340,108,335,108,335,74"/>
+<area shape="rect" id="Node000004" href="$string__refinement_8cpp.html" title="String support via creating string constraints and progressively instantiating the universal constrai..." alt="" coords="464,115,648,170"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="404,64,504,113,502,118,402,69"/>
 </map>

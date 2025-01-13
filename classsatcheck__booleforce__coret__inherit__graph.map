@@ -1,7 +1,11 @@
 <map id="satcheck_booleforce_coret" name="satcheck_booleforce_coret">
-<area shape="rect" id="node1" title=" " alt="" coords="5,319,161,360"/>
-<area shape="rect" id="node2" href="$classsatcheck__booleforce__baset.html" title=" " alt="" coords="5,229,161,271"/>
-<area shape="rect" id="node3" href="$classcnf__solvert.html" title=" " alt="" coords="36,155,131,181"/>
-<area shape="rect" id="node4" href="$classcnft.html" title=" " alt="" coords="60,80,107,107"/>
-<area shape="rect" id="node5" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="55,5,111,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,313,161,353"/>
+<area shape="rect" id="Node000002" href="$classsatcheck__booleforce__baset.html" title=" " alt="" coords="5,225,161,265"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,279,86,313,81,313,81,279"/>
+<area shape="rect" id="Node000003" href="$classcnf__solvert.html" title=" " alt="" coords="36,152,131,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="86,191,86,225,81,225,81,191"/>
+<area shape="rect" id="Node000004" href="$classcnft.html" title=" " alt="" coords="60,79,107,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="86,118,86,152,81,152,81,118"/>
+<area shape="rect" id="Node000005" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="55,5,111,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="86,44,86,79,81,79,81,44"/>
 </map>

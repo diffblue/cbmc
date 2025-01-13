@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['program_20transformation_20overview_45999',['Program Transformation Overview',['../contracts-dev-spec-transform-params.html',1,'contracts-dev-spec']]],
-  ['proof_20harness_20intrumentation_46000',['Proof Harness Intrumentation',['../contracts-dev-spec-harness.html',1,'contracts-dev-spec']]]
+  ['memory_20bounds_20checking_0',['memory bounds checking',['../memory-bounds-checking.html',1,'Memory Bounds Checking'],['../group__module__hidden.html',1,'memory-bounds-checking']]],
+  ['memory_20predicates_1',['memory predicates',['../contracts-memory-predicates.html',1,'Memory Predicates'],['../contracts-dev-spec-memory-predicates-rewriting.html',1,'Rewriting User-Defined Memory Predicates']]]
 ];

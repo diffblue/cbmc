@@ -1,62 +1,131 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/goto_instruction_code.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/goto_instruction_code.h">
-<area shape="rect" id="node1" title=" " alt="" coords="3651,5,3835,61"/>
-<area shape="rect" id="node2" href="$allocate__objects_8cpp.html" title=" " alt="" coords="328,109,512,165"/>
-<area shape="rect" id="node3" href="$c__typecheck__gcc__polymorphic__builtins_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="536,109,757,165"/>
-<area shape="rect" id="node4" href="$expr2c__class_8h.html" title=" " alt="" coords="781,109,965,165"/>
-<area shape="rect" id="node10" href="$cpp__typecheck__constructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="2403,109,2615,165"/>
-<area shape="rect" id="node11" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="981,213,1179,284"/>
-<area shape="rect" id="node28" href="$object__id_8cpp.html" title="Object Identifiers." alt="" coords="2898,109,3091,165"/>
-<area shape="rect" id="node29" href="$goto__instruction__code_8cpp.html" title="Data structures representing instructions in a GOTO program." alt="" coords="3115,109,3311,165"/>
-<area shape="rect" id="node30" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="2689,109,2873,165"/>
-<area shape="rect" id="node49" href="$validate__code_8cpp.html" title=" " alt="" coords="3336,109,3520,165"/>
-<area shape="rect" id="node50" href="$wp_8cpp.html" title="Weakest Preconditions." alt="" coords="3544,109,3728,165"/>
-<area shape="rect" id="node51" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="3753,109,3946,165"/>
-<area shape="rect" id="node52" href="$statement__list__typecheck_8cpp.html" title="Statement List Language Type Checking." alt="" coords="3971,109,4192,165"/>
-<area shape="rect" id="node53" href="$assignments__from__json_8cpp.html" title=" " alt="" coords="4216,109,4435,165"/>
-<area shape="rect" id="node54" href="$character__refine__preprocess_8cpp.html" title="Preprocess a goto&#45;programs so that calls to the java Character library are replaced by simple express..." alt="" coords="4459,109,4695,165"/>
-<area shape="rect" id="node55" href="$java__bytecode__instrument_8cpp.html" title=" " alt="" coords="4720,109,4947,165"/>
-<area shape="rect" id="node56" href="$java__bytecode__typecheck__code_8cpp.html" title="JAVA Bytecode Conversion / Type Checking." alt="" coords="4971,109,5231,165"/>
-<area shape="rect" id="node57" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="5256,109,5475,165"/>
-<area shape="rect" id="node58" href="$java__string__library__preprocess_8h.html" title="Produce code for simple implementation of String Java libraries." alt="" coords="5499,109,5736,165"/>
-<area shape="rect" id="node59" href="$lift__clinit__calls_8cpp.html" title=" " alt="" coords="5760,109,5979,165"/>
-<area shape="rect" id="node60" href="$require__goto__statements_8h.html" title="Utilties for inspecting goto functions." alt="" coords="6003,109,6237,165"/>
-<area shape="rect" id="node5" href="$expr2c_8cpp.html" title=" " alt="" coords="248,228,451,269"/>
-<area shape="rect" id="node6" href="$expr2cpp_8cpp.html" title=" " alt="" coords="475,228,677,269"/>
-<area shape="rect" id="node7" href="$analyze__symbol_8h.html" title="High&#45;level interface to gdb." alt="" coords="702,221,906,277"/>
-<area shape="rect" id="node8" href="$expr2java_8cpp.html" title=" " alt="" coords="5,339,224,395"/>
-<area shape="rect" id="node9" href="$expr2java_8h.html" title=" " alt="" coords="5,221,224,277"/>
-<area shape="rect" id="node12" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="499,569,739,625"/>
-<area shape="rect" id="node13" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="979,332,1176,403"/>
-<area shape="rect" id="node14" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="1200,332,1459,403"/>
-<area shape="rect" id="node15" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="1014,451,1221,521"/>
-<area shape="rect" id="node16" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="299,451,496,521"/>
-<area shape="rect" id="node17" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="792,451,989,521"/>
-<area shape="rect" id="node18" href="$dfcc__is__freeable_8cpp.html" title=" " alt="" coords="1483,332,1680,403"/>
-<area shape="rect" id="node19" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="1704,332,1901,403"/>
-<area shape="rect" id="node20" href="$dfcc__library_8cpp.html" title=" " alt="" coords="1925,332,2123,403"/>
-<area shape="rect" id="node21" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="2147,332,2389,403"/>
-<area shape="rect" id="node22" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="2413,332,2611,403"/>
-<area shape="rect" id="node23" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="2635,332,2832,403"/>
-<area shape="rect" id="node24" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="2997,451,3195,521"/>
-<area shape="rect" id="node25" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="656,332,853,403"/>
-<area shape="rect" id="node26" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="520,451,717,521"/>
-<area shape="rect" id="node27" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="2856,332,3059,403"/>
-<area shape="rect" id="node31" href="$ai__history_8h.html" title="Abstract Interpretation history." alt="" coords="4197,221,4381,277"/>
-<area shape="rect" id="node32" href="$ai__storage_8h.html" title="Abstract Interpretation Storage." alt="" coords="4132,339,4316,395"/>
-<area shape="rect" id="node33" href="$call__graph_8h.html" title="Function Call Graphs." alt="" coords="4405,221,4589,277"/>
-<area shape="rect" id="node34" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="4613,221,4797,277"/>
-<area shape="rect" id="node35" href="$does__remove__const_8cpp.html" title="Analyses." alt="" coords="1203,221,1387,277"/>
-<area shape="rect" id="node36" href="$goto__rw_8h.html" title=" " alt="" coords="1411,228,1624,269"/>
-<area shape="rect" id="node37" href="$local__cfg_8h.html" title="CFG for One Function." alt="" coords="1649,228,1869,269"/>
-<area shape="rect" id="node38" href="$local__safe__pointers_8h.html" title="Local safe pointer analysis." alt="" coords="1893,221,2077,277"/>
-<area shape="rect" id="node39" href="$uncaught__exceptions__analysis_8h.html" title="Over&#45;approximative uncaught exceptions analysis." alt="" coords="2101,221,2312,277"/>
-<area shape="rect" id="node40" href="$abstract__object_8h.html" title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari..." alt="" coords="2336,221,2547,277"/>
-<area shape="rect" id="node41" href="$destructor_8cpp.html" title="Destructor Calls." alt="" coords="2571,221,2765,277"/>
-<area shape="rect" id="node42" href="$goto__convert__class_8h.html" title="Program Transformation." alt="" coords="3805,332,3992,403"/>
-<area shape="rect" id="node43" href="$scope__tree_8h.html" title=" " alt="" coords="3937,221,4122,277"/>
-<area shape="rect" id="node44" href="$fault__localization__provider_8h.html" title="Interface for Goto Checkers to provide Fault Localization." alt="" coords="2789,221,3000,277"/>
-<area shape="rect" id="node45" href="$properties_8h.html" title="Properties." alt="" coords="3024,221,3208,277"/>
-<area shape="rect" id="node46" href="$symex__coverage_8h.html" title="Record and print code coverage of symbolic execution." alt="" coords="3232,221,3416,277"/>
-<area shape="rect" id="node47" href="$unified__diff_8h.html" title="Unified diff (using LCSS) of goto functions." alt="" coords="3441,221,3631,277"/>
-<area shape="rect" id="node48" href="$memory__snapshot__harness__generator_8h.html" title=" " alt="" coords="3656,213,3861,284"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="3981,5,4165,60"/>
+<area shape="rect" id="Node000002" href="$assignments__from__json_8cpp.html" title=" " alt="" coords="333,115,552,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="3968,37,3253,43,2189,57,1164,79,787,93,653,102,564,111,527,118,526,113,564,105,653,96,786,88,1164,73,2189,51,3253,38,3968,32"/>
+<area shape="rect" id="Node000003" href="$character__refine__preprocess_8cpp.html" title="Preprocess a goto&#45;programs so that calls to the java Character library are replaced by simple express..." alt="" coords="577,115,813,170"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="3968,38,3301,45,2319,60,1376,82,1030,95,826,111,786,118,785,113,825,105,1030,90,1376,76,2319,54,3300,40,3968,32"/>
+<area shape="rect" id="Node000004" href="$java__bytecode__instrument_8cpp.html" title=" " alt="" coords="837,115,1064,170"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="3968,38,3346,46,2444,61,1580,83,1263,96,1076,111,1039,118,1038,113,1076,105,1263,90,1580,77,2444,55,3346,40,3967,32"/>
+<area shape="rect" id="Node000005" href="$java__bytecode__typecheck__code_8cpp.html" title="JAVA Bytecode Conversion / Type Checking." alt="" coords="1089,115,1349,170"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="3968,37,3450,39,2695,49,2299,58,1926,71,1604,88,1362,111,1319,118,1318,113,1361,105,1604,83,1926,66,2299,53,2695,44,3450,34,3968,31"/>
+<area shape="rect" id="Node000006" href="$java__static__initializers_8cpp.html" title=" " alt="" coords="1373,115,1592,170"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="3968,36,3491,38,2807,47,2449,56,2112,70,1823,87,1604,111,1568,118,1567,113,1604,105,1822,82,2112,64,2448,51,2807,42,3491,33,3968,31"/>
+<area shape="rect" id="Node000007" href="$java__string__library__preprocess_8h.html" title="Produce code for simple implementation of String Java libraries." alt="" coords="2828,115,3065,170"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="3968,47,3066,133,3065,127,3967,41"/>
+<area shape="rect" id="Node000027" href="$lift__clinit__calls_8cpp.html" title=" " alt="" coords="3367,115,3585,170"/>
+<area shape="poly" id="edge13_Node000001_Node000027" title=" " alt="" coords="3968,50,3794,75,3598,111,3567,118,3566,113,3597,105,3793,69,3967,44"/>
+<area shape="rect" id="Node000028" href="$require__goto__statements_8h.html" title="Utilties for inspecting goto functions." alt="" coords="3609,115,3844,170"/>
+<area shape="poly" id="edge14_Node000001_Node000028" title=" " alt="" coords="3977,67,3812,118,3810,113,3975,62"/>
+<area shape="rect" id="Node000030" href="$allocate__objects_8cpp.html" title=" " alt="" coords="3868,115,4052,170"/>
+<area shape="poly" id="edge16_Node000001_Node000030" title=" " alt="" coords="4037,72,3990,117,3986,113,4034,68"/>
+<area shape="rect" id="Node000031" href="$c__typecheck__gcc__polymorphic__builtins_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="4076,115,4297,170"/>
+<area shape="poly" id="edge17_Node000001_Node000031" title=" " alt="" coords="4113,68,4161,113,4157,117,4109,72"/>
+<area shape="rect" id="Node000032" href="$expr2c__class_8h.html" title=" " alt="" coords="4321,115,4505,170"/>
+<area shape="poly" id="edge18_Node000001_Node000032" title=" " alt="" coords="4171,62,4310,105,4333,113,4331,118,4309,111,4169,67"/>
+<area shape="rect" id="Node000050" href="$cpp__typecheck__constructor_8cpp.html" title="C++ Language Type Checking." alt="" coords="4530,115,4742,170"/>
+<area shape="poly" id="edge25_Node000001_Node000050" title=" " alt="" coords="4180,46,4340,71,4518,105,4547,113,4546,118,4517,111,4339,76,4179,51"/>
+<area shape="rect" id="Node000051" href="$dfcc__library_8h.html" title="Dynamic frame condition checking library loading." alt="" coords="5448,108,5645,177"/>
+<area shape="poly" id="edge26_Node000001_Node000051" title=" " alt="" coords="4179,39,5448,131,5448,137,4179,44"/>
+<area shape="rect" id="Node000075" href="$object__id_8cpp.html" title="Object Identifiers." alt="" coords="5670,115,5863,170"/>
+<area shape="poly" id="edge50_Node000001_Node000075" title=" " alt="" coords="4179,33,4499,39,4926,52,5349,74,5525,88,5658,105,5690,113,5689,118,5657,111,5524,94,5349,79,4926,58,4499,45,4179,38"/>
+<area shape="rect" id="Node000076" href="$goto__instruction__code_8cpp.html" title="Data structures representing instructions in a GOTO program." alt="" coords="5887,115,6083,170"/>
+<area shape="poly" id="edge51_Node000001_Node000076" title=" " alt="" coords="4179,32,4539,37,5029,49,5518,71,5721,86,5875,105,5908,113,5907,118,5874,111,5721,92,5518,76,5029,55,4539,43,4179,38"/>
+<area shape="rect" id="Node000077" href="$goto__program_8h.html" title="Concrete Goto Program." alt="" coords="1616,115,1800,170"/>
+<area shape="poly" id="edge52_Node000001_Node000077" title=" " alt="" coords="3967,41,1800,140,1800,134,3967,36"/>
+<area shape="rect" id="Node000640" href="$validate__code_8cpp.html" title=" " alt="" coords="6108,115,6292,170"/>
+<area shape="poly" id="edge66_Node000001_Node000640" title=" " alt="" coords="4179,31,4579,34,5132,45,5420,54,5689,67,5920,84,6095,105,6127,113,6126,118,6094,111,5920,89,5688,72,5420,59,5132,50,4578,40,4179,37"/>
+<area shape="rect" id="Node000641" href="$wp_8cpp.html" title="Weakest Preconditions." alt="" coords="6316,115,6500,170"/>
+<area shape="poly" id="edge67_Node000001_Node000641" title=" " alt="" coords="4180,31,4616,32,5231,41,5551,50,5851,63,6109,81,6304,105,6336,113,6335,118,6304,111,6109,87,5851,69,5551,55,5230,46,4616,37,4180,36"/>
+<area shape="rect" id="Node000642" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="6525,115,6718,170"/>
+<area shape="poly" id="edge68_Node000001_Node000642" title=" " alt="" coords="4179,31,4651,31,5326,39,5680,48,6011,62,6297,80,6415,92,6512,105,6545,113,6544,118,6512,111,6414,97,6296,86,6011,67,5680,54,5326,45,4651,37,4179,36"/>
+<area shape="rect" id="Node000643" href="$statement__list__typecheck_8cpp.html" title="Statement List Language Type Checking." alt="" coords="6743,115,6964,170"/>
+<area shape="poly" id="edge69_Node000001_Node000643" title=" " alt="" coords="4179,31,4688,32,5426,40,5814,49,6178,62,6493,81,6622,92,6730,105,6767,113,6766,118,6729,111,6622,98,6492,86,6178,68,5814,54,5426,45,4688,37,4179,36"/>
+<area shape="rect" id="Node000008" href="$java__bytecode__convert__class_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="3081,233,3325,287"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="3018,173,3145,230,3143,235,3016,178"/>
+<area shape="rect" id="Node000009" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="2077,350,2339,405"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="2815,150,2678,158,2530,172,2397,195,2345,210,2307,227,2271,276,2226,351,2221,348,2267,273,2304,223,2343,205,2396,190,2529,167,2678,153,2814,145"/>
+<area shape="rect" id="Node000010" href="$java__bytecode__language_8h.html" title=" " alt="" coords="3349,233,3568,287"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="3079,167,3337,223,3366,230,3364,235,3335,228,3078,172"/>
+<area shape="rect" id="Node000024" href="$java__object__factory_8cpp.html" title=" " alt="" coords="2317,233,2536,287"/>
+<area shape="poly" id="edge10_Node000007_Node000024" title=" " alt="" coords="2815,171,2549,228,2520,235,2519,230,2547,223,2814,166"/>
+<area shape="rect" id="Node000025" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="2561,233,2813,287"/>
+<area shape="poly" id="edge11_Node000007_Node000025" title=" " alt="" coords="2876,178,2747,235,2745,230,2874,173"/>
+<area shape="rect" id="Node000026" href="$java__utils_8cpp.html" title=" " alt="" coords="2837,233,3056,287"/>
+<area shape="poly" id="edge12_Node000007_Node000026" title=" " alt="" coords="2949,184,2949,232,2944,232,2944,184"/>
+<area shape="rect" id="Node000029" href="$require__goto__statements_8cpp.html" title=" " alt="" coords="3593,233,3842,287"/>
+<area shape="poly" id="edge15_Node000028_Node000029" title=" " alt="" coords="3726,184,3722,233,3717,232,3721,183"/>
+<area shape="rect" id="Node000033" href="$expr2java_8cpp.html" title=" " alt="" coords="4484,350,4703,405"/>
+<area shape="poly" id="edge19_Node000032_Node000033" title=" " alt="" coords="4481,175,4511,197,4538,224,4558,255,4573,288,4591,349,4586,350,4568,290,4553,257,4534,227,4508,201,4478,180"/>
+<area shape="rect" id="Node000034" href="$expr2java_8h.html" title=" " alt="" coords="4600,233,4819,287"/>
+<area shape="poly" id="edge20_Node000032_Node000034" title=" " alt="" coords="4494,172,4643,230,4641,235,4492,177"/>
+<area shape="rect" id="Node000045" href="$expr2c_8cpp.html" title=" " alt="" coords="3867,240,4069,280"/>
+<area shape="poly" id="edge22_Node000032_Node000045" title=" " alt="" coords="4322,177,4310,180,4196,204,4082,228,4029,243,4028,237,4081,223,4195,199,4309,175,4321,171"/>
+<area shape="rect" id="Node000046" href="$expr2cpp_8cpp.html" title=" " alt="" coords="4093,240,4296,280"/>
+<area shape="poly" id="edge23_Node000032_Node000046" title=" " alt="" coords="4353,179,4232,242,4229,238,4350,174"/>
+<area shape="rect" id="Node000047" href="$analyze__symbol_8h.html" title="High&#45;level interface to gdb." alt="" coords="4321,233,4525,287"/>
+<area shape="poly" id="edge24_Node000032_Node000047" title=" " alt="" coords="4419,183,4423,232,4418,233,4414,184"/>
+<area shape="poly" id="edge21_Node000034_Node000033" title=" " alt="" coords="4675,299,4622,352,4618,348,4671,295"/>
+<area shape="rect" id="Node000052" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="7004,460,7244,515"/>
+<area shape="poly" id="edge27_Node000051_Node000052" title=" " alt="" coords="5660,175,5741,184,5835,189,6049,192,6542,182,6792,177,7028,180,7136,185,7235,193,7323,206,7399,223,7466,240,7520,258,7543,271,7565,288,7585,311,7605,341,7615,361,7619,378,7616,396,7605,414,7581,432,7546,448,7503,460,7454,469,7347,482,7244,487,7244,482,7347,476,7453,464,7502,454,7544,443,7578,428,7601,410,7611,394,7613,379,7609,362,7600,344,7581,314,7561,292,7540,275,7518,263,7465,245,7398,228,7322,211,7234,199,7136,190,7028,185,6793,183,6542,187,6049,198,5834,195,5741,189,5659,180"/>
+<area shape="rect" id="Node000058" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="4944,225,5141,295"/>
+<area shape="poly" id="edge28_Node000051_Node000058" title=" " alt="" coords="5435,167,5300,194,5154,228,5142,231,5141,226,5153,223,5299,189,5434,162"/>
+<area shape="rect" id="Node000059" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="5165,225,5424,295"/>
+<area shape="poly" id="edge29_Node000051_Node000059" title=" " alt="" coords="5462,185,5369,228,5367,223,5460,181"/>
+<area shape="rect" id="Node000060" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="7162,343,7369,412"/>
+<area shape="poly" id="edge30_Node000051_Node000060" title=" " alt="" coords="5660,174,5780,177,5985,178,6528,179,6807,183,7050,190,7227,203,7282,212,7310,223,7319,237,7324,252,7322,283,7310,315,7294,343,7289,341,7305,313,7317,282,7319,252,7315,239,7306,227,7281,217,7226,208,7050,195,6807,188,6528,185,5985,184,5780,183,5659,179"/>
+<area shape="rect" id="Node000061" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="7393,343,7591,412"/>
+<area shape="poly" id="edge31_Node000051_Node000061" title=" " alt="" coords="5659,174,5792,182,5997,184,6521,183,6792,184,7034,189,7223,202,7290,211,7334,223,7377,246,7414,277,7446,310,7471,341,7466,344,7442,314,7411,281,7374,251,7332,228,7289,216,7222,207,7034,195,6792,189,6521,188,5997,189,5792,187,5659,180"/>
+<area shape="rect" id="Node000062" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="5196,343,5393,412"/>
+<area shape="poly" id="edge32_Node000051_Node000062" title=" " alt="" coords="5434,153,5279,163,5108,179,4964,201,4915,213,4890,227,4877,245,4871,261,4872,276,4879,289,4891,301,4907,312,4953,331,5010,346,5073,357,5196,369,5195,374,5072,362,5009,351,4951,336,4905,317,4887,305,4874,292,4867,277,4866,261,4872,243,4886,223,4913,209,4963,195,5107,174,5278,158,5434,147"/>
+<area shape="rect" id="Node000063" href="$dfcc__is__freeable_8cpp.html" title=" " alt="" coords="5448,225,5645,295"/>
+<area shape="poly" id="edge33_Node000051_Node000063" title=" " alt="" coords="5549,191,5549,225,5544,225,5544,191"/>
+<area shape="rect" id="Node000064" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="5669,225,5867,295"/>
+<area shape="poly" id="edge34_Node000051_Node000064" title=" " alt="" coords="5625,181,5705,223,5702,228,5622,186"/>
+<area shape="rect" id="Node000065" href="$dfcc__library_8cpp.html" title=" " alt="" coords="5891,225,6088,295"/>
+<area shape="poly" id="edge35_Node000051_Node000065" title=" " alt="" coords="5659,175,5771,199,5879,223,5891,226,5890,231,5878,228,5770,204,5658,180"/>
+<area shape="rect" id="Node000066" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="6113,225,6354,295"/>
+<area shape="poly" id="edge36_Node000051_Node000066" title=" " alt="" coords="5659,175,5784,194,5881,200,5978,206,6100,223,6113,225,6112,230,6100,228,5978,212,5881,206,5783,199,5659,180"/>
+<area shape="rect" id="Node000067" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="6379,225,6576,295"/>
+<area shape="poly" id="edge37_Node000051_Node000067" title=" " alt="" coords="5659,175,5766,190,5858,197,6014,198,6170,200,6260,207,6366,223,6379,225,6378,230,6365,228,6260,212,6170,205,6014,204,5857,203,5766,195,5659,180"/>
+<area shape="rect" id="Node000068" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="6600,225,6797,295"/>
+<area shape="poly" id="edge38_Node000051_Node000068" title=" " alt="" coords="5660,175,5800,194,5920,201,6026,202,6125,198,6224,195,6330,195,6449,203,6588,223,6600,225,6599,230,6588,228,6449,209,6330,201,6225,200,6126,204,6026,207,5920,207,5800,199,5659,180"/>
+<area shape="rect" id="Node000069" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="5857,343,6055,412"/>
+<area shape="poly" id="edge39_Node000051_Node000069" title=" " alt="" coords="5435,154,5290,165,5133,181,5001,202,4957,214,4934,227,4923,244,4919,260,4923,276,4933,292,4966,299,5048,309,5306,330,5857,367,5857,373,5305,335,5047,314,4965,305,4931,297,4918,279,4914,260,4918,242,4930,223,4955,209,5000,197,5132,176,5289,160,5434,148"/>
+<area shape="rect" id="Node000070" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="7099,225,7296,295"/>
+<area shape="poly" id="edge40_Node000051_Node000070" title=" " alt="" coords="5660,175,5772,191,5875,202,6058,211,6220,208,6371,200,6522,191,6684,188,6867,197,6969,207,7080,223,7099,226,7098,231,7080,228,6968,213,6866,202,6684,194,6523,197,6371,205,6220,214,6058,216,5874,207,5771,196,5659,180"/>
+<area shape="rect" id="Node000072" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="6889,343,7087,412"/>
+<area shape="poly" id="edge48_Node000051_Node000072" title=" " alt="" coords="5659,174,5935,179,6388,183,6620,187,6822,194,6969,206,7015,214,7038,223,7047,237,7052,252,7049,284,7036,315,7018,344,7013,341,7031,313,7044,282,7047,253,7043,239,7034,227,7013,219,6968,211,6822,200,6620,192,6388,188,5935,184,5659,179"/>
+<area shape="rect" id="Node000074" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="6821,225,7024,295"/>
+<area shape="poly" id="edge49_Node000051_Node000074" title=" " alt="" coords="5659,175,5833,197,5982,206,6113,205,6236,199,6358,193,6489,192,6637,200,6810,223,6821,225,6821,230,6809,228,6636,206,6489,197,6359,198,6236,204,6113,210,5982,211,5833,203,5659,180"/>
+<area shape="poly" id="edge41_Node000070_Node000052" title=" " alt="" coords="7170,308,7153,344,7137,406,7129,460,7124,460,7132,405,7148,342,7165,305"/>
+<area shape="poly" id="edge42_Node000070_Node000060" title=" " alt="" coords="7227,305,7248,341,7243,344,7222,308"/>
+<area shape="poly" id="edge43_Node000070_Node000061" title=" " alt="" coords="7297,297,7407,340,7405,345,7295,302"/>
+<area shape="poly" id="edge44_Node000070_Node000062" title=" " alt="" coords="7086,290,7036,297,6856,317,6703,328,6568,334,6442,336,6181,336,6027,338,5845,345,5394,372,5393,367,5845,340,6027,333,6181,330,6442,330,6568,328,6702,323,6855,311,7036,292,7085,284"/>
+<area shape="poly" id="edge45_Node000070_Node000069" title=" " alt="" coords="7086,289,7036,297,6758,330,6482,353,6238,367,6055,375,6055,370,6238,362,6482,347,6758,325,7036,292,7085,284"/>
+<area shape="poly" id="edge46_Node000070_Node000072" title=" " alt="" coords="7126,304,7050,345,7048,340,7123,299"/>
+<area shape="poly" id="edge47_Node000072_Node000052" title=" " alt="" coords="7043,418,7092,458,7089,462,7039,423"/>
+<area shape="rect" id="Node000078" href="$ai__history_8h.html" title="Abstract Interpretation history." alt="" coords="931,233,1115,287"/>
+<area shape="poly" id="edge53_Node000077_Node000078" title=" " alt="" coords="1620,176,1605,180,1533,193,1471,200,1365,204,1260,208,1199,215,1127,228,1098,235,1097,230,1126,223,1198,210,1260,203,1365,199,1471,194,1532,187,1603,175,1619,171"/>
+<area shape="rect" id="Node000124" href="$ai__storage_8h.html" title="Abstract Interpretation Storage." alt="" coords="1105,350,1289,405"/>
+<area shape="poly" id="edge55_Node000077_Node000124" title=" " alt="" coords="1617,177,1605,180,1544,191,1496,194,1450,202,1425,212,1398,227,1381,243,1372,260,1363,278,1347,297,1304,328,1260,352,1257,348,1301,323,1344,293,1359,275,1367,257,1377,240,1394,223,1423,207,1448,197,1495,189,1544,185,1603,175,1615,171"/>
+<area shape="rect" id="Node000140" href="$call__graph_8h.html" title="Function Call Graphs." alt="" coords="1408,233,1592,287"/>
+<area shape="poly" id="edge56_Node000077_Node000140" title=" " alt="" coords="1650,179,1549,235,1546,230,1648,174"/>
+<area shape="rect" id="Node000147" href="$cfg__dominators_8h.html" title="Compute dominators for CFG of goto_function." alt="" coords="1616,233,1800,287"/>
+<area shape="poly" id="edge57_Node000077_Node000147" title=" " alt="" coords="1711,184,1711,232,1705,232,1705,184"/>
+<area shape="rect" id="Node000207" href="$does__remove__const_8cpp.html" title="Analyses." alt="" coords="1824,233,2008,287"/>
+<area shape="poly" id="edge58_Node000077_Node000207" title=" " alt="" coords="1768,174,1870,230,1867,235,1766,179"/>
+<area shape="rect" id="Node000208" href="$goto__rw_8h.html" title=" " alt="" coords="5,240,219,280"/>
+<area shape="poly" id="edge59_Node000077_Node000208" title=" " alt="" coords="1623,176,1604,180,1496,197,1397,208,1221,219,1064,217,918,208,772,199,615,196,438,203,339,213,231,228,169,243,168,237,230,223,339,208,438,198,615,190,772,194,918,203,1064,211,1220,213,1397,203,1496,191,1604,175,1622,171"/>
+<area shape="rect" id="Node000210" href="$local__cfg_8h.html" title="CFG for One Function." alt="" coords="243,240,463,280"/>
+<area shape="poly" id="edge60_Node000077_Node000210" title=" " alt="" coords="1622,176,1604,180,1434,204,1289,214,1161,214,1041,208,920,202,792,200,647,207,476,228,413,242,411,237,476,223,646,202,792,195,921,197,1041,203,1161,208,1289,208,1434,199,1604,175,1621,171"/>
+<area shape="rect" id="Node000219" href="$local__safe__pointers_8h.html" title="Local safe pointer analysis." alt="" coords="488,233,672,287"/>
+<area shape="poly" id="edge61_Node000077_Node000219" title=" " alt="" coords="1622,176,1604,180,1466,200,1347,208,1242,208,1144,204,1046,200,941,200,823,208,684,228,654,235,653,230,684,223,822,202,941,194,1046,195,1144,199,1242,203,1347,203,1465,195,1604,175,1621,171"/>
+<area shape="rect" id="Node000251" href="$uncaught__exceptions__analysis_8h.html" title="Over&#45;approximative uncaught exceptions analysis." alt="" coords="2032,233,2243,287"/>
+<area shape="poly" id="edge62_Node000077_Node000251" title=" " alt="" coords="1814,168,2021,223,2047,230,2046,235,2019,228,1813,173"/>
+<area shape="rect" id="Node000254" href="$abstract__object_8h.html" title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari..." alt="" coords="696,233,907,287"/>
+<area shape="poly" id="edge64_Node000077_Node000254" title=" " alt="" coords="1621,176,1604,180,1501,196,1413,204,1262,206,1111,206,1022,213,919,228,886,235,885,230,918,223,1022,208,1110,201,1262,201,1413,199,1500,191,1604,175,1620,171"/>
+<area shape="rect" id="Node000298" href="$destructor_8cpp.html" title="Destructor Calls." alt="" coords="1139,233,1333,287"/>
+<area shape="poly" id="edge65_Node000077_Node000298" title=" " alt="" coords="1618,176,1605,180,1534,196,1479,205,1423,213,1353,228,1324,235,1323,230,1351,223,1422,208,1478,199,1533,190,1603,175,1616,171"/>
+<area shape="poly" id="edge54_Node000078_Node000124" title=" " alt="" coords="1075,293,1159,347,1156,352,1072,297"/>
+<area shape="poly" id="edge63_Node000251_Node000009" title=" " alt="" coords="2163,298,2194,348,2190,351,2158,300"/>
 </map>

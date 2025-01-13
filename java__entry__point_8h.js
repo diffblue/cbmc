@@ -8,7 +8,7 @@ var java__entry__point_8h =
     [ "generate_java_start_function", "java__entry__point_8h.html#a452b9898c1b4bdb4325ec49ac7c29bd2", null ],
     [ "get_java_class_literal_initializer_signature", "java__entry__point_8h.html#adf20ddd9a3c3a13e61f9ad953636cd90", null ],
     [ "get_main_symbol", "java__entry__point_8h.html#acaff3be26674eba5d955f34ea5303343", null ],
-    [ "java_build_arguments", "java__entry__point_8h.html#acebe1d90a34bfb329a76709ff989cb41", null ],
+    [ "java_build_arguments", "java__entry__point_8h.html#aff4a75889b210ab5e1acc21f1d4e63c3", null ],
     [ "java_entry_point", "java__entry__point_8h.html#a5b6d33e67ed0ee6c7146714a7f8aa5b7", null ],
     [ "java_static_lifetime_init", "java__entry__point_8h.html#abd65be2aac4b3f8df061f9cda7fe4fbc", null ]
 ];

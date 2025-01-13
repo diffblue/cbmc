@@ -1,5 +1,7 @@
 <map id="call_grapht::directed_grapht" name="call_grapht::directed_grapht">
-<area shape="rect" id="node1" title="Directed graph representation of this call graph." alt="" coords="23,171,178,212"/>
-<area shape="rect" id="node2" href="$classgrapht.html" title=" " alt="" coords="5,95,196,121"/>
-<area shape="rect" id="node3" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="49,5,153,32"/>
+<area shape="rect" id="Node000001" title="Directed graph representation of this call graph." alt="" coords="23,168,178,208"/>
+<area shape="rect" id="Node000002" href="$classgrapht.html" title=" " alt="" coords="5,93,196,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,132,103,168,98,168,98,132"/>
+<area shape="rect" id="Node000003" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="49,5,153,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="103,45,103,93,98,93,98,45"/>
 </map>

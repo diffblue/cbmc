@@ -6,7 +6,7 @@ var classsmt2__tokenizert =
     [ "error", "classsmt2__tokenizert.html#a58f39c0316a4676d092519797539df16", null ],
     [ "error", "classsmt2__tokenizert.html#a9944c90bd857a2940a2a88115a68da81", null ],
     [ "get_bin_numeral", "classsmt2__tokenizert.html#a5a5c045337d09f4aeaa8f57a0d084357", null ],
-    [ "get_buffer", "classsmt2__tokenizert.html#a4814af0917196caed6312acd0cda3d6b", null ],
+    [ "get_buffer", "classsmt2__tokenizert.html#a8995048ca86b511846c4e41d4bf40a09", null ],
     [ "get_decimal_numeral", "classsmt2__tokenizert.html#a17166784c0bca1cd3ca11a768448b50e", null ],
     [ "get_hex_numeral", "classsmt2__tokenizert.html#af539043e70bd018518f459f1c571f48e", null ],
     [ "get_quoted_symbol", "classsmt2__tokenizert.html#a744592981c3852112ae4bf6a4e2b5aba", null ],

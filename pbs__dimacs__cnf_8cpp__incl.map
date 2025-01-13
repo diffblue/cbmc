@@ -1,19 +1,40 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/sat/pbs_dimacs_cnf.cpp" name="/home/runner/work/cbmc/cbmc/src/solvers/sat/pbs_dimacs_cnf.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="207,5,391,61"/>
-<area shape="rect" id="node2" href="$pbs__dimacs__cnf_8h.html" title=" " alt="" coords="59,109,197,136"/>
-<area shape="rect" id="node15" title=" " alt="" coords="221,109,286,136"/>
-<area shape="rect" id="node16" title=" " alt="" coords="311,109,377,136"/>
-<area shape="rect" id="node17" title=" " alt="" coords="402,109,475,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,184,48,211"/>
-<area shape="rect" id="node4" title=" " alt="" coords="72,184,123,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="273,557,337,584"/>
-<area shape="rect" id="node6" href="$dimacs__cnf_8h.html" title=" " alt="" coords="197,184,304,211"/>
-<area shape="rect" id="node7" href="$cnf__clause__list_8h.html" title="CNF Generation." alt="" coords="255,259,385,285"/>
-<area shape="rect" id="node8" title=" " alt="" coords="248,333,291,360"/>
-<area shape="rect" id="node9" href="$threeval_8h.html" title=" " alt="" coords="249,483,362,509"/>
-<area shape="rect" id="node10" href="$cnf_8h.html" title="CNF Generation, via Tseitin." alt="" coords="392,333,445,360"/>
-<area shape="rect" id="node11" href="$prop_8h.html" title=" " alt="" coords="372,408,519,435"/>
-<area shape="rect" id="node12" href="$src_2util_2message_8h.html" title=" " alt="" coords="386,483,505,509"/>
-<area shape="rect" id="node13" href="$literal_8h.html" title=" " alt="" coords="529,483,601,509"/>
-<area shape="rect" id="node14" title=" " alt="" coords="625,483,692,509"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="207,5,391,60"/>
+<area shape="rect" id="Node000002" href="$pbs__dimacs__cnf_8h.html" title=" " alt="" coords="59,108,197,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="248,62,165,104,162,99,245,58"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="221,108,286,133"/>
+<area shape="poly" id="edge19_Node000001_Node000014" title=" " alt="" coords="287,61,268,97,263,95,282,59"/>
+<area shape="rect" id="Node000040" title=" " alt="" coords="311,108,377,133"/>
+<area shape="poly" id="edge20_Node000001_Node000040" title=" " alt="" coords="315,59,334,95,329,97,310,61"/>
+<area shape="rect" id="Node000041" title=" " alt="" coords="402,108,475,133"/>
+<area shape="poly" id="edge21_Node000001_Node000041" title=" " alt="" coords="343,58,409,98,407,103,340,62"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,48,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,136,56,175,53,171,110,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="72,181,123,207"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="125,135,110,170,105,168,120,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="273,548,337,573"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="135,133,152,189,160,227,163,266,163,415,165,436,173,456,199,491,234,519,268,540,266,544,231,523,195,495,168,459,160,438,157,416,157,266,154,228,147,190,130,134"/>
+<area shape="rect" id="Node000006" href="$dimacs__cnf_8h.html" title=" " alt="" coords="197,181,304,207"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="149,131,220,172,218,177,146,136"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="248,208,226,264,217,301,213,339,213,415,218,459,240,499,258,520,278,538,275,542,254,524,235,501,213,461,208,415,208,339,212,300,221,262,243,206"/>
+<area shape="rect" id="Node000007" href="$cnf__clause__list_8h.html" title="CNF Generation." alt="" coords="255,255,385,280"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="264,205,301,243,297,247,260,209"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="248,328,291,353"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="314,282,288,318,283,315,309,279"/>
+<area shape="rect" id="Node000009" href="$threeval_8h.html" title=" " alt="" coords="249,475,362,500"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="322,281,310,461,304,460,317,280"/>
+<area shape="rect" id="Node000010" href="$cnf_8h.html" title="CNF Generation, via Tseitin." alt="" coords="392,328,445,353"/>
+<area shape="poly" id="edge11_Node000007_Node000010" title=" " alt="" coords="337,278,393,318,390,322,334,282"/>
+<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="308,500,308,534,303,534,303,500"/>
+<area shape="rect" id="Node000011" href="$prop_8h.html" title=" " alt="" coords="372,401,519,427"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="426,353,439,388,434,390,421,355"/>
+<area shape="poly" id="edge15_Node000011_Node000009" title=" " alt="" coords="424,429,341,471,339,466,422,424"/>
+<area shape="rect" id="Node000012" href="$src_2util_2message_8h.html" title=" " alt="" coords="386,475,505,500"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="448,427,448,461,443,461,443,427"/>
+<area shape="rect" id="Node000038" href="$literal_8h.html" title=" " alt="" coords="529,475,601,500"/>
+<area shape="poly" id="edge16_Node000011_Node000038" title=" " alt="" coords="466,424,535,465,532,470,463,429"/>
+<area shape="rect" id="Node000039" title=" " alt="" coords="625,475,692,500"/>
+<area shape="poly" id="edge18_Node000011_Node000039" title=" " alt="" coords="480,424,613,468,611,473,479,429"/>
+<area shape="poly" id="edge14_Node000012_Node000005" title=" " alt="" coords="424,502,341,544,339,539,422,498"/>
+<area shape="poly" id="edge17_Node000038_Node000005" title=" " alt="" coords="530,501,352,550,350,544,528,496"/>
 </map>

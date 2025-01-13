@@ -1,13 +1,23 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_contract_clauses_codegen.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_contract_clauses_codegen.h">
-<area shape="rect" id="node1" title="Translates assigns and frees clauses of a function contract or loop contract into goto programs that ..." alt="" coords="651,5,893,76"/>
-<area shape="rect" id="node2" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="121,131,361,187"/>
-<area shape="rect" id="node8" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="385,124,644,195"/>
-<area shape="rect" id="node9" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="669,124,875,195"/>
-<area shape="rect" id="node10" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="900,124,1097,195"/>
-<area shape="rect" id="node11" href="$dfcc__instrument__loop_8cpp.html" title=" " alt="" coords="1121,124,1319,195"/>
-<area shape="rect" id="node3" href="$dfcc_8cpp.html" title=" " alt="" coords="21,243,219,313"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,250,485,306"/>
-<area shape="rect" id="node5" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,361,240,417"/>
-<area shape="rect" id="node6" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,361,464,417"/>
-<area shape="rect" id="node7" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,361,747,417"/>
+<area shape="rect" id="Node000001" title="Translates assigns and frees clauses of a function contract or loop contract into goto programs that ..." alt="" coords="651,5,893,75"/>
+<area shape="rect" id="Node000002" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="121,130,361,185"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="638,70,374,125,343,133,342,127,373,120,637,65"/>
+<area shape="rect" id="Node000008" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="385,123,644,192"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="685,83,591,125,589,120,683,78"/>
+<area shape="rect" id="Node000009" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="669,123,875,192"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="775,89,775,122,769,122,769,89"/>
+<area shape="rect" id="Node000010" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="900,123,1097,192"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="851,79,934,120,931,125,849,83"/>
+<area shape="rect" id="Node000011" href="$dfcc__instrument__loop_8cpp.html" title=" " alt="" coords="1121,123,1319,192"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="907,69,1110,120,1122,123,1120,128,1109,125,906,75"/>
+<area shape="rect" id="Node000003" href="$dfcc_8cpp.html" title=" " alt="" coords="21,240,219,309"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="206,196,158,242,154,238,202,192"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,247,485,302"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="281,192,338,245,334,249,277,196"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,357,240,412"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="294,310,183,360,180,355,292,305"/>
+<area shape="rect" id="Node000006" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,357,464,412"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="367,316,367,357,361,357,361,316"/>
+<area shape="rect" id="Node000007" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,357,747,412"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="439,305,557,355,555,360,437,310"/>
 </map>

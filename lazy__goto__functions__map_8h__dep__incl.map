@@ -1,8 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/lazy_goto_functions_map.h" name="/home/runner/work/cbmc/cbmc/jbmc/src/java_bytecode/lazy_goto_functions_map.h">
-<area shape="rect" id="node1" title="Author: Diffblue Ltd." alt="" coords="355,5,573,61"/>
-<area shape="rect" id="node2" href="$lazy__goto__model_8h.html" title="Author: Diffblue Ltd." alt="" coords="355,109,573,165"/>
-<area shape="rect" id="node3" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="5,213,216,269"/>
-<area shape="rect" id="node4" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="240,213,459,269"/>
-<area shape="rect" id="node5" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="483,213,675,269"/>
-<area shape="rect" id="node6" href="$load__java__class_8cpp.html" title=" " alt="" coords="699,213,907,269"/>
+<area shape="rect" id="Node000001" title="Author: Diffblue Ltd." alt="" coords="355,5,573,60"/>
+<area shape="rect" id="Node000002" href="$lazy__goto__model_8h.html" title="Author: Diffblue Ltd." alt="" coords="355,108,573,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="467,74,467,108,461,108,461,74"/>
+<area shape="rect" id="Node000003" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="5,211,216,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="360,169,203,213,202,208,358,164"/>
+<area shape="rect" id="Node000004" href="$lazy__goto__model_8cpp.html" title="Author: Diffblue Ltd." alt="" coords="240,211,459,265"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="425,174,381,213,378,209,422,170"/>
+<area shape="rect" id="Node000005" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="483,211,675,265"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="506,170,550,209,547,213,503,174"/>
+<area shape="rect" id="Node000006" href="$load__java__class_8cpp.html" title=" " alt="" coords="699,211,907,265"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="566,164,715,208,714,213,564,169"/>
 </map>

@@ -5,7 +5,7 @@ var classpoints__tot =
     [ "points_tot", "classpoints__tot.html#af78e6be6481721782ef509ad79f3e943", null ],
     [ "fixedpoint", "classpoints__tot.html#a1ac579ac8678ca00e79bebfff56be3cc", null ],
     [ "operator()", "classpoints__tot.html#a8004fb58d4ed16feddd36c21f8ed1d50", null ],
-    [ "operator[]", "classpoints__tot.html#a3e2442bb9024b1b29d19163d4772559c", null ],
+    [ "operator[]", "classpoints__tot.html#a9ca9057a175e1f70c7013601ac1c2e91", null ],
     [ "output", "classpoints__tot.html#aff5723ea49cd014125760f714da625a1", null ],
     [ "transform", "classpoints__tot.html#a5ff40df7dd8e592517c51cd3fe27bba5", null ],
     [ "cfg", "classpoints__tot.html#a662ef175290a2b06edbd4c184f9ae9ca", null ],

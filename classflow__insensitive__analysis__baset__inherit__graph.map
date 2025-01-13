@@ -1,6 +1,10 @@
 <map id="flow_insensitive_analysis_baset" name="flow_insensitive_analysis_baset">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,193,47"/>
-<area shape="rect" id="node2" href="$classflow__insensitive__analysist.html" title=" " alt="" coords="660,5,853,47"/>
-<area shape="rect" id="node4" href="$classflow__insensitive__analysist.html" title=" " alt="" coords="243,38,473,65"/>
-<area shape="rect" id="node3" href="$classvalue__set__analysis__fit.html" title=" " alt="" coords="903,13,1069,39"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,193,45"/>
+<area shape="rect" id="Node000002" href="$classflow__insensitive__analysist.html" title=" " alt="" coords="660,5,853,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,16,217,16,427,12,636,16,660,17,660,22,636,21,427,17,217,21,207,22"/>
+<area shape="rect" id="Node000004" href="$classflow__insensitive__analysist.html" title=" " alt="" coords="243,38,473,63"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="207,33,243,37,242,42,207,39"/>
+<area shape="rect" id="Node000003" href="$classvalue__set__analysis__fit.html" title=" " alt="" coords="903,13,1069,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="867,23,903,23,903,28,867,28"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="487,52,561,50,636,45,659,42,660,48,636,51,561,56,487,57"/>
 </map>

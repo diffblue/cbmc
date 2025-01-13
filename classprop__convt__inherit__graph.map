@@ -1,14 +1,25 @@
 <map id="prop_convt" name="prop_convt">
-<area shape="rect" id="node1" title=" " alt="" coords="102,155,197,181"/>
-<area shape="rect" id="node4" href="$classprop__conv__solvert.html" title=" " alt="" coords="79,229,220,256"/>
-<area shape="rect" id="node2" href="$classstack__decision__proceduret.html" title=" " alt="" coords="52,80,247,107"/>
-<area shape="rect" id="node3" href="$classdecision__proceduret.html" title="An interface for a decision procedure for satisfiability problems." alt="" coords="73,5,226,32"/>
-<area shape="rect" id="node5" href="$classequalityt.html" title=" " alt="" coords="109,304,189,331"/>
-<area shape="rect" id="node6" href="$classarrayst.html" title=" " alt="" coords="115,379,183,405"/>
-<area shape="rect" id="node7" href="$classboolbvt.html" title=" " alt="" coords="114,453,185,480"/>
-<area shape="rect" id="node8" href="$classbv__pointers__widet.html" title=" " alt="" coords="5,528,147,555"/>
-<area shape="rect" id="node9" href="$classbv__pointerst.html" title=" " alt="" coords="171,528,274,555"/>
-<area shape="rect" id="node10" href="$classbv__dimacst.html" title=" " alt="" coords="25,603,122,629"/>
-<area shape="rect" id="node11" href="$classbv__minimizing__dect.html" title=" " alt="" coords="146,603,299,629"/>
-<area shape="rect" id="node12" href="$classbv__refinementt.html" title=" " alt="" coords="323,603,445,629"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="102,152,197,177"/>
+<area shape="rect" id="Node000004" href="$classprop__conv__solvert.html" title=" " alt="" coords="79,225,220,251"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="152,191,152,225,147,225,147,191"/>
+<area shape="rect" id="Node000002" href="$classstack__decision__proceduret.html" title=" " alt="" coords="52,79,247,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,118,152,152,147,152,147,118"/>
+<area shape="rect" id="Node000003" href="$classdecision__proceduret.html" title="An interface for a decision procedure for satisfiability problems." alt="" coords="73,5,226,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="152,44,152,79,147,79,147,44"/>
+<area shape="rect" id="Node000005" href="$classequalityt.html" title=" " alt="" coords="109,299,189,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="152,264,152,299,147,299,147,264"/>
+<area shape="rect" id="Node000006" href="$classarrayst.html" title=" " alt="" coords="115,372,183,397"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="152,338,152,372,147,372,147,338"/>
+<area shape="rect" id="Node000007" href="$classboolbvt.html" title=" " alt="" coords="114,445,185,471"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="152,411,152,445,147,445,147,411"/>
+<area shape="rect" id="Node000008" href="$classbv__pointers__widet.html" title=" " alt="" coords="5,519,147,544"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="129,482,90,520,86,517,126,478"/>
+<area shape="rect" id="Node000009" href="$classbv__pointerst.html" title=" " alt="" coords="171,519,274,544"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="173,478,213,517,209,520,169,482"/>
+<area shape="rect" id="Node000010" href="$classbv__dimacst.html" title=" " alt="" coords="25,592,122,617"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="188,552,99,594,97,589,185,547"/>
+<area shape="rect" id="Node000011" href="$classbv__minimizing__dect.html" title=" " alt="" coords="146,592,299,617"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="225,558,225,592,220,592,220,558"/>
+<area shape="rect" id="Node000012" href="$classbv__refinementt.html" title=" " alt="" coords="323,592,445,617"/>
+<area shape="poly" id="edge11_Node000009_Node000012" title=" " alt="" coords="262,547,359,589,357,594,260,552"/>
 </map>

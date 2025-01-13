@@ -1,7 +1,17 @@
 <map id="local_control_flow_historyt&lt; track_forward_jumps, track_backward_jumps &gt;" name="local_control_flow_historyt&lt; track_forward_jumps, track_backward_jumps &gt;">
-<area shape="rect" id="node1" title="Whether we track forwards and / or backwards jumps is compile&#45;time fixed as it does not need to be va..." alt="" coords="78,317,262,388"/>
-<area shape="rect" id="node2" href="$classai__history__baset.html" title="A history object is an abstraction / representation of the control&#45;flow part of a set of traces." alt="" coords="5,206,135,233"/>
-<area shape="rect" id="node3" title=" " alt="" coords="91,95,249,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="159,199,383,240"/>
-<area shape="rect" id="node4" title=" " alt="" coords="151,5,189,32"/>
+<area shape="rect" id="Node000001" title="Whether we track forwards and / or backwards jumps is compile&#45;time fixed as it does not need to be va..." alt="" coords="5,313,189,383"/>
+<area shape="rect" id="Node000002" href="$classai__history__baset.html" title="A history object is an abstraction / representation of the control&#45;flow part of a set of traces." alt="" coords="10,203,139,229"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,242,94,312,89,313,76,243"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="96,93,253,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="139,128,118,145,96,175,81,204,77,202,91,173,114,141,136,124"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="164,196,388,236"/>
+<area shape="poly" id="edge8_Node000005_Node000003" title=" " alt="" coords="212,124,234,141,255,168,270,195,265,197,251,171,230,145,209,128"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="155,5,194,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="177,45,177,93,172,93,172,45"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="163,244,136,262,118,286,107,314,102,312,114,284,133,258,160,240"/>
+<area shape="rect" id="Node000006" href="$classlocal__control__flow__decisiont.html" title="Records all local control&#45;flow decisions up to a limit of number of histories per location." alt="" coords="279,328,417,368"/>
+<area shape="poly" id="edge7_Node000006_Node000005" title=" " alt="" coords="310,244,321,259,337,294,347,327,342,328,332,296,316,261,306,247"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="315,319,294,291,283,263,276,237,281,236,288,262,298,288,319,316"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="413,196,563,236"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="459,248,370,330,366,326,455,244"/>
 </map>

@@ -12,7 +12,7 @@ var classui__message__handlert =
     [ "ui_message_handlert", "classui__message__handlert.html#abb51cb039ad8a7f8c0169dc390840075", null ],
     [ "command", "classui__message__handlert.html#a3cba7f8208e6c6650fad14e8069a6288", null ],
     [ "flush", "classui__message__handlert.html#a944903587017b47640cd3ca2c9260f9e", null ],
-    [ "get_json_stream", "classui__message__handlert.html#ad86b8e628073f14632a7966d58c9af7b", null ],
+    [ "get_json_stream", "classui__message__handlert.html#ad88f74028170b638a3242a69969e22e0", null ],
     [ "get_ui", "classui__message__handlert.html#a4919f7300bcf37134a46836b6061d8e5", null ],
     [ "json_ui_msg", "classui__message__handlert.html#a1b9ec25f957b5a873c47f41e34914e2a", null ],
     [ "level_string", "classui__message__handlert.html#a25b6b3149bf17e382ea0631f56e912bb", null ],

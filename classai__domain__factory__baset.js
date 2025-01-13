@@ -4,7 +4,7 @@ var classai__domain__factory__baset =
     [ "statet", "classai__domain__factory__baset.html#ade75ab7fc29edb2b60b2660bce425e37", null ],
     [ "trace_ptrt", "classai__domain__factory__baset.html#a273e2fbf1093c637ac2ec1825ecdc956", null ],
     [ "~ai_domain_factory_baset", "classai__domain__factory__baset.html#a2bf974633d09422f864c86df8ea474ac", null ],
-    [ "copy", "classai__domain__factory__baset.html#ac944ffe8f8891de7f0eb08094f85a5e3", null ],
-    [ "make", "classai__domain__factory__baset.html#a1cb82f9be8f362783b3add6dad842746", null ],
+    [ "copy", "classai__domain__factory__baset.html#ae17f63eeb73822d6588e876028a6c51a", null ],
+    [ "make", "classai__domain__factory__baset.html#aa664c7841bf77b9da2f0ea6a75c226fa", null ],
     [ "merge", "classai__domain__factory__baset.html#af46f7137596f21868aa7fbb00f39fb54", null ]
 ];

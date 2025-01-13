@@ -1,6 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classabstract__goto__modelt.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="5,56,169,83"/>
-<area shape="rect" id="node2" href="$classgoto__modelt.html" title=" " alt="" coords="247,5,351,32"/>
-<area shape="rect" id="node3" href="$classlazy__goto__modelt.html" title="A GOTO model that produces function bodies on demand." alt="" coords="230,56,369,83"/>
-<area shape="rect" id="node4" href="$classwrapper__goto__modelt.html" title="Class providing the abstract GOTO model interface onto an unrelated symbol table and goto_functionst." alt="" coords="217,107,381,133"/>
+<area shape="rect" id="Node000000" href="$classabstract__goto__modelt.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="5,55,169,80"/>
+<area shape="rect" id="Node000001" href="$classgoto__modelt.html" title=" " alt="" coords="247,5,351,31"/>
+<area shape="poly" id="edge35_Node000000_Node000001" title=" " alt="" coords="155,49,247,27,248,33,156,54"/>
+<area shape="rect" id="Node000002" href="$classlazy__goto__modelt.html" title="A GOTO model that produces function bodies on demand." alt="" coords="230,55,369,80"/>
+<area shape="poly" id="edge36_Node000000_Node000002" title=" " alt="" coords="183,65,230,65,230,70,183,70"/>
+<area shape="rect" id="Node000003" href="$classwrapper__goto__modelt.html" title="Class providing the abstract GOTO model interface onto an unrelated symbol table and goto_functionst." alt="" coords="217,104,381,129"/>
+<area shape="poly" id="edge37_Node000000_Node000003" title=" " alt="" coords="156,81,245,101,243,107,155,86"/>
 </map>

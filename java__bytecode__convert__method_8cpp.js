@@ -5,7 +5,7 @@ var java__bytecode__convert__method_8cpp =
     [ "conditional_array_cast", "java__bytecode__convert__method_8cpp.html#a5e90a49aa670371db7755335ce200e95", null ],
     [ "create_method_stub_symbol", "java__bytecode__convert__method_8cpp.html#abc75bc71f6f42c2564f0163ad2c0c044", null ],
     [ "create_parameter_names", "java__bytecode__convert__method_8cpp.html#ab4852145ef7c107d03efc0ad3ea84732", null ],
-    [ "create_parameter_symbols", "java__bytecode__convert__method_8cpp.html#a5f4b74ebec56526e2d911c14caf956ae", null ],
+    [ "create_parameter_symbols", "java__bytecode__convert__method_8cpp.html#a2851504eea45748dad0d41524632ef9d", null ],
     [ "gather_symbol_live_ranges", "java__bytecode__convert__method_8cpp.html#a3481fcc976b366b3da74c4321a044823", null ],
     [ "get_bytecode_type_width", "java__bytecode__convert__method_8cpp.html#ac9b217a160f54e6fb1f9023a3c6ebe7d", null ],
     [ "get_if_cmp_operator", "java__bytecode__convert__method_8cpp.html#af22eda6997f83cdf7d8a46ffe7e6737e", null ],

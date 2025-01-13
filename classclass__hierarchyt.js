@@ -11,7 +11,7 @@ var classclass__hierarchyt =
     [ "get_parents_trans", "classclass__hierarchyt.html#a071d3c5a7d67ba3f3d0367868aee02f1", null ],
     [ "get_parents_trans_rec", "classclass__hierarchyt.html#a486952a4996fe57dd21e6c928cb0dbc5", null ],
     [ "operator()", "classclass__hierarchyt.html#a9d04f6e6eddc3ae6f0e5cce72584e9ae", null ],
-    [ "operator=", "classclass__hierarchyt.html#a49f1c8cbb0441fff3d6ba2c2a2f8763c", null ],
+    [ "operator=", "classclass__hierarchyt.html#a7e31f2dec69cea8423b7f7659c0e6eb0", null ],
     [ "output", "classclass__hierarchyt.html#aaa9c23bfe635d76a80e9b0d4bf73c00d", null ],
     [ "output", "classclass__hierarchyt.html#ae5fbc3a2c035448108db9ae05e2f4eff", null ],
     [ "output_dot", "classclass__hierarchyt.html#a1901873de3068ac60758337819d37044", null ],

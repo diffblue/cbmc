@@ -8,7 +8,7 @@ var java__bytecode__language_8cpp =
     [ "get_ldc_result", "java__bytecode__language_8cpp.html#a3c7b9e03dd1d40715e91cf62be86ad2d", null ],
     [ "get_or_create_class_literal_symbol", "java__bytecode__language_8cpp.html#a7b9e981f92a8edf5f3895b78fd8cfa82", null ],
     [ "infer_opaque_type_fields", "java__bytecode__language_8cpp.html#a804fde4ecb2f7a094a782b7fb42cf714", null ],
-    [ "new_java_bytecode_language", "java__bytecode__language_8cpp.html#af98a1368e0fcaacd9dde2619df3d6ee8", null ],
+    [ "new_java_bytecode_language", "java__bytecode__language_8cpp.html#a5ffc0d6ceeab6b42b2191bfe0ab9abec", null ],
     [ "notify_static_method_calls", "java__bytecode__language_8cpp.html#aef1df774ac0641c50bc6c7e758076c47", null ],
     [ "parse_java_language_options", "java__bytecode__language_8cpp.html#a5f0e06ebc7eacc0ba5873086846e4306", null ],
     [ "throwMainClassLoadingError", "java__bytecode__language_8cpp.html#aa46b250a536aa77e245b3efe45027032", null ]

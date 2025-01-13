@@ -1,12 +1,25 @@
 <map id="nfat&lt; T &gt;" name="nfat&lt; T &gt;">
-<area shape="rect" id="node1" title="Very simple NFA implementation Not super performant, but should be good enough for our purposes." alt="" coords="1709,147,1796,174"/>
-<area shape="rect" id="node2" title=" " alt="" coords="1448,140,1588,181"/>
-<area shape="rect" id="node3" href="$structnfat_1_1transitiont.html" title=" " alt="" coords="1173,99,1335,126"/>
-<area shape="rect" id="node4" title=" " alt="" coords="819,85,989,141"/>
-<area shape="rect" id="node5" title=" " alt="" coords="474,5,617,47"/>
-<area shape="rect" id="node6" title=" " alt="" coords="127,13,309,39"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,43,44,70"/>
-<area shape="rect" id="node9" title=" " alt="" coords="469,76,621,117"/>
-<area shape="rect" id="node8" title=" " alt="" coords="199,143,237,170"/>
-<area shape="rect" id="node10" title=" " alt="" coords="655,190,785,217"/>
+<area shape="rect" id="Node000001" title="Very simple NFA implementation Not super performant, but should be good enough for our purposes." alt="" coords="1709,147,1796,173"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="1448,140,1588,180"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1602,157,1709,157,1709,163,1602,163"/>
+<area shape="rect" id="Node000003" href="$structnfat_1_1transitiont.html" title=" " alt="" coords="1173,99,1335,125"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1338,124,1448,145,1447,150,1337,130"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="474,5,617,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="631,24,795,33,973,57,1150,89,1189,97,1188,102,1149,95,972,62,794,39,631,29"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="819,85,989,139"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="631,45,646,48,795,79,819,85,818,90,794,84,645,53,630,50"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="127,13,309,38"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="323,23,474,23,474,28,323,28"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,43,44,69"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="58,48,137,35,138,41,58,53"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="469,77,621,117"/>
+<area shape="poly" id="edge10_Node000009_Node000006" title=" " alt="" coords="58,56,127,63,469,89,469,95,126,68,58,62"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="1003,109,1173,109,1173,115,1003,115"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="199,143,237,169"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="251,153,410,151,621,141,818,121,819,126,622,147,410,156,251,159"/>
+<area shape="poly" id="edge11_Node000009_Node000008" title=" " alt="" coords="251,148,469,108,470,113,252,153"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="655,190,785,215"/>
+<area shape="poly" id="edge13_Node000010_Node000008" title=" " alt="" coords="251,165,290,177,334,187,420,197,508,202,655,203,655,208,507,208,420,202,333,192,289,182,250,170"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="635,107,645,108,735,112,819,112,819,117,735,117,645,113,635,112"/>
+<area shape="poly" id="edge12_Node000002_Node000010" title=" " alt="" coords="798,196,1447,161,1448,166,798,201"/>
 </map>

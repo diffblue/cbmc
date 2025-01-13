@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_vector.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_vector.h">
-<area shape="rect" id="node1" title="Remove the &#39;vector&#39; data type by compilation into arrays." alt="" coords="269,5,453,61"/>
-<area shape="rect" id="node2" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="5,109,236,165"/>
-<area shape="rect" id="node3" href="$process__goto__program_8cpp.html" title="Get a Goto Program." alt="" coords="260,109,461,165"/>
-<area shape="rect" id="node4" href="$remove__vector_8cpp.html" title="Remove &#39;vector&#39; data type." alt="" coords="486,109,670,165"/>
+<area shape="rect" id="Node000001" title="Remove the &#39;vector&#39; data type by compilation into arrays." alt="" coords="269,5,453,60"/>
+<area shape="rect" id="Node000002" href="$multi__path__symex__checker_8cpp.html" title="Goto Checker using Bounded Model Checking." alt="" coords="5,108,236,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="287,68,184,110,182,105,285,63"/>
+<area shape="rect" id="Node000003" href="$process__goto__program_8cpp.html" title="Get a Goto Program." alt="" coords="260,108,461,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="363,74,363,108,358,108,358,74"/>
+<area shape="rect" id="Node000004" href="$remove__vector_8cpp.html" title="Remove &#39;vector&#39; data type." alt="" coords="486,108,670,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="431,63,522,106,520,110,428,68"/>
 </map>

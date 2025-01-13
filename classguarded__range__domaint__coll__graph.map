@@ -1,9 +1,15 @@
 <map id="guarded_range_domaint" name="guarded_range_domaint">
-<area shape="rect" id="node1" title=" " alt="" coords="53,332,233,359"/>
-<area shape="rect" id="node2" href="$classrange__domain__baset.html" title=" " alt="" coords="5,228,164,255"/>
-<area shape="rect" id="node3" title=" " alt="" coords="188,213,365,269"/>
-<area shape="rect" id="node4" href="$classrange__spect.html" title="Data type to describe upper and lower bounds of the range of bits that a read or write access may aff..." alt="" coords="170,95,271,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="295,95,463,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="327,5,365,32"/>
-<area shape="rect" id="node7" title=" " alt="" coords="392,5,431,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="53,328,233,353"/>
+<area shape="rect" id="Node000002" href="$classrange__domain__baset.html" title=" " alt="" coords="5,225,164,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,262,139,327,134,329,96,264"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="188,211,365,265"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="233,276,160,330,157,326,230,271"/>
+<area shape="rect" id="Node000004" href="$classrange__spect.html" title="Data type to describe upper and lower bounds of the range of bits that a read or write access may aff..." alt="" coords="170,93,271,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="233,130,268,209,263,211,229,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="295,93,463,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="364,131,300,212,295,209,360,128"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="327,5,365,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="349,44,355,68,370,92,366,95,350,70,344,45"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="392,5,431,31"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="405,45,386,94,381,92,400,43"/>
 </map>

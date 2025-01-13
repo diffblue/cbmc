@@ -1,6 +1,9 @@
 <map id="symbolt" name="symbolt">
-<area shape="rect" id="node1" title="Symbol table entry." alt="" coords="207,5,281,32"/>
-<area shape="rect" id="node2" href="$classauxiliary__symbolt.html" title="Internally generated symbol table entryThis is a symbol generated as part of translation to or modifi..." alt="" coords="5,80,144,107"/>
-<area shape="rect" id="node3" href="$classparameter__symbolt.html" title="Symbol table entry of function parameterThis is a symbol generated as part of type checking." alt="" coords="169,80,319,107"/>
-<area shape="rect" id="node4" href="$classtype__symbolt.html" title="Symbol table entry describing a data typeThis is a symbol generated as part of type checking." alt="" coords="343,80,454,107"/>
+<area shape="rect" id="Node000001" title="Symbol table entry." alt="" coords="207,5,281,31"/>
+<area shape="rect" id="Node000002" href="$classauxiliary__symbolt.html" title="Internally generated symbol table entryThis is a symbol generated as part of translation to or modifi..." alt="" coords="5,79,144,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,38,103,81,101,76,203,34"/>
+<area shape="rect" id="Node000003" href="$classparameter__symbolt.html" title="Symbol table entry of function parameterThis is a symbol generated as part of type checking." alt="" coords="169,79,319,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="247,44,247,79,241,79,241,44"/>
+<area shape="rect" id="Node000004" href="$classtype__symbolt.html" title="Symbol table entry describing a data typeThis is a symbol generated as part of type checking." alt="" coords="343,79,454,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="282,34,374,76,372,81,280,39"/>
 </map>

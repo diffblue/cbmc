@@ -1,6 +1,9 @@
 <map id="cfg_infot" name="cfg_infot">
-<area shape="rect" id="node1" title="Stores information about a goto function computed from its CFG." alt="" coords="218,5,297,32"/>
-<area shape="rect" id="node2" href="$classfunction__cfg__infot.html" title=" " alt="" coords="5,80,144,107"/>
-<area shape="rect" id="node3" href="$classgoto__program__cfg__infot.html" title="For a goto program." alt="" coords="169,80,346,107"/>
-<area shape="rect" id="node4" href="$classloop__cfg__infot.html" title=" " alt="" coords="371,80,485,107"/>
+<area shape="rect" id="Node000001" title="Stores information about a goto function computed from its CFG." alt="" coords="218,5,297,31"/>
+<area shape="rect" id="Node000002" href="$classfunction__cfg__infot.html" title=" " alt="" coords="5,79,144,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,38,106,81,104,76,214,33"/>
+<area shape="rect" id="Node000003" href="$classgoto__program__cfg__infot.html" title="For a goto program." alt="" coords="169,79,346,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="260,44,260,79,255,79,255,44"/>
+<area shape="rect" id="Node000004" href="$classloop__cfg__infot.html" title=" " alt="" coords="371,79,485,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="299,33,401,76,399,81,296,38"/>
 </map>

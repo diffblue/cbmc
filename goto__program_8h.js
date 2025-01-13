@@ -1,8 +1,8 @@
 var goto__program_8h =
 [
     [ "goto_programt", "classgoto__programt.html", "classgoto__programt" ],
-    [ "instructiont", "classgoto__programt_1_1instructiont.html", "classgoto__programt_1_1instructiont" ],
-    [ "target_less_than", "structgoto__programt_1_1instructiont_1_1target__less__than.html", "structgoto__programt_1_1instructiont_1_1target__less__than" ],
+    [ "goto_programt::instructiont", "classgoto__programt_1_1instructiont.html", "classgoto__programt_1_1instructiont" ],
+    [ "goto_programt::instructiont::target_less_than", "structgoto__programt_1_1instructiont_1_1target__less__than.html", "structgoto__programt_1_1instructiont_1_1target__less__than" ],
     [ "const_target_hash", "structconst__target__hash.html", "structconst__target__hash" ],
     [ "pointee_address_equalt", "structpointee__address__equalt.html", "structpointee__address__equalt" ],
     [ "forall_goto_program_instructions", "goto__program_8h.html#a21f949b9c8de9b9a887eb6e593d51728", null ],
@@ -30,11 +30,11 @@ var goto__program_8h =
       [ "INCOMPLETE_GOTO", "goto__program_8h.html#a9e03d66cd12c59d9d3daad1ec6296bebaf7e43d946323896d1fb9e9bfe0577fe9", null ]
     ] ],
     [ "as_string", "goto__program_8h.html#aa2c3adcf216997357d7d7dd65504df32", null ],
-    [ "expressions_read", "goto__program_8h.html#a3f7dcece899cf3ae0e44961eb51a6ddf", null ],
-    [ "expressions_written", "goto__program_8h.html#a97622e721ebb6e8f33d0de2d6adb749a", null ],
+    [ "expressions_read", "goto__program_8h.html#a63c96c8fcf89905934310f0c0bfcd64e", null ],
+    [ "expressions_written", "goto__program_8h.html#aae662f17cb285219f7fcf5ad63f57c77", null ],
     [ "for_each_instruction", "goto__program_8h.html#a565b9891fcb43c9a645bcaa4ae363f94", null ],
     [ "for_each_instruction_if", "goto__program_8h.html#ad131c513e5320eb20669eeaff55259bd", null ],
-    [ "objects_read", "goto__program_8h.html#af5e73fd7751bbccdcce5b2e7e1600cfb", null ],
-    [ "objects_written", "goto__program_8h.html#a462c8f6a852996163b3df949a114a679", null ],
-    [ "operator<<", "goto__program_8h.html#aec60d66bd090f7bb028921a7e4299f6a", null ]
+    [ "objects_read", "goto__program_8h.html#ae967a8473cd7cad8eb34ee67b0e7c23a", null ],
+    [ "objects_written", "goto__program_8h.html#a84768723bfe13087f8fec450e8fc4654", null ],
+    [ "operator<<", "goto__program_8h.html#a97c7447185455b1a77222957d3ebb2db", null ]
 ];

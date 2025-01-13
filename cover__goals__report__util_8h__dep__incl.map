@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/cover_goals_report_util.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;checker/cover_goals_report_util.h">
-<area shape="rect" id="node1" title="Cover Goals Reporting Utilities." alt="" coords="123,5,314,61"/>
-<area shape="rect" id="node2" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="5,117,211,173"/>
-<area shape="rect" id="node3" href="$cover__goals__verifier__with__trace__storage_8h.html" title="Goto verifier for covering goals that stores traces." alt="" coords="235,109,427,180"/>
-<area shape="rect" id="node4" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="228,228,433,284"/>
+<area shape="rect" id="Node000001" title="Cover Goals Reporting Utilities." alt="" coords="123,5,314,60"/>
+<area shape="rect" id="Node000002" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="5,115,211,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,72,137,117,133,113,180,68"/>
+<area shape="rect" id="Node000003" href="$cover__goals__verifier__with__trace__storage_8h.html" title="Goto verifier for covering goals that stores traces." alt="" coords="235,108,427,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="258,68,298,106,294,110,254,72"/>
+<area shape="rect" id="Node000004" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="228,225,433,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="333,191,333,225,328,225,328,191"/>
 </map>

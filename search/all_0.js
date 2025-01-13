@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['_24darwin_5fextsn_0',['$DARWIN_EXTSN',['../syslog_8c.html#a2a257ae2acc19027c72ada2b830b44de',1,'syslog.c']]]
+  ['0_20indexing_20threads_20only_0',['Level 0 indexing (threads only)',['../group__goto-symex.html#L0',1,'']]]
 ];

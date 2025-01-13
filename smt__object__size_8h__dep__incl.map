@@ -1,11 +1,25 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/smt2_incremental/smt_object_size.h" name="/home/runner/work/cbmc/cbmc/src/solvers/smt2_incremental/smt_object_size.h">
-<area shape="rect" id="node1" title=" " alt="" coords="375,5,603,61"/>
-<area shape="rect" id="node2" href="$convert__expr__to__smt_8h.html" title=" " alt="" coords="321,228,517,299"/>
-<area shape="rect" id="node5" href="$smt__object__size_8cpp.html" title=" " alt="" coords="5,347,189,417"/>
-<area shape="rect" id="node7" href="$smt2__incremental__decision__procedure_8h.html" title="Decision procedure with incremental SMT2 solving." alt="" coords="643,228,872,299"/>
-<area shape="rect" id="node9" href="$type__size__mapping_8h.html" title="Utilities for making a map of types to associated sizes." alt="" coords="463,109,647,180"/>
-<area shape="rect" id="node3" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="214,347,410,417"/>
-<area shape="rect" id="node4" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="643,347,872,417"/>
-<area shape="rect" id="node6" href="$type__size__mapping_8cpp.html" title=" " alt="" coords="435,347,619,417"/>
-<area shape="rect" id="node8" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="896,354,1080,410"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="375,5,603,60"/>
+<area shape="rect" id="Node000002" href="$convert__expr__to__smt_8h.html" title=" " alt="" coords="321,225,517,295"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="469,73,453,109,436,170,426,226,421,225,431,169,448,107,464,71"/>
+<area shape="rect" id="Node000005" href="$smt__object__size_8cpp.html" title=" " alt="" coords="5,343,189,412"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="451,71,138,344,134,340,447,67"/>
+<area shape="rect" id="Node000007" href="$smt2__incremental__decision__procedure_8h.html" title="Decision procedure with incremental SMT2 solving." alt="" coords="643,225,872,295"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="588,63,626,82,660,106,688,134,711,165,745,224,740,227,707,168,684,137,657,110,623,86,586,68"/>
+<area shape="rect" id="Node000009" href="$type__size__mapping_8h.html" title="Utilities for making a map of types to associated sizes." alt="" coords="463,108,647,177"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="515,71,537,106,532,109,510,74"/>
+<area shape="rect" id="Node000003" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="214,343,410,412"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="380,307,345,344,341,341,376,303"/>
+<area shape="rect" id="Node000004" href="$smt2__incremental__decision__procedure_8cpp.html" title=" " alt="" coords="643,343,872,412"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="531,296,660,340,658,345,529,301"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="313,302,190,346,189,341,311,297"/>
+<area shape="rect" id="Node000006" href="$type__size__mapping_8cpp.html" title=" " alt="" coords="435,343,619,412"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="462,303,497,341,493,344,458,307"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="760,309,760,342,755,342,755,309"/>
+<area shape="rect" id="Node000008" href="$solver__factory_8cpp.html" title="Solver Factory." alt="" coords="896,350,1080,405"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="838,299,937,348,934,352,836,303"/>
+<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="506,188,460,227,457,223,503,184"/>
+<area shape="poly" id="edge12_Node000009_Node000004" title=" " alt="" coords="573,189,597,242,633,293,661,319,693,340,690,345,658,323,629,296,593,244,568,191"/>
+<area shape="poly" id="edge14_Node000009_Node000006" title=" " alt="" coords="552,192,533,343,528,342,546,191"/>
+<area shape="poly" id="edge13_Node000009_Node000007" title=" " alt="" coords="627,182,699,223,697,227,625,187"/>
 </map>

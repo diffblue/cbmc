@@ -3,7 +3,7 @@ var classlanguage__filest =
     [ "file_mapt", "classlanguage__filest.html#a6672b48c8ddd04528f6cf9c09dddcba0", null ],
     [ "lazy_method_mapt", "classlanguage__filest.html#a9ef118fba1684ed8498d4433565ab267", null ],
     [ "module_mapt", "classlanguage__filest.html#a4a789ffcd70d6a31cbaa317448b01bec", null ],
-    [ "add_file", "classlanguage__filest.html#a2dbc0b8f8770f52604f68723baeee59a", null ],
+    [ "add_file", "classlanguage__filest.html#a8f90f29091e0909989dad8f0804157a3", null ],
     [ "can_convert_lazy_method", "classlanguage__filest.html#a9941dee0be80672a826af3ead6f94b8e", null ],
     [ "clear", "classlanguage__filest.html#a9fd80776f20f550c63d990f1849f24a8", null ],
     [ "clear_files", "classlanguage__filest.html#a215dbc04d881920de6669c72df5f4105", null ],

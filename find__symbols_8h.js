@@ -4,7 +4,7 @@ var find__symbols_8h =
     [ "find_non_pointer_type_symbols", "find__symbols_8h.html#a8ed2e802dbe343626841eec95b205239", null ],
     [ "find_non_pointer_type_symbols", "find__symbols_8h.html#a4f06bb25a7e1f536a0bec05c932ccaa7", null ],
     [ "find_symbol_identifiers", "find__symbols_8h.html#a05f2dae11de7edac6496370342cc664e", null ],
-    [ "find_symbols", "find__symbols_8h.html#acb9c53655e41a740947ed92aef1e4a3f", null ],
+    [ "find_symbols", "find__symbols_8h.html#aa50e76249c82e09369caa24e9b3e3049", null ],
     [ "find_symbols", "find__symbols_8h.html#ac94268f5bcbf2cf10e3de6d81e80e411", null ],
     [ "find_symbols", "find__symbols_8h.html#a9d76b8f1fa14d12f046a9a02c9cc5ddb", null ],
     [ "find_type_and_expr_symbols", "find__symbols_8h.html#a84e47296edc4cc7d9934bd1b335ff7ad", null ],

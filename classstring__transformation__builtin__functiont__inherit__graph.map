@@ -1,8 +1,13 @@
 <map id="string_transformation_builtin_functiont" name="string_transformation_builtin_functiont">
-<area shape="rect" id="node1" title="String builtin_function transforming one string into another." alt="" coords="225,104,388,145"/>
-<area shape="rect" id="node3" href="$classstring__concat__char__builtin__functiont.html" title="Adding a character at the end of a string." alt="" coords="449,5,593,47"/>
-<area shape="rect" id="node4" href="$classstring__set__char__builtin__functiont.html" title="Setting a character at a particular position of a string." alt="" coords="436,71,605,112"/>
-<area shape="rect" id="node5" href="$classstring__to__lower__case__builtin__functiont.html" title="Converting each uppercase character of Basic Latin and Latin&#45;1 supplement to the corresponding lowerc..." alt="" coords="441,136,600,177"/>
-<area shape="rect" id="node6" href="$classstring__to__upper__case__builtin__functiont.html" title="Converting each lowercase character of Basic Latin and Latin&#45;1 supplement to the corresponding upperc..." alt="" coords="441,201,601,243"/>
-<area shape="rect" id="node2" href="$classstring__builtin__functiont.html" title="Base class for string functions that are built in the solver." alt="" coords="5,111,177,138"/>
+<area shape="rect" id="Node000001" title="String builtin_function transforming one string into another." alt="" coords="225,101,388,141"/>
+<area shape="rect" id="Node000003" href="$classstring__concat__char__builtin__functiont.html" title="Adding a character at the end of a string." alt="" coords="449,5,593,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="357,92,435,55,464,43,466,48,437,60,359,97"/>
+<area shape="rect" id="Node000004" href="$classstring__set__char__builtin__functiont.html" title="Setting a character at a particular position of a string." alt="" coords="436,69,605,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="401,105,436,99,436,105,402,110"/>
+<area shape="rect" id="Node000005" href="$classstring__to__lower__case__builtin__functiont.html" title="Converting each uppercase character of Basic Latin and Latin&#45;1 supplement to the corresponding lowerc..." alt="" coords="441,133,600,173"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="402,133,442,139,441,144,402,138"/>
+<area shape="rect" id="Node000006" href="$classstring__to__upper__case__builtin__functiont.html" title="Converting each lowercase character of Basic Latin and Latin&#45;1 supplement to the corresponding upperc..." alt="" coords="441,197,601,237"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="359,145,437,183,466,195,464,200,435,188,357,150"/>
+<area shape="rect" id="Node000002" href="$classstring__builtin__functiont.html" title="Base class for string functions that are built in the solver." alt="" coords="5,109,177,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,119,225,119,225,124,192,124"/>
 </map>

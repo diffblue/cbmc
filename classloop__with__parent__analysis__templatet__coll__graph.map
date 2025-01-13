@@ -1,11 +1,25 @@
 <map id="loop_with_parent_analysis_templatet&lt; T, C &gt;" name="loop_with_parent_analysis_templatet&lt; T, C &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="17,541,212,583"/>
-<area shape="rect" id="node2" href="$classloop__templatet.html" title="A loop, specified as a set of instructions." alt="" coords="5,273,181,300"/>
-<area shape="rect" id="node8" title=" " alt="" coords="133,363,307,389"/>
-<area shape="rect" id="node3" title=" " alt="" coords="15,184,140,211"/>
-<area shape="rect" id="node4" title=" " alt="" coords="203,95,242,121"/>
-<area shape="rect" id="node9" title=" " alt="" coords="261,184,395,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="47,95,156,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="207,5,246,32"/>
-<area shape="rect" id="node7" href="$classloop__analysist.html" title=" " alt="" coords="132,452,303,479"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="142,544,337,584"/>
+<area shape="rect" id="Node000002" href="$classloop__templatet.html" title="A loop, specified as a set of instructions." alt="" coords="295,319,471,344"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="375,358,339,433,313,478,284,522,263,546,259,542,280,518,309,475,334,431,371,355"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="218,181,343,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,203,377,213,394,229,403,252,403,277,391,319,386,318,398,276,398,253,389,232,374,218,355,208"/>
+<area shape="rect" id="Node000009" href="$classloop__templatet.html" title="A loop, specified as a set of instructions." alt="" coords="197,269,373,295"/>
+<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="278,220,278,245,283,268,278,270,273,246,273,220"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="13,93,52,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="66,116,248,179,247,184,64,121"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,368,180,393"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="25,133,16,168,17,206,31,254,51,300,88,367,83,369,46,303,26,256,11,207,11,167,20,131"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="27,181,161,207"/>
+<area shape="poly" id="edge13_Node000010_Node000004" title=" " alt="" coords="31,132,36,156,48,169,63,179,60,183,44,173,32,159,26,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="242,93,351,119"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="295,133,286,181,280,180,289,132"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="185,5,224,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="229,38,286,91,282,95,225,42"/>
+<area shape="poly" id="edge12_Node000010_Node000006" title=" " alt="" coords="206,45,196,101,184,131,167,159,150,173,132,184,129,179,147,169,163,156,179,129,191,99,201,44"/>
+<area shape="rect" id="Node000007" href="$classloop__analysist.html" title=" " alt="" coords="93,456,263,481"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="183,494,191,519,212,542,208,546,186,521,178,496"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="116,401,168,454,164,457,112,405"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="251,303,117,370,114,366,248,298"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="92,220,86,269,87,324,93,367,88,368,82,325,81,269,87,220"/>
 </map>

@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/source_lines.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/source_lines.h">
-<area shape="rect" id="node1" title="Set of source code lines contributing to a basic block." alt="" coords="445,5,639,61"/>
-<area shape="rect" id="node2" href="$cover__basic__blocks_8h.html" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="337,109,531,165"/>
-<area shape="rect" id="node7" href="$source__lines_8cpp.html" title="Set of source code lines contributing to a basic block." alt="" coords="555,109,748,165"/>
-<area shape="rect" id="node3" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="5,213,199,269"/>
-<area shape="rect" id="node4" href="$cover__basic__blocks_8cpp.html" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="223,213,416,269"/>
-<area shape="rect" id="node5" href="$cover__instrument__branch_8cpp.html" title="Coverage Instrumentation for Branches." alt="" coords="441,213,659,269"/>
-<area shape="rect" id="node6" href="$cover__instrument__location_8cpp.html" title="Coverage Instrumentation for Location, i.e." alt="" coords="683,213,910,269"/>
+<area shape="rect" id="Node000001" title="Set of source code lines contributing to a basic block." alt="" coords="445,5,639,60"/>
+<area shape="rect" id="Node000002" href="$cover__basic__blocks_8h.html" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="337,108,531,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="505,72,464,110,460,106,502,68"/>
+<area shape="rect" id="Node000007" href="$source__lines_8cpp.html" title="Set of source code lines contributing to a basic block." alt="" coords="555,108,748,163"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="583,68,625,106,621,110,579,72"/>
+<area shape="rect" id="Node000003" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="5,211,199,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="336,169,189,213,188,208,334,164"/>
+<area shape="rect" id="Node000004" href="$cover__basic__blocks_8cpp.html" title="Basic blocks detection for Coverage Instrumentation." alt="" coords="223,211,416,265"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="395,174,351,213,348,209,392,170"/>
+<area shape="rect" id="Node000005" href="$cover__instrument__branch_8cpp.html" title="Coverage Instrumentation for Branches." alt="" coords="441,211,659,265"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="477,170,521,209,518,213,473,174"/>
+<area shape="rect" id="Node000006" href="$cover__instrument__location_8cpp.html" title="Coverage Instrumentation for Location, i.e." alt="" coords="683,211,910,265"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="542,164,703,208,701,213,541,169"/>
 </map>

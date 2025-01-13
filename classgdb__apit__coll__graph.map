@@ -1,13 +1,28 @@
 <map id="gdb_apit" name="gdb_apit">
-<area shape="rect" id="node1" title="Interface for running and querying GDB." alt="" coords="977,149,1056,175"/>
-<area shape="rect" id="node2" title=" " alt="" coords="297,149,383,175"/>
-<area shape="rect" id="node4" title=" " alt="" coords="628,5,791,47"/>
-<area shape="rect" id="node8" title=" " alt="" coords="616,193,803,219"/>
-<area shape="rect" id="node10" title=" " alt="" coords="640,244,779,285"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,141,144,183"/>
-<area shape="rect" id="node5" title=" " alt="" coords="273,43,407,70"/>
-<area shape="rect" id="node6" title=" " alt="" coords="55,43,94,70"/>
-<area shape="rect" id="node7" title=" " alt="" coords="55,251,94,278"/>
-<area shape="rect" id="node9" title=" " alt="" coords="275,251,405,278"/>
-<area shape="rect" id="node11" title=" " alt="" coords="257,302,423,329"/>
+<area shape="rect" id="Node000001" title="Interface for running and querying GDB." alt="" coords="977,135,1056,160"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="616,5,803,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="765,32,855,65,955,108,997,132,994,137,952,112,853,70,763,37"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="297,128,383,153"/>
+<area shape="poly" id="edge15_Node000001_Node000003" title=" " alt="" coords="397,139,977,144,977,150,397,144"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="396,122,591,62,615,48,664,28,666,33,617,52,593,67,397,127"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="640,177,779,217"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="398,150,447,159,640,186,639,192,446,165,397,155"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="628,241,791,281"/>
+<area shape="poly" id="edge11_Node000009_Node000003" title=" " alt="" coords="389,157,425,183,433,196,436,208,440,218,448,228,490,249,537,262,583,267,628,267,628,272,583,272,536,267,488,254,445,232,435,221,431,209,428,198,421,187,386,162"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,121,144,161"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="158,138,297,138,297,143,158,143"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="275,43,405,68"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="418,45,616,25,616,30,418,50"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="55,196,94,221"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="105,191,143,170,317,66,320,70,145,175,107,196"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="257,196,423,221"/>
+<area shape="poly" id="edge9_Node000008_Node000006" title=" " alt="" coords="108,206,257,206,257,211,108,211"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="273,287,407,312"/>
+<area shape="poly" id="edge14_Node000010_Node000006" title=" " alt="" coords="108,217,302,284,301,289,106,222"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="792,184,953,159,976,154,977,160,954,165,793,189"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="437,207,592,205,640,201,640,207,592,210,437,213"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="804,246,878,229,916,216,952,200,980,180,1002,158,1006,162,984,184,955,204,918,221,880,234,805,251"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="421,302,504,303,592,295,656,278,658,283,592,301,504,308,421,308"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="55,287,94,312"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="108,297,272,297,272,302,108,302"/>
 </map>

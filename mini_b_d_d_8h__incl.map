@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/bdd/miniBDD/miniBDD.h" name="/home/runner/work/cbmc/cbmc/src/solvers/bdd/miniBDD/miniBDD.h">
-<area shape="rect" id="node1" title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes." alt="" coords="125,5,309,61"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,109,48,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="72,109,123,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="147,109,205,136"/>
-<area shape="rect" id="node5" title=" " alt="" coords="229,109,288,136"/>
-<area shape="rect" id="node6" title=" " alt="" coords="313,109,375,136"/>
-<area shape="rect" id="node7" title=" " alt="" coords="399,109,502,136"/>
+<area shape="rect" id="Node000001" title="A minimalistic BDD library, following Bryant&#39;s original paper and Andersen&#39;s lecture notes." alt="" coords="125,5,309,60"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,108,48,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,63,62,107,60,102,158,58"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="72,108,123,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,62,126,102,123,98,179,58"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="147,108,205,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="207,61,190,97,185,94,202,59"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="229,108,288,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="232,59,250,94,245,97,228,61"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="313,108,375,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="258,58,317,98,314,102,255,62"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="399,108,502,133"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="290,58,407,101,405,106,288,63"/>
 </map>

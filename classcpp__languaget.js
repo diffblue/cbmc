@@ -11,7 +11,7 @@ var classcpp__languaget =
     [ "main_symbol", "classcpp__languaget.html#a7c4252dbac006cf443f60da0f45f950b", null ],
     [ "merge_symbol_table", "classcpp__languaget.html#a5d7258f5eed40cd7a339e7e552272ca0", null ],
     [ "modules_provided", "classcpp__languaget.html#ad3acc57401a54076b9a3b4a0668e1599", null ],
-    [ "new_language", "classcpp__languaget.html#a3c42c041a33c9323e956264015b350df", null ],
+    [ "new_language", "classcpp__languaget.html#a79dc789093cb9ceed059dc7285488f0d", null ],
     [ "parse", "classcpp__languaget.html#a0255b49358136f5320d56646e0ce7c60", null ],
     [ "preprocess", "classcpp__languaget.html#a51a0a5dc952f7def5c3af47cb6e481a6", null ],
     [ "set_language_options", "classcpp__languaget.html#a1c259ad979fa4a86940ca5c2690a5ce8", null ],

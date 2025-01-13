@@ -1,6 +1,9 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/elf_reader.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/elf_reader.h">
-<area shape="rect" id="node1" title="Read ELF." alt="" coords="31,5,215,61"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,109,69,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="93,109,152,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="177,109,239,136"/>
+<area shape="rect" id="Node000001" title="Read ELF." alt="" coords="31,5,215,60"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,108,69,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,62,61,100,57,96,95,58"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="93,108,152,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="125,60,125,94,120,94,120,60"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="177,108,239,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="151,58,189,96,185,100,147,62"/>
 </map>

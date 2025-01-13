@@ -1,9 +1,17 @@
 <map id="cfg_base_nodet&lt; T, I &gt;" name="cfg_base_nodet&lt; T, I &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="117,483,291,509"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="59,392,219,433"/>
-<area shape="rect" id="node3" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="52,303,193,329"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,184,184,225"/>
-<area shape="rect" id="node5" title=" " alt="" coords="30,95,165,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="78,5,117,32"/>
-<area shape="rect" id="node7" title=" " alt="" coords="203,5,242,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="117,480,291,505"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="53,391,213,431"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,439,196,478,192,482,157,443"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,184,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="72,234,59,255,49,278,45,303,49,327,60,345,73,362,104,388,101,392,70,366,55,348,44,329,39,303,44,277,54,252,68,231"/>
+<area shape="rect" id="Node000007" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="80,301,221,326"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="113,233,147,299,142,302,108,235"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="35,93,170,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="100,133,99,143,97,181,92,181,93,142,95,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="83,5,122,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="105,45,105,93,100,93,100,45"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="209,5,247,31"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="250,40,269,69,275,86,277,104,277,412,272,435,259,454,226,482,223,478,255,451,267,433,272,412,272,105,270,88,264,71,246,43"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="201,41,121,95,118,91,198,36"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="141,339,137,352,135,391,129,390,132,352,136,338"/>
 </map>

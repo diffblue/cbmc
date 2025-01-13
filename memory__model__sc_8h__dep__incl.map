@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model_sc.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;symex/memory_model_sc.h">
-<area shape="rect" id="node1" title="Memory models for partial order concurrency." alt="" coords="129,5,355,61"/>
-<area shape="rect" id="node2" href="$memory__model__sc_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="5,109,231,165"/>
-<area shape="rect" id="node3" href="$memory__model__tso_8h.html" title="Memory models for partial order concurrency." alt="" coords="255,109,480,165"/>
-<area shape="rect" id="node4" href="$memory__model__pso_8h.html" title="Memory models for partial order concurrency." alt="" coords="129,213,355,269"/>
-<area shape="rect" id="node7" href="$memory__model__tso_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="379,213,604,269"/>
-<area shape="rect" id="node5" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="35,317,219,373"/>
-<area shape="rect" id="node6" href="$memory__model__pso_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="244,317,469,373"/>
+<area shape="rect" id="Node000001" title="Memory models for partial order concurrency." alt="" coords="129,5,355,60"/>
+<area shape="rect" id="Node000002" href="$memory__model__sc_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="5,108,231,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,71,152,110,149,106,197,67"/>
+<area shape="rect" id="Node000003" href="$memory__model__tso_8h.html" title="Memory models for partial order concurrency." alt="" coords="255,108,480,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="287,67,336,106,333,110,284,71"/>
+<area shape="rect" id="Node000004" href="$memory__model__pso_8h.html" title="Memory models for partial order concurrency." alt="" coords="129,211,355,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="325,174,276,213,273,208,322,169"/>
+<area shape="rect" id="Node000007" href="$memory__model__tso_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="379,211,604,265"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="412,169,461,208,457,213,409,174"/>
+<area shape="rect" id="Node000005" href="$bmc__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="35,313,219,368"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="203,277,159,315,156,311,200,273"/>
+<area shape="rect" id="Node000006" href="$memory__model__pso_8cpp.html" title="Memory model for partial order concurrency." alt="" coords="244,313,469,368"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="284,273,328,311,325,315,281,277"/>
 </map>

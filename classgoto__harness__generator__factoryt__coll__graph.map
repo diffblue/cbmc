@@ -1,9 +1,15 @@
 <map id="goto_harness_generator_factoryt" name="goto_harness_generator_factoryt">
-<area shape="rect" id="node1" title="helper to select harness type by name." alt="" coords="52,317,231,359"/>
-<area shape="rect" id="node2" title=" " alt="" coords="60,213,223,255"/>
-<area shape="rect" id="node3" title=" " alt="" coords="31,109,118,136"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,5,144,47"/>
-<area shape="rect" id="node5" title=" " alt="" coords="142,109,277,136"/>
-<area shape="rect" id="node6" title=" " alt="" coords="179,13,218,39"/>
-<area shape="rect" id="node7" title=" " alt="" coords="245,13,283,39"/>
+<area shape="rect" id="Node000001" title="helper to select harness type by name." alt="" coords="52,313,231,353"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="60,211,223,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,265,144,313,139,313,139,265"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="31,108,118,133"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,144,132,209,127,212,87,146"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,5,144,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="77,59,77,108,72,108,72,59"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="142,108,277,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="197,146,156,212,151,209,193,144"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="179,13,218,38"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="201,52,203,84,208,107,203,108,197,84,195,52"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="245,13,283,38"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="255,52,237,85,220,109,216,106,232,83,251,49"/>
 </map>

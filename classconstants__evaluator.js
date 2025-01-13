@@ -5,7 +5,7 @@ var classconstants__evaluator =
     [ "adjust_expression_for_rounding_mode", "classconstants__evaluator.html#a756c4577bb45241dc38a792072012a7d", null ],
     [ "environment_with_rounding_mode", "classconstants__evaluator.html#ac3b83b36a18cce4084743fa622eec8f8", null ],
     [ "operator()", "classconstants__evaluator.html#a6145b3654376394d7e81bc7b8bb1a901", null ],
-    [ "reeval_operands", "classconstants__evaluator.html#a01cde7eb5b54898bebd55f2406d48e2a", null ],
+    [ "reeval_operands", "classconstants__evaluator.html#afc8759179b6e7ff302692856bda4fc8d", null ],
     [ "rounding_mode_is_not_set", "classconstants__evaluator.html#a56c418cc53d281c3323b918eb3252b11", null ],
     [ "top", "classconstants__evaluator.html#ae79225ef401a58c784bcec30c630e71e", null ],
     [ "transform", "classconstants__evaluator.html#a4255e1fc525aa23bab76514b3e1edd04", null ],

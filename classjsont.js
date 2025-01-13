@@ -29,7 +29,7 @@ var classjsont =
     [ "json_boolean", "classjsont.html#aa7e09b543f2a57d57e279496f2111b57", null ],
     [ "make_array", "classjsont.html#a261726632468c53cf0498c98c3afd324", null ],
     [ "make_object", "classjsont.html#a4f1e5bbf3421f0bca2410989685e6b04", null ],
-    [ "operator[]", "classjsont.html#a5fccc488fc06e6122cd6c54c0fe67f34", null ],
+    [ "operator[]", "classjsont.html#ac93780896732eeb34eb2f3f78025e6a4", null ],
     [ "output", "classjsont.html#aa48361a732cb68bcb1e8bbde6858e5fe", null ],
     [ "output_key", "classjsont.html#a5a2e3e7afe6407fea6782f9e970b871c", null ],
     [ "output_object", "classjsont.html#aeef438f0943936caf7c90644c2a5be64", null ],

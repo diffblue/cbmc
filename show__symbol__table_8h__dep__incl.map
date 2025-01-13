@@ -1,10 +1,17 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/show_symbol_table.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/show_symbol_table.h">
-<area shape="rect" id="node1" title="Show the symbol table." alt="" coords="784,5,968,61"/>
-<area shape="rect" id="node2" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="5,109,211,165"/>
-<area shape="rect" id="node3" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="235,109,477,165"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="501,109,760,165"/>
-<area shape="rect" id="node5" href="$show__symbol__table_8cpp.html" title="Show the symbol table." alt="" coords="784,109,968,165"/>
-<area shape="rect" id="node6" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="992,109,1261,165"/>
-<area shape="rect" id="node7" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="1285,109,1496,165"/>
-<area shape="rect" id="node8" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="1520,109,1712,165"/>
+<area shape="rect" id="Node000001" title="Show the symbol table." alt="" coords="715,5,899,60"/>
+<area shape="rect" id="Node000002" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="5,108,216,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="701,47,483,73,228,111,217,113,216,108,228,105,482,68,701,42"/>
+<area shape="rect" id="Node000003" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="240,108,432,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="702,57,445,111,433,113,432,108,443,105,701,52"/>
+<area shape="rect" id="Node000004" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="456,108,661,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="730,68,624,110,622,105,728,63"/>
+<area shape="rect" id="Node000005" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="685,108,928,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="809,74,809,108,804,108,804,74"/>
+<area shape="rect" id="Node000006" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="952,108,1211,163"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="892,62,1011,105,1009,110,890,67"/>
+<area shape="rect" id="Node000007" href="$show__symbol__table_8cpp.html" title="Show the symbol table." alt="" coords="1235,108,1419,163"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="912,48,1060,73,1223,105,1235,108,1234,113,1222,111,1059,79,911,53"/>
+<area shape="rect" id="Node000008" href="$memory__analyzer__parse__options_8cpp.html" title="Commandline parser for the memory analyzer executing main work." alt="" coords="1443,108,1712,163"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="913,42,1150,68,1431,105,1443,107,1442,112,1430,111,1150,74,912,47"/>
 </map>

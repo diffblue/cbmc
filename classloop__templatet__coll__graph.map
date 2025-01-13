@@ -1,7 +1,11 @@
 <map id="loop_templatet&lt; T, C &gt;" name="loop_templatet&lt; T, C &gt;">
-<area shape="rect" id="node1" title="A loop, specified as a set of instructions." alt="" coords="5,273,181,300"/>
-<area shape="rect" id="node2" title=" " alt="" coords="31,184,156,211"/>
-<area shape="rect" id="node3" title=" " alt="" coords="42,95,81,121"/>
-<area shape="rect" id="node4" title=" " alt="" coords="105,95,215,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="141,5,179,32"/>
+<area shape="rect" id="Node000001" title="A loop, specified as a set of instructions." alt="" coords="5,269,181,295"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="31,181,156,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,221,96,269,91,269,91,221"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="42,93,81,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="72,131,81,156,91,180,86,182,76,158,67,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="105,93,215,119"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="145,131,105,182,101,179,140,128"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="141,5,179,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="163,45,163,93,157,93,157,45"/>
 </map>

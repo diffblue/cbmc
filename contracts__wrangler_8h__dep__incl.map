@@ -1,8 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/contracts_wrangler.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/contracts_wrangler.h">
-<area shape="rect" id="node1" title="Parse and annotate contracts." alt="" coords="145,5,370,61"/>
-<area shape="rect" id="node2" href="$contracts__wrangler_8cpp.html" title="Parse and annotate contracts." alt="" coords="5,109,245,165"/>
-<area shape="rect" id="node3" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="269,109,512,165"/>
-<area shape="rect" id="node4" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="32,213,267,269"/>
-<area shape="rect" id="node5" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="291,213,491,269"/>
-<area shape="rect" id="node6" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="515,213,773,269"/>
+<area shape="rect" id="Node000001" title="Parse and annotate contracts." alt="" coords="145,5,370,60"/>
+<area shape="rect" id="Node000002" href="$contracts__wrangler_8cpp.html" title="Parse and annotate contracts." alt="" coords="5,108,245,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,70,162,110,158,106,211,66"/>
+<area shape="rect" id="Node000003" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="269,108,512,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="305,66,357,106,354,110,301,70"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="32,211,267,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="316,170,213,213,211,208,314,165"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="291,211,491,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="393,176,393,211,388,211,388,176"/>
+<area shape="rect" id="Node000006" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="515,211,773,265"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="470,165,579,208,577,213,468,170"/>
 </map>

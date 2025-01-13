@@ -26,8 +26,8 @@ var properties_8h =
     [ "is_property_to_check", "properties_8h.html#a1ca11fb3e78e66a6a72215fe5925951b", null ],
     [ "json", "properties_8h.html#ab36680245c3a3e38ca90fd64747b77fd", null ],
     [ "json", "properties_8h.html#a75671eec14a943a63c90339e2cb696b7", null ],
-    [ "operator&=", "properties_8h.html#ad688fe211621f12a8fe4ebfa295380fc", null ],
-    [ "operator|=", "properties_8h.html#a5b8f207c8db77abfa3fa0a3afd62528f", null ],
+    [ "operator&=", "properties_8h.html#a723589b7b106be060c0402a4f2523420", null ],
+    [ "operator|=", "properties_8h.html#a2cc6f92a2c01cc714a6b3d074383eeca", null ],
     [ "result_to_exit_code", "properties_8h.html#ab91b7ed2a40f68e03cd81db61d5acc2b", null ],
     [ "update_properties_from_goto_model", "properties_8h.html#a8a47fc8fe5da96f27e636c7df3563d41", null ],
     [ "xml", "properties_8h.html#acd585c0c596ee5156e84358863fb8794", null ]

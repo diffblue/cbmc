@@ -1,16 +1,29 @@
 <map id="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/gcc_version.h" name="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/gcc_version.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1219,5,1439,47"/>
-<area shape="rect" id="node2" href="$gcc__version_8cpp.html" title=" " alt="" coords="5,102,240,143"/>
-<area shape="rect" id="node3" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="264,95,469,151"/>
-<area shape="rect" id="node4" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="494,102,706,143"/>
-<area shape="rect" id="node5" href="$cpp__typecheck_8cpp.html" title="C++ Language Type Checking." alt="" coords="730,102,969,143"/>
-<area shape="rect" id="node6" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="993,95,1183,151"/>
-<area shape="rect" id="node7" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1208,95,1451,151"/>
-<area shape="rect" id="node8" href="$gcc__mode_8h.html" title="Base class for command line interpretation." alt="" coords="1475,95,1659,151"/>
-<area shape="rect" id="node11" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1683,95,1867,151"/>
-<area shape="rect" id="node12" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1891,95,2149,151"/>
-<area shape="rect" id="node13" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="2174,95,2437,151"/>
-<area shape="rect" id="node14" href="$api_8cpp.html" title=" " alt="" coords="2461,95,2645,151"/>
-<area shape="rect" id="node9" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="1371,199,1555,255"/>
-<area shape="rect" id="node10" href="$goto__cc__main_8cpp.html" title="GOTO&#45;CC Main Module." alt="" coords="1579,199,1763,255"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1219,5,1439,45"/>
+<area shape="rect" id="Node000002" href="$gcc__version_8cpp.html" title=" " alt="" coords="5,101,240,141"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1206,32,1020,37,782,49,518,68,252,96,208,103,207,98,252,91,517,62,782,43,1020,32,1206,26"/>
+<area shape="rect" id="Node000003" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="264,93,469,148"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1206,33,877,53,679,71,482,96,470,98,469,93,481,91,679,65,877,47,1206,28"/>
+<area shape="rect" id="Node000004" href="$cpp__parser_8cpp.html" title="C++ Parser." alt="" coords="494,101,706,141"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1205,39,978,61,718,96,679,103,678,98,717,91,977,56,1205,34"/>
+<area shape="rect" id="Node000005" href="$cpp__typecheck_8cpp.html" title="C++ Language Type Checking." alt="" coords="730,101,969,141"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1217,51,981,96,943,103,942,98,979,91,1216,45"/>
+<area shape="rect" id="Node000006" href="$cprover__parse__options_8cpp.html" title="cprover Command Line Options Processing" alt="" coords="993,93,1183,148"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1269,53,1157,96,1155,91,1267,48"/>
+<area shape="rect" id="Node000007" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1208,93,1451,148"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1332,59,1332,93,1327,93,1327,59"/>
+<area shape="rect" id="Node000008" href="$gcc__mode_8h.html" title="Base class for command line interpretation." alt="" coords="1475,93,1659,148"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1391,48,1501,91,1499,96,1389,53"/>
+<area shape="rect" id="Node000011" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1683,93,1867,148"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1447,45,1671,91,1683,93,1682,99,1670,96,1446,51"/>
+<area shape="rect" id="Node000012" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="1891,93,2149,148"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1453,37,1653,60,1879,91,1891,93,1890,98,1878,96,1653,65,1453,42"/>
+<area shape="rect" id="Node000013" href="$goto__synthesizer__parse__options_8cpp.html" title="Main Module." alt="" coords="2174,93,2437,148"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1453,30,1774,51,1968,69,2162,91,2174,92,2174,98,2161,96,1968,74,1774,57,1453,35"/>
+<area shape="rect" id="Node000014" href="$api_8cpp.html" title=" " alt="" coords="2461,93,2645,148"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1453,24,1646,27,1895,37,2172,57,2312,72,2450,91,2462,93,2461,98,2449,96,2312,77,2171,63,1894,43,1646,33,1453,29"/>
+<area shape="rect" id="Node000009" href="$gcc__mode_8cpp.html" title="GCC Mode." alt="" coords="1371,196,1555,251"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="1531,160,1492,198,1488,194,1528,156"/>
+<area shape="rect" id="Node000010" href="$goto__cc__main_8cpp.html" title="GOTO&#45;CC Main Module." alt="" coords="1579,196,1763,251"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="1606,156,1645,194,1642,198,1602,160"/>
 </map>

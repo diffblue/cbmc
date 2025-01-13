@@ -1,8 +1,13 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/xml_irep.h" name="/home/runner/work/cbmc/cbmc/src/util/xml_irep.h">
-<area shape="rect" id="node1" title=" " alt="" coords="44,5,228,47"/>
-<area shape="rect" id="node2" href="$xml_8h.html" title=" " alt="" coords="107,95,165,121"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,169,48,196"/>
-<area shape="rect" id="node4" title=" " alt="" coords="72,169,123,196"/>
-<area shape="rect" id="node5" title=" " alt="" coords="147,169,205,196"/>
-<area shape="rect" id="node6" title=" " alt="" coords="229,169,293,196"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="44,5,228,45"/>
+<area shape="rect" id="Node000002" href="$xml_8h.html" title=" " alt="" coords="107,93,165,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,46,139,79,133,79,133,46"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,167,48,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,121,58,161,55,157,117,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="72,167,123,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="132,120,112,156,108,153,127,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="147,167,205,192"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="145,118,165,153,160,156,140,120"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="229,167,293,192"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="157,116,230,157,228,162,155,121"/>
 </map>

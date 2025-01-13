@@ -13,8 +13,8 @@ var classguard__bddt =
     [ "operator!", "classguard__bddt.html#a0aa77fba74f580b37454bd80972fc482", null ],
     [ "operator=", "classguard__bddt.html#acf1b8b96745faba86ab2cb317bc9e9db", null ],
     [ "operator=", "classguard__bddt.html#a69a7525e19f142a673b8a58677c25c77", null ],
-    [ "operator-=", "classguard__bddt.html#afa492c36cef7296be929f2921249e51f", null ],
-    [ "operator|=", "classguard__bddt.html#af176bec0541454887db25fe77a509e38", null ],
+    [ "operator-=", "classguard__bddt.html#aa22c109aaf4887c808e0761e2c59de75", null ],
+    [ "operator|=", "classguard__bddt.html#a8829b52985f481bceed140c266418a5b", null ],
     [ "bdd", "classguard__bddt.html#abeb75f86ee0116e0c796ee228fd5e62c", null ],
     [ "is_always_simplified", "classguard__bddt.html#a73f6a0097390d178a37541e7b1c36d12", null ],
     [ "manager", "classguard__bddt.html#ac943d8934521bac8b96ef38439692682", null ]

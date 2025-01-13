@@ -1,10 +1,17 @@
 <map id="taint_parse_treet" name="taint_parse_treet">
-<area shape="rect" id="node1" title=" " alt="" coords="175,408,308,435"/>
-<area shape="rect" id="node2" title=" " alt="" coords="176,319,307,345"/>
-<area shape="rect" id="node3" href="$classtaint__parse__treet_1_1rulet.html" title=" " alt="" coords="96,215,237,256"/>
-<area shape="rect" id="node4" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,96,77,123"/>
-<area shape="rect" id="node5" title=" " alt="" coords="151,96,238,123"/>
-<area shape="rect" id="node6" title=" " alt="" coords="125,5,264,47"/>
-<area shape="rect" id="node7" title=" " alt="" coords="262,222,370,249"/>
-<area shape="rect" id="node8" title=" " alt="" coords="297,96,335,123"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="175,403,308,428"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="176,315,307,340"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="244,354,244,402,239,402,239,354"/>
+<area shape="rect" id="Node000003" href="$classtaint__parse__treet_1_1rulet.html" title=" " alt="" coords="96,212,237,252"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="190,262,210,289,232,313,228,316,206,292,185,265"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="5,95,77,120"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="40,134,41,161,52,186,72,204,97,216,95,221,69,209,47,190,36,162,35,134"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="151,95,238,120"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="192,134,174,212,168,211,186,133"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="125,5,264,45"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="197,59,197,94,192,94,192,59"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="262,219,370,245"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="302,258,275,292,254,316,250,313,271,289,298,254"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="297,95,335,120"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="319,134,319,219,313,219,313,134"/>
 </map>

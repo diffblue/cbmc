@@ -20,6 +20,6 @@ var java__bytecode__language_8h =
       [ "LAZY_METHODS_MODE_EXTERNAL_DRIVER", "java__bytecode__language_8h.html#a7ef72f294370e16463f94f040fe5bf8daf11aa1b70ee22a39b55738bafa1afc9b", null ]
     ] ],
     [ "get_context", "java__bytecode__language_8h.html#ab6b2ed49e69597e31f4c33497001e5dc", null ],
-    [ "new_java_bytecode_language", "java__bytecode__language_8h.html#af98a1368e0fcaacd9dde2619df3d6ee8", null ],
+    [ "new_java_bytecode_language", "java__bytecode__language_8h.html#a5ffc0d6ceeab6b42b2191bfe0ab9abec", null ],
     [ "parse_java_language_options", "java__bytecode__language_8h.html#a5f0e06ebc7eacc0ba5873086846e4306", null ]
 ];

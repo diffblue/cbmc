@@ -5,10 +5,7 @@ var dir_40e09ba5875136afe5f64e800a389a0d =
     [ "axioms.cpp", "axioms_8cpp.html", null ],
     [ "axioms.h", "axioms_8h.html", "axioms_8h" ],
     [ "bv_pointers_wide.cpp", "bv__pointers__wide_8cpp.html", "bv__pointers__wide_8cpp" ],
-    [ "bv_pointers_wide.h", "bv__pointers__wide_8h.html", [
-      [ "bv_pointers_widet", "classbv__pointers__widet.html", "classbv__pointers__widet" ],
-      [ "postponedt", "structbv__pointers__widet_1_1postponedt.html", "structbv__pointers__widet_1_1postponedt" ]
-    ] ],
+    [ "bv_pointers_wide.h", "bv__pointers__wide_8h.html", "bv__pointers__wide_8h" ],
     [ "c_safety_checks.cpp", "c__safety__checks_8cpp.html", "c__safety__checks_8cpp" ],
     [ "c_safety_checks.h", "c__safety__checks_8h.html", "c__safety__checks_8h" ],
     [ "counterexample_found.cpp", "counterexample__found_8cpp.html", "counterexample__found_8cpp" ],
@@ -17,9 +14,7 @@ var dir_40e09ba5875136afe5f64e800a389a0d =
     [ "cprover_parse_options.cpp", "cprover__parse__options_8cpp.html", "cprover__parse__options_8cpp" ],
     [ "cprover_parse_options.h", "cprover__parse__options_8h.html", "cprover__parse__options_8h" ],
     [ "endianness_map_wide.cpp", "endianness__map__wide_8cpp.html", null ],
-    [ "endianness_map_wide.h", "endianness__map__wide_8h.html", [
-      [ "endianness_map_widet", "classendianness__map__widet.html", "classendianness__map__widet" ]
-    ] ],
+    [ "endianness_map_wide.h", "endianness__map__wide_8h.html", "endianness__map__wide_8h" ],
     [ "equality_propagation.cpp", "equality__propagation_8cpp.html", "equality__propagation_8cpp" ],
     [ "equality_propagation.h", "equality__propagation_8h.html", "equality__propagation_8h" ],
     [ "find_variables.cpp", "find__variables_8cpp.html", "find__variables_8cpp" ],
@@ -55,9 +50,7 @@ var dir_40e09ba5875136afe5f64e800a389a0d =
     [ "solver.cpp", "solver_8cpp.html", "solver_8cpp" ],
     [ "solver.h", "solver_8h.html", "solver_8h" ],
     [ "solver_progress.cpp", "solver__progress_8cpp.html", null ],
-    [ "solver_progress.h", "solver__progress_8h.html", [
-      [ "solver_progresst", "classsolver__progresst.html", "classsolver__progresst" ]
-    ] ],
+    [ "solver_progress.h", "solver__progress_8h.html", "solver__progress_8h" ],
     [ "solver_types.cpp", "solver__types_8cpp.html", "solver__types_8cpp" ],
     [ "solver_types.h", "solver__types_8h.html", "solver__types_8h" ],
     [ "state.cpp", "state_8cpp.html", null ],

@@ -1,9 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/unwind.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/unwind.h">
-<area shape="rect" id="node1" title="Loop unwinding." alt="" coords="572,5,765,61"/>
-<area shape="rect" id="node2" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="5,117,199,173"/>
-<area shape="rect" id="node3" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="223,109,421,180"/>
-<area shape="rect" id="node4" href="$dfcc__library_8cpp.html" title=" " alt="" coords="445,109,642,180"/>
-<area shape="rect" id="node5" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="666,117,925,173"/>
-<area shape="rect" id="node6" href="$k__induction_8cpp.html" title="k&#45;induction" alt="" coords="949,117,1143,173"/>
-<area shape="rect" id="node7" href="$unwind_8cpp.html" title="Loop unwinding." alt="" coords="1167,117,1360,173"/>
+<area shape="rect" id="Node000001" title="Loop unwinding." alt="" coords="572,5,765,60"/>
+<area shape="rect" id="Node000002" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="5,115,199,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="559,50,394,75,212,111,184,118,183,113,211,105,393,70,558,45"/>
+<area shape="rect" id="Node000003" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="223,108,421,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="572,67,422,113,420,108,571,62"/>
+<area shape="rect" id="Node000004" href="$dfcc__library_8cpp.html" title=" " alt="" coords="445,108,642,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="629,71,584,110,581,106,626,67"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="666,115,925,170"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="712,67,766,113,763,117,709,72"/>
+<area shape="rect" id="Node000006" href="$k__induction_8cpp.html" title="k&#45;induction" alt="" coords="949,115,1143,170"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="780,61,937,105,962,113,961,118,936,111,778,66"/>
+<area shape="rect" id="Node000007" href="$unwind_8cpp.html" title="Loop unwinding." alt="" coords="1167,115,1360,170"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="780,43,957,68,1156,105,1184,113,1183,118,1155,111,956,73,779,49"/>
 </map>

@@ -1,7 +1,15 @@
 <map id="call_stack_historyt" name="call_stack_historyt">
-<area shape="rect" id="node1" title="Records the call stack Care must be taken when using this on recursive code; it will need the domain ..." alt="" coords="83,303,227,329"/>
-<area shape="rect" id="node2" href="$classai__history__baset.html" title="A history object is an abstraction / representation of the control&#45;flow part of a set of traces." alt="" coords="5,206,135,233"/>
-<area shape="rect" id="node3" title=" " alt="" coords="78,95,235,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="159,199,328,240"/>
-<area shape="rect" id="node4" title=" " alt="" coords="137,5,176,32"/>
+<area shape="rect" id="Node000001" title="Records the call stack Care must be taken when using this on recursive code; it will need the domain ..." alt="" coords="5,306,149,331"/>
+<area shape="rect" id="Node000002" href="$classai__history__baset.html" title="A history object is an abstraction / representation of the control&#45;flow part of a set of traces." alt="" coords="9,203,138,229"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,243,80,306,74,306,72,243"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="81,93,239,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="117,127,97,144,82,175,77,204,71,203,77,173,93,141,114,123"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="162,196,331,236"/>
+<area shape="poly" id="edge7_Node000005_Node000003" title=" " alt="" coords="194,124,213,141,231,168,243,194,238,196,226,170,209,144,191,128"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="141,5,179,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="163,45,163,93,157,93,157,45"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="179,244,143,262,113,285,90,308,86,304,109,281,140,258,177,239"/>
+<area shape="rect" id="Node000006" href="$classcall__stack__historyt_1_1call__stack__entryt.html" title=" " alt="" coords="173,299,317,339"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="245,250,244,260,245,298,240,298,239,260,240,250"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="277,287,285,274,287,264,285,255,271,238,275,234,289,253,292,264,291,276,282,290"/>
 </map>

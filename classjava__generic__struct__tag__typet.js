@@ -4,6 +4,6 @@ var classjava__generic__struct__tag__typet =
     [ "java_generic_struct_tag_typet", "classjava__generic__struct__tag__typet.html#a514aa28f76221114ca357393edd174fb", null ],
     [ "java_generic_struct_tag_typet", "classjava__generic__struct__tag__typet.html#aa81e7378832224cfb92714efeedfcb1e", null ],
     [ "generic_type_index", "classjava__generic__struct__tag__typet.html#ac4457bb048d2b9433caaf5352f445645", null ],
-    [ "generic_types", "classjava__generic__struct__tag__typet.html#aaca306c6c7510a43977d6ad5897e6e2b", null ],
-    [ "generic_types", "classjava__generic__struct__tag__typet.html#a8d6453ce1270b85c3c43c8fbfa3d76f7", null ]
+    [ "generic_types", "classjava__generic__struct__tag__typet.html#a0be992c7d28e2e189e323b5276ec94a5", null ],
+    [ "generic_types", "classjava__generic__struct__tag__typet.html#a6a2d216fce3fe3972b614a5e8692d4a9", null ]
 ];

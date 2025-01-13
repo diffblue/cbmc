@@ -1,8 +1,8 @@
 var smt2__format_8h =
 [
-    [ "smt2_format_containert", "structsmt2__format__containert.html", "structsmt2__format__containert" ],
-    [ "operator<<", "smt2__format_8h.html#a20d068b0bd35b3acd8b8fdb23fa791a8", null ],
-    [ "smt2_format", "smt2__format_8h.html#ae9974f56207cf1086256da014d824be0", null ],
-    [ "smt2_format_rec", "smt2__format_8h.html#aa0aff05b73ab87c5bb0b89b35ad2d701", null ],
-    [ "smt2_format_rec", "smt2__format_8h.html#ab75e2772ae58550b238a389a62ad19d3", null ]
+    [ "smt2_format_containert< T >", "structsmt2__format__containert.html", "structsmt2__format__containert" ],
+    [ "operator<<", "smt2__format_8h.html#a87b39b03d01be9dedea75de46e31275e", null ],
+    [ "smt2_format", "smt2__format_8h.html#a22e3181e198d5918128a319099f30e85", null ],
+    [ "smt2_format_rec", "smt2__format_8h.html#a87c2e8d3df6f81c8be941aa060b9f3ba", null ],
+    [ "smt2_format_rec", "smt2__format_8h.html#ae4dade77f57655232a021f9a346b71ab", null ]
 ];

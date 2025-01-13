@@ -1,6 +1,11 @@
 <map id="/home/runner/work/cbmc/cbmc/src/analyses/local_bitvector_analysis.h" name="/home/runner/work/cbmc/cbmc/src/analyses/local_bitvector_analysis.h">
-<area shape="rect" id="node1" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="231,5,415,61"/>
-<area shape="rect" id="node2" href="$local__bitvector__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis." alt="" coords="5,109,189,165"/>
-<area shape="rect" id="node3" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="214,109,431,165"/>
-<area shape="rect" id="node4" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="456,109,715,165"/>
+<area shape="rect" id="Node000001" title="Field&#45;insensitive, location&#45;sensitive bitvector analysis." alt="" coords="357,5,541,60"/>
+<area shape="rect" id="Node000002" href="$local__bitvector__analysis_8cpp.html" title="Field&#45;insensitive, location&#45;sensitive may&#45;alias analysis." alt="" coords="5,108,189,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="345,66,190,111,188,105,344,61"/>
+<area shape="rect" id="Node000003" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="214,108,431,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="407,71,357,110,354,106,404,67"/>
+<area shape="rect" id="Node000004" href="$goto__analyzer__parse__options_8cpp.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="456,108,699,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="495,66,545,106,542,110,492,70"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="723,108,981,163"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="556,58,748,105,747,111,554,63"/>
 </map>

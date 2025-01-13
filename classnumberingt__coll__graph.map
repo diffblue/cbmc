@@ -1,9 +1,16 @@
 <map id="numberingt&lt; keyt, hasht &gt;" name="numberingt&lt; keyt, hasht &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="800,61,999,88"/>
-<area shape="rect" id="node2" title=" " alt="" coords="511,16,674,72"/>
-<area shape="rect" id="node3" title=" " alt="" coords="157,23,309,65"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,5,44,32"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,76,44,103"/>
-<area shape="rect" id="node7" title=" " alt="" coords="169,96,298,123"/>
-<area shape="rect" id="node6" title=" " alt="" coords="503,96,683,123"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="800,39,999,65"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="503,7,683,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="697,28,800,39,799,44,696,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="169,7,298,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="311,17,502,17,502,23,311,23"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,29,44,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="57,35,168,24,169,29,58,41"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="157,64,309,104"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="58,51,69,55,158,72,157,78,67,60,56,56"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="511,57,674,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="687,71,800,60,800,65,688,77"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="323,81,511,81,511,87,323,87"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,98,44,123"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="58,110,133,107,162,101,163,107,134,112,58,115"/>
 </map>

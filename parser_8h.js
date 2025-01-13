@@ -7,5 +7,5 @@ var parser_8h =
     [ "stack_type", "parser_8h.html#adba476d747b84e969ada235e47922eae", null ],
     [ "YY_INPUT", "parser_8h.html#aacfdca45fa4beb8b06172525a53c424a", null ],
     [ "YY_USER_ACTION", "parser_8h.html#a6198b2fcf96178b24ad4efff2a3debb0", null ],
-    [ "_newstack", "parser_8h.html#a5bb666c6222814ac13c43acbf290380c", null ]
+    [ "_newstack", "parser_8h.html#a1303031263d5c3974513a9dd0e4dfdec", null ]
 ];

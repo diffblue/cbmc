@@ -1,40 +1,77 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_skip.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/remove_skip.h">
-<area shape="rect" id="node1" title="Program Transformation." alt="" coords="4339,5,4523,61"/>
-<area shape="rect" id="node2" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="5,117,223,173"/>
-<area shape="rect" id="node3" href="$goto__convert_8cpp.html" title="Program Transformation." alt="" coords="247,117,461,173"/>
-<area shape="rect" id="node4" href="$string__instrumentation_8cpp.html" title="String Abstraction." alt="" coords="486,117,763,173"/>
-<area shape="rect" id="node5" href="$remove__asm_8cpp.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="787,117,998,173"/>
-<area shape="rect" id="node6" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="1022,117,1227,173"/>
-<area shape="rect" id="node7" href="$static__simplifier_8cpp.html" title=" " alt="" coords="1251,117,1435,173"/>
-<area shape="rect" id="node8" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="1459,117,1643,173"/>
-<area shape="rect" id="node9" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="1668,109,1917,180"/>
-<area shape="rect" id="node10" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="1941,117,2204,173"/>
-<area shape="rect" id="node11" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="2229,117,2463,173"/>
-<area shape="rect" id="node12" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="2488,117,2681,173"/>
-<area shape="rect" id="node13" href="$dfcc_8cpp.html" title=" " alt="" coords="2706,109,2903,180"/>
-<area shape="rect" id="node14" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="2927,109,3125,180"/>
-<area shape="rect" id="node15" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="3149,109,3346,180"/>
-<area shape="rect" id="node16" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="3371,117,3564,173"/>
-<area shape="rect" id="node17" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="3588,117,3781,173"/>
-<area shape="rect" id="node18" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="3806,117,4027,173"/>
-<area shape="rect" id="node19" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="4051,117,4310,173"/>
-<area shape="rect" id="node20" href="$havoc__loops_8cpp.html" title="Havoc Loops." alt="" coords="4335,117,4528,173"/>
-<area shape="rect" id="node21" href="$k__induction_8cpp.html" title="k&#45;induction" alt="" coords="4552,117,4745,173"/>
-<area shape="rect" id="node22" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="4769,117,4963,173"/>
-<area shape="rect" id="node23" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="4987,117,5180,173"/>
-<area shape="rect" id="node24" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="5204,117,5397,173"/>
-<area shape="rect" id="node25" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="5421,117,5615,173"/>
-<area shape="rect" id="node26" href="$goto__check_8cpp.html" title="GOTO Programs." alt="" coords="5639,117,5823,173"/>
-<area shape="rect" id="node27" href="$remove__function__pointers_8cpp.html" title="Program Transformation." alt="" coords="5848,117,6071,173"/>
-<area shape="rect" id="node28" href="$remove__returns_8cpp.html" title="Replace function returns by assignments to global variables." alt="" coords="6095,117,6279,173"/>
-<area shape="rect" id="node29" href="$remove__skip_8cpp.html" title="Program Transformation." alt="" coords="6303,117,6487,173"/>
-<area shape="rect" id="node30" href="$remove__virtual__functions_8cpp.html" title="Remove Virtual Function (Method) Calls." alt="" coords="6511,117,6730,173"/>
-<area shape="rect" id="node31" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="6754,117,6951,173"/>
-<area shape="rect" id="node32" href="$api_8cpp.html" title=" " alt="" coords="6975,117,7159,173"/>
-<area shape="rect" id="node33" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="7183,117,7394,173"/>
-<area shape="rect" id="node34" href="$convert__java__nondet_8cpp.html" title="Convert side_effect_expr_nondett expressions." alt="" coords="7418,117,7637,173"/>
-<area shape="rect" id="node35" href="$remove__exceptions_8cpp.html" title="Remove exception handling." alt="" coords="7661,117,7879,173"/>
-<area shape="rect" id="node36" href="$replace__java__nondet_8cpp.html" title="Replace Java Nondet expressions." alt="" coords="7903,117,8122,173"/>
-<area shape="rect" id="node37" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="8146,117,8338,173"/>
-<area shape="rect" id="node38" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="8362,117,8546,173"/>
+<area shape="rect" id="Node000001" title="Program Transformation." alt="" coords="4321,5,4505,60"/>
+<area shape="rect" id="Node000002" href="$janalyzer__parse__options_8cpp.html" title="JANALYZER Command Line Option Processing." alt="" coords="5,115,216,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="4307,37,3471,40,2194,51,1540,61,954,73,497,90,336,100,228,111,193,118,192,113,228,105,335,94,497,85,954,68,1540,55,2194,46,3471,35,4307,32"/>
+<area shape="rect" id="Node000003" href="$convert__java__nondet_8cpp.html" title="Convert side_effect_expr_nondett expressions." alt="" coords="240,115,459,170"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="4307,37,3514,42,2314,54,1700,63,1151,76,723,91,572,101,471,111,434,118,433,113,470,105,571,95,723,86,1151,71,1700,58,2314,48,3514,36,4307,32"/>
+<area shape="rect" id="Node000004" href="$remove__exceptions_8cpp.html" title="Remove exception handling." alt="" coords="483,115,701,170"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="4308,37,3558,43,2434,55,1861,65,1349,77,949,93,808,101,714,111,677,118,676,113,713,105,807,96,949,87,1348,72,1861,60,2434,50,3558,37,4308,32"/>
+<area shape="rect" id="Node000005" href="$replace__java__nondet_8cpp.html" title="Replace Java Nondet expressions." alt="" coords="725,115,944,170"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="4308,37,3602,44,2555,57,1546,79,1175,94,1044,102,956,111,919,118,918,113,956,105,1043,96,1175,88,1546,74,2555,52,3602,38,4308,32"/>
+<area shape="rect" id="Node000006" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="968,115,1160,170"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="4307,37,3641,43,2662,56,2164,66,1721,78,1376,93,1254,101,1172,111,1139,118,1138,113,1172,105,1253,96,1375,88,1721,73,2164,61,2661,51,3641,38,4307,32"/>
+<area shape="rect" id="Node000007" href="$jdiff__parse__options_8cpp.html" title="JDIFF Command Line Option Processing." alt="" coords="1184,115,1368,170"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="4307,37,3679,44,2765,57,1890,79,1569,93,1456,102,1380,111,1349,118,1347,113,1380,105,1455,96,1569,88,1890,74,2765,52,3679,38,4307,32"/>
+<area shape="rect" id="Node000008" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="1393,115,1610,170"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="4308,38,3725,46,2887,61,2088,83,1795,96,1622,111,1586,118,1585,113,1621,105,1794,91,2087,78,2887,56,3725,41,4308,33"/>
+<area shape="rect" id="Node000009" href="$goto__convert_8cpp.html" title="Program Transformation." alt="" coords="1634,115,1849,170"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="4307,36,3816,37,3108,46,2737,55,2388,68,2088,86,1862,111,1826,118,1825,113,1861,105,2088,81,2388,63,2737,50,3108,40,3816,32,4307,31"/>
+<area shape="rect" id="Node000010" href="$string__instrumentation_8cpp.html" title="String Abstraction." alt="" coords="1873,115,2151,170"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="4307,38,3869,43,3249,55,2622,77,2361,92,2163,111,2119,118,2118,113,2162,105,2360,87,2622,72,3249,50,3869,38,4307,32"/>
+<area shape="rect" id="Node000011" href="$remove__asm_8cpp.html" title="Remove &#39;asm&#39; statements by compiling them into suitable standard goto program instructions." alt="" coords="2175,115,2385,170"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="4308,37,3910,41,3358,53,3071,62,2803,75,2572,91,2398,111,2363,118,2362,113,2397,105,2572,85,2803,69,3071,57,3357,47,3910,36,4308,32"/>
+<area shape="rect" id="Node000012" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="2409,115,2615,170"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="4307,38,3950,43,3465,56,2980,77,2779,92,2627,111,2593,118,2592,113,2626,105,2779,87,2980,72,3465,50,3950,38,4307,32"/>
+<area shape="rect" id="Node000013" href="$static__simplifier_8cpp.html" title=" " alt="" coords="2639,115,2823,170"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="4307,38,3988,44,3563,57,3142,78,2967,93,2835,111,2805,118,2803,113,2834,105,2967,88,3141,73,3563,51,3988,39,4307,33"/>
+<area shape="rect" id="Node000014" href="$goto__diff__parse__options_8cpp.html" title="GOTO&#45;DIFF Command Line Option Processing." alt="" coords="2847,115,3031,170"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="4308,39,4027,47,3662,60,3304,82,3156,95,3043,111,3013,118,3011,113,3042,105,3155,90,3303,76,3662,55,4027,41,4308,34"/>
+<area shape="rect" id="Node000015" href="$disjunctive__polynomial__acceleration_8cpp.html" title="Loop Acceleration." alt="" coords="3055,108,3305,177"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="4307,38,4120,43,3873,54,3596,76,3454,92,3316,111,3305,113,3304,107,3316,105,3454,86,3595,71,3873,49,4120,37,4307,32"/>
+<area shape="rect" id="Node000016" href="$sat__path__enumerator_8cpp.html" title="Loop Acceleration." alt="" coords="3329,115,3591,170"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="4308,42,3992,64,3798,84,3604,111,3566,118,3565,113,3604,105,3797,79,3991,59,4307,36"/>
+<area shape="rect" id="Node000017" href="$scratch__program_8cpp.html" title="Loop Acceleration." alt="" coords="3616,115,3851,170"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="4308,47,4101,72,3863,111,3830,118,3829,113,3862,105,4101,67,4307,42"/>
+<area shape="rect" id="Node000018" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="3875,115,4069,170"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="4309,58,4082,111,4056,118,4055,113,4081,105,4307,53"/>
+<area shape="rect" id="Node000019" href="$dfcc_8cpp.html" title=" " alt="" coords="4093,108,4291,177"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="4348,69,4262,110,4260,105,4346,64"/>
+<area shape="rect" id="Node000020" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="4315,108,4512,177"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="4416,74,4416,108,4411,108,4411,74"/>
+<area shape="rect" id="Node000021" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="4536,108,4733,177"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="4481,64,4567,105,4564,110,4478,69"/>
+<area shape="rect" id="Node000022" href="$cover_8cpp.html" title="Coverage Instrumentation." alt="" coords="4758,115,4951,170"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="4519,53,4746,105,4772,113,4771,118,4745,111,4518,58"/>
+<area shape="rect" id="Node000023" href="$full__slicer_8cpp.html" title="Slicing." alt="" coords="4975,115,5169,170"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="4520,40,4727,64,4846,83,4965,105,4993,113,4992,118,4963,111,4845,88,4726,70,4519,46"/>
+<area shape="rect" id="Node000024" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="5193,115,5415,170"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="4519,36,4819,57,5000,78,5182,105,5216,113,5215,118,5181,111,5000,83,4818,63,4519,41"/>
+<area shape="rect" id="Node000025" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5439,115,5697,170"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="4519,34,4693,40,4919,52,5172,74,5427,105,5467,113,5466,118,5426,111,5172,79,4919,58,4692,45,4519,39"/>
+<area shape="rect" id="Node000026" href="$havoc__loops_8cpp.html" title="Havoc Loops." alt="" coords="5722,115,5915,170"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="4519,34,4785,43,5129,57,5465,78,5604,91,5710,105,5742,113,5740,118,5709,111,5603,96,5465,83,5129,63,4785,48,4519,39"/>
+<area shape="rect" id="Node000027" href="$k__induction_8cpp.html" title="k&#45;induction" alt="" coords="5939,115,6133,170"/>
+<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="4520,33,4827,40,5234,53,5636,75,5802,89,5928,105,5960,113,5959,118,5928,111,5802,94,5635,80,5234,59,4827,45,4520,38"/>
+<area shape="rect" id="Node000028" href="$model__argc__argv_8cpp.html" title="Initialize command line arguments." alt="" coords="6157,115,6350,170"/>
+<area shape="poly" id="edge27_Node000001_Node000028" title=" " alt="" coords="4519,32,4867,38,5337,50,5804,71,5999,87,6146,105,6178,113,6177,118,6145,111,5998,92,5804,77,5336,55,4867,43,4519,38"/>
+<area shape="rect" id="Node000029" href="$race__check_8cpp.html" title="Race Detection for Threaded Goto Programs." alt="" coords="6374,115,6567,170"/>
+<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="4519,32,4905,35,5438,46,5715,56,5973,68,6195,85,6363,105,6396,113,6395,118,6362,111,6195,90,5972,74,5714,61,5438,52,4905,41,4519,37"/>
+<area shape="rect" id="Node000030" href="$reachability__slicer_8cpp.html" title="Reachability Slicer Consider the control flow graph of the goto program and a criterion,..." alt="" coords="6591,115,6785,170"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="4519,31,4944,33,5540,43,5850,52,6141,65,6391,83,6580,105,6613,113,6612,118,6580,111,6391,88,6141,70,5850,57,5540,48,4944,39,4519,37"/>
+<area shape="rect" id="Node000031" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="6809,115,7002,170"/>
+<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="4519,31,4982,31,5641,40,5986,49,6309,62,6588,81,6703,92,6798,105,6830,113,6829,118,6797,111,6702,98,6587,86,6309,67,5986,54,5641,45,4982,37,4519,36"/>
+<area shape="rect" id="Node000032" href="$goto__check_8cpp.html" title="GOTO Programs." alt="" coords="7027,115,7211,170"/>
+<area shape="poly" id="edge31_Node000001_Node000032" title=" " alt="" coords="4519,33,5066,40,5845,55,6584,77,6855,90,7015,105,7047,113,7045,118,7014,111,6855,96,6584,82,5845,60,5066,46,4519,38"/>
+<area shape="rect" id="Node000033" href="$remove__function__pointers_8cpp.html" title="Program Transformation." alt="" coords="7235,115,7458,170"/>
+<area shape="poly" id="edge32_Node000001_Node000033" title=" " alt="" coords="4519,31,5054,31,5836,38,6249,47,6637,61,6971,80,7109,92,7223,105,7261,113,7260,118,7222,111,7108,97,6970,85,6636,66,6249,52,5836,43,5054,36,4519,36"/>
+<area shape="rect" id="Node000034" href="$remove__returns_8cpp.html" title="Replace function returns by assignments to global variables." alt="" coords="7483,115,7667,170"/>
+<area shape="poly" id="edge33_Node000001_Node000034" title=" " alt="" coords="4519,32,5151,38,6073,51,6956,73,7280,88,7395,96,7471,105,7503,113,7502,118,7470,111,7394,102,7280,93,6956,79,6073,57,5151,44,4519,37"/>
+<area shape="rect" id="Node000035" href="$remove__skip_8cpp.html" title="Program Transformation." alt="" coords="7691,115,7875,170"/>
+<area shape="poly" id="edge34_Node000001_Node000035" title=" " alt="" coords="4519,32,5190,37,6177,50,6678,60,7125,72,7474,87,7597,96,7679,105,7711,113,7710,118,7678,111,7596,101,7473,92,7125,77,6678,65,6177,55,5190,43,4519,37"/>
+<area shape="rect" id="Node000036" href="$remove__virtual__functions_8cpp.html" title="Remove Virtual Function (Method) Calls." alt="" coords="7899,115,8117,170"/>
+<area shape="poly" id="edge35_Node000001_Node000036" title=" " alt="" coords="4519,32,5228,38,6280,52,7294,74,7667,88,7799,96,7887,105,7924,113,7923,118,7886,111,7799,102,7667,93,7294,79,6280,57,5228,43,4519,37"/>
+<area shape="rect" id="Node000037" href="$cegis__verifier_8cpp.html" title="Verifier for Counterexample&#45;Guided Synthesis." alt="" coords="8141,115,8339,170"/>
+<area shape="poly" id="edge36_Node000001_Node000037" title=" " alt="" coords="4519,32,5272,36,6401,48,6977,57,7492,70,7893,86,8035,95,8130,105,8164,113,8163,118,8129,111,8035,100,7893,91,7491,75,6977,63,6401,53,5272,41,4519,37"/>
+<area shape="rect" id="Node000038" href="$api_8cpp.html" title=" " alt="" coords="8363,115,8547,170"/>
+<area shape="poly" id="edge37_Node000001_Node000038" title=" " alt="" coords="4519,31,5312,34,6511,45,7124,54,7672,67,8099,84,8251,94,8351,105,8383,113,8382,118,8350,111,8250,99,8099,89,7671,72,7123,59,6510,50,5312,40,4519,37"/>
 </map>

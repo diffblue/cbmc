@@ -1,10 +1,18 @@
 <map id="class_hierarchy_graph_nodet" name="class_hierarchy_graph_nodet">
-<area shape="rect" id="node1" title="Class hierarchy graph node: simply contains a class identifier." alt="" coords="115,496,282,537"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="15,392,175,433"/>
-<area shape="rect" id="node3" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="24,303,165,329"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,184,184,225"/>
-<area shape="rect" id="node5" title=" " alt="" coords="27,95,162,121"/>
-<area shape="rect" id="node6" title=" " alt="" coords="43,5,82,32"/>
-<area shape="rect" id="node7" title=" " alt="" coords="109,5,147,32"/>
-<area shape="rect" id="node8" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="199,399,271,426"/>
+<area shape="rect" id="Node000001" title="Class hierarchy graph node: simply contains a class identifier." alt="" coords="115,493,282,533"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="15,391,175,431"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,438,181,491,177,495,122,442"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,181,184,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,235,88,279,88,328,95,390,89,391,83,328,83,279,87,235"/>
+<area shape="rect" id="Node000007" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="119,301,260,326"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="122,230,181,299,177,302,118,234"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="27,93,162,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="97,132,97,181,92,181,92,132"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="43,5,82,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="63,44,66,68,83,91,79,95,62,70,57,45"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="109,5,147,31"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="121,45,102,94,97,92,116,43"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="170,338,115,392,112,389,166,334"/>
+<area shape="rect" id="Node000008" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="199,398,271,423"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="229,437,208,494,203,492,224,435"/>
 </map>

@@ -1,8 +1,8 @@
 var classarray__of__exprt =
 [
     [ "array_of_exprt", "classarray__of__exprt.html#a6f854c1e49314b6aabd6ae5dbda9caa1", null ],
-    [ "type", "classarray__of__exprt.html#a9424eb794e181b619359bfcaa87f1fe0", null ],
-    [ "type", "classarray__of__exprt.html#ade9189e07aa7b9c074f4d650f05ef7f0", null ],
-    [ "what", "classarray__of__exprt.html#a6c3d19d6eb229886cc98397b21a2470b", null ],
-    [ "what", "classarray__of__exprt.html#a12e26bb57c49558d8e8a0024072f8a07", null ]
+    [ "type", "classarray__of__exprt.html#a1dc98455233f585ee78ec20b74f9fcb2", null ],
+    [ "type", "classarray__of__exprt.html#ae684c624d16aa8e585bbb055754c8a97", null ],
+    [ "what", "classarray__of__exprt.html#af6dc339f56b843056ebd5d146d734ba1", null ],
+    [ "what", "classarray__of__exprt.html#a7d787f350906f5dc01cdb419a6adfe06", null ]
 ];

@@ -1,8 +1,8 @@
 var string__refinement_8h =
 [
     [ "string_refinementt", "classstring__refinementt.html", "classstring__refinementt" ],
-    [ "configt", "structstring__refinementt_1_1configt.html", "structstring__refinementt_1_1configt" ],
-    [ "infot", "structstring__refinementt_1_1infot.html", null ],
+    [ "string_refinementt::configt", "structstring__refinementt_1_1configt.html", "structstring__refinementt_1_1configt" ],
+    [ "string_refinementt::infot", "structstring__refinementt_1_1infot.html", null ],
     [ "DEFAULT_MAX_NB_REFINEMENT", "string__refinement_8h.html#a9135d29d4eb9f527e80e67dcfdbd6001", null ],
     [ "HELP_STRING_REFINEMENT", "string__refinement_8h.html#ae11f6c916205de0216ff66d6d695002b", null ],
     [ "HELP_STRING_REFINEMENT_CBMC", "string__refinement_8h.html#aa6391928dfcbb73eb6fcc3aca2a60930", null ],

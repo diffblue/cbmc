@@ -5,6 +5,6 @@ var classtype__with__subtypest =
     [ "type_with_subtypest", "classtype__with__subtypest.html#a603a7a4f214677d47030890b09eab9e3", null ],
     [ "copy_to_subtypes", "classtype__with__subtypest.html#a7b486d915935b68050c04815be04fcd2", null ],
     [ "move_to_subtypes", "classtype__with__subtypest.html#a0f77d337fd63e27bfca0a54d2f55d7a2", null ],
-    [ "subtypes", "classtype__with__subtypest.html#a112ec9aaec5a90b84955c6624bf73bcf", null ],
-    [ "subtypes", "classtype__with__subtypest.html#adc40c06de7cf0898fe47fb8be7a0bebe", null ]
+    [ "subtypes", "classtype__with__subtypest.html#a6917731da46a5423e53d01141ba23918", null ],
+    [ "subtypes", "classtype__with__subtypest.html#aac24a8a8087e615838ebce430b6359b3", null ]
 ];

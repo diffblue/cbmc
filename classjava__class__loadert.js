@@ -1,13 +1,13 @@
 var classjava__class__loadert =
 [
-    [ "get_extra_class_refs_functiont", "classjava__class__loadert.html#af3ccf7c41d0f4f600b41fce779d77429", null ],
+    [ "get_extra_class_refs_functiont", "classjava__class__loadert.html#a11e764b57f77d4992784404c6133f346", null ],
     [ "parse_tree_with_overlayst", "classjava__class__loadert.html#aef3bb8b6b47f9bd6372755a34720e7f1", null ],
     [ "parse_tree_with_overridest_mapt", "classjava__class__loadert.html#a53e3af8e56f7ef3c28ccd9f4dd92a631", null ],
     [ "java_class_loadert", "classjava__class__loadert.html#a0c84f56451cdb4225e3d4c812f5ed453", null ],
     [ "add_load_classes", "classjava__class__loadert.html#af9a0a00777e4a62d984eb2089f40f632", null ],
     [ "can_load_class", "classjava__class__loadert.html#a6b19f13a5d260dc3f1c6808a20f76318", null ],
-    [ "get_class_with_overlays_map", "classjava__class__loadert.html#acb24bb3124ffa6a9f8a2ce36c823e790", null ],
-    [ "get_original_class", "classjava__class__loadert.html#ae7bff6bf8cc8828086655522980f624f", null ],
+    [ "get_class_with_overlays_map", "classjava__class__loadert.html#a82a19e23cb29aa2959ed5750abc9d222", null ],
+    [ "get_original_class", "classjava__class__loadert.html#ad109b2dad140305bbfb870c3dfe33f57", null ],
     [ "get_parse_tree", "classjava__class__loadert.html#abcefa5f238779d5c8574938d4431d82d", null ],
     [ "load_entire_jar", "classjava__class__loadert.html#a46146b5e55c6942bb3433666cae28e4b", null ],
     [ "operator()", "classjava__class__loadert.html#aaea71c45ea5c6b033d7319f7f27a9f37", null ],

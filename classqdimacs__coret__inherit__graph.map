@@ -1,13 +1,23 @@
 <map id="qdimacs_coret" name="qdimacs_coret">
-<area shape="rect" id="node1" title=" " alt="" coords="239,379,356,405"/>
-<area shape="rect" id="node7" href="$classqbf__bdd__certificatet.html" title=" " alt="" coords="61,453,211,480"/>
-<area shape="rect" id="node10" href="$classqbf__qube__coret.html" title=" " alt="" coords="236,453,359,480"/>
-<area shape="rect" id="node11" href="$classqbf__squolem__coret.html" title=" " alt="" coords="383,453,529,480"/>
-<area shape="rect" id="node2" href="$classqdimacs__cnft.html" title=" " alt="" coords="243,304,351,331"/>
-<area shape="rect" id="node3" href="$classdimacs__cnft.html" title=" " alt="" coords="247,229,347,256"/>
-<area shape="rect" id="node4" href="$classcnf__clause__listt.html" title=" " alt="" coords="236,155,359,181"/>
-<area shape="rect" id="node5" href="$classcnft.html" title=" " alt="" coords="274,80,321,107"/>
-<area shape="rect" id="node6" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="269,5,325,32"/>
-<area shape="rect" id="node8" href="$classqbf__bdd__coret.html" title=" " alt="" coords="5,528,120,555"/>
-<area shape="rect" id="node9" href="$classqbf__skizzo__coret.html" title=" " alt="" coords="144,528,275,555"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="239,372,356,397"/>
+<area shape="rect" id="Node000007" href="$classqbf__bdd__certificatet.html" title=" " alt="" coords="61,445,211,471"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="260,405,163,448,161,443,258,400"/>
+<area shape="rect" id="Node000010" href="$classqbf__qube__coret.html" title=" " alt="" coords="236,445,359,471"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="300,411,300,445,295,445,295,411"/>
+<area shape="rect" id="Node000011" href="$classqbf__squolem__coret.html" title=" " alt="" coords="383,445,529,471"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="336,400,431,443,429,448,334,405"/>
+<area shape="rect" id="Node000002" href="$classqdimacs__cnft.html" title=" " alt="" coords="243,299,351,324"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="300,338,300,372,295,372,295,338"/>
+<area shape="rect" id="Node000003" href="$classdimacs__cnft.html" title=" " alt="" coords="247,225,347,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="300,264,300,299,295,299,295,264"/>
+<area shape="rect" id="Node000004" href="$classcnf__clause__listt.html" title=" " alt="" coords="236,152,359,177"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="300,191,300,225,295,225,295,191"/>
+<area shape="rect" id="Node000005" href="$classcnft.html" title=" " alt="" coords="274,79,321,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="300,118,300,152,295,152,295,118"/>
+<area shape="rect" id="Node000006" href="$classpropt.html" title="TO_BE_DOCUMENTED." alt="" coords="269,5,325,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="300,44,300,79,295,79,295,44"/>
+<area shape="rect" id="Node000008" href="$classqbf__bdd__coret.html" title=" " alt="" coords="5,519,120,544"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="116,482,76,520,73,517,112,478"/>
+<area shape="rect" id="Node000009" href="$classqbf__skizzo__coret.html" title=" " alt="" coords="144,519,275,544"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="160,478,199,517,196,520,156,482"/>
 </map>

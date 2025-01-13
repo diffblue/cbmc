@@ -1,9 +1,21 @@
 <map id="loop_analysist&lt; T, C &gt;" name="loop_analysist&lt; T, C &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="5,132,176,159"/>
-<area shape="rect" id="node2" href="$classnatural__loops__templatet.html" title=" " alt="" coords="653,39,907,110"/>
-<area shape="rect" id="node4" href="$classnatural__loops__templatet.html" title=" " alt="" coords="670,171,890,242"/>
-<area shape="rect" id="node5" href="$classlexical__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any lexical loops." alt="" coords="227,125,405,166"/>
-<area shape="rect" id="node6" href="$classlinked__loop__analysist.html" title=" " alt="" coords="235,190,397,231"/>
-<area shape="rect" id="node7" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="225,59,407,101"/>
-<area shape="rect" id="node3" href="$classnatural__loopst.html" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;" alt="" coords="956,61,1071,88"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,190,176,216"/>
+<area shape="rect" id="Node000002" href="$classnatural__loops__templatet.html" title=" " alt="" coords="896,36,1149,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,179,151,144,199,110,251,82,293,65,395,40,528,15,633,4,739,7,872,23,922,34,921,39,872,28,738,12,633,9,529,21,397,46,295,70,253,87,201,115,154,148,116,183"/>
+<area shape="rect" id="Node000004" href="$classnatural__loops__templatet.html" title=" " alt="" coords="913,170,1133,239"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="190,213,290,224,396,232,523,236,649,232,786,224,912,213,913,218,787,229,649,238,523,242,396,238,289,229,190,219"/>
+<area shape="rect" id="Node000005" href="$classlexical__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any lexical loops." alt="" coords="433,119,612,159"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="177,185,200,182,433,148,434,153,200,187,178,191"/>
+<area shape="rect" id="Node000006" href="$classlinked__loop__analysist.html" title=" " alt="" coords="441,183,604,223"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="190,200,441,200,441,206,190,206"/>
+<area shape="rect" id="Node000007" href="$classnatural__loops__templatet.html" title="Main driver for working out if a class (normally goto_programt) has any natural loops." alt="" coords="432,55,613,95"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="127,182,199,151,319,115,431,90,432,95,321,121,201,156,129,187"/>
+<area shape="rect" id="Node000008" href="$classloop__analysist.html" title=" " alt="" coords="396,298,649,353"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="108,226,145,277,171,302,201,321,248,336,298,345,348,347,396,345,396,350,348,352,297,350,247,342,199,325,168,306,141,281,103,229"/>
+<area shape="rect" id="Node000009" href="$classloop__analysist.html" title=" " alt="" coords="413,377,633,432"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="100,229,112,268,132,315,161,361,180,381,201,397,251,418,305,429,360,430,412,426,413,431,360,436,305,434,250,423,199,401,176,385,157,364,127,318,107,270,95,230"/>
+<area shape="rect" id="Node000003" href="$classnatural__loopst.html" title="A concretized version of natural_loops_templatet&lt;const goto_programt, goto_programt::const_targett&gt;" alt="" coords="1199,58,1313,84"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1163,68,1198,68,1198,74,1163,74"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="627,80,673,82,773,84,872,82,896,80,896,86,872,87,773,89,673,87,627,85"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="628,93,651,105,659,113,664,121,668,128,675,134,732,162,794,181,855,193,913,199,912,205,854,198,792,186,730,166,672,139,663,131,659,123,655,116,648,109,625,98"/>
 </map>

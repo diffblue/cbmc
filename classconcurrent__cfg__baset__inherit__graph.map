@@ -1,9 +1,11 @@
 <map id="concurrent_cfg_baset&lt; T, P, I &gt;" name="concurrent_cfg_baset&lt; T, P, I &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="40,439,201,480"/>
-<area shape="rect" id="node6" href="$classconcurrent__cfg__baset.html" title=" " alt="" coords="5,557,236,613"/>
-<area shape="rect" id="node2" href="$classcfg__baset.html" title=" " alt="" coords="21,333,220,389"/>
-<area shape="rect" id="node3" href="$classgrapht.html" title=" " alt="" coords="19,124,211,180"/>
-<area shape="rect" id="node5" href="$classcfg__baset.html" title="A multi&#45;procedural control flow graph (CFG) whose nodes store references to instructions in a GOTO pr..." alt="" coords="137,229,288,256"/>
-<area shape="rect" id="node4" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="63,5,167,32"/>
-<area shape="rect" id="node7" href="$classprocedure__local__concurrent__cfg__baset.html" title=" " alt="" coords="20,663,221,704"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="359,41,520,81"/>
+<area shape="rect" id="Node000004" href="$classprocedure__local__concurrent__cfg__baset.html" title=" " alt="" coords="792,5,993,45"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="534,51,792,31,792,36,534,57"/>
+<area shape="rect" id="Node000005" href="$classconcurrent__cfg__baset.html" title=" " alt="" coords="777,70,1008,125"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="528,81,544,84,664,95,777,97,777,102,664,100,544,89,527,87"/>
+<area shape="rect" id="Node000002" href="$classcfg__baset.html" title="A multi&#45;procedural control flow graph (CFG) whose nodes store references to instructions in a GOTO pr..." alt="" coords="159,49,309,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="323,59,359,59,359,64,323,64"/>
+<area shape="rect" id="Node000003" href="$classgrapht.html" title="A generic directed graph with a parametric node type." alt="" coords="5,49,109,74"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,59,158,59,158,64,123,64"/>
 </map>

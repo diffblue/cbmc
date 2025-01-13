@@ -1,10 +1,17 @@
 <map id="/home/runner/work/cbmc/cbmc/src/cprover/sentinel_dll.h" name="/home/runner/work/cbmc/cbmc/src/cprover/sentinel_dll.h">
-<area shape="rect" id="node1" title=" " alt="" coords="585,5,813,47"/>
-<area shape="rect" id="node2" href="$axioms_8h.html" title="Axioms." alt="" coords="269,102,470,143"/>
-<area shape="rect" id="node6" href="$sentinel__dll_8cpp.html" title="Axioms." alt="" coords="494,95,687,151"/>
-<area shape="rect" id="node7" href="$simplify__state__expr_8cpp.html" title="Simplify State Expressions." alt="" coords="711,95,905,151"/>
-<area shape="rect" id="node8" href="$state__encoding_8cpp.html" title=" " alt="" coords="929,95,1113,151"/>
-<area shape="rect" id="node3" href="$axioms_8cpp.html" title="Axioms." alt="" coords="5,206,221,247"/>
-<area shape="rect" id="node4" href="$counterexample__found_8cpp.html" title="Counterexample Found." alt="" coords="246,199,493,255"/>
-<area shape="rect" id="node5" href="$inductiveness_8cpp.html" title="Inductiveness." alt="" coords="516,206,775,247"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="585,5,813,45"/>
+<area shape="rect" id="Node000002" href="$axioms_8h.html" title="Axioms." alt="" coords="269,101,470,141"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="620,52,437,103,435,98,618,47"/>
+<area shape="rect" id="Node000006" href="$sentinel__dll_8cpp.html" title="Axioms." alt="" coords="494,93,687,148"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="668,56,623,95,619,91,665,52"/>
+<area shape="rect" id="Node000007" href="$simplify__state__expr_8cpp.html" title="Simplify State Expressions." alt="" coords="711,93,905,148"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="733,52,779,91,775,95,730,56"/>
+<area shape="rect" id="Node000008" href="$state__encoding_8cpp.html" title=" " alt="" coords="929,93,1113,148"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="778,47,931,91,930,96,777,52"/>
+<area shape="rect" id="Node000003" href="$axioms_8cpp.html" title="Axioms." alt="" coords="5,203,221,243"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="309,148,162,206,160,201,307,143"/>
+<area shape="rect" id="Node000004" href="$counterexample__found_8cpp.html" title="Counterexample Found." alt="" coords="246,196,493,251"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="372,154,372,196,367,196,367,154"/>
+<area shape="rect" id="Node000005" href="$inductiveness_8cpp.html" title="Inductiveness." alt="" coords="516,203,775,243"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="435,143,595,201,593,206,433,148"/>
 </map>

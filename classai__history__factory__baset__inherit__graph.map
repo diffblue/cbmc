@@ -1,6 +1,9 @@
 <map id="ai_history_factory_baset" name="ai_history_factory_baset">
-<area shape="rect" id="node1" title="As more detailed histories can get complex (for example, nested loops or deep, mutually recursive cal..." alt="" coords="5,86,144,127"/>
-<area shape="rect" id="node2" href="$classai__history__factory__default__constructort.html" title="An easy factory implementation for histories that don&#39;t need parameters." alt="" coords="192,5,352,61"/>
-<area shape="rect" id="node3" href="$classcall__stack__history__factoryt.html" title=" " alt="" coords="203,86,341,127"/>
-<area shape="rect" id="node4" href="$classlocal__control__flow__history__factoryt.html" title=" " alt="" coords="203,151,341,193"/>
+<area shape="rect" id="Node000001" title="As more detailed histories can get complex (for example, nested loops or deep, mutually recursive cal..." alt="" coords="5,85,144,125"/>
+<area shape="rect" id="Node000002" href="$classai__history__factory__default__constructort.html" title="An easy factory implementation for histories that don&#39;t need parameters." alt="" coords="192,5,352,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,77,196,58,198,63,144,82"/>
+<area shape="rect" id="Node000003" href="$classcall__stack__history__factoryt.html" title=" " alt="" coords="203,85,341,125"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,102,202,102,202,107,158,107"/>
+<area shape="rect" id="Node000004" href="$classlocal__control__flow__history__factoryt.html" title=" " alt="" coords="203,149,341,189"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="151,126,211,146,209,151,149,131"/>
 </map>

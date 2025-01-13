@@ -1,9 +1,16 @@
 <map id="/home/runner/work/cbmc/cbmc/src/solvers/bdd/bdd_miniBDD.h" name="/home/runner/work/cbmc/cbmc/src/solvers/bdd/bdd_miniBDD.h">
-<area shape="rect" id="node1" title="Interface to miniBDD functions that are used in CBMC BDD functions should only be accessed through th..." alt="" coords="145,5,329,61"/>
-<area shape="rect" id="node2" href="$bdd_8h.html" title="Choice between the different interface to BDD libraries." alt="" coords="135,109,338,151"/>
-<area shape="rect" id="node3" href="$guard__bdd_8h.html" title="Guard Data Structure Implementation using BDDs." alt="" coords="5,206,236,247"/>
-<area shape="rect" id="node5" href="$bdd__expr_8h.html" title="Conversion between exprt and miniBDD." alt="" coords="261,199,445,255"/>
-<area shape="rect" id="node4" href="$guard__bdd_8cpp.html" title="Implementation of guards using BDDs." alt="" coords="34,303,221,359"/>
-<area shape="rect" id="node6" href="$bv__pointers_8cpp.html" title=" " alt="" coords="248,303,449,359"/>
-<area shape="rect" id="node7" href="$bdd__expr_8cpp.html" title="Conversion between exprt and miniBDD." alt="" coords="474,303,658,359"/>
+<area shape="rect" id="Node000001" title="Interface to miniBDD functions that are used in CBMC BDD functions should only be accessed through th..." alt="" coords="145,5,329,60"/>
+<area shape="rect" id="Node000002" href="$bdd_8h.html" title="Choice between the different interface to BDD libraries." alt="" coords="135,108,338,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="239,74,239,108,234,108,234,74"/>
+<area shape="rect" id="Node000003" href="$guard__bdd_8h.html" title="Guard Data Structure Implementation using BDDs." alt="" coords="5,203,236,243"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="204,159,146,205,142,201,201,154"/>
+<area shape="rect" id="Node000005" href="$bdd__expr_8h.html" title="Conversion between exprt and miniBDD." alt="" coords="261,196,445,251"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="273,155,322,194,318,198,269,159"/>
+<area shape="rect" id="Node000004" href="$guard__bdd_8cpp.html" title="Implementation of guards using BDDs." alt="" coords="34,299,221,353"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="125,257,128,298,123,299,120,257"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="283,259,187,301,185,296,281,254"/>
+<area shape="rect" id="Node000006" href="$bv__pointers_8cpp.html" title=" " alt="" coords="248,299,449,353"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="354,265,352,299,347,298,348,264"/>
+<area shape="rect" id="Node000007" href="$bdd__expr_8cpp.html" title="Conversion between exprt and miniBDD." alt="" coords="474,299,658,353"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="421,254,512,296,509,301,419,259"/>
 </map>

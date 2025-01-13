@@ -1,5 +1,7 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/slice_global_inits.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;programs/slice_global_inits.h">
-<area shape="rect" id="node1" title="Remove initializations of unused global variables." alt="" coords="165,5,349,61"/>
-<area shape="rect" id="node2" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,109,264,165"/>
-<area shape="rect" id="node3" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="288,109,472,165"/>
+<area shape="rect" id="Node000001" title="Remove initializations of unused global variables." alt="" coords="165,5,349,60"/>
+<area shape="rect" id="Node000002" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="5,108,264,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,71,168,110,165,106,213,67"/>
+<area shape="rect" id="Node000003" href="$slice__global__inits_8cpp.html" title="Remove initializations of unused global variables." alt="" coords="288,108,472,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="302,67,350,106,346,110,298,71"/>
 </map>

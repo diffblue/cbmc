@@ -1,15 +1,30 @@
 <map id="linking_diagnosticst" name="linking_diagnosticst">
-<area shape="rect" id="node1" title=" " alt="" coords="88,525,240,552"/>
-<area shape="rect" id="node2" href="$classmessage__handlert.html" title=" " alt="" coords="55,384,198,411"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,221,192,247"/>
-<area shape="rect" id="node4" title=" " alt="" coords="22,102,151,129"/>
-<area shape="rect" id="node5" title=" " alt="" coords="241,5,279,32"/>
-<area shape="rect" id="node11" title=" " alt="" coords="176,102,344,129"/>
-<area shape="rect" id="node13" title=" " alt="" coords="464,95,616,136"/>
-<area shape="rect" id="node6" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="293,436,395,463"/>
-<area shape="rect" id="node7" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="445,332,585,359"/>
-<area shape="rect" id="node8" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="267,332,421,359"/>
-<area shape="rect" id="node9" title=" " alt="" coords="267,213,421,255"/>
-<area shape="rect" id="node10" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="368,102,440,129"/>
-<area shape="rect" id="node12" title=" " alt="" coords="482,5,521,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="44,519,196,544"/>
+<area shape="rect" id="Node000002" href="$classmessage__handlert.html" title=" " alt="" coords="27,379,170,405"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,418,121,518,116,519,100,419"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,218,192,243"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,257,101,379,96,379,96,257"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="34,101,163,126"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="101,139,101,218,96,218,96,139"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="175,5,214,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="163,31,141,41,122,56,109,79,103,101,98,100,104,77,118,53,139,37,161,26"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="189,93,341,133"/>
+<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="193,44,198,68,208,81,222,91,218,95,205,84,194,70,188,45"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="365,101,533,126"/>
+<area shape="poly" id="edge15_Node000013_Node000005" title=" " alt="" coords="227,33,263,52,288,67,340,85,392,98,390,103,339,90,286,72,260,57,225,38"/>
+<area shape="rect" id="Node000006" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="243,431,346,456"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="260,465,145,521,143,516,258,460"/>
+<area shape="rect" id="Node000007" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="383,328,523,353"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="440,366,421,389,398,409,371,423,344,433,342,428,369,418,394,404,417,385,436,363"/>
+<area shape="rect" id="Node000008" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="206,328,359,353"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="288,367,296,430,291,431,283,368"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="270,147,284,327,279,328,265,147"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="399,5,438,31"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="398,42,359,72,313,95,311,91,356,67,394,38"/>
+<area shape="poly" id="edge14_Node000013_Node000010" title=" " alt="" coords="429,43,448,100,443,101,424,45"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="366,211,519,251"/>
+<area shape="poly" id="edge11_Node000008_Node000011" title=" " alt="" coords="405,260,301,330,298,326,402,256"/>
+<area shape="rect" id="Node000012" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="579,101,651,126"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="613,140,604,166,587,189,556,209,520,222,518,217,553,205,583,185,599,163,608,139"/>
+<area shape="poly" id="edge13_Node000011_Node000013" title=" " alt="" coords="448,140,447,158,445,210,440,210,441,157,443,139"/>
 </map>

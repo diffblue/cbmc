@@ -1,7 +1,11 @@
 <map id="find_is_fresh_calls_visitort" name="find_is_fresh_calls_visitort">
-<area shape="rect" id="node1" title="Predicate to be used with the exprt::visit() function." alt="" coords="889,35,1031,77"/>
-<area shape="rect" id="node2" title=" " alt="" coords="521,28,756,84"/>
-<area shape="rect" id="node3" title=" " alt="" coords="127,5,291,32"/>
-<area shape="rect" id="node4" title=" " alt="" coords="154,80,263,107"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,80,44,107"/>
+<area shape="rect" id="Node000001" title="Predicate to be used with the exprt::visit() function." alt="" coords="889,35,1031,75"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="521,28,756,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="770,53,889,53,889,58,770,58"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="127,5,291,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="304,24,522,43,521,48,304,29"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="154,80,263,105"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="277,95,381,97,497,90,548,80,549,85,498,95,381,103,277,100"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,80,44,105"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="57,90,154,90,154,95,57,95"/>
 </map>

@@ -1,9 +1,15 @@
 <map id="goto_unwindt" name="goto_unwindt">
-<area shape="rect" id="node1" title=" " alt="" coords="1273,50,1384,77"/>
-<area shape="rect" id="node2" href="$structgoto__unwindt_1_1unwind__logt.html" title=" " alt="" coords="949,50,1147,77"/>
-<area shape="rect" id="node3" title=" " alt="" coords="555,35,808,91"/>
-<area shape="rect" id="node4" title=" " alt="" coords="157,5,308,47"/>
-<area shape="rect" id="node5" title=" " alt="" coords="165,87,300,114"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,62,44,89"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,113,44,139"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1273,50,1384,75"/>
+<area shape="rect" id="Node000002" href="$structgoto__unwindt_1_1unwind__logt.html" title=" " alt="" coords="949,50,1147,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1161,60,1273,60,1273,65,1161,65"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="555,35,808,90"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="822,60,949,60,949,65,822,65"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="157,5,308,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="322,30,555,50,554,55,321,35"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="165,87,300,113"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="314,103,417,104,530,97,585,87,586,93,531,103,417,110,314,108"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,62,44,87"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="58,76,165,89,165,94,57,81"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,111,44,137"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="58,121,133,116,172,110,172,115,134,121,58,126"/>
 </map>

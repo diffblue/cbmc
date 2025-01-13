@@ -1,11 +1,11 @@
 var small__shared__ptr_8h =
 [
-    [ "small_shared_ptrt", "classsmall__shared__ptrt.html", "classsmall__shared__ptrt" ],
-    [ "small_shared_pointeet", "classsmall__shared__pointeet.html", "classsmall__shared__pointeet" ],
-    [ "make_small_shared_ptr", "small__shared__ptr_8h.html#a222cbe74f5a635386d52030235c320c7", null ],
+    [ "small_shared_ptrt< T >", "classsmall__shared__ptrt.html", "classsmall__shared__ptrt" ],
+    [ "small_shared_pointeet< Num >", "classsmall__shared__pointeet.html", "classsmall__shared__pointeet" ],
+    [ "make_small_shared_ptr", "small__shared__ptr_8h.html#a4b6bd9b65064588996def4938fe09137", null ],
     [ "operator!=", "small__shared__ptr_8h.html#ae16b0402a91046eb89f43a39db384809", null ],
     [ "operator<", "small__shared__ptr_8h.html#a3f43b6935bb324066bf3a69a9ae019d5", null ],
-    [ "operator<<", "small__shared__ptr_8h.html#a79a6e53495b1dd6bc93a0850fbc44abf", null ],
+    [ "operator<<", "small__shared__ptr_8h.html#a75781f6bf2313332729d5af0a342cfc4", null ],
     [ "operator<=", "small__shared__ptr_8h.html#a7c3f2265c90d70f30bc4670da6d3409c", null ],
     [ "operator==", "small__shared__ptr_8h.html#abafa91560a61bd58b553ae2b5aad59be", null ],
     [ "operator>", "small__shared__ptr_8h.html#a7640bd3a204f62ebea32f3a7cb3ef617", null ],

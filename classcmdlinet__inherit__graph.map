@@ -1,13 +1,23 @@
 <map id="cmdlinet" name="cmdlinet">
-<area shape="rect" id="node1" title=" " alt="" coords="5,157,84,184"/>
-<area shape="rect" id="node2" href="$classfree__form__cmdlinet.html" title="An implementation of cmdlinet to be used in tests." alt="" coords="132,132,283,159"/>
-<area shape="rect" id="node3" href="$classgoto__cc__cmdlinet.html" title=" " alt="" coords="139,183,275,209"/>
-<area shape="rect" id="node4" href="$classarmcc__cmdlinet.html" title=" " alt="" coords="336,5,463,32"/>
-<area shape="rect" id="node5" href="$classas86__cmdlinet.html" title=" " alt="" coords="341,56,458,83"/>
-<area shape="rect" id="node6" href="$classas__cmdlinet.html" title=" " alt="" coords="349,107,450,133"/>
-<area shape="rect" id="node7" href="$classbcc__cmdlinet.html" title=" " alt="" coords="345,157,453,184"/>
-<area shape="rect" id="node8" href="$classgcc__cmdlinet.html" title=" " alt="" coords="345,208,453,235"/>
-<area shape="rect" id="node9" href="$classld__cmdlinet.html" title=" " alt="" coords="350,259,449,285"/>
-<area shape="rect" id="node10" href="$classms__cl__cmdlinet.html" title=" " alt="" coords="337,309,461,336"/>
-<area shape="rect" id="node11" href="$classms__link__cmdlinet.html" title=" " alt="" coords="331,360,468,387"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,84,180"/>
+<area shape="rect" id="Node000002" href="$classfree__form__cmdlinet.html" title="An implementation of cmdlinet to be used in tests." alt="" coords="132,129,283,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,157,131,151,132,156,98,162"/>
+<area shape="rect" id="Node000003" href="$classgoto__cc__cmdlinet.html" title=" " alt="" coords="139,179,275,204"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="98,172,140,179,139,184,97,178"/>
+<area shape="rect" id="Node000004" href="$classarmcc__cmdlinet.html" title=" " alt="" coords="336,5,463,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="274,170,281,164,293,149,300,134,304,104,309,72,316,56,329,40,346,28,349,33,332,44,320,59,314,74,309,104,305,136,297,152,285,168,277,174"/>
+<area shape="rect" id="Node000005" href="$classas86__cmdlinet.html" title=" " alt="" coords="341,55,458,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="271,170,281,164,297,146,304,128,312,109,329,89,349,78,351,82,332,93,317,111,309,130,301,149,284,168,274,175"/>
+<area shape="rect" id="Node000006" href="$classas__cmdlinet.html" title=" " alt="" coords="349,104,450,129"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="261,172,282,164,330,138,358,127,360,132,332,143,284,168,263,176"/>
+<area shape="rect" id="Node000007" href="$classbcc__cmdlinet.html" title=" " alt="" coords="345,153,453,179"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="289,178,345,170,345,176,289,183"/>
+<area shape="rect" id="Node000008" href="$classgcc__cmdlinet.html" title=" " alt="" coords="345,203,453,228"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="289,199,345,206,345,211,289,204"/>
+<area shape="rect" id="Node000009" href="$classld__cmdlinet.html" title=" " alt="" coords="350,252,449,277"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="255,207,332,237,365,249,363,254,330,242,253,212"/>
+<area shape="rect" id="Node000010" href="$classms__cl__cmdlinet.html" title=" " alt="" coords="337,301,461,327"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="234,212,278,249,332,286,359,299,357,304,329,291,275,254,230,216"/>
+<area shape="rect" id="Node000011" href="$classms__link__cmdlinet.html" title=" " alt="" coords="331,351,468,376"/>
+<area shape="poly" id="edge10_Node000003_Node000011" title=" " alt="" coords="225,214,269,275,299,307,332,336,355,348,353,353,329,340,295,311,265,278,221,217"/>
 </map>

@@ -5,102 +5,117 @@
  -->
 <!-- Title: abstract_object_sett Pages: 1 -->
 <svg width="745pt" height="85pt"
- viewBox="0.00 0.00 745.00 85.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 81)">
+ viewBox="0.00 0.00 745.00 84.50" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 80.5)">
 <title>abstract_object_sett</title>
 <!-- Node1 -->
-<g id="node1" class="node">
+<g id="Node000001" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="621,-28.5 621,-47.5 737,-47.5 737,-28.5 621,-28.5"/>
-<text text-anchor="middle" x="679" y="-35.5" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_object_sett</text>
+<g id="a_Node000001"><a xlink:title=" ">
+<polygon fill="#999999" stroke="#666666" points="737,-47 621,-47 621,-28 737,-28 737,-47"/>
+<text text-anchor="middle" x="679" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">abstract_object_sett</text>
 </a>
 </g>
 </g>
 <!-- Node2 -->
-<g id="node2" class="node">
+<g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="400,-12 400,-64 549,-64 549,-12 400,-12"/>
-<text text-anchor="start" x="408" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_set</text>
-<text text-anchor="start" x="408" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; abstract_object_pointert,</text>
-<text text-anchor="start" x="408" y="-30" font-family="Helvetica,sans-Serif" font-size="10.00"> abstract_hashert, abstract</text>
-<text text-anchor="middle" x="474.5" y="-19" font-family="Helvetica,sans-Serif" font-size="10.00">_equalert &gt;</text>
+<g id="a_Node000002"><a xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="549,-63.5 400,-63.5 400,-11.5 549,-11.5 549,-63.5"/>
+<text text-anchor="start" x="408" y="-51.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_set</text>
+<text text-anchor="start" x="408" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; abstract_object_pointert,</text>
+<text text-anchor="start" x="408" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00"> abstract_hashert, abstract</text>
+<text text-anchor="middle" x="474.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">_equalert &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node2&#45;&gt;Node1 -->
-<g id="edge1" class="edge">
+<g id="edge1_Node000001_Node000002" class="edge">
 <title>Node2&#45;&gt;Node1</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M559.26,-38C580,-38 601.75,-38 620.88,-38"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="559.18,-34.5 549.18,-38 559.18,-41.5 559.18,-34.5"/>
-<text text-anchor="middle" x="585" y="-41" font-family="Helvetica,sans-Serif" font-size="10.00"> values</text>
+<g id="a_edge1_Node000001_Node000002"><a xlink:title=" ">
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M559.26,-37.5C580,-37.5 601.75,-37.5 620.88,-37.5"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="559.18,-34 549.18,-37.5 559.18,-41 559.18,-34"/>
+</a>
+</g>
+<text text-anchor="middle" x="585" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> values</text>
 </g>
 <!-- Node3 -->
-<g id="node3" class="node">
+<g id="Node000003" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="100.5,-56.5 100.5,-75.5 218.5,-75.5 218.5,-56.5 100.5,-56.5"/>
-<text text-anchor="middle" x="159.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::shared_ptr&lt; T &gt;</text>
+<g id="a_Node000003"><a xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="218.5,-75 100.5,-75 100.5,-56 218.5,-56 218.5,-75"/>
+<text text-anchor="middle" x="159.5" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00">std::shared_ptr&lt; T &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node3&#45;&gt;Node2 -->
-<g id="edge2" class="edge">
+<g id="edge2_Node000002_Node000003" class="edge">
 <title>Node3&#45;&gt;Node2</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M228.82,-59.89C279.38,-55.37 348.17,-49.21 399.94,-44.58"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="228.29,-56.42 218.64,-60.8 228.91,-63.39 228.29,-56.42"/>
-<text text-anchor="middle" x="314" y="-60" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
+<g id="a_edge2_Node000002_Node000003"><a xlink:title=" ">
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M228.82,-59.39C279.38,-54.87 348.17,-48.71 399.94,-44.08"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="228.29,-55.92 218.64,-60.3 228.91,-62.89 228.29,-55.92"/>
+</a>
+</g>
+<text text-anchor="middle" x="314" y="-59.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> keys</text>
 </g>
 <!-- Node4 -->
-<g id="node4" class="node">
+<g id="Node000004" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="0,-56.5 0,-75.5 29,-75.5 29,-56.5 0,-56.5"/>
-<text text-anchor="middle" x="14.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">T</text>
+<g id="a_Node000004"><a xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="29,-75 0,-75 0,-56 29,-56 29,-75"/>
+<text text-anchor="middle" x="14.5" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00">T</text>
 </a>
 </g>
 </g>
 <!-- Node4&#45;&gt;Node3 -->
-<g id="edge3" class="edge">
+<g id="edge3_Node000003_Node000004" class="edge">
 <title>Node4&#45;&gt;Node3</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M39.64,-66C56.27,-66 79.12,-66 100.34,-66"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="39.21,-62.5 29.21,-66 39.21,-69.5 39.21,-62.5"/>
-<text text-anchor="middle" x="60" y="-69" font-family="Helvetica,sans-Serif" font-size="10.00"> ptr</text>
+<g id="a_edge3_Node000003_Node000004"><a xlink:title=" ">
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M39.64,-65.5C56.27,-65.5 79.12,-65.5 100.34,-65.5"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="39.21,-62 29.21,-65.5 39.21,-69 39.21,-62"/>
+</a>
+</g>
+<text text-anchor="middle" x="60" y="-68.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> ptr</text>
 </g>
 <!-- Node5 -->
-<g id="node5" class="node">
+<g id="Node000005" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="91,-0.5 91,-19.5 228,-19.5 228,-0.5 91,-0.5"/>
-<text text-anchor="middle" x="159.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_set&lt; K &gt;</text>
+<g id="a_Node000005"><a xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="228,-19 91,-19 91,0 228,0 228,-19"/>
+<text text-anchor="middle" x="159.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_set&lt; K &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node5&#45;&gt;Node2 -->
-<g id="edge4" class="edge">
+<g id="edge4_Node000002_Node000005" class="edge">
 <title>Node5&#45;&gt;Node2</title>
-<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M238.32,-3.69C280.99,-1.72 334.68,-1.68 382,-9 387.85,-9.9 393.83,-11.12 399.8,-12.53"/>
-<polygon fill="orange" stroke="orange" points="238.09,-0.19 228.28,-4.2 238.44,-7.19 238.09,-0.19"/>
-<text text-anchor="start" x="246" y="-34" font-family="Helvetica,sans-Serif" font-size="10.00"> &lt; abstract_object_pointert,</text>
-<text text-anchor="start" x="246" y="-23" font-family="Helvetica,sans-Serif" font-size="10.00"> abstract_hashert, abstract</text>
-<text text-anchor="middle" x="314" y="-12" font-family="Helvetica,sans-Serif" font-size="10.00">_equalert &gt;</text>
+<g id="a_edge4_Node000002_Node000005"><a xlink:title=" ">
+<path fill="none" stroke="orange" stroke-dasharray="5,2" d="M238.32,-3.19C280.99,-1.22 334.68,-1.18 382,-8.5 387.85,-9.4 393.83,-10.62 399.8,-12.03"/>
+<polygon fill="orange" stroke="orange" points="238.09,0.31 228.28,-3.7 238.44,-6.69 238.09,0.31"/>
+</a>
+</g>
+<text text-anchor="start" x="246" y="-33.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> &lt; abstract_object_pointert,</text>
+<text text-anchor="start" x="246" y="-22.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> abstract_hashert, abstract</text>
+<text text-anchor="middle" x="314" y="-11.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">_equalert &gt;</text>
 </g>
 <!-- Node6 -->
-<g id="node6" class="node">
+<g id="Node000006" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="0,-0.5 0,-19.5 29,-19.5 29,-0.5 0,-0.5"/>
-<text text-anchor="middle" x="14.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">K</text>
+<g id="a_Node000006"><a xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="29,-19 0,-19 0,0 29,0 29,-19"/>
+<text text-anchor="middle" x="14.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">K</text>
 </a>
 </g>
 </g>
 <!-- Node6&#45;&gt;Node5 -->
-<g id="edge5" class="edge">
+<g id="edge5_Node000005_Node000006" class="edge">
 <title>Node6&#45;&gt;Node5</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M39.53,-10C53.74,-10 72.51,-10 90.93,-10"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="39.21,-6.5 29.21,-10 39.21,-13.5 39.21,-6.5"/>
-<text text-anchor="middle" x="60" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00"> keys</text>
+<g id="a_edge5_Node000005_Node000006"><a xlink:title=" ">
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M39.53,-9.5C53.74,-9.5 72.51,-9.5 90.93,-9.5"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="39.21,-6 29.21,-9.5 39.21,-13 39.21,-6"/>
+</a>
+</g>
+<text text-anchor="middle" x="60" y="-12.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> keys</text>
 </g>
 </g>
 </svg>

@@ -1,5 +1,7 @@
 <map id="call_grapht::function_nodet" name="call_grapht::function_nodet">
-<area shape="rect" id="node1" title="Node of the directed graph representation of this call graph." alt="" coords="21,185,175,227"/>
-<area shape="rect" id="node2" href="$classgraph__nodet.html" title=" " alt="" coords="5,95,191,136"/>
-<area shape="rect" id="node3" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="27,5,169,32"/>
+<area shape="rect" id="Node000001" title="Node of the directed graph representation of this call graph." alt="" coords="21,183,175,223"/>
+<area shape="rect" id="Node000002" href="$classgraph__nodet.html" title=" " alt="" coords="5,93,191,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,147,101,183,95,183,95,147"/>
+<area shape="rect" id="Node000003" href="$classgraph__nodet.html" title="This class represents a node in a directed graph." alt="" coords="27,5,169,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,44,101,93,95,93,95,44"/>
 </map>

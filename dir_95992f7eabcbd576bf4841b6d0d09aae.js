@@ -1,16 +1,9 @@
 var dir_95992f7eabcbd576bf4841b6d0d09aae =
 [
     [ "arrays.cpp", "arrays_8cpp.html", null ],
-    [ "arrays.h", "arrays_8h.html", [
-      [ "arrayst", "classarrayst.html", "classarrayst" ],
-      [ "array_equalityt", "structarrayst_1_1array__equalityt.html", "structarrayst_1_1array__equalityt" ],
-      [ "lazy_constraintt", "structarrayst_1_1lazy__constraintt.html", "structarrayst_1_1lazy__constraintt" ]
-    ] ],
+    [ "arrays.h", "arrays_8h.html", "arrays_8h" ],
     [ "boolbv.cpp", "boolbv_8cpp.html", null ],
-    [ "boolbv.h", "boolbv_8h.html", [
-      [ "boolbvt", "classboolbvt.html", "classboolbvt" ],
-      [ "quantifiert", "classboolbvt_1_1quantifiert.html", "classboolbvt_1_1quantifiert" ]
-    ] ],
+    [ "boolbv.h", "boolbv_8h.html", "boolbv_8h" ],
     [ "boolbv_abs.cpp", "boolbv__abs_8cpp.html", null ],
     [ "boolbv_add_sub.cpp", "boolbv__add__sub_8cpp.html", null ],
     [ "boolbv_array.cpp", "boolbv__array_8cpp.html", null ],
@@ -39,10 +32,7 @@ var dir_95992f7eabcbd576bf4841b6d0d09aae =
     [ "boolbv_index.cpp", "boolbv__index_8cpp.html", "boolbv__index_8cpp" ],
     [ "boolbv_let.cpp", "boolbv__let_8cpp.html", null ],
     [ "boolbv_map.cpp", "boolbv__map_8cpp.html", null ],
-    [ "boolbv_map.h", "boolbv__map_8h.html", [
-      [ "boolbv_mapt", "classboolbv__mapt.html", "classboolbv__mapt" ],
-      [ "map_entryt", "classboolbv__mapt_1_1map__entryt.html", "classboolbv__mapt_1_1map__entryt" ]
-    ] ],
+    [ "boolbv_map.h", "boolbv__map_8h.html", "boolbv__map_8h" ],
     [ "boolbv_member.cpp", "boolbv__member_8cpp.html", "boolbv__member_8cpp" ],
     [ "boolbv_mod.cpp", "boolbv__mod_8cpp.html", null ],
     [ "boolbv_mult.cpp", "boolbv__mult_8cpp.html", null ],
@@ -64,38 +54,21 @@ var dir_95992f7eabcbd576bf4841b6d0d09aae =
     [ "boolbv_update_bit.cpp", "boolbv__update__bit_8cpp.html", null ],
     [ "boolbv_update_bits.cpp", "boolbv__update__bits_8cpp.html", null ],
     [ "boolbv_width.cpp", "boolbv__width_8cpp.html", null ],
-    [ "boolbv_width.h", "boolbv__width_8h.html", [
-      [ "boolbv_widtht", "classboolbv__widtht.html", "classboolbv__widtht" ],
-      [ "membert", "structboolbv__widtht_1_1membert.html", "structboolbv__widtht_1_1membert" ],
-      [ "defined_entryt", "structboolbv__widtht_1_1defined__entryt.html", "structboolbv__widtht_1_1defined__entryt" ]
-    ] ],
+    [ "boolbv_width.h", "boolbv__width_8h.html", "boolbv__width_8h" ],
     [ "boolbv_with.cpp", "boolbv__with_8cpp.html", null ],
     [ "bv_dimacs.cpp", "bv__dimacs_8cpp.html", null ],
-    [ "bv_dimacs.h", "bv__dimacs_8h.html", [
-      [ "bv_dimacst", "classbv__dimacst.html", "classbv__dimacst" ]
-    ] ],
+    [ "bv_dimacs.h", "bv__dimacs_8h.html", "bv__dimacs_8h" ],
     [ "bv_minimize.cpp", "bv__minimize_8cpp.html", null ],
     [ "bv_minimize.h", "bv__minimize_8h.html", "bv__minimize_8h" ],
     [ "bv_pointers.cpp", "bv__pointers_8cpp.html", "bv__pointers_8cpp" ],
-    [ "bv_pointers.h", "bv__pointers_8h.html", [
-      [ "bv_pointerst", "classbv__pointerst.html", "classbv__pointerst" ],
-      [ "postponedt", "structbv__pointerst_1_1postponedt.html", "structbv__pointerst_1_1postponedt" ]
-    ] ],
+    [ "bv_pointers.h", "bv__pointers_8h.html", "bv__pointers_8h" ],
     [ "bv_utils.cpp", "bv__utils_8cpp.html", "bv__utils_8cpp" ],
-    [ "bv_utils.h", "bv__utils_8h.html", [
-      [ "bv_utilst", "classbv__utilst.html", "classbv__utilst" ]
-    ] ],
+    [ "bv_utils.h", "bv__utils_8h.html", "bv__utils_8h" ],
     [ "c_bit_field_replacement_type.cpp", "c__bit__field__replacement__type_8cpp.html", "c__bit__field__replacement__type_8cpp" ],
     [ "c_bit_field_replacement_type.h", "c__bit__field__replacement__type_8h.html", "c__bit__field__replacement__type_8h" ],
     [ "equality.cpp", "equality_8cpp.html", null ],
-    [ "equality.h", "equality_8h.html", [
-      [ "equalityt", "classequalityt.html", "classequalityt" ],
-      [ "typestructt", "structequalityt_1_1typestructt.html", "structequalityt_1_1typestructt" ]
-    ] ],
+    [ "equality.h", "equality_8h.html", "equality_8h" ],
     [ "literal_vector_expr.h", "literal__vector__expr_8h.html", "literal__vector__expr_8h" ],
     [ "pointer_logic.cpp", "pointer__logic_8cpp.html", null ],
-    [ "pointer_logic.h", "pointer__logic_8h.html", [
-      [ "pointer_logict", "classpointer__logict.html", "classpointer__logict" ],
-      [ "pointert", "structpointer__logict_1_1pointert.html", "structpointer__logict_1_1pointert" ]
-    ] ]
+    [ "pointer_logic.h", "pointer__logic_8h.html", "pointer__logic_8h" ]
 ];

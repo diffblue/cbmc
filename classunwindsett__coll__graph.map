@@ -1,10 +1,18 @@
 <map id="unwindsett" name="unwindsett">
-<area shape="rect" id="node1" title=" " alt="" coords="904,139,999,165"/>
-<area shape="rect" id="node2" title=" " alt="" coords="508,124,739,180"/>
-<area shape="rect" id="node3" title=" " alt="" coords="157,103,292,129"/>
-<area shape="rect" id="node6" title=" " alt="" coords="518,58,729,99"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,77,44,104"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,128,44,155"/>
-<area shape="rect" id="node7" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="189,5,261,32"/>
-<area shape="rect" id="node8" href="$classabstract__goto__modelt.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="541,204,705,231"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="904,65,999,91"/>
+<area shape="rect" id="Node000002" href="$classabstract__goto__modelt.html" title="Abstract interface to eager or lazy GOTO models." alt="" coords="541,8,705,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="719,29,881,55,909,63,908,68,879,61,719,34"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="518,58,729,98"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="743,75,904,75,904,81,743,81"/>
+<area shape="rect" id="Node000004" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="189,5,261,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="275,23,484,54,518,59,517,64,484,59,274,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="157,103,292,128"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="305,105,518,85,518,90,306,110"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="508,124,739,179"/>
+<area shape="poly" id="edge8_Node000008_Node000005" title=" " alt="" coords="264,131,317,149,414,159,508,159,508,164,413,165,315,154,262,136"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,77,44,103"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="58,91,157,104,157,109,57,97"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,127,44,152"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="58,136,133,131,168,125,169,131,134,137,58,142"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="751,124,879,95,907,88,908,93,881,101,753,129"/>
 </map>

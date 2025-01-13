@@ -20,7 +20,7 @@ var classjava__bytecode__languaget =
     [ "initialize_class_loader", "classjava__bytecode__languaget.html#a930d563120ad586225c37da973a0785c", null ],
     [ "methods_provided", "classjava__bytecode__languaget.html#a003bf82dc490d51197043cfb70a0839f", null ],
     [ "modules_provided", "classjava__bytecode__languaget.html#a9b031de42fb5d0fe1a2ae705545c8b73", null ],
-    [ "new_language", "classjava__bytecode__languaget.html#a4202acca3fd114dc994f91be0b625c4e", null ],
+    [ "new_language", "classjava__bytecode__languaget.html#a4512f8b8e12a4222ca2b497ad50ae1b9", null ],
     [ "parse", "classjava__bytecode__languaget.html#afe55bd1c9b0a0b3604bd034bdde7561c", null ],
     [ "parse_from_main_class", "classjava__bytecode__languaget.html#ab32eab233cbbfe988feeb2ce982f87fc", null ],
     [ "preprocess", "classjava__bytecode__languaget.html#acf962e24b8ae1afc58f720ddf8cf2424", null ],
