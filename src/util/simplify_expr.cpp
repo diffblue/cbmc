@@ -975,6 +975,52 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       else if(op_id==ID_ashr || op_id==ID_lshr || op_id==ID_shl)
       {
       }
+      else if(op_id == ID_zero_extend)
+      {
+        const exprt &zero_extended_op = to_zero_extend_expr(expr.op());
+        if(
+          auto bv_type =
+            type_try_dynamic_cast<bitvector_typet>(zero_extended_op.type()))
+        {
+          auto new_expr = expr;
+          if(
+            bv_type->id() == ID_signedbv &&
+            bv_type->get_width() < to_bitvector_type(expr_type).get_width())
+          {
+            new_expr.op() =
+              simplify_typecast(
+                typecast_exprt{
+                  zero_extended_op, unsignedbv_typet{bv_type->get_width()}})
+                .expr;
+          }
+          else
+            new_expr.op() = zero_extended_op;
+          return changed(simplify_typecast(new_expr)); // rec. call
+        }
+      }
+      else if(op_id == ID_concatenation)
+      {
+        const auto &operands = expr.op().operands();
+        if(
+          operands.size() == 2 && operands.front().is_constant() &&
+          to_constant_expr(operands.front()).value_is_zero_string())
+        {
+          auto new_expr = expr;
+          const bitvector_typet &bv_type =
+            to_bitvector_type(operands.back().type());
+          if(bv_type.id() == ID_signedbv)
+          {
+            new_expr.op() =
+              simplify_typecast(
+                typecast_exprt{
+                  operands.back(), unsignedbv_typet{bv_type.get_width()}})
+                .expr;
+          }
+          else
+            new_expr.op() = operands.back();
+          return changed(simplify_typecast(new_expr)); // rec. call
+        }
+      }
     }
   }
 
