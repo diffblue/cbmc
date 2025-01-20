@@ -1,3 +1,8 @@
+void __asm_mfence(void)
+{
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence");
+}
+
 volatile int turn;
 int x;
 volatile int flag1 = 0, flag2 = 0;
