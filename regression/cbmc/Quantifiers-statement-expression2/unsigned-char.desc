@@ -1,0 +1,16 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+
+^\*\* Results:$
+^\[main.assertion.1\] line 12 assertion b\[.*0\] == 10 && b\[.*1\] == 10: SUCCESS$
+^\[main.assertion.2\] line 13 assertion c\[.*0\] == 10 && c\[.*1\] == 10: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+skip_typecast as used in expr_eq of boolbv_quantifier.cpp no longer applies when
+using an unsigned char, which makes our quantifier instantiation fail when
+triggered from our in-tree SMT solver. We need to audit all uses of
+skip_typecast as some of these may even be unsound.
