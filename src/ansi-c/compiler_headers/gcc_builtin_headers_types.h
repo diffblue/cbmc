@@ -1,5 +1,4 @@
 // clang-format off
-typedef void ** __builtin_va_list;
 typedef void ** __builtin_ms_va_list;
 
 typedef int    __gcc_m64   __attribute__ ((__vector_size__ (8), __may_alias__));

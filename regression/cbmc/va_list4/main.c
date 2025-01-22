@@ -1,4 +1,4 @@
-#ifdef __GNUC__
+#if defined(__GNUC__) && (!defined(__aarch64__) || defined(__APPLE__))
 
 struct __va_list_tag;
 typedef struct __va_list_tag __va_list_tag;
