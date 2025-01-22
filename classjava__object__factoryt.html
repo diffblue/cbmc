@@ -711,7 +711,7 @@ Private Attributes</h2></td></tr>
 <p>Generate codet assignments to initalize the selected concrete type. </p>
 <p>Generated code looks as follows (here A = replacement_pointer.subtype()):</p>
 <p>// allocate memory for a new object, depends on <code>lifetime</code> A { ... } tmp_object;</p>
-<p>// non-det init all the fields of A <a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">A.x</a> = NONDET(...) <a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">A.y</a> = NONDET(...)</p>
+<p>// non-det init all the fields of A <a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">A.x</a> = <a class="el" href="dfcc__spec__functions_8h.html#a3ecf46e1e7fbd4d056d745e57a5f12f8ab4f81fec985f333bd5faf678bb12ef2f" title="havocs the pointer to an nondet pointer">NONDET(...)</a> <a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">A.y</a> = <a class="el" href="dfcc__spec__functions_8h.html#a3ecf46e1e7fbd4d056d745e57a5f12f8ab4f81fec985f333bd5faf678bb12ef2f" title="havocs the pointer to an nondet pointer">NONDET(...)</a></p>
 <p>// assign <code>expr</code> with a suitably casted pointer to new_object A * p = &amp;tmp_object</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -801,8 +801,9 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="comment">// recursive initialization of obj in NO_UPDATE_IN_PLACE mode</span></div>
 <div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
 </div><!-- fragment --><p>When in MUST_UPDATE_IN_PLACE mode, all code is emitted by a recursive call to gen_nondet_init in MUST_UPDATE_IN_PLACE mode, and looks like:</p>
-<div class="fragment"><div class="line">(*&lt;expr&gt;).<a class="code hl_class" href="classait.html">some_int</a> := <a class="code hl_class" href="classait.html">NONDET</a>(<a class="code hl_class" href="classait.html">int</a>)</div>
-<div class="line">(*&lt;expr&gt;).<a class="code hl_class" href="classait.html">some_char</a> := <a class="code hl_class" href="classait.html">NONDET</a>(<a class="code hl_class" href="classait.html">char</a>)</div>
+<div class="fragment"><div class="line">(*&lt;expr&gt;).<a class="code hl_class" href="classait.html">some_int</a> := <a class="code hl_enumvalue" href="dfcc__spec__functions_8h.html#a3ecf46e1e7fbd4d056d745e57a5f12f8ab4f81fec985f333bd5faf678bb12ef2f">NONDET</a>(<a class="code hl_class" href="classait.html">int</a>)</div>
+<div class="line">(*&lt;expr&gt;).<a class="code hl_class" href="classait.html">some_char</a> := <a class="code hl_enumvalue" href="dfcc__spec__functions_8h.html#a3ecf46e1e7fbd4d056d745e57a5f12f8ab4f81fec985f333bd5faf678bb12ef2f">NONDET</a>(<a class="code hl_class" href="classait.html">char</a>)</div>
+<div class="ttc" id="adfcc__spec__functions_8h_html_a3ecf46e1e7fbd4d056d745e57a5f12f8ab4f81fec985f333bd5faf678bb12ef2f"><div class="ttname"><a href="dfcc__spec__functions_8h.html#a3ecf46e1e7fbd4d056d745e57a5f12f8ab4f81fec985f333bd5faf678bb12ef2f">dfcc_ptr_havoc_modet::NONDET</a></div><div class="ttdeci">@ NONDET</div><div class="ttdoc">havocs the pointer to an nondet pointer</div></div>
 </div><!-- fragment --><p> It is illegal to call the function with MAY_UPDATE_IN_PLACE.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

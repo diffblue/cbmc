@@ -81,6 +81,7 @@ var cprover__builtin__headers_8h =
     [ "__CPROVER_object_whole", "cprover__builtin__headers_8h.html#a4fa7fcb05ec9018275a358ae39f80392", null ],
     [ "__CPROVER_old", "cprover__builtin__headers_8h.html#a10645790184f1c29e831659a4fd568bb", null ],
     [ "__CPROVER_output", "cprover__builtin__headers_8h.html#aa0a661d278b3b171c33c1b15d32449a3", null ],
+    [ "__CPROVER_pointer_equals", "cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72", null ],
     [ "__CPROVER_pointer_in_range", "cprover__builtin__headers_8h.html#a1b20b799960319368a2fa329aaf5f676", null ],
     [ "__CPROVER_pointer_in_range_dfcc", "cprover__builtin__headers_8h.html#a33926c3f831d23353ac2baf02eeb063a", null ],
     [ "__CPROVER_POINTER_OBJECT", "cprover__builtin__headers_8h.html#a84fcea3f7109884566cb6e4e934abf13", null ],

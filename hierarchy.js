@@ -455,6 +455,7 @@ var hierarchy =
     [ "dfcc_lift_memory_predicatest", "classdfcc__lift__memory__predicatest.html", null ],
     [ "dfcc_loop_infot", "classdfcc__loop__infot.html", null ],
     [ "dfcc_obeys_contractt", "classdfcc__obeys__contractt.html", null ],
+    [ "dfcc_pointer_equalst", "classdfcc__pointer__equalst.html", null ],
     [ "dfcc_pointer_in_ranget", "classdfcc__pointer__in__ranget.html", null ],
     [ "dfcc_spec_functionst", "classdfcc__spec__functionst.html", null ],
     [ "dfcc_swap_and_wrapt", "classdfcc__swap__and__wrapt.html", null ],
@@ -574,7 +575,9 @@ var hierarchy =
     [ "expr_queryt< T >", "classexpr__queryt.html", null ],
     [ "expr_skeletont", "classexpr__skeletont.html", null ],
     [ "detail::expr_try_dynamic_cast_return_typet< Ret, T >", "structdetail_1_1expr__try__dynamic__cast__return__typet.html", null ],
-    [ "expr_visitort", "classexpr__visitort.html", null ],
+    [ "expr_visitort", "classexpr__visitort.html", [
+      [ "pointer_equality_visitort", "classpointer__equality__visitort.html", null ]
+    ] ],
     [ "smt_bit_vector_theoryt::extractt", "structsmt__bit__vector__theoryt_1_1extractt.html", null ],
     [ "smt_function_application_termt::factoryt< functiont >", "classsmt__function__application__termt_1_1factoryt.html", null ],
     [ "smt_function_application_termt::factoryt< smt_array_theoryt::selectt >", "classsmt__function__application__termt_1_1factoryt.html", null ],

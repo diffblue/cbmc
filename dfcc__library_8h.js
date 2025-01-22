@@ -42,6 +42,7 @@ var dfcc__library_8h =
       [ "LINK_IS_FRESH", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57caa88478d9a860164e16494a799556a640", null ],
       [ "LINK_ALLOCATED", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cac2032fb582d7cd029f268f995eb8a298", null ],
       [ "LINK_DEALLOCATED", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca4f1c276440e066c96db9d064173243ae", null ],
+      [ "POINTER_EQUALS", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca80885f1999610798ae7e2d9480627e27", null ],
       [ "IS_FRESH", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57cacf027dd86cc7b624d490bff9f5d0cd9d", null ],
       [ "POINTER_IN_RANGE_DFCC", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca2920c74fa9cac391e894d2aef1f63623", null ],
       [ "IS_FREEABLE", "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca0a6f938522ddc6da8229dc6b80359227", null ],

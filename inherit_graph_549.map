@@ -1,31 +1,25 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="32,105,119,131"/>
-<area shape="rect" id="Node000001" href="$classgoto__convertt.html" title=" " alt="" coords="200,31,312,56"/>
-<area shape="poly" id="edge394_Node000000_Node000001" title=" " alt="" coords="117,97,192,65,220,54,222,59,194,70,119,102"/>
-<area shape="rect" id="Node000004" href="$classpreprocessort.html" title=" " alt="" coords="201,80,311,105"/>
-<area shape="poly" id="edge397_Node000000_Node000004" title=" " alt="" coords="132,107,200,98,201,103,133,113"/>
-<area shape="rect" id="Node000005" href="$classsafety__checkert.html" title=" " alt="" coords="193,129,319,155"/>
-<area shape="poly" id="edge398_Node000000_Node000005" title=" " alt="" coords="133,123,194,131,193,136,132,128"/>
-<area shape="rect" id="Node000006" href="$classtypecheckt.html" title=" " alt="" coords="209,179,303,204"/>
-<area shape="poly" id="edge399_Node000000_Node000006" title=" " alt="" coords="121,133,224,176,222,181,119,138"/>
-<area shape="rect" id="Node000002" href="$classcleanert.html" title="Class that allows to clean expressions of side effects and to generate havoc_slice expressions." alt="" coords="427,5,502,31"/>
-<area shape="poly" id="edge395_Node000001_Node000002" title=" " alt="" coords="326,32,427,20,427,25,326,38"/>
-<area shape="rect" id="Node000003" href="$classgoto__convert__functionst.html" title=" " alt="" coords="375,55,554,80"/>
-<area shape="poly" id="edge396_Node000001_Node000003" title=" " alt="" coords="326,49,375,54,375,60,326,54"/>
-<area shape="rect" id="Node000007" href="$classc__typecheck__baset.html" title=" " alt="" coords="391,228,538,253"/>
-<area shape="poly" id="edge400_Node000006_Node000007" title=" " alt="" coords="317,203,411,225,410,231,316,208"/>
-<area shape="rect" id="Node000013" href="$classjava__bytecode__typecheckt.html" title=" " alt="" coords="367,129,563,155"/>
-<area shape="poly" id="edge403_Node000006_Node000013" title=" " alt="" coords="316,175,410,152,411,157,317,180"/>
-<area shape="rect" id="Node000014" href="$classstatement__list__typecheckt.html" title="Class for encapsulating the current state of the type check." alt="" coords="367,179,562,204"/>
-<area shape="poly" id="edge404_Node000006_Node000014" title=" " alt="" coords="317,189,367,189,367,194,317,194"/>
-<area shape="rect" id="Node000008" href="$classansi__c__typecheckt.html" title=" " alt="" coords="611,204,753,229"/>
-<area shape="poly" id="edge401_Node000007_Node000008" title=" " alt="" coords="551,228,610,222,611,227,552,234"/>
-<area shape="rect" id="Node000009" href="$classcpp__typecheckt.html" title=" " alt="" coords="620,253,744,279"/>
-<area shape="poly" id="edge402_Node000007_Node000009" title=" " alt="" coords="552,248,620,256,620,261,551,253"/>
-<area shape="rect" id="Node000012" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="5,253,145,279"/>
-<area shape="rect" id="Node000010" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="205,253,307,279"/>
-<area shape="poly" id="edge405_Node000012_Node000010" title=" " alt="" coords="159,263,204,263,204,269,159,269"/>
-<area shape="poly" id="edge406_Node000010_Node000007" title=" " alt="" coords="321,256,391,247,392,252,321,261"/>
-<area shape="rect" id="Node000011" href="$classmulti__namespacet.html" title="A multi namespace is essentially a namespace, with a list of namespaces." alt="" coords="393,277,536,303"/>
-<area shape="poly" id="edge407_Node000010_Node000011" title=" " alt="" coords="322,271,394,279,393,284,321,276"/>
+<area shape="rect" id="Node000000" href="$classmessage__handlert.html" title=" " alt="" coords="5,153,148,179"/>
+<area shape="rect" id="Node000001" href="$classapi__message__handlert.html" title=" " alt="" coords="211,5,380,31"/>
+<area shape="poly" id="edge384_Node000000_Node000001" title=" " alt="" coords="92,140,134,89,163,62,195,40,220,28,223,33,197,44,166,66,138,93,96,144"/>
+<area shape="rect" id="Node000002" href="$classconsole__message__handlert.html" title=" " alt="" coords="196,55,395,80"/>
+<area shape="poly" id="edge385_Node000000_Node000002" title=" " alt="" coords="104,143,145,115,195,89,228,78,230,83,197,94,148,120,107,147"/>
+<area shape="rect" id="Node000005" href="$classinlining__decoratort.html" title="Decorator for a message_handlert used during function inlining that collect names of GOTO functions c..." alt="" coords="223,104,367,129"/>
+<area shape="poly" id="edge388_Node000000_Node000005" title=" " alt="" coords="146,148,238,127,239,132,147,153"/>
+<area shape="rect" id="Node000006" href="$classnull__message__handlert.html" title=" " alt="" coords="209,153,382,179"/>
+<area shape="poly" id="edge389_Node000000_Node000006" title=" " alt="" coords="162,163,208,163,208,169,162,169"/>
+<area shape="rect" id="Node000007" href="$classsmt2__message__handlert.html" title=" " alt="" coords="204,203,387,228"/>
+<area shape="poly" id="edge390_Node000000_Node000007" title=" " alt="" coords="147,179,239,200,238,205,146,184"/>
+<area shape="rect" id="Node000008" href="$classstream__message__handlert.html" title=" " alt="" coords="198,252,393,277"/>
+<area shape="poly" id="edge391_Node000000_Node000008" title=" " alt="" coords="107,184,149,212,197,237,234,249,232,254,195,242,146,216,104,189"/>
+<area shape="rect" id="Node000011" href="$classui__message__handlert.html" title=" " alt="" coords="215,301,376,327"/>
+<area shape="poly" id="edge394_Node000000_Node000011" title=" " alt="" coords="96,188,138,239,166,266,197,288,223,299,220,304,195,292,163,270,134,243,92,192"/>
+<area shape="rect" id="Node000003" href="$classcl__message__handlert.html" title=" " alt="" coords="451,31,611,56"/>
+<area shape="poly" id="edge386_Node000002_Node000003" title=" " alt="" coords="408,53,451,49,452,54,409,59"/>
+<area shape="rect" id="Node000004" href="$classgcc__message__handlert.html" title=" " alt="" coords="446,80,617,105"/>
+<area shape="poly" id="edge387_Node000002_Node000004" title=" " alt="" coords="409,77,446,81,446,86,408,82"/>
+<area shape="rect" id="Node000009" href="$classcerr__message__handlert.html" title=" " alt="" coords="444,227,619,252"/>
+<area shape="poly" id="edge392_Node000008_Node000009" title=" " alt="" coords="406,250,443,246,444,251,407,255"/>
+<area shape="rect" id="Node000010" href="$classcout__message__handlert.html" title=" " alt="" coords="443,276,620,301"/>
+<area shape="poly" id="edge393_Node000008_Node000010" title=" " alt="" coords="407,273,443,277,442,282,406,279"/>
 </map>

@@ -36,6 +36,8 @@ var dir_c09e2f4c4cbc9b698baa471c135538ab =
     [ "dfcc_loop_tags.h", "dfcc__loop__tags_8h.html", "dfcc__loop__tags_8h" ],
     [ "dfcc_obeys_contract.cpp", "dfcc__obeys__contract_8cpp.html", null ],
     [ "dfcc_obeys_contract.h", "dfcc__obeys__contract_8h.html", "dfcc__obeys__contract_8h" ],
+    [ "dfcc_pointer_equals.cpp", "dfcc__pointer__equals_8cpp.html", "dfcc__pointer__equals_8cpp" ],
+    [ "dfcc_pointer_equals.h", "dfcc__pointer__equals_8h.html", "dfcc__pointer__equals_8h" ],
     [ "dfcc_pointer_in_range.cpp", "dfcc__pointer__in__range_8cpp.html", null ],
     [ "dfcc_pointer_in_range.h", "dfcc__pointer__in__range_8h.html", "dfcc__pointer__in__range_8h" ],
     [ "dfcc_root_object.cpp", "dfcc__root__object_8cpp.html", "dfcc__root__object_8cpp" ],

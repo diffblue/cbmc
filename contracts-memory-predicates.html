@@ -100,43 +100,84 @@ $(document).ready(function(){initNavTree('contracts-memory-predicates.html','');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md113">The __CPROVER_is_fresh predicate</a><ul><li class="level2"><a href="#autotoc_md114">Syntax</a><ul><li class="level3"><a href="#autotoc_md115">Parameters</a></li>
-<li class="level3"><a href="#autotoc_md116">Return Value</a></li>
+<ul><li class="level1"><a href="#autotoc_md114">The __CPROVER_pointer_equals predicate</a><ul><li class="level2"><a href="#autotoc_md115">Syntax</a><ul><li class="level3"><a href="#autotoc_md116">Parameters</a></li>
+<li class="level3"><a href="#autotoc_md117">Return Value</a></li>
 </ul>
 </li>
-<li class="level2"><a href="#autotoc_md117">Semantics</a><ul><li class="level3"><a href="#autotoc_md118">Enforcement</a></li>
-<li class="level3"><a href="#autotoc_md119">Replacement</a></li>
-<li class="level3"><a href="#autotoc_md120">Influence of memory allocation failure modes flags in assumption contexts</a></li>
+<li class="level2"><a href="#autotoc_md118">Semantics</a><ul><li class="level3"><a href="#autotoc_md119">Enforcement</a></li>
+<li class="level3"><a href="#autotoc_md120">Replacement</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md121">The __CPROVER_pointer_in_range_dfcc predicate</a><ul><li class="level2"><a href="#autotoc_md122">Syntax</a></li>
-<li class="level2"><a href="#autotoc_md123">Semantics</a></li>
+<li class="level1"><a href="#autotoc_md121">The __CPROVER_is_fresh predicate</a><ul><li class="level2"><a href="#autotoc_md122">Syntax</a><ul><li class="level3"><a href="#autotoc_md123">Parameters</a></li>
+<li class="level3"><a href="#autotoc_md124">Return Value</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md124">User defined memory predicates</a><ul><li class="level2"><a href="#autotoc_md125">Limitations</a></li>
+<li class="level2"><a href="#autotoc_md125">Semantics</a><ul><li class="level3"><a href="#autotoc_md126">Enforcement</a></li>
+<li class="level3"><a href="#autotoc_md127">Replacement</a></li>
+<li class="level3"><a href="#autotoc_md128">Influence of memory allocation failure modes flags in assumption contexts</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md126">Additional Resources</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#autotoc_md129">The __CPROVER_pointer_in_range_dfcc predicate</a><ul><li class="level2"><a href="#autotoc_md130">Syntax</a></li>
+<li class="level2"><a href="#autotoc_md131">Semantics</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#autotoc_md132">User defined memory predicates</a><ul><li class="level2"><a href="#autotoc_md133">Limitations</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#autotoc_md134">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<p>The built-in and user-defined predicates discussed in this section are meant to let users describe the shape of the memory accessed through pointers in <em>requires clauses</em> and <em>ensures clauses</em>. Attempting to call these predicates outside of a requires or ensures clause context will result in a verification error. </p>
-<h1><a class="anchor" id="autotoc_md113"></a>
+<p>The built-in and user-defined predicates discussed in this section are meant to let users describe the shape of the memory accessed through pointers in <em>requires clauses</em> and <em>ensures clauses</em>. Attempting to call these predicates outside of a requires or ensures clause context will result in a verification error.</p>
+<h1><a class="anchor" id="autotoc_md114"></a>
+The __CPROVER_pointer_equals predicate</h1>
+<h2><a class="anchor" id="autotoc_md115"></a>
+Syntax</h2>
+<div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a>(<span class="keywordtype">void</span> *p, <span class="keywordtype">void</span> *<a class="code hl_class" href="classait.html">q</a>);</div>
+<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
+<div class="ttc" id="acprover__builtin__headers_8h_html_ac61fb50d2ca904c50381ed220caa1c72"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_pointer_equals(void *p, void *q)</div></div>
+</div><!-- fragment --><p> This predicate can only be used in ensures and requires clauses and checks for pointer validity and equality.</p>
+<h3><a class="anchor" id="autotoc_md116"></a>
+Parameters</h3>
+<p><code>__CPROVER_pointer_equals</code> takes two pointers as arguments.</p>
+<h3><a class="anchor" id="autotoc_md117"></a>
+Return Value</h3>
+<p>It returns a <code>bool</code> value:</p><ul>
+<li><code>true</code> iff pointers are both null or valid and are equal,</li>
+<li><code>false</code> otherwise.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md118"></a>
+Semantics</h2>
+<h3><a class="anchor" id="autotoc_md119"></a>
+Enforcement</h3>
+<p>When checking a contract using <code>--enforce-contract foo</code>:</p><ul>
+<li>used in a <em>requires</em> clause, the predicate will check that <code>ptr2</code> is always either null or valid, and it will make <code>ptr1</code> equal to <code>ptr2</code>. This results in a state resulting in a state where both pointers are either null or valid and equal;</li>
+<li>used in an <em>ensures</em> clause it will check that memory both pointers are always either null or valid and equal.</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md120"></a>
+Replacement</h3>
+<p>When checking a contract using <code>--replace-call-with-contract foo</code>, we get the dual behaviour:</p><ul>
+<li>used in a <em>requires</em> clause it will check that memory both pointers are always either null or valid and equal,</li>
+<li>used in an <em>ensures</em> clause, the predicate will check that <code>ptr2</code> is always either null or valid, and it will make <code>ptr1</code> equal to <code>ptr2</code>. This results in a state resulting in a state where both pointers are either null or valid and equal.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md121"></a>
 The __CPROVER_is_fresh predicate</h1>
-<h2><a class="anchor" id="autotoc_md114"></a>
+<h2><a class="anchor" id="autotoc_md122"></a>
 Syntax</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<span class="keywordtype">void</span> *p, <span class="keywordtype">size_t</span> size);</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ad4e9673ed79a6d8ff4af6cf12d95c29f"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_is_fresh(const void *mem, __CPROVER_size_t size)</div></div>
 </div><!-- fragment --><p>To specify memory footprint we use a special function called <code>__CPROVER_is_fresh</code>. The meaning of <code>__CPROVER_is_fresh</code> is that we are borrowing a pointer from the external environment (in a precondition), or returning it to the calling context (in a postcondition).</p>
-<h3><a class="anchor" id="autotoc_md115"></a>
+<h3><a class="anchor" id="autotoc_md123"></a>
 Parameters</h3>
 <p><code>__CPROVER_is_fresh</code> takes two arguments: a pointer and an allocation size. The first argument is the pointer to be checked for "freshness" (i.e., not previously allocated), and the second is the expected size <b>in bytes</b> for the memory available at the pointer.</p>
-<h3><a class="anchor" id="autotoc_md116"></a>
+<h3><a class="anchor" id="autotoc_md124"></a>
 Return Value</h3>
 <p>It returns a <code>bool</code> value, indicating whether the pointer is fresh.</p>
-<h2><a class="anchor" id="autotoc_md117"></a>
+<h2><a class="anchor" id="autotoc_md125"></a>
 Semantics</h2>
 <p>To illustrate the semantics for <code>__CPROVER_is_fresh</code>, consider the following implementation of <code>sum</code> function.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">err_signal</a>; <span class="comment">// Global variable</span></div>
@@ -153,9 +194,8 @@ Semantics</h2>
 <div class="line">  *out = (<a class="code hl_class" href="classait.html">uint32_t</a>) result;</div>
 <div class="line">  *<a class="code hl_class" href="classait.html">err_signal</a> = <a class="code hl_class" href="classait.html">SUCCESS</a>;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition</b> <a href="stdlib_8c_source.html#l00212">stdlib.c:212</a></div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md118"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md126"></a>
 Enforcement</h3>
 <p>When checking the contract abstracts a function a <code>__CPROVER_is_fresh</code> in a <em>requires</em> clause will cause fresh memory to be allocated. In an <em>ensures</em> clause it will check that memory was freshly allocated.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">err_signal</a>; <span class="comment">// Global variable</span></div>
@@ -180,7 +220,7 @@ Enforcement</h3>
 <div class="line">}</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a564e8a5a7bebea04fdd5ee1277832478"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a></div><div class="ttdeci">void __CPROVER_assert(__CPROVER_bool assertion, const char *description)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ae5af07e274b573cd0f23ffb9d332bef2"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a></div><div class="ttdeci">void __CPROVER_assume(__CPROVER_bool assumption)</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md119"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md127"></a>
 Replacement</h3>
 <p>In our example, consider that a function <code>foo</code> may call <code>sum</code>.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">err_signal</a>; <span class="comment">// Global variable</span></div>
@@ -215,7 +255,7 @@ Replacement</h3>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">return</span> *<a class="code hl_class" href="classait.html">err_signal</a>;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md120"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md128"></a>
 Influence of memory allocation failure modes flags in assumption contexts</h3>
 <p>CBMC models <a href="https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/memory-primitives.md#malloc-modelling">memory allocation failure modes</a>. When activated, these modesl result in different behaviours for <code>__CPROVER_is_fresh</code> in assumption contexts (i.e. when used in a requires clause of a contract being checked against a function, or in an ensures clause of a contract being used to abstract a function call).</p>
 <ol type="1">
@@ -227,17 +267,17 @@ Influence of memory allocation failure modes flags in assumption contexts</h3>
 <ol type="1">
 <li><b>Fail assert</b> (flags: <code>--malloc-may-fail --malloc-fail-assert</code>): In this mode, if <code>size</code> is larger than <code>__CPROVER_max_malloc_size</code>, an <code>max allocation size exceeded</code> assertion is triggered in <code>malloc</code> and execution continues under the assumption that <code>size</code> is less than <code>__CPROVER_max_malloc_size</code>, with <code>malloc</code> returning a non-NULL pointer. <code>__CPROVER_is_fresh</code> never fails in assumption contexts, so it will trigger a <code>max allocation size exceeded</code> assertion and continue execution under the implicit assumption that <code>size</code> is less than <code>__CPROVER_max_malloc_size</code>.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md121"></a>
+<h1><a class="anchor" id="autotoc_md129"></a>
 The __CPROVER_pointer_in_range_dfcc predicate</h1>
-<h2><a class="anchor" id="autotoc_md122"></a>
+<h2><a class="anchor" id="autotoc_md130"></a>
 Syntax</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#a33926c3f831d23353ac2baf02eeb063a">__CPROVER_pointer_in_range_dfcc</a>(<span class="keywordtype">void</span> *lb, <span class="keywordtype">void</span> *p, <span class="keywordtype">void</span> *ub);</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a33926c3f831d23353ac2baf02eeb063a"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a33926c3f831d23353ac2baf02eeb063a">__CPROVER_pointer_in_range_dfcc</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_pointer_in_range_dfcc(void *lb, void *ptr, void *ub)</div></div>
 </div><!-- fragment --><p>This predicate holds if <code>lb</code>, <code>p</code> and <code>ub</code> are valid pointers within the same object and the pointers are ordered such that <code>lb &lt;= p &amp;&amp; p &lt;= ub</code> holds.</p>
-<h2><a class="anchor" id="autotoc_md123"></a>
+<h2><a class="anchor" id="autotoc_md131"></a>
 Semantics</h2>
 <p>In assertion contexts, the predicate checks the conditions described above. In assumption contexts, the predicate checks that <code>lb</code> and <code>ub</code> are valid pointers into the same object, and updates <code>p</code> using a side effect to be a non-deterministic pointer ranging between <code>lb</code> and <code>ub</code>.</p>
-<h1><a class="anchor" id="autotoc_md124"></a>
+<h1><a class="anchor" id="autotoc_md132"></a>
 User defined memory predicates</h1>
 <p>Users can write their own memory predicates based on the core predicates described above. <code>__CPROVER_is_fresh</code> allows to specify pointer validity and separation. <code>__CPROVER_pointer_in_range</code> allows to specify aliasing constraints.</p>
 <p>For instance, one could write a predicate defining linked lists of at most <code>len</code> elements as follows:</p>
@@ -300,14 +340,14 @@ User defined memory predicates</h1>
 <div class="line">  <span class="keywordflow">return</span> l-&gt;value + l-&gt;next-&gt;value + l-&gt;next-&gt;next-&gt;value + <a class="code hl_class" href="classait.html">b</a>-&gt;first-&gt;size +</div>
 <div class="line">         <a class="code hl_class" href="classait.html">b</a>-&gt;second-&gt;size;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md125"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md133"></a>
 Limitations</h2>
 <p>The main limitation with user defined predicates are:</p><ul>
 <li>their evaluation must terminate;</li>
 <li>self-recursive predicates are supported, but mutually recursive predicates are not supported for the moment.</li>
 </ul>
 <p>For instance, in the <code>is_list</code> example above, recursion is bounded by the use of the explicit <code>len</code> parameter. The <code>is_double_buffer</code> predicate also describes a bounded structure.</p>
-<h1><a class="anchor" id="autotoc_md126"></a>
+<h1><a class="anchor" id="autotoc_md134"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>

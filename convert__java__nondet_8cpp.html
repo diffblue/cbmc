@@ -255,7 +255,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Converts side_effect_exprt_nondett expressions using java_object_factory. </p>
-<p>For example, NONDET(SomeClass *) may become a nondet choice between a null pointer and a fresh instance of SomeClass, whose fields are in turn nondet initialized in the same way. See <a class="el" href="java__object__factory_8h.html">java_object_factory.h</a> for details.</p>
+<p>For example, <a class="el" href="dfcc__spec__functions_8h.html#a3ecf46e1e7fbd4d056d745e57a5f12f8ab4f81fec985f333bd5faf678bb12ef2f" title="havocs the pointer to an nondet pointer">NONDET(SomeClass *)</a> may become a nondet choice between a null pointer and a fresh instance of SomeClass, whose fields are in turn nondet initialized in the same way. See <a class="el" href="java__object__factory_8h.html">java_object_factory.h</a> for details.</p>
 <p>Note the code introduced has been freshly <code>goto_convert</code>'d without any passes such as <a class="el" href="remove__java__new_8cpp.html#adf7fbd0d4982ca81db2145a8cc88af8d">remove_java_new</a> being run. Therefore the caller may need to (re-)run this and other expected GOTO transformations after this pass completes. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">goto_functions</td><td>The set of goto programs to modify. </td></tr>
@@ -309,7 +309,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Converts side_effect_exprt_nondett expressions using java_object_factory. </p>
-<p>For example, NONDET(SomeClass *) may become a nondet choice between a null pointer and a fresh instance of SomeClass, whose fields are in turn nondet initialized in the same way. See <a class="el" href="java__object__factory_8h.html">java_object_factory.h</a> for details.</p>
+<p>For example, <a class="el" href="dfcc__spec__functions_8h.html#a3ecf46e1e7fbd4d056d745e57a5f12f8ab4f81fec985f333bd5faf678bb12ef2f" title="havocs the pointer to an nondet pointer">NONDET(SomeClass *)</a> may become a nondet choice between a null pointer and a fresh instance of SomeClass, whose fields are in turn nondet initialized in the same way. See <a class="el" href="java__object__factory_8h.html">java_object_factory.h</a> for details.</p>
 <p>Note the code introduced has been freshly <code>goto_convert</code>'d without any passes such as <a class="el" href="remove__java__new_8cpp.html#adf7fbd0d4982ca81db2145a8cc88af8d">remove_java_new</a> being run. Therefore the caller may need to (re-)run this and other expected GOTO transformations after this pass completes. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">function</td><td>goto program to modify </td></tr>

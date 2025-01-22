@@ -100,12 +100,12 @@ $(document).ready(function(){initNavTree('contracts-loops.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md108">Examples</a><ul><li class="level2"><a href="#autotoc_md109">Binary Search Unbounded Proof</a></li>
-<li class="level2"><a href="#autotoc_md110">Array Wipe Unbounded Proof</a></li>
-<li class="level2"><a href="#autotoc_md111">Caution With Nested Loop</a></li>
+<ul><li class="level1"><a href="#autotoc_md109">Examples</a><ul><li class="level2"><a href="#autotoc_md110">Binary Search Unbounded Proof</a></li>
+<li class="level2"><a href="#autotoc_md111">Array Wipe Unbounded Proof</a></li>
+<li class="level2"><a href="#autotoc_md112">Caution With Nested Loop</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#autotoc_md112">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md113">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
@@ -116,9 +116,9 @@ $(document).ready(function(){initNavTree('contracts-loops.html',''); initResizab
 </ul>
 <p><b>The three clauses need to be declared in this sequence to avoid errors. Each loop contract should only have one assigns clause that contains all assigned targets.</b> Loop contracts are not used by default. To enable CBMC to check for loop contracts, add the <code>--apply-loop-contract</code> flag at the <code>goto-instrument</code> step.</p>
 <p>These clauses formally describe an abstraction of a loop for the purpose of an unbounded proof. CBMC also provides a series of built-in constructs to aid writing loop contracts (e.g., <em>history variables</em> and <em>quantifiers</em>). CBMC will use the abstraction in place of the loop and prove the invariants of the loop only if the loop contracts describes a sound and inductive abstraction of the loop.</p>
-<h1><a class="anchor" id="autotoc_md108"></a>
+<h1><a class="anchor" id="autotoc_md109"></a>
 Examples</h1>
-<h2><a class="anchor" id="autotoc_md109"></a>
+<h2><a class="anchor" id="autotoc_md110"></a>
 Binary Search Unbounded Proof</h2>
 <p>Consider an implementation of the <a href="https://en.wikipedia.org/wiki/Binary_search_algorithm">binary search algorithm</a> below.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
@@ -206,7 +206,7 @@ Binary Search Unbounded Proof</h2>
 <div class="line">goto-instrument --apply-loop-contracts binary_search.goto binary_search_inst.goto</div>
 <div class="line">cbmc binary_search_inst.goto --pointer-check --bounds-check --signed-overflow-check</div>
 </div><!-- fragment --><p>The first command compiles the program to a GOTO binary, next we instrument the loops using the annotated loop contracts, and finally we verify the instrumented GOTO binary with desired checks.</p>
-<h2><a class="anchor" id="autotoc_md110"></a>
+<h2><a class="anchor" id="autotoc_md111"></a>
 Array Wipe Unbounded Proof</h2>
 <p>This example uses the <b>forall</b> quantifiers hence requires solving with the <code>--smt2</code> flag. </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_class" href="classait.html">array_wipe</a>(<a class="code hl_class" href="classait.html">__CPROVER_size_t</a> len, <span class="keywordtype">char</span> * array)</div>
 <div class="line">{  </div>
@@ -225,7 +225,7 @@ Array Wipe Unbounded Proof</h2>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a2be80782db5f3cfb2a75f18530b2c992"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a2be80782db5f3cfb2a75f18530b2c992">__CPROVER_object_upto</a></div><div class="ttdeci">void __CPROVER_object_upto(void *ptr, __CPROVER_size_t size)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a564e8a5a7bebea04fdd5ee1277832478"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a></div><div class="ttdeci">void __CPROVER_assert(__CPROVER_bool assertion, const char *description)</div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ae5af07e274b573cd0f23ffb9d332bef2"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a></div><div class="ttdeci">void __CPROVER_assume(__CPROVER_bool assumption)</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md111"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md112"></a>
 Caution With Nested Loop</h2>
 <p>Due to the nature of <a class="el" href="contracts-assigns.html">Assigns Clauses</a>, we need to be aware of the non-deterministic value of the assigned target. In the example below, </p><div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">unsigned</span> <a class="code hl_class" href="classait.html">table</a>[256] = {1, 2, 3, ..., 256};</div>
 <div class="line"> </div>
@@ -246,7 +246,7 @@ Caution With Nested Loop</h2>
 <div class="line">        }</div>
 <div class="line">}</div>
 </div><!-- fragment --><p> If <code>t &lt; 256</code> is not included in the outer loop invariant, the inner loop invariant <code>t &lt; 256</code> will immediately fail at loop entry because, in the inductive step of the outer loop, the assigns target <code>t</code> of the outer loop will be a non-deterministic value which can be greater than 256. With the predicate <code>t&lt;256</code> in the outer loop's invariants will restrict <code>t</code> to be less than <code>256</code> in the proof of the inductive step of the outer loop.</p>
-<h1><a class="anchor" id="autotoc_md112"></a>
+<h1><a class="anchor" id="autotoc_md113"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
