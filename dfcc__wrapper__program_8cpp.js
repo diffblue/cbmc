@@ -7,5 +7,7 @@ var dfcc__wrapper__program_8cpp =
     [ "create_contract_write_set", "dfcc__wrapper__program_8cpp.html#aebc14f99673d9aeef3b5cc00caa8ce2b", null ],
     [ "create_ensures_write_set", "dfcc__wrapper__program_8cpp.html#adf1686ea845de4ac56dd3d0e2f542f09", null ],
     [ "create_is_fresh_set", "dfcc__wrapper__program_8cpp.html#af1f840702c286a960fc18abcfe93e31a", null ],
-    [ "create_requires_write_set", "dfcc__wrapper__program_8cpp.html#a0ea49570d9654e6d8dbfcb75f337a68e", null ]
+    [ "create_requires_write_set", "dfcc__wrapper__program_8cpp.html#a0ea49570d9654e6d8dbfcb75f337a68e", null ],
+    [ "disable_may_fail", "dfcc__wrapper__program_8cpp.html#aaa82052628606087bde431d50ab55e94", null ],
+    [ "disable_may_fail_rec", "dfcc__wrapper__program_8cpp.html#a3d2766929b7f81db95148002c7721d7d", null ]
 ];

@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('dfcc__is__cprover__symbol_8h.html','')
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__is__cprover__symbol_8h__dep__incl.svg" width="664" height="198"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__is__cprover__symbol_8h__dep__incl.svg" width="891" height="198"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="dfcc__is__cprover__symbol_8h_source.html">Go to the source code of this file.</a></p>
@@ -127,6 +127,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aae5f679b0752cad089c2167f71e04ed1" id="r_aae5f679b0752cad089c2167f71e04ed1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__is__cprover__symbol_8h.html#aae5f679b0752cad089c2167f71e04ed1">dfcc_is_cprover_static_symbol</a> (<a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
 <tr class="memdesc:aae5f679b0752cad089c2167f71e04ed1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>true</code> iff the symbol is one of the known CPROVER static instrumentation variables or ends with <code>$object</code> and represents an auto-generated object following a pointer dereference.  <br /></td></tr>
 <tr class="separator:aae5f679b0752cad089c2167f71e04ed1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6adcaaf4d1991810b07643d5db6023bd" id="r_a6adcaaf4d1991810b07643d5db6023bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__is__cprover__symbol_8h.html#a6adcaaf4d1991810b07643d5db6023bd">dfcc_is_cprover_pointer_predicate</a> (<a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;id)</td></tr>
+<tr class="memdesc:a6adcaaf4d1991810b07643d5db6023bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>true</code> iff the symbol is one of the CPROVER pointer predicates.  <br /></td></tr>
+<tr class="separator:a6adcaaf4d1991810b07643d5db6023bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a5e2dd0859f9f2fc8e98a59f66cd76c6d" name="a5e2dd0859f9f2fc8e98a59f66cd76c6d"></a>
@@ -148,6 +151,28 @@ Functions</h2></td></tr>
 <p>Returns <code>true</code> iff id is one of the known CPROVER functions or starts with <code>__VERIFIER</code> or <code>nondet</code>. </p>
 
 <p class="definition">Definition at line <a class="el" href="dfcc__is__cprover__symbol_8cpp_source.html#l00139">139</a> of file <a class="el" href="dfcc__is__cprover__symbol_8cpp_source.html">dfcc_is_cprover_symbol.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a6adcaaf4d1991810b07643d5db6023bd" name="a6adcaaf4d1991810b07643d5db6023bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6adcaaf4d1991810b07643d5db6023bd">&#9670;&#160;</a></span>dfcc_is_cprover_pointer_predicate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> dfcc_is_cprover_pointer_predicate </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns <code>true</code> iff the symbol is one of the CPROVER pointer predicates. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__is__cprover__symbol_8cpp_source.html#l00160">160</a> of file <a class="el" href="dfcc__is__cprover__symbol_8cpp_source.html">dfcc_is_cprover_symbol.cpp</a>.</p>
 
 </div>
 </div>

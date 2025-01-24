@@ -117,6 +117,7 @@ $(document).ready(function(){initNavTree('dfcc__wrapper__program_8cpp.html','');
 <code>#include &lt;<a class="el" href="language__util_8h_source.html">langapi/language_util.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__contract__functions_8h_source.html">dfcc_contract_functions.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__instrument_8h_source.html">dfcc_instrument.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="dfcc__is__cprover__symbol_8h_source.html">dfcc_is_cprover_symbol.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__library_8h_source.html">dfcc_library.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__lift__memory__predicates_8h_source.html">dfcc_lift_memory_predicates.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__pointer__equals_8h_source.html">dfcc_pointer_equals.h</a>&quot;</code><br />
@@ -126,7 +127,7 @@ $(document).ready(function(){initNavTree('dfcc__wrapper__program_8cpp.html','');
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__wrapper__program_8cpp__incl.svg" width="4495" height="946"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__wrapper__program_8cpp__incl.svg" width="4136" height="872"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="dfcc__wrapper__program_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -156,6 +157,11 @@ Functions</h2></td></tr>
 <tr class="memitem:a99fa082668694e12519d0d4ef850b6fd" id="r_a99fa082668694e12519d0d4ef850b6fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classsymbol__exprt.html">symbol_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__wrapper__program_8cpp.html#a99fa082668694e12519d0d4ef850b6fd">create_addr_of_is_fresh_set</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;library, <a class="el" href="classait.html">const</a> <a class="el" href="classsymbolt.html">symbolt</a> &amp;wrapper_symbol)</td></tr>
 <tr class="memdesc:a99fa082668694e12519d0d4ef850b6fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate object set pointer used to support is_fresh predicates.  <br /></td></tr>
 <tr class="separator:a99fa082668694e12519d0d4ef850b6fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d2766929b7f81db95148002c7721d7d" id="r_a3d2766929b7f81db95148002c7721d7d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__wrapper__program_8cpp.html#a3d2766929b7f81db95148002c7721d7d">disable_may_fail_rec</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="classait.html">bool</a> <a class="el" href="classait.html">no_fail</a>)</td></tr>
+<tr class="memdesc:a3d2766929b7f81db95148002c7721d7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recursively traverses expression, adding "no_fail" attributes to pointer predicates that we know cannot fail when invoked in an assume context: Starting from the root with "no_fail" true, we recurse over the boolean structure, setting the "no_fail" false for all but the last operand disjunctive operators like <code>||</code> and <code>==&gt;</code>, and distributing the current "no_fail" status over disjunctions.  <br /></td></tr>
+<tr class="separator:a3d2766929b7f81db95148002c7721d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa82052628606087bde431d50ab55e94" id="r_aaa82052628606087bde431d50ab55e94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__wrapper__program_8cpp.html#aaa82052628606087bde431d50ab55e94">disable_may_fail</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:aaa82052628606087bde431d50ab55e94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a56d63d31a121542dab8052c7d2650a06" name="a56d63d31a121542dab8052c7d2650a06"></a>
@@ -200,7 +206,7 @@ Functions</h2></td></tr>
 
 <p>Generate the contract write set pointer. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00048">48</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00049">49</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -246,7 +252,7 @@ Functions</h2></td></tr>
 
 <p>Generate the write set pointer to check side effects in ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00104">104</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00105">105</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +298,7 @@ Functions</h2></td></tr>
 
 <p>Generate object set pointer used to support is_fresh predicates. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00132">132</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00133">133</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -338,7 +344,7 @@ Functions</h2></td></tr>
 
 <p>Generate the write set pointer to check side effects in requires clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00076">76</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00077">77</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -384,7 +390,7 @@ Functions</h2></td></tr>
 
 <p>Generate the contract write set. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00034">34</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00035">35</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -430,7 +436,7 @@ Functions</h2></td></tr>
 
 <p>Generate the write set to check side effects in ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00090">90</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00091">91</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -476,7 +482,7 @@ Functions</h2></td></tr>
 
 <p>Generate object set used to support is_fresh predicates. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00118">118</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00119">119</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>
@@ -520,7 +526,80 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00062">62</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00063">63</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aaa82052628606087bde431d50ab55e94" name="aaa82052628606087bde431d50ab55e94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa82052628606087bde431d50ab55e94">&#9670;&#160;</a></span>disable_may_fail()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">void</a> disable_may_fail </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00631">631</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3d2766929b7f81db95148002c7721d7d" name="a3d2766929b7f81db95148002c7721d7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d2766929b7f81db95148002c7721d7d">&#9670;&#160;</a></span>disable_may_fail_rec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">void</a> disable_may_fail_rec </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">bool</a>&#160;</td>
+          <td class="paramname"><em>no_fail</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Recursively traverses expression, adding "no_fail" attributes to pointer predicates that we know cannot fail when invoked in an assume context: Starting from the root with "no_fail" true, we recurse over the boolean structure, setting the "no_fail" false for all but the last operand disjunctive operators like <code>||</code> and <code>==&gt;</code>, and distributing the current "no_fail" status over disjunctions. </p>
+<p>For instance: </p><div class="fragment"><div class="line">(len &gt; 0):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">false</a> ==&gt; <a class="code hl_class" href="classait.html">is_fresh</a>(p, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">true</a></div>
+<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
+</div><!-- fragment --><div class="fragment"><div class="line"><a class="code hl_class" href="classait.html">is_fresh</a>(p, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">true</a> &amp;&amp; <a class="code hl_class" href="classait.html">is_fresh</a>(<a class="code hl_class" href="classait.html">q</a>, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">true</a></div>
+</div><!-- fragment --><div class="fragment"><div class="line"><a class="code hl_class" href="classait.html">is_fresh</a>(p, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">false</a> ||</div>
+<div class="line"><a class="code hl_class" href="classait.html">is_fresh</a>(<a class="code hl_class" href="classait.html">q</a>, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">false</a> ||</div>
+<div class="line"><a class="code hl_class" href="classait.html">is_fresh</a>(<a class="code hl_variable" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">true</a></div>
+<div class="ttc" id="airep__hash_8h_html_a6f2aef269e9e7c90182bcb65e01977d3"><div class="ttname"><a href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a></div><div class="ttdeci">static int8_t r</div><div class="ttdef"><b>Definition</b> <a href="irep__hash_8h_source.html#l00059">irep_hash.h:60</a></div></div>
+</div><!-- fragment --><div class="fragment"><div class="line"><a class="code hl_class" href="classait.html">is_fresh</a>(p, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">false</a> ||</div>
+<div class="line">(</div>
+<div class="line">   <a class="code hl_class" href="classait.html">is_fresh</a>(<a class="code hl_class" href="classait.html">q</a>, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">true</a> &amp;&amp;</div>
+<div class="line">   (</div>
+<div class="line">     (len&gt;0):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">true</a> ==&gt; <a class="code hl_class" href="classait.html">is_fresh</a>(<a class="code hl_variable" href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a>, len):<a class="code hl_class" href="classait.html">no_fail</a>=<a class="code hl_class" href="classait.html">true</a></div>
+<div class="line">   )</div>
+<div class="line">)</div>
+</div><!-- fragment --> <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>The expression to traverse </td></tr>
+    <tr><td class="paramname">no_fail</td><td>The current no_fail value based on logical context </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__wrapper__program_8cpp_source.html#l00572">572</a> of file <a class="el" href="dfcc__wrapper__program_8cpp_source.html">dfcc_wrapper_program.cpp</a>.</p>
 
 </div>
 </div>

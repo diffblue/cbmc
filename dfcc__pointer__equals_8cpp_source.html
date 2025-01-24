@@ -119,149 +119,158 @@ $(document).ready(function(){initNavTree('dfcc__pointer__equals_8cpp_source.html
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;<a class="code" href="cprover__prefix_8h.html">util/cprover_prefix.h</a>&gt;</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;<a class="code" href="expr__iterator_8h.html">util/expr_iterator.h</a>&gt;</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;<a class="code" href="pointer__expr_8h.html">util/pointer_expr.h</a>&gt;</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;<a class="code" href="replace__expr_8h.html">util/replace_expr.h</a>&gt;</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;<a class="code" href="std__code_8h.html">util/std_code.h</a>&gt;</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;<a class="code" href="std__expr_8h.html">util/std_expr.h</a>&gt;</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;<a class="code" href="symbol_8h.html">util/symbol.h</a>&gt;</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &quot;<a class="code" href="dfcc__cfg__info_8h.html">dfcc_cfg_info.h</a>&quot;</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#include &quot;<a class="code" href="dfcc__library_8h.html">dfcc_library.h</a>&quot;</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="foldopen" id="foldopen00024" data-start="{" data-end="}">
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classdfcc__pointer__equalst.html#a8d4fffbbda63b3c72e7761b7f88831a8">   24</a></span><a class="code hl_function" href="classdfcc__pointer__equalst.html#a8d4fffbbda63b3c72e7761b7f88831a8">dfcc_pointer_equalst::dfcc_pointer_equalst</a>(</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  <a class="code hl_class" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;library,</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  : library(library), message_handler(message_handler), <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler)</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>{</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>}</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;<a class="code" href="prefix_8h.html">util/prefix.h</a>&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;<a class="code" href="replace__expr_8h.html">util/replace_expr.h</a>&gt;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;<a class="code" href="std__code_8h.html">util/std_code.h</a>&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;<a class="code" href="std__expr_8h.html">util/std_expr.h</a>&gt;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;<a class="code" href="suffix_8h.html">util/suffix.h</a>&gt;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &lt;<a class="code" href="symbol_8h.html">util/symbol.h</a>&gt;</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &quot;<a class="code" href="dfcc__cfg__info_8h.html">dfcc_cfg_info.h</a>&quot;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &quot;<a class="code" href="dfcc__library_8h.html">dfcc_library.h</a>&quot;</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="foldopen" id="foldopen00026" data-start="{" data-end="}">
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classdfcc__pointer__equalst.html#a8d4fffbbda63b3c72e7761b7f88831a8">   26</a></span><a class="code hl_function" href="classdfcc__pointer__equalst.html#a8d4fffbbda63b3c72e7761b7f88831a8">dfcc_pointer_equalst::dfcc_pointer_equalst</a>(</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  <a class="code hl_class" href="classdfcc__libraryt.html">dfcc_libraryt</a> &amp;library,</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  : library(library), message_handler(message_handler), <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>(message_handler)</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>{</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>}</div>
 </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="foldopen" id="foldopen00031" data-start="{" data-end="}">
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">   31</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">dfcc_pointer_equalst::rewrite_calls</a>(</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  <a class="code hl_class" href="classgoto__programt.html">goto_programt</a> &amp;program,</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  <a class="code hl_class" href="classdfcc__cfg__infot.html">dfcc_cfg_infot</a> cfg_info)</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>{</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  <a class="code hl_function" href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">rewrite_calls</a>(</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    program,</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin(),</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end(),</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    cfg_info);</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>}</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="foldopen" id="foldopen00033" data-start="{" data-end="}">
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">   33</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">dfcc_pointer_equalst::rewrite_calls</a>(</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  <a class="code hl_class" href="classgoto__programt.html">goto_programt</a> &amp;program,</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  <a class="code hl_class" href="classdfcc__cfg__infot.html">dfcc_cfg_infot</a> cfg_info)</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>{</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  <a class="code hl_function" href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">rewrite_calls</a>(</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    program,</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin(),</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end(),</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    cfg_info);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>}</div>
 </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="foldopen" id="foldopen00042" data-start="{" data-end="}">
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno"><a class="line" href="classdfcc__pointer__equalst.html#a71e042fc25eb0f37e2822e6bd253f1c3">   42</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">dfcc_pointer_equalst::rewrite_calls</a>(</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  <a class="code hl_class" href="classgoto__programt.html">goto_programt</a> &amp;program,</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  <a class="code hl_typedef" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> <a class="code hl_class" href="classait.html">first_instruction</a>,</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  <span class="keyword">const</span> <a class="code hl_typedef" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;<a class="code hl_class" href="classait.html">last_instruction</a>,</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  <a class="code hl_class" href="classdfcc__cfg__infot.html">dfcc_cfg_infot</a> cfg_info)</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>{</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  <span class="keyword">auto</span> &amp;target = <a class="code hl_class" href="classait.html">first_instruction</a>;</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  <span class="keywordflow">while</span>(target != <a class="code hl_class" href="classait.html">last_instruction</a>)</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  {</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordflow">if</span>(target-&gt;is_function_call())</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    {</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;function = target-&gt;call_function();</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>      <span class="keywordflow">if</span>(function.id() == <a class="code hl_class" href="classait.html">ID_symbol</a>)</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>      {</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        <span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;<a class="code hl_class" href="classait.html">fun_name</a> = <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(function).get_identifier();</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">fun_name</a> == <a class="code hl_define" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;pointer_equals&quot;</span>)</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>        {</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>          <span class="comment">// add address on first operand</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>          target-&gt;call_arguments()[0] =</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>            <a class="code hl_class" href="classaddress__of__exprt.html">address_of_exprt</a>(target-&gt;call_arguments()[0]);</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>          <span class="comment">// fix the function name.</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>          <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(target-&gt;call_function())</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>            .set_identifier(</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>              <a class="code hl_variable" href="classdfcc__pointer__equalst.html#a9ca9e81015e504859039c1d898b9d99c">library</a>.<a class="code hl_variable" href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_fun_symbol</a>[<a class="code hl_enumvalue" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca80885f1999610798ae7e2d9480627e27">dfcc_funt::POINTER_EQUALS</a>].name);</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>          <span class="comment">// pass the write_set</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>          target-&gt;call_arguments().push_back(cfg_info.<a class="code hl_function" href="classdfcc__cfg__infot.html#acdee8dbd7ef70e72a6c956b11f498378">get_write_set</a>(target));</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        }</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      }</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    }</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    target++;</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>  }</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>}</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="foldopen" id="foldopen00044" data-start="{" data-end="}">
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classdfcc__pointer__equalst.html#a71e042fc25eb0f37e2822e6bd253f1c3">   44</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">dfcc_pointer_equalst::rewrite_calls</a>(</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  <a class="code hl_class" href="classgoto__programt.html">goto_programt</a> &amp;program,</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  <a class="code hl_typedef" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> <a class="code hl_class" href="classait.html">first_instruction</a>,</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  <span class="keyword">const</span> <a class="code hl_typedef" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;<a class="code hl_class" href="classait.html">last_instruction</a>,</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  <a class="code hl_class" href="classdfcc__cfg__infot.html">dfcc_cfg_infot</a> cfg_info)</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>{</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  <span class="keyword">auto</span> &amp;target = <a class="code hl_class" href="classait.html">first_instruction</a>;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  <span class="keywordflow">while</span>(target != <a class="code hl_class" href="classait.html">last_instruction</a>)</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>  {</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordflow">if</span>(target-&gt;is_function_call())</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    {</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>      <span class="keyword">const</span> <span class="keyword">auto</span> &amp;function = target-&gt;call_function();</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>      <span class="keywordflow">if</span>(function.id() == <a class="code hl_class" href="classait.html">ID_symbol</a>)</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>      {</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;<a class="code hl_class" href="classait.html">fun_name</a> = <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(function).get_identifier();</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="keywordflow">if</span>(<a class="code hl_function" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(<a class="code hl_class" href="classait.html">fun_name</a>), <a class="code hl_define" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;pointer_equals&quot;</span>))</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>        {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>          <span class="comment">// add address on first operand</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>          target-&gt;call_arguments()[0] =</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>            <a class="code hl_class" href="classaddress__of__exprt.html">address_of_exprt</a>(target-&gt;call_arguments()[0]);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>          <span class="comment">// fix the function name.</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>          <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(target-&gt;call_function())</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>            .set_identifier(</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>              <a class="code hl_variable" href="classdfcc__pointer__equalst.html#a9ca9e81015e504859039c1d898b9d99c">library</a>.<a class="code hl_variable" href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_fun_symbol</a>[<a class="code hl_enumvalue" href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca80885f1999610798ae7e2d9480627e27">dfcc_funt::POINTER_EQUALS</a>].name);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>          <span class="comment">// pass the may_fail flag</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>          <span class="keywordflow">if</span>(function.source_location().get_bool(<span class="stringliteral">&quot;no_fail&quot;</span>))</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            target-&gt;call_arguments().push_back(<a class="code hl_class" href="classfalse__exprt.html">false_exprt</a>());</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>          <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            target-&gt;call_arguments().push_back(<a class="code hl_class" href="classtrue__exprt.html">true_exprt</a>());</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>          <span class="comment">// pass the write_set</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>          target-&gt;call_arguments().push_back(cfg_info.<a class="code hl_function" href="classdfcc__cfg__infot.html#acdee8dbd7ef70e72a6c956b11f498378">get_write_set</a>(target));</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        }</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>      }</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    target++;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  }</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>}</div>
 </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
-<div class="foldopen" id="foldopen00079" data-start="{" data-end="};">
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="classpointer__equality__visitort.html">   79</a></span><span class="keyword">class </span><a class="code hl_class" href="classpointer__equality__visitort.html">pointer_equality_visitort</a> : <span class="keyword">public</span> <a class="code hl_class" href="classexpr__visitort.html">expr_visitort</a></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>{</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">   82</a></span>  std::vector&lt;exprt *&gt; <a class="code hl_variable" href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">equality_exprs_to_transform</a>;</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="keyword">public</span>:</div>
-<div class="foldopen" id="foldopen00085" data-start="{" data-end="}">
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classpointer__equality__visitort.html#a66d15f21f2223ea98c6addab5ab45710">   85</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classpointer__equality__visitort.html#a66d15f21f2223ea98c6addab5ab45710">visit_expr</a>(<a class="code hl_class" href="classexprt.html">exprt</a> &amp;expr)</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>  {</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keywordflow">if</span>(expr.<a class="code hl_function" href="classirept.html#ad2e8b084a2d7f6b9707534756f9705bf">id</a>() == <a class="code hl_class" href="classait.html">ID_equal</a>)</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    {</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>      <span class="keyword">const</span> <a class="code hl_class" href="classequal__exprt.html">equal_exprt</a> &amp;<a class="code hl_class" href="classait.html">equal_expr</a> = <a class="code hl_function" href="std__expr_8h.html#ad97baf8e24290417209b94156deafbfd">to_equal_expr</a>(expr);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>      <span class="comment">// Check if both operands are pointers</span></div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>      <span class="keywordflow">if</span>(</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        <a class="code hl_class" href="classait.html">equal_expr</a>.lhs().type().id() == <a class="code hl_class" href="classait.html">ID_pointer</a> &amp;&amp;</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        <a class="code hl_class" href="classait.html">equal_expr</a>.rhs().type().id() == <a class="code hl_class" href="classait.html">ID_pointer</a>)</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>      {</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <a class="code hl_variable" href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">equality_exprs_to_transform</a>.push_back(&amp;expr);</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>      }</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    }</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>  }</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="foldopen" id="foldopen00087" data-start="{" data-end="};">
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="classpointer__equality__visitort.html">   87</a></span><span class="keyword">class </span><a class="code hl_class" href="classpointer__equality__visitort.html">pointer_equality_visitort</a> : <span class="keyword">public</span> <a class="code hl_class" href="classexpr__visitort.html">expr_visitort</a></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>{</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">   90</a></span>  std::vector&lt;exprt *&gt; <a class="code hl_variable" href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">equality_exprs_to_transform</a>;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00093" data-start="{" data-end="}">
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="classpointer__equality__visitort.html#a66d15f21f2223ea98c6addab5ab45710">   93</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classpointer__equality__visitort.html#a66d15f21f2223ea98c6addab5ab45710">visit_expr</a>(<a class="code hl_class" href="classexprt.html">exprt</a> &amp;expr)</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  {</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keywordflow">if</span>(expr.<a class="code hl_function" href="classirept.html#ad2e8b084a2d7f6b9707534756f9705bf">id</a>() == <a class="code hl_class" href="classait.html">ID_equal</a>)</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>      <span class="keyword">const</span> <a class="code hl_class" href="classequal__exprt.html">equal_exprt</a> &amp;<a class="code hl_class" href="classait.html">equal_expr</a> = <a class="code hl_function" href="std__expr_8h.html#ad97baf8e24290417209b94156deafbfd">to_equal_expr</a>(expr);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>      <span class="comment">// Check if both operands are pointers</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>      <span class="keywordflow">if</span>(</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <a class="code hl_class" href="classait.html">equal_expr</a>.lhs().type().id() == <a class="code hl_class" href="classait.html">ID_pointer</a> &amp;&amp;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <a class="code hl_class" href="classait.html">equal_expr</a>.rhs().type().id() == <a class="code hl_class" href="classait.html">ID_pointer</a>)</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>      {</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        <a class="code hl_variable" href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">equality_exprs_to_transform</a>.push_back(&amp;expr);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>      }</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    }</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>  }</div>
 </div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>  <span class="comment">// Apply the transformations after visiting</span></div>
-<div class="foldopen" id="foldopen00102" data-start="{" data-end="}">
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="classpointer__equality__visitort.html#a086598fa43ae2b70412cab4cda335004">  102</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classpointer__equality__visitort.html#a086598fa43ae2b70412cab4cda335004">transform</a>()</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>  {</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keyword">const</span> <a class="code hl_class" href="classcode__typet.html">code_typet</a> <a class="code hl_class" href="classait.html">pointer_equals_type</a>(</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>      {<a class="code hl_class" href="classcode__typet_1_1parametert.html">code_typet::parametert</a>(<a class="code hl_function" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code hl_function" href="c__types_8cpp.html#a6f6aec504f78b56c7fb81619813ee8f1">void_type</a>())),</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>       <a class="code hl_class" href="classcode__typet_1_1parametert.html">code_typet::parametert</a>(<a class="code hl_function" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code hl_function" href="c__types_8cpp.html#a6f6aec504f78b56c7fb81619813ee8f1">void_type</a>()))},</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>      <a class="code hl_class" href="classbool__typet.html">bool_typet</a>());</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    <a class="code hl_class" href="classsymbol__exprt.html">symbol_exprt</a> <a class="code hl_class" href="classait.html">pointer_equals</a>(<span class="stringliteral">&quot;ID_pointer_equals&quot;</span>, <a class="code hl_class" href="classait.html">pointer_equals_type</a>);</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordflow">for</span>(<a class="code hl_class" href="classexprt.html">exprt</a> *<a class="code hl_class" href="classait.html">expr_ptr</a> : <a class="code hl_variable" href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">equality_exprs_to_transform</a>)</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    {</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      <span class="keyword">const</span> <a class="code hl_class" href="classequal__exprt.html">equal_exprt</a> &amp;<a class="code hl_class" href="classait.html">equal_expr</a> = <a class="code hl_function" href="std__expr_8h.html#ad97baf8e24290417209b94156deafbfd">to_equal_expr</a>(*<a class="code hl_class" href="classait.html">expr_ptr</a>);</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      <span class="comment">// Create the function call to __CPROVER_pointer_equals</span></div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>      <span class="comment">// Add the original equality operands as arguments</span></div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <a class="code hl_class" href="classside__effect__expr__function__callt.html">side_effect_expr_function_callt</a> result(</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        <a class="code hl_class" href="classait.html">pointer_equals</a>,</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        {<a class="code hl_class" href="classait.html">equal_expr</a>.lhs(), <a class="code hl_class" href="classait.html">equal_expr</a>.rhs()},</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <a class="code hl_class" href="classbool__typet.html">bool_typet</a>(),</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <a class="code hl_class" href="classait.html">equal_expr</a>.source_location());</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>      result.<a class="code hl_function" href="classside__effect__expr__function__callt.html#ab8cfc0876b6168e266c3765fc41bdb06">arguments</a>().push_back(<a class="code hl_class" href="classait.html">equal_expr</a>.lhs());</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>      result.arguments().push_back(<a class="code hl_class" href="classait.html">equal_expr</a>.rhs());</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>      <span class="comment">// Set the type of the function call</span></div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>      result.type() = <a class="code hl_class" href="classbool__typet.html">bool_typet</a>();</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>      <span class="comment">// Replace the original expression</span></div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>      *<a class="code hl_class" href="classait.html">expr_ptr</a> = result;</div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    }</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  }</div>
-</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>};</div>
-</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>  <span class="comment">// Apply the transformations after visiting</span></div>
+<div class="foldopen" id="foldopen00110" data-start="{" data-end="}">
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="classpointer__equality__visitort.html#a086598fa43ae2b70412cab4cda335004">  110</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classpointer__equality__visitort.html#a086598fa43ae2b70412cab4cda335004">transform</a>()</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>  {</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keyword">const</span> <a class="code hl_class" href="classcode__typet.html">code_typet</a> <a class="code hl_class" href="classait.html">pointer_equals_type</a>(</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      {<a class="code hl_class" href="classcode__typet_1_1parametert.html">code_typet::parametert</a>(<a class="code hl_function" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code hl_function" href="c__types_8cpp.html#a6f6aec504f78b56c7fb81619813ee8f1">void_type</a>())),</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>       <a class="code hl_class" href="classcode__typet_1_1parametert.html">code_typet::parametert</a>(<a class="code hl_function" href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a>(<a class="code hl_function" href="c__types_8cpp.html#a6f6aec504f78b56c7fb81619813ee8f1">void_type</a>()))},</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      <a class="code hl_class" href="classbool__typet.html">bool_typet</a>());</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <a class="code hl_class" href="classsymbol__exprt.html">symbol_exprt</a> <a class="code hl_class" href="classait.html">pointer_equals</a>(</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      <a class="code hl_define" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a> <span class="stringliteral">&quot;pointer_equals&quot;</span>, <a class="code hl_class" href="classait.html">pointer_equals_type</a>);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keywordflow">for</span>(<a class="code hl_class" href="classexprt.html">exprt</a> *<a class="code hl_class" href="classait.html">expr_ptr</a> : <a class="code hl_variable" href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">equality_exprs_to_transform</a>)</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    {</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>      <span class="keyword">const</span> <a class="code hl_class" href="classequal__exprt.html">equal_exprt</a> &amp;<a class="code hl_class" href="classait.html">equal_expr</a> = <a class="code hl_function" href="std__expr_8h.html#ad97baf8e24290417209b94156deafbfd">to_equal_expr</a>(*<a class="code hl_class" href="classait.html">expr_ptr</a>);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>      <span class="comment">// Create the function call to __CPROVER_pointer_equals</span></div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>      <span class="comment">// Add the original equality operands as arguments</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>      <a class="code hl_class" href="classside__effect__expr__function__callt.html">side_effect_expr_function_callt</a> result(</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        <a class="code hl_class" href="classait.html">pointer_equals</a>,</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        {<a class="code hl_class" href="classait.html">equal_expr</a>.lhs(), <a class="code hl_class" href="classait.html">equal_expr</a>.rhs()},</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        <a class="code hl_class" href="classbool__typet.html">bool_typet</a>(),</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <a class="code hl_class" href="classait.html">equal_expr</a>.source_location());</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span> </div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>      result.<a class="code hl_function" href="classside__effect__expr__function__callt.html#ab8cfc0876b6168e266c3765fc41bdb06">arguments</a>().push_back(<a class="code hl_class" href="classait.html">equal_expr</a>.lhs());</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>      result.arguments().push_back(<a class="code hl_class" href="classait.html">equal_expr</a>.rhs());</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="comment">// Usage function</span></div>
-<div class="foldopen" id="foldopen00136" data-start="{" data-end="}">
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno"><a class="line" href="dfcc__pointer__equals_8cpp.html#a496762c781c8e2ed82099e86b0e65a85">  136</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="dfcc__pointer__equals_8cpp.html#a496762c781c8e2ed82099e86b0e65a85">rewrite_equal_exprt_to_pointer_equals</a>(<a class="code hl_class" href="classexprt.html">exprt</a> &amp;expr)</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>{</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>  <a class="code hl_class" href="classpointer__equality__visitort.html">pointer_equality_visitort</a> <a class="code hl_class" href="classait.html">visitor</a>;</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span> </div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>  <span class="comment">// First collect all equality expressions</span></div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>  expr.<a class="code hl_function" href="classexprt.html#a7033c2804c1af690bd6aa39c48e2e449">visit</a>(<a class="code hl_class" href="classait.html">visitor</a>);</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>  <span class="comment">// Then transform them</span></div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>  <a class="code hl_class" href="classait.html">visitor</a>.transform();</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>}</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>      <span class="comment">// Set the type of the function call</span></div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>      result.type() = <a class="code hl_class" href="classbool__typet.html">bool_typet</a>();</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span> </div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>      <span class="comment">// Replace the original expression</span></div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>      *<a class="code hl_class" href="classait.html">expr_ptr</a> = result;</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    }</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>  }</div>
+</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>};</div>
+</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span> </div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="comment">// Usage function</span></div>
+<div class="foldopen" id="foldopen00145" data-start="{" data-end="}">
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno"><a class="line" href="dfcc__pointer__equals_8cpp.html#a496762c781c8e2ed82099e86b0e65a85">  145</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="dfcc__pointer__equals_8cpp.html#a496762c781c8e2ed82099e86b0e65a85">rewrite_equal_exprt_to_pointer_equals</a>(<a class="code hl_class" href="classexprt.html">exprt</a> &amp;expr)</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>{</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>  <a class="code hl_class" href="classpointer__equality__visitort.html">pointer_equality_visitort</a> <a class="code hl_class" href="classait.html">visitor</a>;</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>  <span class="comment">// First collect all equality expressions</span></div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>  expr.<a class="code hl_function" href="classexprt.html#a7033c2804c1af690bd6aa39c48e2e449">visit</a>(<a class="code hl_class" href="classait.html">visitor</a>);</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>  <span class="comment">// Then transform them</span></div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>  <a class="code hl_class" href="classait.html">visitor</a>.transform();</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>}</div>
 </div>
 <div class="ttc" id="ac__types_8cpp_html_a6f6aec504f78b56c7fb81619813ee8f1"><div class="ttname"><a href="c__types_8cpp.html#a6f6aec504f78b56c7fb81619813ee8f1">void_type</a></div><div class="ttdeci">empty_typet void_type()</div><div class="ttdef"><b>Definition</b> <a href="c__types_8cpp_source.html#l00245">c_types.cpp:245</a></div></div>
 <div class="ttc" id="ac__types_8cpp_html_a875507bd5fb82fbd7b6640ac105aa8b0"><div class="ttname"><a href="c__types_8cpp.html#a875507bd5fb82fbd7b6640ac105aa8b0">pointer_type</a></div><div class="ttdeci">pointer_typet pointer_type(const typet &amp;subtype)</div><div class="ttdef"><b>Definition</b> <a href="c__types_8cpp_source.html#l00235">c_types.cpp:235</a></div></div>
@@ -275,41 +284,47 @@ $(document).ready(function(){initNavTree('dfcc__pointer__equals_8cpp_source.html
 <div class="ttc" id="aclassdfcc__cfg__infot_html_acdee8dbd7ef70e72a6c956b11f498378"><div class="ttname"><a href="classdfcc__cfg__infot.html#acdee8dbd7ef70e72a6c956b11f498378">dfcc_cfg_infot::get_write_set</a></div><div class="ttdeci">const exprt &amp; get_write_set(goto_programt::const_targett target) const</div><div class="ttdoc">Returns the write set variable to use for the given instruction Returns the write set for the loop,...</div><div class="ttdef"><b>Definition</b> <a href="dfcc__cfg__info_8cpp_source.html#l00662">dfcc_cfg_info.cpp:662</a></div></div>
 <div class="ttc" id="aclassdfcc__libraryt_html"><div class="ttname"><a href="classdfcc__libraryt.html">dfcc_libraryt</a></div><div class="ttdoc">Class interface to library types and functions defined in cprover_contracts.c.</div><div class="ttdef"><b>Definition</b> <a href="dfcc__library_8h_source.html#l00155">dfcc_library.h:156</a></div></div>
 <div class="ttc" id="aclassdfcc__libraryt_html_ae916015349046afe273bf50f03bc85df"><div class="ttname"><a href="classdfcc__libraryt.html#ae916015349046afe273bf50f03bc85df">dfcc_libraryt::dfcc_fun_symbol</a></div><div class="ttdeci">std::map&lt; dfcc_funt, symbolt &gt; dfcc_fun_symbol</div><div class="ttdoc">Maps enum values to the actual function symbols (dynamically loaded)</div><div class="ttdef"><b>Definition</b> <a href="dfcc__library_8h_source.html#l00219">dfcc_library.h:219</a></div></div>
-<div class="ttc" id="aclassdfcc__pointer__equalst_html_a8d4fffbbda63b3c72e7761b7f88831a8"><div class="ttname"><a href="classdfcc__pointer__equalst.html#a8d4fffbbda63b3c72e7761b7f88831a8">dfcc_pointer_equalst::dfcc_pointer_equalst</a></div><div class="ttdeci">dfcc_pointer_equalst(dfcc_libraryt &amp;library, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00024">dfcc_pointer_equals.cpp:24</a></div></div>
-<div class="ttc" id="aclassdfcc__pointer__equalst_html_a92a79be384d2cb4fb86687634935fc5b"><div class="ttname"><a href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">dfcc_pointer_equalst::rewrite_calls</a></div><div class="ttdeci">void rewrite_calls(goto_programt &amp;program, dfcc_cfg_infot cfg_info)</div><div class="ttdoc">Rewrites calls to pointer_equals predicates into calls to the library implementation in the given pro...</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00031">dfcc_pointer_equals.cpp:31</a></div></div>
+<div class="ttc" id="aclassdfcc__pointer__equalst_html_a8d4fffbbda63b3c72e7761b7f88831a8"><div class="ttname"><a href="classdfcc__pointer__equalst.html#a8d4fffbbda63b3c72e7761b7f88831a8">dfcc_pointer_equalst::dfcc_pointer_equalst</a></div><div class="ttdeci">dfcc_pointer_equalst(dfcc_libraryt &amp;library, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00026">dfcc_pointer_equals.cpp:26</a></div></div>
+<div class="ttc" id="aclassdfcc__pointer__equalst_html_a92a79be384d2cb4fb86687634935fc5b"><div class="ttname"><a href="classdfcc__pointer__equalst.html#a92a79be384d2cb4fb86687634935fc5b">dfcc_pointer_equalst::rewrite_calls</a></div><div class="ttdeci">void rewrite_calls(goto_programt &amp;program, dfcc_cfg_infot cfg_info)</div><div class="ttdoc">Rewrites calls to pointer_equals predicates into calls to the library implementation in the given pro...</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00033">dfcc_pointer_equals.cpp:33</a></div></div>
 <div class="ttc" id="aclassdfcc__pointer__equalst_html_a9ca9e81015e504859039c1d898b9d99c"><div class="ttname"><a href="classdfcc__pointer__equalst.html#a9ca9e81015e504859039c1d898b9d99c">dfcc_pointer_equalst::library</a></div><div class="ttdeci">dfcc_libraryt &amp; library</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8h_source.html#l00060">dfcc_pointer_equals.h:60</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition</b> <a href="dstring_8h_source.html#l00037">dstring.h:38</a></div></div>
 <div class="ttc" id="aclassequal__exprt_html"><div class="ttname"><a href="classequal__exprt.html">equal_exprt</a></div><div class="ttdoc">Equality.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l01365">std_expr.h:1366</a></div></div>
 <div class="ttc" id="aclassexpr__visitort_html"><div class="ttname"><a href="classexpr__visitort.html">expr_visitort</a></div><div class="ttdef"><b>Definition</b> <a href="expr_8h_source.html#l00366">expr.h:367</a></div></div>
 <div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
 <div class="ttc" id="aclassexprt_html_a7033c2804c1af690bd6aa39c48e2e449"><div class="ttname"><a href="classexprt.html#a7033c2804c1af690bd6aa39c48e2e449">exprt::visit</a></div><div class="ttdeci">void visit(class expr_visitort &amp;visitor)</div><div class="ttdoc">These are pre-order traversal visitors, i.e., the visitor is executed on a node before its children h...</div><div class="ttdef"><b>Definition</b> <a href="expr_8cpp_source.html#l00237">expr.cpp:237</a></div></div>
+<div class="ttc" id="aclassfalse__exprt_html"><div class="ttname"><a href="classfalse__exprt.html">false_exprt</a></div><div class="ttdoc">The Boolean constant false.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l03198">std_expr.h:3199</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition</b> <a href="goto__program_8h_source.html#l00072">goto_program.h:73</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a02da75dda2bb6a101b93ebbca2e01ea1"><div class="ttname"><a href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">goto_programt::instructions</a></div><div class="ttdeci">instructionst instructions</div><div class="ttdoc">The list of instructions in the goto program.</div><div class="ttdef"><b>Definition</b> <a href="goto__program_8h_source.html#l00622">goto_program.h:622</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html_a482e1655ec4a9670ab70f49c0cfb4b09"><div class="ttname"><a href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a></div><div class="ttdeci">instructionst::iterator targett</div><div class="ttdef"><b>Definition</b> <a href="goto__program_8h_source.html#l00614">goto_program.h:614</a></div></div>
 <div class="ttc" id="aclassirept_html_ad2e8b084a2d7f6b9707534756f9705bf"><div class="ttname"><a href="classirept.html#ad2e8b084a2d7f6b9707534756f9705bf">irept::id</a></div><div class="ttdeci">const irep_idt &amp; id() const</div><div class="ttdef"><b>Definition</b> <a href="irep_8h_source.html#l00388">irep.h:388</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition</b> <a href="src_2util_2message_8h_source.html#l00026">message.h:27</a></div></div>
-<div class="ttc" id="aclasspointer__equality__visitort_html"><div class="ttname"><a href="classpointer__equality__visitort.html">pointer_equality_visitort</a></div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00079">dfcc_pointer_equals.cpp:80</a></div></div>
-<div class="ttc" id="aclasspointer__equality__visitort_html_a086598fa43ae2b70412cab4cda335004"><div class="ttname"><a href="classpointer__equality__visitort.html#a086598fa43ae2b70412cab4cda335004">pointer_equality_visitort::transform</a></div><div class="ttdeci">void transform()</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00102">dfcc_pointer_equals.cpp:102</a></div></div>
-<div class="ttc" id="aclasspointer__equality__visitort_html_a66d15f21f2223ea98c6addab5ab45710"><div class="ttname"><a href="classpointer__equality__visitort.html#a66d15f21f2223ea98c6addab5ab45710">pointer_equality_visitort::visit_expr</a></div><div class="ttdeci">void visit_expr(exprt &amp;expr)</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00085">dfcc_pointer_equals.cpp:85</a></div></div>
-<div class="ttc" id="aclasspointer__equality__visitort_html_af28790c85eae7287bbf20ac05289e74d"><div class="ttname"><a href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">pointer_equality_visitort::equality_exprs_to_transform</a></div><div class="ttdeci">std::vector&lt; exprt * &gt; equality_exprs_to_transform</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00082">dfcc_pointer_equals.cpp:82</a></div></div>
+<div class="ttc" id="aclasspointer__equality__visitort_html"><div class="ttname"><a href="classpointer__equality__visitort.html">pointer_equality_visitort</a></div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00087">dfcc_pointer_equals.cpp:88</a></div></div>
+<div class="ttc" id="aclasspointer__equality__visitort_html_a086598fa43ae2b70412cab4cda335004"><div class="ttname"><a href="classpointer__equality__visitort.html#a086598fa43ae2b70412cab4cda335004">pointer_equality_visitort::transform</a></div><div class="ttdeci">void transform()</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00110">dfcc_pointer_equals.cpp:110</a></div></div>
+<div class="ttc" id="aclasspointer__equality__visitort_html_a66d15f21f2223ea98c6addab5ab45710"><div class="ttname"><a href="classpointer__equality__visitort.html#a66d15f21f2223ea98c6addab5ab45710">pointer_equality_visitort::visit_expr</a></div><div class="ttdeci">void visit_expr(exprt &amp;expr)</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00093">dfcc_pointer_equals.cpp:93</a></div></div>
+<div class="ttc" id="aclasspointer__equality__visitort_html_af28790c85eae7287bbf20ac05289e74d"><div class="ttname"><a href="classpointer__equality__visitort.html#af28790c85eae7287bbf20ac05289e74d">pointer_equality_visitort::equality_exprs_to_transform</a></div><div class="ttdeci">std::vector&lt; exprt * &gt; equality_exprs_to_transform</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00090">dfcc_pointer_equals.cpp:90</a></div></div>
 <div class="ttc" id="aclassside__effect__expr__function__callt_html"><div class="ttname"><a href="classside__effect__expr__function__callt.html">side_effect_expr_function_callt</a></div><div class="ttdoc">A side_effect_exprt representation of a function call side effect.</div><div class="ttdef"><b>Definition</b> <a href="std__code_8h_source.html#l01691">std_code.h:1692</a></div></div>
 <div class="ttc" id="aclassside__effect__expr__function__callt_html_ab8cfc0876b6168e266c3765fc41bdb06"><div class="ttname"><a href="classside__effect__expr__function__callt.html#ab8cfc0876b6168e266c3765fc41bdb06">side_effect_expr_function_callt::arguments</a></div><div class="ttdeci">exprt::operandst &amp; arguments()</div><div class="ttdef"><b>Definition</b> <a href="std__code_8h_source.html#l01718">std_code.h:1718</a></div></div>
 <div class="ttc" id="aclasssymbol__exprt_html"><div class="ttname"><a href="classsymbol__exprt.html">symbol_exprt</a></div><div class="ttdoc">Expression to hold a symbol (variable)</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l00130">std_expr.h:131</a></div></div>
+<div class="ttc" id="aclasstrue__exprt_html"><div class="ttname"><a href="classtrue__exprt.html">true_exprt</a></div><div class="ttdoc">The Boolean constant true.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l03189">std_expr.h:3190</a></div></div>
+<div class="ttc" id="aconverter_8cpp_html_ad8e2b943a39300fa9ca5cd4b40266848"><div class="ttname"><a href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a></div><div class="ttdeci">bool has_prefix(const std::string &amp;s, const std::string &amp;prefix)</div><div class="ttdef"><b>Definition</b> <a href="converter_8cpp_source.html#l00013">converter.cpp:13</a></div></div>
 <div class="ttc" id="acprover__prefix_8h_html"><div class="ttname"><a href="cprover__prefix_8h.html">cprover_prefix.h</a></div></div>
 <div class="ttc" id="acprover__prefix_8h_html_a5f537726f4fcb4d977cbd151c99a39df"><div class="ttname"><a href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a></div><div class="ttdeci">#define CPROVER_PREFIX</div><div class="ttdef"><b>Definition</b> <a href="cprover__prefix_8h_source.html#l00014">cprover_prefix.h:14</a></div></div>
 <div class="ttc" id="adfcc__cfg__info_8h_html"><div class="ttname"><a href="dfcc__cfg__info_8h.html">dfcc_cfg_info.h</a></div><div class="ttdoc">Class that computes CFG information about the loop structure of a GOTO function for the purpose of dy...</div></div>
 <div class="ttc" id="adfcc__library_8h_html"><div class="ttname"><a href="dfcc__library_8h.html">dfcc_library.h</a></div><div class="ttdoc">Dynamic frame condition checking library loading.</div></div>
 <div class="ttc" id="adfcc__library_8h_html_a97b83fb2b0fd27b4146627b468ceb57ca80885f1999610798ae7e2d9480627e27"><div class="ttname"><a href="dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca80885f1999610798ae7e2d9480627e27">dfcc_funt::POINTER_EQUALS</a></div><div class="ttdeci">@ POINTER_EQUALS</div></div>
-<div class="ttc" id="adfcc__pointer__equals_8cpp_html_a496762c781c8e2ed82099e86b0e65a85"><div class="ttname"><a href="dfcc__pointer__equals_8cpp.html#a496762c781c8e2ed82099e86b0e65a85">rewrite_equal_exprt_to_pointer_equals</a></div><div class="ttdeci">void rewrite_equal_exprt_to_pointer_equals(exprt &amp;expr)</div><div class="ttdoc">Rewrites equal_exprt over pointers into calls to the front-end function __CPROVER_pointer_equals,...</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00136">dfcc_pointer_equals.cpp:136</a></div></div>
+<div class="ttc" id="adfcc__pointer__equals_8cpp_html_a496762c781c8e2ed82099e86b0e65a85"><div class="ttname"><a href="dfcc__pointer__equals_8cpp.html#a496762c781c8e2ed82099e86b0e65a85">rewrite_equal_exprt_to_pointer_equals</a></div><div class="ttdeci">void rewrite_equal_exprt_to_pointer_equals(exprt &amp;expr)</div><div class="ttdoc">Rewrites equal_exprt over pointers into calls to the front-end function __CPROVER_pointer_equals,...</div><div class="ttdef"><b>Definition</b> <a href="dfcc__pointer__equals_8cpp_source.html#l00145">dfcc_pointer_equals.cpp:145</a></div></div>
 <div class="ttc" id="adfcc__pointer__equals_8h_html"><div class="ttname"><a href="dfcc__pointer__equals_8h.html">dfcc_pointer_equals.h</a></div><div class="ttdoc">Instruments occurrences of pointer_equals predicates in programs encoding requires and ensures clause...</div></div>
 <div class="ttc" id="aexpr__iterator_8h_html"><div class="ttname"><a href="expr__iterator_8h.html">expr_iterator.h</a></div><div class="ttdoc">Forward depth-first search iterators These iterators' copy operations are expensive,...</div></div>
+<div class="ttc" id="airep_8h_html_ac5e91c37aa36daafdb4168bd34a42ced"><div class="ttname"><a href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a></div><div class="ttdeci">const std::string &amp; id2string(const irep_idt &amp;d)</div><div class="ttdef"><b>Definition</b> <a href="irep_8h_source.html#l00044">irep.h:44</a></div></div>
 <div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition</b> <a href="math_8c_source.html#l02776">math.c:2776</a></div></div>
 <div class="ttc" id="apointer__expr_8h_html"><div class="ttname"><a href="pointer__expr_8h.html">pointer_expr.h</a></div><div class="ttdoc">API to expression classes for Pointers.</div></div>
+<div class="ttc" id="aprefix_8h_html"><div class="ttname"><a href="prefix_8h.html">prefix.h</a></div></div>
 <div class="ttc" id="areplace__expr_8h_html"><div class="ttname"><a href="replace__expr_8h.html">replace_expr.h</a></div></div>
 <div class="ttc" id="astd__code_8h_html"><div class="ttname"><a href="std__code_8h.html">std_code.h</a></div></div>
 <div class="ttc" id="astd__expr_8h_html"><div class="ttname"><a href="std__expr_8h.html">std_expr.h</a></div><div class="ttdoc">API to expression classes.</div></div>
 <div class="ttc" id="astd__expr_8h_html_ab73d10aafcdec6cfd5992704af55dd51"><div class="ttname"><a href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a></div><div class="ttdeci">const symbol_exprt &amp; to_symbol_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a symbol_exprt.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l00272">std_expr.h:272</a></div></div>
 <div class="ttc" id="astd__expr_8h_html_ad97baf8e24290417209b94156deafbfd"><div class="ttname"><a href="std__expr_8h.html#ad97baf8e24290417209b94156deafbfd">to_equal_expr</a></div><div class="ttdeci">const equal_exprt &amp; to_equal_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to an equal_exprt.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l01407">std_expr.h:1407</a></div></div>
+<div class="ttc" id="asuffix_8h_html"><div class="ttname"><a href="suffix_8h.html">suffix.h</a></div></div>
 <div class="ttc" id="asymbol_8h_html"><div class="ttname"><a href="symbol_8h.html">symbol.h</a></div><div class="ttdoc">Symbol table entry.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

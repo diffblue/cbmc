@@ -260,7 +260,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:acd3d4aa41c85488781b59c0663b295cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Links <code>is_fresh_set</code> to <code>write_set-&gt;linked_is_fresh</code> so that the is_fresh predicates can be evaluated in requires and ensures clauses.  <br /></td></tr>
 <tr class="separator:acd3d4aa41c85488781b59c0663b295cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf9fba247bc34e6fb97a9677ce9eb17c" id="r_adf9fba247bc34e6fb97a9677ce9eb17c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#adf9fba247bc34e6fb97a9677ce9eb17c">__CPROVER_contracts_link_allocated</a> (<a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set_postconditions</a>, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set_to_link</a>)</td></tr>
-<tr class="memdesc:adf9fba247bc34e6fb97a9677ce9eb17c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Links <code>write_set_to_link-&gt;allocated</code> to <code>write_set_postconditions-&gt;linked_allocated</code> so that allocations performed by <a class="el" href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a> when evaluating ensures clauses are recorded in <code>write_set_to_link</code>.  <br /></td></tr>
+<tr class="memdesc:adf9fba247bc34e6fb97a9677ce9eb17c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Links <code>write_set_to_link-&gt;allocated</code> to <code>write_set_postconditions-&gt;linked_allocated</code> so that allocations performed by <a class="el" href="cprover__contracts_8c.html#aacf4b59741ead08d66b72005b2d442ec">__CPROVER_contracts_is_fresh</a> when evaluating ensures clauses are recorded in <code>write_set_to_link</code>.  <br /></td></tr>
 <tr class="separator:adf9fba247bc34e6fb97a9677ce9eb17c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a018a0d9ca28d2b11eda9af5f9f1f3058" id="r_a018a0d9ca28d2b11eda9af5f9f1f3058"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a018a0d9ca28d2b11eda9af5f9f1f3058">__CPROVER_contracts_link_deallocated</a> (<a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set_postconditions</a>, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set_to_link</a>)</td></tr>
 <tr class="memdesc:a018a0d9ca28d2b11eda9af5f9f1f3058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Links <code>write_set_to_link-&gt;deallocated</code> to <code>write_set_postconditions-&gt;linked_deallocated</code> so that deallocations performed by the function get recorded in <code>write_set_to_link-&gt;deallocated</code> and are later available to <a class="el" href="cprover__contracts_8c.html#a947ac49e226fbeab880aa2f195d5daf1">__CPROVER_contracts_was_freed</a> predicate when evaluating ensures clauses.  <br /></td></tr>
@@ -271,15 +271,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a7c4964591200e4b19659a38003a59783" id="r_a7c4964591200e4b19659a38003a59783"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a7c4964591200e4b19659a38003a59783">__CPROVER_contracts_make_invalid_pointer</a> (<a class="el" href="classait.html">void</a> **ptr)</td></tr>
 <tr class="memdesc:a7c4964591200e4b19659a38003a59783"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes the given pointer invalid.  <br /></td></tr>
 <tr class="separator:a7c4964591200e4b19659a38003a59783"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a834c5ee55bb640f1ac42e0617dd6d1f0" id="r_a834c5ee55bb640f1ac42e0617dd6d1f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a834c5ee55bb640f1ac42e0617dd6d1f0">__CPROVER_contracts_pointer_equals</a> (<a class="el" href="classait.html">void</a> **<a class="el" href="classait.html">ptr1</a>, <a class="el" href="classait.html">void</a> *<a class="el" href="classait.html">ptr2</a>, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set</a>)</td></tr>
-<tr class="memdesc:a834c5ee55bb640f1ac42e0617dd6d1f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the <code>pointer_equals</code> front-end predicate.  <br /></td></tr>
-<tr class="separator:a834c5ee55bb640f1ac42e0617dd6d1f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a618ed6892d91825d0becba82c6df28b6" id="r_a618ed6892d91825d0becba82c6df28b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a> (<a class="el" href="classait.html">void</a> **<a class="el" href="classait.html">elem</a>, <a class="el" href="classait.html">__CPROVER_size_t</a> size, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set</a>)</td></tr>
-<tr class="memdesc:a618ed6892d91825d0becba82c6df28b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the <code>is_fresh</code> front-end predicate.  <br /></td></tr>
-<tr class="separator:a618ed6892d91825d0becba82c6df28b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af613107ae0a7da1e8553a1552c386601" id="r_af613107ae0a7da1e8553a1552c386601"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#af613107ae0a7da1e8553a1552c386601">__CPROVER_contracts_pointer_in_range_dfcc</a> (<a class="el" href="classait.html">void</a> *lb, <a class="el" href="classait.html">void</a> **ptr, <a class="el" href="classait.html">void</a> *ub, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set</a>)</td></tr>
-<tr class="memdesc:af613107ae0a7da1e8553a1552c386601"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the <code>pointer_in_range_dfcc</code> front-end predicate.  <br /></td></tr>
-<tr class="separator:af613107ae0a7da1e8553a1552c386601"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30f2d81a210b88630f5a3fbb30b5bd81" id="r_a30f2d81a210b88630f5a3fbb30b5bd81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a30f2d81a210b88630f5a3fbb30b5bd81">__CPROVER_contracts_pointer_equals</a> (<a class="el" href="classait.html">void</a> **<a class="el" href="classait.html">ptr1</a>, <a class="el" href="classait.html">void</a> *<a class="el" href="classait.html">ptr2</a>, <a class="el" href="classait.html">__CPROVER_bool</a> <a class="el" href="classait.html">may_fail</a>, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set</a>)</td></tr>
+<tr class="memdesc:a30f2d81a210b88630f5a3fbb30b5bd81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the <code>pointer_equals</code> front-end predicate.  <br /></td></tr>
+<tr class="separator:a30f2d81a210b88630f5a3fbb30b5bd81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacf4b59741ead08d66b72005b2d442ec" id="r_aacf4b59741ead08d66b72005b2d442ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#aacf4b59741ead08d66b72005b2d442ec">__CPROVER_contracts_is_fresh</a> (<a class="el" href="classait.html">void</a> **<a class="el" href="classait.html">elem</a>, <a class="el" href="classait.html">__CPROVER_size_t</a> size, <a class="el" href="classait.html">__CPROVER_bool</a> <a class="el" href="classait.html">may_fail</a>, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set</a>)</td></tr>
+<tr class="memdesc:aacf4b59741ead08d66b72005b2d442ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the <code>is_fresh</code> front-end predicate.  <br /></td></tr>
+<tr class="separator:aacf4b59741ead08d66b72005b2d442ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee38f90ee9a527603c94a054a0ecb5b1" id="r_aee38f90ee9a527603c94a054a0ecb5b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#aee38f90ee9a527603c94a054a0ecb5b1">__CPROVER_contracts_pointer_in_range_dfcc</a> (<a class="el" href="classait.html">void</a> *lb, <a class="el" href="classait.html">void</a> **ptr, <a class="el" href="classait.html">void</a> *ub, <a class="el" href="classait.html">__CPROVER_bool</a> <a class="el" href="classait.html">may_fail</a>, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> <a class="el" href="classait.html">write_set</a>)</td></tr>
+<tr class="memdesc:aee38f90ee9a527603c94a054a0ecb5b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the <code>pointer_in_range_dfcc</code> front-end predicate.  <br /></td></tr>
+<tr class="separator:aee38f90ee9a527603c94a054a0ecb5b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a334155076c3df79d49783cac896269ff" id="r_a334155076c3df79d49783cac896269ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a334155076c3df79d49783cac896269ff">__CPROVER_contracts_write_set_havoc_get_assignable_target</a> (<a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> set, <a class="el" href="classait.html">__CPROVER_size_t</a> idx)</td></tr>
 <tr class="memdesc:a334155076c3df79d49783cac896269ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the start address of the conditional address range found at index <code>idx</code> in <code>set-&gt;contract_assigns</code>.  <br /></td></tr>
 <tr class="separator:a334155076c3df79d49783cac896269ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -298,9 +298,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a32aea85f6c7e488872e663c0df6eca8c" id="r_a32aea85f6c7e488872e663c0df6eca8c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a32aea85f6c7e488872e663c0df6eca8c">__CPROVER_contracts_check_replace_ensures_was_freed_preconditions</a> (<a class="el" href="classait.html">void</a> *ptr, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> set)</td></tr>
 <tr class="memdesc:a32aea85f6c7e488872e663c0df6eca8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asserts that <code>ptr</code> is found in <code>set-&gt;contract_frees</code>.  <br /></td></tr>
 <tr class="separator:a32aea85f6c7e488872e663c0df6eca8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75e072b13a1a23ee80665cb9a23e197d" id="r_a75e072b13a1a23ee80665cb9a23e197d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a75e072b13a1a23ee80665cb9a23e197d">__CPROVER_contracts_obeys_contract</a> (<a class="el" href="classait.html">void</a>(**<a class="el" href="classait.html">function_pointer</a>)(<a class="el" href="classait.html">void</a>), <a class="el" href="classait.html">void</a>(*<a class="el" href="classait.html">contract</a>)(<a class="el" href="classait.html">void</a>), <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> set)</td></tr>
-<tr class="memdesc:a75e072b13a1a23ee80665cb9a23e197d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the <code>obeys_contract</code> front-end predicate.  <br /></td></tr>
-<tr class="separator:a75e072b13a1a23ee80665cb9a23e197d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9517161a35650cf5f7aed607a8f7e661" id="r_a9517161a35650cf5f7aed607a8f7e661"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cprover__contracts_8c.html#a9517161a35650cf5f7aed607a8f7e661">__CPROVER_contracts_obeys_contract</a> (<a class="el" href="classait.html">void</a>(**<a class="el" href="classait.html">function_pointer</a>)(<a class="el" href="classait.html">void</a>), <a class="el" href="classait.html">void</a>(*<a class="el" href="classait.html">contract</a>)(<a class="el" href="classait.html">void</a>), <a class="el" href="classait.html">__CPROVER_bool</a> <a class="el" href="classait.html">may_fail</a>, <a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a> set)</td></tr>
+<tr class="memdesc:a9517161a35650cf5f7aed607a8f7e661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the <code>obeys_contract</code> front-end predicate.  <br /></td></tr>
+<tr class="separator:a9517161a35650cf5f7aed607a8f7e661"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -650,7 +650,7 @@ Variables</h2></td></tr>
 <p>Asserts that <code>ptr</code> is found in <code>set-&gt;contract_frees</code>. </p>
 <p>If proved, the assertion demonstrates that it is possible to assume that <code>was_freed(ptr)</code> holds as a post condition without causing a contradiction. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01612">1612</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01619">1619</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -715,12 +715,12 @@ Variables</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>True iff a pointer satisfies the preconditions for the <code>free</code> function and can hence be safely deallocated using <code>free</code>.</dd></dl>
 <p>If called in an assumption context, only basic conditions are checked: the pointer has offset 0 and points to a dynamic object. If called in an assertion context, extra conditions depending on nondeterministic CPROVER instrumentation variables are checked, yielding the full set of conditions checked by the CPROVER library implementation of free. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01554">1554</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01561">1561</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
-<a id="a618ed6892d91825d0becba82c6df28b6" name="a618ed6892d91825d0becba82c6df28b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a618ed6892d91825d0becba82c6df28b6">&#9670;&#160;</a></span>__CPROVER_contracts_is_fresh()</h2>
+<a id="aacf4b59741ead08d66b72005b2d442ec" name="aacf4b59741ead08d66b72005b2d442ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacf4b59741ead08d66b72005b2d442ec">&#9670;&#160;</a></span>__CPROVER_contracts_is_fresh()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -740,6 +740,12 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td>
+          <td class="paramname"><em>may_fail</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a>&#160;</td>
           <td class="paramname"><em>write_set</em>&#160;</td>
         </tr>
@@ -754,8 +760,9 @@ Variables</h2></td></tr>
 <p>Implementation of the <code>is_fresh</code> front-end predicate. </p>
 <p>The behaviour depends on the boolean flags carried by <code>write_set</code> which reflect the invocation context: checking vs. replacing a contract, in a requires or an ensures clause context. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">elem</td><td>First argument of the <code>is_fresh</code> predicate </td></tr>
-    <tr><td class="paramname">size</td><td>Second argument of the <code>is_fresh</code> predicate </td></tr>
+    <tr><td class="paramname">elem</td><td>Pointer to the target pointer of the check </td></tr>
+    <tr><td class="paramname">size</td><td>Size to check for </td></tr>
+    <tr><td class="paramname">may_fail</td><td>Allow predicate to fail in assume mode </td></tr>
     <tr><td class="paramname">write_set</td><td>Write set in which seen/allocated objects are recorded;</td></tr>
   </table>
   </dd>
@@ -766,7 +773,7 @@ Variables</h2></td></tr>
 <li>When <code>set-&gt;assert_requires_ctx</code> or <code>set-&gt;assert_ensures_ctx</code> is <code>true</code>, the predicate first computes wether <code>*elem</code> is in <code>set-&gt;linked_is_fresh</code> and returns false if it is. Otherwise it records the object in <code>set-&gt;linked_is_fresh</code> and returns the value of r_ok(*elem, size). </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01242">1242</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01246">1246</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -796,7 +803,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Links <code>write_set_to_link-&gt;allocated</code> to <code>write_set_postconditions-&gt;linked_allocated</code> so that allocations performed by <a class="el" href="cprover__contracts_8c.html#a618ed6892d91825d0becba82c6df28b6">__CPROVER_contracts_is_fresh</a> when evaluating ensures clauses are recorded in <code>write_set_to_link</code>. </p>
+<p>Links <code>write_set_to_link-&gt;allocated</code> to <code>write_set_postconditions-&gt;linked_allocated</code> so that allocations performed by <a class="el" href="cprover__contracts_8c.html#aacf4b59741ead08d66b72005b2d442ec">__CPROVER_contracts_is_fresh</a> when evaluating ensures clauses are recorded in <code>write_set_to_link</code>. </p>
 
 <p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01087">1087</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
@@ -923,8 +930,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a75e072b13a1a23ee80665cb9a23e197d" name="a75e072b13a1a23ee80665cb9a23e197d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75e072b13a1a23ee80665cb9a23e197d">&#9670;&#160;</a></span>__CPROVER_contracts_obeys_contract()</h2>
+<a id="a9517161a35650cf5f7aed607a8f7e661" name="a9517161a35650cf5f7aed607a8f7e661"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9517161a35650cf5f7aed607a8f7e661">&#9670;&#160;</a></span>__CPROVER_contracts_obeys_contract()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -944,6 +951,12 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td>
+          <td class="paramname"><em>may_fail</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a>&#160;</td>
           <td class="paramname"><em>set</em>&#160;</td>
         </tr>
@@ -959,7 +972,7 @@ Variables</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>True iff a function pointer points to the specified contract.</dd></dl>
 <p>If called in an assumption context, translates to an assignment <code>function_pointer = contract</code>. If called in an assertion context, translates to an <code>function_pointer == contract</code>. The function pointer is taken by reference to be able to update it using a side-effect in assumption contexts. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01647">1647</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01654">1654</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1252,8 +1265,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a834c5ee55bb640f1ac42e0617dd6d1f0" name="a834c5ee55bb640f1ac42e0617dd6d1f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a834c5ee55bb640f1ac42e0617dd6d1f0">&#9670;&#160;</a></span>__CPROVER_contracts_pointer_equals()</h2>
+<a id="a30f2d81a210b88630f5a3fbb30b5bd81" name="a30f2d81a210b88630f5a3fbb30b5bd81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30f2d81a210b88630f5a3fbb30b5bd81">&#9670;&#160;</a></span>__CPROVER_contracts_pointer_equals()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1269,6 +1282,12 @@ Variables</h2></td></tr>
           <td></td>
           <td class="paramtype"><a class="el" href="classait.html">void</a> *&#160;</td>
           <td class="paramname"><em>ptr2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td>
+          <td class="paramname"><em>may_fail</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1289,18 +1308,19 @@ Variables</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">ptr1</td><td>First argument of the <code>pointer_equals</code> predicate </td></tr>
     <tr><td class="paramname">ptr2</td><td>Second argument of the <code>pointer_equals</code> predicate </td></tr>
+    <tr><td class="paramname">may_fail</td><td>Allow predicate to fail in assume mode </td></tr>
     <tr><td class="paramname">write_set</td><td>Write set which conveys the invocation context (requires/ensures clause, assert/assume context);</td></tr>
   </table>
   </dd>
 </dl>
 <p>The behaviour is as follows: When <code>set-&gt;assume_requires_ctx</code> or <code>set-&gt;assume_ensures_ctx</code> is <code>true</code>, the predicate nondeterministically invalidates <code>*ptr1</code> and returns <code>false</code>, or checks that <code>ptr2</code> is either NULL or valid, and assigns <code>*ptr1</code> to <code>ptr2</code>. When <code>set-&gt;assert_requires_ctx</code> or <code>set-&gt;assert_ensures_ctx</code> is <code>true</code>, the predicate checks that both <code>*ptr1</code> and <code>ptr2</code> are either NULL or valid, and returns the value of (*ptr1 == ptr2). </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01179">1179</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01180">1180</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
-<a id="af613107ae0a7da1e8553a1552c386601" name="af613107ae0a7da1e8553a1552c386601"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af613107ae0a7da1e8553a1552c386601">&#9670;&#160;</a></span>__CPROVER_contracts_pointer_in_range_dfcc()</h2>
+<a id="aee38f90ee9a527603c94a054a0ecb5b1" name="aee38f90ee9a527603c94a054a0ecb5b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee38f90ee9a527603c94a054a0ecb5b1">&#9670;&#160;</a></span>__CPROVER_contracts_pointer_in_range_dfcc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1326,6 +1346,12 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">__CPROVER_bool</a>&#160;</td>
+          <td class="paramname"><em>may_fail</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="cprover__contracts_8c.html#a8f7470f5b28d687194dd6480b4fcf0c6">__CPROVER_contracts_write_set_ptr_t</a>&#160;</td>
           <td class="paramname"><em>write_set</em>&#160;</td>
         </tr>
@@ -1343,6 +1369,7 @@ Variables</h2></td></tr>
     <tr><td class="paramname">lb</td><td>Lower bound pointer </td></tr>
     <tr><td class="paramname">ptr</td><td>Target pointer of the predicate </td></tr>
     <tr><td class="paramname">ub</td><td>Upper bound pointer </td></tr>
+    <tr><td class="paramname">may_fail</td><td>Allow predicate to fail in assume mode </td></tr>
     <tr><td class="paramname">write_set</td><td>Write set in which seen/allocated objects are recorded;</td></tr>
   </table>
   </dd>
@@ -1352,7 +1379,7 @@ Variables</h2></td></tr>
 <li>When <code>set-&gt;assert_requires_ctx</code> or <code>set-&gt;assert_ensures_ctx</code> is <code>true</code>, the predicate checks that <code>lb</code> and <code>ub</code> are valid, into the same object, ordered, and assigns <code>ptr</code> to some nondet offset between <code>lb</code> and <code>ub</code>. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01448">1448</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01454">1454</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1384,7 +1411,7 @@ Variables</h2></td></tr>
 
 <p>Returns true iff the pointer <code>ptr</code> is found in <code>set-&gt;deallocated</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01586">1586</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01593">1593</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2029,7 +2056,7 @@ Variables</h2></td></tr>
 
 <p>Returns the start address of the conditional address range found at index <code>idx</code> in <code>set-&gt;contract_assigns</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01499">1499</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01506">1506</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2061,7 +2088,7 @@ Variables</h2></td></tr>
 
 <p>Havocs the whole object pointed to by the lower bound pointer of the element stored at index <code>idx</code> in <code>set-&gt;contract_assigns</code>, if it is writable. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01518">1518</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01525">1525</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2093,7 +2120,7 @@ Variables</h2></td></tr>
 
 <p>Havocs the range of bytes represented byt the element stored at index <code>idx</code> in <code>set-&gt;contract_assigns</code>, if it is writable. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01531">1531</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01538">1538</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
