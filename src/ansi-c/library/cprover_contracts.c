@@ -64,8 +64,27 @@ typedef struct
   void **elems;
 } __CPROVER_contracts_obj_set_t;
 
-/// \brief Type of pointers to \ref __CPROVER_contracts_car_set_t.
+/// \brief Type of pointers to \ref __CPROVER_contracts_obj_set_t.
 typedef __CPROVER_contracts_obj_set_t *__CPROVER_contracts_obj_set_ptr_t;
+
+/// \brief Stores context information supporting the evaluation of pointer
+/// predicates in both assume and assert contexts for all predicates:
+/// pointer equals, pointer_in_range_dfcc, pointer_is_fresh, obeys_contract.
+typedef struct
+{
+  /// \brief Nondet variable ranging over the set of objects allocated
+  /// by __CPROVER_contracts_is_fresh. Used to check separation constraints
+  /// in __CPROVER_contracts_is_fresh.
+  void *fresh_ptr;
+  /// \brief Nondet variable ranging over the set of locations storing
+  /// pointers on which predicates were assumed/asserted. Used to ensure
+  /// that at most one predicate is assumed per pointer.
+  void **ptr_pred;
+} __CPROVER_contracts_ptr_pred_ctx_t;
+
+/// \brief Type of pointers to \ref __CPROVER_contracts_ptr_pred_ctx_t.
+typedef __CPROVER_contracts_ptr_pred_ctx_t
+  *__CPROVER_contracts_ptr_pred_ctx_ptr_t;
 
 /// \brief Runtime representation of a write set.
 typedef struct
@@ -84,7 +103,7 @@ typedef struct
   __CPROVER_contracts_obj_set_t deallocated;
   /// \brief Pointer to object set supporting the is_fresh predicate checks
   /// (indexed mode)
-  __CPROVER_contracts_obj_set_ptr_t linked_is_fresh;
+  __CPROVER_contracts_ptr_pred_ctx_ptr_t linked_ptr_pred_ctx;
   /// \brief Object set recording the is_fresh allocations in post conditions
   __CPROVER_contracts_obj_set_ptr_t linked_allocated;
   /// \brief Object set recording the deallocations (used by was_freed)
@@ -393,6 +412,27 @@ __CPROVER_HIDE:;
   return set->elems[object_id] == ptr;
 }
 
+/// \brief Resets the nondet tracker for pointer predicates in \p set.
+/// Invoked between requires and ensures clauses evaluation to allow ensures
+/// clauses to establish different pointer predicates on the same pointers.
+void __CPROVER_contracts_ptr_pred_ctx_init(
+  __CPROVER_contracts_ptr_pred_ctx_ptr_t set)
+{
+__CPROVER_HIDE:;
+  set->fresh_ptr = (void *)0;
+  set->ptr_pred = (void **)0;
+}
+
+/// \brief Resets the nondet tracker for pointer predicates in \p set.
+/// Invoked right between requires and ensures clauses to allow ensures clauses
+/// to establish a different pointer predicates on the same pointers.
+void __CPROVER_contracts_ptr_pred_ctx_reset(
+  __CPROVER_contracts_ptr_pred_ctx_ptr_t set)
+{
+__CPROVER_HIDE:;
+  set->ptr_pred = (void **)0;
+}
+
 /// \brief Initialises a \ref __CPROVER_contracts_write_set_t object.
 /// \param[inout] set Pointer to the object to initialise
 /// \param[in] contract_assigns_size Max size of the assigns clause
@@ -434,7 +474,7 @@ __CPROVER_HIDE:;
     &(set->contract_frees_append), contract_frees_size);
   __CPROVER_contracts_obj_set_create_indexed_by_object_id(&(set->allocated));
   __CPROVER_contracts_obj_set_create_indexed_by_object_id(&(set->deallocated));
-  set->linked_is_fresh = 0;
+  set->linked_ptr_pred_ctx = 0;
   set->linked_allocated = 0;
   set->linked_deallocated = 0;
   set->assume_requires_ctx = assume_requires_ctx;
@@ -473,8 +513,8 @@ __CPROVER_HIDE:;
   __CPROVER_deallocate(set->contract_frees_append.elems);
   __CPROVER_deallocate(set->allocated.elems);
   __CPROVER_deallocate(set->deallocated.elems);
-  // do not free set->linked_is_fresh->elems or set->deallocated_linked->elems
-  // since they are owned by someone else.
+  // do not free set->linked_ptr_pred_ctx->elems or
+  // set->deallocated_linked->elems since they are owned by someone else.
 }
 
 /// \brief Inserts a snapshot of the range starting at \p ptr of size \p size
@@ -542,9 +582,6 @@ void __CPROVER_contracts_write_set_insert_object_from(
 /// \brief Inserts a snapshot of the range of bytes starting at \p ptr of
 /// \p size bytes in \p set->contact_assigns at index \p idx.
 ///
-/// - The start address is `ptr`
-/// - The size in bytes is `size`
-///
 /// \param[inout] set The set to update
 /// \param[in] idx Insertion index
 /// \param[in] ptr Pointer to the start of the range
@@ -567,10 +604,8 @@ void __CPROVER_contracts_write_set_add_freeable(
   void *ptr)
 {
 __CPROVER_HIDE:;
-  // we don't check yet that the pointer satisfies
-  // the __CPROVER_contracts_is_freeable as precondition.
-  // preconditions will be checked if there is an actual attempt
-  // to free the pointer.
+  // Preconditions will be checked if there is an actual attempt
+  // to free the pointer, don't check preemptively.
 
   // store pointer
   __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
@@ -1060,23 +1095,23 @@ SET_DEALLOCATE_FREEABLE_LOOP:
 }
 
 /// \brief Links \p is_fresh_set to
-/// \p write_set->linked_is_fresh so that the is_fresh predicates
-/// can be evaluated in requires and ensures clauses.
-void __CPROVER_contracts_link_is_fresh(
+/// \p write_set->linked_ptr_pred_ctx to share evaluation context between
+/// requires and ensures clauses for separation checks.
+void __CPROVER_contracts_link_ptr_pred_ctx(
   __CPROVER_contracts_write_set_ptr_t write_set,
-  __CPROVER_contracts_obj_set_ptr_t is_fresh_set)
+  __CPROVER_contracts_ptr_pred_ctx_ptr_t ptr_pred_ctx)
 {
 __CPROVER_HIDE:;
 #ifdef __CPROVER_DFCC_DEBUG_LIB
   __CPROVER_assert(write_set != 0, "write_set not NULL");
 #endif
-  if((is_fresh_set != 0))
+  if((ptr_pred_ctx != 0))
   {
-    write_set->linked_is_fresh = is_fresh_set;
+    write_set->linked_ptr_pred_ctx = ptr_pred_ctx;
   }
   else
   {
-    write_set->linked_is_fresh = 0;
+    write_set->linked_ptr_pred_ctx = 0;
   }
 }
 
@@ -1205,7 +1240,15 @@ __CPROVER_HIDE:;
     }
     __CPROVER_assert(
       (ptr2 == 0) || __CPROVER_r_ok(ptr2, 0),
-      "pointer_equals is only called with valid pointers");
+      "__CPROVER_pointer_equals is only called with valid pointers");
+    __CPROVER_assert(
+      write_set->linked_ptr_pred_ctx->ptr_pred != ptr1,
+      "__CPROVER_pointer_equals does not conflict with other pointer "
+      "predicate");
+    write_set->linked_ptr_pred_ctx->ptr_pred =
+      __VERIFIER_nondet___CPROVER_bool()
+        ? ptr1
+        : write_set->linked_ptr_pred_ctx->ptr_pred;
     *ptr1 = ptr2;
     return 1;
   }
@@ -1214,35 +1257,41 @@ __CPROVER_HIDE:;
     void *derefd = *ptr1;
     __CPROVER_assert(
       (derefd == 0) || __CPROVER_r_ok(derefd, 0),
-      "pointer_equals is only called with valid pointers");
+      "__CPROVER_pointer_equals is only called with valid pointers");
     __CPROVER_assert(
       (ptr2 == 0) || __CPROVER_r_ok(ptr2, 0),
-      "pointer_equals is only called with valid pointers");
-    return derefd == ptr2;
+      "__CPROVER_pointer_equals is only called with valid pointers");
+    if(derefd != ptr2)
+    {
+      return 0;
+    }
+    __CPROVER_assert(
+      write_set->linked_ptr_pred_ctx->ptr_pred != ptr1,
+      "__CPROVER_pointer_equals does not conflict with other pointer "
+      "predicate");
+    write_set->linked_ptr_pred_ctx->ptr_pred =
+      __VERIFIER_nondet___CPROVER_bool()
+        ? ptr1
+        : write_set->linked_ptr_pred_ctx->ptr_pred;
+    return 1;
   }
 }
 
 /// \brief Implementation of the `is_fresh` front-end predicate.
 ///
-/// The behaviour depends on the boolean flags carried by \p write_set
-/// which reflect the invocation context: checking vs. replacing a contract,
-/// in a requires or an ensures clause context.
 /// \param elem Pointer to the target pointer of the check
-/// \param size Size to check for
+/// \param size Size to check
 /// \param may_fail Allow predicate to fail in assume mode
-/// \param write_set Write set in which seen/allocated objects are recorded;
+/// \param write_set Write set (carries assert/assume requires/ensures context
+///   flags, sets to allocated/seen objects for separation checks)
 ///
 /// \details The behaviour is as follows:
-/// - When \p set->assume_requires_ctx is `true`, the predicate allocates a new
-/// object, records the object in \p set->linked_is_fresh, updates \p *elem to
-/// point to the fresh object and returns `true`;
-/// - When \p set->assume_ensures_ctx is `true`, the predicate allocates a new
-/// object, records the object in \p set->linked_allocated, updates \p *elem
-/// to point to the fresh object and returns `true`;
-/// - When \p set->assert_requires_ctx or \p set->assert_ensures_ctx is `true`,
-/// the predicate first computes wether \p *elem is in \p set->linked_is_fresh
-/// and returns false if it is. Otherwise it records the object in
-/// \p set->linked_is_fresh and returns the value of r_ok(*elem, size).
+/// - In assume contexts, returns false if another pointer predicate is already
+///  assumed, otherwise, allocates a fresh object, mark *elem and elem as seen
+///  in the write set.
+/// - In assert contexts, returns false if another pointer predicate is already
+///  succesfully asserted, otherwise checks separation and size, mark *elem and
+/// elem as seen in the write set.
 __CPROVER_bool __CPROVER_contracts_is_fresh(
   void **elem,
   __CPROVER_size_t size,
@@ -1250,19 +1299,7 @@ __CPROVER_bool __CPROVER_contracts_is_fresh(
   __CPROVER_contracts_write_set_ptr_t write_set)
 {
 __CPROVER_HIDE:;
-  __CPROVER_assert(
-    (write_set != 0) & ((write_set->assume_requires_ctx == 1) |
-                        (write_set->assert_requires_ctx == 1) |
-                        (write_set->assume_ensures_ctx == 1) |
-                        (write_set->assert_ensures_ctx == 1)),
-    "__CPROVER_is_fresh is used only in requires or ensures clauses");
-#ifdef __CPROVER_DFCC_DEBUG_LIB
-  __CPROVER_assert(
-    __CPROVER_rw_ok(write_set, sizeof(__CPROVER_contracts_write_set_t)),
-    "set readable");
-  __CPROVER_assert(
-    write_set->linked_is_fresh, "set->linked_is_fresh is not NULL");
-#endif
+
   if(write_set->assume_requires_ctx)
   {
 #ifdef __CPROVER_DFCC_DEBUG_LIB
@@ -1299,32 +1336,28 @@ __CPROVER_HIDE:;
       __CPROVER_contracts_make_invalid_pointer(elem);
       return 0;
     }
-
     void *ptr = __CPROVER_allocate(size, 0);
     *elem = ptr;
+    __CPROVER_assert(
+      write_set->linked_ptr_pred_ctx->ptr_pred != elem,
+      "__CPROVER_is_fresh does not conflict with other pointer predicate");
+    write_set->linked_ptr_pred_ctx->ptr_pred =
+      __VERIFIER_nondet___CPROVER_bool()
+        ? elem
+        : write_set->linked_ptr_pred_ctx->ptr_pred;
+    write_set->linked_ptr_pred_ctx->fresh_ptr =
+      __VERIFIER_nondet___CPROVER_bool()
+        ? ptr
+        : write_set->linked_ptr_pred_ctx->fresh_ptr;
 
     // record the object size for non-determistic bounds checking
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
     __CPROVER_malloc_is_new_array =
       record_malloc ? 0 : __CPROVER_malloc_is_new_array;
-
     // do not detect memory leaks when assuming a precondition of a contract
     // for contract checking
     // __CPROVER_bool record_may_leak = __VERIFIER_nondet___CPROVER_bool();
     // __CPROVER_memory_leak = record_may_leak ? ptr : __CPROVER_memory_leak;
-
-#ifdef __CPROVER_DFCC_DEBUG_LIB
-    // manually inlined below
-    __CPROVER_contracts_obj_set_add(write_set->linked_is_fresh, ptr);
-#else
-    __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
-    write_set->linked_is_fresh->nof_elems =
-      (write_set->linked_is_fresh->elems[object_id] != 0)
-        ? write_set->linked_is_fresh->nof_elems
-        : write_set->linked_is_fresh->nof_elems + 1;
-    write_set->linked_is_fresh->elems[object_id] = ptr;
-    write_set->linked_is_fresh->is_empty = 0;
-#endif
     return 1;
   }
   else if(write_set->assume_ensures_ctx)
@@ -1362,6 +1395,17 @@ __CPROVER_HIDE:;
 
     void *ptr = __CPROVER_allocate(size, 0);
     *elem = ptr;
+    __CPROVER_assert(
+      write_set->linked_ptr_pred_ctx->ptr_pred != elem,
+      "__CPROVER_is_fresh does not conflict with other pointer predicate");
+    write_set->linked_ptr_pred_ctx->ptr_pred =
+      __VERIFIER_nondet___CPROVER_bool()
+        ? elem
+        : write_set->linked_ptr_pred_ctx->ptr_pred;
+    write_set->linked_ptr_pred_ctx->fresh_ptr =
+      __VERIFIER_nondet___CPROVER_bool()
+        ? ptr
+        : write_set->linked_ptr_pred_ctx->fresh_ptr;
 
     // record the object size for non-determistic bounds checking
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
@@ -1395,34 +1439,26 @@ __CPROVER_HIDE:;
         (write_set->assume_ensures_ctx == 0),
       "only one context flag at a time");
 #endif
-    __CPROVER_contracts_obj_set_ptr_t seen = write_set->linked_is_fresh;
     void *ptr = *elem;
-    // null pointers or already seen pointers are not fresh
-#ifdef __CPROVER_DFCC_DEBUG_LIB
-    // manually inlined below
-    if((ptr == 0) || (__CPROVER_contracts_obj_set_contains(seen, ptr)))
-      return 0;
-#else
-    if(ptr == 0)
-      return 0;
-
-    __CPROVER_size_t object_id = __CPROVER_POINTER_OBJECT(ptr);
-
-    if(seen->elems[object_id] != 0)
-      return 0;
-#endif
-
-#ifdef __CPROVER_DFCC_DEBUG_LIB
-    // manually inlined below
-    __CPROVER_contracts_obj_set_add(seen, ptr);
-#else
-    seen->nof_elems =
-      (seen->elems[object_id] != 0) ? seen->nof_elems : seen->nof_elems + 1;
-    seen->elems[object_id] = ptr;
-    seen->is_empty = 0;
-#endif
-    // check size
-    return __CPROVER_r_ok(ptr, size);
+    if(
+      ptr != (void *)0 &&
+      !__CPROVER_same_object(write_set->linked_ptr_pred_ctx->fresh_ptr, ptr) &&
+      __CPROVER_r_ok(ptr, size))
+    {
+      __CPROVER_assert(
+        write_set->linked_ptr_pred_ctx->ptr_pred != elem,
+        "__CPROVER_is_fresh does not conflict with other pointer predicate");
+      write_set->linked_ptr_pred_ctx->ptr_pred =
+        __VERIFIER_nondet___CPROVER_bool()
+          ? elem
+          : write_set->linked_ptr_pred_ctx->ptr_pred;
+      write_set->linked_ptr_pred_ctx->fresh_ptr =
+        __VERIFIER_nondet___CPROVER_bool()
+          ? ptr
+          : write_set->linked_ptr_pred_ctx->fresh_ptr;
+      return 1;
+    }
+    return 0;
   }
   else
   {
@@ -1491,13 +1527,37 @@ __CPROVER_HIDE:;
     __CPROVER_size_t max_offset = ub_offset - lb_offset;
     __CPROVER_assume(offset <= max_offset);
     *ptr = (char *)lb + offset;
+    __CPROVER_assert(
+      write_set->linked_ptr_pred_ctx->ptr_pred != ptr,
+      "__CPROVER_pointer_in_range_dfcc does not conflict with other pointer "
+      "predicate");
+    write_set->linked_ptr_pred_ctx->ptr_pred =
+      __VERIFIER_nondet___CPROVER_bool()
+        ? ptr
+        : write_set->linked_ptr_pred_ctx->ptr_pred;
     return 1;
   }
   else /* write_set->assert_requires_ctx | write_set->assert_ensures_ctx */
   {
     __CPROVER_size_t offset = __CPROVER_POINTER_OFFSET(*ptr);
-    return __CPROVER_same_object(lb, *ptr) && lb_offset <= offset &&
-           offset <= ub_offset;
+    if(
+      __CPROVER_same_object(lb, *ptr) && lb_offset <= offset &&
+      offset <= ub_offset)
+    {
+      __CPROVER_assert(
+        write_set->linked_ptr_pred_ctx->ptr_pred != ptr,
+        "__CPROVER_pointer_in_range_dfcc does not conflict with other "
+        "predicate");
+      write_set->linked_ptr_pred_ctx->ptr_pred =
+        __VERIFIER_nondet___CPROVER_bool()
+          ? ptr
+          : write_set->linked_ptr_pred_ctx->ptr_pred;
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
   }
 }
 
@@ -1669,6 +1729,14 @@ __CPROVER_HIDE:;
     if(may_fail && __VERIFIER_nondet___CPROVER_bool())
       return 0;
 
+    __CPROVER_assert(
+      set->linked_ptr_pred_ctx->ptr_pred != (void **)function_pointer,
+      "__CPROVER_obeys_contract does not conflict with other pointer "
+      "predicate");
+    set->linked_ptr_pred_ctx->ptr_pred = __VERIFIER_nondet___CPROVER_bool()
+                                           ? (void **)function_pointer
+                                           : set->linked_ptr_pred_ctx->ptr_pred;
+
     // must hold, assign the function pointer to the contract function
     *function_pointer = contract;
     return 1;
@@ -1676,7 +1744,18 @@ __CPROVER_HIDE:;
   else
   {
     // in assumption contexts, the pointer gets checked for equality
-    return *function_pointer == contract;
+    if(*function_pointer == contract)
+    {
+      __CPROVER_assert(
+        set->linked_ptr_pred_ctx->ptr_pred != (void **)function_pointer,
+        "__CPROVER_obeys_contract does not conflict with other pointer "
+        "predicate");
+      set->linked_ptr_pred_ctx->ptr_pred =
+        __VERIFIER_nondet___CPROVER_bool() ? (void **)function_pointer
+                                           : set->linked_ptr_pred_ctx->ptr_pred;
+      return 1;
+    }
+    return 0;
   }
 }
 #endif // __CPROVER_contracts_library_defined

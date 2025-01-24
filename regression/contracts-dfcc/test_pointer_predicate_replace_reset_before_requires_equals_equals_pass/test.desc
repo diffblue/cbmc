@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract bar --replace-call-with-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Tests that assuming different predicates on a same pointer is possible across pre and post conditions.
+Initially *z equals x, after the call *z equals y.

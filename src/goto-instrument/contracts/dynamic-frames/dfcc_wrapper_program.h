@@ -41,14 +41,15 @@ class conditional_target_group_exprt;
 /// \details The body of the wrapper is divided into a number of sections
 /// represented as separate goto_programs:
 /// - \ref preamble
-///  - create is_fresh_set, requires_write_set, ensures_write_set,
+///  - create ptr_pred_ctx, requires_write_set, ensures_write_set,
 ///    contract_write_set variables
-/// - \ref link_is_fresh
-///   - link the is_fresh_set to requires_write_set and ensures_write_set
+/// - \ref link_ptr_pred_ctx
+///   - link the ptr_pred_ctx to requires_write_set and ensures_write_set
 ///   - in REPLACE mode, link the caller_write_set to the contract_write_set
 ///     so that deallocations and allocations are reflected in the caller
 /// - \ref preconditions
-///   - evaluate preconditions, checking side effects against requires_write_set
+///   - evaluate preconditions, while checking the absence of side effects
+///     against the empty requires_write_set
 /// - \ref history
 ///   - declare and snapshot history variables
 /// - \ref write_set_checks
@@ -82,7 +83,8 @@ class conditional_target_group_exprt;
 ///   CALL link_allocated(ensures_write_set, caller_write_set);
 ///   ```
 /// - \ref postconditions
-///   - evaluate preconditions, checking side effects against ensures_write_set
+///   - reset pointer predicate context object, evaluate preconditions while
+///     checking absence of side effects against the empty ensures_write_set
 /// - \ref postamble
 ///  - release all object sets and write set variables
 ///
@@ -159,10 +161,10 @@ protected:
   const symbol_exprt addr_of_ensures_write_set;
 
   /// Symbol for the object set used to evaluate is_fresh predicates.
-  const symbol_exprt is_fresh_set;
+  const symbol_exprt ptr_pred_ctx;
 
   /// Symbol for the pointer to the is_fresh object set.
-  const symbol_exprt addr_of_is_fresh_set;
+  const symbol_exprt addr_of_ptr_pred_ctx;
 
   /// Set of required or ensured contracts for function pointers discovered
   /// when processing the contract of interest.
@@ -187,7 +189,7 @@ protected:
   // in the declaration order below.
 
   goto_programt preamble;
-  goto_programt link_is_fresh;
+  goto_programt link_ptr_pred_ctx;
   goto_programt preconditions;
   goto_programt history;
   goto_programt write_set_checks;
@@ -224,11 +226,12 @@ protected:
   /// - Adds release function call in \ref postamble
   void encode_contract_write_set();
 
-  /// Encodes the object set used to evaluate is fresh predicates,
-  /// - Adds declaration of object set and pointer to set to \ref preamble
-  /// - Adds initialisation function call in \ref preamble
-  /// - Adds release function call in \ref postamble
-  void encode_is_fresh_set();
+  /// Encodes the pointer predicates evaluation context object.
+  /// - Adds declaration of context object and pointer to \ref preamble
+  /// - Adds init function call in \ref preamble
+  /// - Adds reset function call in \ref link_deallocated_contract
+  /// - Adds dead instruction in \ref postamble
+  void encode_ptr_pred_ctx();
 
   /// Encodes preconditions, instruments them to check for side effects
   void encode_requires_clauses();

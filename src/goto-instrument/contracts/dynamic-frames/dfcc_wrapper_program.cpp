@@ -116,30 +116,30 @@ static symbol_exprt create_addr_of_ensures_write_set(
 }
 
 /// Generate object set used to support is_fresh predicates
-static symbol_exprt create_is_fresh_set(
+static symbol_exprt create_ptr_pred_ctx(
   symbol_table_baset &symbol_table,
   dfcc_libraryt &library,
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
     symbol_table,
-    library.dfcc_type[dfcc_typet::OBJ_SET],
+    library.dfcc_type[dfcc_typet::PTR_PRED_CTX],
     wrapper_symbol.name,
-    "__is_fresh_set",
+    "__ptr_pred_ctx",
     wrapper_symbol.location);
 }
 
 /// Generate object set pointer used to support is_fresh predicates
-static symbol_exprt create_addr_of_is_fresh_set(
+static symbol_exprt create_addr_of_ptr_pred_ctx(
   symbol_table_baset &symbol_table,
   dfcc_libraryt &library,
   const symbolt &wrapper_symbol)
 {
   return dfcc_utilst::create_symbol(
     symbol_table,
-    library.dfcc_type[dfcc_typet::OBJ_SET_PTR],
+    library.dfcc_type[dfcc_typet::PTR_PRED_CTX_PTR],
     wrapper_symbol.name,
-    "__address_of_is_fresh_set",
+    "__address_of_ptr_pred_ctx",
     wrapper_symbol.location);
 }
 
@@ -187,9 +187,9 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
       goto_model.symbol_table,
       library,
       wrapper_symbol)),
-    is_fresh_set(
-      create_is_fresh_set(goto_model.symbol_table, library, wrapper_symbol)),
-    addr_of_is_fresh_set(create_addr_of_is_fresh_set(
+    ptr_pred_ctx(
+      create_ptr_pred_ctx(goto_model.symbol_table, library, wrapper_symbol)),
+    addr_of_ptr_pred_ctx(create_addr_of_ptr_pred_ctx(
       goto_model.symbol_table,
       library,
       wrapper_symbol)),
@@ -227,7 +227,7 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
   // encode all contract clauses
   encode_requires_write_set();
   encode_ensures_write_set();
-  encode_is_fresh_set();
+  encode_ptr_pred_ctx();
   encode_requires_clauses();
   encode_contract_write_set();
   encode_function_call();
@@ -247,7 +247,7 @@ void dfcc_wrapper_programt::add_to_dest(goto_programt &dest)
 {
   // add code to dest in the right order
   dest.destructive_append(preamble);
-  dest.destructive_append(link_is_fresh);
+  dest.destructive_append(link_ptr_pred_ctx);
   dest.destructive_append(preconditions);
   dest.destructive_append(history);
   dest.destructive_append(write_set_checks);
@@ -501,39 +501,39 @@ void dfcc_wrapper_programt::encode_contract_write_set()
     goto_programt::make_dead(addr_of_contract_write_set, wrapper_sl));
 }
 
-void dfcc_wrapper_programt::encode_is_fresh_set()
+void dfcc_wrapper_programt::encode_ptr_pred_ctx()
 {
-  preamble.add(goto_programt::make_decl(is_fresh_set, wrapper_sl));
+  preamble.add(goto_programt::make_decl(ptr_pred_ctx, wrapper_sl));
 
-  preamble.add(goto_programt::make_decl(addr_of_is_fresh_set, wrapper_sl));
+  preamble.add(goto_programt::make_decl(addr_of_ptr_pred_ctx, wrapper_sl));
   preamble.add(goto_programt::make_assignment(
-    addr_of_is_fresh_set, address_of_exprt(is_fresh_set), wrapper_sl));
+    addr_of_ptr_pred_ctx, address_of_exprt(ptr_pred_ctx), wrapper_sl));
 
-  // CALL obj_set_create_indexed_by_object_id(is_fresh_set) in preamble
+  // CALL ptr_pred_ctx_init(ptr_pred_ctx) in preamble
   preamble.add(goto_programt::make_function_call(
-    library.obj_set_create_indexed_by_object_id_call(
-      addr_of_is_fresh_set, wrapper_sl),
+    library.ptr_pred_ctx_init_call(addr_of_ptr_pred_ctx, wrapper_sl),
     wrapper_sl));
 
   // link to requires write set
-  link_is_fresh.add(goto_programt::make_function_call(
-    library.link_is_fresh_call(
-      addr_of_requires_write_set, addr_of_is_fresh_set, wrapper_sl),
+  link_ptr_pred_ctx.add(goto_programt::make_function_call(
+    library.link_ptr_pred_ctx_call(
+      addr_of_requires_write_set, addr_of_ptr_pred_ctx, wrapper_sl),
     wrapper_sl));
 
   // link to ensures write set
-  link_is_fresh.add(goto_programt::make_function_call(
-    library.link_is_fresh_call(
-      addr_of_ensures_write_set, addr_of_is_fresh_set, wrapper_sl),
+  link_ptr_pred_ctx.add(goto_programt::make_function_call(
+    library.link_ptr_pred_ctx_call(
+      addr_of_ensures_write_set, addr_of_ptr_pred_ctx, wrapper_sl),
     wrapper_sl));
 
-  // release call in postamble
-  postamble.add(goto_programt::make_function_call(
-    library.obj_set_release_call(addr_of_is_fresh_set, wrapper_sl),
+  // reset tracking of target pointers to allow ensures clause to
+  // post different predicates.
+  link_deallocated_contract.add(goto_programt::make_function_call(
+    library.ptr_pred_ctx_reset_call(addr_of_ptr_pred_ctx, wrapper_sl),
     wrapper_sl));
 
   // DEAD instructions in postamble
-  postamble.add(goto_programt::make_dead(is_fresh_set, wrapper_sl));
+  postamble.add(goto_programt::make_dead(ptr_pred_ctx, wrapper_sl));
 }
 
 /// Recursively traverses expression, adding "no_fail" attributes to pointer

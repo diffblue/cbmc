@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo
+^\[__CPROVER_contracts_pointer_in_range_dfcc.assertion.6] line \d+ __CPROVER_pointer_in_range_dfcc does not conflict with other pointer predicate: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Tests that assuming more than one pointer predicate on the same target pointer triggers a failure.

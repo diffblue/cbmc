@@ -1,0 +1,14 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Tests that a same pointer can be the target of multiple pointer predicates as
+long as they do not apply at the same time.
+- `x` is fresh and inialized to 0
+- `y` is equal to `x`if select is true, or fresh otherwise
+- foo assigns y to 1
+- x is equal to 1 if select is true, 0 otherwise

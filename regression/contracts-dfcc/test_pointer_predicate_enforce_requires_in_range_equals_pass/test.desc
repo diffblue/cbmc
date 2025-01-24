@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Tests that more than one predicate can be assumed on a same target as long at
+they don't hold at the same time.

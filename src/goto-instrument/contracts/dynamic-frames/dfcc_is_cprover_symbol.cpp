@@ -30,6 +30,8 @@ init_function_symbols(std::unordered_set<irep_idt> &function_symbols)
     function_symbols.insert(CPROVER_PREFIX "assert");
     function_symbols.insert(CPROVER_PREFIX "assignable");
     function_symbols.insert(CPROVER_PREFIX "assume");
+    function_symbols.insert(CPROVER_PREFIX "contracts_ptr_pred_ctx_init");
+    function_symbols.insert(CPROVER_PREFIX "contracts_ptr_pred_ctx_reset");
     function_symbols.insert(CPROVER_PREFIX "contracts_car_create");
     function_symbols.insert(CPROVER_PREFIX "contracts_car_set_contains");
     function_symbols.insert(CPROVER_PREFIX "contracts_car_set_create");
@@ -42,7 +44,7 @@ init_function_symbols(std::unordered_set<irep_idt> &function_symbols)
     function_symbols.insert(CPROVER_PREFIX "contracts_is_fresh");
     function_symbols.insert(CPROVER_PREFIX "contracts_link_allocated");
     function_symbols.insert(CPROVER_PREFIX "contracts_link_deallocated");
-    function_symbols.insert(CPROVER_PREFIX "contracts_link_is_fresh");
+    function_symbols.insert(CPROVER_PREFIX "contracts_link_ptr_pred_ctx");
     function_symbols.insert(CPROVER_PREFIX "contracts_obeys_contract");
     function_symbols.insert(CPROVER_PREFIX "contracts_obj_set_add");
     function_symbols.insert(CPROVER_PREFIX "contracts_obj_set_append");

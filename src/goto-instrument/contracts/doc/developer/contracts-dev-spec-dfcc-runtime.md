@@ -112,8 +112,8 @@ typedef struct __CPROVER_contracts_write_set_t
   // Set of objects deallocated by the function under analysis (indexed mode)
   __CPROVER_contracts_obj_set_t deallocated;
 
-  // Object set supporting the is_fresh predicate checks (indexed mode)
-  __CPROVER_contracts_obj_set_ptr_t linked_is_fresh;
+  // Object set supporting the pointer predicate checks
+  __CPROVER_contracts_ptr_pred_ctx_ptr_t linked_ptr_pred_ctx;
 
   // Object set recording the is_fresh allocations in post conditions
   // (replacement mode only)

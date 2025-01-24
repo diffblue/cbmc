@@ -21,7 +21,6 @@ int foo(int *x)
     ptr_ok(x))
   __CPROVER_ensures(
     !ptr_ok(x) &&
-    !__CPROVER_is_fresh(x, sizeof(int)) &&
     return_ok(__CPROVER_return_value, x))
 // clang-format on
 {
