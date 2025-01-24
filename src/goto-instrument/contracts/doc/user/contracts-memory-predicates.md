@@ -4,252 +4,170 @@ Back to @ref contracts-user
 
 @tableofcontents
 
-The built-in and user-defined predicates discussed in this section are meant to
-let users describe the shape of the memory accessed through pointers in
-_requires clauses_ and _ensures clauses_. Attempting to call these predicates
-outside of a requires or ensures clause context will result in a verification
-error.
+The built-in predicates discussed in this section are used to describe pointer
+properties in _requires clauses_ and _ensures clauses_.
+
+At a basic level the predicates allow to specify pointers to fresh objects
+(i.e. allocated and distinct, `__CPROVER_is_fresh(p, size)`), of aliased pointers
+(`__CPROVER_pointer_equals(p, q)`), or pointers ranging over pointer intervals
+(`__CPROVER_pointer_in_range_dfcc(lb, p, ub)`).
+
+They can only be used in the context of a requires and ensures clauses, any
+attempt to call these predicates outside of a requires or ensures clause will
+result in a verification error.
+
+Pointer predicates can be used with conjunctions, implications or disjunctions
+to describe richer data structures where some parts are only conditionally
+allocated, but requires and ensures clauses must not attempt to establish more
+than one predicate at the same time for a same pointer.
+
+One can build their own pointer predicates using these built-in predicates,
+to describe (bounded) linked data structures such as buffers, lists, etc.
 
 ## The __CPROVER_pointer_equals predicate
-### Syntax
+
+This predicate checks for pointer validity and equality.
 
 ```c
 bool __CPROVER_pointer_equals(void *p, void *q);
 ```
-This predicate can only be used in ensures and requires clauses and checks for
-pointer validity and equality.
 
-#### Parameters
+This predicate checks for pointer validity and equality.
 
-`__CPROVER_pointer_equals` takes two pointers as arguments.
+It returns:
+- `true` if and only if:
+  -  `p` is either `NULL` or valid,
+  -  `q` is either `NULL` of valid,
+  -  `p` is equal to `q`.
 
-#### Return Value
+When checking a function against a contract (`--enforce-contract`):
+- in a _requires_ clause, the predicate will check that `q` is always
+  either `NULL` or valid, and it will assign `p` with `q`. This results in a state
+  where both pointers are either `NULL` or valid and are equal;
+- used in an _ensures_ clause it will check that both `p` and `q` are either
+  NULL or valid, and that `p == q`.
 
-It returns a `bool` value:
-- `true` iff pointers are both null or valid and are equal,
-- `false` otherwise.
-
-### Semantics
-
-#### Enforcement
-
-When checking a contract using `--enforce-contract foo`:
-- used in a _requires_ clause, the predicate will check that `ptr2` is always
-  either null or valid, and it will make `ptr1` equal to `ptr2`.
-  This results in a state resulting in a state where both pointers are either
-  null or valid and equal;
-- used in an _ensures_ clause it will check that memory both pointers are always
-  either null or valid and equal.
-
-#### Replacement
-
-When checking a contract using `--replace-call-with-contract foo`, we get the
-dual behaviour:
-- used in a _requires_ clause it will check that memory both pointers are always
-  either null or valid and equal,
-- used in an _ensures_ clause, the predicate will check that `ptr2` is always
-  either null or valid, and it will make `ptr1` equal to `ptr2`.
-  This results in a state resulting in a state where both pointers are either
-  null or valid and equal.
+When replacing a function call by a contract (`--replace-call-with-contract`):
+we get the dual behaviour:
+- used in a _requires_ clause it will check that both `p` and `q` are either
+  NULL or valid, and that `p == q`.
+- in an _ensures clause, the predicate will check that `q` is always
+  either `NULL` or valid, and it will assign `p` with `q`. This results in a state
+  where both pointers are either `NULL` or valid and are equal;
 
 ## The __CPROVER_is_fresh predicate
-### Syntax
+
+The predicate `__CPROVER_is_fresh `  takes a pointer `p` and an allocation
+size `size` and checks pointer validity and separation with other fresh pointers.
 
 ```c
 bool __CPROVER_is_fresh(void *p, size_t size);
 ```
 
-To specify memory footprint we use a special function called `__CPROVER_is_fresh `.
-The meaning of `__CPROVER_is_fresh` is that we are borrowing a pointer from the
-external environment (in a precondition), or returning it to the calling context
-(in a postcondition).
+The predicate `__CPROVER_is_fresh(p, n)` holds when `p` points into a valid
+object with at least `n` bytes available after the pointer, and the object
+pointed to by `p` is distinct from all other objects pointed to in other
+`__CPROVER_is_fresh(q, m)` found in the requires and ensures clauses.
 
-#### Parameters
+When checking a function against a contract (`--enforce-contract`):
+- `__CPROVER_is_fresh` in the `requires` clause works like a nondeterministic
+  `p = malloc(size)` (separation is assured by construction);
+- `__CPROVER_is_fresh` in the `ensures` clause checks pointer validity and
+  separation against other `__CPROVER_is_fresh` occurrences in the `requires`
+  clause and the `ensures` clause.
 
-`__CPROVER_is_fresh` takes two arguments: a pointer and an allocation size.
-The first argument is the pointer to be checked for "freshness" (i.e., not previously
-allocated), and the second is the expected size **in bytes** for the memory
-available at the pointer.
-
-#### Return Value
-
-It returns a `bool` value, indicating whether the pointer is fresh.
-
-### Semantics
-
-To illustrate the semantics for `__CPROVER_is_fresh`, consider the following
-implementation of `sum` function.
-
-```c
-int *err_signal; // Global variable
-
-void sum(const uint32_t a, const uint32_t b, uint32_t* out)
-__CPROVER_requires(__CPROVER_is_fresh(out, sizeof(*out)))
-__CPROVER_ensures(__CPROVER_is_fresh(err_signal, sizeof(*err_signal)))
-__CPROVER_assigns(*out, err_signal)
-{
-  const uint64_t result = ((uint64_t) a) + ((uint64_t) b);
-  err_signal = malloc(sizeof(*err_signal));
-  if (!err_signal) return;
-  if (result > UINT32_MAX) *err_signal = FAILURE;
-  *out = (uint32_t) result;
-  *err_signal = SUCCESS;
-}
-```
-
-#### Enforcement
-
-When checking the contract abstracts a function a `__CPROVER_is_fresh`
-in a _requires_ clause will cause fresh memory to be allocated.
-In an _ensures_ clause it will check that memory was freshly allocated.
-
-```c
-int *err_signal; // Global variable
-
-int __CPROVER_contracts_original_sum(const uint32_t a, const uint32_t b, uint32_t* out)
-{
-  const uint64_t result = ((uint64_t) a) + ((uint64_t) b);
-  err_signal = malloc(sizeof(*err_signal));
-  if (!err_signal) return;
-  if (result > UINT32_MAX) *err_signal = FAILURE;
-  *out = (uint32_t) result;
-  *err_signal = SUCCESS;
-}
-
-/* Function Contract Enforcement */
-int sum(const uint32_t a, const uint32_t b, uint32_t* out)
-{
-  __CPROVER_assume(__CPROVER_is_fresh(out, sizeof(*out))); // Assumes out is freshly allocated
-  int return_value_sum = __CPROVER_contracts_original_sum(a, b, out);
-  __CPROVER_assert(__CPROVER_is_fresh(err_signal, sizeof(*err_signal)), "Check ensures clause");
-  return return_value_sum;
-}
-```
-
-#### Replacement
-
-In our example, consider that a function `foo` may call `sum`.
-
-```c
-int *err_signal; // Global variable
-
-int foo()
-{
-  uint32_t a;
-  uint32_t b;
-  uint32_t out;
-  sum(a, b, &out);
-  return *err_signal;
-}
-```
-
-When using a contract as an abstraction in place of a call to the function
-a `__CPROVER_is_fresh` in a _requires_ clause will check that the argument
-supplied is fresh and `__CPROVER_is_fresh` in an _ensures_ clause will
-result in a fresh malloc.
-
-```c
-int *err_signal; // Global variable
-
-int foo()
-{
-  uint32_t a;
-  uint32_t b;
-  uint32_t out;
-
-  /* Function Contract Replacement */
-  /* Precondition */
-  __CPROVER_assert(__CPROVER_is_fresh(out, sizeof(*out)), "Check requires clause");
-
-  /* Writable Set */
-  *(&out) = nondet_uint32_t();
-  err_signal = nondet_int_pointer();
-
-  /* Postconditions */
-  __CPROVER_assume(__CPROVER_is_fresh(err_signal, sizeof(*err_signal))); // Assumes out is allocated
-
-  return *err_signal;
-}
-```
-
-#### Influence of memory allocation failure modes flags in assumption contexts
-
-CBMC models
-[memory allocation failure modes](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/memory-primitives.md#malloc-modelling).
-When activated, these modesl result in different
-behaviours for `__CPROVER_is_fresh` in assumption contexts (i.e. when used in a
-requires clause of a contract being checked against a function, or in an
-ensures clause of a contract being used to abstract a function call).
-
-1. **No failure mode** (no flags):
-  In this mode, `malloc` and `__CPROVER_is_fresh` never fail
-  and will accept a size parameter up to `SIZE_MAX` without triggerring errors.
-  However, pointer overflow and assigns clause checking errors will happen any
-  time one tries to access such objects beyond an offset of
-  `__CPROVER_max_malloc_size` (in bytes), by executing `ptr[size-1]` or
-  `ptr[size]` in user-code, or by writing
-  `__CPROVER_assigns(__CPROVER_object_from(ptr))` in a contract;
-1. **Fail with NULL** (flags: `--malloc-may-fail --malloc-fail-null`):
-  In this mode, if `size` is larger than
-  `__CPROVER_max_malloc_size`, `malloc` returns a NULL pointer, and imposes an
-  implicit assumption that size is less than `__CPROVER_max_malloc_size` when
-  returning a non-NULL pointer. `__CPROVER_is_fresh` never fails in assumption
-  contexts, so it adds an implicit assumption that `size` is less
-  than `__CPROVER_max_malloc_size`.
-1. **Fail assert** (flags: `--malloc-may-fail --malloc-fail-assert`):
-  In this mode, if `size` is larger
-  than `__CPROVER_max_malloc_size`, an `max allocation size exceeded` assertion
-  is triggered in `malloc` and execution continues under the assumption that
-  `size` is less than `__CPROVER_max_malloc_size`, with `malloc` returning a
-  non-NULL pointer. `__CPROVER_is_fresh` never fails in assumption contexts,
-  so it will trigger a `max allocation size exceeded` assertion and continue
-  execution under the implicit assumption that `size` is less than
-  `__CPROVER_max_malloc_size`.
+When replacing a function call by a contract (`--replace-call-with-contract`):
+- `__CPROVER_is_fresh` in the `requires` clause checks pointer validity and
+  separation against other `__CPROVER_is_fresh` occurrences in the `requires`
+  clause;
+- `__CPROVER_is_fresh` in the `ensures` clause works like a nondeterministic
+  `p = malloc(size)` (separation is assured by construction);
 
 ## The __CPROVER_pointer_in_range_dfcc predicate
 ### Syntax
+
+This predicate holds if pointers `lb`, `p` and `ub` are valid pointers, pointing
+within the same object and the condition `lb <= p && p <= ub` holds.
 
 ```c
 bool __CPROVER_pointer_in_range_dfcc(void *lb, void *p, void *ub);
 ```
 
-This predicate holds if `lb`, `p` and `ub` are valid pointers within the same
-object and the pointers are ordered such that `lb <= p && p <= ub` holds.
+When checking a function against a contract (`--enforce-contract`):
+- In the `requires` clause, `__CPROVER_pointer_in_range_dfcc` checks that `lb`
+  and `ub` are valid and point into the same object, and nondeterministically
+  assigns `p` to a nondet pointer between `lb` and `ub`;
+- In the `ensures` clause, `__CPROVER_pointer_in_range_dfcc` checks that `lb`
+  and `ub` are valid and point into the same object, that `p` is between `lb`
+  and `ub`;
 
-### Semantics
-In assertion contexts, the predicate checks the conditions described above.
-In assumption contexts, the predicate checks that `lb` and `ub` are valid pointers
-into the same object, and updates `p` using a side effect to be a non-deterministic
-pointer ranging between `lb` and `ub`.
+When replacing a function call by a contract (`--replace-call-with-contract`):
+- In the `requires` clause, `__CPROVER_pointer_in_range_dfcc` checks that `lb`
+  and `ub` are valid and point into the same object, that `p` is between `lb`
+  and `ub`;
+- In the `ensures` clause, `__CPROVER_pointer_in_range_dfcc` checks that `lb`
+  and `ub` are valid and point into the same object, and nondeterministically
+  assigns `p` to a nondet pointer between `lb` and `ub`;
 
-## User defined memory predicates
+## Using memory predicates in disjunctions
 
-Users can write their own memory predicates based on the core predicates described above.
-`__CPROVER_is_fresh` allows to specify pointer validity and separation.
-`__CPROVER_pointer_in_range` allows to specify aliasing constraints.
+It is possible to use memory predicates in disjunctions to describe alternatives.
 
-For instance, one could write a predicate defining linked lists of at most `len`
-elements as follows:
+For instance, to specify a conditionally allocated pointer, the implication
+ `==>` operator can be used.
 
-```c
-typedef struct list_t
+The `array` pointer is only valid when len is in some bounds, otherwise nothing
+is assumed about `array` and the pointer is considered _invalid_, i.e. any
+attempt to use it by the program under verification will result in an error.
+
+```C
+int foo(int *array, size_t len)
+__CPROVER_requires(
+  (len < INT_MAX/sizeof(int) && len > 0)
+      ==> __CPROVER_is_fresh(array, len*sizeof(int)))
 {
-  int value;
-  struct list_t *next;
-} list_t;
-
-// true iff list of len nodes with values in [-10,10]
-bool is_list(list_t *l, size_t len)
-{
-  if(len == 0)
-    return l == NULL;
-  else
-    return __CPROVER_is_fresh(l, sizeof(*l)) && -10 <= l->value &&
-           l->value <= 10 && is_list(l->next, len - 1);
+   ...
 }
 ```
 
-One can also simply describe finite nested structures:
+In this other example, the function takes two pointers `a` and `b` and a
+and sets `*out` to the longest one:
+
+```C
+void foo(int *a, size_t len_a, int *b, size_t len_b, int **out)
+__CPROVER_requires(__CPROVER_is_fresh(a, len_a * sizeof(int)))
+__CPROVER_requires(__CPROVER_is_fresh(b, len_b * sizeof(int)))
+__CPROVER_requires(__CPROVER_is_fresh(out, sizeof(int *)))
+__CPROVER_assigns(*out)
+__CPROVER_requires(len_a >= len_b ==> __CPROVER_pointer_equals(*out, a))
+__CPROVER_requires(len_a < len_b ==> __CPROVER_pointer_equals(*out, b))
+{
+   ...
+}
+```
+
+In last other example, the function takes two pointers `a` and `b` and a
+and sets `*out` to either `a` or `b`, nondeterministically:
+
+```C
+void foo(int *a, int *b, int **out)
+__CPROVER_requires(__CPROVER_is_fresh(a, 1)) // at least one byte
+__CPROVER_requires(__CPROVER_is_fresh(b, 1))
+__CPROVER_requires(__CPROVER_is_fresh(out, sizeof(int *)))
+__CPROVER_assigns(*out)
+__CPROVER_requires(
+  __CPROVER_pointer_equals(*out, a) || __CPROVER_pointer_equals(*out, b))
+{
+   ...
+}
+```
+
+## Writing your own memory predicates
+
+One can write their own memory predicates based on the built-in predicates.
+
+
+One can specify (finite) nested structures:
 
 ```c
 typedef struct buffer_t
@@ -283,16 +201,46 @@ bool is_double_buffer(double_buffer_t *b)
 }
 ```
 
-And one can then use these predicates in requires or ensures clauses for function
-contracts.
+One can even describe inductively defined (but bounded) structures such as lists:
 
 ```c
+typedef struct list_t
+{
+  int value;
+  struct list_t *next;
+} list_t;
+
+bool value_in_range(int lb, int value, int ub) {
+  return lb <= value && value <= ub;
+}
+
+bool is_list(list_t *l, size_t len)
+{
+  if(len == 0) {
+    // list size bounded by `len`
+    return __CPROVER_pointer_equals(l,  NULL);
+  } else {
+    // either NULL or some fresh node
+    if (__CPROVER_pointer_equals(l,  NULL)) {
+      return true;
+    } else {
+      return __CPROVER_is_fresh(l, sizeof(*l)) &&
+        value_in_range(-10, l->value, 10) &&
+        is_list(l->next, len - 1);
+    }
+  }
+}
+```
+
+And use these predicates in requires/ensures clauses:
+
+```c
+// take a list and a double buffer and sum list values and buffer sizes
 int foo(list_t *l, double_buffer_t *b)
   // clang-format off
   __CPROVER_requires(is_list(l, 3))
   __CPROVER_requires(is_double_buffer(b))
-  __CPROVER_ensures(-28 <= __CPROVER_return_value &&
-                    __CPROVER_return_value <= 50)
+  __CPROVER_ensures(-28 <= __CPROVER_return_value && __CPROVER_return_value <= 50)
 // clang-format on
 {
   // access the assumed data structure
@@ -301,16 +249,21 @@ int foo(list_t *l, double_buffer_t *b)
 }
 ```
 
+Internally, CBMC instruments these user-defined predicates to turn them into
+- nondeterministic allocators that build the data structures when used in
+  assumption contexts;
+- checker functions that can walk a pointer structure and check pointer validity
+  and separation/aliasing/interval constraints in assertion contexts.
+
 ### Limitations
 
 The main limitation with user defined predicates are:
 - their evaluation must terminate;
-- self-recursive predicates are supported, but mutually recursive predicates are
-  not supported for the moment.
+  - For instance, in the `is_list` example above, recursion is bounded using
+  use of the explicit `len` parameter.
+  - The `is_double_buffer` predicate also describes a bounded structure.
+- mutually-recursive predicates are not supported for the moment.
 
-For instance, in the `is_list` example above, recursion is bounded by the use of
-the explicit `len` parameter. The `is_double_buffer` predicate also describes
-a bounded structure.
 
 ## Additional Resources
 
