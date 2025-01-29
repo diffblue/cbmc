@@ -11,10 +11,10 @@
 <!-- Node0 -->
 <g id="Node000000" class="node">
 <title>Node0</title>
-<g id="a_Node000000"><a xlink:href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html" target="_top" xlink:title="Runtime representation of a write set.">
+<g id="a_Node000000"><a xlink:href="struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t.html" target="_top" xlink:title="Stores context information supporting the evaluation of pointer predicates in both assume and assert ...">
 <polygon fill="white" stroke="#666666" points="124,-30 0,-30 0,0 124,0 124,-30"/>
 <text text-anchor="start" x="8" y="-18" font-family="Helvetica,sans-Serif" font-size="10.00">__CPROVER_contracts</text>
-<text text-anchor="middle" x="62" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">_write_set_t</text>
+<text text-anchor="middle" x="62" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">_ptr_pred_ctx_t</text>
 </a>
 </g>
 </g>

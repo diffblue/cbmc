@@ -1,9 +1,11 @@
 <map id="__CPROVER_contracts_write_set_t" name="__CPROVER_contracts_write_set_t">
-<area shape="rect" id="Node000001" title="Runtime representation of a write set." alt="" coords="123,299,288,339"/>
-<area shape="rect" id="Node000002" href="$struct_____c_p_r_o_v_e_r__contracts__car__set__t.html" title="A set of __CPROVER_contracts_car_t." alt="" coords="5,108,171,148"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,162,91,218,98,247,113,273,126,286,142,296,139,301,123,290,109,276,94,249,85,219,82,162"/>
+<area shape="rect" id="Node000001" title="Runtime representation of a write set." alt="" coords="627,124,792,164"/>
+<area shape="rect" id="Node000002" href="$struct_____c_p_r_o_v_e_r__contracts__car__set__t.html" title="A set of __CPROVER_contracts_car_t." alt="" coords="264,5,429,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="444,21,523,29,564,38,604,52,630,67,655,85,693,122,689,126,651,89,628,71,602,57,563,44,522,34,443,26"/>
 <area shape="rect" id="Node000003" href="$struct_____c_p_r_o_v_e_r__contracts__car__t.html" title="A conditionally writable range of bytes." alt="" coords="5,5,171,45"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,59,91,108,85,108,85,59"/>
-<area shape="rect" id="Node000004" href="$struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html" title="A set of pointers." alt="" coords="195,108,360,148"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="271,162,255,216,232,276,219,300,215,297,227,274,250,214,266,160"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="184,23,264,23,264,28,184,28"/>
+<area shape="rect" id="Node000004" href="$struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html" title="A set of pointers." alt="" coords="264,124,429,164"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="443,141,627,141,627,147,443,147"/>
+<area shape="rect" id="Node000005" href="$struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t.html" title="Stores context information supporting the evaluation of pointer predicates in both assume and assert ..." alt="" coords="264,188,429,228"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="442,189,602,161,626,157,627,162,603,167,443,195"/>
 </map>

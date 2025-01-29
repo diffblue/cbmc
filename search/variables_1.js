@@ -15,7 +15,7 @@ var searchData=
   ['add_12',['add',['../classsmt__bit__vector__theoryt.html#a29aecc331566400adee93ce9f1a3224e',1,'smt_bit_vector_theoryt']]],
   ['addr_5fof_5fcontract_5fwrite_5fset_13',['addr_of_contract_write_set',['../classdfcc__wrapper__programt.html#ad1d7e05668c88c3bfde20eb52996dee9',1,'dfcc_wrapper_programt']]],
   ['addr_5fof_5fensures_5fwrite_5fset_14',['addr_of_ensures_write_set',['../classdfcc__wrapper__programt.html#a59eb9f10b4c1602eae75eff03c4f5b05',1,'dfcc_wrapper_programt']]],
-  ['addr_5fof_5fis_5ffresh_5fset_15',['addr_of_is_fresh_set',['../classdfcc__wrapper__programt.html#a921931144b1fbb94f53de6e6b422d206',1,'dfcc_wrapper_programt']]],
+  ['addr_5fof_5fptr_5fpred_5fctx_15',['addr_of_ptr_pred_ctx',['../classdfcc__wrapper__programt.html#a0405c76d41a065ead6baa44766389326',1,'dfcc_wrapper_programt']]],
   ['addr_5fof_5frequires_5fwrite_5fset_16',['addr_of_requires_write_set',['../classdfcc__wrapper__programt.html#a33ce194cf4ad80d4951730c94f9b996f',1,'dfcc_wrapper_programt']]],
   ['addr_5fof_5fwrite_5fset_5fvar_17',['addr_of_write_set_var',['../classdfcc__loop__infot.html#a011243024aae667b906f6eb28852a1f6',1,'dfcc_loop_infot']]],
   ['address_18',['address',['../structpropertyt_1_1trace__updatet.html#a990840f29e54140a16b76ba482429dd6',1,'propertyt::trace_updatet::address'],['../structshadow__memory__statet_1_1shadowed__addresst.html#a5ef62f533aee54998d221bdcbcfe3b2d',1,'shadow_memory_statet::shadowed_addresst::address'],['../structgdb__apit_1_1pointer__valuet.html#a22d263c7ea54a329f10beac27185f92e',1,'gdb_apit::pointer_valuet::address'],['../structjava__bytecode__parse__treet_1_1instructiont.html#a826597d5c243ef359180f63ff08782bc',1,'java_bytecode_parse_treet::instructiont::address']]],

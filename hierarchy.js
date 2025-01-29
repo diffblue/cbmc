@@ -4,6 +4,7 @@ var hierarchy =
     [ "__CPROVER_contracts_car_set_t", "struct_____c_p_r_o_v_e_r__contracts__car__set__t.html", null ],
     [ "__CPROVER_contracts_car_t", "struct_____c_p_r_o_v_e_r__contracts__car__t.html", null ],
     [ "__CPROVER_contracts_obj_set_t", "struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html", null ],
+    [ "__CPROVER_contracts_ptr_pred_ctx_t", "struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t.html", null ],
     [ "__CPROVER_contracts_write_set_t", "struct_____c_p_r_o_v_e_r__contracts__write__set__t.html", null ],
     [ "__CPROVER_jsa_abstract_heap", "struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html", null ],
     [ "__CPROVER_jsa_abstract_node", "struct_____c_p_r_o_v_e_r__jsa__abstract__node.html", null ],

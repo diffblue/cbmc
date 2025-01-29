@@ -1,5 +1,7 @@
 var NAVTREEINDEX72 =
 {
+"compilation-and-development.html#compilation-and-development-subsubsection-macro-debug":[0,4,7,0,2,1],
+"compilation-and-development.html#compilation-and-development-subsubsection-running-individual-regression-tests-directly-with-test-pl":[0,4,7,1,0,2],
 "compilation-and-development.html#compilation-and-development-subsubsection-running-regression-tests-with-ctest":[0,4,7,1,0,1],
 "compilation-and-development.html#compilation-and-development-subsubsection-running-regression-tests-with-make":[0,4,7,1,0,0],
 "compile_8cpp.html":[8,0,2,10,14],
@@ -247,7 +249,5 @@ var NAVTREEINDEX72 =
 "contracts-requires-ensures.html#autotoc_md140":[1,0,2,1,0],
 "contracts-requires-ensures.html#autotoc_md141":[1,0,2,1,1],
 "contracts-requires-ensures.html#autotoc_md142":[1,0,2,2],
-"contracts-user-cli.html":[1,0,11],
-"contracts-user-cli.html#autotoc_md74":[1,0,11,0],
-"contracts-user-cli.html#autotoc_md75":[1,0,11,1]
+"contracts-user-cli.html":[1,0,11]
 };

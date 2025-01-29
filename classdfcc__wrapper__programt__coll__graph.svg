@@ -1735,14 +1735,14 @@
 <text text-anchor="middle" x="2146" y="-124" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">_set</text>
 <text text-anchor="start" x="2088.5" y="-113" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">addr_of_ensures_write</text>
 <text text-anchor="middle" x="2146" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">_set</text>
-<text text-anchor="start" x="2088.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">addr_of_is_fresh</text>
-<text text-anchor="middle" x="2146" y="-80" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">_set</text>
+<text text-anchor="start" x="2088.5" y="-91" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">addr_of_ptr_pred</text>
+<text text-anchor="middle" x="2146" y="-80" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">_ctx</text>
 <text text-anchor="start" x="2088.5" y="-69" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">addr_of_requires</text>
 <text text-anchor="middle" x="2146" y="-58" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">_write_set</text>
 <text text-anchor="middle" x="2146" y="-47" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">caller_write_set</text>
 <text text-anchor="middle" x="2146" y="-36" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">contract_write_set</text>
 <text text-anchor="middle" x="2146" y="-25" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">ensures_write_set</text>
-<text text-anchor="middle" x="2146" y="-14" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">is_fresh_set</text>
+<text text-anchor="middle" x="2146" y="-14" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">ptr_pred_ctx</text>
 <text text-anchor="middle" x="2146" y="-3" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">requires_write_set</text>
 </g>
 <!-- Node61 -->
@@ -1892,7 +1892,7 @@
 <text text-anchor="middle" x="1995.5" y="-446" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">_caller</text>
 <text text-anchor="start" x="1953" y="-435" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">link_deallocated</text>
 <text text-anchor="middle" x="1995.5" y="-424" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">_contract</text>
-<text text-anchor="middle" x="1995.5" y="-413" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">link_is_fresh</text>
+<text text-anchor="middle" x="1995.5" y="-413" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">link_ptr_pred_ctx</text>
 <text text-anchor="middle" x="1995.5" y="-402" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">postamble</text>
 <text text-anchor="middle" x="1995.5" y="-391" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">postconditions</text>
 <text text-anchor="middle" x="1995.5" y="-380" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey">preamble</text>
