@@ -41,12 +41,12 @@ var NAVTREE =
           [ "Additional Resources", "contracts-loops.html#autotoc_md113", null ]
         ] ],
         [ "Requires and Ensures Clauses", "contracts-requires-ensures.html", [
-          [ "Syntax", "contracts-requires-ensures.html#autotoc_md138", null ],
-          [ "Semantics", "contracts-requires-ensures.html#autotoc_md139", [
-            [ "Enforcement", "contracts-requires-ensures.html#autotoc_md140", null ],
-            [ "Replacement", "contracts-requires-ensures.html#autotoc_md141", null ]
+          [ "Syntax", "contracts-requires-ensures.html#autotoc_md125", null ],
+          [ "Semantics", "contracts-requires-ensures.html#autotoc_md126", [
+            [ "Enforcement", "contracts-requires-ensures.html#autotoc_md127", null ],
+            [ "Replacement", "contracts-requires-ensures.html#autotoc_md128", null ]
           ] ],
-          [ "Additional Resources", "contracts-requires-ensures.html#autotoc_md142", null ]
+          [ "Additional Resources", "contracts-requires-ensures.html#autotoc_md129", null ]
         ] ],
         [ "Assigns Clauses", "contracts-assigns.html", [
           [ "Syntax", "contracts-assigns.html#autotoc_md61", [
@@ -88,35 +88,16 @@ var NAVTREE =
           [ "Additional Resources", "contracts-decreases.html#autotoc_md78", null ]
         ] ],
         [ "Memory Predicates", "contracts-memory-predicates.html", [
-          [ "The __CPROVER_pointer_equals predicate", "contracts-memory-predicates.html#autotoc_md114", [
-            [ "Syntax", "contracts-memory-predicates.html#autotoc_md115", [
-              [ "Parameters", "contracts-memory-predicates.html#autotoc_md116", null ],
-              [ "Return Value", "contracts-memory-predicates.html#autotoc_md117", null ]
-            ] ],
-            [ "Semantics", "contracts-memory-predicates.html#autotoc_md118", [
-              [ "Enforcement", "contracts-memory-predicates.html#autotoc_md119", null ],
-              [ "Replacement", "contracts-memory-predicates.html#autotoc_md120", null ]
-            ] ]
+          [ "The __CPROVER_pointer_equals predicate", "contracts-memory-predicates.html#autotoc_md114", null ],
+          [ "The __CPROVER_is_fresh predicate", "contracts-memory-predicates.html#autotoc_md115", null ],
+          [ "The __CPROVER_pointer_in_range_dfcc predicate", "contracts-memory-predicates.html#autotoc_md116", [
+            [ "Syntax", "contracts-memory-predicates.html#autotoc_md117", null ]
           ] ],
-          [ "The __CPROVER_is_fresh predicate", "contracts-memory-predicates.html#autotoc_md121", [
-            [ "Syntax", "contracts-memory-predicates.html#autotoc_md122", [
-              [ "Parameters", "contracts-memory-predicates.html#autotoc_md123", null ],
-              [ "Return Value", "contracts-memory-predicates.html#autotoc_md124", null ]
-            ] ],
-            [ "Semantics", "contracts-memory-predicates.html#autotoc_md125", [
-              [ "Enforcement", "contracts-memory-predicates.html#autotoc_md126", null ],
-              [ "Replacement", "contracts-memory-predicates.html#autotoc_md127", null ],
-              [ "Influence of memory allocation failure modes flags in assumption contexts", "contracts-memory-predicates.html#autotoc_md128", null ]
-            ] ]
+          [ "Using memory predicates in disjunctions", "contracts-memory-predicates.html#autotoc_md118", null ],
+          [ "Writing your own memory predicates", "contracts-memory-predicates.html#autotoc_md119", [
+            [ "Limitations", "contracts-memory-predicates.html#autotoc_md120", null ]
           ] ],
-          [ "The __CPROVER_pointer_in_range_dfcc predicate", "contracts-memory-predicates.html#autotoc_md129", [
-            [ "Syntax", "contracts-memory-predicates.html#autotoc_md130", null ],
-            [ "Semantics", "contracts-memory-predicates.html#autotoc_md131", null ]
-          ] ],
-          [ "User defined memory predicates", "contracts-memory-predicates.html#autotoc_md132", [
-            [ "Limitations", "contracts-memory-predicates.html#autotoc_md133", null ]
-          ] ],
-          [ "Additional Resources", "contracts-memory-predicates.html#autotoc_md134", null ]
+          [ "Additional Resources", "contracts-memory-predicates.html#autotoc_md121", null ]
         ] ],
         [ "Function Pointer Predicates", "contracts-function-pointer-predicates.html", [
           [ "Syntax", "contracts-function-pointer-predicates.html#autotoc_md87", [
@@ -144,9 +125,9 @@ var NAVTREE =
           [ "Additional Resources", "contracts-history-variables.html#autotoc_md105", null ]
         ] ],
         [ "Quantifiers", "contracts-quantifiers.html", [
-          [ "Syntax", "contracts-quantifiers.html#autotoc_md135", null ],
-          [ "Semantics", "contracts-quantifiers.html#autotoc_md136", null ],
-          [ "Additional Resources", "contracts-quantifiers.html#autotoc_md137", null ]
+          [ "Syntax", "contracts-quantifiers.html#autotoc_md122", null ],
+          [ "Semantics", "contracts-quantifiers.html#autotoc_md123", null ],
+          [ "Additional Resources", "contracts-quantifiers.html#autotoc_md124", null ]
         ] ],
         [ "Command Line Interface for Code Contracts", "contracts-user-cli.html", [
           [ "Applying loop and/or function contracts transformations (without the dynamic frames method)", "contracts-user-cli.html#autotoc_md74", null ],
@@ -212,17 +193,17 @@ var NAVTREE =
       ] ]
     ] ],
     [ "The CPROVER C++ API", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-cpp_2readme.html", [
-      [ "Implementation", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-cpp_2readme.html#autotoc_md162", null ],
-      [ "Example", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-cpp_2readme.html#autotoc_md163", null ]
+      [ "Implementation", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-cpp_2readme.html#autotoc_md149", null ],
+      [ "Example", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-cpp_2readme.html#autotoc_md150", null ]
     ] ],
     [ "Libcprover-rust", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-rust_2readme.html", [
-      [ "Building instructions", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-rust_2readme.html#autotoc_md165", null ],
-      [ "Basic Usage", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-rust_2readme.html#autotoc_md166", null ],
-      [ "Notes", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-rust_2readme.html#autotoc_md169", null ]
+      [ "Building instructions", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-rust_2readme.html#autotoc_md152", null ],
+      [ "Basic Usage", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-rust_2readme.html#autotoc_md153", null ],
+      [ "Notes", "md__2home_2runner_2work_2cbmc_2cbmc_2src_2libcprover-rust_2readme.html#autotoc_md156", null ]
     ] ],
     [ "Symex and GOTO program instructions", "md__2home_2runner_2work_2cbmc_2cbmc_2doc_2architectural_2symex-instructions.html", [
-      [ "A (very) short introduction to Symex", "md__2home_2runner_2work_2cbmc_2cbmc_2doc_2architectural_2symex-instructions.html#autotoc_md222", null ],
-      [ "Instruction Types", "md__2home_2runner_2work_2cbmc_2cbmc_2doc_2architectural_2symex-instructions.html#autotoc_md223", null ]
+      [ "A (very) short introduction to Symex", "md__2home_2runner_2work_2cbmc_2cbmc_2doc_2architectural_2symex-instructions.html#autotoc_md209", null ],
+      [ "Instruction Types", "md__2home_2runner_2work_2cbmc_2cbmc_2doc_2architectural_2symex-instructions.html#autotoc_md210", null ]
     ] ],
     [ "Deprecated List", "deprecated.html", null ],
     [ "Namespaces", "namespaces.html", [
@@ -337,84 +318,84 @@ var NAVTREEINDEX =
 "classvalue__set__fit.html#a3cd93e52c8df2048d90dcc942c8f2e71",
 "classvariable__sensitivity__object__factoryt.html#a7a24ea7b9bea4634c42c91e99be8ebab",
 "compilation-and-development.html#compilation-and-development-subsubsection-macro-debug",
-"contracts-user-cli.html#autotoc_md74",
-"count__eloc_8cpp_source.html",
-"cpp__name_8cpp.html",
-"cprover__contracts_8c.html#a0d15ef1621aaeab7b113315bace80158",
-"dfcc__infer__loop__assigns_8cpp.html#a1b4167feb8d13a0061548776365f5ebb",
-"dir_3de98a525830ece433065d8a27851bc8.html",
-"exit__codes_8h.html#ad4d7d07aa6ca41afebd91e159aec09e0",
-"find__symbols_8h.html#a4f06bb25a7e1f536a0bec05c932ccaa7",
-"functions.html",
-"gcc__builtin__headers__arm_8h.html#a5b877163264343bc83bac944445e2d06",
-"gcc__builtin__headers__ia32-2_8h.html#a29a021da8df4e6b8999bb61c4a7772bb",
-"gcc__builtin__headers__ia32-2_8h.html#a85085495cf66b4b7b89c71a4ceba757e",
-"gcc__builtin__headers__ia32-2_8h.html#aee4bd4085e4379f1d071a2abd325771c",
-"gcc__builtin__headers__ia32-3_8h.html#a4dedb24fe3b27e6c7d653111e9fa30fd",
-"gcc__builtin__headers__ia32-3_8h.html#ab61ba2103fbb75232138db10daa0aa2f",
-"gcc__builtin__headers__ia32-4_8h.html#a17c12ee57208bd688ab7bcc2dc22caf7",
-"gcc__builtin__headers__ia32-4_8h.html#a93bfeee35d3fc9129dbe5f451ac9fe0d",
-"gcc__builtin__headers__ia32-5_8h.html#a0e10f7f2885e667702d889e390cac945",
-"gcc__builtin__headers__ia32-5_8h.html#a8000fe11f8085277432f77c0acf16296",
-"gcc__builtin__headers__ia32-5_8h.html#af8b1fb3cf1d22350dc1f4f67d826159e",
-"gcc__builtin__headers__ia32-6_8h.html#a70e57ba212b97b1d2763e96cad4d1535",
-"gcc__builtin__headers__ia32-6_8h.html#ae7cd70b1278b3c3c7663210a316c58eb",
-"gcc__builtin__headers__ia32-7_8h.html#a3ee11826173853837379960f664e2de0",
-"gcc__builtin__headers__ia32-7_8h.html#a9473b9b256052b2360ebab93ef58afba",
-"gcc__builtin__headers__ia32-7_8h.html#aef42e39c6de521d6a6b2f76ee6f52645",
-"gcc__builtin__headers__ia32-8_8h.html#a420ba1a5327d7ca5305b66b97099f2d8",
-"gcc__builtin__headers__ia32-8_8h.html#a94b4de38def73a0ce9fc6dc59aba72ff",
-"gcc__builtin__headers__ia32-8_8h.html#ae882bb94ff485ef050aecda422318676",
-"gcc__builtin__headers__ia32-9_8h.html#a6c11b4e6eceeb32e1d83928264ad89ba",
-"gcc__builtin__headers__ia32-9_8h.html#af4905f84d3d010a52cadba6be039d0e7",
-"gcc__builtin__headers__ia32_8h.html#a31354b27c9a8c6ef8ab05480468218a8",
-"gcc__builtin__headers__ia32_8h.html#a6d01185912ec873354ebdbcdd894ac29",
-"gcc__builtin__headers__ia32_8h.html#aa15dcc9ffd15eff998f1a6dd34e51c6b",
-"gcc__builtin__headers__ia32_8h.html#add01d06f12a101ee47db15821340a654",
-"gcc__builtin__headers__math_8h.html#a44fe8267efbe90e7e286c18f5ece71e9",
-"gcc__builtin__headers__math_8h.html#ae497622a6b8c593e6e5f4252bcc081ab",
-"gcc__builtin__headers__omp_8h.html#a1af74c5cd4c449adcd6821b5ce206441",
-"gcc__builtin__headers__ubsan_8h.html#a85bdff393766729d00633450407e5d43",
-"globals_eval_u.html",
-"goto__inline_8h.html#ade5846664c18cd5ae7f0cde01915128a",
-"havoc__loops_8cpp.html",
-"interval__abstract__value_8cpp.html#a42a4283e9792ecf91ad20d13dc27d664",
-"java__bytecode__convert__method_8cpp.html#af22eda6997f83cdf7d8a46ffe7e6737e",
-"java__object__factory_8cpp.html#a983536d126da4c3537440152a1cc4f53",
-"java__types_8h.html#a6bb001cc2bdb3ea02ce55060469d297a",
-"json__parser_8cpp.html",
-"load__method__by__regex_8h.html#a7e934d7ee0bf4df87f2e6e70ec18847e",
-"math_8c.html#ae11b7781f057eb7ba5d7ed95be7fdbee",
-"miniz_8cpp.html#a37639f95844a8c30995fc1f5d4bb75a1",
-"miniz_8h.html#a48ece9a3d251aa69af280e975b6cc080",
-"mmio_8cpp.html#aba8cfa5b7d62d41af934b61a270c8638",
-"nondet_8h.html#a80c909c21f0a1dceab36075262975d9c",
-"pointer__expr_8h.html#a48198961183dd243516c796673202e5c",
-"properties_8h.html#a6eca9606823b052bba5e8d516f891feb",
-"remove__asm_8h.html#ac9f4a9caf33999bb6eb44679e4137375",
-"renaming__level_8h.html#a7cc127489ddf0f4efa10c683389ccaa9",
-"run__test__with__compilers_8cpp.html",
-"sharing__map_8h.html#a4b727bf70e22cb4c1eb9ce32ed7198a9",
-"single__path__symex__only__checker_8cpp_source.html",
-"solver_8cpp.html#a3288ed247c7e9903148a1d2d5b9fedf1",
-"statement__list__parse__tree__io_8cpp.html#ab808f24ca213eb430e47291eda1248f1",
-"std__expr_8h.html#a07e5f2947d71d70a104de08e35891b46",
-"stdio_8c.html",
-"string__constraint__generator__float_8cpp.html#ad247cc63dcafb5b98da2ba4491897962",
-"struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html#ad1b4929e90f296943b475244ff223f1c",
-"structc__wranglert.html#af0a1eaed721b54c17bf5ef491ab5bcb9",
-"structconfigt_1_1verilogt.html#a8432e3b69e0efe776d198be2a33e687f",
-"structfloat__utilst_1_1unpacked__floatt.html#a4728c7786438e20a2284bb8c4e3baf7b",
-"structinfix__opt.html#a5e8dee9dfdea6364767e7e89d2b90a67",
-"structjava__bytecode__parse__treet_1_1methodt_1_1verification__type__infot.html#a7a9b485a5f24fca6972f7b53f9103a62a1ee1bf637e279d10b9686c47f2b7d385",
-"structmz__zip__internal__state__tag.html#a0071a211627637fc049defb3f61972fe",
-"structsimplify__exprt_1_1resultt.html",
-"structsolver__hardnesst.html#a79b1654d3a538f42108e080160d692b8",
-"structtdefl__compressor.html#ad495682142ede0ea54a774a45a1e4145",
-"symex__clean__expr_8cpp_source.html",
-"type__size__mapping_8h.html",
-"utils_8cpp.html#a2636321c60f87bb1a79d8e8ba0d59dac",
-"vcd__goto__trace_8cpp_source.html"
+"contracts_8h.html#a5bce273094114e9f3977fabf73595f85",
+"counterexample__found_8cpp.html",
+"cpp__parse__tree_8h_source.html",
+"cprover__contracts_8c.html#a5908d26833d22bd6c0b4ca8ffda586f2",
+"dfcc__instrument_8cpp_source.html",
+"dir_7ec25742ab1d47a7a6823282222807fd.html",
+"expr2c_8cpp.html#a77a3d43c8e3848745c96591c2d7d626e",
+"find__variables_8cpp.html#a5dbaa6116e961b5a749749ee7ac7ed39",
+"functions_f.html",
+"gcc__builtin__headers__arm_8h.html#a75db93a08a60563a9732d91de6108951",
+"gcc__builtin__headers__ia32-2_8h.html#a2dbded2063efe82d631cdb13bb3b12b2",
+"gcc__builtin__headers__ia32-2_8h.html#a8a695c071838b85e3bfb838693d59399",
+"gcc__builtin__headers__ia32-2_8h.html#af25a230b1763f139fa8319b4385c511a",
+"gcc__builtin__headers__ia32-3_8h.html#a53dbc643a7b4901a3a99cd1c216c457e",
+"gcc__builtin__headers__ia32-3_8h.html#ab7f415c9edc3c6e659e01dad8edc606a",
+"gcc__builtin__headers__ia32-4_8h.html#a1dbb06e5297f07dd2124ee75c30918cd",
+"gcc__builtin__headers__ia32-4_8h.html#a9b328ed191523d0b92d51a99f3f577ae",
+"gcc__builtin__headers__ia32-5_8h.html#a138aa1a185f7f445daf84d73fb546967",
+"gcc__builtin__headers__ia32-5_8h.html#a86b468839765982557c670b5077590bf",
+"gcc__builtin__headers__ia32-5_8h.html#afcebf8db998fd05223965a9f3577a365",
+"gcc__builtin__headers__ia32-6_8h.html#a763e706d6f64d7666b838bc68fa753fd",
+"gcc__builtin__headers__ia32-6_8h.html#aee9a9eabbf5c6b49d8af7bb629bc3606",
+"gcc__builtin__headers__ia32-7_8h.html#a44d0c99930c1e554fdd1e333d4bdd3a4",
+"gcc__builtin__headers__ia32-7_8h.html#a9b2b5cc4eeacb4c14c3adb29a0399c48",
+"gcc__builtin__headers__ia32-7_8h.html#af2f6d56c950f48dbfadd6be4143555c1",
+"gcc__builtin__headers__ia32-8_8h.html#a4589d47119182b031fe613749d6c2f59",
+"gcc__builtin__headers__ia32-8_8h.html#a97c30c9a3047c7d5acfd5711ccade641",
+"gcc__builtin__headers__ia32-8_8h.html#aedb7d27f602bd1e39d773527fb16c70b",
+"gcc__builtin__headers__ia32-9_8h.html#a727119f5538f34fb5ccb0a0aa9f027aa",
+"gcc__builtin__headers__ia32-9_8h.html#afc37bcd1a15e123734f2e5fdb0e12d1c",
+"gcc__builtin__headers__ia32_8h.html#a34cbd2e7df58a2c3f96f2b1c8e60dcc4",
+"gcc__builtin__headers__ia32_8h.html#a700e36db8d58b41b452098f7b86d6eb3",
+"gcc__builtin__headers__ia32_8h.html#aa3804f7e08c8670a7e5333083040f29e",
+"gcc__builtin__headers__ia32_8h.html#adf6b049d10d5252f4e4bda4f7f910da9",
+"gcc__builtin__headers__math_8h.html#a4f4958a36a9eecdbd0c89e68e524a71d",
+"gcc__builtin__headers__math_8h.html#aeb7e728350e442c10065da58f5adff56",
+"gcc__builtin__headers__omp_8h.html#a3167de4576b306f2971532fa14c15ec7",
+"gcc__builtin__headers__ubsan_8h.html#a9fc271a17c29145f4faa87fdb0cb0421",
+"globals_func_h.html",
+"goto__inspect__parse__options_8cpp_source.html",
+"help__formatter_8h.html",
+"interval__abstract__value_8h_source.html",
+"java__bytecode__convert__method__class_8h_source.html",
+"java__object__factory_8h.html#a4b97a4bfdd95ff2cbf659886893da794",
+"java__types_8h.html#a9e05756e9a221ca2c8964de70bbaca1e",
+"json__stream_8h.html",
+"local__control__flow__history_8h.html",
+"math_8c.html#aedc37bf10d69d2efa2a478f5f5d4b26b",
+"miniz_8cpp.html#a418a771218f0a371ebc981939074bbe4",
+"miniz_8h.html#a520050b2d27e4a1073e4462c5258d7f2",
+"mode_8cpp.html#ac4ac8d5b0b68188f36dc286b51575e49",
+"nondet__static_8cpp.html",
+"pointer__expr_8h.html#a696a420f51893ec102bc4304a7dfa017",
+"properties_8h.html#ab36680245c3a3e38ca90fd64747b77fd",
+"remove__complex_8cpp.html#a4b7d77830b1e727c1384d85d11a20dc6",
+"replace__expr_8cpp.html#a0dbd90590278e24405b65fa8071912a9",
+"safety__checker_8h.html",
+"sharing__node_8h.html#ae5fa88a0a7f51f8eef4ace0337ade161",
+"slice_8cpp.html",
+"solver__factory_8cpp.html#a52b4fb3cf88b8c148bd4b9002e924245",
+"statement__list__parse__tree__io_8h.html#a833cdd0535037e5de40e46164af95f65",
+"std__expr_8h.html#a18b0a6c6d24c97764ee7fb55e0825bb9",
+"stdio_8c.html#a37c1e8ce8a2b411fa666dc33972a2cec",
+"string__constraint__generator__main_8cpp.html#afe2672af020aea21e7bc1aa0bf2ee801",
+"struct_____c_p_r_o_v_e_r__jsa__concrete__node.html#a7418c3ee9d0ca1e10808ac9564bf71d0",
+"structc__wranglert_1_1functiont.html#a005d725c42100a68acab5eb862f7bda6",
+"structconstant__propagator__domaint_1_1valuest.html#a765909ed7881c0ce4a3d499509af7871",
+"structframet_1_1loop__infot.html",
+"structinterpretert_1_1function__assignments__contextt.html#acc908a6366aead5e29a2f4b52c461b06",
+"structjava__bytecode__parsert_1_1pool__entryt.html#a6bd09559d29fa8237cf6c4b61fd7a4eb",
+"structmz__zip__writer__add__state.html#a305f9fa7f47b583ee53b8ee0401edd9e",
+"structsmt2__convt_1_1identifiert.html#ad988b7dd54839ea1d0653d0447378475",
+"structsolver__hardnesst.html#af1a9c5d467278c45908f8c174aa8aeea",
+"structtdefl__output__buffer.html#ab506aa434be983761db4cca43d2ebc9e",
+"symex__dead_8cpp.html#a6f137469bd054654d606305836732f85",
+"typedef__type_8h.html#a9db44f9c436d5be8e8a0fdf19973dc83",
+"utils_8cpp.html#a7330365cdd84d9b1d8503a299c7b309c",
+"verification__result_8h.html#a968c86fa056ac6fd9150ef96f64fcd37abb1ca97ec761fc37101737ba0aa2e7c5"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -100,204 +100,114 @@ $(document).ready(function(){initNavTree('contracts-memory-predicates.html','');
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md114">The __CPROVER_pointer_equals predicate</a><ul><li class="level2"><a href="#autotoc_md115">Syntax</a><ul><li class="level3"><a href="#autotoc_md116">Parameters</a></li>
-<li class="level3"><a href="#autotoc_md117">Return Value</a></li>
+<ul><li class="level1"><a href="#autotoc_md114">The __CPROVER_pointer_equals predicate</a></li>
+<li class="level1"><a href="#autotoc_md115">The __CPROVER_is_fresh predicate</a></li>
+<li class="level1"><a href="#autotoc_md116">The __CPROVER_pointer_in_range_dfcc predicate</a><ul><li class="level2"><a href="#autotoc_md117">Syntax</a></li>
 </ul>
 </li>
-<li class="level2"><a href="#autotoc_md118">Semantics</a><ul><li class="level3"><a href="#autotoc_md119">Enforcement</a></li>
-<li class="level3"><a href="#autotoc_md120">Replacement</a></li>
+<li class="level1"><a href="#autotoc_md118">Using memory predicates in disjunctions</a></li>
+<li class="level1"><a href="#autotoc_md119">Writing your own memory predicates</a><ul><li class="level2"><a href="#autotoc_md120">Limitations</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="level1"><a href="#autotoc_md121">The __CPROVER_is_fresh predicate</a><ul><li class="level2"><a href="#autotoc_md122">Syntax</a><ul><li class="level3"><a href="#autotoc_md123">Parameters</a></li>
-<li class="level3"><a href="#autotoc_md124">Return Value</a></li>
-</ul>
-</li>
-<li class="level2"><a href="#autotoc_md125">Semantics</a><ul><li class="level3"><a href="#autotoc_md126">Enforcement</a></li>
-<li class="level3"><a href="#autotoc_md127">Replacement</a></li>
-<li class="level3"><a href="#autotoc_md128">Influence of memory allocation failure modes flags in assumption contexts</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="level1"><a href="#autotoc_md129">The __CPROVER_pointer_in_range_dfcc predicate</a><ul><li class="level2"><a href="#autotoc_md130">Syntax</a></li>
-<li class="level2"><a href="#autotoc_md131">Semantics</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#autotoc_md132">User defined memory predicates</a><ul><li class="level2"><a href="#autotoc_md133">Limitations</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#autotoc_md134">Additional Resources</a></li>
+<li class="level1"><a href="#autotoc_md121">Additional Resources</a></li>
 </ul>
 </div>
 <div class="textblock"><p>Back to <a class="el" href="contracts-user.html">Code Contracts User Documentation</a></p>
-<p>The built-in and user-defined predicates discussed in this section are meant to let users describe the shape of the memory accessed through pointers in <em>requires clauses</em> and <em>ensures clauses</em>. Attempting to call these predicates outside of a requires or ensures clause context will result in a verification error.</p>
+<p>The built-in predicates discussed in this section are used to describe pointer properties in <em>requires clauses</em> and <em>ensures clauses</em>.</p>
+<p>At a basic level the predicates allow to specify pointers to fresh objects (i.e. allocated and distinct, <code>__CPROVER_is_fresh(p, size)</code>), of aliased pointers (<code>__CPROVER_pointer_equals(p, q)</code>), or pointers ranging over pointer intervals (<code>__CPROVER_pointer_in_range_dfcc(lb, p, ub)</code>).</p>
+<p>They can only be used in the context of a requires and ensures clauses, any attempt to call these predicates outside of a requires or ensures clause will result in a verification error.</p>
+<p>Pointer predicates can be used with conjunctions, implications or disjunctions to describe richer data structures where some parts are only conditionally allocated, but requires and ensures clauses must not attempt to establish more than one predicate at the same time for a same pointer.</p>
+<p>One can build their own pointer predicates using these built-in predicates, to describe (bounded) linked data structures such as buffers, lists, etc.</p>
 <h1><a class="anchor" id="autotoc_md114"></a>
 The __CPROVER_pointer_equals predicate</h1>
-<h2><a class="anchor" id="autotoc_md115"></a>
-Syntax</h2>
+<p>This predicate checks for pointer validity and equality.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a>(<span class="keywordtype">void</span> *p, <span class="keywordtype">void</span> *<a class="code hl_class" href="classait.html">q</a>);</div>
 <div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ac61fb50d2ca904c50381ed220caa1c72"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_pointer_equals(void *p, void *q)</div></div>
-</div><!-- fragment --><p> This predicate can only be used in ensures and requires clauses and checks for pointer validity and equality.</p>
-<h3><a class="anchor" id="autotoc_md116"></a>
-Parameters</h3>
-<p><code>__CPROVER_pointer_equals</code> takes two pointers as arguments.</p>
-<h3><a class="anchor" id="autotoc_md117"></a>
-Return Value</h3>
-<p>It returns a <code>bool</code> value:</p><ul>
-<li><code>true</code> iff pointers are both null or valid and are equal,</li>
-<li><code>false</code> otherwise.</li>
+</div><!-- fragment --><p>This predicate checks for pointer validity and equality.</p>
+<p>It returns:</p><ul>
+<li><code>true</code> if and only if:<ul>
+<li><code>p</code> is either <code>NULL</code> or valid,</li>
+<li><code>q</code> is either <code>NULL</code> of valid,</li>
+<li><code>p</code> is equal to <code>q</code>.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md118"></a>
-Semantics</h2>
-<h3><a class="anchor" id="autotoc_md119"></a>
-Enforcement</h3>
-<p>When checking a contract using <code>--enforce-contract foo</code>:</p><ul>
-<li>used in a <em>requires</em> clause, the predicate will check that <code>ptr2</code> is always either null or valid, and it will make <code>ptr1</code> equal to <code>ptr2</code>. This results in a state resulting in a state where both pointers are either null or valid and equal;</li>
-<li>used in an <em>ensures</em> clause it will check that memory both pointers are always either null or valid and equal.</li>
+</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md120"></a>
-Replacement</h3>
-<p>When checking a contract using <code>--replace-call-with-contract foo</code>, we get the dual behaviour:</p><ul>
-<li>used in a <em>requires</em> clause it will check that memory both pointers are always either null or valid and equal,</li>
-<li>used in an <em>ensures</em> clause, the predicate will check that <code>ptr2</code> is always either null or valid, and it will make <code>ptr1</code> equal to <code>ptr2</code>. This results in a state resulting in a state where both pointers are either null or valid and equal.</li>
+<p>When checking a function against a contract (<code>--enforce-contract</code>):</p><ul>
+<li>in a <em>requires</em> clause, the predicate will check that <code>q</code> is always either <code>NULL</code> or valid, and it will assign <code>p</code> with <code>q</code>. This results in a state where both pointers are either <code>NULL</code> or valid and are equal;</li>
+<li>used in an <em>ensures</em> clause it will check that both <code>p</code> and <code>q</code> are either NULL or valid, and that <code>p == q</code>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md121"></a>
+<p>When replacing a function call by a contract (<code>--replace-call-with-contract</code>): we get the dual behaviour:</p><ul>
+<li>used in a <em>requires</em> clause it will check that both <code>p</code> and <code>q</code> are either NULL or valid, and that <code>p == q</code>.</li>
+<li>in an _ensures clause, the predicate will check that <code>q</code> is always either <code>NULL</code> or valid, and it will assign <code>p</code> with <code>q</code>. This results in a state where both pointers are either <code>NULL</code> or valid and are equal;</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md115"></a>
 The __CPROVER_is_fresh predicate</h1>
-<h2><a class="anchor" id="autotoc_md122"></a>
-Syntax</h2>
+<p>The predicate <code>__CPROVER_is_fresh</code> takes a pointer <code>p</code> and an allocation size <code>size</code> and checks pointer validity and separation with other fresh pointers.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<span class="keywordtype">void</span> *p, <span class="keywordtype">size_t</span> size);</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_ad4e9673ed79a6d8ff4af6cf12d95c29f"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_is_fresh(const void *mem, __CPROVER_size_t size)</div></div>
-</div><!-- fragment --><p>To specify memory footprint we use a special function called <code>__CPROVER_is_fresh</code>. The meaning of <code>__CPROVER_is_fresh</code> is that we are borrowing a pointer from the external environment (in a precondition), or returning it to the calling context (in a postcondition).</p>
-<h3><a class="anchor" id="autotoc_md123"></a>
-Parameters</h3>
-<p><code>__CPROVER_is_fresh</code> takes two arguments: a pointer and an allocation size. The first argument is the pointer to be checked for "freshness" (i.e., not previously allocated), and the second is the expected size <b>in bytes</b> for the memory available at the pointer.</p>
-<h3><a class="anchor" id="autotoc_md124"></a>
-Return Value</h3>
-<p>It returns a <code>bool</code> value, indicating whether the pointer is fresh.</p>
-<h2><a class="anchor" id="autotoc_md125"></a>
-Semantics</h2>
-<p>To illustrate the semantics for <code>__CPROVER_is_fresh</code>, consider the following implementation of <code>sum</code> function.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">err_signal</a>; <span class="comment">// Global variable</span></div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">void</span> <a class="code hl_class" href="classait.html">sum</a>(<span class="keyword">const</span> <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">a</a>, <span class="keyword">const</span> <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">b</a>, <a class="code hl_class" href="classait.html">uint32_t</a>* out)</div>
-<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(out, <span class="keyword">sizeof</span>(*out)))</div>
-<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_ensures</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<a class="code hl_class" href="classait.html">err_signal</a>, <span class="keyword">sizeof</span>(*<a class="code hl_class" href="classait.html">err_signal</a>)))</div>
-<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_assigns</a>(*out, <a class="code hl_class" href="classait.html">err_signal</a>)</div>
-<div class="line">{</div>
-<div class="line">  <span class="keyword">const</span> <a class="code hl_class" href="classait.html">uint64_t</a> result = ((<a class="code hl_class" href="classait.html">uint64_t</a>) <a class="code hl_class" href="classait.html">a</a>) + ((<a class="code hl_class" href="classait.html">uint64_t</a>) <a class="code hl_class" href="classait.html">b</a>);</div>
-<div class="line">  <a class="code hl_class" href="classait.html">err_signal</a> = <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(<span class="keyword">sizeof</span>(*<a class="code hl_class" href="classait.html">err_signal</a>));</div>
-<div class="line">  <span class="keywordflow">if</span> (!<a class="code hl_class" href="classait.html">err_signal</a>) <span class="keywordflow">return</span>;</div>
-<div class="line">  <span class="keywordflow">if</span> (result &gt; <a class="code hl_class" href="classait.html">UINT32_MAX</a>) *<a class="code hl_class" href="classait.html">err_signal</a> = <a class="code hl_class" href="classait.html">FAILURE</a>;</div>
-<div class="line">  *out = (<a class="code hl_class" href="classait.html">uint32_t</a>) result;</div>
-<div class="line">  *<a class="code hl_class" href="classait.html">err_signal</a> = <a class="code hl_class" href="classait.html">SUCCESS</a>;</div>
-<div class="line">}</div>
-<div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition</b> <a href="stdlib_8c_source.html#l00212">stdlib.c:212</a></div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md126"></a>
-Enforcement</h3>
-<p>When checking the contract abstracts a function a <code>__CPROVER_is_fresh</code> in a <em>requires</em> clause will cause fresh memory to be allocated. In an <em>ensures</em> clause it will check that memory was freshly allocated.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">err_signal</a>; <span class="comment">// Global variable</span></div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">__CPROVER_contracts_original_sum</a>(<span class="keyword">const</span> <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">a</a>, <span class="keyword">const</span> <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">b</a>, <a class="code hl_class" href="classait.html">uint32_t</a>* out)</div>
-<div class="line">{</div>
-<div class="line">  <span class="keyword">const</span> <a class="code hl_class" href="classait.html">uint64_t</a> result = ((<a class="code hl_class" href="classait.html">uint64_t</a>) <a class="code hl_class" href="classait.html">a</a>) + ((<a class="code hl_class" href="classait.html">uint64_t</a>) <a class="code hl_class" href="classait.html">b</a>);</div>
-<div class="line">  <a class="code hl_class" href="classait.html">err_signal</a> = <a class="code hl_function" href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a>(<span class="keyword">sizeof</span>(*<a class="code hl_class" href="classait.html">err_signal</a>));</div>
-<div class="line">  <span class="keywordflow">if</span> (!<a class="code hl_class" href="classait.html">err_signal</a>) <span class="keywordflow">return</span>;</div>
-<div class="line">  <span class="keywordflow">if</span> (result &gt; <a class="code hl_class" href="classait.html">UINT32_MAX</a>) *<a class="code hl_class" href="classait.html">err_signal</a> = <a class="code hl_class" href="classait.html">FAILURE</a>;</div>
-<div class="line">  *out = (<a class="code hl_class" href="classait.html">uint32_t</a>) result;</div>
-<div class="line">  *<a class="code hl_class" href="classait.html">err_signal</a> = <a class="code hl_class" href="classait.html">SUCCESS</a>;</div>
-<div class="line">}</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">/* Function Contract Enforcement */</span></div>
-<div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">sum</a>(<span class="keyword">const</span> <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">a</a>, <span class="keyword">const</span> <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">b</a>, <a class="code hl_class" href="classait.html">uint32_t</a>* out)</div>
-<div class="line">{</div>
-<div class="line">  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(out, <span class="keyword">sizeof</span>(*out))); <span class="comment">// Assumes out is freshly allocated</span></div>
-<div class="line">  <span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">return_value_sum</a> = <a class="code hl_class" href="classait.html">__CPROVER_contracts_original_sum</a>(<a class="code hl_class" href="classait.html">a</a>, <a class="code hl_class" href="classait.html">b</a>, out);</div>
-<div class="line">  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<a class="code hl_class" href="classait.html">err_signal</a>, <span class="keyword">sizeof</span>(*<a class="code hl_class" href="classait.html">err_signal</a>)), <span class="stringliteral">&quot;Check ensures clause&quot;</span>);</div>
-<div class="line">  <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">return_value_sum</a>;</div>
-<div class="line">}</div>
-<div class="ttc" id="acprover__builtin__headers_8h_html_a564e8a5a7bebea04fdd5ee1277832478"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a></div><div class="ttdeci">void __CPROVER_assert(__CPROVER_bool assertion, const char *description)</div></div>
-<div class="ttc" id="acprover__builtin__headers_8h_html_ae5af07e274b573cd0f23ffb9d332bef2"><div class="ttname"><a href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a></div><div class="ttdeci">void __CPROVER_assume(__CPROVER_bool assumption)</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md127"></a>
-Replacement</h3>
-<p>In our example, consider that a function <code>foo</code> may call <code>sum</code>.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">err_signal</a>; <span class="comment">// Global variable</span></div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">foo</a>()</div>
-<div class="line">{</div>
-<div class="line">  <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">a</a>;</div>
-<div class="line">  <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">b</a>;</div>
-<div class="line">  <a class="code hl_class" href="classait.html">uint32_t</a> out;</div>
-<div class="line">  <a class="code hl_class" href="classait.html">sum</a>(<a class="code hl_class" href="classait.html">a</a>, <a class="code hl_class" href="classait.html">b</a>, &amp;out);</div>
-<div class="line">  <span class="keywordflow">return</span> *<a class="code hl_class" href="classait.html">err_signal</a>;</div>
-<div class="line">}</div>
-</div><!-- fragment --><p>When using a contract as an abstraction in place of a call to the function a <code>__CPROVER_is_fresh</code> in a <em>requires</em> clause will check that the argument supplied is fresh and <code>__CPROVER_is_fresh</code> in an <em>ensures</em> clause will result in a fresh malloc.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">err_signal</a>; <span class="comment">// Global variable</span></div>
-<div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">foo</a>()</div>
-<div class="line">{</div>
-<div class="line">  <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">a</a>;</div>
-<div class="line">  <a class="code hl_class" href="classait.html">uint32_t</a> <a class="code hl_class" href="classait.html">b</a>;</div>
-<div class="line">  <a class="code hl_class" href="classait.html">uint32_t</a> out;</div>
-<div class="line"> </div>
-<div class="line">  <span class="comment">/* Function Contract Replacement */</span></div>
-<div class="line">  <span class="comment">/* Precondition */</span></div>
-<div class="line">  <a class="code hl_function" href="cprover__builtin__headers_8h.html#a564e8a5a7bebea04fdd5ee1277832478">__CPROVER_assert</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(out, <span class="keyword">sizeof</span>(*out)), <span class="stringliteral">&quot;Check requires clause&quot;</span>);</div>
-<div class="line"> </div>
-<div class="line">  <span class="comment">/* Writable Set */</span></div>
-<div class="line">  *(&amp;out) = <a class="code hl_class" href="classait.html">nondet_uint32_t</a>();</div>
-<div class="line">  <a class="code hl_class" href="classait.html">err_signal</a> = <a class="code hl_class" href="classait.html">nondet_int_pointer</a>();</div>
-<div class="line"> </div>
-<div class="line">  <span class="comment">/* Postconditions */</span></div>
-<div class="line">  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<a class="code hl_class" href="classait.html">err_signal</a>, <span class="keyword">sizeof</span>(*<a class="code hl_class" href="classait.html">err_signal</a>))); <span class="comment">// Assumes out is allocated</span></div>
-<div class="line"> </div>
-<div class="line">  <span class="keywordflow">return</span> *<a class="code hl_class" href="classait.html">err_signal</a>;</div>
-<div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md128"></a>
-Influence of memory allocation failure modes flags in assumption contexts</h3>
-<p>CBMC models <a href="https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/memory-primitives.md#malloc-modelling">memory allocation failure modes</a>. When activated, these modesl result in different behaviours for <code>__CPROVER_is_fresh</code> in assumption contexts (i.e. when used in a requires clause of a contract being checked against a function, or in an ensures clause of a contract being used to abstract a function call).</p>
-<ol type="1">
-<li><b>No failure mode</b> (no flags): In this mode, <code>malloc</code> and <code>__CPROVER_is_fresh</code> never fail and will accept a size parameter up to <code>SIZE_MAX</code> without triggerring errors. However, pointer overflow and assigns clause checking errors will happen any time one tries to access such objects beyond an offset of <code>__CPROVER_max_malloc_size</code> (in bytes), by executing <code>ptr[size-1]</code> or <code>ptr[size]</code> in user-code, or by writing <code>__CPROVER_assigns(__CPROVER_object_from(ptr))</code> in a contract;</li>
-</ol>
-<ol type="1">
-<li><b>Fail with NULL</b> (flags: <code>--malloc-may-fail --malloc-fail-null</code>): In this mode, if <code>size</code> is larger than <code>__CPROVER_max_malloc_size</code>, <code>malloc</code> returns a NULL pointer, and imposes an implicit assumption that size is less than <code>__CPROVER_max_malloc_size</code> when returning a non-NULL pointer. <code>__CPROVER_is_fresh</code> never fails in assumption contexts, so it adds an implicit assumption that <code>size</code> is less than <code>__CPROVER_max_malloc_size</code>.</li>
-</ol>
-<ol type="1">
-<li><b>Fail assert</b> (flags: <code>--malloc-may-fail --malloc-fail-assert</code>): In this mode, if <code>size</code> is larger than <code>__CPROVER_max_malloc_size</code>, an <code>max allocation size exceeded</code> assertion is triggered in <code>malloc</code> and execution continues under the assumption that <code>size</code> is less than <code>__CPROVER_max_malloc_size</code>, with <code>malloc</code> returning a non-NULL pointer. <code>__CPROVER_is_fresh</code> never fails in assumption contexts, so it will trigger a <code>max allocation size exceeded</code> assertion and continue execution under the implicit assumption that <code>size</code> is less than <code>__CPROVER_max_malloc_size</code>.</li>
-</ol>
-<h1><a class="anchor" id="autotoc_md129"></a>
+</div><!-- fragment --><p>The predicate <code>__CPROVER_is_fresh(p, n)</code> holds when <code>p</code> points into a valid object with at least <code>n</code> bytes available after the pointer, and the object pointed to by <code>p</code> is distinct from all other objects pointed to in other <code>__CPROVER_is_fresh(q, m)</code> found in the requires and ensures clauses.</p>
+<p>When checking a function against a contract (<code>--enforce-contract</code>):</p><ul>
+<li><code>__CPROVER_is_fresh</code> in the <code>requires</code> clause works like a nondeterministic <code>p = malloc(size)</code> (separation is assured by construction);</li>
+<li><code>__CPROVER_is_fresh</code> in the <code>ensures</code> clause checks pointer validity and separation against other <code>__CPROVER_is_fresh</code> occurrences in the <code>requires</code> clause and the <code>ensures</code> clause.</li>
+</ul>
+<p>When replacing a function call by a contract (<code>--replace-call-with-contract</code>):</p><ul>
+<li><code>__CPROVER_is_fresh</code> in the <code>requires</code> clause checks pointer validity and separation against other <code>__CPROVER_is_fresh</code> occurrences in the <code>requires</code> clause;</li>
+<li><code>__CPROVER_is_fresh</code> in the <code>ensures</code> clause works like a nondeterministic <code>p = malloc(size)</code> (separation is assured by construction);</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md116"></a>
 The __CPROVER_pointer_in_range_dfcc predicate</h1>
-<h2><a class="anchor" id="autotoc_md130"></a>
+<h2><a class="anchor" id="autotoc_md117"></a>
 Syntax</h2>
+<p>This predicate holds if pointers <code>lb</code>, <code>p</code> and <code>ub</code> are valid pointers, pointing within the same object and the condition <code>lb &lt;= p &amp;&amp; p &lt;= ub</code> holds.</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#a33926c3f831d23353ac2baf02eeb063a">__CPROVER_pointer_in_range_dfcc</a>(<span class="keywordtype">void</span> *lb, <span class="keywordtype">void</span> *p, <span class="keywordtype">void</span> *ub);</div>
 <div class="ttc" id="acprover__builtin__headers_8h_html_a33926c3f831d23353ac2baf02eeb063a"><div class="ttname"><a href="cprover__builtin__headers_8h.html#a33926c3f831d23353ac2baf02eeb063a">__CPROVER_pointer_in_range_dfcc</a></div><div class="ttdeci">__CPROVER_bool __CPROVER_pointer_in_range_dfcc(void *lb, void *ptr, void *ub)</div></div>
-</div><!-- fragment --><p>This predicate holds if <code>lb</code>, <code>p</code> and <code>ub</code> are valid pointers within the same object and the pointers are ordered such that <code>lb &lt;= p &amp;&amp; p &lt;= ub</code> holds.</p>
-<h2><a class="anchor" id="autotoc_md131"></a>
-Semantics</h2>
-<p>In assertion contexts, the predicate checks the conditions described above. In assumption contexts, the predicate checks that <code>lb</code> and <code>ub</code> are valid pointers into the same object, and updates <code>p</code> using a side effect to be a non-deterministic pointer ranging between <code>lb</code> and <code>ub</code>.</p>
-<h1><a class="anchor" id="autotoc_md132"></a>
-User defined memory predicates</h1>
-<p>Users can write their own memory predicates based on the core predicates described above. <code>__CPROVER_is_fresh</code> allows to specify pointer validity and separation. <code>__CPROVER_pointer_in_range</code> allows to specify aliasing constraints.</p>
-<p>For instance, one could write a predicate defining linked lists of at most <code>len</code> elements as follows:</p>
-<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_class" href="classait.html">list_t</a></div>
+</div><!-- fragment --><p>When checking a function against a contract (<code>--enforce-contract</code>):</p><ul>
+<li>In the <code>requires</code> clause, <code>__CPROVER_pointer_in_range_dfcc</code> checks that <code>lb</code> and <code>ub</code> are valid and point into the same object, and nondeterministically assigns <code>p</code> to a nondet pointer between <code>lb</code> and <code>ub</code>;</li>
+<li>In the <code>ensures</code> clause, <code>__CPROVER_pointer_in_range_dfcc</code> checks that <code>lb</code> and <code>ub</code> are valid and point into the same object, that <code>p</code> is between <code>lb</code> and <code>ub</code>;</li>
+</ul>
+<p>When replacing a function call by a contract (<code>--replace-call-with-contract</code>):</p><ul>
+<li>In the <code>requires</code> clause, <code>__CPROVER_pointer_in_range_dfcc</code> checks that <code>lb</code> and <code>ub</code> are valid and point into the same object, that <code>p</code> is between <code>lb</code> and <code>ub</code>;</li>
+<li>In the <code>ensures</code> clause, <code>__CPROVER_pointer_in_range_dfcc</code> checks that <code>lb</code> and <code>ub</code> are valid and point into the same object, and nondeterministically assigns <code>p</code> to a nondet pointer between <code>lb</code> and <code>ub</code>;</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md118"></a>
+Using memory predicates in disjunctions</h1>
+<p>It is possible to use memory predicates in disjunctions to describe alternatives.</p>
+<p>For instance, to specify a conditionally allocated pointer, the implication <code>==&gt;</code> operator can be used.</p>
+<p>The <code>array</code> pointer is only valid when len is in some bounds, otherwise nothing is assumed about <code>array</code> and the pointer is considered <em>invalid</em>, i.e. any attempt to use it by the program under verification will result in an error.</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">foo</a>(<span class="keywordtype">int</span> *array, <span class="keywordtype">size_t</span> len)</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(</div>
+<div class="line">  (len &lt; <a class="code hl_class" href="classait.html">INT_MAX</a>/<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>) &amp;&amp; len &gt; 0)</div>
+<div class="line">      ==&gt; <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(array, len*<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)))</div>
 <div class="line">{</div>
-<div class="line">  <span class="keywordtype">int</span> value;</div>
-<div class="line">  <span class="keyword">struct </span><a class="code hl_class" href="classait.html">list_t</a> *next;</div>
-<div class="line">} <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">list_t</a>;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// true iff list of len nodes with values in [-10,10]</span></div>
-<div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">is_list</a>(<a class="code hl_class" href="classait.html">list_t</a> *l, <span class="keywordtype">size_t</span> len)</div>
-<div class="line">{</div>
-<div class="line">  <span class="keywordflow">if</span>(len == 0)</div>
-<div class="line">    <span class="keywordflow">return</span> l == <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">NULL</a>;</div>
-<div class="line">  <span class="keywordflow">else</span></div>
-<div class="line">    <span class="keywordflow">return</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(l, <span class="keyword">sizeof</span>(*l)) &amp;&amp; -10 &lt;= l-&gt;value &amp;&amp;</div>
-<div class="line">           l-&gt;value &lt;= 10 &amp;&amp; <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">is_list</a>(l-&gt;next, len - 1);</div>
+<div class="line">   ...</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassait_html_acb910a3c8ab35d67a9a9a27c324e4992"><div class="ttname"><a href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">ait::ait</a></div><div class="ttdeci">ait()</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:565</a></div></div>
-</div><!-- fragment --><p>One can also simply describe finite nested structures:</p>
+</div><!-- fragment --><p>In this other example, the function takes two pointers <code>a</code> and <code>b</code> and a and sets <code>*out</code> to the longest one:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_class" href="classait.html">foo</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">a</a>, <span class="keywordtype">size_t</span> <a class="code hl_class" href="classait.html">len_a</a>, <span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">b</a>, <span class="keywordtype">size_t</span> <a class="code hl_class" href="classait.html">len_b</a>, <span class="keywordtype">int</span> **out)</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<a class="code hl_class" href="classait.html">a</a>, <a class="code hl_class" href="classait.html">len_a</a> * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)))</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<a class="code hl_class" href="classait.html">b</a>, <a class="code hl_class" href="classait.html">len_b</a> * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>)))</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(out, <span class="keyword">sizeof</span>(<span class="keywordtype">int</span> *)))</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_assigns</a>(*out)</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_class" href="classait.html">len_a</a> &gt;= <a class="code hl_class" href="classait.html">len_b</a> ==&gt; <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a>(*out, <a class="code hl_class" href="classait.html">a</a>))</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_class" href="classait.html">len_a &lt; len_b ==&gt;</a> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a>(*out, <a class="code hl_class" href="classait.html">b</a>))</div>
+<div class="line">{</div>
+<div class="line">   ...</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>In last other example, the function takes two pointers <code>a</code> and <code>b</code> and a and sets <code>*out</code> to either <code>a</code> or <code>b</code>, nondeterministically:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_class" href="classait.html">foo</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">a</a>, <span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">b</a>, <span class="keywordtype">int</span> **out)</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<a class="code hl_class" href="classait.html">a</a>, 1)) <span class="comment">// at least one byte</span></div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<a class="code hl_class" href="classait.html">b</a>, 1))</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(out, <a class="code hl_class" href="classait.html">sizeof</a>(<span class="keywordtype">int</span> *)))</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_assigns</a>(*out)</div>
+<div class="line"><a class="code hl_class" href="classait.html">__CPROVER_requires</a>(</div>
+<div class="line">  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a>(*out, <a class="code hl_class" href="classait.html">a</a>) || <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a>(*out, <a class="code hl_class" href="classait.html">b</a>))</div>
+<div class="line">{</div>
+<div class="line">   ...</div>
+<div class="line">}</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md119"></a>
+Writing your own memory predicates</h1>
+<p>One can write their own memory predicates based on the built-in predicates.</p>
+<p>One can specify (finite) nested structures:</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_class" href="classait.html">buffer_t</a></div>
 <div class="line">{</div>
 <div class="line">  <span class="keywordtype">size_t</span> size;</div>
@@ -327,27 +237,62 @@ User defined memory predicates</h1>
 <div class="line">  <span class="keywordflow">return</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(<a class="code hl_class" href="classait.html">b</a>, <span class="keyword">sizeof</span>(*<a class="code hl_class" href="classait.html">b</a>)) &amp;&amp; <a class="code hl_class" href="classait.html">is_buffer</a>(<a class="code hl_class" href="classait.html">b</a>-&gt;first) &amp;&amp;</div>
 <div class="line">         <a class="code hl_class" href="classait.html">is_buffer</a>(<a class="code hl_class" href="classait.html">b</a>-&gt;second);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>And one can then use these predicates in requires or ensures clauses for function contracts.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">foo</a>(<a class="code hl_class" href="classait.html">list_t</a> *l, <a class="code hl_class" href="classait.html">double_buffer_t</a> *<a class="code hl_class" href="classait.html">b</a>)</div>
+<div class="ttc" id="aclassait_html_acb910a3c8ab35d67a9a9a27c324e4992"><div class="ttname"><a href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">ait::ait</a></div><div class="ttdeci">ait()</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:565</a></div></div>
+</div><!-- fragment --><p>One can even describe inductively defined (but bounded) structures such as lists:</p>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_class" href="classait.html">list_t</a></div>
+<div class="line">{</div>
+<div class="line">  <span class="keywordtype">int</span> value;</div>
+<div class="line">  <span class="keyword">struct </span><a class="code hl_class" href="classait.html">list_t</a> *next;</div>
+<div class="line">} <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">list_t</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">value_in_range</a>(<span class="keywordtype">int</span> lb, <span class="keywordtype">int</span> value, <span class="keywordtype">int</span> ub) {</div>
+<div class="line">  <span class="keywordflow">return</span> lb &lt;= value &amp;&amp; value &lt;= ub;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">bool</span> <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">is_list</a>(<a class="code hl_class" href="classait.html">list_t</a> *l, <span class="keywordtype">size_t</span> len)</div>
+<div class="line">{</div>
+<div class="line">  <span class="keywordflow">if</span>(len == 0) {</div>
+<div class="line">    <span class="comment">// list size bounded by `len`</span></div>
+<div class="line">    <span class="keywordflow">return</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a>(l,  <a class="code hl_class" href="classait.html">NULL</a>);</div>
+<div class="line">  } <span class="keywordflow">else</span> {</div>
+<div class="line">    <span class="comment">// either NULL or some fresh node</span></div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_function" href="cprover__builtin__headers_8h.html#ac61fb50d2ca904c50381ed220caa1c72">__CPROVER_pointer_equals</a>(l,  <a class="code hl_class" href="classait.html">NULL</a>)) {</div>
+<div class="line">      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">    } <span class="keywordflow">else</span> {</div>
+<div class="line">      <span class="keywordflow">return</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#ad4e9673ed79a6d8ff4af6cf12d95c29f">__CPROVER_is_fresh</a>(l, <span class="keyword">sizeof</span>(*l)) &amp;&amp;</div>
+<div class="line">        <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">value_in_range</a>(-10, l-&gt;value, 10) &amp;&amp;</div>
+<div class="line">        <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">is_list</a>(l-&gt;next, len - 1);</div>
+<div class="line">    }</div>
+<div class="line">  }</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>And use these predicates in requires/ensures clauses:</p>
+<div class="fragment"><div class="line"><span class="comment">// take a list and a double buffer and sum list values and buffer sizes</span></div>
+<div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">foo</a>(<a class="code hl_class" href="classait.html">list_t</a> *l, <a class="code hl_class" href="classait.html">double_buffer_t</a> *<a class="code hl_class" href="classait.html">b</a>)</div>
 <div class="line">  <span class="comment">// clang-format off</span></div>
-<div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_class" href="classait.html">is_list</a>(l, 3))</div>
+<div class="line">  <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">__CPROVER_requires</a>(<a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">is_list</a>(l, 3))</div>
 <div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_class" href="classait.html">is_double_buffer</a>(<a class="code hl_class" href="classait.html">b</a>))</div>
-<div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_ensures</a>(-28 &lt;= <a class="code hl_class" href="classait.html">__CPROVER_return_value</a> &amp;&amp;</div>
-<div class="line">                    <a class="code hl_class" href="classait.html">__CPROVER_return_value</a> &lt;= 50)</div>
+<div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_ensures</a>(-28 &lt;= <a class="code hl_class" href="classait.html">__CPROVER_return_value</a> &amp;&amp; <a class="code hl_class" href="classait.html">__CPROVER_return_value</a> &lt;= 50)</div>
 <div class="line"><span class="comment">// clang-format on</span></div>
 <div class="line">{</div>
 <div class="line">  <span class="comment">// access the assumed data structure</span></div>
 <div class="line">  <span class="keywordflow">return</span> l-&gt;value + l-&gt;next-&gt;value + l-&gt;next-&gt;next-&gt;value + <a class="code hl_class" href="classait.html">b</a>-&gt;first-&gt;size +</div>
 <div class="line">         <a class="code hl_class" href="classait.html">b</a>-&gt;second-&gt;size;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md133"></a>
+</div><!-- fragment --><p>Internally, CBMC instruments these user-defined predicates to turn them into</p><ul>
+<li>nondeterministic allocators that build the data structures when used in assumption contexts;</li>
+<li>checker functions that can walk a pointer structure and check pointer validity and separation/aliasing/interval constraints in assertion contexts.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md120"></a>
 Limitations</h2>
 <p>The main limitation with user defined predicates are:</p><ul>
-<li>their evaluation must terminate;</li>
-<li>self-recursive predicates are supported, but mutually recursive predicates are not supported for the moment.</li>
+<li>their evaluation must terminate;<ul>
+<li>For instance, in the <code>is_list</code> example above, recursion is bounded using use of the explicit <code>len</code> parameter.</li>
+<li>The <code>is_double_buffer</code> predicate also describes a bounded structure.</li>
 </ul>
-<p>For instance, in the <code>is_list</code> example above, recursion is bounded by the use of the explicit <code>len</code> parameter. The <code>is_double_buffer</code> predicate also describes a bounded structure.</p>
-<h1><a class="anchor" id="autotoc_md134"></a>
+</li>
+<li>mutually-recursive predicates are not supported for the moment.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md121"></a>
 Additional Resources</h1>
 <ul>
 <li><a class="el" href="contracts-functions.html">Function Contracts</a><ul>
