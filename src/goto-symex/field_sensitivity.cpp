@@ -111,34 +111,68 @@ exprt field_sensitivityt::apply(
         const member_exprt member{tmp.get_original_expr(), comp};
         auto recursive_member =
           get_subexpression_at_offset(member, be.offset(), be.type(), ns);
-        if(
-          recursive_member.has_value() &&
-          (recursive_member->id() == ID_member ||
-           recursive_member->id() == ID_index))
+        if(!recursive_member.has_value())
+          continue;
+
+        // We need to inspect the access path as the resulting expression may
+        // involve index expressions. When array field sensitivity is disabled
+        // or the size of the array that is indexed into is larger than
+        // max_field_sensitivity_array_size then only the expression up to (but
+        // excluding) said index expression can be turned into an ssa_exprt.
+        exprt full_exprt = *recursive_member;
+        exprt *for_ssa = &full_exprt;
+        exprt *parent = for_ssa;
+        while(parent->id() == ID_typecast)
+          parent = &to_typecast_expr(*parent).op();
+        while(parent->id() == ID_member || parent->id() == ID_index)
         {
-          tmp.type() = be.type();
-          tmp.set_expression(*recursive_member);
-          if(was_l2)
+          if(parent->id() == ID_member)
           {
-            return apply(
-              ns, state, state.rename(std::move(tmp), ns).get(), write);
+            parent = &to_member_expr(*parent).compound();
           }
           else
-            return apply(ns, state, std::move(tmp), write);
+          {
+            parent = &to_index_expr(*parent).array();
+#ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
+            if(
+              !to_array_type(parent->type()).size().is_constant() ||
+              numeric_cast_v<mp_integer>(
+                to_constant_expr(to_array_type(parent->type()).size())) >
+                max_field_sensitivity_array_size)
+            {
+              for_ssa = parent;
+            }
+#else
+            for_ssa = parent;
+#endif // ENABLE_ARRAY_FIELD_SENSITIVITY
+          }
         }
-        else if(
-          recursive_member.has_value() && recursive_member->id() == ID_typecast)
+
+        if(for_ssa->id() == ID_index || for_ssa->id() == ID_member)
+        {
+          tmp.type() = for_ssa->type();
+          tmp.set_expression(*for_ssa);
+          if(was_l2)
+          {
+            *for_ssa =
+              apply(ns, state, state.rename(std::move(tmp), ns).get(), write);
+          }
+          else
+            *for_ssa = apply(ns, state, std::move(tmp), write);
+
+          return full_exprt;
+        }
+        else if(for_ssa->id() == ID_typecast)
         {
           if(was_l2)
           {
-            return apply(
-              ns,
-              state,
-              state.rename(std::move(*recursive_member), ns).get(),
-              write);
+            *for_ssa =
+              apply(ns, state, state.rename(*for_ssa, ns).get(), write);
           }
           else
-            return apply(ns, state, std::move(*recursive_member), write);
+            *for_ssa = apply(ns, state, std::move(*for_ssa), write);
+
+          return full_exprt;
         }
       }
     }
