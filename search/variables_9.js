@@ -78,7 +78,7 @@ var searchData=
   ['index_5ftype_75',['index_type',['../classjava__string__library__preprocesst.html#afc4064c1a11538c901572697c2b3342b',1,'java_string_library_preprocesst']]],
   ['indexed_5fby_5fobject_5fid_76',['indexed_by_object_id',['../struct_____c_p_r_o_v_e_r__contracts__obj__set__t.html#a8d69b5417dd5f5f2123917173ba0d4ff',1,'__CPROVER_contracts_obj_set_t']]],
   ['infinity_77',['infinity',['../structfloat__bvt_1_1unpacked__floatt.html#acee2c4ad90d62ac2f68b3c6b579e9bb2',1,'float_bvt::unpacked_floatt::infinity'],['../structfloat__utilst_1_1unpacked__floatt.html#a847f9798094dd42833a53b0292998f11',1,'float_utilst::unpacked_floatt::infinity']]],
-  ['infinity_5fflag_78',['infinity_flag',['../classieee__floatt.html#a9e16a097e0e6643d34ea36f60dc3e5c0',1,'ieee_floatt']]],
+  ['infinity_5fflag_78',['infinity_flag',['../classieee__float__valuet.html#adc5bfe7e5548c71834708246bec0eac0',1,'ieee_float_valuet']]],
   ['infix_5fmap_79',['infix_map',['../format__expr_8cpp.html#a8986772751d28e7cd9135c2249f46338',1,'format_expr.cpp']]],
   ['init_5fstate_80',['init_state',['../classautomatont.html#a9eb4ab098b728f7e248928401f21abc9',1,'automatont']]],
   ['initial_5fequation_5fgenerated_81',['initial_equation_generated',['../classsingle__loop__incremental__symex__checkert.html#a924bc847db864172213a4e089f96a84d',1,'single_loop_incremental_symex_checkert']]],

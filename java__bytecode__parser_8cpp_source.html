@@ -950,7 +950,7 @@ $(document).ready(function(){initNavTree('java__bytecode__parser_8cpp_source.htm
 <div class="line"><a id="l00782" name="l00782"></a><span class="lineno">  782</span> </div>
 <div class="line"><a id="l00783" name="l00783"></a><span class="lineno">  783</span>      case CONSTANT_Float:</div>
 <div class="line"><a id="l00784" name="l00784"></a><span class="lineno">  784</span>      {</div>
-<div class="line"><a id="l00785" name="l00785"></a><span class="lineno">  785</span>        ieee_floatt value(ieee_float_spect::single_precision());</div>
+<div class="line"><a id="l00785" name="l00785"></a><span class="lineno">  785</span>        ieee_float_valuet value(ieee_float_spect::single_precision());</div>
 <div class="line"><a id="l00786" name="l00786"></a><span class="lineno">  786</span>        value.unpack(entry.number);</div>
 <div class="line"><a id="l00787" name="l00787"></a><span class="lineno">  787</span>        entry.expr = value.to_expr();</div>
 <div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span>      }</div>
@@ -962,7 +962,7 @@ $(document).ready(function(){initNavTree('java__bytecode__parser_8cpp_source.htm
 <div class="line"><a id="l00794" name="l00794"></a><span class="lineno">  794</span> </div>
 <div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span>      case CONSTANT_Double:</div>
 <div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span>      {</div>
-<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span>        ieee_floatt value(ieee_float_spect::double_precision());</div>
+<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span>        ieee_float_valuet value(ieee_float_spect::double_precision());</div>
 <div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span>        value.unpack(entry.number);</div>
 <div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span>        entry.expr = value.to_expr();</div>
 <div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span>      }</div>

@@ -249,7 +249,7 @@ var searchData=
   ['set_5frounding_5fmode_246',['set_rounding_mode',['../classfloat__utilst.html#a47f7fbeda67fd1b9a0b0b4005f06f748',1,'float_utilst']]],
   ['set_5fscope_247',['set_scope',['../classcpp__scopest.html#adc7641ed35af8f183d1e448a0033a303',1,'cpp_scopest']]],
   ['set_5fshareable_248',['set_shareable',['../classcopy__on__write__pointeet.html#a3b0df20ddbea9bbadd2cbeb028a4aff9',1,'copy_on_write_pointeet']]],
-  ['set_5fsign_249',['set_sign',['../classieee__floatt.html#a59ad60c9af825f09c3c4377483419735',1,'ieee_floatt']]],
+  ['set_5fsign_249',['set_sign',['../classieee__float__valuet.html#a0cdce2072353d87e1661b20df3c2e9db',1,'ieee_float_valuet']]],
   ['set_5fsize_5ft_250',['set_size_t',['../classirept.html#a5d69a0c6f50e54219f0694fa879008d9',1,'irept']]],
   ['set_5fsource_5flocation_251',['set_source_location',['../classparsert.html#a8ece34cc904b6d3d462099da69ae68f5',1,'parsert::set_source_location()'],['../classencoding__targett.html#a41d40e6ef05eb28221048050e24ae952',1,'encoding_targett::set_source_location(source_locationt __source_location)'],['../classencoding__targett.html#a41d40e6ef05eb28221048050e24ae952',1,'encoding_targett::set_source_location(source_locationt __source_location)']]],
   ['set_5fspecialization_5fof_252',['set_specialization_of',['../classcpp__declarationt.html#a58c55c08f7c5a3d856a9dd97a5351124',1,'cpp_declarationt']]],

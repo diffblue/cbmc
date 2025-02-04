@@ -15,7 +15,7 @@ var searchData=
   ['named_5fsub_12',['named_sub',['../classtree__nodet.html#a29d3309a833548c958ebedc6f8d8159c',1,'tree_nodet']]],
   ['named_5fterms_13',['named_terms',['../classsmt2__parsert.html#a4719836944f98b6ab2b3bc617a5cf3c1',1,'smt2_parsert']]],
   ['nan_14',['nan',['../structfloat__utilst_1_1unpacked__floatt.html#a4728c7786438e20a2284bb8c4e3baf7b',1,'float_utilst::unpacked_floatt::NaN'],['../structfloat__bvt_1_1unpacked__floatt.html#a997a92f919b7c1c4014d46344439ae2d',1,'float_bvt::unpacked_floatt::NaN']]],
-  ['nan_5fflag_15',['NaN_flag',['../classieee__floatt.html#a5cc5289e0b32328fdb24db84fd0a04f4',1,'ieee_floatt']]],
+  ['nan_5fflag_15',['NaN_flag',['../classieee__float__valuet.html#ad55f7d5f38d52d65e50a4b1c2625cf26',1,'ieee_float_valuet']]],
   ['nand_16',['nand',['../classsmt__bit__vector__theoryt.html#aa957a1ce445cae2000abda21bb362517',1,'smt_bit_vector_theoryt']]],
   ['native_5ftool_5fname_17',['native_tool_name',['../classas__modet.html#a6ce9d5d828f649479e85e0ab91b6128d',1,'as_modet::native_tool_name'],['../classgcc__modet.html#a04f9334b1ba6426c2863ea6f781889e0',1,'gcc_modet::native_tool_name'],['../classld__modet.html#a746dd94323425951570740cfb05f3c6c',1,'ld_modet::native_tool_name']]],
   ['natural_5floops_18',['natural_loops',['../classacceleratet.html#a3a66e4438691dbd4175481b721b66eeb',1,'acceleratet::natural_loops'],['../classhavoc__loopst.html#ae0346ff58d8636a1bc090f68584932e3',1,'havoc_loopst::natural_loops'],['../classk__inductiont.html#a68059f5540f3f41b7ccfddbe167970e9',1,'k_inductiont::natural_loops']]],

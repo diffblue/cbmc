@@ -1,5 +1,11 @@
 var NAVTREEINDEX72 =
 {
+"compilation-and-development.html#compilation-and-development-section-time-profiling":[0,4,7,5],
+"compilation-and-development.html#compilation-and-development-subsection-cmake-files":[0,4,7,0,1],
+"compilation-and-development.html#compilation-and-development-subsection-coverage":[0,4,7,1,2],
+"compilation-and-development.html#compilation-and-development-subsection-makefiles":[0,4,7,0,0],
+"compilation-and-development.html#compilation-and-development-subsection-personal-configuration":[0,4,7,0,2],
+"compilation-and-development.html#compilation-and-development-subsection-regression-tests":[0,4,7,1,0],
 "compilation-and-development.html#compilation-and-development-subsection-sat-solver":[0,4,7,1,3],
 "compilation-and-development.html#compilation-and-development-subsection-unit-tests":[0,4,7,1,1],
 "compilation-and-development.html#compilation-and-development-subsubsection-config-inc":[0,4,7,0,2,0],
@@ -243,11 +249,5 @@ var NAVTREEINDEX72 =
 "contracts-user-cli.html#autotoc_md74":[1,0,11,0],
 "contracts-user-cli.html#autotoc_md75":[1,0,11,1],
 "contracts-user.html":[1,0],
-"contracts_8cpp.html":[8,0,2,15,1,3],
-"contracts_8cpp.html#aa5cfbf27af004419d6d598ab11fea026":[8,0,2,15,1,3,0],
-"contracts_8cpp.html#adada6f88e622579129bc72b562fc39bb":[8,0,2,15,1,3,1],
-"contracts_8cpp.html#aec8058244e9b9220cb2c76b1297dca0c":[8,0,2,15,1,3,2],
-"contracts_8cpp_source.html":[8,0,2,15,1,3],
-"contracts_8h.html":[8,0,2,15,1,4],
-"contracts_8h.html#a051e6496766835c8bfc4d5f74cf6b56a":[8,0,2,15,1,4,12]
+"contracts_8cpp.html":[8,0,2,15,1,3]
 };

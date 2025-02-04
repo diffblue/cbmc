@@ -631,6 +631,7 @@ var annotated_dup =
     [ "ieee_float_notequal_exprt", "classieee__float__notequal__exprt.html", "classieee__float__notequal__exprt" ],
     [ "ieee_float_op_exprt", "classieee__float__op__exprt.html", "classieee__float__op__exprt" ],
     [ "ieee_float_spect", "classieee__float__spect.html", "classieee__float__spect" ],
+    [ "ieee_float_valuet", "classieee__float__valuet.html", "classieee__float__valuet" ],
     [ "ieee_floatt", "classieee__floatt.html", "classieee__floatt" ],
     [ "if_exprt", "classif__exprt.html", "classif__exprt" ],
     [ "implies_exprt", "classimplies__exprt.html", "classimplies__exprt" ],

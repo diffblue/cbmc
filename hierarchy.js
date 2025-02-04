@@ -896,7 +896,9 @@ var hierarchy =
     [ "identity_functort", "classidentity__functort.html", null ],
     [ "smt2_parsert::idt", "structsmt2__parsert_1_1idt.html", null ],
     [ "ieee_float_spect", "classieee__float__spect.html", null ],
-    [ "ieee_floatt", "classieee__floatt.html", null ],
+    [ "ieee_float_valuet", "classieee__float__valuet.html", [
+      [ "ieee_floatt", "classieee__floatt.html", null ]
+    ] ],
     [ "smt_core_theoryt::if_then_elset", "structsmt__core__theoryt_1_1if__then__elset.html", null ],
     [ "framet::implicationt", "structframet_1_1implicationt.html", null ],
     [ "smt_core_theoryt::impliest", "structsmt__core__theoryt_1_1impliest.html", null ],
