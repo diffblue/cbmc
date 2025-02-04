@@ -1,5 +1,8 @@
 var NAVTREEINDEX73 =
 {
+"contracts_8h.html#a08c29ebb62cb5a2c8f67034db5d5e38e":[8,0,2,15,1,4,7],
+"contracts_8h.html#a144c6c013d6f0307d7315a9ae98447d5":[8,0,2,15,1,4,6],
+"contracts_8h.html#a31c48af55fa7161300741d422cc91a67":[8,0,2,15,1,4,2],
 "contracts_8h.html#a5bce273094114e9f3977fabf73595f85":[8,0,2,15,1,4,9],
 "contracts_8h.html#a72459550c5e18c0fe0d22293c523d503":[8,0,2,15,1,4,3],
 "contracts_8h.html#a88e11920e0c48a2c8b408fb2aeb49032":[8,0,2,15,1,4,11],
@@ -246,8 +249,5 @@ var NAVTREEINDEX73 =
 "count__eloc_8h.html#a96e08d8c6623fb450e50e6e49edbea9b":[8,0,2,15,14,3],
 "count__eloc_8h.html#abd4ad98505072da944475d801d0edb96":[8,0,2,15,14,0],
 "count__eloc_8h_source.html":[8,0,2,15,14],
-"counterexample__beautification_8cpp.html":[8,0,2,11,5],
-"counterexample__beautification_8cpp_source.html":[8,0,2,11,5],
-"counterexample__beautification_8h.html":[8,0,2,11,6],
-"counterexample__beautification_8h_source.html":[8,0,2,11,6]
+"counterexample__beautification_8cpp.html":[8,0,2,11,5]
 };

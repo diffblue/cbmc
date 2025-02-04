@@ -1,5 +1,8 @@
 var NAVTREEINDEX70 =
 {
+"classvalue__set__fit.html#a2b6882585ad137d4f3dc4edfb33c9c58":[7,0,1351,17],
+"classvalue__set__fit.html#a35865f96105ec53cb74f2c7571332851":[7,0,1351,52],
+"classvalue__set__fit.html#a380ae07f690a0692d42eb7ba14134143":[7,0,1351,14],
 "classvalue__set__fit.html#a3cd93e52c8df2048d90dcc942c8f2e71":[7,0,1351,2],
 "classvalue__set__fit.html#a3e50740ec702290e4ffd357e4f16fa67":[7,0,1351,19],
 "classvalue__set__fit.html#a4a542fe2ba17347c7f67cde69412c62b":[7,0,1351,56],
@@ -246,8 +249,5 @@ var NAVTREEINDEX70 =
 "classvariable__sensitivity__domaint.html#aedbe5df1af9e464073aa052c81abb30b":[7,0,1362,6],
 "classvariable__sensitivity__domaint.html#af3a6162d575d55e8663bc36b57e1e7cf":[7,0,1362,4],
 "classvariable__sensitivity__object__factoryt.html":[7,0,1363],
-"classvariable__sensitivity__object__factoryt.html#a0e9025635567f868f7033550f93a6057":[7,0,1363,5],
-"classvariable__sensitivity__object__factoryt.html#a4216651c10d0c6310d556f27c3823d99":[7,0,1363,3],
-"classvariable__sensitivity__object__factoryt.html#a5cf60e5c1504170033835ab3650b3d9e":[7,0,1363,0],
-"classvariable__sensitivity__object__factoryt.html#a64dfea68dcee78dc1d5722d69dbccac6":[7,0,1363,2]
+"classvariable__sensitivity__object__factoryt.html#a0e9025635567f868f7033550f93a6057":[7,0,1363,5]
 };

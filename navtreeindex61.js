@@ -1,5 +1,8 @@
 var NAVTREEINDEX61 =
 {
+"classsmt__bit__vector__theoryt.html#a52330f71cf946e26f11fecb2285b1f2f":[7,0,1114,63],
+"classsmt__bit__vector__theoryt.html#a5373aaa3654611d86057523d60accbe9":[7,0,1114,48],
+"classsmt__bit__vector__theoryt.html#a63867577b6a9cbd77bb7b55acd16186f":[7,0,1114,46],
 "classsmt__bit__vector__theoryt.html#a7975e094c7231888c7325f602abb6424":[7,0,1114,53],
 "classsmt__bit__vector__theoryt.html#a79c1d89076d05979d548ee4c1187c02a":[7,0,1114,49],
 "classsmt__bit__vector__theoryt.html#a7b51d737568ab464212ecd038effec44":[7,0,1114,38],
@@ -246,8 +249,5 @@ var NAVTREEINDEX61 =
 "classsmt__sat__responset.html#a811d40a883e0f6e3d0a5050fad7787b9":[7,0,1153,0],
 "classsmt__set__logic__commandt.html":[7,0,1154],
 "classsmt__set__logic__commandt.html#a1f7a91e3a7a33b17bf1e2e2a7575bae0":[7,0,1154,1],
-"classsmt__set__logic__commandt.html#a6dbb18ecec8ec4403b69a4b32f8ac30f":[7,0,1154,0],
-"classsmt__set__option__commandt.html":[7,0,1155],
-"classsmt__set__option__commandt.html#a19114eea6111db590de712dde933082a":[7,0,1155,0],
-"classsmt__set__option__commandt.html#a1fa07b70400b5ba13bbbcf751bd847fc":[7,0,1155,1]
+"classsmt__set__logic__commandt.html#a6dbb18ecec8ec4403b69a4b32f8ac30f":[7,0,1154,0]
 };

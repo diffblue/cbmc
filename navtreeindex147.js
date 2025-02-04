@@ -1,5 +1,8 @@
 var NAVTREEINDEX147 =
 {
+"symex__coverage_8h.html":[8,0,2,11,47],
+"symex__coverage_8h_source.html":[8,0,2,11,47],
+"symex__dead_8cpp.html":[8,0,2,17,62],
 "symex__dead_8cpp.html#a6f137469bd054654d606305836732f85":[8,0,2,17,62,0],
 "symex__dead_8cpp_source.html":[8,0,2,17,62],
 "symex__decl_8cpp.html":[8,0,2,17,63],
@@ -246,8 +249,5 @@ var NAVTREEINDEX147 =
 "typecheck_8cpp_source.html":[8,0,2,30,249],
 "typecheck_8h.html":[8,0,2,30,250],
 "typecheck_8h.html#a2e797eddbd8b4b6218b7b24df840c151":[8,0,2,30,250,2],
-"typecheck_8h_source.html":[8,0,2,30,250],
-"typedef__type_8h.html":[8,0,2,1,75],
-"typedef__type_8h.html#a2e152e202dbcab4cfb87618e414c5e82":[8,0,2,1,75,1],
-"typedef__type_8h.html#a82d8bfa52be25c0d0327b33d6519d281":[8,0,2,1,75,2]
+"typecheck_8h_source.html":[8,0,2,30,250]
 };

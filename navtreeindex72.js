@@ -1,5 +1,8 @@
 var NAVTREEINDEX72 =
 {
+"compilation-and-development.html#compilation-and-development-subsection-sat-solver":[0,4,7,1,3],
+"compilation-and-development.html#compilation-and-development-subsection-unit-tests":[0,4,7,1,1],
+"compilation-and-development.html#compilation-and-development-subsubsection-config-inc":[0,4,7,0,2,0],
 "compilation-and-development.html#compilation-and-development-subsubsection-macro-debug":[0,4,7,0,2,1],
 "compilation-and-development.html#compilation-and-development-subsubsection-running-individual-regression-tests-directly-with-test-pl":[0,4,7,1,0,2],
 "compilation-and-development.html#compilation-and-development-subsubsection-running-regression-tests-with-ctest":[0,4,7,1,0,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX72 =
 "contracts_8cpp.html#aec8058244e9b9220cb2c76b1297dca0c":[8,0,2,15,1,3,2],
 "contracts_8cpp_source.html":[8,0,2,15,1,3],
 "contracts_8h.html":[8,0,2,15,1,4],
-"contracts_8h.html#a051e6496766835c8bfc4d5f74cf6b56a":[8,0,2,15,1,4,12],
-"contracts_8h.html#a08c29ebb62cb5a2c8f67034db5d5e38e":[8,0,2,15,1,4,7],
-"contracts_8h.html#a144c6c013d6f0307d7315a9ae98447d5":[8,0,2,15,1,4,6],
-"contracts_8h.html#a31c48af55fa7161300741d422cc91a67":[8,0,2,15,1,4,2]
+"contracts_8h.html#a051e6496766835c8bfc4d5f74cf6b56a":[8,0,2,15,1,4,12]
 };

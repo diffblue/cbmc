@@ -1,5 +1,8 @@
 var NAVTREEINDEX146 =
 {
+"structtdefl__output__buffer.html#a26e5da3f933edc1a218afbe7838e9d22":[7,0,1274,1],
+"structtdefl__output__buffer.html#a60119e1ddcb4fb92149189bed7cb8250":[7,0,1274,2],
+"structtdefl__output__buffer.html#ab0705ebff551ebede28640ada5a9d2ab":[7,0,1274,0],
 "structtdefl__output__buffer.html#ab506aa434be983761db4cca43d2ebc9e":[7,0,1274,3],
 "structtdefl__sym__freq.html":[7,0,1275],
 "structtdefl__sym__freq.html#a17b56e7162419d3ea5fe175d3f1c855e":[7,0,1275,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX146 =
 "symex__coverage_8cpp.html":[8,0,2,11,46],
 "symex__coverage_8cpp.html#a1819aa0b602444ef830969781e5d38f6":[8,0,2,11,46,4],
 "symex__coverage_8cpp.html#a79d3ab409cf75633d512877f46fb9ccc":[8,0,2,11,46,5],
-"symex__coverage_8cpp_source.html":[8,0,2,11,46],
-"symex__coverage_8h.html":[8,0,2,11,47],
-"symex__coverage_8h_source.html":[8,0,2,11,47],
-"symex__dead_8cpp.html":[8,0,2,17,62]
+"symex__coverage_8cpp_source.html":[8,0,2,11,46]
 };
