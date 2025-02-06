@@ -64,12 +64,12 @@ var searchData=
   ['multi_5fpath_5fsymex_5fcheckert_61',['multi_path_symex_checkert',['../classmulti__path__symex__checkert.html',1,'']]],
   ['multi_5fpath_5fsymex_5fonly_5fcheckert_62',['multi_path_symex_only_checkert',['../classmulti__path__symex__only__checkert.html',1,'']]],
   ['multiplyt_63',['multiplyt',['../structsmt__bit__vector__theoryt_1_1multiplyt.html',1,'smt_bit_vector_theoryt']]],
-  ['mz_5fstream_5fs_64',['mz_stream_s',['../structmz__stream__s.html',1,'']]],
+  ['mz_5fdummy_5ftime_5ft_5ftag_64',['mz_dummy_time_t_tag',['../structmz__dummy__time__t__tag.html',1,'']]],
   ['mz_5fzip_5farchive_65',['mz_zip_archive',['../structmz__zip__archive.html',1,'']]],
   ['mz_5fzip_5farchive_5ffile_5fstat_66',['mz_zip_archive_file_stat',['../structmz__zip__archive__file__stat.html',1,'']]],
   ['mz_5fzip_5farchive_5fstatet_67',['mz_zip_archive_statet',['../classmz__zip__archive__statet.html',1,'']]],
   ['mz_5fzip_5farchivet_68',['mz_zip_archivet',['../classmz__zip__archivet.html',1,'']]],
   ['mz_5fzip_5farray_69',['mz_zip_array',['../structmz__zip__array.html',1,'']]],
   ['mz_5fzip_5finternal_5fstate_5ftag_70',['mz_zip_internal_state_tag',['../structmz__zip__internal__state__tag.html',1,'']]],
-  ['mz_5fzip_5fwriter_5fadd_5fstate_71',['mz_zip_writer_add_state',['../structmz__zip__writer__add__state.html',1,'']]]
+  ['mz_5fzip_5freader_5fextract_5fiter_5fstate_71',['mz_zip_reader_extract_iter_state',['../structmz__zip__reader__extract__iter__state.html',1,'']]]
 ];

@@ -15,7 +15,7 @@ var structmz__zip__archive__file__stat =
     [ "m_is_supported", "structmz__zip__archive__file__stat.html#a4742f25dec4e490bedc1262b96e49ed6", null ],
     [ "m_local_header_ofs", "structmz__zip__archive__file__stat.html#acc27b6ca5dd7159c19bc3dc32e844ac7", null ],
     [ "m_method", "structmz__zip__archive__file__stat.html#ae1a9a8fbc09a4c3c14b04667d0f2d189", null ],
-    [ "m_time", "structmz__zip__archive__file__stat.html#a18d1f5f9b03e906c40ecd707610a5869", null ],
+    [ "m_padding", "structmz__zip__archive__file__stat.html#a6d2a11a9d4219d30780dd2eb2f819ec1", null ],
     [ "m_uncomp_size", "structmz__zip__archive__file__stat.html#aa55ee3580a844400d4bd43be27ae3808", null ],
     [ "m_version_made_by", "structmz__zip__archive__file__stat.html#a3038faf9c1f24f2bf48eab9cc2b8ce8c", null ],
     [ "m_version_needed", "structmz__zip__archive__file__stat.html#a0cfb77699313b855dcd1b5bed9dfb93a", null ]

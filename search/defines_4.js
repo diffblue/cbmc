@@ -10,12 +10,6 @@ var searchData=
   ['data_5finvariant_5fwith_5firep_7',['DATA_INVARIANT_WITH_IREP',['../invariant__utils_8h.html#a4417e07d35a600f29345f36262c136db',1,'invariant_utils.h']]],
   ['db_5fentry_5fpoint_5fpostfix_8',['DB_ENTRY_POINT_POSTFIX',['../statement__list__entry__point_8cpp.html#a9c659505179d006e9089f84a5dfc0d9c',1,'statement_list_entry_point.cpp']]],
   ['default_5fmax_5fnb_5frefinement_9',['DEFAULT_MAX_NB_REFINEMENT',['../string__refinement_8h.html#a9135d29d4eb9f527e80e67dcfdbd6001',1,'string_refinement.h']]],
-  ['deflate_10',['deflate',['../miniz_8h.html#a04be214323e3ae74865fa6f7006a16fd',1,'miniz.h']]],
-  ['deflatebound_11',['deflateBound',['../miniz_8h.html#a56f41bdffa865e02ed160ebdc54b5d87',1,'miniz.h']]],
-  ['deflateend_12',['deflateEnd',['../miniz_8h.html#a0a4adb4287e6b8f1f239821ee15834b5',1,'miniz.h']]],
-  ['deflateinit_13',['deflateInit',['../miniz_8h.html#a5e9d5f0b1abf4368ac4d55b0909dcd99',1,'miniz.h']]],
-  ['deflateinit2_14',['deflateInit2',['../miniz_8h.html#a5fdefdacf3bc7c8484df6e8b7bd5b2bc',1,'miniz.h']]],
-  ['deflatereset_15',['deflateReset',['../miniz_8h.html#acd6a182af06163cb069f9e3a61dbac73',1,'miniz.h']]],
-  ['deprecated_16',['DEPRECATED',['../deprecate_8h.html#ad034ea058031ed95e52d3bac1743640a',1,'deprecate.h']]],
-  ['dotgraphsettings_17',['dotgraphsettings',['../compile_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b',1,'DOTGRAPHSETTINGS:&#160;compile.cpp'],['../dot_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b',1,'DOTGRAPHSETTINGS:&#160;dot.cpp']]]
+  ['deprecated_10',['DEPRECATED',['../deprecate_8h.html#ad034ea058031ed95e52d3bac1743640a',1,'deprecate.h']]],
+  ['dotgraphsettings_11',['dotgraphsettings',['../compile_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b',1,'DOTGRAPHSETTINGS:&#160;compile.cpp'],['../dot_8cpp.html#a5b1c2ca69fb2572f85dbe78bb577fc8b',1,'DOTGRAPHSETTINGS:&#160;dot.cpp']]]
 ];

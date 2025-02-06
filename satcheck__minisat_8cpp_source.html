@@ -284,15 +284,15 @@ $(document).ready(function(){initNavTree('satcheck__minisat_8cpp_source.html',''
 <div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  <a class="code hl_variable" href="classsatcheck__minisat1__baset.html#a5b6082699457be001ddd483eccb7239d">solver</a>-&gt;simplifyDB();</div>
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>  std::string msg;</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>  std::string <a class="code hl_class" href="classait.html">msg</a>;</div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
 <div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classsatcheck__minisat1__baset.html#a7387d1d1658e812999d6100e44cb3bda">empty_clause_added</a>)</div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>  {</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    msg=<span class="stringliteral">&quot;empty clause: instance is UNSATISFIABLE&quot;</span>;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <a class="code hl_class" href="classait.html">msg</a>=<span class="stringliteral">&quot;empty clause: instance is UNSATISFIABLE&quot;</span>;</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>  }</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classsatcheck__minisat1__baset.html#a5b6082699457be001ddd483eccb7239d">solver</a>-&gt;okay())</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>  {</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    msg=<span class="stringliteral">&quot;SAT checker inconsistent: instance is UNSATISFIABLE&quot;</span>;</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    <a class="code hl_class" href="classait.html">msg</a>=<span class="stringliteral">&quot;SAT checker inconsistent: instance is UNSATISFIABLE&quot;</span>;</div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>  }</div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>  <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>  {</div>
@@ -301,16 +301,16 @@ $(document).ready(function(){initNavTree('satcheck__minisat_8cpp_source.html',''
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classsatcheck__minisat1__baset.html#a5b6082699457be001ddd483eccb7239d">solver</a>-&gt;solve(<a class="code hl_class" href="classait.html">MiniSat_assumptions</a>))</div>
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    {</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>      msg=<span class="stringliteral">&quot;SAT checker: instance is SATISFIABLE&quot;</span>;</div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>      <a class="code hl_variable" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code hl_function" href="classmessaget.html#af879b94f89c5b687ea7f0c596e3ad583">status</a>() &lt;&lt; msg &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>      <a class="code hl_class" href="classait.html">msg</a>=<span class="stringliteral">&quot;SAT checker: instance is SATISFIABLE&quot;</span>;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>      <a class="code hl_variable" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code hl_function" href="classmessaget.html#af879b94f89c5b687ea7f0c596e3ad583">status</a>() &lt;&lt; <a class="code hl_class" href="classait.html">msg</a> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>      <a class="code hl_variable" href="classcnf__solvert.html#a39424fed370ef344cf5cde8b66a1e1e3">status</a>=<a class="code hl_enumvalue" href="classcnf__solvert.html#aa8e93be9bb231ffc18ecd8bcb55d4245a684e1388a91900480c702ac5b8f6b4d8">SAT</a>;</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca27ccb7b2b3e57bbdd3c5c5a621a7da88">P_SATISFIABLE</a>;</div>
 <div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>    }</div>
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>      msg=<span class="stringliteral">&quot;SAT checker: instance is UNSATISFIABLE&quot;</span>;</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>      <a class="code hl_class" href="classait.html">msg</a>=<span class="stringliteral">&quot;SAT checker: instance is UNSATISFIABLE&quot;</span>;</div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>  }</div>
 <div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>  <a class="code hl_variable" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code hl_function" href="classmessaget.html#af879b94f89c5b687ea7f0c596e3ad583">status</a>() &lt;&lt; msg &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>  <a class="code hl_variable" href="classpropt.html#afdb08f757ee6d3a90a7732de7372dade">log</a>.<a class="code hl_function" href="classmessaget.html#af879b94f89c5b687ea7f0c596e3ad583">status</a>() &lt;&lt; <a class="code hl_class" href="classait.html">msg</a> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>  <a class="code hl_variable" href="classcnf__solvert.html#a39424fed370ef344cf5cde8b66a1e1e3">status</a>=<a class="code hl_enumvalue" href="classcnf__solvert.html#aa8e93be9bb231ffc18ecd8bcb55d4245a58516af515d5eb19e854c0a1b580c421">UNSAT</a>;</div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>  <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classpropt.html#abc5dd44f95571105f68cc1724b5fa06ca202ae688865d6a63a00ec10972ff4bc4">P_UNSATISFIABLE</a>;</div>
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>}</div>

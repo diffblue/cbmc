@@ -417,7 +417,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>  <span class="keyword">const</span> <a class="code hl_class" href="classexprt.html">exprt</a> &amp;<a class="code hl_function" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>,</div>
 <div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>  <span class="keyword">const</span> <a class="code hl_class" href="classexprt.html">exprt</a> &amp;cond,</div>
 <div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>  <span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;property_id,</div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>  <span class="keyword">const</span> std::string &amp;msg,</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>  <span class="keyword">const</span> std::string &amp;<a class="code hl_class" href="classait.html">msg</a>,</div>
 <div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>  <span class="keyword">const</span> <a class="code hl_struct" href="structsymex__targett_1_1sourcet.html">sourcet</a> &amp;source)</div>
 <div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>{</div>
 <div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>  <a class="code hl_variable" href="classsymex__target__equationt.html#a3180b42854c3ead00d443f3b2cd24343">SSA_steps</a>.emplace_back(source, <a class="code hl_enumvalue" href="classgoto__trace__stept.html#a6cd0384a4a8c5dbfba0817c5972e5ebca1edce3bd99a335da00a27703a24f3dfc">goto_trace_stept::typet::ASSERT</a>);</div>
@@ -425,7 +425,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span> </div>
 <div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#a9f7a94652344890a8d5d52d410f72c7f">guard</a>=<a class="code hl_function" href="c__safety__checks_8cpp.html#a1675f729dc854238dd23840d004c7c0a">guard</a>;</div>
 <div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#a3977bf4be5f66320bbf67e6259e57817">cond_expr</a>=cond;</div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#aa22b0e951097553e76e97d5054729f78">comment</a>=msg;</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#aa22b0e951097553e76e97d5054729f78">comment</a>=<a class="code hl_class" href="classait.html">msg</a>;</div>
 <div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#ad83019ee85b1173d3d3961c6fe9a48b9">property_id</a> = property_id;</div>
 <div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span> </div>
 <div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>  <a class="code hl_function" href="classsymex__target__equationt.html#aa624913e1d25f5ceae5833869c90e9b8">merge_ireps</a>(SSA_step);</div>
@@ -451,7 +451,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="foldopen" id="foldopen00314" data-start="{" data-end="}">
 <div class="line"><a id="l00314" name="l00314"></a><span class="lineno"><a class="line" href="classsymex__target__equationt.html#a014add91110364631c91efde5ac2b39b">  314</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classsymex__target__equationt.html#a014add91110364631c91efde5ac2b39b">symex_target_equationt::constraint</a>(</div>
 <div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>  <span class="keyword">const</span> <a class="code hl_class" href="classexprt.html">exprt</a> &amp;cond,</div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>  <span class="keyword">const</span> std::string &amp;msg,</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>  <span class="keyword">const</span> std::string &amp;<a class="code hl_class" href="classait.html">msg</a>,</div>
 <div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>  <span class="keyword">const</span> <a class="code hl_struct" href="structsymex__targett_1_1sourcet.html">sourcet</a> &amp;source)</div>
 <div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>{</div>
 <div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>  <span class="comment">// like assumption, but with global effect</span></div>
@@ -460,7 +460,7 @@ $(document).ready(function(){initNavTree('symex__target__equation_8cpp_source.ht
 <div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span> </div>
 <div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#a9f7a94652344890a8d5d52d410f72c7f">guard</a>=<a class="code hl_class" href="classtrue__exprt.html">true_exprt</a>();</div>
 <div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#a3977bf4be5f66320bbf67e6259e57817">cond_expr</a>=cond;</div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#aa22b0e951097553e76e97d5054729f78">comment</a>=msg;</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>  SSA_step.<a class="code hl_variable" href="class_s_s_a__stept.html#aa22b0e951097553e76e97d5054729f78">comment</a>=<a class="code hl_class" href="classait.html">msg</a>;</div>
 <div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span> </div>
 <div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>  <a class="code hl_function" href="classsymex__target__equationt.html#aa624913e1d25f5ceae5833869c90e9b8">merge_ireps</a>(SSA_step);</div>
 <div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>}</div>

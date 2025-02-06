@@ -365,7 +365,7 @@ $(document).ready(function(){initNavTree('ui__message_8cpp_source.html',''); ini
 <div class="foldopen" id="foldopen00241" data-start="{" data-end="}">
 <div class="line"><a id="l00241" name="l00241"></a><span class="lineno"><a class="line" href="classui__message__handlert.html#aeae3ef9be9f33581a25d17d6d01da460">  241</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classui__message__handlert.html#aeae3ef9be9f33581a25d17d6d01da460">ui_message_handlert::ui_msg</a>(</div>
 <div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>  <span class="keyword">const</span> std::string &amp;type,</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>  <span class="keyword">const</span> std::string &amp;msg,</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>  <span class="keyword">const</span> std::string &amp;<a class="code hl_class" href="classait.html">msg</a>,</div>
 <div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>  <span class="keyword">const</span> <a class="code hl_class" href="classsource__locationt.html">source_locationt</a> &amp;location)</div>
 <div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>{</div>
 <div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>  <span class="keywordflow">switch</span>(<a class="code hl_function" href="classui__message__handlert.html#a4919f7300bcf37134a46836b6061d8e5">get_ui</a>())</div>
@@ -374,11 +374,11 @@ $(document).ready(function(){initNavTree('ui__message_8cpp_source.html',''); ini
 <div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
 <div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8ace1e130b2826522bdf9754945d769620">uit::XML_UI</a>:</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    <a class="code hl_function" href="classui__message__handlert.html#a9fd340646af846aefed4f1b5e4217325">xml_ui_msg</a>(type, msg, location);</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    <a class="code hl_function" href="classui__message__handlert.html#a9fd340646af846aefed4f1b5e4217325">xml_ui_msg</a>(type, <a class="code hl_class" href="classait.html">msg</a>, location);</div>
 <div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
 <div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="classui__message__handlert.html#aa32a572a8a2b51e6c8019a208ccc17a8ac9bbfffade9998d8a234beb61a68f505">uit::JSON_UI</a>:</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    <a class="code hl_function" href="classui__message__handlert.html#a1b9ec25f957b5a873c47f41e34914e2a">json_ui_msg</a>(type, msg, location);</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    <a class="code hl_function" href="classui__message__handlert.html#a1b9ec25f957b5a873c47f41e34914e2a">json_ui_msg</a>(type, <a class="code hl_class" href="classait.html">msg</a>, location);</div>
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>  }</div>
 <div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>}</div>

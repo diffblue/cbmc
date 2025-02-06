@@ -20,7 +20,5 @@ var searchData=
   ['acc_5fvolatile_17',['ACC_VOLATILE',['../java__bytecode__parser_8cpp.html#afa6aaa9fa8e6b7c139a6f459ab3a42b1',1,'java_bytecode_parser.cpp']]],
   ['actual_5farray_5fhack_18',['ACTUAL_ARRAY_HACK',['../boolbv__index_8cpp.html#a4d12a428d8d14d5b233e143533b7ff8a',1,'boolbv_index.cpp']]],
   ['add_5fall_5fpos_19',['add_all_pos',['../goto2graph_8h.html#a3fd47444373d602c2114b4630af887f4',1,'goto2graph.h']]],
-  ['adler32_20',['adler32',['../miniz_8h.html#a88899508e9a73aad5db1854cd1cc87d7',1,'miniz.h']]],
-  ['alloc_5ffunc_21',['alloc_func',['../miniz_8h.html#a4719a257e0920f8212b267186ea81083',1,'miniz.h']]],
-  ['and_22',['AND',['../expr2statement__list_8cpp.html#acd1b97556dfbbac61063a63031d2f91d',1,'expr2statement_list.cpp']]]
+  ['and_20',['AND',['../expr2statement__list_8cpp.html#acd1b97556dfbbac61063a63031d2f91d',1,'expr2statement_list.cpp']]]
 ];

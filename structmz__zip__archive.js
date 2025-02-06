@@ -8,6 +8,7 @@ var structmz__zip__archive =
     [ "m_pAlloc_opaque", "structmz__zip__archive.html#a54c3a1be907a1e075a112ff06b191644", null ],
     [ "m_pFree", "structmz__zip__archive.html#abb6dbd66d702cdffc05a885f8448003d", null ],
     [ "m_pIO_opaque", "structmz__zip__archive.html#a477d8ad842fa3707c2330454c8173f7d", null ],
+    [ "m_pNeeds_keepalive", "structmz__zip__archive.html#a943ea385742e04f7995cb54b46892213", null ],
     [ "m_pRead", "structmz__zip__archive.html#ac3df2038c7486a5df1ed51bfa3f7443c", null ],
     [ "m_pRealloc", "structmz__zip__archive.html#ac3cdd59e8bcc156954790af62fee92e8", null ],
     [ "m_pState", "structmz__zip__archive.html#a9d47a170d9f54452fcfe1152c26af40b", null ],
