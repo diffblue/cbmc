@@ -27,11 +27,6 @@ std::unique_ptr<c_qualifierst> java_qualifierst::clone() const
   return std::move(other);
 }
 
-std::size_t java_qualifierst::count() const
-{
-  return c_qualifierst::count() + annotations.size();
-}
-
 void java_qualifierst::clear()
 {
   c_qualifierst::clear();

@@ -109,12 +109,6 @@ public:
     is_noreturn |= other.is_noreturn;
     return *this;
   }
-
-  virtual std::size_t count() const
-  {
-    return is_constant + is_volatile + is_restricted + is_atomic + is_ptr32 +
-           is_ptr64 + is_nodiscard + is_noreturn;
-  }
 };
 
 #endif // CPROVER_ANSI_C_C_QUALIFIERS_H
