@@ -31,7 +31,6 @@ public:
   {
     return annotations;
   }
-  std::size_t count() const override;
 
   void clear() override;
 
