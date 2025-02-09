@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_member_spec.h"
 #include "cpp_enum_type.h"
 
-// #define DEBUG
+#define DEBUG
 #ifdef DEBUG
 #include <iostream>
 
@@ -346,7 +346,6 @@ protected:
   bool rPostfixExpr(exprt &);
   bool rPrimaryExpr(exprt &);
   bool rVarName(exprt &);
-  bool rVarNameCore(exprt &);
   bool maybeTemplateArgs();
 
   bool rFunctionBody(cpp_declaratort &);
@@ -778,7 +777,7 @@ bool Parser::isTypeSpecifier()
          t == TOK_CPROVER_BOOL || t == TOK_CLASS || t == TOK_STRUCT ||
          t == TOK_UNION || t == TOK_ENUM || t == TOK_INTERFACE ||
          t == TOK_TYPENAME || t == TOK_TYPEOF || t == TOK_DECLTYPE ||
-         t == TOK_UNDERLYING_TYPE;
+         t == TOK_UNDERLYING_TYPE || t == TOK_ATOMIC_TYPE_SPECIFIER;
 }
 
 /*
@@ -1336,31 +1335,61 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     if(!rTemplateDecl2(template_type, kind))
       return false;
 
-    // TODO
-
-    cpp_tokent tk1, tk2;
+    cpp_tokent tk1;
 
     if(lex.get_token(tk1) != TOK_CLASS)
       return false;
 
-    if(lex.LookAhead(0) == ',')
+    declaration=cpp_declarationt();
+    set_location(declaration, tk1);
+
+    declaration.set(ID_is_type, true);
+    declaration.type()=template_type;
+
+    declaration.declarators().resize(1);
+    cpp_declaratort &declarator=declaration.declarators().front();
+
+    declarator=cpp_declaratort();
+    declarator.name().make_nil();
+    declarator.type().make_nil();
+    set_location(declarator, tk1);
+
+    if(lex.LookAhead(0) == ',' || lex.LookAhead(0) == '>')
       return true;
 
-    if(!is_identifier(lex.get_token(tk2)))
+    if(lex.LookAhead(0)==TOK_ELLIPSIS)
+    {
+      cpp_tokent tk2;
+      lex.get_token(tk2);
+      declarator.set_has_ellipsis();
+    }
+
+    if(is_identifier(lex.LookAhead(0)))
+    {
+      cpp_tokent tk2;
+      lex.get_token(tk2);
+
+      declarator.name() = cpp_namet(tk2.data.get(ID_C_base_name));
+      set_location(declarator.name(), tk2);
+
+      add_id(declarator.name(), new_scopet::kindt::TYPE_TEMPLATE_PARAMETER);
+    }
+    else
       return false;
-    // Ptree cspec=new PtreeClassSpec(new LeafReserved(tk1),
-    //                                  Ptree::Cons(new Leaf(tk2),nil),
-    //                                  nil);
-    // decl=Ptree::Snoc(decl, cspec);
+
     if(lex.LookAhead(0)=='=')
     {
+      if(declarator.get_has_ellipsis())
+        return false;
+
       typet default_type;
+
       lex.get_token(tk1);
       if(!rTypeName(default_type))
-          return false;
+        return false;
 
-      // decl=Ptree::Nconc(decl, Ptree::List(new Leaf(tk1),
-      //                                      default_type));
+      declarator.value()=exprt(ID_type);
+      declarator.value().type().swap(default_type);
     }
   }
   else
@@ -1485,6 +1514,10 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
     return false;
 
   cpp_member_spect member_spec;
+  if(!optMemberSpec(member_spec))
+    return false;
+  if(!optAttribute(declaration.type()))
+    return false;
   if(!optMemberSpec(member_spec))
     return false;
 
@@ -2051,8 +2084,6 @@ bool Parser::isPtrToMember(int i)
 */
 bool Parser::optMemberSpec(cpp_member_spect &member_spec)
 {
-  member_spec.clear();
-
   int t=lex.LookAhead(0);
 
   while(
@@ -2502,6 +2533,17 @@ bool Parser::optAttribute(typet &t)
         break;
       }
 
+      case TOK_GCC_IDENTIFIER:
+        if(tk.text == "clang" && lex.LookAhead(0) == TOK_SCOPE)
+        {
+          exprt discarded;
+          if(!rExpression(discarded, false))
+            return false;
+        }
+        else
+          return false;
+        break;
+
     default:
       // TODO: way may wish to change this: GCC, Clang, Visual Studio merely
       // warn when they see an attribute that they don't recognize
@@ -2737,8 +2779,34 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 
     return true;
   }
+  else if(t == TOK_ATOMIC_TYPE_SPECIFIER)
+  {
+#ifdef DEBUG
+    std::cout << std::string(__indent, ' ')
+              << "Parser::optIntegralTypeOrClassSpec 9\n";
+#endif // DEBUG
+    cpp_tokent atomic_tk;
+    lex.get_token(atomic_tk);
+
+    cpp_tokent tk;
+    if(lex.get_token(tk)!='(')
+      return false;
+
+    // the argument is always a type
+    if(!rTypeSpecifier(p, false))
+      return false;
+
+    if(lex.get_token(tk)!=')')
+      return false;
+
+    return true;
+  }
   else
   {
+#ifdef DEBUG
+    std::cout << std::string(__indent, ' ')
+              << "Parser::optIntegralTypeOrClassSpec 10\n";
+#endif // DEBUG
     p.make_nil();
     return true;
   }
@@ -3774,7 +3842,7 @@ bool Parser::rName(irept &name)
         components.back().add(ID_expr_arg).swap(expr);
 
         if(lex.LookAhead(0) != TOK_SCOPE)
-          return false;
+          return true;
       }
       break;
 
@@ -4549,6 +4617,9 @@ bool Parser::rEnumSpec(typet &spec)
     spec.set(ID_C_class, true);
   }
 
+  if(!optAttribute(spec))
+    return false;
+
   if(lex.LookAhead(0)!='{' &&
      lex.LookAhead(0)!=':')
   {
@@ -4715,7 +4786,7 @@ bool Parser::rClassSpec(typet &spec)
   if(!optAttribute(spec))
     return false;
 
-  if(lex.LookAhead(0)=='{')
+  if(lex.LookAhead(0)=='{' || lex.LookAhead(0) == ':')
   {
     // no tag
 #ifdef DEBUG
@@ -4734,21 +4805,21 @@ bool Parser::rClassSpec(typet &spec)
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rClassSpec 5\n";
 #endif
+  }
 
-    t=lex.LookAhead(0);
+  t=lex.LookAhead(0);
 
-    if(t==':')
-    {
-      if(!rBaseSpecifiers(spec.add(ID_bases)))
-        return false;
-    }
-    else if(t=='{')
-    {
-    }
-    else
-    {
-      return true;
-    }
+  if(t==':')
+  {
+    if(!rBaseSpecifiers(spec.add(ID_bases)))
+      return false;
+  }
+  else if(t=='{')
+  {
+  }
+  else
+  {
+    return true;
   }
 
 #ifdef DEBUG
@@ -6721,7 +6792,10 @@ bool Parser::rPostfixExpr(exprt &exp)
   }
 
 #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 1\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 1 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << '\n';
 #endif
 
   exprt e;
@@ -7276,16 +7350,7 @@ bool Parser::rVarName(exprt &name)
               << '\n';
 #endif
 
-  if(rVarNameCore(name))
-    return true;
-  else
-    return false;
-}
-
-bool Parser::rVarNameCore(exprt &name)
-{
 #ifdef DEBUG
-  indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rVarNameCore 0\n";
 #endif
 
@@ -7458,7 +7523,7 @@ bool Parser::moreVarName()
 /*
   template.args : '<' any* '>'
 
-  template.args must be followed by '(' or '::'
+  template.args must be followed by '(', '::', or ';'
 */
 bool Parser::maybeTemplateArgs()
 {
@@ -7480,7 +7545,8 @@ bool Parser::maybeTemplateArgs()
         return false;
       else if((u=='>' || u==TOK_SHIFTRIGHT) &&
               (lex.LookAhead(i)==TOK_SCOPE || lex.LookAhead(i)=='(' ||
-               lex.LookAhead(i)==')'))
+               lex.LookAhead(i)==')' || lex.LookAhead(i) == '}' ||
+               lex.LookAhead(i) == ',' || lex.LookAhead(i) == ';'))
         return true;
     }
 #else
@@ -7903,7 +7969,9 @@ std::optional<codet> Parser::rStatement()
       if(!rUsing(cpp_using))
         return {};
 
-      UNIMPLEMENTED;
+      codet statement(ID_cpp_using);
+      // UNIMPLEMENTED;
+      return std::move(statement);
     }
 
   case TOK_STATIC_ASSERT:
@@ -7918,6 +7986,14 @@ std::optional<codet> Parser::rStatement()
       statement.operands().swap(cpp_static_assert.operands());
 
       return std::move(statement);
+    }
+
+  case '[':
+    {
+      typet discard;
+      if(!optAttribute(discard))
+        return {};
+      return code_blockt{};
     }
 
   default:
