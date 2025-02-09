@@ -3750,6 +3750,34 @@ bool Parser::rName(irept &name)
         return true;
       break;
 
+    case TOK_DECLTYPE:
+#ifdef DEBUG
+      std::cout << std::string(__indent, ' ') << "Parser::rName 9\n";
+#endif
+      lex.get_token(tk);
+      {
+        components.push_back(typet{ID_decltype});
+        set_location(components.back(), tk);
+
+        if(lex.get_token(tk)!='(')
+          return false;
+
+        // the argument is always an expression
+
+        exprt expr;
+        if(!rCommaExpression(expr))
+          return false;
+
+        if(lex.get_token(tk)!=')')
+          return false;
+
+        components.back().add(ID_expr_arg).swap(expr);
+
+        if(lex.LookAhead(0) != TOK_SCOPE)
+          return false;
+      }
+      break;
+
     default:
       return false;
     }
@@ -7215,14 +7243,6 @@ bool Parser::rPrimaryExpr(exprt &exp)
     if(!rVarName(exp))
       return false;
 
-    if(lex.LookAhead(0)==TOK_SCOPE)
-    {
-      lex.get_token(tk);
-
-      // exp=new PtreeStaticUserStatementExpr(exp,
-      //                        Ptree::Cons(new Leaf(tk), exp2));
-      // TODO
-    }
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 17\n";
 #endif
@@ -7384,6 +7404,34 @@ bool Parser::rVarNameCore(exprt &name)
         components.push_back(op);
       }
       return true;
+
+    case TOK_DECLTYPE:
+#ifdef DEBUG
+      std::cout << std::string(__indent, ' ') << "Parser::rVarNameCore 8\n";
+#endif
+      lex.get_token(tk);
+      {
+        components.push_back(typet{ID_decltype});
+        set_location(components.back(), tk);
+
+        if(lex.get_token(tk)!='(')
+          return false;
+
+        // the argument is always an expression
+
+        exprt expr;
+        if(!rCommaExpression(expr))
+          return false;
+
+        if(lex.get_token(tk)!=')')
+          return false;
+
+        components.back().add(ID_expr_arg).swap(expr);
+
+        if(lex.LookAhead(0) != TOK_SCOPE)
+          return false;
+      }
+      break;
 
     default:
       return false;
