@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_member_spec.h"
 #include "cpp_enum_type.h"
 
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
 #include <iostream>
 
@@ -3157,7 +3157,10 @@ bool Parser::rDeclarator(
   }
 
 #ifdef DEBUG
-  std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 2\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 2 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << '\n';
 #endif
 
   t=lex.LookAhead(0);
@@ -3621,7 +3624,11 @@ bool Parser::rName(irept &name)
 {
 #ifdef DEBUG
   indenter _i;
-  std::cout << std::string(__indent, ' ') << "Parser::rName 0\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rName 0 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << ' ' << lex.Save()
+              << '\n';
 #endif
 
   name=cpp_namet();
@@ -4167,9 +4174,20 @@ bool Parser::rArgDeclListOrInit(
   bool &is_args,
   bool maybe_init)
 {
+#ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rArgDeclListOrInit 0 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << '\n';
+#endif
+
   cpp_token_buffert::post pos=lex.Save();
   if(maybe_init)
   {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rArgDeclListOrInit 1" << std::endl;
+#endif
     if(rFunctionArguments(arglist))
       if(lex.LookAhead(0)==')')
       {
@@ -4183,12 +4201,18 @@ bool Parser::rArgDeclListOrInit(
   }
   else
   {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rArgDeclListOrInit 2" << std::endl;
+#endif
     is_args = rArgDeclList(arglist);
 
     if(is_args)
       return true;
     else
     {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rArgDeclListOrInit 3" << std::endl;
+#endif
       lex.Restore(pos);
       // encode.Clear();
       return rFunctionArguments(arglist);
@@ -4203,11 +4227,22 @@ bool Parser::rArgDeclListOrInit(
 */
 bool Parser::rArgDeclList(irept &arglist)
 {
+#ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rArgDeclList 0 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << '\n';
+#endif
+
   irept list;
 
   list.clear();
   for(;;)
   {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rArgDeclList 1" << std::endl;
+#endif
     cpp_declarationt declaration;
 
     int t=lex.LookAhead(0);
@@ -4215,6 +4250,9 @@ bool Parser::rArgDeclList(irept &arglist)
       break;
     else if(t==TOK_ELLIPSIS)
     {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rArgDeclList 2" << std::endl;
+#endif
       cpp_tokent tk;
       lex.get_token(tk);
       list.get_sub().push_back(irept(ID_ellipsis));
@@ -4222,6 +4260,12 @@ bool Parser::rArgDeclList(irept &arglist)
     }
     else if(rArgDeclaration(declaration))
     {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rArgDeclList 3 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << '\n';
+#endif
       cpp_tokent tk;
 
       list.get_sub().push_back(irept(irep_idt()));
@@ -4306,7 +4350,7 @@ bool Parser::rInitializeExpr(exprt &expr)
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rInitializeExpr 0 "
               << lex.LookAhead(0)
-              << ' ' << lex.current_token().text
+              << ' ' << lex.peek().text
               << '\n';
 #endif
 
@@ -4402,6 +4446,11 @@ bool Parser::rInitializeExpr(exprt &expr)
 */
 bool Parser::rFunctionArguments(exprt &args)
 {
+#ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rFunctionArguments 1\n";
+#endif
+
   exprt exp;
   cpp_tokent tk;
 
@@ -4411,10 +4460,18 @@ bool Parser::rFunctionArguments(exprt &args)
 
   for(;;)
   {
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rFunctionArguments 2\n";
+#endif
+
     if(!rInitializeExpr(exp))
       return false;
 
     args.add_to_operands(std::move(exp));
+
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rFunctionArguments 3\n";
+#endif
 
     if(lex.LookAhead(0)==TOK_ELLIPSIS &&
        (lex.LookAhead(1)==')' || lex.LookAhead(1)==','))
@@ -5111,7 +5168,10 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
 {
 #ifdef DEBUG
   indenter _i;
-  std::cout << std::string(__indent, ' ') << "Parser::rLogicalOrExpr 0\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rLogicalOrExpr 0 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << '\n';
 #endif
 
   if(!rLogicalAndExpr(exp, template_args))
@@ -6518,7 +6578,11 @@ bool Parser::rPostfixExpr(exprt &exp)
 {
 #ifdef DEBUG
   indenter _i;
-  std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << ' ' << lex.Save()
+              << '\n';
 #endif
 
   typet type;
@@ -6574,13 +6638,16 @@ bool Parser::rPostfixExpr(exprt &exp)
   else
   {
     lex.Restore(pos);
+#ifdef DEBUG
+  std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0.2\n";
+#endif
 
     exprt type_or_function_name;
     if(rName(type_or_function_name) &&
        (lex.LookAhead(0) == '(' || lex.LookAhead(0) == '{'))
     {
 #ifdef DEBUG
-      std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0.2\n";
+      std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0.3\n";
 #endif
 
       cpp_tokent tk;
@@ -6612,6 +6679,9 @@ bool Parser::rPostfixExpr(exprt &exp)
     }
     else
     {
+#ifdef DEBUG
+      std::cout << std::string(__indent, ' ') << "Parser::rPostfixExpr 0.4\n";
+#endif
       lex.Restore(pos);
       if(!rPrimaryExpr(exp))
         return false;
@@ -7011,7 +7081,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 0 "
-            << lex.LookAhead(0) << ' ' << lex.current_token().text << '\n';
+            << lex.LookAhead(0) << ' ' << lex.peek().text << '\n';
 #endif
 
   switch(lex.LookAhead(0))
@@ -7175,7 +7245,11 @@ bool Parser::rVarName(exprt &name)
 {
 #ifdef DEBUG
   indenter _i;
-  std::cout << std::string(__indent, ' ') << "Parser::rVarName 0\n";
+  std::cout << std::string(__indent, ' ') << "Parser::rVarName 0 "
+              << lex.LookAhead(0)
+              << ' ' << lex.peek().text
+              << ' ' << lex.Save()
+              << '\n';
 #endif
 
   if(rVarNameCore(name))
