@@ -1215,7 +1215,7 @@ bool Parser::rTempArgList(irept &args)
   : CLASS [Identifier] {'=' type.name}
   | CLASS Ellipsis [Identifier]
   | type.specifier arg.declarator {'=' conditional.expr}
-  | template.decl2 CLASS Identifier {'=' type.name}
+  | template.decl2 CLASS {Identifier {'=' type.name}}
 */
 bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 {
@@ -1340,9 +1340,14 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     cpp_tokent tk1, tk2;
 
-    if(lex.get_token(tk1) != TOK_CLASS || !is_identifier(lex.get_token(tk2)))
+    if(lex.get_token(tk1) != TOK_CLASS)
       return false;
 
+    if(lex.LookAhead(0) == ',')
+      return true;
+
+    if(!is_identifier(lex.get_token(tk2)))
+      return false;
     // Ptree cspec=new PtreeClassSpec(new LeafReserved(tk1),
     //                                  Ptree::Cons(new Leaf(tk2),nil),
     //                                  nil);
@@ -3144,6 +3149,13 @@ bool Parser::rDeclarator(
   if(!rDeclaratorQualifier())
     return false;
 
+  if(lex.LookAhead(0)==TOK_ELLIPSIS)
+  {
+    cpp_tokent tk;
+    lex.get_token(tk);
+    d_outer.set(ID_ellipsis, true);
+  }
+
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 2\n";
 #endif
@@ -4095,6 +4107,12 @@ bool Parser::rTemplateArgs(irept &template_args)
 
       if(!rConditionalExpr(exp, true))
         return false;
+
+      if(lex.LookAhead(0)==TOK_ELLIPSIS)
+      {
+        lex.get_token(tk1);
+        exp.set(ID_ellipsis, true);
+      }
     }
 
 #ifdef DEBUG
@@ -4208,14 +4226,15 @@ bool Parser::rArgDeclList(irept &arglist)
 
       list.get_sub().push_back(irept(irep_idt()));
       list.get_sub().back().swap(declaration);
-      t=lex.LookAhead(0);
-      if(t==',')
-        lex.get_token(tk);
-      else if(t==TOK_ELLIPSIS)
+      if(lex.LookAhead(0)==TOK_ELLIPSIS)
       {
         lex.get_token(tk);
         list.get_sub().push_back(irept(ID_ellipsis));
       }
+
+      t=lex.LookAhead(0);
+      if(t==',')
+        lex.get_token(tk);
       else if(t!=')' && t!=TOK_ELLIPSIS)
         return false;
     }
