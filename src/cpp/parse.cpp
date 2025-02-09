@@ -2458,7 +2458,7 @@ bool Parser::rGCCAttribute(typet &t)
 
 bool Parser::optAttribute(typet &t)
 {
-  if(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
+  while(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
   {
     lex.get_token();
 
@@ -4626,6 +4626,10 @@ bool Parser::rEnumBody(irept &body)
     irept &n=body.get_sub().back();
     set_location(n, tk);
     n.set(ID_name, tk.data.get(ID_C_base_name));
+
+    typet discarded_attribute;
+    if(!optAttribute(discarded_attribute))
+      return false;
 
     if(lex.LookAhead(0, tk2)=='=') // set the constant
     {
