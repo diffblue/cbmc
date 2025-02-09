@@ -3149,7 +3149,7 @@ bool Parser::rDeclarator(
   if(!rDeclaratorQualifier())
     return false;
 
-  if(lex.LookAhead(0)==TOK_ELLIPSIS)
+  if(lex.LookAhead(0)==TOK_ELLIPSIS && lex.LookAhead(1)!=')')
   {
     cpp_tokent tk;
     lex.get_token(tk);
