@@ -1,6 +1,5 @@
 var NAVTREEINDEX72 =
 {
-"compilation-and-development.html#compilation-and-development-section-running-tests":[0,4,7,1],
 "compilation-and-development.html#compilation-and-development-section-time-profiling":[0,4,7,5],
 "compilation-and-development.html#compilation-and-development-subsection-cmake-files":[0,4,7,0,1],
 "compilation-and-development.html#compilation-and-development-subsection-coverage":[0,4,7,1,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX72 =
 "contracts-user-cli.html":[1,0,11],
 "contracts-user-cli.html#autotoc_md74":[1,0,11,0],
 "contracts-user-cli.html#autotoc_md75":[1,0,11,1],
-"contracts-user.html":[1,0]
+"contracts-user.html":[1,0],
+"contracts_8cpp.html":[8,0,2,15,1,3]
 };

@@ -131,9 +131,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a502de850e529a8dc9395c3839142740c" id="r_a502de850e529a8dc9395c3839142740c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnamespace__baset.html#a502de850e529a8dc9395c3839142740c">follow_macros</a> (<a class="el" href="classexprt.html">exprt</a> &amp;) <a class="el" href="classait.html">const</a></td></tr>
 <tr class="memdesc:a502de850e529a8dc9395c3839142740c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Follow macros to their values in a given expression.  <br /></td></tr>
 <tr class="separator:a502de850e529a8dc9395c3839142740c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08ff1828dbaf894a44a23f50a700255a" id="r_a08ff1828dbaf894a44a23f50a700255a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a">follow</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;) <a class="el" href="classait.html">const</a></td></tr>
-<tr class="memdesc:a08ff1828dbaf894a44a23f50a700255a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resolve type symbol to the type it points to.  <br /></td></tr>
-<tr class="separator:a08ff1828dbaf894a44a23f50a700255a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a5ad94024723d598ae0b8b67e7a3710" id="r_a9a5ad94024723d598ae0b8b67e7a3710"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classunion__typet.html">union_typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710">follow_tag</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classunion__tag__typet.html">union_tag_typet</a> &amp;) <a class="el" href="classait.html">const</a></td></tr>
 <tr class="memdesc:a9a5ad94024723d598ae0b8b67e7a3710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Follow type tag of union type.  <br /></td></tr>
 <tr class="separator:a9a5ad94024723d598ae0b8b67e7a3710"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,7 +154,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>Basic interface for a namespace. </p>
 <p>This is not used in practice, as the one being used is <a class="el" href="classnamespacet.html">namespacet</a> which uses two symbol tables, and <a class="el" href="classmulti__namespacet.html">multi_namespacet</a> which can combine more than two. </p>
 
-<p class="definition">Definition at line <a class="el" href="namespace_8h_source.html#l00036">36</a> of file <a class="el" href="namespace_8h_source.html">namespace.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="namespace_8h_source.html#l00035">35</a> of file <a class="el" href="namespace_8h_source.html">namespace.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abe5c53b1b62505c9659705752d62f4c0" name="abe5c53b1b62505c9659705752d62f4c0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abe5c53b1b62505c9659705752d62f4c0">&#9670;&#160;</a></span>~namespace_baset()</h2>
@@ -187,37 +184,6 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a08ff1828dbaf894a44a23f50a700255a" name="a08ff1828dbaf894a44a23f50a700255a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08ff1828dbaf894a44a23f50a700255a">&#9670;&#160;</a></span>follow()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp; namespace_baset::follow </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
-          <td class="paramname"><em>src</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Resolve type symbol to the type it points to. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000022">Deprecated:</a></b></dt><dd>"deprecated since " "2024" "-" "2" "-" "19" "; " "use follow_tag(...) instead" <br  />
- </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">src</td><td>The type we want to resolve in the symbol table. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The resolved type. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00049">49</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a502de850e529a8dc9395c3839142740c" name="a502de850e529a8dc9395c3839142740c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a502de850e529a8dc9395c3839142740c">&#9670;&#160;</a></span>follow_macros()</h2>
 
@@ -242,7 +208,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00107">107</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00093">93</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
 
 </div>
 </div>
@@ -271,7 +237,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The type of the enum tag in the symbol table. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00087">87</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00073">73</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
 
 </div>
 </div>
@@ -293,7 +259,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Resolve a <code><a class="el" href="classstruct__tag__typet.html" title="A struct tag type, i.e., struct_typet with an identifier.">struct_tag_typet</a></code> or <code><a class="el" href="classunion__tag__typet.html" title="A union tag type, i.e., union_typet with an identifier.">union_tag_typet</a></code> to the complete version. </p>
 
-<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00097">97</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00083">83</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
 
 </div>
 </div>
@@ -322,7 +288,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The type of the struct tag in the symbol table. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00075">75</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00061">61</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
 
 </div>
 </div>
@@ -351,7 +317,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The type of the union tag in the symbol table. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00063">63</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="namespace_8cpp_source.html#l00049">49</a> of file <a class="el" href="namespace_8cpp_source.html">namespace.cpp</a>.</p>
 
 </div>
 </div>
@@ -389,7 +355,7 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the symbol found. </dd></dl>
 <dl class="section remark"><dt>Remarks</dt><dd>: It is a PRECONDITION that the symbol name exists in the namespace. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="namespace_8h_source.html#l00046">46</a> of file <a class="el" href="namespace_8h_source.html">namespace.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="namespace_8h_source.html#l00045">45</a> of file <a class="el" href="namespace_8h_source.html">namespace.h</a>.</p>
 
 </div>
 </div>

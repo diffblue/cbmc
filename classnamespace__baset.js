@@ -1,7 +1,6 @@
 var classnamespace__baset =
 [
     [ "~namespace_baset", "classnamespace__baset.html#abe5c53b1b62505c9659705752d62f4c0", null ],
-    [ "follow", "classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a", null ],
     [ "follow_macros", "classnamespace__baset.html#a502de850e529a8dc9395c3839142740c", null ],
     [ "follow_tag", "classnamespace__baset.html#a1dd4e7c520bf6fa01b07276b786360a8", null ],
     [ "follow_tag", "classnamespace__baset.html#ae3799dedcee82ca3d64174f1d43d3cf2", null ],

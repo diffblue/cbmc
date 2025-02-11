@@ -1,6 +1,5 @@
 var NAVTREEINDEX60 =
 {
-"classsmt2__convt.html#a962fb170a091d392e1d1c45e94373ce4":[7,0,1095,65],
 "classsmt2__convt.html#a9795fecf70f0723ce27376b3747d10ce":[7,0,1095,74],
 "classsmt2__convt.html#a9bc0eee3d659f8f9e4954aff5272fbda":[7,0,1095,6],
 "classsmt2__convt.html#aa4a2b1dc9a0236c9d5c9094578be94f0":[7,0,1095,69],
@@ -58,16 +57,16 @@ var NAVTREEINDEX60 =
 "classsmt2__dect.html#ab9c841fcf12f1a6e6315faa652d7c5ea":[7,0,1096,3],
 "classsmt2__dect.html#ae49fa23afe3eb63ef032412b6a8364d5":[7,0,1096,4],
 "classsmt2__encoding__targett.html":[7,0,1097],
-"classsmt2__encoding__targett.html#a2ea0a7b729657873046737b10b461e11":[7,0,1097,7],
 "classsmt2__encoding__targett.html#a2ea0a7b729657873046737b10b461e11":[7,0,1097,8],
+"classsmt2__encoding__targett.html#a2ea0a7b729657873046737b10b461e11":[7,0,1097,7],
 "classsmt2__encoding__targett.html#a3b544e909c64c975c47f20a08f4c9657":[7,0,1097,0],
 "classsmt2__encoding__targett.html#a3b544e909c64c975c47f20a08f4c9657":[7,0,1097,2],
 "classsmt2__encoding__targett.html#a6dace009ac6648183789af644913716a":[7,0,1097,4],
 "classsmt2__encoding__targett.html#a73c4618809cdacca240b75559336cf68":[7,0,1097,5],
 "classsmt2__encoding__targett.html#a73c4618809cdacca240b75559336cf68":[7,0,1097,6],
 "classsmt2__encoding__targett.html#a8f1d3ca5d3eb6f0f1896d1c32570fec3":[7,0,1097,9],
-"classsmt2__encoding__targett.html#a9043a2837d27612018b4bcaacd5dc208":[7,0,1097,1],
 "classsmt2__encoding__targett.html#a9043a2837d27612018b4bcaacd5dc208":[7,0,1097,3],
+"classsmt2__encoding__targett.html#a9043a2837d27612018b4bcaacd5dc208":[7,0,1097,1],
 "classsmt2__encoding__targett.html#ab582aabff4d17cf6b3fc49816913f5bf":[7,0,1097,10],
 "classsmt2__encoding__targett.html#aeda22675f6e4545b81acb0aa26e2ed09":[7,0,1097,11],
 "classsmt2__incremental__decision__proceduret.html":[7,0,1099],
@@ -249,5 +248,6 @@ var NAVTREEINDEX60 =
 "classsmt__bit__vector__theoryt.html":[7,0,1114],
 "classsmt__bit__vector__theoryt.html#a05f7d3348ccdd6cc0e3d862cf79249da":[7,0,1114,67],
 "classsmt__bit__vector__theoryt.html#a14db5528c75e65bbab7d89f3cbc09ff4":[7,0,1114,47],
-"classsmt__bit__vector__theoryt.html#a1bd836e4aa0ca4bca21d0d3eb23d89fa":[7,0,1114,65]
+"classsmt__bit__vector__theoryt.html#a1bd836e4aa0ca4bca21d0d3eb23d89fa":[7,0,1114,65],
+"classsmt__bit__vector__theoryt.html#a1e00ada4b9d6e57760afcdeb3e1fedef":[7,0,1114,58]
 };
