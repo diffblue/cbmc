@@ -1,5 +1,6 @@
 var NAVTREEINDEX57 =
 {
+"classsatcheck__minisat__simplifiert.html#ae236b34c15866e669e21f6d6c964626d":[7,0,1045,2],
 "classsatcheck__picosatt.html":[7,0,1046],
 "classsatcheck__picosatt.html#a0ac09afa5140cb452868f9764c1fd965":[7,0,1046,1],
 "classsatcheck__picosatt.html#a1e8dc8d125c977e7f34ffd016e7b86b3":[7,0,1046,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX57 =
 "classsharing__mapt_1_1delta__view__itemt.html#a1be2f2989f4817c93395e7262717ecb2":[7,0,1063,0,2],
 "classsharing__mapt_1_1delta__view__itemt.html#a481a8bc65c4846246965da96445954c1":[7,0,1063,0,6],
 "classsharing__mapt_1_1delta__view__itemt.html#a63bf5fefc805f3a501a5ee7f30356eb6":[7,0,1063,0,0],
-"classsharing__mapt_1_1delta__view__itemt.html#a855c706131aec8c945894915ff392acd":[7,0,1063,0,4],
-"classsharing__mapt_1_1delta__view__itemt.html#abc7a4bb229ec74700240dfc519653620":[7,0,1063,0,3]
+"classsharing__mapt_1_1delta__view__itemt.html#a855c706131aec8c945894915ff392acd":[7,0,1063,0,4]
 };

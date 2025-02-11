@@ -5,6 +5,7 @@ var classieee__floatt =
       [ "ROUND_TO_MINUS_INF", "classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5ab6b757a07e9aa93231ff7c68d235ac63", null ],
       [ "ROUND_TO_PLUS_INF", "classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a4414573d0272c608ca990b33d307bd46", null ],
       [ "ROUND_TO_ZERO", "classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a2621328d5b01becd0d4cbc87945671fe", null ],
+      [ "ROUND_TO_AWAY", "classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a99ce844b7db13fad4c7e0442840a61fe", null ],
       [ "UNKNOWN", "classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a999344fd37a8812faa6d3147e3a79f25", null ],
       [ "NONDETERMINISTIC", "classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a1b27d226a427e2ecd2a5bb5b5367c0ae", null ]
     ] ],

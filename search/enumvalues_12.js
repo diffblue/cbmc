@@ -27,9 +27,10 @@ var searchData=
   ['root_5fscope_24',['ROOT_SCOPE',['../classcpp__idt.html#a5a7813531d46081e1a04df4b3ced3b50ad939b380bd895837cf94418281d6f4b6',1,'cpp_idt']]],
   ['rotate_5fleft_25',['ROTATE_LEFT',['../classbv__utilst.html#aa0f3ee3af1950795702240672d2ab262a5d167d235f5a8880ec432fc13206106f',1,'bv_utilst']]],
   ['rotate_5fright_26',['ROTATE_RIGHT',['../classbv__utilst.html#aa0f3ee3af1950795702240672d2ab262a17ac59a0d27b38c77bd02f3bcefd5728',1,'bv_utilst']]],
-  ['round_5fto_5feven_27',['ROUND_TO_EVEN',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5aafff1a3b5dba4ec1746fbe14f7f562a2',1,'ieee_floatt']]],
-  ['round_5fto_5fminus_5finf_28',['ROUND_TO_MINUS_INF',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5ab6b757a07e9aa93231ff7c68d235ac63',1,'ieee_floatt']]],
-  ['round_5fto_5fplus_5finf_29',['ROUND_TO_PLUS_INF',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a4414573d0272c608ca990b33d307bd46',1,'ieee_floatt']]],
-  ['round_5fto_5fzero_30',['ROUND_TO_ZERO',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a2621328d5b01becd0d4cbc87945671fe',1,'ieee_floatt']]],
-  ['running_31',['RUNNING',['../classpiped__processt.html#aafb07ee63f8650b8a358470d6231116da43491564ebcfd38568918efbd6e840fd',1,'piped_processt']]]
+  ['round_5fto_5faway_27',['ROUND_TO_AWAY',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a99ce844b7db13fad4c7e0442840a61fe',1,'ieee_floatt']]],
+  ['round_5fto_5feven_28',['ROUND_TO_EVEN',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5aafff1a3b5dba4ec1746fbe14f7f562a2',1,'ieee_floatt']]],
+  ['round_5fto_5fminus_5finf_29',['ROUND_TO_MINUS_INF',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5ab6b757a07e9aa93231ff7c68d235ac63',1,'ieee_floatt']]],
+  ['round_5fto_5fplus_5finf_30',['ROUND_TO_PLUS_INF',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a4414573d0272c608ca990b33d307bd46',1,'ieee_floatt']]],
+  ['round_5fto_5fzero_31',['ROUND_TO_ZERO',['../classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a2621328d5b01becd0d4cbc87945671fe',1,'ieee_floatt']]],
+  ['running_32',['RUNNING',['../classpiped__processt.html#aafb07ee63f8650b8a358470d6231116da43491564ebcfd38568918efbd6e840fd',1,'piped_processt']]]
 ];

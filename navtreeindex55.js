@@ -1,5 +1,6 @@
 var NAVTREEINDEX55 =
 {
+"classreference__counting.html#ae6a28795472019d5b62ecb425034f701":[7,0,994,10],
 "classreference__counting.html#af43283338c416d0f5fe675097684e288":[7,0,994,9],
 "classreference__counting.html#afbc953ef7fffcc59430283e35ff02dc4":[7,0,994,13],
 "classreference__counting_1_1dt.html":[7,0,994,0],
@@ -212,8 +213,8 @@ var NAVTREEINDEX55 =
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html":[7,0,1,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[6,0,6,0,2],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[7,0,1,0,2],
-"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[7,0,1,0,1],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[6,0,6,0,1],
+"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[7,0,1,0,1],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ad237205052e4ff0c9b5cc7fac680fc96":[6,0,6,0,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ad237205052e4ff0c9b5cc7fac680fc96":[7,0,1,0,0],
 "classresolution__prooft.html":[7,0,1014],
@@ -248,6 +249,5 @@ var NAVTREEINDEX55 =
 "classrw__guarded__range__set__value__sett.html#a508504db7a0b181e0f4ea13af806ce0b":[7,0,1018,0],
 "classrw__guarded__range__set__value__sett.html#a5158ea7c2f5049ef2637fa15f27e0264":[7,0,1018,5],
 "classrw__guarded__range__set__value__sett.html#a5329822fe43c8b700939ab86dba94762":[7,0,1018,10],
-"classrw__guarded__range__set__value__sett.html#a6863bcbdb12ad601a08a2c877b047e0d":[7,0,1018,11],
-"classrw__guarded__range__set__value__sett.html#a7bf764f82862d5ba7f77ceeb928d1abe":[7,0,1018,2]
+"classrw__guarded__range__set__value__sett.html#a6863bcbdb12ad601a08a2c877b047e0d":[7,0,1018,11]
 };
