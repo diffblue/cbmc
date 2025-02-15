@@ -10,6 +10,7 @@ var classieee__floatt =
       [ "NONDETERMINISTIC", "classieee__floatt.html#adaf43650c65e11349d61e08fd2df7ed5a1b27d226a427e2ecd2a5bb5b5367c0ae", null ]
     ] ],
     [ "ieee_floatt", "classieee__floatt.html#ae4e6873ac44c56b89368245ebbb8e2f1", null ],
+    [ "ieee_floatt", "classieee__floatt.html#a225489b41fbf11807f4860cc0a643ed8", null ],
     [ "ieee_floatt", "classieee__floatt.html#a8c0eb26d08645aa29305f1e3439d9d72", null ],
     [ "ieee_floatt", "classieee__floatt.html#ab24fd41cf593ab93e7fcb0d1c54aaafd", null ],
     [ "ieee_floatt", "classieee__floatt.html#a1c1ddf5603b4c8a4f24099cc999b5d99", null ],
@@ -23,6 +24,7 @@ var classieee__floatt =
     [ "operator+=", "classieee__floatt.html#a486687e6bd81029de215e88156afd4bd", null ],
     [ "operator-=", "classieee__floatt.html#a9133c39093207936382d70f42c9d700d", null ],
     [ "operator/=", "classieee__floatt.html#aa129bb65251c29bbabf3e4108a30cc29", null ],
+    [ "round_to_integral", "classieee__floatt.html#af714d5fd822f349693bf012b0706ca33", null ],
     [ "rounding_mode", "classieee__floatt.html#ad1d0abf3c510e28961a9d3c2b8daa90f", null ],
     [ "rounding_mode_expr", "classieee__floatt.html#a7350df2f7646e4ec69e4ac41ad566cfa", null ],
     [ "to_double", "classieee__floatt.html#aa07f020daf365aeb306dbbd0657282a3", null ],

@@ -1,6 +1,7 @@
 var floatbv__expr_8h =
 [
     [ "floatbv_typecast_exprt", "classfloatbv__typecast__exprt.html", "classfloatbv__typecast__exprt" ],
+    [ "floatbv_round_to_integral_exprt", "classfloatbv__round__to__integral__exprt.html", "classfloatbv__round__to__integral__exprt" ],
     [ "isnan_exprt", "classisnan__exprt.html", "classisnan__exprt" ],
     [ "isinf_exprt", "classisinf__exprt.html", "classisinf__exprt" ],
     [ "isfinite_exprt", "classisfinite__exprt.html", "classisfinite__exprt" ],
@@ -10,6 +11,7 @@ var floatbv__expr_8h =
     [ "ieee_float_op_exprt", "classieee__float__op__exprt.html", "classieee__float__op__exprt" ],
     [ "floatbv_mod_exprt", "classfloatbv__mod__exprt.html", "classfloatbv__mod__exprt" ],
     [ "floatbv_rem_exprt", "classfloatbv__rem__exprt.html", "classfloatbv__rem__exprt" ],
+    [ "can_cast_expr< floatbv_round_to_integral_exprt >", "floatbv__expr_8h.html#a908f6ab3487a44acf56fd0e6a3576a5c", null ],
     [ "can_cast_expr< floatbv_typecast_exprt >", "floatbv__expr_8h.html#a037e0724e9cfbec3cd9608ac019488f5", null ],
     [ "can_cast_expr< ieee_float_equal_exprt >", "floatbv__expr_8h.html#ab2fa91a6eeff47f564e1b82632adc7c2", null ],
     [ "can_cast_expr< ieee_float_notequal_exprt >", "floatbv__expr_8h.html#adeb4bf2e029c1e9d0a14e479d673c3b6", null ],
@@ -23,6 +25,8 @@ var floatbv__expr_8h =
     [ "to_floatbv_mod_expr", "floatbv__expr_8h.html#a8b0e2b7ce2390f245f87c4e525501eb7", null ],
     [ "to_floatbv_rem_expr", "floatbv__expr_8h.html#ab20844a531cb3973d9c78869fd496ee2", null ],
     [ "to_floatbv_rem_expr", "floatbv__expr_8h.html#a39decbabb0996b4cdd7560d422211dfa", null ],
+    [ "to_floatbv_round_to_integral_expr", "floatbv__expr_8h.html#a35277f202ea1ff0691f76d3e7ccf8822", null ],
+    [ "to_floatbv_round_to_integral_expr", "floatbv__expr_8h.html#a86eca867ed8df429fa03aed00e59459a", null ],
     [ "to_floatbv_typecast_expr", "floatbv__expr_8h.html#ae1a4652991d4f5fcb04c525c3009fda9", null ],
     [ "to_floatbv_typecast_expr", "floatbv__expr_8h.html#a66010764a8bc4672304983313065f195", null ],
     [ "to_ieee_float_equal_expr", "floatbv__expr_8h.html#a39a6f8f7930dff710e16d8956913c8af", null ],

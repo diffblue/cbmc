@@ -508,6 +508,7 @@ var annotated_dup =
     [ "float_utilst", "classfloat__utilst.html", "classfloat__utilst" ],
     [ "floatbv_mod_exprt", "classfloatbv__mod__exprt.html", "classfloatbv__mod__exprt" ],
     [ "floatbv_rem_exprt", "classfloatbv__rem__exprt.html", "classfloatbv__rem__exprt" ],
+    [ "floatbv_round_to_integral_exprt", "classfloatbv__round__to__integral__exprt.html", "classfloatbv__round__to__integral__exprt" ],
     [ "floatbv_typecast_exprt", "classfloatbv__typecast__exprt.html", "classfloatbv__typecast__exprt" ],
     [ "floatbv_typet", "classfloatbv__typet.html", "classfloatbv__typet" ],
     [ "flow_insensitive_abstract_domain_baset", "classflow__insensitive__abstract__domain__baset.html", "classflow__insensitive__abstract__domain__baset" ],

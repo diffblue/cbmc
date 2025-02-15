@@ -1578,6 +1578,7 @@ var hierarchy =
               [ "factorial_power_exprt", "classfactorial__power__exprt.html", null ],
               [ "floatbv_mod_exprt", "classfloatbv__mod__exprt.html", null ],
               [ "floatbv_rem_exprt", "classfloatbv__rem__exprt.html", null ],
+              [ "floatbv_round_to_integral_exprt", "classfloatbv__round__to__integral__exprt.html", null ],
               [ "floatbv_typecast_exprt", "classfloatbv__typecast__exprt.html", null ],
               [ "function_application_exprt", "classfunction__application__exprt.html", null ],
               [ "implies_exprt", "classimplies__exprt.html", null ],

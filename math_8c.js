@@ -60,9 +60,6 @@ var math_8c =
     [ "__sort_of_CPROVER_remainder", "math_8c.html#a517c5789940d3f9b25d17efb1ac6404f", null ],
     [ "__sort_of_CPROVER_remainderf", "math_8c.html#a44f1309085cc0f577103681994bcda36", null ],
     [ "__sort_of_CPROVER_remainderl", "math_8c.html#a9714aac1a423ec9a4f11e2c22ec26530", null ],
-    [ "__sort_of_CPROVER_round_to_integral", "math_8c.html#af9c42b36944fcd82a5e0ba189909822f", null ],
-    [ "__sort_of_CPROVER_round_to_integralf", "math_8c.html#af36b953169cae6dd8c949906dde9eb1c", null ],
-    [ "__sort_of_CPROVER_round_to_integrall", "math_8c.html#a8d9d422d172470d7ff15bfffcf6d341f", null ],
     [ "__VERIFIER_nondet_double", "math_8c.html#ac78478d6c78290f248a8173f8de5e640", null ],
     [ "__VERIFIER_nondet_float", "math_8c.html#a1ab6421a4a974f25e86bc533a81588d2", null ],
     [ "__VERIFIER_nondet_int32_t", "math_8c.html#a67115817a750a87eb899252b5deb2f9f", null ],
@@ -171,5 +168,6 @@ var math_8c =
     [ "sqrtl", "math_8c.html#a2a1102aa390e0865fcd052f58f8b4123", null ],
     [ "trunc", "math_8c.html#a82a151adfde56b28fa8a50355c4f2ff6", null ],
     [ "truncf", "math_8c.html#aa8bb2049c170c9ac5b131fdba029991a", null ],
-    [ "truncl", "math_8c.html#a8f9695496a9bb839eb5f728b6bf0c856", null ]
+    [ "truncl", "math_8c.html#a8f9695496a9bb839eb5f728b6bf0c856", null ],
+    [ "__CPROVER_rounding_mode", "math_8c.html#a94175070111cb2d4b3ba0c2a2742a016", null ]
 ];
