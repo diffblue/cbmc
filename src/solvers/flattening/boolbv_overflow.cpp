@@ -125,15 +125,14 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
       ? bv_utilst::representationt::SIGNED
       : bv_utilst::representationt::UNSIGNED;
 
-  if(
-    const auto plus_overflow = expr_try_dynamic_cast<plus_overflow_exprt>(expr))
+  if(expr_try_dynamic_cast<plus_overflow_exprt>(expr))
   {
     if(bv0.size() != bv1.size())
       return SUB::convert_rest(expr);
 
     return bv_utils.overflow_add(bv0, bv1, rep);
   }
-  if(const auto minus = expr_try_dynamic_cast<minus_overflow_exprt>(expr))
+  if(expr_try_dynamic_cast<minus_overflow_exprt>(expr))
   {
     if(bv0.size() != bv1.size())
       return SUB::convert_rest(expr);
@@ -158,8 +157,7 @@ literalt boolbvt::convert_binary_overflow(const binary_overflow_exprt &expr)
 
     return mult_overflow_result(prop, bv0, bv1, rep).back();
   }
-  else if(
-    const auto shl_overflow = expr_try_dynamic_cast<shl_overflow_exprt>(expr))
+  else if(expr_try_dynamic_cast<shl_overflow_exprt>(expr))
   {
     DATA_INVARIANT(!bv0.empty(), "zero-sized operand");
 
