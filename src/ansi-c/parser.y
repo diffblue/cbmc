@@ -2495,6 +2495,9 @@ declaration_or_expression_statement:
 
 iteration_statement:
         TOK_WHILE '(' comma_expression_opt ')'
+        {
+          PARSER.pragma_cprover_consume_unwind();
+        }
           cprover_contract_assigns_opt
           cprover_contract_loop_invariant_list_opt 
           cprover_contract_decreases_opt
@@ -2502,18 +2505,21 @@ iteration_statement:
         {
           $$=$1;
           statement($$, ID_while);
-          parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($8)));
-
-          if(!parser_stack($5).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($5).operands());
+          parser_stack($$).add_to_operands(std::move(parser_stack($3)), std::move(parser_stack($9)));
 
           if(!parser_stack($6).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($6).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($6).operands());
 
           if(!parser_stack($7).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($7).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($7).operands());
+
+          if(!parser_stack($8).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($8).operands());
         }
         | TOK_DO
+        {
+          PARSER.pragma_cprover_consume_unwind();
+        }
           cprover_contract_assigns_opt
           cprover_contract_loop_invariant_list_opt
           cprover_contract_decreases_opt
@@ -2522,16 +2528,16 @@ iteration_statement:
         {
           $$=$1;
           statement($$, ID_dowhile);
-          parser_stack($$).add_to_operands(std::move(parser_stack($8)), std::move(parser_stack($5)));
-
-          if(!parser_stack($2).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($2).operands());
+          parser_stack($$).add_to_operands(std::move(parser_stack($9)), std::move(parser_stack($6)));
 
           if(!parser_stack($3).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($3).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_assigns)).operands().swap(parser_stack($3).operands());
 
           if(!parser_stack($4).operands().empty())
-            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($4).operands());
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_loop_invariant)).operands().swap(parser_stack($4).operands());
+
+          if(!parser_stack($5).operands().empty())
+            static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($5).operands());
         }
         | TOK_FOR
           {
@@ -2541,6 +2547,7 @@ iteration_statement:
               unsigned prefix=++PARSER.current_scope().compound_counter;
               PARSER.new_scope(std::to_string(prefix)+"::");
             }
+            PARSER.pragma_cprover_consume_unwind();
           }
           '(' declaration_or_expression_statement
               comma_expression_opt ';'
