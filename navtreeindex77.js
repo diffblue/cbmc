@@ -1,5 +1,6 @@
 var NAVTREEINDEX77 =
 {
+"dfcc__contract__handler_8cpp.html":[8,0,2,15,1,1,10],
 "dfcc__contract__handler_8cpp_source.html":[8,0,2,15,1,1,10],
 "dfcc__contract__handler_8h.html":[8,0,2,15,1,1,11],
 "dfcc__contract__handler_8h_source.html":[8,0,2,15,1,1,11],
@@ -248,6 +249,5 @@ var NAVTREEINDEX77 =
 "dimacs__cnf_8h.html":[8,0,2,27,7,5],
 "dimacs__cnf_8h_source.html":[8,0,2,27,7,5],
 "dir_034d9ce8f5e904bef115a46acd2961c1.html":[8,0,2,15,2],
-"dir_03d682e021e4c6309d130abf57ca5133.html":[8,0,1,0,4],
-"dir_07fb78a0b4d496699ca5c92e9ebaed68.html":[8,0,2,18]
+"dir_03d682e021e4c6309d130abf57ca5133.html":[8,0,1,0,4]
 };

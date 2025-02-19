@@ -48,7 +48,7 @@ var searchData=
   ['_5fremaining_5fvccs_45',['_remaining_vccs',['../classgoto__symext.html#abfdbcee300e32f0907fbd69765429080',1,'goto_symext']]],
   ['_5frounding_5fmode_46',['_rounding_mode',['../classieee__floatt.html#ab8e9bad54e69af48fd575a347a10582b',1,'ieee_floatt']]],
   ['_5fsize_47',['_size',['../classsparse__vectort.html#a05da4481a8d054359db0781c777fa088',1,'sparse_vectort']]],
-  ['_5fsource_5flocation_48',['_source_location',['../classgoto__programt_1_1instructiont.html#aa04747c9b1d05ff376153b9a48e98ab3',1,'goto_programt::instructiont']]],
+  ['_5fsource_5flocation_48',['_source_location',['../classgoto__programt_1_1instructiont.html#aa04747c9b1d05ff376153b9a48e98ab3',1,'goto_programt::instructiont::_source_location'],['../classparsert.html#acd7dedf50401e39bdf9b884936c803f7',1,'parsert::_source_location']]],
   ['_5ftotal_5fvccs_49',['_total_vccs',['../classgoto__symext.html#a53c7781501310d8987eecae776eaafa5',1,'goto_symext']]],
   ['_5ftype_50',['_type',['../classgoto__programt_1_1instructiont.html#a78a9858e6efdf7c578e6020510f2cce6',1,'goto_programt::instructiont']]],
   ['_5fui_51',['_ui',['../classui__message__handlert.html#a6df644192a70806bffe4d988ec6d6739',1,'ui_message_handlert']]],

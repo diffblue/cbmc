@@ -16,13 +16,14 @@ var classparsert =
     [ "set_function", "classparsert.html#af459c7fd5cca58ee231a53f1fab351f6", null ],
     [ "set_line_no", "classparsert.html#ae930fa1b6f895d5fb8ee54f3bd4ff3dc", null ],
     [ "set_source_location", "classparsert.html#a8ece34cc904b6d3d462099da69ae68f5", null ],
+    [ "source_location", "classparsert.html#a6ae9da01cdd79d14ca1ca411e8664200", null ],
+    [ "_source_location", "classparsert.html#acd7dedf50401e39bdf9b884936c803f7", null ],
     [ "column", "classparsert.html#a8add2bb2d514652762382434063e4951", null ],
     [ "in", "classparsert.html#a400e7c320c73c1e83ca4c6c531e3722c", null ],
     [ "last_line", "classparsert.html#a7cc67811c3bdc43bb25d269a1fb34eb7", null ],
     [ "line_no", "classparsert.html#ae30107d041ca239b3e24be58f6ed5dfc", null ],
     [ "log", "classparsert.html#a94e006a32fee9b88158cb35bc2788b65", null ],
     [ "previous_line_no", "classparsert.html#ab62352356552d8e83177c52db8fa1aa2", null ],
-    [ "source_location", "classparsert.html#a28bc578d212eb0c5adbb2e7b3887e1dd", null ],
     [ "stack", "classparsert.html#ad8957b2b4a2b5305105071c1945c9068", null ],
     [ "this_line", "classparsert.html#a99044687aaa939057d6fe327b9652ee4", null ]
 ];
