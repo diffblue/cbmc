@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo
+^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that when __CPROVER_is_fresh is asserted in ensures clauses
+in contract checking mode, it allows both objet level separation and byte
+interval separation within the same object.

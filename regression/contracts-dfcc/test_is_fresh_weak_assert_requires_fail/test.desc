@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract bar --replace-call-with-contract foo
+^\[bar.assertion.\d+\].* unmodified 0: FAILURE$
+^\[foo.precondition.\d+\].*Check requires clause of contract contract::foo for function foo: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+This test checks that when __CPROVER_is_fresh is asserted in requires clauses
+in contract replacement mode, it detects byte interval separation failure within
+the same object.
