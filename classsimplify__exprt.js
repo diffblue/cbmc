@@ -27,6 +27,7 @@ var classsimplify__exprt =
     [ "simplify_extractbits", "classsimplify__exprt.html#ac87a98ebadfaad6266cb7e341ec948f3", null ],
     [ "simplify_ffs", "classsimplify__exprt.html#ad22bbe1d5c8c1c037d8ba6e0d0c7db3f", null ],
     [ "simplify_floatbv_op", "classsimplify__exprt.html#af3eeb6bbc690359c5b56c76da1bf7cc2", null ],
+    [ "simplify_floatbv_round_to_integral", "classsimplify__exprt.html#afd50b567f137e02f30b54b7cd317cbe3", null ],
     [ "simplify_floatbv_typecast", "classsimplify__exprt.html#a945fa0fe27a5a64d0a0e6ee5a62dfba1", null ],
     [ "simplify_function_application", "classsimplify__exprt.html#aae5ce5667107791421e4d24d3e7ac1af", null ],
     [ "simplify_ieee_float_relation", "classsimplify__exprt.html#af6f07602312c923c244e32a8010a9cff", null ],
