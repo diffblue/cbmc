@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract bar --replace-call-with-contract foo _ --z3 --slice-formula
+^\[foo.precondition.\d+\].*Check requires clause of contract contract::foo for function foo: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that when __CPROVER_is_fresh in preconditions replacement checks
+succeed when separation and size are as expected.

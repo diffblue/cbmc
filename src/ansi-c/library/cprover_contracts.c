@@ -72,13 +72,7 @@ typedef __CPROVER_contracts_obj_set_t *__CPROVER_contracts_obj_set_ptr_t;
 /// pointer equals, pointer_in_range_dfcc, pointer_is_fresh, obeys_contract.
 typedef struct
 {
-  /// \brief Nondet variable ranging over the set of objects allocated
-  /// by __CPROVER_contracts_is_fresh. Used to check separation constraints
-  /// in __CPROVER_contracts_is_fresh.
-  void *fresh_ptr;
-  /// \brief Nondet variable ranging over the set of locations storing
-  /// pointers on which predicates were assumed/asserted. Used to ensure
-  /// that at most one predicate is assumed per pointer.
+  __CPROVER_contracts_car_t fresh_car;
   void **ptr_pred;
 } __CPROVER_contracts_ptr_pred_ctx_t;
 
@@ -419,7 +413,8 @@ void __CPROVER_contracts_ptr_pred_ctx_init(
   __CPROVER_contracts_ptr_pred_ctx_ptr_t set)
 {
 __CPROVER_HIDE:;
-  set->fresh_ptr = (void *)0;
+  set->fresh_car = (__CPROVER_contracts_car_t){
+    .is_writable = 0, .size = 0, .lb = (void *)0, .ub = (void *)0};
   set->ptr_pred = (void **)0;
 }
 
@@ -1345,10 +1340,10 @@ __CPROVER_HIDE:;
       __VERIFIER_nondet___CPROVER_bool()
         ? elem
         : write_set->linked_ptr_pred_ctx->ptr_pred;
-    write_set->linked_ptr_pred_ctx->fresh_ptr =
+    write_set->linked_ptr_pred_ctx->fresh_car =
       __VERIFIER_nondet___CPROVER_bool()
-        ? ptr
-        : write_set->linked_ptr_pred_ctx->fresh_ptr;
+        ? __CPROVER_contracts_car_create(ptr, size)
+        : write_set->linked_ptr_pred_ctx->fresh_car;
 
     // record the object size for non-determistic bounds checking
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
@@ -1403,10 +1398,10 @@ __CPROVER_HIDE:;
       __VERIFIER_nondet___CPROVER_bool()
         ? elem
         : write_set->linked_ptr_pred_ctx->ptr_pred;
-    write_set->linked_ptr_pred_ctx->fresh_ptr =
+    write_set->linked_ptr_pred_ctx->fresh_car =
       __VERIFIER_nondet___CPROVER_bool()
-        ? ptr
-        : write_set->linked_ptr_pred_ctx->fresh_ptr;
+        ? __CPROVER_contracts_car_create(ptr, size)
+        : write_set->linked_ptr_pred_ctx->fresh_car;
 
     // record the object size for non-determistic bounds checking
     __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
@@ -1440,11 +1435,15 @@ __CPROVER_HIDE:;
         (write_set->assume_ensures_ctx == 0),
       "only one context flag at a time");
 #endif
+    // check separation
     void *ptr = *elem;
+    __CPROVER_contracts_car_t car = __CPROVER_contracts_car_create(ptr, size);
+    __CPROVER_contracts_car_t fresh_car =
+      write_set->linked_ptr_pred_ctx->fresh_car;
     if(
-      ptr != (void *)0 &&
-      !__CPROVER_same_object(write_set->linked_ptr_pred_ctx->fresh_ptr, ptr) &&
-      __CPROVER_r_ok(ptr, size))
+      ptr != (void *)0 && __CPROVER_r_ok(ptr, size) &&
+      (!__CPROVER_same_object(car.lb, fresh_car.lb) ||
+       (car.ub <= fresh_car.lb) || (fresh_car.ub <= car.lb)))
     {
       __CPROVER_assert(
         write_set->linked_ptr_pred_ctx->ptr_pred != elem,
@@ -1454,10 +1453,10 @@ __CPROVER_HIDE:;
         __VERIFIER_nondet___CPROVER_bool()
           ? elem
           : write_set->linked_ptr_pred_ctx->ptr_pred;
-      write_set->linked_ptr_pred_ctx->fresh_ptr =
+      write_set->linked_ptr_pred_ctx->fresh_car =
         __VERIFIER_nondet___CPROVER_bool()
-          ? ptr
-          : write_set->linked_ptr_pred_ctx->fresh_ptr;
+          ? car
+          : write_set->linked_ptr_pred_ctx->fresh_car;
       return 1;
     }
     return 0;
