@@ -696,6 +696,8 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
         new_expr.id(ID_or);
       else if(expr.id()==ID_bitxor)
         new_expr.id(ID_xor);
+      else if(expr.id() == ID_bitxnor)
+        new_expr.id(ID_equal);
       else
         UNREACHABLE;
 
@@ -709,8 +711,8 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
           *it=true_exprt();
       }
 
-      new_expr.type()=bool_typet();
-      new_expr = simplify_boolean(new_expr);
+      new_expr.type() = bool_typet{};
+      new_expr = simplify_node(new_expr);
 
       return changed(simplify_typecast(typecast_exprt(new_expr, expr.type())));
     }
