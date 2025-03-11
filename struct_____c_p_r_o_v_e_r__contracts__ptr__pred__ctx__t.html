@@ -105,14 +105,19 @@ $(document).ready(function(){initNavTree('struct_____c_p_r_o_v_e_r__contracts__p
 
 <p>Stores context information supporting the evaluation of pointer predicates in both assume and assert contexts for all predicates: pointer equals, pointer_in_range_dfcc, pointer_is_fresh, obeys_contract.  
  <a href="struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t.html#details">More...</a></p>
+<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Collaboration diagram for __CPROVER_contracts_ptr_pred_ctx_t:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
+<div class="center"><iframe scrolling="no" frameborder="0" src="struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t__coll__graph.svg" width="176" height="154"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a0b44b545521aa7fd55282a07ddeaead8" id="r_a0b44b545521aa7fd55282a07ddeaead8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t.html#a0b44b545521aa7fd55282a07ddeaead8">fresh_ptr</a></td></tr>
-<tr class="memdesc:a0b44b545521aa7fd55282a07ddeaead8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nondet variable ranging over the set of objects allocated by __CPROVER_contracts_is_fresh.  <br /></td></tr>
-<tr class="separator:a0b44b545521aa7fd55282a07ddeaead8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93c0daab51199d526e012d7cb304df88" id="r_a93c0daab51199d526e012d7cb304df88"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t.html#a93c0daab51199d526e012d7cb304df88">fresh_car</a></td></tr>
+<tr class="separator:a93c0daab51199d526e012d7cb304df88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aceff771de51c1e6c8131aeda91b2ab72" id="r_aceff771de51c1e6c8131aeda91b2ab72"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t.html#aceff771de51c1e6c8131aeda91b2ab72">ptr_pred</a></td></tr>
-<tr class="memdesc:aceff771de51c1e6c8131aeda91b2ab72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nondet variable ranging over the set of locations storing pointers on which predicates were assumed/asserted.  <br /></td></tr>
 <tr class="separator:aceff771de51c1e6c8131aeda91b2ab72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -120,22 +125,19 @@ Public Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00073">73</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
-<a id="a0b44b545521aa7fd55282a07ddeaead8" name="a0b44b545521aa7fd55282a07ddeaead8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b44b545521aa7fd55282a07ddeaead8">&#9670;&#160;</a></span>fresh_ptr</h2>
+<a id="a93c0daab51199d526e012d7cb304df88" name="a93c0daab51199d526e012d7cb304df88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93c0daab51199d526e012d7cb304df88">&#9670;&#160;</a></span>fresh_car</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classait.html">void</a>* __CPROVER_contracts_ptr_pred_ctx_t::fresh_ptr</td>
+          <td class="memname"><a class="el" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a> __CPROVER_contracts_ptr_pred_ctx_t::fresh_car</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Nondet variable ranging over the set of objects allocated by __CPROVER_contracts_is_fresh. </p>
-<p>Used to check separation constraints in __CPROVER_contracts_is_fresh. </p>
-
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00078">78</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00075">75</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -151,10 +153,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Nondet variable ranging over the set of locations storing pointers on which predicates were assumed/asserted. </p>
-<p>Used to ensure that at most one predicate is assumed per pointer. </p>
-
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00082">82</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00076">76</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>

@@ -399,7 +399,7 @@ Variables</h2></td></tr>
 
 <p>Type of pointers to <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__ptr__pred__ctx__t.html">__CPROVER_contracts_ptr_pred_ctx_t</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00087">87</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00081">81</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -417,7 +417,7 @@ Variables</h2></td></tr>
 
 <p>Type of pointers to <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__write__set__t.html">__CPROVER_contracts_write_set_t</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00126">126</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00120">120</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -476,7 +476,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="struct_____c_p_r_o_v_e_r__contracts__car__t.html">__CPROVER_contracts_car_t</a> value </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00133">133</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00127">127</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -516,7 +516,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff an element of <code>set</code> contains <code>candidate</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00225">225</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00219">219</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -555,7 +555,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00153">153</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00147">147</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -608,7 +608,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00174">174</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00168">168</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -647,7 +647,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00203">203</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00197">197</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -680,7 +680,7 @@ Variables</h2></td></tr>
 <p>Asserts that <code>ptr</code> is found in <code>set-&gt;contract_frees</code>. </p>
 <p>If proved, the assertion demonstrates that it is possible to assume that <code>was_freed(ptr)</code> holds as a post condition without causing a contradiction. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01681">1681</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01680">1680</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -745,7 +745,7 @@ Variables</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>True iff a pointer satisfies the preconditions for the <code>free</code> function and can hence be safely deallocated using <code>free</code>.</dd></dl>
 <p>If called in an assumption context, only basic conditions are checked: the pointer has offset 0 and points to a dynamic object. If called in an assertion context, extra conditions depending on nondeterministic CPROVER instrumentation variables are checked, yielding the full set of conditions checked by the CPROVER library implementation of free. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01623">1623</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01622">1622</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -802,7 +802,7 @@ Variables</h2></td></tr>
 <li>In assert contexts, returns false if another pointer predicate is already succesfully asserted, otherwise checks separation and size, mark *elem and elem as seen in the write set. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01295">1295</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01290">1290</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -834,7 +834,7 @@ Variables</h2></td></tr>
 
 <p>Links <code>write_set_to_link-&gt;allocated</code> to <code>write_set_postconditions-&gt;linked_allocated</code> so that allocations performed by <a class="el" href="cprover__contracts_8c.html#aacf4b59741ead08d66b72005b2d442ec">__CPROVER_contracts_is_fresh</a> when evaluating ensures clauses are recorded in <code>write_set_to_link</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01122">1122</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01117">1117</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -866,7 +866,7 @@ Variables</h2></td></tr>
 
 <p>Links <code>write_set_to_link-&gt;deallocated</code> to <code>write_set_postconditions-&gt;linked_deallocated</code> so that deallocations performed by the function get recorded in <code>write_set_to_link-&gt;deallocated</code> and are later available to <a class="el" href="cprover__contracts_8c.html#a947ac49e226fbeab880aa2f195d5daf1">__CPROVER_contracts_was_freed</a> predicate when evaluating ensures clauses. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01147">1147</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01142">1142</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -898,7 +898,7 @@ Variables</h2></td></tr>
 
 <p>Links <code>is_fresh_set</code> to <code>write_set-&gt;linked_ptr_pred_ctx</code> to share evaluation context between requires and ensures clauses for separation checks. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01100">1100</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01095">1095</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -924,7 +924,7 @@ Variables</h2></td></tr>
 <li>simple: pointer is either null or pointing to a dead object of size zero. The simple model is activated by a CLI switch in goto-instrument. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01182">1182</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01177">1177</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1001,7 +1001,7 @@ Variables</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>True iff a function pointer points to the specified contract.</dd></dl>
 <p>If called in an assumption context, translates to an assignment <code>function_pointer = contract</code>. If called in an assertion context, translates to an <code>function_pointer == contract</code>. The function pointer is taken by reference to be able to update it using a side-effect in assumption contexts. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01716">1716</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01715">1715</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1041,7 +1041,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00327">327</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00321">321</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1081,7 +1081,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00346">346</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00340">340</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1121,7 +1121,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff a pointer with the same object id exists in <code>set</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00385">385</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00379">379</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1161,7 +1161,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff <code>ptr</code> exists in <code>set</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00402">402</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00396">396</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1200,7 +1200,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00291">291</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00285">285</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1229,7 +1229,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00257">257</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00251">251</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1251,7 +1251,7 @@ Variables</h2></td></tr>
 
 <p>Releases resources used by <code>set</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00311">311</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00305">305</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1290,7 +1290,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00365">365</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00359">359</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1344,7 +1344,7 @@ Variables</h2></td></tr>
 </dl>
 <p>The behaviour is as follows: When <code>set-&gt;assume_requires_ctx</code> or <code>set-&gt;assume_ensures_ctx</code> is <code>true</code>, the predicate nondeterministically invalidates <code>*ptr1</code> and returns <code>false</code>, or checks that <code>ptr2</code> is either NULL or valid, and assigns <code>*ptr1</code> to <code>ptr2</code>. When <code>set-&gt;assert_requires_ctx</code> or <code>set-&gt;assert_ensures_ctx</code> is <code>true</code>, the predicate checks that both <code>*ptr1</code> and <code>ptr2</code> are either NULL or valid, and returns the value of (*ptr1 == ptr2). </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01215">1215</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01210">1210</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1408,7 +1408,7 @@ Variables</h2></td></tr>
 <li>When <code>set-&gt;assert_requires_ctx</code> or <code>set-&gt;assert_ensures_ctx</code> is <code>true</code>, the predicate checks that <code>lb</code> and <code>ub</code> are valid, into the same object, ordered, and assigns <code>ptr</code> to some nondet offset between <code>lb</code> and <code>ub</code>. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01492">1492</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01491">1491</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1431,7 +1431,7 @@ Variables</h2></td></tr>
 <p>Resets the nondet tracker for pointer predicates in <code>set</code>. </p>
 <p>Invoked between requires and ensures clauses evaluation to allow ensures clauses to establish different pointer predicates on the same pointers. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00418">418</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00412">412</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1454,7 +1454,7 @@ Variables</h2></td></tr>
 <p>Resets the nondet tracker for pointer predicates in <code>set</code>. </p>
 <p>Invoked right between requires and ensures clauses to allow ensures clauses to establish a different pointer predicates on the same pointers. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00429">429</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00424">424</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1486,7 +1486,7 @@ Variables</h2></td></tr>
 
 <p>Returns true iff the pointer <code>ptr</code> is found in <code>set-&gt;deallocated</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01655">1655</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01654">1654</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1525,7 +1525,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00638">638</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00633">633</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1564,7 +1564,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00660">660</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00655">655</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1603,7 +1603,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00602">602</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00597">597</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1632,7 +1632,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff <code>set-&gt;deallocated</code> is empty </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00764">764</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00759">759</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1673,7 +1673,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff the range of bytes starting at <code>dest</code> and of <code>__CPROVER_OBJECT_SIZE(dest) - __CPROVER_POINTER_OFFSET(dest)</code> bytes is contained in <code>set-&gt;allocated</code> or <code>set-&gt;contract_assigns</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00891">891</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00886">886</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1721,7 +1721,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff the range of bytes starting at <code>dest</code> and extending for <code>MIN(__CPROVER_OBJECT_SIZE(dest) - __CPROVER_POINTER_OFFSET(dest), __CPROVER_OBJECT_SIZE(src) - __CPROVER_POINTER_OFFSET(src))</code> bytes is contained in <code>set-&gt;allocated</code> or <code>set-&gt;contract_assigns</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00914">914</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00909">909</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1762,7 +1762,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff the range of bytes starting at <code>dest</code> and of <code>__CPROVER_OBJECT_SIZE(dest) - __CPROVER_POINTER_OFFSET(dest)</code> bytes is contained in <code>set-&gt;allocated</code> or <code>set-&gt;contract_assigns</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00871">871</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00866">866</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1809,7 +1809,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff the range of bytes starting at <code>ptr</code> of <code>size</code> bytes is contained in <code>set-&gt;allocated</code> or <code>set-&gt;contract_assigns</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00779">779</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00774">774</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1850,7 +1850,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff all elements of <code>candidate-&gt;contract_assigns</code> are included in some element of <code>reference-&gt;contract_assigns</code> or <code>reference-&gt;allocated</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00986">986</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00981">981</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1891,7 +1891,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff deallocation is allowed and <code>ptr</code> is contained in <code>set-&gt;contract_frees</code> or <code>set-&gt;allocated</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00957">957</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00952">952</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1932,7 +1932,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff all elements of <code>candidate-&gt;contract_frees</code> are included in some element of <code>reference-&gt;contract_frees</code> or <code>reference-&gt;allocated</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01017">1017</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01012">1012</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -1972,7 +1972,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True iff the range of bytes starting at <code>(char *)ptr - __CPROVER_POINTER_OFFSET(ptr)</code> and of size <code>__CPROVER_OBJECT_SIZE(ptr)</code> is contained in <code>set-&gt;contract_assigns</code> or <code>set-&gt;allocated</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00936">936</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00931">931</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2060,7 +2060,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00452">452</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00447">447</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2099,7 +2099,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01062">1062</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01057">1057</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2131,7 +2131,7 @@ Variables</h2></td></tr>
 
 <p>Returns the start address of the conditional address range found at index <code>idx</code> in <code>set-&gt;contract_assigns</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01568">1568</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01567">1567</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2163,7 +2163,7 @@ Variables</h2></td></tr>
 
 <p>Havocs the whole object pointed to by the lower bound pointer of the element stored at index <code>idx</code> in <code>set-&gt;contract_assigns</code>, if it is writable. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01587">1587</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01586">1586</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2195,7 +2195,7 @@ Variables</h2></td></tr>
 
 <p>Havocs the range of bytes represented byt the element stored at index <code>idx</code> in <code>set-&gt;contract_assigns</code>, if it is writable. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01600">1600</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l01599">1599</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2248,7 +2248,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00526">526</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00521">521</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2298,7 +2298,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00570">570</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00565">565</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2351,7 +2351,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00589">589</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00584">584</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2401,7 +2401,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00546">546</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00541">541</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2441,7 +2441,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00685">685</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00680">680</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2481,7 +2481,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00710">710</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00705">705</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
@@ -2503,7 +2503,7 @@ Variables</h2></td></tr>
 
 <p>Releases resources used by <code>set</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00489">489</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cprover__contracts_8c_source.html#l00484">484</a> of file <a class="el" href="cprover__contracts_8c_source.html">cprover_contracts.c</a>.</p>
 
 </div>
 </div>
