@@ -316,10 +316,16 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       }
     }
 
-    if(has_subexpr(where, ID_side_effect))
+    if(has_subexpr(
+         where,
+         [&](const exprt &subexpr)
+         {
+           return can_cast_expr<side_effect_exprt>(subexpr) &&
+                  can_cast_expr<side_effect_expr_function_callt>(subexpr);
+         }))
     {
       error().source_location = expr.source_location();
-      error() << "quantifier must not contain side effects" << eom;
+      error() << "quantifier must not contain function calls" << eom;
       throw 0;
     }
 

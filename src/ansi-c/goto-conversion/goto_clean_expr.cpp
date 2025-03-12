@@ -13,11 +13,246 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
+#include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
+#include <util/replace_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
+#include <analyses/natural_loops.h>
+
 #include "destructor.h"
+
+#include <unordered_map>
+
+static symbol_exprt find_base_symbol(const exprt &expr)
+{
+  if(expr.id() == ID_symbol)
+  {
+    return to_symbol_expr(expr);
+  }
+  else if(expr.id() == ID_member)
+  {
+    return find_base_symbol(to_member_expr(expr).struct_op());
+  }
+  else if(expr.id() == ID_index)
+  {
+    return find_base_symbol(to_index_expr(expr).array());
+  }
+  else if(expr.id() == ID_dereference)
+  {
+    return find_base_symbol(to_dereference_expr(expr).pointer());
+  }
+  else
+  {
+    throw "unsupported expression type for finding base symbol";
+  }
+}
+
+static exprt convert_statement_expression(
+  const quantifier_exprt &qex,
+  const code_expressiont &code,
+  const irep_idt &mode,
+  goto_convertt &converter)
+{
+  goto_programt where;
+  converter.goto_convert(code, where, mode);
+  where.compute_location_numbers();
+
+  natural_loops_mutablet natural_loops(where);
+  INVARIANT(
+    natural_loops.loop_map.size() == 0, "quantifier must not contain loops");
+
+  // `last` is the instruction corresponding to the last expression in the
+  // statement expression.
+  goto_programt::const_targett last = where.instructions.end();
+  for(goto_programt::const_targett it = where.instructions.begin();
+      it != where.instructions.end();
+      ++it)
+  {
+    // `last` is an other-instruction.
+    if(it->is_other())
+    {
+      last = it;
+    }
+  }
+
+  DATA_INVARIANT(
+    last != where.instructions.end(),
+    "expression statements must contain a terminator expression");
+
+  auto last_expr = to_code_expression(last->get_other()).expression();
+
+  struct pathst
+  {
+    // `paths` contains all the `targett` we are iterating over.
+    std::vector<goto_programt::const_targett> paths;
+    std::vector<std::pair<exprt, replace_mapt>> path_conditions_and_value_maps;
+
+    pathst(
+      std::vector<goto_programt::const_targett> paths,
+      std::vector<std::pair<exprt, replace_mapt>>
+        path_conditions_and_value_maps)
+      : paths(paths),
+        path_conditions_and_value_maps(path_conditions_and_value_maps)
+    {
+    }
+
+    bool empty()
+    {
+      return paths.empty();
+    }
+
+    goto_programt::const_targett &back_it()
+    {
+      return paths.back();
+    }
+
+    exprt &back_path_condition()
+    {
+      return path_conditions_and_value_maps.back().first;
+    }
+
+    replace_mapt &back_value_map()
+    {
+      return path_conditions_and_value_maps.back().second;
+    }
+
+    void push_back(
+      goto_programt::const_targett target,
+      exprt path_condition,
+      replace_mapt value_map)
+    {
+      paths.push_back(target);
+      path_conditions_and_value_maps.push_back(
+        std::make_pair(path_condition, value_map));
+    }
+
+    void pop_back()
+    {
+      paths.pop_back();
+      path_conditions_and_value_maps.pop_back();
+    }
+  };
+
+  pathst paths(
+    {1, where.instructions.begin()},
+    {1, std::make_pair(true_exprt(), replace_mapt())});
+
+  std::unordered_set<symbol_exprt, irep_hash> declared_symbols;
+  // All bound variables are local.
+  declared_symbols.insert(qex.variables().begin(), qex.variables().end());
+
+  exprt res = true_exprt();
+
+  // Visit the quantifier body along `paths`.
+  while(!paths.empty())
+  {
+    auto &current_it = paths.back_it();
+    auto &path_condition = paths.back_path_condition();
+    auto &value_map = paths.back_value_map();
+    INVARIANT(
+      current_it != where.instructions.end(),
+      "Quantifier body must have a unique end expression.");
+
+    switch(current_it->type())
+    {
+    // Add all local-declared symbols into `declared_symbols`.
+    case goto_program_instruction_typet::DECL:
+      declared_symbols.insert(current_it->decl_symbol());
+      break;
+
+    // ASSIGN lhs := rhs
+    // Add the replace lhr <- value_map(rhs) to the current value_map.
+    case goto_program_instruction_typet::ASSIGN:
+    {
+      // Check that if lhs is a declared symbol.
+      auto lhs = current_it->assign_lhs();
+      INVARIANT(
+        declared_symbols.count(find_base_symbol(lhs)),
+        "quantifier must not contain side effects");
+      exprt rhs = current_it->assign_rhs();
+      replace_expr(value_map, rhs);
+      value_map[lhs] = rhs;
+    }
+    break;
+
+    // GOTO label
+    // -----------
+    // Move the current targett to label.
+    // or
+    // IF cond GOTO label
+    // ----------
+    // Move the current targett to targett+1 with path condition
+    // path_condition && !cond;
+    // and add a new path starting from label with path condition
+    // path_condition && cond.
+    case goto_program_instruction_typet::GOTO:
+    {
+      if(!current_it->condition().is_true())
+      {
+        auto next_it = current_it->targets.front();
+        exprt copy_path_condition = path_condition;
+        replace_mapt copy_symbol_map = value_map;
+        auto copy_condition = current_it->condition();
+        path_condition =
+          and_exprt(path_condition, not_exprt(current_it->condition()));
+        current_it++;
+        paths.push_back(
+          next_it,
+          and_exprt(copy_path_condition, copy_condition),
+          copy_symbol_map);
+      }
+      else
+      {
+        current_it = current_it->targets.front();
+      }
+      continue;
+    }
+
+    // EXPRESSION(expr)
+    // The last instruction is an expression statement.
+    // We add the predicate path_condition ==> value_map(expr) to res.
+    case goto_program_instruction_typet::OTHER:
+    {
+      if(current_it == last)
+      {
+        exprt copy_of_last_expr = last_expr;
+        replace_expr(value_map, copy_of_last_expr);
+        res = and_exprt(res, implies_exprt(path_condition, copy_of_last_expr));
+        paths.pop_back();
+        continue;
+      }
+    }
+    break;
+
+    // Ignored instructions.
+    case goto_program_instruction_typet::ASSERT:
+    case goto_program_instruction_typet::ASSUME:
+    case goto_program_instruction_typet::ATOMIC_BEGIN:
+    case goto_program_instruction_typet::ATOMIC_END:
+    case goto_program_instruction_typet::DEAD:
+    case goto_program_instruction_typet::LOCATION:
+    case goto_program_instruction_typet::SKIP:
+    case goto_program_instruction_typet::THROW:
+      break;
+
+    // Unsupported instructions.
+    case goto_program_instruction_typet::CATCH:
+    case goto_program_instruction_typet::END_FUNCTION:
+    case goto_program_instruction_typet::END_THREAD:
+    case goto_program_instruction_typet::FUNCTION_CALL:
+    case goto_program_instruction_typet::INCOMPLETE_GOTO:
+    case goto_program_instruction_typet::SET_RETURN_VALUE:
+    case goto_program_instruction_typet::START_THREAD:
+    case goto_program_instruction_typet::NO_INSTRUCTION_TYPE:
+      UNREACHABLE;
+    }
+
+    current_it++;
+  }
+  return res;
+}
 
 symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,
@@ -90,7 +325,14 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
   // g2 = (i > 10)
   // forall (i : int) (g1 || g2)
   if(expr.id() == ID_forall || expr.id() == ID_exists)
+  {
+    code_expressiont where{to_quantifier_expr(expr).where()};
+    // Need cleaning when the quantifier body is a side-effect expression.
+    if(has_subexpr(expr, ID_side_effect))
+      return true;
+
     return false;
+  }
 
   for(const auto &op : expr.operands())
   {
@@ -440,9 +682,25 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
   }
   else if(expr.id() == ID_forall || expr.id() == ID_exists)
   {
+    quantifier_exprt &qex = to_quantifier_expr(expr);
+    code_expressiont code{qex.where()};
     DATA_INVARIANT(
-      !has_subexpr(expr, ID_side_effect),
-      "the front-end should check quantified expressions for side-effects");
+      !has_subexpr(expr, ID_side_effect) ||
+        (code.operands()[0].id() == ID_side_effect &&
+         code.operands()[0].get_named_sub()[ID_statement].id() ==
+           ID_statement_expression),
+      "quantifier must not contain side effects");
+
+    // Handle the case that quantifier body is a statement expression.
+    if(
+      code.operands()[0].id() == ID_side_effect &&
+      code.operands()[0].get_named_sub()[ID_statement].id() ==
+        ID_statement_expression)
+    {
+      auto res = convert_statement_expression(qex, code, mode, *this);
+      qex.where() = res;
+      return clean_expr(res, mode, result_is_used);
+    }
   }
   else if(expr.id() == ID_address_of)
   {
