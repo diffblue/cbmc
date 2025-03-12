@@ -1,0 +1,8 @@
+CORE
+quantifier-with-function-call.c
+
+^EXIT=6$
+^SIGNAL=0$
+quantifier must not contain function calls
+--
+^warning: ignoring
