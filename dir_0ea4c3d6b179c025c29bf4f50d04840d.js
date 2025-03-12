@@ -8,7 +8,7 @@ var dir_0ea4c3d6b179c025c29bf4f50d04840d =
     [ "goto_asm.cpp", "goto__asm_8cpp.html", null ],
     [ "goto_check_c.cpp", "goto__check__c_8cpp.html", "goto__check__c_8cpp" ],
     [ "goto_check_c.h", "goto__check__c_8h.html", "goto__check__c_8h" ],
-    [ "goto_clean_expr.cpp", "goto__clean__expr_8cpp.html", null ],
+    [ "goto_clean_expr.cpp", "goto__clean__expr_8cpp.html", "goto__clean__expr_8cpp" ],
     [ "goto_convert.cpp", "goto__convert_8cpp.html", "goto__convert_8cpp" ],
     [ "goto_convert.h", "goto__convert_8h.html", "goto__convert_8h" ],
     [ "goto_convert_class.h", "goto__convert__class_8h.html", "goto__convert__class_8h" ],

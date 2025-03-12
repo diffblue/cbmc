@@ -799,7 +799,7 @@ var searchData=
   ['mz_5ffopen_796',['MZ_FOPEN',['../miniz_8cpp.html#a7ab43238d8cd27afaf9ee668c8f6ab70',1,'miniz.cpp']]],
   ['mz_5fforceinline_797',['MZ_FORCEINLINE',['../miniz_8h.html#a2c231672fab55aa544b2a34cc9d92fe1',1,'miniz.h']]],
   ['mz_5ffread_798',['MZ_FREAD',['../miniz_8cpp.html#a52bd2726a671aabfe4d49804e79900d0',1,'miniz.cpp']]],
-  ['mz_5ffree_799',['mz_free',['../miniz_8h.html#aade076e929401256dc0aa8fd611f0906',1,'mz_free(void *p):&#160;miniz.cpp'],['../miniz_8cpp.html#a7bdc0af59e4ca6d7bd8b7d5d005ff55e',1,'mz_free(void *p):&#160;miniz.cpp'],['../miniz_8h.html#ac73e9b464ae92e51b762f496296d7582',1,'MZ_FREE:&#160;miniz.h']]],
+  ['mz_5ffree_799',['mz_free',['../miniz_8h.html#ac73e9b464ae92e51b762f496296d7582',1,'MZ_FREE:&#160;miniz.h'],['../miniz_8h.html#aade076e929401256dc0aa8fd611f0906',1,'mz_free(void *p):&#160;miniz.cpp'],['../miniz_8cpp.html#a7bdc0af59e4ca6d7bd8b7d5d005ff55e',1,'mz_free(void *p):&#160;miniz.cpp']]],
   ['mz_5ffree_5ffunc_800',['mz_free_func',['../miniz_8h.html#ac00f79fc7189a19f9729dbd9b82c8380',1,'miniz.h']]],
   ['mz_5ffreopen_801',['MZ_FREOPEN',['../miniz_8cpp.html#a39982d7e112363ff6d284ace3b9cf9bc',1,'miniz.cpp']]],
   ['mz_5ffseek64_802',['MZ_FSEEK64',['../miniz_8cpp.html#a6cd8f6b4134fc9ea62f311ac7f2c5c1d',1,'miniz.cpp']]],
