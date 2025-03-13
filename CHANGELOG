@@ -1,3 +1,65 @@
+# CBMC 6.5.0
+
+This release addresses both soundness (via #8562) and performance issues (via
+#8574, #8576) in our code contracts instrumentation, and includes a collection
+of bit-operator cleanup (such as #8524, #8531) and floating-point support
+improvements (TiesToAway rounding via #8515, native rounding to integer via
+#8538) that aid EBMC/HW-CBMC.
+
+## What's Changed
+* CONTRACTS: allow pointer predicates to fail in `assume` contexts by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8562
+* Add IEEE 754 TiesToAway rounding mode by @kroening in https://github.com/diffblue/cbmc/pull/8515
+* Handle quantifiers with statement expressions by @qinheping in https://github.com/diffblue/cbmc/pull/8605
+
+## Bug Fixes
+* SMT2: support `onehot` and `onehot0` by @kroening in https://github.com/diffblue/cbmc/pull/8524
+* `cmdlinet`: add `value_opt` methods by @kroening in https://github.com/diffblue/cbmc/pull/8525
+* add mulit-ary constructor for xor_exprt, bitxor_exprt, bitand_exprt, … by @kroening in https://github.com/diffblue/cbmc/pull/8529
+* add nand_exprt, nor_exprt, xnor_exprt, bitnand_exprt, bitnor_exprt by @kroening in https://github.com/diffblue/cbmc/pull/8531
+* SMT2: relations on the range type by @kroening in https://github.com/diffblue/cbmc/pull/8523
+* SMT2: allow natural-typed shift distance by @kroening in https://github.com/diffblue/cbmc/pull/8519
+* SMT2: fix exception thrown when given unsupported expression by @kroening in https://github.com/diffblue/cbmc/pull/8518
+* Add floatbv_mod_exprt and floatbv_rem_exprt classes by @kroening in https://github.com/diffblue/cbmc/pull/8532
+* use `zero_extend_exprt` in SMT2 front-end by @kroening in https://github.com/diffblue/cbmc/pull/8493
+* SMT2: implement cond by @kroening in https://github.com/diffblue/cbmc/pull/8467
+* SMT2: bvnor, bvnand are binary only; add bvxnor by @kroening in https://github.com/diffblue/cbmc/pull/8508
+* SMT2: implement nand, nor, xnor by @kroening in https://github.com/diffblue/cbmc/pull/8530
+* Fix `onehot0` flattening by @kroening in https://github.com/diffblue/cbmc/pull/8536
+* implement `xnor` in prop_conv_solvert by @kroening in https://github.com/diffblue/cbmc/pull/8533
+* `ieee_floatt`: add preconditions by @kroening in https://github.com/diffblue/cbmc/pull/8540
+* Bugfix: flattening for non-binary `bitnor`, `bitnand`, `bitxnor` by @kroening in https://github.com/diffblue/cbmc/pull/8542
+* KNOWNBUG test for enum-range check inside LHS of an assignment by @kroening in https://github.com/diffblue/cbmc/pull/8543
+* fix enum-range check for LHSs by @kroening in https://github.com/diffblue/cbmc/pull/8544
+* protect `ieee_floatt::rounding_mode` by @kroening in https://github.com/diffblue/cbmc/pull/8551
+* SMT2 parser: add abbreviated versions of the rounding modes by @kroening in https://github.com/diffblue/cbmc/pull/8539
+* `ieee_floatt::one`(...) by @kroening in https://github.com/diffblue/cbmc/pull/8552
+* Compile Java regression test sources (1/n) by @peterschrammel in https://github.com/diffblue/cbmc/pull/8487
+* Compile Java regression test sources (2/n) by @peterschrammel in https://github.com/diffblue/cbmc/pull/8548
+* Compile Java regression test sources (3/n) by @peterschrammel in https://github.com/diffblue/cbmc/pull/8549
+* goto-analyzer: `--show-local-bitvector` by @kroening in https://github.com/diffblue/cbmc/pull/8546
+* CONTRACTS: ignore `__CPROVER_dead_object` assignments by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8554
+* Compile Java regression test sources (4/n) by @peterschrammel in https://github.com/diffblue/cbmc/pull/8553
+* util: Replace std::basic_string<unsigned> with std::basic_string<char32_t> by @xokdvium in https://github.com/diffblue/cbmc/pull/8559
+* Fix publish workflow by @tautschnig in https://github.com/diffblue/cbmc/pull/8564
+* CONTRACTS: force success for necessary pointer predicates by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8574
+* CONTRACTS: separation checks using nondet demonic variable by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8576
+* CONTRACTS: ensure at most one predicate per pointer by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8577
+* add @peterschrammel as code owner to /src/solvers/floatbv by @kroening in https://github.com/diffblue/cbmc/pull/8580
+* SMT2: range_type fixes by @kroening in https://github.com/diffblue/cbmc/pull/8537
+* Split `ieee_floatt` into `ieee_float_valuet` and `ieee_floatt` by @kroening in https://github.com/diffblue/cbmc/pull/8550
+* Update third-party miniz to 0c30a001bc3c70 by @tautschnig in https://github.com/diffblue/cbmc/pull/8563
+* implement boolbvt::get for enumeration types by @kroening in https://github.com/diffblue/cbmc/pull/8589
+* bump clang-format to clang-15 by @kroening in https://github.com/diffblue/cbmc/pull/8561
+* Remove `namespace_baset::follow(typet)` by @kroening in https://github.com/diffblue/cbmc/pull/8590
+* Introduce `floatbv_round_to_integral_exprt` by @kroening in https://github.com/diffblue/cbmc/pull/8538
+* line number for files with no newline by @kroening in https://github.com/diffblue/cbmc/pull/8558
+* Value-set based dereferencing: fix simplified handling of *(p + i) by @tautschnig in https://github.com/diffblue/cbmc/pull/8578
+* fixup #8538 -- correct rounding modes for `floor`, `trunc` by @kroening in https://github.com/diffblue/cbmc/pull/8597
+* simplify: rewrite `bitxnor` on booleans to equal by @kroening in https://github.com/diffblue/cbmc/pull/8594
+* CONTRACTS: is_fresh now tracks separation at the byte level instead of whole objects by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8603
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.4.1...cbmc-6.5.0
+
 # CBMC 6.4.1
 
 This patch release addresses a hard-coding of C semantics in the back-end for pointer subtraction (via #8497).
