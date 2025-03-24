@@ -3128,6 +3128,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_node(const exprt &node)
   {
     r = simplify_prophecy_pointer_in_range(*prophecy_pointer_in_range);
   }
+  else if(expr.id() == ID_exists || expr.id() == ID_forall)
+  {
+    r = simplify_quantifier_expr(to_quantifier_expr(expr));
+  }
 
   if(!no_change_join_operands)
     r = changed(r);

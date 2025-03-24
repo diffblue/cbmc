@@ -68,6 +68,7 @@ class popcount_exprt;
 class power_exprt;
 class prophecy_pointer_in_range_exprt;
 class prophecy_r_or_w_ok_exprt;
+class quantifier_exprt;
 class refined_string_exprt;
 class shift_exprt;
 class sign_exprt;
@@ -253,6 +254,9 @@ public:
   /// Try to simplify prophecy_pointer_in_range to a constant expression.
   [[nodiscard]] resultt<>
   simplify_prophecy_pointer_in_range(const prophecy_pointer_in_range_exprt &);
+
+  /// Try to simplify exists/forall to a constant expression.
+  [[nodiscard]] resultt<> simplify_quantifier_expr(const quantifier_exprt &);
 
   // auxiliary
   bool simplify_if_implies(
