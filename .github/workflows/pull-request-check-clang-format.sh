@@ -26,7 +26,7 @@ echo "Checking for formatting errors introduced since $MERGE_BASE"
 
 # Do the checking. "eval" is used so that quotes (as inserted into $EXCLUDES
 # above) are not interpreted as parts of file names.
-eval git-clang-format-15 --binary clang-format-15 $MERGE_BASE -- $EXCLUDES
+eval git-clang-format-15 --binary clang-format-15 $MERGE_BASE -- $EXCLUDES || true
 git diff > formatted.diff
 if [[ -s formatted.diff ]] ; then
   echo 'Formatting error! The following diff shows the required changes'
