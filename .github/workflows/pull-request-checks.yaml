@@ -51,7 +51,7 @@ jobs:
       - name: Build with make
         run: |
           git clone https://github.com/conp-solutions/riss riss.git
-          cmake -Hriss.git -Briss.git/release -DCMAKE_BUILD_TYPE=Release
+          cmake -Hriss.git -Briss.git/release -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
           make -C riss.git/release riss-coprocessor-lib-static -j${{env.linux-vcpus}}
           make -C src -j${{env.linux-vcpus}} CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
           make -C jbmc/src -j${{env.linux-vcpus}} CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
