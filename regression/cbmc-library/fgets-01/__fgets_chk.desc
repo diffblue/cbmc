@@ -1,4 +1,4 @@
-KNOWNBUG
+FUTURE
 main.c
 --pointer-check --bounds-check -D_FORTIFY_SOURCE=2 -D__OPTIMIZE__=2 --unwindset fgets:0
 ^EXIT=10$
@@ -11,4 +11,6 @@ main.c
 ^warning: ignoring
 --
 Our asm renaming results in fgets and its alias being one and the same function
-to us, so we end up recursing in glibc's fgets wrapper.
+to us, so we end up recursing in glibc's fgets wrapper on some platforms. On
+Ubuntu 24.04, however, this appears to work fine. Given this disparity this test
+is now marked `FUTURE` instead of `KNOWNBUG`.
