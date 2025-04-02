@@ -7,7 +7,7 @@ on:
 jobs:
   # This job takes approximately 18 minutes
   run-10-random-tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,7 +19,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y build-essential flex bison maven ccache clang-10 clang++-10
+          sudo apt-get install --no-install-recommends -y build-essential flex bison maven ccache clang-19 clang++-19
           sudo apt-get install --no-install-recommends -y csmith libcsmith-dev
           make -C src minisat2-download
       - name: Prepare ccache
@@ -27,10 +27,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-CSMITH
+          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-CSMITH
           restore-keys: |
-            ${{ runner.os }}-20.04-make-clang-${{ github.ref }}
-            ${{ runner.os }}-20.04-make-clang
+            ${{ runner.os }}-24.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-24.04-make-clang
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV

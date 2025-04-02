@@ -6,7 +6,7 @@ on:
 jobs:
   # This job takes approximately 1 minute
   check-clang-format:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,7 +28,7 @@ jobs:
 
   # This job takes approximately 1 minute
   check-cpplint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:

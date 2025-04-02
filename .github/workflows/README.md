@@ -25,19 +25,22 @@ The files in this folder correspond to:
 
 We are currently building and testing CBMC under the following configurations:
 
-* `make` * `gcc` * `linux` (ubuntu 20.04)
-* `make` * `clang` * `linux` (ubuntu 20.04)
-* `cmake` * `gcc` * `linux` (ubuntu 20.04)
-* `make` * `clang` * `macos` (10.15)
-* `cmake` * `clang` * `macos` (10.15)
+* `make` * `gcc` * `linux` (ubuntu 24.04)
+* `make` * `clang` * `linux` (ubuntu 22.04, 24.04)
+* `cmake` * `gcc` * `linux` (ubuntu 22.04, 24.04)
+* `cmake` * `gcc-14` * `linux` (ubuntu 24.04)
+* `cmake` * `gcc` * `linux` (ubuntu 22.04 32-bit)
+* `make` * `clang` * `macos` (13)
+* `cmake` * `clang` * `macos` (14)
 * `cmake` * `vs` * `windows` (vs2019)
+* `make` * `vs` * `windows` (vs2022)
 
 Aside from the main platform builds for testing, we are also performing
 some auxiliary builds that test packaging support to be up-to-date. We
 do that for:
 
 * a `docker` image
-* an `ubuntu-20.04` package
+* a `ubuntu-24.04` package
 * a `windows-msi` installer package
 
 Last but not least, we are also performing a coverage statistics collection

@@ -11,8 +11,8 @@ env:
 
 jobs:
   # This job takes approximately 15 to 40 minutes
-  check-ubuntu-20_04-make-gcc:
-    runs-on: ubuntu-20.04
+  check-ubuntu-24_04-make-gcc:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,10 +38,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-make-${{ github.ref }}
-            ${{ runner.os }}-20.04-make
+            ${{ runner.os }}-24.04-make-${{ github.ref }}
+            ${{ runner.os }}-24.04-make
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -92,8 +92,8 @@ jobs:
           fi
 
   # This job takes approximately 25 to 34 minutes
-  check-ubuntu-20_04-make-clang:
-    runs-on: ubuntu-20.04
+  check-ubuntu-24_04-make-clang:
+    runs-on: ubuntu-24.04
     env:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
@@ -108,7 +108,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-10 clang++-10 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
           make -C src minisat2-download cadical-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
@@ -124,10 +124,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-make-clang-${{ github.ref }}
-            ${{ runner.os }}-20.04-make-clang
+            ${{ runner.os }}-24.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-24.04-make-clang
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -165,8 +165,8 @@ jobs:
   # The reason we opted for a new job is that adding a `test-z3` step to the current
   # jobs increases the job runtime to unacceptable levels (over 2hrs).
   # This job takes approximately 3 to 18 minutes
-  check-ubuntu-20_04-make-clang-smt-z3:
-    runs-on: ubuntu-20.04
+  check-ubuntu-24_04-make-clang-smt-z3:
+    runs-on: ubuntu-24.04
     env:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
@@ -179,7 +179,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-10 clang++-10 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
           make -C src minisat2-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
@@ -189,10 +189,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-make-clang-${{ github.ref }}
-            ${{ runner.os }}-20.04-make-clang
+            ${{ runner.os }}-24.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-24.04-make-clang
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -207,8 +207,8 @@ jobs:
         run: make -C regression/cbmc test-z3
 
   # This job takes approximately 17 to 42 minutes
-  check-ubuntu-20_04-cmake-gcc:
-    runs-on: ubuntu-20.04
+  check-ubuntu-24_04-cmake-gcc:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -234,10 +234,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-Release-${{ github.ref }}
-            ${{ runner.os }}-20.04-Release
+            ${{ runner.os }}-24.04-Release-${{ github.ref }}
+            ${{ runner.os }}-24.04-Release
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -499,8 +499,8 @@ jobs:
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
   # This job takes approximately 2 to 24 minutes
-  check-ubuntu-20_04-cmake-gcc-KNOWNBUG:
-    runs-on: ubuntu-20.04
+  check-ubuntu-24_04-cmake-gcc-KNOWNBUG:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -518,10 +518,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-Release-${{ github.ref }}
-            ${{ runner.os }}-20.04-Release
+            ${{ runner.os }}-24.04-Release-${{ github.ref }}
+            ${{ runner.os }}-24.04-Release
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -546,8 +546,8 @@ jobs:
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
 
   # This job takes approximately 7 to 30 minutes
-  check-ubuntu-20_04-cmake-gcc-THOROUGH:
-    runs-on: ubuntu-20.04
+  check-ubuntu-24_04-cmake-gcc-THOROUGH:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -565,10 +565,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-Release-${{ github.ref }}
-            ${{ runner.os }}-20.04-Release
+            ${{ runner.os }}-24.04-Release-${{ github.ref }}
+            ${{ runner.os }}-24.04-Release
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -877,7 +877,7 @@ jobs:
 
   # This job takes approximately 2 to 3 minutes
   check-string-table:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Check for unused irep ids
@@ -885,7 +885,7 @@ jobs:
 
   # This job takes approximately 23 to 29 minutes
   check-docker-image:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -909,7 +909,7 @@ jobs:
 
   # This job takes approximately 22 to 41 minutes
   include-what-you-use:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:

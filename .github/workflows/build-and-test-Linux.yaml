@@ -8,7 +8,7 @@ on:
 jobs:
   # This job takes approximately 18 minutes
   CompileLinux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,7 +20,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y clang-10 clang++-10 flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
+          sudo apt-get install --no-install-recommends -y clang-19 clang++-19 flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
           sudo apt-get install --no-install-recommends -y libssl-dev libelf-dev libudev-dev libpci-dev libiberty-dev autoconf
           sudo apt-get install --no-install-recommends -y gawk jq
 
@@ -29,10 +29,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-KERNEL
+          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-KERNEL
           restore-keys: |
-            ${{ runner.os }}-20.04-make-clang-${{ github.ref }}
-            ${{ runner.os }}-20.04-make-clang
+            ${{ runner.os }}-24.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-24.04-make-clang
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV

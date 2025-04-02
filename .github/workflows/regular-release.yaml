@@ -8,7 +8,7 @@ name: Create Release
 jobs:
   get-version-information:
     name: Get Version Information
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.split-version.outputs._1 }}
     steps:
@@ -24,7 +24,7 @@ jobs:
           separator: '-'
   perform-release:
     name: Perform Release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: get-version-information
     steps:
       - name: Checkout code
@@ -62,7 +62,7 @@ jobs:
 
             ```sh
             # Ubuntu 20:
-            $ dpkg -i ubuntu-20.04-cbmc-${{ env.CBMC_VERSION }}-Linux.deb
+            $ dpkg -i ubuntu-24.04-cbmc-${{ env.CBMC_VERSION }}-Linux.deb
             ```
 
             ## Windows
