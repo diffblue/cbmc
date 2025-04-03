@@ -921,9 +921,9 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison iwyu
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build clang-19 clang++-19 gdb maven flex bison iwyu
       - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
       - name: Run include-what-you-use
         run: |
           iwyu_tool -p build/compile_commands.json -j${{env.linux-vcpus}} | tee includes.txt
