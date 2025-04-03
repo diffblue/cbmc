@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2irep.h"
 
+#include <fstream>
+
 std::string smt2_dect::decision_procedure_text() const
 {
   // clang-format off

@@ -16,8 +16,6 @@ Author: Thomas Kiley
 
 #include "goto_functions.h"
 
-#include <iostream>
-
 /// For outputting the GOTO program in a readable JSON format.
 /// \param _list_only: output only list of functions, but not their bodies
 show_goto_functions_jsont::show_goto_functions_jsont(bool _list_only)

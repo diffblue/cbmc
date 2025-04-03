@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "shadow_memory_state.h"
 
 #include <functional>
-#include <memory>
 
 class incremental_dirtyt;
 class symex_target_equationt;

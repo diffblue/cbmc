@@ -27,8 +27,6 @@ Author: Daniel Kroening
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
 
-#include <ostream>
-
 static std::optional<symbol_exprt> get_object_rec(const exprt &src)
 {
   if(src.id()==ID_symbol)

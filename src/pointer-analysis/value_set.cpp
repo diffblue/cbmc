@@ -27,8 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/xml.h>
 
-#include <ostream>
-
 #ifdef DEBUG
 #include <iostream>
 #include <util/format_expr.h>
