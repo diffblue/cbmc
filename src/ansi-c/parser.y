@@ -34,6 +34,12 @@ int yyansi_cerror(const std::string &error);
 
 #include "literals/convert_integer_literal.h"
 
+/* To avoid LTO -Wodr clashes */
+#define YYTOKENTYPE 1
+#define YYEMPTY -2
+#define YYEOF    0                 /* "end of file"  */
+#define YYerror 256                /* error  */
+#define YYUNDEF 257                /* "invalid token"  */
 #include "ansi_c_y.tab.h"
 
 #include <util/mathematical_expr.h>
@@ -60,225 +66,225 @@ int yyansi_cerror(const std::string &error);
 
 /*** ANSI-C keywords ***/
 
-%token TOK_AUTO      "auto"
-%token TOK_BOOL      "bool"
-%token TOK_COMPLEX   "complex"
-%token TOK_BREAK     "break"
-%token TOK_CASE      "case"
-%token TOK_CHAR      "char"
-%token TOK_CONST     "const"
-%token TOK_CONTINUE  "continue"
-%token TOK_DEFAULT   "default"
-%token TOK_DO        "do"
-%token TOK_DOUBLE    "double"
-%token TOK_ELSE      "else"
-%token TOK_ENUM      "enum"
-%token TOK_EXTERN    "extern"
-%token TOK_FLOAT     "float"
-%token TOK_FOR       "for"
-%token TOK_GOTO      "goto"
-%token TOK_IF        "if"
-%token TOK_INLINE    "inline"
-%token TOK_INT       "int"
-%token TOK_LONG      "long"
-%token TOK_REGISTER  "register"
-%token TOK_RESTRICT  "restrict"
-%token TOK_RETURN    "return"
-%token TOK_SHORT     "short"
-%token TOK_SIGNED    "signed"
-%token TOK_SIZEOF    "sizeof"
-%token TOK_STATIC    "static"
-%token TOK_STRUCT    "struct"
-%token TOK_SWITCH    "switch"
-%token TOK_TYPEDEF   "typedef"
-%token TOK_UNION     "union"
-%token TOK_UNSIGNED  "unsigned"
-%token TOK_VOID      "void"
-%token TOK_VOLATILE  "volatile"
-%token TOK_WCHAR_T   "wchar_t"
-%token TOK_WHILE     "while"
+%token ATOK_AUTO      "auto"
+%token ATOK_BOOL      "bool"
+%token ATOK_COMPLEX   "complex"
+%token ATOK_BREAK     "break"
+%token ATOK_CASE      "case"
+%token ATOK_CHAR      "char"
+%token ATOK_CONST     "const"
+%token ATOK_CONTINUE  "continue"
+%token ATOK_DEFAULT   "default"
+%token ATOK_DO        "do"
+%token ATOK_DOUBLE    "double"
+%token ATOK_ELSE      "else"
+%token ATOK_ENUM      "enum"
+%token ATOK_EXTERN    "extern"
+%token ATOK_FLOAT     "float"
+%token ATOK_FOR       "for"
+%token ATOK_GOTO      "goto"
+%token ATOK_IF        "if"
+%token ATOK_INLINE    "inline"
+%token ATOK_INT       "int"
+%token ATOK_LONG      "long"
+%token ATOK_REGISTER  "register"
+%token ATOK_RESTRICT  "restrict"
+%token ATOK_RETURN    "return"
+%token ATOK_SHORT     "short"
+%token ATOK_SIGNED    "signed"
+%token ATOK_SIZEOF    "sizeof"
+%token ATOK_STATIC    "static"
+%token ATOK_STRUCT    "struct"
+%token ATOK_SWITCH    "switch"
+%token ATOK_TYPEDEF   "typedef"
+%token ATOK_UNION     "union"
+%token ATOK_UNSIGNED  "unsigned"
+%token ATOK_VOID      "void"
+%token ATOK_VOLATILE  "volatile"
+%token ATOK_WCHAR_T   "wchar_t"
+%token ATOK_WHILE     "while"
 
 /*** multi-character operators ***/
 
-%token TOK_ARROW     "->"
-%token TOK_INCR      "++"
-%token TOK_DECR      "--"
-%token TOK_SHIFTLEFT "<<"
-%token TOK_SHIFTRIGHT ">>"
-%token TOK_LE        "<="
-%token TOK_GE        ">="
-%token TOK_EQ        "=="
-%token TOK_NE        "!="
-%token TOK_ANDAND    "&&"
-%token TOK_OROR      "||"
-%token TOK_ELLIPSIS  "..."
+%token ATOK_ARROW     "->"
+%token ATOK_INCR      "++"
+%token ATOK_DECR      "--"
+%token ATOK_SHIFTLEFT "<<"
+%token ATOK_SHIFTRIGHT ">>"
+%token ATOK_LE        "<="
+%token ATOK_GE        ">="
+%token ATOK_EQ        "=="
+%token ATOK_NE        "!="
+%token ATOK_ANDAND    "&&"
+%token ATOK_OROR      "||"
+%token ATOK_ELLIPSIS  "..."
 
 /*** modifying assignment operators ***/
 
-%token TOK_MULTASSIGN  "*="
-%token TOK_DIVASSIGN   "/="
-%token TOK_MODASSIGN   "%="
-%token TOK_PLUSASSIGN  "+="
-%token TOK_MINUSASSIGN "-="
-%token TOK_SHLASSIGN   "<<="
-%token TOK_SHRASSIGN   ">>="
-%token TOK_ANDASSIGN   "&="
-%token TOK_XORASSIGN   "^="
-%token TOK_ORASSIGN    "|="
+%token ATOK_MULTASSIGN  "*="
+%token ATOK_DIVASSIGN   "/="
+%token ATOK_MODASSIGN   "%="
+%token ATOK_PLUSASSIGN  "+="
+%token ATOK_MINUSASSIGN "-="
+%token ATOK_SHLASSIGN   "<<="
+%token ATOK_SHRASSIGN   ">>="
+%token ATOK_ANDASSIGN   "&="
+%token ATOK_XORASSIGN   "^="
+%token ATOK_ORASSIGN    "|="
 
 /*** scanner parsed tokens (these have a value!) ***/
 
-%token TOK_GCC_IDENTIFIER
-%token TOK_MSC_IDENTIFIER
-%token TOK_TYPEDEFNAME
-%token TOK_INTEGER
-%token TOK_FLOATING
-%token TOK_CHARACTER
-%token TOK_STRING
-%token TOK_ASM_STRING
+%token ATOK_GCC_IDENTIFIER
+%token ATOK_MSC_IDENTIFIER
+%token ATOK_TYPEDEFNAME
+%token ATOK_INTEGER
+%token ATOK_FLOATING
+%token ATOK_CHARACTER
+%token ATOK_STRING
+%token ATOK_ASM_STRING
 
 /*** extensions ***/
 
-%token TOK_INT8        "__int8"
-%token TOK_INT16       "__int16"
-%token TOK_INT32       "__int32"
-%token TOK_INT64       "__int64"
-%token TOK_PTR32       "__ptr32"
-%token TOK_PTR64       "__ptr64"
-%token TOK_TYPEOF      "typeof"
-%token TOK_GCC_AUTO_TYPE "__auto_type"
-%token TOK_GCC_FLOAT16 "_Float16"
-%token TOK_GCC_FLOAT32 "_Float32"
-%token TOK_GCC_FLOAT32X "_Float32x"
-%token TOK_GCC_FLOAT80 "__float80"
-%token TOK_GCC_FLOAT64 "_Float64"
-%token TOK_GCC_FLOAT64X "_Float64x"
-%token TOK_GCC_FLOAT128 "_Float128"
-%token TOK_GCC_FLOAT128X "_Float128x"
-%token TOK_GCC_INT128 "__int128"
-%token TOK_GCC_DECIMAL32 "_Decimal32"
-%token TOK_GCC_DECIMAL64 "_Decimal64"
-%token TOK_GCC_DECIMAL128 "_Decimal128"
-%token TOK_GCC_ASM     "__asm__"
-%token TOK_GCC_ASM_PAREN "__asm__ (with parentheses)"
-%token TOK_GCC_ATTRIBUTE "__attribute__"
-%token TOK_GCC_ATTRIBUTE_ALIGNED "aligned"
-%token TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION "transparent_union"
-%token TOK_GCC_ATTRIBUTE_PACKED "packed"
-%token TOK_GCC_ATTRIBUTE_VECTOR_SIZE "vector_size"
-%token TOK_GCC_ATTRIBUTE_MODE "mode"
-%token TOK_GCC_ATTRIBUTE_GNU_INLINE "__gnu_inline__"
-%token TOK_GCC_ATTRIBUTE_WEAK "weak"
-%token TOK_GCC_ATTRIBUTE_ALIAS "alias"
-%token TOK_GCC_ATTRIBUTE_SECTION "section"
-%token TOK_GCC_ATTRIBUTE_NORETURN "noreturn"
-%token TOK_GCC_ATTRIBUTE_CONSTRUCTOR "constructor"
-%token TOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
-%token TOK_GCC_ATTRIBUTE_FALLTHROUGH "fallthrough"
-%token TOK_GCC_ATTRIBUTE_USED "used"
-%token TOK_GCC_LABEL   "__label__"
-%token TOK_MSC_ASM     "__asm"
-%token TOK_MSC_BASED   "__based"
-%token TOK_CW_VAR_ARG_TYPEOF "_var_arg_typeof"
-%token TOK_BUILTIN_VA_ARG "__builtin_va_arg"
-%token TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
-%token TOK_CLANG_BUILTIN_CONVERTVECTOR "__builtin_convertvector"
-%token TOK_OFFSETOF    "__offsetof"
-%token TOK_ALIGNOF     "__alignof__"
-%token TOK_MSC_TRY     "__try"
-%token TOK_MSC_FINALLY "__finally"
-%token TOK_MSC_EXCEPT  "__except"
-%token TOK_MSC_LEAVE   "__leave"
-%token TOK_MSC_DECLSPEC "__declspec"
-%token TOK_MSC_FORCEINLINE "__forceinline"
-%token TOK_INTERFACE   "__interface"
-%token TOK_CDECL       "__cdecl"
-%token TOK_STDCALL     "__stdcall"
-%token TOK_FASTCALL    "__fastcall"
-%token TOK_CLRCALL     "__clrcall"
-%token TOK_FORALL      "forall"
-%token TOK_EXISTS      "exists"
-%token TOK_ACSL_FORALL "\\forall"
-%token TOK_ACSL_EXISTS "\\exists"
-%token TOK_ACSL_LAMBDA "\\lambda"
-%token TOK_ACSL_LET    "\\let"
-%token TOK_ARRAY_OF    "array_of"
-%token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
-%token TOK_CPROVER_FLOATBV "__CPROVER_floatbv"
-%token TOK_CPROVER_FIXEDBV "__CPROVER_fixedbv"
-%token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
-%token TOK_CPROVER_BOOL "__CPROVER_bool"
-%token TOK_CPROVER_THROW "__CPROVER_throw"
-%token TOK_CPROVER_CATCH "__CPROVER_catch"
-%token TOK_CPROVER_TRY "__CPROVER_try"
-%token TOK_CPROVER_FINALLY "__CPROVER_finally"
-%token TOK_CPROVER_ID  "__CPROVER_ID"
-%token TOK_CPROVER_LOOP_INVARIANT  "__CPROVER_loop_invariant"
-%token TOK_CPROVER_DECREASES "__CPROVER_decreases"
-%token TOK_CPROVER_REQUIRES  "__CPROVER_requires"
-%token TOK_CPROVER_ENSURES  "__CPROVER_ensures"
-%token TOK_CPROVER_ASSIGNS "__CPROVER_assigns"
-%token TOK_CPROVER_FREES "__CPROVER_frees"
-%token TOK_IMPLIES     "==>"
-%token TOK_EQUIVALENT  "<==>"
-%token TOK_XORXOR      "^^"
-%token TOK_TRUE        "TRUE"
-%token TOK_FALSE       "FALSE"
-%token TOK_REAL        "__real__"
-%token TOK_IMAG        "__imag__"
-%token TOK_ALIGNAS     "_Alignas"
-%token TOK_ATOMIC_TYPE_QUALIFIER "_Atomic"
-%token TOK_ATOMIC_TYPE_SPECIFIER "_Atomic()"
-%token TOK_GENERIC     "_Generic"
-%token TOK_IMAGINARY   "_Imaginary"
-%token TOK_NORETURN    "_Noreturn"
-%token TOK_STATIC_ASSERT "_Static_assert"
-%token TOK_THREAD_LOCAL "_Thread_local"
-%token TOK_NULLPTR     "nullptr"
-%token TOK_CONSTEXPR   "constexpr"
-%token TOK_BIT_CAST    "__builtin_bit_cast"
+%token ATOK_INT8        "__int8"
+%token ATOK_INT16       "__int16"
+%token ATOK_INT32       "__int32"
+%token ATOK_INT64       "__int64"
+%token ATOK_PTR32       "__ptr32"
+%token ATOK_PTR64       "__ptr64"
+%token ATOK_TYPEOF      "typeof"
+%token ATOK_GCC_AUTO_TYPE "__auto_type"
+%token ATOK_GCC_FLOAT16 "_Float16"
+%token ATOK_GCC_FLOAT32 "_Float32"
+%token ATOK_GCC_FLOAT32X "_Float32x"
+%token ATOK_GCC_FLOAT80 "__float80"
+%token ATOK_GCC_FLOAT64 "_Float64"
+%token ATOK_GCC_FLOAT64X "_Float64x"
+%token ATOK_GCC_FLOAT128 "_Float128"
+%token ATOK_GCC_FLOAT128X "_Float128x"
+%token ATOK_GCC_INT128 "__int128"
+%token ATOK_GCC_DECIMAL32 "_Decimal32"
+%token ATOK_GCC_DECIMAL64 "_Decimal64"
+%token ATOK_GCC_DECIMAL128 "_Decimal128"
+%token ATOK_GCC_ASM     "__asm__"
+%token ATOK_GCC_ASM_PAREN "__asm__ (with parentheses)"
+%token ATOK_GCC_ATTRIBUTE "__attribute__"
+%token ATOK_GCC_ATTRIBUTE_ALIGNED "aligned"
+%token ATOK_GCC_ATTRIBUTE_TRANSPARENT_UNION "transparent_union"
+%token ATOK_GCC_ATTRIBUTE_PACKED "packed"
+%token ATOK_GCC_ATTRIBUTE_VECTOR_SIZE "vector_size"
+%token ATOK_GCC_ATTRIBUTE_MODE "mode"
+%token ATOK_GCC_ATTRIBUTE_GNU_INLINE "__gnu_inline__"
+%token ATOK_GCC_ATTRIBUTE_WEAK "weak"
+%token ATOK_GCC_ATTRIBUTE_ALIAS "alias"
+%token ATOK_GCC_ATTRIBUTE_SECTION "section"
+%token ATOK_GCC_ATTRIBUTE_NORETURN "noreturn"
+%token ATOK_GCC_ATTRIBUTE_CONSTRUCTOR "constructor"
+%token ATOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
+%token ATOK_GCC_ATTRIBUTE_FALLTHROUGH "fallthrough"
+%token ATOK_GCC_ATTRIBUTE_USED "used"
+%token ATOK_GCC_LABEL   "__label__"
+%token ATOK_MSC_ASM     "__asm"
+%token ATOK_MSC_BASED   "__based"
+%token ATOK_CW_VAR_ARG_TYPEOF "_var_arg_typeof"
+%token ATOK_BUILTIN_VA_ARG "__builtin_va_arg"
+%token ATOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
+%token ATOK_CLANG_BUILTIN_CONVERTVECTOR "__builtin_convertvector"
+%token ATOK_OFFSETOF    "__offsetof"
+%token ATOK_ALIGNOF     "__alignof__"
+%token ATOK_MSC_TRY     "__try"
+%token ATOK_MSC_FINALLY "__finally"
+%token ATOK_MSC_EXCEPT  "__except"
+%token ATOK_MSC_LEAVE   "__leave"
+%token ATOK_MSC_DECLSPEC "__declspec"
+%token ATOK_MSC_FORCEINLINE "__forceinline"
+%token ATOK_INTERFACE   "__interface"
+%token ATOK_CDECL       "__cdecl"
+%token ATOK_STDCALL     "__stdcall"
+%token ATOK_FASTCALL    "__fastcall"
+%token ATOK_CLRCALL     "__clrcall"
+%token ATOK_FORALL      "forall"
+%token ATOK_EXISTS      "exists"
+%token ATOK_ACSL_FORALL "\\forall"
+%token ATOK_ACSL_EXISTS "\\exists"
+%token ATOK_ACSL_LAMBDA "\\lambda"
+%token ATOK_ACSL_LET    "\\let"
+%token ATOK_ARRAY_OF    "array_of"
+%token ATOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
+%token ATOK_CPROVER_FLOATBV "__CPROVER_floatbv"
+%token ATOK_CPROVER_FIXEDBV "__CPROVER_fixedbv"
+%token ATOK_CPROVER_ATOMIC "__CPROVER_atomic"
+%token ATOK_CPROVER_BOOL "__CPROVER_bool"
+%token ATOK_CPROVER_THROW "__CPROVER_throw"
+%token ATOK_CPROVER_CATCH "__CPROVER_catch"
+%token ATOK_CPROVER_TRY "__CPROVER_try"
+%token ATOK_CPROVER_FINALLY "__CPROVER_finally"
+%token ATOK_CPROVER_ID  "__CPROVER_ID"
+%token ATOK_CPROVER_LOOP_INVARIANT  "__CPROVER_loop_invariant"
+%token ATOK_CPROVER_DECREASES "__CPROVER_decreases"
+%token ATOK_CPROVER_REQUIRES  "__CPROVER_requires"
+%token ATOK_CPROVER_ENSURES  "__CPROVER_ensures"
+%token ATOK_CPROVER_ASSIGNS "__CPROVER_assigns"
+%token ATOK_CPROVER_FREES "__CPROVER_frees"
+%token ATOK_IMPLIES     "==>"
+%token ATOK_EQUIVALENT  "<==>"
+%token ATOK_XORXOR      "^^"
+%token ATOK_TRUE        "TRUE"
+%token ATOK_FALSE       "FALSE"
+%token ATOK_REAL        "__real__"
+%token ATOK_IMAG        "__imag__"
+%token ATOK_ALIGNAS     "_Alignas"
+%token ATOK_ATOMIC_TYPE_QUALIFIER "_Atomic"
+%token ATOK_ATOMIC_TYPE_SPECIFIER "_Atomic()"
+%token ATOK_GENERIC     "_Generic"
+%token ATOK_IMAGINARY   "_Imaginary"
+%token ATOK_NORETURN    "_Noreturn"
+%token ATOK_STATIC_ASSERT "_Static_assert"
+%token ATOK_THREAD_LOCAL "_Thread_local"
+%token ATOK_NULLPTR     "nullptr"
+%token ATOK_CONSTEXPR   "constexpr"
+%token ATOK_BIT_CAST    "__builtin_bit_cast"
 
 /*** special scanner reports ***/
 
-%token TOK_SCANNER_ERROR /* used by scanner to report errors */
-%token TOK_SCANNER_EOF   /* used by scanner to report end of import */
+%token ATOK_SCANNER_ERROR /* used by scanner to report errors */
+%token ATOK_SCANNER_EOF   /* used by scanner to report end of import */
 
 /*** these exist only for the benefit of the C++ frontend */
 
-%token TOK_CATCH       "catch"
-%token TOK_CHAR16_T    "char16_t"
-%token TOK_CHAR32_T    "char32_t"
-%token TOK_CLASS       "class"
-%token TOK_DELETE      "delete"
-%token TOK_DECLTYPE    "decltype"
-%token TOK_EXPLICIT    "explicit"
-%token TOK_FRIEND      "friend"
-%token TOK_MUTABLE     "mutable"
-%token TOK_NAMESPACE   "namespace"
-%token TOK_NEW         "new"
-%token TOK_NODISCARD   "nodiscard"
-%token TOK_NOEXCEPT    "noexcept"
-%token TOK_OPERATOR    "operator"
-%token TOK_PRIVATE     "private"
-%token TOK_PROTECTED   "protected"
-%token TOK_PUBLIC      "public"
-%token TOK_TEMPLATE    "template"
-%token TOK_THIS        "this"
-%token TOK_THROW       "throw"
-%token TOK_TYPEID      "typeid"
-%token TOK_TYPENAME    "typename"
-%token TOK_TRY         "try"
-%token TOK_USING       "using"
-%token TOK_VIRTUAL     "virtual"
-%token TOK_SCOPE       "::"
-%token TOK_DOTPM       ".*"
-%token TOK_ARROWPM     "->*"
-%token TOK_UNARY_TYPE_PREDICATE
-%token TOK_BINARY_TYPE_PREDICATE
-%token TOK_MSC_UUIDOF  "__uuidof"
-%token TOK_MSC_IF_EXISTS "__if_exists"
-%token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
-%token TOK_UNDERLYING_TYPE "__underlying_type"
+%token ATOK_CATCH       "catch"
+%token ATOK_CHAR16_T    "char16_t"
+%token ATOK_CHAR32_T    "char32_t"
+%token ATOK_CLASS       "class"
+%token ATOK_DELETE      "delete"
+%token ATOK_DECLTYPE    "decltype"
+%token ATOK_EXPLICIT    "explicit"
+%token ATOK_FRIEND      "friend"
+%token ATOK_MUTABLE     "mutable"
+%token ATOK_NAMESPACE   "namespace"
+%token ATOK_NEW         "new"
+%token ATOK_NODISCARD   "nodiscard"
+%token ATOK_NOEXCEPT    "noexcept"
+%token ATOK_OPERATOR    "operator"
+%token ATOK_PRIVATE     "private"
+%token ATOK_PROTECTED   "protected"
+%token ATOK_PUBLIC      "public"
+%token ATOK_TEMPLATE    "template"
+%token ATOK_THIS        "this"
+%token ATOK_THROW       "throw"
+%token ATOK_TYPEID      "typeid"
+%token ATOK_TYPENAME    "typename"
+%token ATOK_TRY         "try"
+%token ATOK_USING       "using"
+%token ATOK_VIRTUAL     "virtual"
+%token ATOK_SCOPE       "::"
+%token ATOK_DOTPM       ".*"
+%token ATOK_ARROWPM     "->*"
+%token ATOK_UNARY_TYPE_PREDICATE
+%token ATOK_BINARY_TYPE_PREDICATE
+%token ATOK_MSC_UUIDOF  "__uuidof"
+%token ATOK_MSC_IF_EXISTS "__if_exists"
+%token ATOK_MSC_IF_NOT_EXISTS "__if_not_exists"
+%token ATOK_UNDERLYING_TYPE "__underlying_type"
 
 /*** priority, associativity, etc. definitions **************************/
 
@@ -306,9 +312,9 @@ grammar:
 /*** Token with values **************************************************/
 
 identifier:
-          TOK_GCC_IDENTIFIER
-        | TOK_MSC_IDENTIFIER
-        | TOK_CPROVER_ID TOK_STRING
+          ATOK_GCC_IDENTIFIER
+        | ATOK_MSC_IDENTIFIER
+        | ATOK_CPROVER_ID ATOK_STRING
         {
           // construct an identifier from a string that would otherwise not be a
           // valid identifier in C
@@ -323,23 +329,23 @@ identifier:
         ;
 
 typedef_name:
-        TOK_TYPEDEFNAME
+        ATOK_TYPEDEFNAME
         ;
 
 integer:
-        TOK_INTEGER
+        ATOK_INTEGER
         ;
 
 floating:
-        TOK_FLOATING
+        ATOK_FLOATING
         ;
 
 character:
-        TOK_CHARACTER
+        ATOK_CHARACTER
         ;
 
 string:
-        TOK_STRING
+        ATOK_STRING
         ;
 
 /*** Constants **********************************************************/
@@ -367,7 +373,7 @@ primary_expression:
         ;
 
 generic_selection:
-          TOK_GENERIC '(' assignment_expression ',' generic_assoc_list ')'
+          ATOK_GENERIC '(' assignment_expression ',' generic_assoc_list ')'
         {
           $$=$1;
           set($$, ID_generic_selection);
@@ -395,7 +401,7 @@ generic_association:
           parser_stack($$).set(ID_type_arg, parser_stack($1));
           parser_stack($$).set(ID_value, parser_stack($3));
         }
-        | TOK_DEFAULT ':' assignment_expression
+        | ATOK_DEFAULT ':' assignment_expression
         {
           $$=$2;
           parser_stack($$).id(ID_generic_association);
@@ -405,14 +411,14 @@ generic_association:
         ;
 
 gcc_builtin_expressions:
-          TOK_BUILTIN_VA_ARG '(' assignment_expression ',' type_name ')'
+          ATOK_BUILTIN_VA_ARG '(' assignment_expression ',' type_name ')'
         {
           $$=$1;
           parser_stack($$).id(ID_gcc_builtin_va_arg);
           mto($$, $3);
           parser_stack($$).type().swap(parser_stack($5));
         }
-        | TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P '('
+        | ATOK_GCC_BUILTIN_TYPES_COMPATIBLE_P '('
            type_name ',' type_name ')'
         {
           $$=$1;
@@ -426,7 +432,7 @@ gcc_builtin_expressions:
         ;
 
 clang_builtin_expressions:
-          TOK_CLANG_BUILTIN_CONVERTVECTOR '(' assignment_expression ',' type_name ')'
+          ATOK_CLANG_BUILTIN_CONVERTVECTOR '(' assignment_expression ',' type_name ')'
         {
           $$=$1;
           parser_stack($$).id(ID_clang_builtin_convertvector);
@@ -436,7 +442,7 @@ clang_builtin_expressions:
         ;
 
 cw_builtin_expressions:
-          TOK_CW_VAR_ARG_TYPEOF '(' type_name ')'
+          ATOK_CW_VAR_ARG_TYPEOF '(' type_name ')'
         {
           $$=$1;
           parser_stack($$).id(ID_cw_va_arg_typeof);
@@ -445,7 +451,7 @@ cw_builtin_expressions:
         ;
 
 offsetof:
-        TOK_OFFSETOF '(' type_name ',' offsetof_member_designator ')'
+        ATOK_OFFSETOF '(' type_name ',' offsetof_member_designator ')'
         {
           $$=$1;
           parser_stack($$).id(ID_builtin_offsetof);
@@ -477,7 +483,7 @@ offsetof_member_designator:
           mto($2, $3);
           mto($$, $2);
         }
-        | offsetof_member_designator TOK_ARROW member_name
+        | offsetof_member_designator ATOK_ARROW member_name
         {
           $$=$1;
           set($2, ID_index);
@@ -490,7 +496,7 @@ offsetof_member_designator:
         ;
           
 quantifier_expression:
-          TOK_FORALL compound_scope '{' declaration comma_expression '}'
+          ATOK_FORALL compound_scope '{' declaration comma_expression '}'
         {
           $$=$1;
           set($$, ID_forall);
@@ -498,7 +504,7 @@ quantifier_expression:
           mto($$, $5);
           PARSER.pop_scope();
         }
-        | TOK_EXISTS compound_scope '{' declaration comma_expression '}'
+        | ATOK_EXISTS compound_scope '{' declaration comma_expression '}'
         {
           $$=$1;
           set($$, ID_exists);
@@ -509,7 +515,7 @@ quantifier_expression:
         ;
 
 cprover_contract_loop_invariant:
-          TOK_CPROVER_LOOP_INVARIANT '(' ACSL_binding_expression ')'
+          ATOK_CPROVER_LOOP_INVARIANT '(' ACSL_binding_expression ')'
         { $$=$3; }
         ;
 
@@ -536,7 +542,7 @@ ACSL_binding_expression_list:
 cprover_contract_decreases_opt:
         /* nothing */
         { init($$); parser_stack($$).make_nil(); }
-        | TOK_CPROVER_DECREASES '(' ACSL_binding_expression_list ')'
+        | ATOK_CPROVER_DECREASES '(' ACSL_binding_expression_list ')'
         { $$=$3; }
         ;
 
@@ -579,19 +585,19 @@ postfix_expression:
           mto($$, $1);
           parser_stack($$).set(ID_component_name, parser_stack($3).get(ID_C_base_name));
         }
-        | postfix_expression TOK_ARROW member_name
+        | postfix_expression ATOK_ARROW member_name
         { $$=$2;
           set($$, ID_ptrmember);
           mto($$, $1);
           parser_stack($$).set(ID_component_name, parser_stack($3).get(ID_C_base_name));
         }
-        | postfix_expression TOK_INCR
+        | postfix_expression ATOK_INCR
         { $$=$2;
           set($$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_postincrement);
           mto($$, $1);
         }
-        | postfix_expression TOK_DECR
+        | postfix_expression ATOK_DECR
         { $$=$2;
           set($$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_postdecrement);
@@ -641,13 +647,13 @@ argument_expression_list:
 
 unary_expression:
           postfix_expression
-        | TOK_INCR unary_expression
+        | ATOK_INCR unary_expression
         { $$=$1;
           set($$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_preincrement);
           mto($$, $2);
         }
-        | TOK_DECR unary_expression
+        | ATOK_DECR unary_expression
         { $$=$1;
           set($$, ID_side_effect);
           parser_stack($$).set(ID_statement, ID_predecrement);
@@ -658,7 +664,7 @@ unary_expression:
           set($$, ID_address_of);
           mto($$, $2);
         }
-        | TOK_ANDAND gcc_local_label
+        | ATOK_ANDAND gcc_local_label
         { // this takes the address of a label (a gcc extension)
           $$=$1;
           irep_idt identifier=PARSER.lookup_label(parser_stack($2).get(ID_C_base_name));
@@ -694,29 +700,29 @@ unary_expression:
           set($$, ID_not);
           mto($$, $2);
         }
-        | TOK_SIZEOF unary_expression
+        | ATOK_SIZEOF unary_expression
         { $$=$1;
           set($$, ID_sizeof);
           mto($$, $2);
         }
-        | TOK_SIZEOF '(' type_name ')'
+        | ATOK_SIZEOF '(' type_name ')'
         { $$=$1;
           set($$, ID_sizeof);
           parser_stack($$).add(ID_type_arg).swap(parser_stack($3));
         }
-        | TOK_ALIGNOF unary_expression
+        | ATOK_ALIGNOF unary_expression
         { // note no parentheses for expressions, just like sizeof
           $$=$1;
           set($$, ID_alignof);
           mto($$, $2);
         }
-        | TOK_ALIGNOF '(' type_name ')'
+        | ATOK_ALIGNOF '(' type_name ')'
         {
           $$=$1;
           parser_stack($$).id(ID_alignof);
           parser_stack($$).add(ID_type_arg).swap(parser_stack($3));
         }
-        | TOK_BIT_CAST '(' type_name ',' unary_expression ')'
+        | ATOK_BIT_CAST '(' type_name ',' unary_expression ')'
         { $$=$1;
           set($$, ID_bit_cast);
           mto($$, $5);
@@ -733,12 +739,12 @@ cast_expression:
           mto($$, $4);
           parser_stack($$).type().swap(parser_stack($2));
         }
-        | TOK_REAL cast_expression
+        | ATOK_REAL cast_expression
         { $$=$1;
           set($$, ID_complex_real);
           mto($$, $2);
         }
-        | TOK_IMAG cast_expression
+        | ATOK_IMAG cast_expression
         { $$=$1;
           set($$, ID_complex_imag);
           mto($$, $2);
@@ -765,9 +771,9 @@ additive_expression:
 
 shift_expression:
           additive_expression
-        | shift_expression TOK_SHIFTLEFT additive_expression
+        | shift_expression ATOK_SHIFTLEFT additive_expression
         { binary($$, $1, $2, ID_shl, $3); }
-        | shift_expression TOK_SHIFTRIGHT additive_expression
+        | shift_expression ATOK_SHIFTRIGHT additive_expression
         { binary($$, $1, $2, ID_shr, $3); }
         ;
 
@@ -777,17 +783,17 @@ relational_expression:
         { binary($$, $1, $2, ID_lt, $3); }
         | relational_expression '>' shift_expression
         { binary($$, $1, $2, ID_gt, $3); }
-        | relational_expression TOK_LE shift_expression
+        | relational_expression ATOK_LE shift_expression
         { binary($$, $1, $2, ID_le, $3); }
-        | relational_expression TOK_GE shift_expression
+        | relational_expression ATOK_GE shift_expression
         { binary($$, $1, $2, ID_ge, $3); }
         ;
 
 equality_expression:
           relational_expression
-        | equality_expression TOK_EQ relational_expression
+        | equality_expression ATOK_EQ relational_expression
         { binary($$, $1, $2, ID_equal, $3); }
-        | equality_expression TOK_NE relational_expression
+        | equality_expression ATOK_NE relational_expression
         { binary($$, $1, $2, ID_notequal, $3); }
         ;
 
@@ -811,19 +817,19 @@ inclusive_or_expression:
 
 logical_and_expression:
           inclusive_or_expression
-        | logical_and_expression TOK_ANDAND inclusive_or_expression
+        | logical_and_expression ATOK_ANDAND inclusive_or_expression
         { binary($$, $1, $2, ID_and, $3); }
         ;
 
 logical_xor_expression:
           logical_and_expression
-        | logical_xor_expression TOK_XORXOR logical_and_expression
+        | logical_xor_expression ATOK_XORXOR logical_and_expression
         { binary($$, $1, $2, ID_xor, $3); }
         ;
 
 logical_or_expression:
           logical_xor_expression
-        | logical_or_expression TOK_OROR logical_xor_expression
+        | logical_or_expression ATOK_OROR logical_xor_expression
         { binary($$, $1, $2, ID_or, $3); }
         ;
 
@@ -832,7 +838,7 @@ logical_or_expression:
    and binds weaker than 'OR', and stronger than bi-implication. */
 logical_implication_expression:
           logical_or_expression
-        | logical_or_expression TOK_IMPLIES logical_implication_expression
+        | logical_or_expression ATOK_IMPLIES logical_implication_expression
         { binary($$, $1, $2, ID_implies, $3); }
         ;
 
@@ -841,14 +847,14 @@ logical_implication_expression:
    and binds weaker than '==>', and stronger than quantifiers. */
 logical_equivalence_expression:
           logical_implication_expression
-        | logical_equivalence_expression TOK_EQUIVALENT logical_implication_expression
+        | logical_equivalence_expression ATOK_EQUIVALENT logical_implication_expression
         { binary($$, $1, $2, ID_equal, $3); }
         ;
 
 /* Non-standard, defined by ACSL. Lowest precedence of all operators. */
 ACSL_binding_expression:
           conditional_expression
-        | TOK_ACSL_FORALL compound_scope declaration ACSL_binding_expression
+        | ATOK_ACSL_FORALL compound_scope declaration ACSL_binding_expression
         {
           $$=$1;
           set($$, ID_forall);
@@ -856,7 +862,7 @@ ACSL_binding_expression:
           mto($$, $4);
           PARSER.pop_scope();
         }
-        | TOK_ACSL_EXISTS compound_scope declaration ACSL_binding_expression
+        | ATOK_ACSL_EXISTS compound_scope declaration ACSL_binding_expression
         {
           $$=$1;
           set($$, ID_exists);
@@ -864,7 +870,7 @@ ACSL_binding_expression:
           mto($$, $4);
           PARSER.pop_scope();
         }
-        | TOK_ACSL_LAMBDA compound_scope declaration ACSL_binding_expression
+        | ATOK_ACSL_LAMBDA compound_scope declaration ACSL_binding_expression
         {
           $$=$1;
           set($$, ID_lambda);
@@ -896,25 +902,25 @@ assignment_expression:
           ACSL_binding_expression /* usually conditional_expression */
         | cast_expression '=' assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign); }
-        | cast_expression TOK_MULTASSIGN assignment_expression
+        | cast_expression ATOK_MULTASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_mult); }
-        | cast_expression TOK_DIVASSIGN assignment_expression
+        | cast_expression ATOK_DIVASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_div); }
-        | cast_expression TOK_MODASSIGN assignment_expression
+        | cast_expression ATOK_MODASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_mod); }
-        | cast_expression TOK_PLUSASSIGN assignment_expression
+        | cast_expression ATOK_PLUSASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_plus); }
-        | cast_expression TOK_MINUSASSIGN assignment_expression
+        | cast_expression ATOK_MINUSASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_minus); }
-        | cast_expression TOK_SHLASSIGN assignment_expression
+        | cast_expression ATOK_SHLASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_shl); }
-        | cast_expression TOK_SHRASSIGN assignment_expression
+        | cast_expression ATOK_SHRASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_shr); }
-        | cast_expression TOK_ANDASSIGN assignment_expression
+        | cast_expression ATOK_ANDASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_bitand); }
-        | cast_expression TOK_XORASSIGN assignment_expression
+        | cast_expression ATOK_XORASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_bitxor); }
-        | cast_expression TOK_ORASSIGN assignment_expression
+        | cast_expression ATOK_ORASSIGN assignment_expression
         { binary($$, $1, $2, ID_side_effect, $3); parser_stack($$).set(ID_statement, ID_assign_bitor); }
         ;
 
@@ -955,7 +961,7 @@ declaration:
         ;
         
 static_assert_declaration:
-          TOK_STATIC_ASSERT '(' assignment_expression ',' assignment_expression ')'
+          ATOK_STATIC_ASSERT '(' assignment_expression ',' assignment_expression ')'
         {
           $$=$1;
           set($$, ID_declaration);
@@ -1006,7 +1012,7 @@ default_declaring_list:
         ;
 
 post_declarator_attribute:
-          TOK_GCC_ASM_PAREN volatile_or_goto_opt '(' gcc_asm_commands ')'
+          ATOK_GCC_ASM_PAREN volatile_or_goto_opt '(' gcc_asm_commands ')'
         {
           $$=$1;
           parser_stack($$).id(ID_asm);
@@ -1065,7 +1071,7 @@ declaring_list:
           $$=$4;
           to_ansi_c_declaration(parser_stack($$)).add_initializer(parser_stack($5));
         }
-        | TOK_GCC_AUTO_TYPE declarator
+        | ATOK_GCC_AUTO_TYPE declarator
           post_declarator_attributes_opt '=' initializer
         {
           // handled as typeof(initializer)
@@ -1159,24 +1165,24 @@ declaration_qualifier:
         ;
 
 type_qualifier:
-          TOK_ATOMIC_TYPE_QUALIFIER { $$=$1; set($$, ID_atomic); }
-        | TOK_CONST                 { $$=$1; set($$, ID_const); }
-        | TOK_RESTRICT              { $$=$1; set($$, ID_restrict); }
-        | TOK_VOLATILE              { $$=$1; set($$, ID_volatile); }
-        | TOK_CPROVER_ATOMIC        { $$=$1; set($$, ID_cprover_atomic); }
-        | TOK_PTR32                 { $$=$1; set($$, ID_ptr32); }
-        | TOK_PTR64                 { $$=$1; set($$, ID_ptr64); }
-        | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); mto($$, $3); }
+          ATOK_ATOMIC_TYPE_QUALIFIER { $$=$1; set($$, ID_atomic); }
+        | ATOK_CONST                 { $$=$1; set($$, ID_const); }
+        | ATOK_RESTRICT              { $$=$1; set($$, ID_restrict); }
+        | ATOK_VOLATILE              { $$=$1; set($$, ID_volatile); }
+        | ATOK_CPROVER_ATOMIC        { $$=$1; set($$, ID_cprover_atomic); }
+        | ATOK_PTR32                 { $$=$1; set($$, ID_ptr32); }
+        | ATOK_PTR64                 { $$=$1; set($$, ID_ptr64); }
+        | ATOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); mto($$, $3); }
         | alignas_specifier
         ;
 
 alignas_specifier:
-          TOK_ALIGNAS '(' comma_expression ')'
+          ATOK_ALIGNAS '(' comma_expression ')'
         { $$ = $1;
           parser_stack($$).id(ID_aligned);
           parser_stack($$).set(ID_size, parser_stack($3));
         }
-        | TOK_ALIGNAS '(' type_name ')'
+        | ATOK_ALIGNAS '(' type_name ')'
         { $$ = $1;
           parser_stack($$).id(ID_aligned);
           parser_stack($3).set(ID_type_arg, parser_stack($3));
@@ -1328,12 +1334,12 @@ typedef_type_specifier:
         ;
 
 typeof_specifier:
-          TOK_TYPEOF '(' comma_expression ')'
+          ATOK_TYPEOF '(' comma_expression ')'
         { $$ = $1;
           parser_stack($$).id(ID_typeof);
           mto($$, $3);
         }
-        | TOK_TYPEOF '(' type_name ')'
+        | ATOK_TYPEOF '(' type_name ')'
         { $$ = $1;
           parser_stack($$).id(ID_typeof);
           parser_stack($$).set(ID_type_arg, parser_stack($3));
@@ -1357,7 +1363,7 @@ typeof_type_specifier:
         ;
 
 atomic_specifier:
-          TOK_ATOMIC_TYPE_SPECIFIER '(' type_name ')'
+          ATOK_ATOMIC_TYPE_SPECIFIER '(' type_name ')'
         {
           $$=$1;
           parser_stack($$).id(ID_atomic_type_specifier);
@@ -1382,15 +1388,15 @@ atomic_type_specifier:
         ;
 
 msc_decl_identifier:
-          TOK_MSC_IDENTIFIER
+          ATOK_MSC_IDENTIFIER
         {
           parser_stack($$).id(parser_stack($$).get(ID_identifier));
         }
-        | TOK_TYPEDEFNAME
+        | ATOK_TYPEDEFNAME
         {
           parser_stack($$).id(parser_stack($$).get(ID_identifier));
         }
-        | TOK_RESTRICT
+        | ATOK_RESTRICT
         {
           parser_stack($$).id(ID_restrict);
         }
@@ -1398,11 +1404,11 @@ msc_decl_identifier:
 
 msc_decl_modifier:
           msc_decl_identifier
-        | msc_decl_identifier '(' TOK_STRING ')'
+        | msc_decl_identifier '(' ATOK_STRING ')'
         {
           $$=$1; mto($$, $3);
         }
-        | msc_decl_identifier '(' TOK_INTEGER ')'
+        | msc_decl_identifier '(' ATOK_INTEGER ')'
         {
           $$=$1; mto($$, $3);
         }
@@ -1429,12 +1435,12 @@ msc_declspec_seq:
         ;
 
 msc_declspec:
-          TOK_MSC_DECLSPEC '(' msc_declspec_seq ')'
+          ATOK_MSC_DECLSPEC '(' msc_declspec_seq ')'
         {
           $$=$1; set($$, ID_msc_declspec);
           parser_stack($$).operands().swap(parser_stack($3).operands());
         }
-        | TOK_MSC_DECLSPEC '(' ')'
+        | ATOK_MSC_DECLSPEC '(' ')'
         {
           $$=$1; set($$, ID_msc_declspec);
         }
@@ -1462,16 +1468,16 @@ msc_declspec_opt:
         ;
 
 storage_class:
-          TOK_TYPEDEF      { $$=$1; set($$, ID_typedef); }
-        | TOK_EXTERN       { $$=$1; set($$, ID_extern); }
-        | TOK_STATIC       { $$=$1; set($$, ID_static); }
-        | TOK_AUTO         { $$=$1; set($$, ID_auto); }
-        | TOK_REGISTER     { $$=$1; set($$, ID_register); }
-        | TOK_INLINE       { $$=$1; set($$, ID_inline); }
-        | TOK_THREAD_LOCAL { $$=$1; set($$, ID_thread_local); }
-        | TOK_GCC_ASM      { $$=$1; set($$, ID_asm); }
+          ATOK_TYPEDEF      { $$=$1; set($$, ID_typedef); }
+        | ATOK_EXTERN       { $$=$1; set($$, ID_extern); }
+        | ATOK_STATIC       { $$=$1; set($$, ID_static); }
+        | ATOK_AUTO         { $$=$1; set($$, ID_auto); }
+        | ATOK_REGISTER     { $$=$1; set($$, ID_register); }
+        | ATOK_INLINE       { $$=$1; set($$, ID_inline); }
+        | ATOK_THREAD_LOCAL { $$=$1; set($$, ID_thread_local); }
+        | ATOK_GCC_ASM      { $$=$1; set($$, ID_asm); }
         | msc_declspec     { $$=$1; }
-        | TOK_MSC_FORCEINLINE
+        | ATOK_MSC_FORCEINLINE
         {
           // equivalent to always_inline, and seemingly also has the semantics
           // of extern inline in that multiple definitions can be provided in
@@ -1493,54 +1499,54 @@ storage_class:
         ;
 
 basic_type_name:
-          TOK_INT      { $$=$1; set($$, ID_int); }
-        | TOK_INT8     { $$=$1; set($$, ID_int8); }
-        | TOK_INT16    { $$=$1; set($$, ID_int16); }
-        | TOK_INT32    { $$=$1; set($$, ID_int32); }
-        | TOK_INT64    { $$=$1; set($$, ID_int64); }
-        | TOK_CHAR     { $$=$1; set($$, ID_char); }
-        | TOK_SHORT    { $$=$1; set($$, ID_short); }
-        | TOK_LONG     { $$=$1; set($$, ID_long); }
-        | TOK_FLOAT    { $$=$1; set($$, ID_float); }
-        | TOK_GCC_FLOAT16   { $$=$1; set($$, ID_gcc_float16); }
-        | TOK_GCC_FLOAT32   { $$=$1; set($$, ID_gcc_float32); }
-        | TOK_GCC_FLOAT32X  { $$=$1; set($$, ID_gcc_float32x); }
-        | TOK_GCC_FLOAT64   { $$=$1; set($$, ID_gcc_float64); }
-        | TOK_GCC_FLOAT64X  { $$=$1; set($$, ID_gcc_float64x); }
-        | TOK_GCC_FLOAT80   { $$=$1; set($$, ID_gcc_float80); }
-        | TOK_GCC_FLOAT128  { $$=$1; set($$, ID_gcc_float128); }
-        | TOK_GCC_FLOAT128X { $$=$1; set($$, ID_gcc_float128x); }
-        | TOK_GCC_INT128    { $$=$1; set($$, ID_gcc_int128); }
-        | TOK_GCC_DECIMAL32 { $$=$1; set($$, ID_gcc_decimal32); }
-        | TOK_GCC_DECIMAL64 { $$=$1; set($$, ID_gcc_decimal64); }
-        | TOK_GCC_DECIMAL128 { $$=$1; set($$, ID_gcc_decimal128); }
-        | TOK_DOUBLE   { $$=$1; set($$, ID_double); }
-        | TOK_SIGNED   { $$=$1; set($$, ID_signed); }
-        | TOK_UNSIGNED { $$=$1; set($$, ID_unsigned); }
-        | TOK_VOID     { $$=$1; set($$, ID_void); }
-        | TOK_BOOL     { $$=$1; set($$, ID_c_bool); }
-        | TOK_COMPLEX  { $$=$1; set($$, ID_complex); }
-        | TOK_CPROVER_BITVECTOR '[' comma_expression ']'
+          ATOK_INT      { $$=$1; set($$, ID_int); }
+        | ATOK_INT8     { $$=$1; set($$, ID_int8); }
+        | ATOK_INT16    { $$=$1; set($$, ID_int16); }
+        | ATOK_INT32    { $$=$1; set($$, ID_int32); }
+        | ATOK_INT64    { $$=$1; set($$, ID_int64); }
+        | ATOK_CHAR     { $$=$1; set($$, ID_char); }
+        | ATOK_SHORT    { $$=$1; set($$, ID_short); }
+        | ATOK_LONG     { $$=$1; set($$, ID_long); }
+        | ATOK_FLOAT    { $$=$1; set($$, ID_float); }
+        | ATOK_GCC_FLOAT16   { $$=$1; set($$, ID_gcc_float16); }
+        | ATOK_GCC_FLOAT32   { $$=$1; set($$, ID_gcc_float32); }
+        | ATOK_GCC_FLOAT32X  { $$=$1; set($$, ID_gcc_float32x); }
+        | ATOK_GCC_FLOAT64   { $$=$1; set($$, ID_gcc_float64); }
+        | ATOK_GCC_FLOAT64X  { $$=$1; set($$, ID_gcc_float64x); }
+        | ATOK_GCC_FLOAT80   { $$=$1; set($$, ID_gcc_float80); }
+        | ATOK_GCC_FLOAT128  { $$=$1; set($$, ID_gcc_float128); }
+        | ATOK_GCC_FLOAT128X { $$=$1; set($$, ID_gcc_float128x); }
+        | ATOK_GCC_INT128    { $$=$1; set($$, ID_gcc_int128); }
+        | ATOK_GCC_DECIMAL32 { $$=$1; set($$, ID_gcc_decimal32); }
+        | ATOK_GCC_DECIMAL64 { $$=$1; set($$, ID_gcc_decimal64); }
+        | ATOK_GCC_DECIMAL128 { $$=$1; set($$, ID_gcc_decimal128); }
+        | ATOK_DOUBLE   { $$=$1; set($$, ID_double); }
+        | ATOK_SIGNED   { $$=$1; set($$, ID_signed); }
+        | ATOK_UNSIGNED { $$=$1; set($$, ID_unsigned); }
+        | ATOK_VOID     { $$=$1; set($$, ID_void); }
+        | ATOK_BOOL     { $$=$1; set($$, ID_c_bool); }
+        | ATOK_COMPLEX  { $$=$1; set($$, ID_complex); }
+        | ATOK_CPROVER_BITVECTOR '[' comma_expression ']'
         {
           $$=$1;
           set($$, ID_custom_bv);
           parser_stack($$).add(ID_size).swap(parser_stack($3));
         }
-        | TOK_CPROVER_FLOATBV '[' comma_expression ']' '[' comma_expression ']'
+        | ATOK_CPROVER_FLOATBV '[' comma_expression ']' '[' comma_expression ']'
         {
           $$=$1;
           set($$, ID_custom_floatbv);
           parser_stack($$).add(ID_size).swap(parser_stack($3));
           parser_stack($$).add(ID_f).swap(parser_stack($6));
         }
-        | TOK_CPROVER_FIXEDBV '[' comma_expression ']' '[' comma_expression ']'
+        | ATOK_CPROVER_FIXEDBV '[' comma_expression ']' '[' comma_expression ']'
         {
           $$=$1;
           set($$, ID_custom_fixedbv);
           parser_stack($$).add(ID_size).swap(parser_stack($3));
           parser_stack($$).add(ID_f).swap(parser_stack($6));
         }
-        | TOK_CPROVER_BOOL { $$=$1; set($$, ID_proper_bool); }
+        | ATOK_CPROVER_BOOL { $$=$1; set($$, ID_proper_bool); }
         ;
 
 elaborated_type_name:
@@ -1550,7 +1556,7 @@ elaborated_type_name:
         ;
         
 array_of_construct:
-          TOK_ARRAY_OF '<' type_name '>'
+          ATOK_ARRAY_OF '<' type_name '>'
         { $$=$1; stack_type($$).add_subtype().swap(parser_stack($2)); }
         ;
 
@@ -1618,40 +1624,40 @@ aggregate_name:
         ;
 
 aggregate_key:
-          TOK_STRUCT
+          ATOK_STRUCT
         { $$=$1; set($$, ID_struct); }
-        | TOK_UNION
+        | ATOK_UNION
         { $$=$1; set($$, ID_union); }
         ;
 
 gcc_type_attribute:
-          TOK_GCC_ATTRIBUTE_PACKED
+          ATOK_GCC_ATTRIBUTE_PACKED
         { $$=$1; set($$, ID_packed); }
-        | TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION
+        | ATOK_GCC_ATTRIBUTE_TRANSPARENT_UNION
         { $$=$1; set($$, ID_transparent_union); }
-        | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')'
+        | ATOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')'
         { $$=$1; set($$, ID_frontend_vector); parser_stack($$).add(ID_size)=parser_stack($3); }
-        | TOK_GCC_ATTRIBUTE_ALIGNED
+        | ATOK_GCC_ATTRIBUTE_ALIGNED
         { $$=$1; set($$, ID_aligned); }
-        | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')'
+        | ATOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')'
         { $$=$1; set($$, ID_aligned); parser_stack($$).set(ID_size, parser_stack($3)); }
-        | TOK_GCC_ATTRIBUTE_MODE '(' identifier ')'
+        | ATOK_GCC_ATTRIBUTE_MODE '(' identifier ')'
         { $$=$1; set($$, ID_gcc_attribute_mode); parser_stack($$).set(ID_size, parser_stack($3).get(ID_identifier)); }
-        | TOK_GCC_ATTRIBUTE_GNU_INLINE
+        | ATOK_GCC_ATTRIBUTE_GNU_INLINE
         { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
-        | TOK_GCC_ATTRIBUTE_WEAK
+        | ATOK_GCC_ATTRIBUTE_WEAK
         { $$=$1; set($$, ID_weak); }
-        | TOK_GCC_ATTRIBUTE_ALIAS '(' TOK_STRING ')'
+        | ATOK_GCC_ATTRIBUTE_ALIAS '(' ATOK_STRING ')'
         { $$=$1; set($$, ID_alias); mto($$, $3); }
-        | TOK_GCC_ATTRIBUTE_SECTION '(' TOK_STRING ')'
+        | ATOK_GCC_ATTRIBUTE_SECTION '(' ATOK_STRING ')'
         { $$=$1; set($$, ID_section); mto($$, $3); }
-        | TOK_GCC_ATTRIBUTE_NORETURN
+        | ATOK_GCC_ATTRIBUTE_NORETURN
         { $$=$1; set($$, ID_noreturn); }
-        | TOK_GCC_ATTRIBUTE_CONSTRUCTOR
+        | ATOK_GCC_ATTRIBUTE_CONSTRUCTOR
         { $$=$1; set($$, ID_constructor); }
-        | TOK_GCC_ATTRIBUTE_DESTRUCTOR
+        | ATOK_GCC_ATTRIBUTE_DESTRUCTOR
         { $$=$1; set($$, ID_destructor); }
-        | TOK_GCC_ATTRIBUTE_USED
+        | ATOK_GCC_ATTRIBUTE_USED
         { $$=$1; set($$, ID_used); }
         ;
 
@@ -1660,7 +1666,7 @@ gcc_attribute:
         {
           init($$);
         }
-        | TOK_GCC_ATTRIBUTE_FALLTHROUGH
+        | ATOK_GCC_ATTRIBUTE_FALLTHROUGH
         {
           // attribute ignored
           init($$);
@@ -1677,9 +1683,9 @@ gcc_attribute_list:
         ;          
 
 gcc_attribute_specifier:
-          TOK_GCC_ATTRIBUTE '(' '(' gcc_attribute_list ')' ')'
+          ATOK_GCC_ATTRIBUTE '(' '(' gcc_attribute_list ')' ')'
         { $$=$4; }
-        | TOK_NORETURN
+        | ATOK_NORETURN
         { $$=$1; set($$, ID_noreturn); }
         ;
 
@@ -1934,7 +1940,7 @@ braced_enumerator_list_opt:
           $$=$2;
         }
 
-enum_key: TOK_ENUM
+enum_key: ATOK_ENUM
         {
           $$=$1;
           set($$, ID_c_enum);
@@ -1990,7 +1996,7 @@ enumerator_value_opt:
 
 parameter_type_list:
           parameter_list
-        | parameter_list ',' TOK_ELLIPSIS
+        | parameter_list ',' ATOK_ELLIPSIS
         {
           typet tmp(ID_ellipsis);
           $$=$1;
@@ -2272,7 +2278,7 @@ designator:
           mto($1, $2);
           mto($$, $1);
         }
-        | '[' comma_expression TOK_ELLIPSIS comma_expression ']'
+        | '[' comma_expression ATOK_ELLIPSIS comma_expression ']'
         {
           // TODO
           init($$);
@@ -2287,7 +2293,7 @@ designator:
           mto($2, $3);
           mto($$, $2);
         }
-        | designator '[' comma_expression TOK_ELLIPSIS comma_expression ']'
+        | designator '[' comma_expression ATOK_ELLIPSIS comma_expression ']'
         {
           // TODO
           $$=$1;
@@ -2344,12 +2350,12 @@ gcc_attribute_specifier_opt:
         ;
 
 msc_label_identifier:
-          TOK_MSC_IDENTIFIER
-        | TOK_TYPEDEFNAME
+          ATOK_MSC_IDENTIFIER
+        | ATOK_TYPEDEFNAME
         ;
 
 labeled_statement:
-          TOK_GCC_IDENTIFIER ':' gcc_attribute_specifier_opt stmt_not_decl_or_attr
+          ATOK_GCC_IDENTIFIER ':' gcc_attribute_specifier_opt stmt_not_decl_or_attr
         {
           // we ignore the GCC attribute
           $$=$2;
@@ -2366,14 +2372,14 @@ labeled_statement:
           parser_stack($$).set(ID_label, identifier);
           mto($$, $3);
         }
-        | TOK_CASE constant_expression ':' statement
+        | ATOK_CASE constant_expression ':' statement
         {
           $$=$1;
           statement($$, ID_switch_case);
           mto($$, $2);
           mto($$, $4);
         }
-        | TOK_CASE constant_expression TOK_ELLIPSIS constant_expression ':' statement
+        | ATOK_CASE constant_expression ATOK_ELLIPSIS constant_expression ':' statement
         {
           // this is a GCC extension
           $$=$1;
@@ -2382,7 +2388,7 @@ labeled_statement:
           mto($$, $4);
           mto($$, $6);
         }
-        | TOK_DEFAULT ':' statement
+        | ATOK_DEFAULT ':' statement
         {
           $$=$1;
           statement($$, ID_switch_case);
@@ -2395,7 +2401,7 @@ labeled_statement:
 statement_attribute:
         gcc_attribute_specifier ';'
         {
-          // Really should only be TOK_GCC_ATTRIBUTE_FALLTHROUGH or a label
+          // Really should only be ATOK_GCC_ATTRIBUTE_FALLTHROUGH or a label
           // attribute. Only semicolons permitted after the attribute:
           // https://gcc.gnu.org/onlinedocs/gcc/Label-Attributes.html
           // We ignore all such attributes.
@@ -2420,7 +2426,7 @@ compound_statement:
           parser_stack($$).operands().swap(parser_stack($3).operands());
           PARSER.pop_scope();
         }
-        | compound_scope '{' TOK_ASM_STRING '}'
+        | compound_scope '{' ATOK_ASM_STRING '}'
         {
           $$=$2;
           statement($$, ID_asm);
@@ -2466,21 +2472,21 @@ expression_statement:
         ;
 
 selection_statement:
-          TOK_IF '(' comma_expression ')' statement
+          ATOK_IF '(' comma_expression ')' statement
         {
           $$=$1;
           statement($$, ID_ifthenelse);
           parser_stack($$).add_to_operands(
             std::move(parser_stack($3)), std::move(parser_stack($5)), nil_exprt());
         }
-        | TOK_IF '(' comma_expression ')' statement TOK_ELSE statement
+        | ATOK_IF '(' comma_expression ')' statement ATOK_ELSE statement
         {
           $$=$1;
           statement($$, ID_ifthenelse);
           parser_stack($$).add_to_operands(
             std::move(parser_stack($3)), std::move(parser_stack($5)), std::move(parser_stack($7)));
         }
-        | TOK_SWITCH '(' comma_expression ')' statement
+        | ATOK_SWITCH '(' comma_expression ')' statement
         {
           $$=$1;
           statement($$, ID_switch);
@@ -2494,7 +2500,7 @@ declaration_or_expression_statement:
         ;
 
 iteration_statement:
-        TOK_WHILE '(' comma_expression_opt ')'
+        ATOK_WHILE '(' comma_expression_opt ')'
           cprover_contract_assigns_opt
           cprover_contract_loop_invariant_list_opt 
           cprover_contract_decreases_opt
@@ -2513,12 +2519,12 @@ iteration_statement:
           if(!parser_stack($7).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($7).operands());
         }
-        | TOK_DO
+        | ATOK_DO
           cprover_contract_assigns_opt
           cprover_contract_loop_invariant_list_opt
           cprover_contract_decreases_opt
           statement
-          TOK_WHILE '(' comma_expression ')' ';'
+          ATOK_WHILE '(' comma_expression ')' ';'
         {
           $$=$1;
           statement($$, ID_dowhile);
@@ -2533,7 +2539,7 @@ iteration_statement:
           if(!parser_stack($4).operands().empty())
             static_cast<exprt &>(parser_stack($$).add(ID_C_spec_decreases)).operands().swap(parser_stack($4).operands());
         }
-        | TOK_FOR
+        | ATOK_FOR
           {
             // In C99 and upwards, for(;;) has a scope
             if(PARSER.for_has_scope)
@@ -2573,7 +2579,7 @@ iteration_statement:
         ;
 
 jump_statement:
-          TOK_GOTO comma_expression ';'
+          ATOK_GOTO comma_expression ';'
         {
           $$=$1;
           if(parser_stack($2).id()==ID_symbol)
@@ -2590,29 +2596,29 @@ jump_statement:
             mto($$, $2);
           }
         }
-        | TOK_GOTO typedef_name ';'
+        | ATOK_GOTO typedef_name ';'
         {
           $$=$1;
           statement($$, ID_goto);
           irep_idt identifier=PARSER.lookup_label(parser_stack($2).get(ID_C_base_name));
           parser_stack($$).set(ID_destination, identifier);
         }
-        | TOK_CONTINUE ';'
+        | ATOK_CONTINUE ';'
         { $$=$1; statement($$, ID_continue); }
-        | TOK_BREAK ';'
+        | ATOK_BREAK ';'
         { $$=$1; statement($$, ID_break); }
-        | TOK_RETURN ';'
+        | ATOK_RETURN ';'
         {
           $$=$1;
           statement($$, ID_return);
           parser_stack($$).operands().push_back(nil_exprt());
         }
-        | TOK_RETURN comma_expression ';'
+        | ATOK_RETURN comma_expression ';'
         { $$=$1; statement($$, ID_return); mto($$, $2); }
         ;
 
 gcc_local_label_statement:
-          TOK_GCC_LABEL gcc_local_label_list ';'
+          ATOK_GCC_LABEL gcc_local_label_list ';'
         { 
           $$=$1;
           statement($$, ID_gcc_local_label);
@@ -2650,13 +2656,13 @@ gcc_local_label: identifier_or_typedef_name
         ;
 
 gcc_asm_statement:
-          TOK_GCC_ASM_PAREN volatile_or_goto_opt '(' gcc_asm_commands ')' ';'
+          ATOK_GCC_ASM_PAREN volatile_or_goto_opt '(' gcc_asm_commands ')' ';'
         { $$=$1;
           statement($$, ID_asm);
           parser_stack($$).set(ID_flavor, ID_gcc);
           parser_stack($$).operands().swap(parser_stack($4).operands());
         }
-        | TOK_GCC_ASM_PAREN volatile_or_goto_opt '{' TOK_ASM_STRING '}'
+        | ATOK_GCC_ASM_PAREN volatile_or_goto_opt '{' ATOK_ASM_STRING '}'
         {
           $$=$1;
           statement($$, ID_asm);
@@ -2667,13 +2673,13 @@ gcc_asm_statement:
         ;
 
 msc_asm_statement:
-          TOK_MSC_ASM '{' TOK_ASM_STRING '}'
+          ATOK_MSC_ASM '{' ATOK_ASM_STRING '}'
         { $$=$1;
           statement($$, ID_asm);
           parser_stack($$).set(ID_flavor, ID_msc);
           mto($$, $3);
         }
-        | TOK_MSC_ASM TOK_ASM_STRING
+        | ATOK_MSC_ASM ATOK_ASM_STRING
         { $$=$1;
           statement($$, ID_asm);
           parser_stack($$).set(ID_flavor, ID_msc);
@@ -2682,8 +2688,8 @@ msc_asm_statement:
         ;
 
 msc_seh_statement:
-          TOK_MSC_TRY compound_statement
-          TOK_MSC_EXCEPT '(' comma_expression ')' compound_statement
+          ATOK_MSC_TRY compound_statement
+          ATOK_MSC_EXCEPT '(' comma_expression ')' compound_statement
         {
           $$=$1;
           statement($$, ID_msc_try_except);
@@ -2691,15 +2697,15 @@ msc_seh_statement:
           mto($$, $5);
           mto($$, $7);
         }
-        | TOK_MSC_TRY compound_statement
-          TOK_MSC_FINALLY compound_statement
+        | ATOK_MSC_TRY compound_statement
+          ATOK_MSC_FINALLY compound_statement
         {
           $$=$1;
           statement($$, ID_msc_try_finally);
           mto($$, $2);
           mto($$, $4);
         }
-        | TOK_MSC_LEAVE
+        | ATOK_MSC_LEAVE
         {
           $$=$1;
           statement($$, ID_msc_leave);
@@ -2707,21 +2713,21 @@ msc_seh_statement:
         ;
 
 cprover_exception_statement:
-          TOK_CPROVER_THROW ';'
+          ATOK_CPROVER_THROW ';'
         {
           $$=$1;
           statement($$, ID_CPROVER_throw);
         }
-        | TOK_CPROVER_TRY compound_statement
-          TOK_CPROVER_CATCH compound_statement
+        | ATOK_CPROVER_TRY compound_statement
+          ATOK_CPROVER_CATCH compound_statement
         {
           $$=$1;
           statement($$, ID_CPROVER_try_catch);
           mto($$, $2);
           mto($$, $4);
         }
-        | TOK_CPROVER_TRY compound_statement
-          TOK_CPROVER_FINALLY compound_statement
+        | ATOK_CPROVER_TRY compound_statement
+          ATOK_CPROVER_FINALLY compound_statement
         {
           $$=$1;
           statement($$, ID_CPROVER_try_finally);
@@ -2732,9 +2738,9 @@ cprover_exception_statement:
 
 volatile_or_goto_opt:
           /* nothing */
-        | volatile_or_goto_opt TOK_VOLATILE
-        | volatile_or_goto_opt TOK_GOTO
-        | volatile_or_goto_opt TOK_INLINE
+        | volatile_or_goto_opt ATOK_VOLATILE
+        | volatile_or_goto_opt ATOK_GOTO
+        | volatile_or_goto_opt ATOK_INLINE
         ;
 
 /* asm ( assembler template
@@ -2949,11 +2955,11 @@ external_definition:
         ;
 
 asm_definition:
-          TOK_GCC_ASM_PAREN '(' string ')' ';'
+          ATOK_GCC_ASM_PAREN '(' string ')' ';'
         {
           // Not obvious what to do with this.
         }
-        | '{' TOK_ASM_STRING '}'
+        | '{' ATOK_ASM_STRING '}'
         {
           // Not obvious what to do with this.
         }
@@ -3337,7 +3343,7 @@ parameter_abstract_declarator:
         ;
 
 cprover_function_contract:
-          TOK_CPROVER_ENSURES
+          ATOK_CPROVER_ENSURES
         {
           PARSER.new_scope("ensures::");
         }
@@ -3348,7 +3354,7 @@ cprover_function_contract:
           mto($$, $4);
           PARSER.pop_scope();
         }
-        | TOK_CPROVER_REQUIRES
+        | ATOK_CPROVER_REQUIRES
         {
           PARSER.new_scope("requires::");
         }
@@ -3418,13 +3424,13 @@ conditional_target_list_opt_semicol:
         }
 
 cprover_contract_assigns:
-         TOK_CPROVER_ASSIGNS '(' conditional_target_list_opt_semicol ')'
+         ATOK_CPROVER_ASSIGNS '(' conditional_target_list_opt_semicol ')'
         {
           $$=$1;
           set($$, ID_C_spec_assigns);
           mto($$, $3);
         }
-        | TOK_CPROVER_ASSIGNS '(' ')'
+        | ATOK_CPROVER_ASSIGNS '(' ')'
         {
           $$=$1;
           set($$, ID_C_spec_assigns);
@@ -3439,13 +3445,13 @@ cprover_contract_assigns_opt:
         ;
 
 cprover_contract_frees:
-         TOK_CPROVER_FREES '(' conditional_target_list_opt_semicol ')'
+         ATOK_CPROVER_FREES '(' conditional_target_list_opt_semicol ')'
         {
           $$=$1;
           set($$, ID_C_spec_frees);
           mto($$, $3);
         }
-        | TOK_CPROVER_FREES '(' ')'
+        | ATOK_CPROVER_FREES '(' ')'
         {
           $$=$1;
           set($$, ID_C_spec_frees);

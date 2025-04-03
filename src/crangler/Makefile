@@ -27,6 +27,7 @@ all: crangler$(EXEEXT)
 
 c_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyc -o$@ scanner.l
+	$(SED) -e's,struct yyguts_t,struct yycguts_t,g' <$@ >$@.tmp && mv $@.tmp $@
 
 ###############################################################################
 

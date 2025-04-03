@@ -105,7 +105,7 @@ int make_identifier()
     parser_stack(yyansi_clval).id(ID_symbol);
     parser_stack(yyansi_clval).set(ID_C_base_name, final_base_name);
     return PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ?
-      TOK_MSC_IDENTIFIER : TOK_GCC_IDENTIFIER;
+      ATOK_MSC_IDENTIFIER : ATOK_GCC_IDENTIFIER;
   }
   else
   {
@@ -126,13 +126,13 @@ int make_identifier()
     if(result==ansi_c_id_classt::ANSI_C_TYPEDEF)
     {
       parser_stack(yyansi_clval).id(ID_typedef_type);
-      return TOK_TYPEDEFNAME;
+      return ATOK_TYPEDEFNAME;
     }
     else
     {
       parser_stack(yyansi_clval).id(ID_symbol);
       return PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ?
-        TOK_MSC_IDENTIFIER : TOK_GCC_IDENTIFIER;
+        ATOK_MSC_IDENTIFIER : ATOK_GCC_IDENTIFIER;
     }
   }
 }
@@ -192,7 +192,7 @@ int cpp_operator(int token)
   else
   {
     yyansi_cerror("C++ operator not allowed in C mode");
-    return TOK_SCANNER_ERROR;
+    return ATOK_SCANNER_ERROR;
   }
 }
 
@@ -296,7 +296,7 @@ enable_or_disable ("enable"|"disable")
 <COMMENT1>{
    "*/"         { BEGIN(GRAMMAR); } /* end comment state, back to GRAMMAR */
    "/*"         { yyansi_cerror("Probably nested comments"); }
-   <<EOF>>      { yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
+   <<EOF>>      { yyansi_cerror("Unterminated comment"); return ATOK_SCANNER_ERROR; }
    [^*/\n]*     { /* ignore every char except '*' and NL (performance!) */ }
    .            { } /* all single characters within comments are ignored */
    \n           { }
@@ -305,7 +305,7 @@ enable_or_disable ("enable"|"disable")
 <STRING_LITERAL_COMMENT>{
    "*/"         { yy_pop_state(); } /* end comment state, back to STRING_LITERAL */
    "/*"         { yyansi_cerror("Probably nested comments"); }
-   <<EOF>>      { yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
+   <<EOF>>      { yyansi_cerror("Unterminated comment"); return ATOK_SCANNER_ERROR; }
    [^*/\n]*     { /* ignore every char except '*' and NL (performance!) */ }
    .            { } /* all single characters within comments are ignored */
    \n           { }
@@ -322,7 +322,7 @@ enable_or_disable ("enable"|"disable")
                   loc();
                   source_locationt l=parser_stack(yyansi_clval).source_location();
                   parser_stack(yyansi_clval)=convert_character_literal(yytext, true, l);
-                  return TOK_CHARACTER;
+                  return ATOK_CHARACTER;
                 }
 
 <GRAMMAR,GCC_ATTRIBUTE3>{string_lit} {
@@ -352,7 +352,7 @@ enable_or_disable ("enable"|"disable")
                   parser_stack(yyansi_clval).add_source_location().swap(l);
                   yy_pop_state(); // back to normal
                   yyless(0); // put back
-                  return TOK_STRING;
+                  return ATOK_STRING;
                 }
 
 <GRAMMAR>{newline} { } /* skipped */
@@ -437,7 +437,7 @@ enable_or_disable ("enable"|"disable")
                     yyansi_cerror(
                       "Found enable and disable pragmas for " +
                       id2string(check_name));
-                    return TOK_SCANNER_ERROR;
+                    return ATOK_SCANNER_ERROR;
                   }
                   PARSER.pragma_cprover_add_check(check_name, enable);
                   PARSER.set_pragma_cprover();
@@ -445,7 +445,7 @@ enable_or_disable ("enable"|"disable")
 
 <CPROVER_PRAGMA>. {
                   yyansi_cerror("Unsupported #pragma CPROVER");
-                  return TOK_SCANNER_ERROR;
+                  return ATOK_SCANNER_ERROR;
                 }
 
 <GRAMMAR>{cppstart}"pragma" { BEGIN(OTHER_PRAGMA); }
@@ -477,7 +477,7 @@ enable_or_disable ("enable"|"disable")
 
 <GRAMMAR>{cppdirective} {
                   yyansi_cerror("Preprocessor directive found");
-                  return TOK_SCANNER_ERROR;
+                  return ATOK_SCANNER_ERROR;
                 }
 
 %{
@@ -485,183 +485,183 @@ enable_or_disable ("enable"|"disable")
 %}
 
 <GRAMMAR,GCC_ATTRIBUTE3>{
-"auto"          { loc(); return TOK_AUTO; }
+"auto"          { loc(); return ATOK_AUTO; }
 "_Bool"         { if(PARSER.cpp98)
                     return make_identifier();
                   else
-                  { loc(); return TOK_BOOL; }
+                  { loc(); return ATOK_BOOL; }
                 }
-"break"         { loc(); return TOK_BREAK; }
-"case"          { loc(); return TOK_CASE; }
-"char"          { loc(); return TOK_CHAR; }
-"_Complex"      { loc(); return TOK_COMPLEX; }
-"const"         { loc(); return TOK_CONST; }
-"continue"      { loc(); return TOK_CONTINUE; }
-"default"       { loc(); return TOK_DEFAULT; }
-"do"            { loc(); return TOK_DO; }
-"double"        { loc(); return TOK_DOUBLE; }
-"else"          { loc(); return TOK_ELSE; }
-"enum"          { loc(); PARSER.tag_following=true; return TOK_ENUM; }
-"extern"        { loc(); return TOK_EXTERN; }
-"float"         { loc(); return TOK_FLOAT; }
-"for"           { loc(); return TOK_FOR; }
-"goto"          { loc(); return TOK_GOTO; }
-"if"            { loc(); return TOK_IF; }
-"inline"        { loc(); return TOK_INLINE; }
-"int"           { loc(); return TOK_INT; }
-"long"          { loc(); return TOK_LONG; }
-"register"      { loc(); return TOK_REGISTER; }
-"restrict"      { loc(); return TOK_RESTRICT; }
-"return"        { loc(); return TOK_RETURN; }
-"short"         { loc(); return TOK_SHORT; }
-"signed"        { loc(); return TOK_SIGNED; }
-"sizeof"        { loc(); return TOK_SIZEOF; }
-"static"        { loc(); return TOK_STATIC; }
-"struct"        { loc(); PARSER.tag_following=true; return TOK_STRUCT; }
-"switch"        { loc(); return TOK_SWITCH; }
-"typedef"       { loc(); return TOK_TYPEDEF; }
-"union"         { loc(); PARSER.tag_following=true; return TOK_UNION; }
-"unsigned"      { loc(); return TOK_UNSIGNED; }
-"void"          { loc(); return TOK_VOID; }
-"volatile"      { loc(); return TOK_VOLATILE; }
-"while"         { loc(); return TOK_WHILE; }
+"break"         { loc(); return ATOK_BREAK; }
+"case"          { loc(); return ATOK_CASE; }
+"char"          { loc(); return ATOK_CHAR; }
+"_Complex"      { loc(); return ATOK_COMPLEX; }
+"const"         { loc(); return ATOK_CONST; }
+"continue"      { loc(); return ATOK_CONTINUE; }
+"default"       { loc(); return ATOK_DEFAULT; }
+"do"            { loc(); return ATOK_DO; }
+"double"        { loc(); return ATOK_DOUBLE; }
+"else"          { loc(); return ATOK_ELSE; }
+"enum"          { loc(); PARSER.tag_following=true; return ATOK_ENUM; }
+"extern"        { loc(); return ATOK_EXTERN; }
+"float"         { loc(); return ATOK_FLOAT; }
+"for"           { loc(); return ATOK_FOR; }
+"goto"          { loc(); return ATOK_GOTO; }
+"if"            { loc(); return ATOK_IF; }
+"inline"        { loc(); return ATOK_INLINE; }
+"int"           { loc(); return ATOK_INT; }
+"long"          { loc(); return ATOK_LONG; }
+"register"      { loc(); return ATOK_REGISTER; }
+"restrict"      { loc(); return ATOK_RESTRICT; }
+"return"        { loc(); return ATOK_RETURN; }
+"short"         { loc(); return ATOK_SHORT; }
+"signed"        { loc(); return ATOK_SIGNED; }
+"sizeof"        { loc(); return ATOK_SIZEOF; }
+"static"        { loc(); return ATOK_STATIC; }
+"struct"        { loc(); PARSER.tag_following=true; return ATOK_STRUCT; }
+"switch"        { loc(); return ATOK_SWITCH; }
+"typedef"       { loc(); return ATOK_TYPEDEF; }
+"union"         { loc(); PARSER.tag_following=true; return ATOK_UNION; }
+"unsigned"      { loc(); return ATOK_UNSIGNED; }
+"void"          { loc(); return ATOK_VOID; }
+"volatile"      { loc(); return ATOK_VOLATILE; }
+"while"         { loc(); return ATOK_WHILE; }
 
 "__auto_type"   { if((PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG)
                      && !PARSER.cpp98)
-                  { loc(); return TOK_GCC_AUTO_TYPE; }
+                  { loc(); return ATOK_GCC_AUTO_TYPE; }
                   else
                     return make_identifier();
                 }
 
 "_Float16"      { if(PARSER.float16_type)
-                  { loc(); return TOK_GCC_FLOAT16; }
+                  { loc(); return ATOK_GCC_FLOAT16; }
                   else
                     return make_identifier();
                 }
 
 {CPROVER_PREFIX}"Float16" {
-                  loc(); return TOK_GCC_FLOAT16;
+                  loc(); return ATOK_GCC_FLOAT16;
                 }
 
 "__bf16"        { if(PARSER.bf16_type)
-                  { loc(); return TOK_GCC_FLOAT16; }
+                  { loc(); return ATOK_GCC_FLOAT16; }
                   else
                     return make_identifier();
                 }
 
 "__fp16"        { if(PARSER.fp16_type)
-                  { loc(); return TOK_GCC_FLOAT16; }
+                  { loc(); return ATOK_GCC_FLOAT16; }
                   else
                     return make_identifier();
                 }
 
 "_Float32"      { if(PARSER.ts_18661_3_Floatn_types)
-                  { loc(); return TOK_GCC_FLOAT32; }
+                  { loc(); return ATOK_GCC_FLOAT32; }
                   else
                     return make_identifier();
                 }
 
 "_Float32x"     { if(PARSER.ts_18661_3_Floatn_types)
-                  { loc(); return TOK_GCC_FLOAT32X; }
+                  { loc(); return ATOK_GCC_FLOAT32X; }
                   else
                     return make_identifier();
                 }
 
 "_Float64"      { if(PARSER.ts_18661_3_Floatn_types)
-                  { loc(); return TOK_GCC_FLOAT64; }
+                  { loc(); return ATOK_GCC_FLOAT64; }
                   else
                     return make_identifier();
                 }
 
 "_Float64x"     { if(PARSER.ts_18661_3_Floatn_types)
-                  { loc(); return TOK_GCC_FLOAT64X; }
+                  { loc(); return ATOK_GCC_FLOAT64X; }
                   else
                     return make_identifier();
                 }
 
 {CPROVER_PREFIX}"Float64x" {
-                  loc(); return TOK_GCC_FLOAT64X;
+                  loc(); return ATOK_GCC_FLOAT64X;
                 }
 
 {CPROVER_PREFIX}"Float80" {
-                  loc(); return TOK_GCC_FLOAT80;
+                  loc(); return ATOK_GCC_FLOAT80;
                 }
 
 "__float128"    { if(PARSER.__float128_is_keyword)
-                  { loc(); return TOK_GCC_FLOAT128; }
+                  { loc(); return ATOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
                 }
 
 "_Float128"     { if(PARSER.ts_18661_3_Floatn_types)
-                  { loc(); return TOK_GCC_FLOAT128; }
+                  { loc(); return ATOK_GCC_FLOAT128; }
                   else
                     return make_identifier();
                 }
 
 {CPROVER_PREFIX}"Float128" {
-                  loc(); return TOK_GCC_FLOAT128;
+                  loc(); return ATOK_GCC_FLOAT128;
                 }
 
 "_Float128x"    { if(PARSER.ts_18661_3_Floatn_types)
-                  { loc(); return TOK_GCC_FLOAT128X; }
+                  { loc(); return ATOK_GCC_FLOAT128X; }
                   else
                     return make_identifier();
                 }
 
 "__int128"      { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                  { loc(); return TOK_GCC_INT128; }
+                  { loc(); return ATOK_GCC_INT128; }
                   else
                     return make_identifier();
                 }
 
 "_Decimal32"    { // clang doesn't have it
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
-                    { loc(); return TOK_GCC_DECIMAL32; }
+                    { loc(); return ATOK_GCC_DECIMAL32; }
                   else
                     return make_identifier();
                 }
 
 "_Decimal64"    { // clang doesn't have it
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
-                    { loc(); return TOK_GCC_DECIMAL64; }
+                    { loc(); return ATOK_GCC_DECIMAL64; }
                   else
                     return make_identifier();
                 }
 
 "_Decimal128"   { // clang doesn't have it
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
-                    { loc(); return TOK_GCC_DECIMAL128; }
+                    { loc(); return ATOK_GCC_DECIMAL128; }
                   else
                     return make_identifier();
                 }
 
-"__int8"        { return MSC_Keyword(TOK_INT8); }
-"__int16"       { return MSC_Keyword(TOK_INT16); }
-"__int32"       { return MSC_Keyword(TOK_INT32); }
+"__int8"        { return MSC_Keyword(ATOK_INT8); }
+"__int16"       { return MSC_Keyword(ATOK_INT16); }
+"__int32"       { return MSC_Keyword(ATOK_INT32); }
 
 "__int64"       { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM ||
                      PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
-                    { loc(); return TOK_INT64; }
+                    { loc(); return ATOK_INT64; }
                   else
                     return make_identifier();
                 }
 "_int64"        { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                    { loc(); return TOK_INT64; }
+                    { loc(); return ATOK_INT64; }
                   else
                     return make_identifier();
                 }
-"__ptr32"       { return MSC_Keyword(TOK_PTR32); }
-"__ptr64"       { return MSC_Keyword(TOK_PTR64); }
+"__ptr32"       { return MSC_Keyword(ATOK_PTR32); }
+"__ptr64"       { return MSC_Keyword(ATOK_PTR64); }
 
 %{
 /*
-"__stdcall"     { return MSC_Keyword(TOK_STDCALL); }
-"__fastcall"    { return MSC_Keyword(TOK_FASTCALL); }
-"__clrcall"     { return MSC_Keyword(TOK_CLRCALL); }
+"__stdcall"     { return MSC_Keyword(ATOK_STDCALL); }
+"__fastcall"    { return MSC_Keyword(ATOK_FASTCALL); }
+"__clrcall"     { return MSC_Keyword(ATOK_CLRCALL); }
 */
 %}
 
@@ -669,7 +669,7 @@ enable_or_disable ("enable"|"disable")
 "__complex"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_COMPLEX; }
+                    { loc(); return ATOK_COMPLEX; }
                   else
                     return make_identifier();
                 }
@@ -678,7 +678,7 @@ enable_or_disable ("enable"|"disable")
 "__real"        { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_REAL; }
+                    { loc(); return ATOK_REAL; }
                   else
                     return make_identifier();
                 }
@@ -687,7 +687,7 @@ enable_or_disable ("enable"|"disable")
 "__imag"        { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_IMAG; }
+                    { loc(); return ATOK_IMAG; }
                   else
                     return make_identifier();
                 }
@@ -698,7 +698,7 @@ enable_or_disable ("enable"|"disable")
 %}
 
 "_var_arg_typeof" { if(PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
-                    { loc(); return TOK_CW_VAR_ARG_TYPEOF; }
+                    { loc(); return ATOK_CW_VAR_ARG_TYPEOF; }
                   else
                     return make_identifier();
                 }
@@ -706,7 +706,7 @@ enable_or_disable ("enable"|"disable")
 "__builtin_va_arg" { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                         PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                         PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_BUILTIN_VA_ARG; }
+                    { loc(); return ATOK_BUILTIN_VA_ARG; }
                   else
                     return make_identifier();
                 }
@@ -716,7 +716,7 @@ enable_or_disable ("enable"|"disable")
 "offsetof"      { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_OFFSETOF; }
+                    { loc(); return ATOK_OFFSETOF; }
                   else
                     return make_identifier();
                 }
@@ -725,7 +725,7 @@ enable_or_disable ("enable"|"disable")
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P; }
+                    { loc(); return ATOK_GCC_BUILTIN_TYPES_COMPATIBLE_P; }
                   else
                     return make_identifier();
                 }
@@ -733,7 +733,7 @@ enable_or_disable ("enable"|"disable")
 "__builtin_convertvector" {
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                    { loc(); return TOK_CLANG_BUILTIN_CONVERTVECTOR; }
+                    { loc(); return ATOK_CLANG_BUILTIN_CONVERTVECTOR; }
                   else
                     return make_identifier();
                 }
@@ -741,7 +741,7 @@ enable_or_disable ("enable"|"disable")
 "__alignof__"   { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_ALIGNOF; }
+                    { loc(); return ATOK_ALIGNOF; }
                   else
                     return make_identifier();
                 }
@@ -752,13 +752,13 @@ enable_or_disable ("enable"|"disable")
                      PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_ALIGNOF; }
+                    { loc(); return ATOK_ALIGNOF; }
                   else
                     return make_identifier();
                 }
 
 "__ALIGNOF__"   { if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_ALIGNOF; }
+                    { loc(); return ATOK_ALIGNOF; }
                   else
                     return make_identifier();
                 }
@@ -768,7 +768,7 @@ enable_or_disable ("enable"|"disable")
                   // but Visual Studio does!
                   if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_ALIGNOF; }
+                    { loc(); return ATOK_ALIGNOF; }
                   else
                     return make_identifier();
                 }
@@ -777,12 +777,12 @@ enable_or_disable ("enable"|"disable")
                   {
                     loc();
                     BEGIN(MSC_ASM);
-                    return TOK_MSC_ASM;
+                    return ATOK_MSC_ASM;
                   }
                   else if(PARSER.cpp98)
                   {
                     loc();
-                    return TOK_GCC_ASM;
+                    return ATOK_GCC_ASM;
                   }
                   else
                     BEGIN(GCC_ASM);
@@ -795,7 +795,7 @@ enable_or_disable ("enable"|"disable")
                     if(PARSER.cpp98)
                     {
                       loc();
-                      return TOK_GCC_ASM;
+                      return ATOK_GCC_ASM;
                     }
                     else
                       BEGIN(GCC_ASM);
@@ -812,7 +812,7 @@ enable_or_disable ("enable"|"disable")
                     if(PARSER.cpp98)
                     {
                       loc();
-                      return TOK_GCC_ASM;
+                      return ATOK_GCC_ASM;
                     }
                     else
                       BEGIN(GCC_ASM);
@@ -822,7 +822,7 @@ enable_or_disable ("enable"|"disable")
                 }
 
 "__based"       { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                    { loc(); return TOK_MSC_BASED; }
+                    { loc(); return ATOK_MSC_BASED; }
                   else
                     return make_identifier();
                 }
@@ -834,7 +834,7 @@ enable_or_disable ("enable"|"disable")
                 }
 
 "__wchar_t"     { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                    { loc(); return TOK_WCHAR_T; }
+                    { loc(); return ATOK_WCHAR_T; }
                   else
                     return make_identifier();
                 }
@@ -843,79 +843,79 @@ enable_or_disable ("enable"|"disable")
 /* C++ Keywords and Operators */
 %}
 
-alignas             { return cpp11_keyword(TOK_ALIGNAS); } // C++11
-alignof             { return cpp11_keyword(TOK_ALIGNOF); } // C++11
-and                 { return cpp98_keyword(TOK_ANDAND); }
-and_eq              { return cpp98_keyword(TOK_ANDASSIGN); }
-bool                { return cpp98_keyword(TOK_BOOL); }
-catch               { return cpp98_keyword(TOK_CATCH); }
+alignas             { return cpp11_keyword(ATOK_ALIGNAS); } // C++11
+alignof             { return cpp11_keyword(ATOK_ALIGNOF); } // C++11
+and                 { return cpp98_keyword(ATOK_ANDAND); }
+and_eq              { return cpp98_keyword(ATOK_ANDASSIGN); }
+bool                { return cpp98_keyword(ATOK_BOOL); }
+catch               { return cpp98_keyword(ATOK_CATCH); }
 char16_t            { // C++11, but Visual Studio uses typedefs
                       if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
                         return make_identifier();
                       else
-                        return cpp11_keyword(TOK_CHAR16_T);
+                        return cpp11_keyword(ATOK_CHAR16_T);
                     }
 char32_t            { // C++11, but Visual Studio uses typedefs
                       if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
                         return make_identifier();
                       else
-                        return cpp11_keyword(TOK_CHAR32_T);
+                        return cpp11_keyword(ATOK_CHAR32_T);
                     }
-class               { return cpp98_keyword(TOK_CLASS); }
+class               { return cpp98_keyword(ATOK_CLASS); }
 compl               { return cpp98_keyword('~'); }
-constexpr           { return cpp11_keyword(TOK_CONSTEXPR); } // C++11
-delete              { return cpp98_keyword(TOK_DELETE); }
-decltype            { return cpp11_keyword(TOK_DECLTYPE); } // C++11
-explicit            { return cpp98_keyword(TOK_EXPLICIT); }
-false               { return cpp98_keyword(TOK_FALSE); }
-friend              { return cpp98_keyword(TOK_FRIEND); }
-mutable             { return cpp98_keyword(TOK_MUTABLE); }
-namespace           { return cpp98_keyword(TOK_NAMESPACE); }
-new                 { return cpp98_keyword(TOK_NEW); }
-nodiscard           { return cpp11_keyword(TOK_NODISCARD); } // C++11
-noexcept            { return cpp11_keyword(TOK_NOEXCEPT); } // C++11
-noreturn            { return cpp11_keyword(TOK_NORETURN); } // C++11
+constexpr           { return cpp11_keyword(ATOK_CONSTEXPR); } // C++11
+delete              { return cpp98_keyword(ATOK_DELETE); }
+decltype            { return cpp11_keyword(ATOK_DECLTYPE); } // C++11
+explicit            { return cpp98_keyword(ATOK_EXPLICIT); }
+false               { return cpp98_keyword(ATOK_FALSE); }
+friend              { return cpp98_keyword(ATOK_FRIEND); }
+mutable             { return cpp98_keyword(ATOK_MUTABLE); }
+namespace           { return cpp98_keyword(ATOK_NAMESPACE); }
+new                 { return cpp98_keyword(ATOK_NEW); }
+nodiscard           { return cpp11_keyword(ATOK_NODISCARD); } // C++11
+noexcept            { return cpp11_keyword(ATOK_NOEXCEPT); } // C++11
+noreturn            { return cpp11_keyword(ATOK_NORETURN); } // C++11
 not                 { return cpp98_keyword('!'); }
-not_eq              { return cpp98_keyword(TOK_NE); }
-nullptr             { return cpp11_keyword(TOK_NULLPTR); } // C++11
-operator            { return cpp98_keyword(TOK_OPERATOR); }
-or                  { return cpp98_keyword(TOK_OROR); }
-or_eq               { return cpp98_keyword(TOK_ORASSIGN); }
-private             { return cpp98_keyword(TOK_PRIVATE); }
-protected           { return cpp98_keyword(TOK_PROTECTED); }
-public              { return cpp98_keyword(TOK_PUBLIC); }
+not_eq              { return cpp98_keyword(ATOK_NE); }
+nullptr             { return cpp11_keyword(ATOK_NULLPTR); } // C++11
+operator            { return cpp98_keyword(ATOK_OPERATOR); }
+or                  { return cpp98_keyword(ATOK_OROR); }
+or_eq               { return cpp98_keyword(ATOK_ORASSIGN); }
+private             { return cpp98_keyword(ATOK_PRIVATE); }
+protected           { return cpp98_keyword(ATOK_PROTECTED); }
+public              { return cpp98_keyword(ATOK_PUBLIC); }
 static_assert       { // C++11, but Visual Studio supports it in all modes
                       // as a keyword, even though the documentation claims
                       // it's a macro.
                       if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
                       {
-                        loc(); return TOK_STATIC_ASSERT;
+                        loc(); return ATOK_STATIC_ASSERT;
                       }
                       else
-                        return cpp11_keyword(TOK_STATIC_ASSERT);
+                        return cpp11_keyword(ATOK_STATIC_ASSERT);
                     }
-template            { return cpp98_keyword(TOK_TEMPLATE); }
-this                { return cpp98_keyword(TOK_THIS); }
-thread_local        { return cpp11_keyword(TOK_THREAD_LOCAL); } // C++11
-throw               { return cpp98_keyword(TOK_THROW); }
-true                { return cpp98_keyword(TOK_TRUE); }
-typeid              { return cpp98_keyword(TOK_TYPEID); }
-typename            { return cpp98_keyword(TOK_TYPENAME); }
-using               { return cpp98_keyword(TOK_USING); }
-virtual             { return cpp98_keyword(TOK_VIRTUAL); }
+template            { return cpp98_keyword(ATOK_TEMPLATE); }
+this                { return cpp98_keyword(ATOK_THIS); }
+thread_local        { return cpp11_keyword(ATOK_THREAD_LOCAL); } // C++11
+throw               { return cpp98_keyword(ATOK_THROW); }
+true                { return cpp98_keyword(ATOK_TRUE); }
+typeid              { return cpp98_keyword(ATOK_TYPEID); }
+typename            { return cpp98_keyword(ATOK_TYPENAME); }
+using               { return cpp98_keyword(ATOK_USING); }
+virtual             { return cpp98_keyword(ATOK_VIRTUAL); }
 wchar_t             { // CodeWarrior doesn't have wchar_t built in,
                       // and MSC has a command-line option to turn it off
                       if(PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
                         return make_identifier();
                       else
-                        return cpp98_keyword(TOK_WCHAR_T);
+                        return cpp98_keyword(ATOK_WCHAR_T);
                     }
 xor                 { return cpp98_keyword('^'); }
-xor_eq              { return cpp98_keyword(TOK_XORASSIGN); }
-".*"                { return cpp_operator(TOK_DOTPM); }
-"->*"               { return cpp_operator(TOK_ARROWPM); }
+xor_eq              { return cpp98_keyword(ATOK_XORASSIGN); }
+".*"                { return cpp_operator(ATOK_DOTPM); }
+"->*"               { return cpp_operator(ATOK_ARROWPM); }
 "::"                { if(PARSER.cpp98)
-                        return cpp_operator(TOK_SCOPE);
+                        return cpp_operator(ATOK_SCOPE);
                       else
                       {
                         yyless(1); // puts all but one : back into stream
@@ -928,7 +928,7 @@ xor_eq              { return cpp98_keyword(TOK_XORASSIGN); }
 __decltype          { if(PARSER.cpp98 &&
                          (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                           PARSER.mode==configt::ansi_ct::flavourt::CLANG))
-                        return cpp98_keyword(TOK_DECLTYPE);
+                        return cpp98_keyword(ATOK_DECLTYPE);
                       else
                         return make_identifier();
                     }
@@ -940,38 +940,38 @@ __decltype          { if(PARSER.cpp98 &&
    http://clang.llvm.org/docs/LanguageExtensions.html#checks-for-type-trait-primitives */
 %}
 
-"__has_assign"      { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_copy"        { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_finalizer"   { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_assign" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_constructor" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_copy" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_assign" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_constructor" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_copy" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_destructor" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_user_destructor" { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_virtual_destructor" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_abstract"     { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_base_of"      { loc(); return cpp98_keyword(TOK_BINARY_TYPE_PREDICATE); }
-"__is_class"        { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_convertible_to" { loc(); return cpp98_keyword(TOK_BINARY_TYPE_PREDICATE); }
-"__is_delegate"     { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_empty"        { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_enum"         { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_interface_class" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_pod"          { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_polymorphic"  { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_ref_array"    { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_ref_class"    { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_sealed"       { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_simple_value_class" { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_union"        { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_value_class"  { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__has_assign"      { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_copy"        { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_finalizer"   { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_assign" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_constructor" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_copy" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_assign" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_constructor" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_copy" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_destructor" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_user_destructor" { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__has_virtual_destructor" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_abstract"     { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_base_of"      { loc(); return cpp98_keyword(ATOK_BINARY_TYPE_PREDICATE); }
+"__is_class"        { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_convertible_to" { loc(); return cpp98_keyword(ATOK_BINARY_TYPE_PREDICATE); }
+"__is_delegate"     { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_empty"        { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_enum"         { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_interface_class" { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_pod"          { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_polymorphic"  { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_ref_array"    { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_ref_class"    { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_sealed"       { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_simple_value_class" { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_union"        { loc(); return cpp98_keyword(ATOK_UNARY_TYPE_PREDICATE); }
+"__is_value_class"  { loc(); return MSC_cpp_keyword(ATOK_UNARY_TYPE_PREDICATE); }
 
-"__if_exists"       { loc(); return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }
-"__if_not_exists"   { loc(); return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
-"__underlying_type" { loc(); return cpp98_keyword(TOK_UNDERLYING_TYPE); }
+"__if_exists"       { loc(); return MSC_cpp_keyword(ATOK_MSC_IF_EXISTS); }
+"__if_not_exists"   { loc(); return MSC_cpp_keyword(ATOK_MSC_IF_NOT_EXISTS); }
+"__underlying_type" { loc(); return cpp98_keyword(ATOK_UNDERLYING_TYPE); }
 
 "["{ws}"repeatable" |
 "["{ws}"source_annotation_attribute" |
@@ -996,28 +996,28 @@ __decltype          { if(PARSER.cpp98 &&
 
 "__char16_t"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                     return cpp98_keyword(TOK_CHAR16_T); // GNU extension
+                     return cpp98_keyword(ATOK_CHAR16_T); // GNU extension
                    else
                      return make_identifier();
                  }
 
 "__nullptr"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                     return cpp98_keyword(TOK_NULLPTR); // GNU extension
+                     return cpp98_keyword(ATOK_NULLPTR); // GNU extension
                    else
                      return make_identifier();
                  }
 
 "__null"         { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                     return cpp98_keyword(TOK_NULLPTR); // GNU extension
+                     return cpp98_keyword(ATOK_NULLPTR); // GNU extension
                    else
                      return make_identifier();
                  }
 
 "__char32_t"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                     return cpp98_keyword(TOK_CHAR32_T); // GNU extension
+                     return cpp98_keyword(ATOK_CHAR32_T); // GNU extension
                    else
                      return make_identifier();
                  }
@@ -1031,13 +1031,13 @@ __decltype          { if(PARSER.cpp98 &&
                           PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR ||
                           PARSER.mode==configt::ansi_ct::flavourt::ARM)
                   {
-                    loc(); return TOK_MSC_DECLSPEC;
+                    loc(); return ATOK_MSC_DECLSPEC;
                   }
                   else if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   {
                     // GCC supports this on Windows as an exception!
                     // Should likely reject on other targets.
-                    loc(); return TOK_MSC_DECLSPEC;
+                    loc(); return ATOK_MSC_DECLSPEC;
                   }
                   else
                     return make_identifier();
@@ -1060,7 +1060,7 @@ __decltype          { if(PARSER.cpp98 &&
                   {
                     BEGIN(GCC_ATTRIBUTE1);
                     loc();
-                    return TOK_GCC_ATTRIBUTE;
+                    return ATOK_GCC_ATTRIBUTE;
                   }
                   else
                     return make_identifier();
@@ -1071,8 +1071,8 @@ __decltype          { if(PARSER.cpp98 &&
 
 "__extension__" { /* ignore */ }
 
-"__restrict"    { loc(); return TOK_RESTRICT; }
-"__restrict__"  { loc(); return TOK_RESTRICT; }
+"__restrict"    { loc(); return ATOK_RESTRICT; }
+"__restrict__"  { loc(); return ATOK_RESTRICT; }
 
 "_cdecl"        { /* ignore */ }
 "__cdecl"       { /* ignore */ }
@@ -1086,14 +1086,14 @@ __decltype          { if(PARSER.cpp98 &&
 "__vectorcall"  { /* ignore */ }
 "__w64"         { /* ignore */ }
 
-"__const"       { loc(); return TOK_CONST; }
-"__const__"     { loc(); return TOK_CONST; }
+"__const"       { loc(); return ATOK_CONST; }
+"__const__"     { loc(); return ATOK_CONST; }
 
-"__signed"      { loc(); return TOK_SIGNED; }
-"__signed__"    { loc(); return TOK_SIGNED; }
+"__signed"      { loc(); return ATOK_SIGNED; }
+"__signed__"    { loc(); return ATOK_SIGNED; }
 
-"__volatile"    { loc(); return TOK_VOLATILE; }
-"__volatile__"  { loc(); return TOK_VOLATILE; }
+"__volatile"    { loc(); return ATOK_VOLATILE; }
+"__volatile__"  { loc(); return ATOK_VOLATILE; }
 
 "__pure"        { /* an ARM extension */
                   if(PARSER.mode==configt::ansi_ct::flavourt::ARM)
@@ -1232,71 +1232,71 @@ __decltype          { if(PARSER.cpp98 &&
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_TYPEOF; }
+                    { loc(); return ATOK_TYPEOF; }
                   else
                     return make_identifier();
                 }
 "__typeof"      { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_TYPEOF; }
+                    { loc(); return ATOK_TYPEOF; }
                   else
                     return make_identifier();
                 }
 
-"__typeof__"    { loc(); return TOK_TYPEOF; }
+"__typeof__"    { loc(); return ATOK_TYPEOF; }
 
 "__forceinline" { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_MSC_FORCEINLINE; }
+                    { loc(); return ATOK_MSC_FORCEINLINE; }
                   else
                     return make_identifier();
                 }
 
 "_inline"       { // http://msdn.microsoft.com/en-us/library/z8y1yy88.aspx
                   if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                    { loc(); return TOK_INLINE; }
+                    { loc(); return ATOK_INLINE; }
                   else
                     return make_identifier();
                 }
 
-"__inline"      { loc(); return TOK_INLINE; }
-"__inline__"    { loc(); return TOK_INLINE; }
+"__inline"      { loc(); return ATOK_INLINE; }
+"__inline__"    { loc(); return ATOK_INLINE; }
 
 "__label__"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_GCC_LABEL; }
+                    { loc(); return ATOK_GCC_LABEL; }
                   else
                     return make_identifier();
                 }
 
 "__try"         { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                    { loc(); return TOK_MSC_TRY; }
+                    { loc(); return ATOK_MSC_TRY; }
                   else
                     return make_identifier();
                 }
 
 "try"           { if(PARSER.cpp98) // C++?
-                    { loc(); return TOK_TRY; }
+                    { loc(); return ATOK_TRY; }
                   else
                     return make_identifier();
                 }
 
 "__finally"     { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                    { loc(); return TOK_MSC_FINALLY; }
+                    { loc(); return ATOK_MSC_FINALLY; }
                   else
                     return make_identifier();
                 }
 
 "__except"      { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                    { loc(); return TOK_MSC_EXCEPT; }
+                    { loc(); return ATOK_MSC_EXCEPT; }
                   else
                     return make_identifier();
                 }
 
 "__leave"       { if(PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                    { loc(); return TOK_MSC_LEAVE; }
+                    { loc(); return ATOK_MSC_LEAVE; }
                   else
                     return make_identifier();
                 }
@@ -1304,89 +1304,89 @@ __decltype          { if(PARSER.cpp98 &&
 "__nodiscard__" { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_NODISCARD; }
+                    { loc(); return ATOK_NODISCARD; }
                   else
                     return make_identifier();
                 }
 
 "__builtin_bit_cast" { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                           PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                         { loc(); return TOK_BIT_CAST; }
+                         { loc(); return ATOK_BIT_CAST; }
                        else
                          return make_identifier();
                      }
 
-{CPROVER_PREFIX}"atomic"       { loc(); return TOK_CPROVER_ATOMIC; }
-{CPROVER_PREFIX}"forall"       { loc(); return TOK_FORALL; }
-{CPROVER_PREFIX}"exists"       { loc(); return TOK_EXISTS; }
-{CPROVER_PREFIX}"array_of"     { loc(); return TOK_ARRAY_OF; }
-{CPROVER_PREFIX}"thread_local" { loc(); return TOK_THREAD_LOCAL; }
-{CPROVER_PREFIX}"bitvector"    { loc(); return TOK_CPROVER_BITVECTOR; }
-{CPROVER_PREFIX}"floatbv"      { loc(); return TOK_CPROVER_FLOATBV; }
-{CPROVER_PREFIX}"fixedbv"      { loc(); return TOK_CPROVER_FIXEDBV; }
-{CPROVER_PREFIX}"bool"         { loc(); return TOK_CPROVER_BOOL; }
-{CPROVER_PREFIX}"throw"        { loc(); return TOK_CPROVER_THROW; }
-{CPROVER_PREFIX}"catch"        { loc(); return TOK_CPROVER_CATCH; }
-{CPROVER_PREFIX}"try"          { loc(); return TOK_CPROVER_TRY; }
-{CPROVER_PREFIX}"finally"      { loc(); return TOK_CPROVER_FINALLY; }
-{CPROVER_PREFIX}"ID"           { loc(); return TOK_CPROVER_ID; }
-{CPROVER_PREFIX}"loop_invariant" { loc(); return TOK_CPROVER_LOOP_INVARIANT; }
-{CPROVER_PREFIX}"decreases"    { loc(); return TOK_CPROVER_DECREASES; }
-{CPROVER_PREFIX}"requires"     { loc(); return TOK_CPROVER_REQUIRES; }
-{CPROVER_PREFIX}"ensures"      { loc(); return TOK_CPROVER_ENSURES; }
-{CPROVER_PREFIX}"assigns"      { loc(); return TOK_CPROVER_ASSIGNS; }
-{CPROVER_PREFIX}"frees"        { loc(); return TOK_CPROVER_FREES; }
+{CPROVER_PREFIX}"atomic"       { loc(); return ATOK_CPROVER_ATOMIC; }
+{CPROVER_PREFIX}"forall"       { loc(); return ATOK_FORALL; }
+{CPROVER_PREFIX}"exists"       { loc(); return ATOK_EXISTS; }
+{CPROVER_PREFIX}"array_of"     { loc(); return ATOK_ARRAY_OF; }
+{CPROVER_PREFIX}"thread_local" { loc(); return ATOK_THREAD_LOCAL; }
+{CPROVER_PREFIX}"bitvector"    { loc(); return ATOK_CPROVER_BITVECTOR; }
+{CPROVER_PREFIX}"floatbv"      { loc(); return ATOK_CPROVER_FLOATBV; }
+{CPROVER_PREFIX}"fixedbv"      { loc(); return ATOK_CPROVER_FIXEDBV; }
+{CPROVER_PREFIX}"bool"         { loc(); return ATOK_CPROVER_BOOL; }
+{CPROVER_PREFIX}"throw"        { loc(); return ATOK_CPROVER_THROW; }
+{CPROVER_PREFIX}"catch"        { loc(); return ATOK_CPROVER_CATCH; }
+{CPROVER_PREFIX}"try"          { loc(); return ATOK_CPROVER_TRY; }
+{CPROVER_PREFIX}"finally"      { loc(); return ATOK_CPROVER_FINALLY; }
+{CPROVER_PREFIX}"ID"           { loc(); return ATOK_CPROVER_ID; }
+{CPROVER_PREFIX}"loop_invariant" { loc(); return ATOK_CPROVER_LOOP_INVARIANT; }
+{CPROVER_PREFIX}"decreases"    { loc(); return ATOK_CPROVER_DECREASES; }
+{CPROVER_PREFIX}"requires"     { loc(); return ATOK_CPROVER_REQUIRES; }
+{CPROVER_PREFIX}"ensures"      { loc(); return ATOK_CPROVER_ENSURES; }
+{CPROVER_PREFIX}"assigns"      { loc(); return ATOK_CPROVER_ASSIGNS; }
+{CPROVER_PREFIX}"frees"        { loc(); return ATOK_CPROVER_FREES; }
 
 "\xe2\x88\x80" |
 "\\forall"      { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_ACSL_FORALL;
+                  loc(); return ATOK_ACSL_FORALL;
                 }
 
 "\xe2\x88\x83" |
 "\\exists"      { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_ACSL_EXISTS;
+                  loc(); return ATOK_ACSL_EXISTS;
                 }
 
 "\\lambda"      { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_ACSL_LAMBDA;
+                  loc(); return ATOK_ACSL_LAMBDA;
                 }
 
 "\\let"         { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_ACSL_LET;
+                  loc(); return ATOK_ACSL_LET;
                 }
 
 "\xe2\x87\x92" |
 "==>"           { /* Non-standard, obviously. Found in Spec# and ACSL syntax. */
-                  loc(); return TOK_IMPLIES;
+                  loc(); return ATOK_IMPLIES;
                 }
 
 "\xe2\x87\x94" |
 "<==>"          { /* Non-standard, obviously. Found in Spec# and ACSL syntax. */
-                  loc(); return TOK_EQUIVALENT;
+                  loc(); return ATOK_EQUIVALENT;
                 }
 
 "\xe2\x89\xa5"  { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_GE;
+                  loc(); return ATOK_GE;
                 }
 
 "\xe2\x89\xa1"  { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_EQ;
+                  loc(); return ATOK_EQ;
                 }
 
 "\xe2\x89\xa2"  { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_NE;
+                  loc(); return ATOK_NE;
                 }
 
 "\xe2\x89\xa4"  { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_LE;
+                  loc(); return ATOK_LE;
                 }
 
 "\xe2\x88\xa7"  { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_ANDAND;
+                  loc(); return ATOK_ANDAND;
                 }
 
 "\xe2\x88\xa8"  { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_OROR;
+                  loc(); return ATOK_OROR;
                 }
 
 "\xc2\xac"      { /* Non-standard, obviously. Found in ACSL syntax. */
@@ -1395,7 +1395,7 @@ __decltype          { if(PARSER.cpp98 &&
 
 "\xe2\x8a\xbb" |
 "^^"            { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_XORXOR;
+                  loc(); return ATOK_XORXOR;
                 }
 
 "\xe2\x88\x92"  { /* Non-standard, obviously. Found in ACSL syntax. */
@@ -1403,17 +1403,17 @@ __decltype          { if(PARSER.cpp98 &&
                 }
 
 "\\true"        { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_TRUE;
+                  loc(); return ATOK_TRUE;
                 }
 
 "\\false"       { /* Non-standard, obviously. Found in ACSL syntax. */
-                  loc(); return TOK_FALSE;
+                  loc(); return ATOK_FALSE;
                 }
 
 "__thread"      { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
-                    { loc(); return TOK_THREAD_LOCAL; }
+                    { loc(); return ATOK_THREAD_LOCAL; }
                   else
                     return make_identifier();
                 }
@@ -1424,7 +1424,7 @@ __decltype          { if(PARSER.cpp98 &&
                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
-                    { loc(); return TOK_ALIGNAS; }
+                    { loc(); return ATOK_ALIGNAS; }
                   else
                     return make_identifier();
                 }
@@ -1436,7 +1436,7 @@ __decltype          { if(PARSER.cpp98 &&
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                       PARSER.mode==configt::ansi_ct::flavourt::ARM ||
                       PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO))
-                    { loc(); return TOK_ALIGNOF; }
+                    { loc(); return ATOK_ALIGNOF; }
                   else
                     return make_identifier();
                 }
@@ -1457,7 +1457,7 @@ __decltype          { if(PARSER.cpp98 &&
                       (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                        PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                        PARSER.mode==configt::ansi_ct::flavourt::ARM))
-                    { loc(); return TOK_ATOMIC_TYPE_SPECIFIER; }
+                    { loc(); return ATOK_ATOMIC_TYPE_SPECIFIER; }
                   else
                     return make_identifier();
                 }
@@ -1466,7 +1466,7 @@ __decltype          { if(PARSER.cpp98 &&
                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
-                    { loc(); return TOK_ATOMIC_TYPE_QUALIFIER; }
+                    { loc(); return ATOK_ATOMIC_TYPE_QUALIFIER; }
                   else
                     return make_identifier();
                 }
@@ -1477,7 +1477,7 @@ __decltype          { if(PARSER.cpp98 &&
                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
-                    { loc(); return TOK_GENERIC; }
+                    { loc(); return ATOK_GENERIC; }
                   else
                     return make_identifier();
                 }
@@ -1488,7 +1488,7 @@ __decltype          { if(PARSER.cpp98 &&
                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
-                    { loc(); return TOK_IMAGINARY; }
+                    { loc(); return ATOK_IMAGINARY; }
                   else
                     return make_identifier();
                 }
@@ -1499,7 +1499,7 @@ __decltype          { if(PARSER.cpp98 &&
                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
-                    { loc(); return TOK_NORETURN; }
+                    { loc(); return ATOK_NORETURN; }
                   else
                     return make_identifier();
                 }
@@ -1507,7 +1507,7 @@ __decltype          { if(PARSER.cpp98 &&
   /* This is a C11 keyword */
 
 "_Static_assert" { if(!PARSER.cpp98)
-                    { loc(); return TOK_STATIC_ASSERT; }
+                    { loc(); return ATOK_STATIC_ASSERT; }
                   else
                     return make_identifier();
                 }
@@ -1518,7 +1518,7 @@ __decltype          { if(PARSER.cpp98 &&
                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                       PARSER.mode==configt::ansi_ct::flavourt::ARM))
-                    { loc(); return TOK_THREAD_LOCAL; }
+                    { loc(); return ATOK_THREAD_LOCAL; }
                   else
                     return make_identifier();
                 }
@@ -1552,29 +1552,29 @@ __decltype          { if(PARSER.cpp98 &&
   /* operators following */
 
 <GRAMMAR,GCC_ATTRIBUTE3>{
-"->"            { loc(); return TOK_ARROW; }
-"++"            { loc(); return TOK_INCR; }
-"--"            { loc(); return TOK_DECR; }
-"<<"            { loc(); return TOK_SHIFTLEFT; }
-">>"            { loc(); return TOK_SHIFTRIGHT; }
-"<="            { loc(); return TOK_LE; }
-">="            { loc(); return TOK_GE; }
-"=="            { loc(); return TOK_EQ; }
-"!="            { loc(); return TOK_NE; }
-"&&"            { loc(); return TOK_ANDAND; }
-"||"            { loc(); return TOK_OROR; }
-"..."           { loc(); return TOK_ELLIPSIS; }
+"->"            { loc(); return ATOK_ARROW; }
+"++"            { loc(); return ATOK_INCR; }
+"--"            { loc(); return ATOK_DECR; }
+"<<"            { loc(); return ATOK_SHIFTLEFT; }
+">>"            { loc(); return ATOK_SHIFTRIGHT; }
+"<="            { loc(); return ATOK_LE; }
+">="            { loc(); return ATOK_GE; }
+"=="            { loc(); return ATOK_EQ; }
+"!="            { loc(); return ATOK_NE; }
+"&&"            { loc(); return ATOK_ANDAND; }
+"||"            { loc(); return ATOK_OROR; }
+"..."           { loc(); return ATOK_ELLIPSIS; }
 
-"*="            { loc(); return TOK_MULTASSIGN; }
-"/="            { loc(); return TOK_DIVASSIGN; }
-"%="            { loc(); return TOK_MODASSIGN; }
-"+="            { loc(); return TOK_PLUSASSIGN; }
-"-="            { loc(); return TOK_MINUSASSIGN; }
-"<<="           { loc(); return TOK_SHLASSIGN; }
-">>="           { loc(); return TOK_SHRASSIGN; }
-"&="            { loc(); return TOK_ANDASSIGN; }
-"^="            { loc(); return TOK_XORASSIGN; }
-"|="            { loc(); return TOK_ORASSIGN; }
+"*="            { loc(); return ATOK_MULTASSIGN; }
+"/="            { loc(); return ATOK_DIVASSIGN; }
+"%="            { loc(); return ATOK_MODASSIGN; }
+"+="            { loc(); return ATOK_PLUSASSIGN; }
+"-="            { loc(); return ATOK_MINUSASSIGN; }
+"<<="           { loc(); return ATOK_SHLASSIGN; }
+">>="           { loc(); return ATOK_SHRASSIGN; }
+"&="            { loc(); return ATOK_ANDASSIGN; }
+"^="            { loc(); return ATOK_XORASSIGN; }
+"|="            { loc(); return ATOK_ORASSIGN; }
 
   /* digraphs */
 "<:"            { loc(); return '['; }
@@ -1590,36 +1590,36 @@ __decltype          { if(PARSER.cpp98 &&
 {integer_s}     { newstack(yyansi_clval);
                   parser_stack(yyansi_clval)=convert_integer_literal(yytext);
                   PARSER.set_source_location(parser_stack(yyansi_clval));
-                  return TOK_INTEGER;
+                  return ATOK_INTEGER;
                 }
 
 {clang_ext_float_s} { if(PARSER.mode!=configt::ansi_ct::flavourt::GCC &&
                          PARSER.mode != configt::ansi_ct::flavourt::CLANG)
                       {
                         yyansi_cerror("Floating-point constant with unsupported extension");
-                        return TOK_SCANNER_ERROR;
+                        return ATOK_SCANNER_ERROR;
                       }
                       newstack(yyansi_clval);
                       parser_stack(yyansi_clval)=convert_float_literal(yytext);
                       PARSER.set_source_location(parser_stack(yyansi_clval));
-                      return TOK_FLOATING;
+                      return ATOK_FLOATING;
                     }
 
 {gcc_ext_float_s} { if(PARSER.mode!=configt::ansi_ct::flavourt::GCC)
                     {
                       yyansi_cerror("Floating-point constant with unsupported extension");
-                      return TOK_SCANNER_ERROR;
+                      return ATOK_SCANNER_ERROR;
                     }
                     newstack(yyansi_clval);
                     parser_stack(yyansi_clval)=convert_float_literal(yytext);
                     PARSER.set_source_location(parser_stack(yyansi_clval));
-                    return TOK_FLOATING;
+                    return ATOK_FLOATING;
                   }
 
 {float_s}       { newstack(yyansi_clval);
                   parser_stack(yyansi_clval)=convert_float_literal(yytext);
                   PARSER.set_source_location(parser_stack(yyansi_clval));
-                  return TOK_FLOATING;
+                  return ATOK_FLOATING;
                 }
 
 "{"             {
@@ -1657,7 +1657,7 @@ __decltype          { if(PARSER.cpp98 &&
                   parser_stack(yyansi_clval)=string_constantt(yytext);
                   parser_stack(yyansi_clval).add_source_location()=l;
                   BEGIN(GRAMMAR);
-                  return TOK_ASM_STRING;
+                  return ATOK_ASM_STRING;
                 }
 
 <ASM_BLOCK>{
@@ -1671,7 +1671,7 @@ __decltype          { if(PARSER.cpp98 &&
                   parser_stack(yyansi_clval)=string_constantt(PARSER.string_literal);
                   BEGIN(GRAMMAR);
                   yyless(0); // put back
-                  return TOK_ASM_STRING;
+                  return ATOK_ASM_STRING;
                 }
 }
 
@@ -1696,16 +1696,16 @@ __decltype          { if(PARSER.cpp98 &&
                 }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
-"{"             { yyless(0); BEGIN(GRAMMAR); loc(); PARSER.asm_block_following=true; return TOK_GCC_ASM_PAREN; }
-"("             { yyless(0); BEGIN(GRAMMAR); loc(); return TOK_GCC_ASM_PAREN; }
-"volatile"      { yyless(0); BEGIN(GRAMMAR); loc(); return TOK_GCC_ASM_PAREN; }
-"__volatile"    { yyless(0); BEGIN(GRAMMAR); loc(); return TOK_GCC_ASM_PAREN; }
-"__volatile__"  { yyless(0); BEGIN(GRAMMAR); loc(); return TOK_GCC_ASM_PAREN; }
-"goto"          { yyless(0); BEGIN(GRAMMAR); loc(); return TOK_GCC_ASM_PAREN; }
-"inline"        { yyless(0); BEGIN(GRAMMAR); loc(); return TOK_GCC_ASM_PAREN; }
-"__inline"      { yyless(0); BEGIN(GRAMMAR); loc(); return TOK_GCC_ASM_PAREN; }
-"__inline__"    { yyless(0); BEGIN(GRAMMAR); loc(); return TOK_GCC_ASM_PAREN; }
-.               { yyless(0); BEGIN(GRAMMAR); loc(); PARSER.asm_block_following=true; return TOK_GCC_ASM; }
+"{"             { yyless(0); BEGIN(GRAMMAR); loc(); PARSER.asm_block_following=true; return ATOK_GCC_ASM_PAREN; }
+"("             { yyless(0); BEGIN(GRAMMAR); loc(); return ATOK_GCC_ASM_PAREN; }
+"volatile"      { yyless(0); BEGIN(GRAMMAR); loc(); return ATOK_GCC_ASM_PAREN; }
+"__volatile"    { yyless(0); BEGIN(GRAMMAR); loc(); return ATOK_GCC_ASM_PAREN; }
+"__volatile__"  { yyless(0); BEGIN(GRAMMAR); loc(); return ATOK_GCC_ASM_PAREN; }
+"goto"          { yyless(0); BEGIN(GRAMMAR); loc(); return ATOK_GCC_ASM_PAREN; }
+"inline"        { yyless(0); BEGIN(GRAMMAR); loc(); return ATOK_GCC_ASM_PAREN; }
+"__inline"      { yyless(0); BEGIN(GRAMMAR); loc(); return ATOK_GCC_ASM_PAREN; }
+"__inline__"    { yyless(0); BEGIN(GRAMMAR); loc(); return ATOK_GCC_ASM_PAREN; }
+.               { yyless(0); BEGIN(GRAMMAR); loc(); PARSER.asm_block_following=true; return ATOK_GCC_ASM; }
 }
 
 <GCC_ATTRIBUTE1>{
@@ -1733,45 +1733,45 @@ __decltype          { if(PARSER.cpp98 &&
 <GCC_ATTRIBUTE2>{ // an attribute is following -- these may be keywords!
 
 "aligned" |
-"__aligned__"       { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_ALIGNED; }
+"__aligned__"       { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_ALIGNED; }
 
 "packed" |
-"__packed__"        { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_PACKED; }
+"__packed__"        { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_PACKED; }
 
 "transparent_union" |
-"__transparent_union__" { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION; }
+"__transparent_union__" { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_TRANSPARENT_UNION; }
 
 "vector_size" |
-"__vector_size__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_VECTOR_SIZE; }
+"__vector_size__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_VECTOR_SIZE; }
 
 "mode" |
-"__mode__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_MODE; }
+"__mode__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_MODE; }
 
-"__gnu_inline__"    { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_GNU_INLINE; }
+"__gnu_inline__"    { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_GNU_INLINE; }
 
 "weak" |
-"__weak__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_WEAK; }
+"__weak__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_WEAK; }
 
 "alias" |
-"__alias__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_ALIAS; }
+"__alias__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_ALIAS; }
 
 "section" |
-"__section__"       { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_SECTION; }
+"__section__"       { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_SECTION; }
 
 "noreturn" |
-"__noreturn__"      { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_NORETURN; }
+"__noreturn__"      { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_NORETURN; }
 
 "constructor" |
-"__constructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_CONSTRUCTOR; }
+"__constructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_CONSTRUCTOR; }
 
 "destructor" |
-"__destructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_DESTRUCTOR; }
+"__destructor__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_DESTRUCTOR; }
 
 "fallthrough" |
-"__fallthrough__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_FALLTHROUGH; }
+"__fallthrough__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_FALLTHROUGH; }
 
 "used" |
-"__used__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_USED; }
+"__used__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return ATOK_GCC_ATTRIBUTE_USED; }
 
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
@@ -1814,7 +1814,7 @@ __decltype          { if(PARSER.cpp98 &&
 {integer_s}     { newstack(yyansi_clval);
                   parser_stack(yyansi_clval)=convert_integer_literal(yytext);
                   PARSER.set_source_location(parser_stack(yyansi_clval));
-                  return TOK_INTEGER;
+                  return ATOK_INTEGER;
                 }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }

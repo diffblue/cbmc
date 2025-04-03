@@ -131,7 +131,8 @@ modified (as `bv_refinementt` and `string_refinementt` do).
   interfaces. This is not used by the SMT2 back-ends.
 
 * smt2/:   Provides the `smt2_dect` type which converts the formulae to
-  SMT-LIB 2 and then invokes one of Boolector, CVC3, CVC4, MathSAT, Yices or Z3.
+  SMT-LIB 2 and then invokes one of Boolector, CVC3, CVC4, CVC5, MathSAT,
+  Yices or Z3.
   Note that the interaction with the solver is batched and uses
   temporary files rather than using the interactive command supported by
   SMT-LIB 2. With the `–fpa` option, this output mode will not flatten

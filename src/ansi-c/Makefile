@@ -104,11 +104,15 @@ all: ansi-c$(LIBEXT)
 
 ansi_c_y.tab.cpp: parser.y
 	$(YACC) $(YFLAGS) -pyyansi_c parser.y --defines=ansi_c_y.tab.h -o $@
+	$(SED) -e's,enum yytokentype,enum yytokentype_ansi,' \
+	  <ansi_c_y.tab.h >ansi_c_y.tab.h.tmp && \
+	  mv ansi_c_y.tab.h.tmp ansi_c_y.tab.h
 
 ansi_c_y.tab.h: ansi_c_y.tab.cpp
 
 ansi_c_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyansi_c -o$@ scanner.l
+	$(SED) -e's,struct yyguts_t,struct yyansiguts_t,g' <$@ >$@.tmp && mv $@.tmp $@
 
 # extra dependencies
 ansi_c_y.tab$(OBJEXT): ansi_c_y.tab.cpp ansi_c_y.tab.h

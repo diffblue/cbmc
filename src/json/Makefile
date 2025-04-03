@@ -25,6 +25,7 @@ json_y.tab.h: json_y.tab.cpp
 
 json_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyjson -o$@ scanner.l
+	$(SED) -e's,struct yyguts_t,struct yyjsonguts_t,g' <$@ >$@.tmp && mv $@.tmp $@
 
 generated_files: json_lex.yy.cpp json_y.tab.cpp json_y.tab.h
 

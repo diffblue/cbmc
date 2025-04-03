@@ -73,7 +73,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     #   Ensure NDEBUG is not set for release builds
-    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
     #   Enable lots of warnings
     set(CMAKE_CXX_FLAGS
@@ -103,9 +103,10 @@ endif()
 
 set(enable_cbmc_tests on CACHE BOOL "Whether CBMC tests should be enabled")
 
-set(sat_impl "minisat2" CACHE STRING
-    "This setting controls the SAT library which is used. Valid values are
-    'minisat2', 'glucose', 'cadical', 'ipasir-cadical' or 'ipasir-custom'"
+set(sat_impl "minisat2;glucose,cadical" CACHE STRING
+    "This setting control the SAT libraries which are used. Valid values are
+'minisat2', 'glucose', 'cadical', 'ipasir-cadical' or 'ipasir-custom'.
+Use multiple solvers ; seperated"
 )
 
 if(${enable_cbmc_tests})
@@ -122,8 +123,12 @@ if(DEFINED CMAKE_USE_CUDD)
 
     if(NOT EXISTS ${cudd_SOURCE_DIR}/Makefile)
         message(STATUS "Configuring Cudd-3.0.0")
-        execute_process(COMMAND ./configure WORKING_DIRECTORY ${cudd_SOURCE_DIR})
+        execute_process(COMMAND ./configure HAVE_DOXYGEN=FALSE WORKING_DIRECTORY ${cudd_SOURCE_DIR})
     endif()
+    message(STATUS "Patching Cudd-3.0.0")
+    execute_process(
+        COMMAND patch -N -p0 -i ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cudd-3.0.0-postconfig.patch
+        WORKING_DIRECTORY ${cudd_SOURCE_DIR})
     message(STATUS "Building Cudd-3.0.0")
     execute_process(COMMAND make WORKING_DIRECTORY ${cudd_SOURCE_DIR})
 
@@ -209,6 +214,10 @@ function(cprover_default_properties)
      CXX_STANDARD ${CBMC_CXX_STANDARD}
      CXX_STANDARD_REQUIRED ${CBMC_CXX_STANDARD_REQUIRED}
      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY})
+
+    if(ipo_supported)
+      set_property(TARGET ${ARGN} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+    endif()
 endfunction()
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux AND
@@ -221,6 +230,24 @@ endif()
 
 option(WITH_MEMORY_ANALYZER
   "build the memory analyzer" ${WITH_MEMORY_ANALYZER_DEFAULT})
+
+# Our requirement is 3.8
+if((CMAKE_MAJOR_VERSION GREATER_EQUAL 4 OR CMAKE_MINOR_VERSION GREATER_EQUAL 9)
+   AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+  cmake_policy(SET CMP0069 NEW)
+  include(CheckIPOSupported)
+  check_ipo_supported(RESULT ipo_supported OUTPUT error LANGUAGES CXX)
+endif()
+
+if(ipo_supported)
+  message(STATUS "IPO / LTO enabled")
+  set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+  add_definitions(-DLTO)
+else()
+  message(STATUS "IPO / LTO not supported: <${error}>")
+endif()
+
+find_program(SED sed gsed)
 
 add_subdirectory(src)
 add_subdirectory(regression)

@@ -23,6 +23,8 @@ macro(generic_bison name)
     endif()
 
     set(bison_source "${name}_y.tab.cpp")
+    set_source_files_properties(${bison_source} PROPERTIES
+      COMPILE_FLAGS "-Dyyalloc=${name}_yyalloc -Dyysymbol_kind_t=${name}_yysymbol_kind_t -Dyytokentype=${name}_yytokentype")
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${bison_source}")
         message(FATAL_ERROR "Generated file ${bison_source} found in source tree. If you previously built with `make`, run `make clean` and try again")
     endif()
@@ -37,10 +39,15 @@ macro(generic_bison name)
         COMPILE_FLAGS "${bison_warnings_as_errors} -pyy${name}"
     )
     set(renamed_parser_header "${CMAKE_CURRENT_BINARY_DIR}/${bison_header}")
-    add_custom_command(OUTPUT "${renamed_parser_header}"
-        COMMAND "${CMAKE_COMMAND}" -E copy "${BISON_parser_OUTPUT_HEADER}" "${renamed_parser_header}"
-        MAIN_DEPENDENCY "${BISON_parser_OUTPUT_HEADER}"
-    )
+    if(${SED} STREQUAL "SED-NOTFOUND")
+      add_custom_command(OUTPUT "${renamed_parser_header}"
+          COMMAND "${CMAKE_COMMAND}" -E copy "${BISON_parser_OUTPUT_HEADER}" "${renamed_parser_header}"
+          MAIN_DEPENDENCY "${BISON_parser_OUTPUT_HEADER}")
+    else()
+      add_custom_command(OUTPUT "${renamed_parser_header}"
+          COMMAND ${SED} -e "s,enum yytokentype,enum yytokentype_${name}," <${BISON_parser_OUTPUT_HEADER} >${renamed_parser_header}
+          MAIN_DEPENDENCY "${BISON_parser_OUTPUT_HEADER}")
+    endif()
     list(REMOVE_ITEM BISON_parser_OUTPUTS "${BISON_parser_OUTPUT_HEADER}")
     list(APPEND BISON_parser_OUTPUTS "${renamed_parser_header}")
 endmacro(generic_bison)
@@ -58,6 +65,13 @@ macro(generic_flex name)
         "${CMAKE_CURRENT_BINARY_DIR}/${name}_lex.yy.cpp"
         COMPILE_FLAGS "-Pyy${name}"
     )
+    if(NOT ${SED} STREQUAL "SED-NOTFOUND")
+      set(new_flex_source "${CMAKE_CURRENT_BINARY_DIR}/${name}_lex_sed.yy.cpp")
+      add_custom_command(OUTPUT "${new_flex_source}"
+          COMMAND ${SED} -e "s,struct yyguts_t,struct yy${name}guts_t,g" <${FLEX_scanner_OUTPUTS} >${new_flex_source}
+          MAIN_DEPENDENCY "${FLEX_scanner_OUTPUTS}")
+      set(FLEX_scanner_OUTPUTS "${new_flex_source}")
+    endif()
 endmacro(generic_flex)
 
 #   Set the public include locations for a target.
@@ -84,6 +98,12 @@ macro(add_if_library target name)
         string(REGEX REPLACE "-" "_" define ${upper_name})
 
         target_compile_definitions(${target} PUBLIC HAVE_${define})
+        if(ipo_supported)
+          set_property(TARGET ${name} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+        endif()
+    endif()
+    if(ipo_supported)
+      set_property(TARGET ${target} PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
     endif()
 endmacro(add_if_library)
 
