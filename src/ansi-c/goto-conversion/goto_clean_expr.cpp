@@ -43,6 +43,14 @@ static symbol_exprt find_base_symbol(const exprt &expr)
   {
     return find_base_symbol(to_dereference_expr(expr).pointer());
   }
+  else if(expr.id() == ID_typecast)
+  {
+    return find_base_symbol(to_typecast_expr(expr).op());
+  }
+  else if(expr.id() == ID_address_of)
+  {
+    return find_base_symbol(to_address_of_expr(expr).op());
+  }
   else
   {
     throw "unsupported expression type for finding base symbol";
@@ -63,6 +71,10 @@ static exprt convert_statement_expression(
   INVARIANT(
     natural_loops.loop_map.size() == 0, "quantifier must not contain loops");
 
+  std::unordered_set<symbol_exprt, irep_hash> declared_symbols;
+  // All bound variables are local.
+  declared_symbols.insert(qex.variables().begin(), qex.variables().end());
+
   // `last` is the instruction corresponding to the last expression in the
   // statement expression.
   goto_programt::const_targett last = where.instructions.end();
@@ -75,6 +87,11 @@ static exprt convert_statement_expression(
     {
       last = it;
     }
+
+    if(it->is_decl())
+    {
+      declared_symbols.insert(it->decl_symbol());
+    }
   }
 
   DATA_INVARIANT(
@@ -82,6 +99,12 @@ static exprt convert_statement_expression(
     "expression statements must contain a terminator expression");
 
   auto last_expr = to_code_expression(last->get_other()).expression();
+  if(
+    last_expr.id() == ID_typecast &&
+    to_typecast_expr(last_expr).type().id() == ID_empty)
+  {
+    to_typecast_expr(last_expr).type() = bool_typet();
+  }
 
   struct pathst
   {
@@ -139,10 +162,6 @@ static exprt convert_statement_expression(
     {1, where.instructions.begin()},
     {1, std::make_pair(true_exprt(), replace_mapt())});
 
-  std::unordered_set<symbol_exprt, irep_hash> declared_symbols;
-  // All bound variables are local.
-  declared_symbols.insert(qex.variables().begin(), qex.variables().end());
-
   exprt res = true_exprt();
 
   // Visit the quantifier body along `paths`.
@@ -151,9 +170,12 @@ static exprt convert_statement_expression(
     auto &current_it = paths.back_it();
     auto &path_condition = paths.back_path_condition();
     auto &value_map = paths.back_value_map();
-    INVARIANT(
-      current_it != where.instructions.end(),
-      "Quantifier body must have a unique end expression.");
+
+    if(current_it == where.instructions.end())
+    {
+      paths.pop_back();
+      continue;
+    }
 
     switch(current_it->type())
     {
