@@ -54,6 +54,16 @@ _cbmc_autocomplete()
   fi
 
   #if none of the above applies, offer directories and files that we can analyze
-  COMPREPLY=( $(compgen -G '*.class|*.jar|*.cpp|*.cc|*.c\+\+|*.ii|*.cxx|*.c|*.i|*.gb' -- $cur) )
+  _filedir -d
+  COMPREPLY+=( $(compgen -G "$cur*.c") )
+  COMPREPLY+=( $(compgen -G "$cur*.c\+\+") )
+  COMPREPLY+=( $(compgen -G "$cur*.cc") )
+  COMPREPLY+=( $(compgen -G "$cur*.class") )
+  COMPREPLY+=( $(compgen -G "$cur*.cpp") )
+  COMPREPLY+=( $(compgen -G "$cur*.cxx") )
+  COMPREPLY+=( $(compgen -G "$cur*.gb") )
+  COMPREPLY+=( $(compgen -G "$cur*.i") )
+  COMPREPLY+=( $(compgen -G "$cur*.ii") )
+  COMPREPLY+=( $(compgen -G "$cur*.jar") )
 }
 complete -F _cbmc_autocomplete cbmc
