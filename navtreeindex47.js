@@ -1,7 +1,5 @@
 var NAVTREEINDEX47 =
 {
-"classlinking__diagnosticst.html#aee47ec6d500e05221ab6320a3f69e01c":[7,0,771,3],
-"classlinkingt.html":[7,0,772],
 "classlinkingt.html#a00b64ed0daa8cac5af21e9eb933b2131":[7,0,772,15],
 "classlinkingt.html#a0119897371f9ced79a7e12097c5ae08a":[7,0,772,7],
 "classlinkingt.html#a06cee25f04d5e4a24801773c5a7ae6d8":[7,0,772,3],
@@ -249,5 +247,7 @@ var NAVTREEINDEX47 =
 "classloop__contracts__synthesizer__baset.html#afe0f2f25659a33a84ffd2e2615d89a5d":[7,0,796,0],
 "classloop__templatet.html":[7,0,798],
 "classloop__templatet.html#a1bc0d4e6f6d9cd34f4044ee1d6b91af7":[7,0,798,11],
-"classloop__templatet.html#a36ab9c3983ba32dd5e13b5eac69bbc27":[7,0,798,8]
+"classloop__templatet.html#a36ab9c3983ba32dd5e13b5eac69bbc27":[7,0,798,8],
+"classloop__templatet.html#a5d422145b3d8cb6abb231be6d48fb053":[7,0,798,7],
+"classloop__templatet.html#a5df41b3889e4281efe4a2241ddd12c6b":[7,0,798,4]
 };

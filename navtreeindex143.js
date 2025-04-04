@@ -1,7 +1,5 @@
 var NAVTREEINDEX143 =
 {
-"structrequire__goto__statements_1_1pointer__assignment__locationt.html#a87fc9a93fee7d306c38218612c862f71":[7,0,1,1,1],
-"structrequire__parse__tree_1_1expected__instructiont.html":[6,0,7,0],
 "structrequire__parse__tree_1_1expected__instructiont.html":[7,0,2,0],
 "structrequire__parse__tree_1_1expected__instructiont.html#a046f6557da676b14ab32fbbb4d0d2b91":[7,0,2,0,3],
 "structrequire__parse__tree_1_1expected__instructiont.html#a046f6557da676b14ab32fbbb4d0d2b91":[6,0,7,0,3],
@@ -249,5 +247,7 @@ var NAVTREEINDEX143 =
 "structsmt__core__theoryt_1_1andt.html#a32be2562bedad70b0174332960ab77ca":[7,0,1125,0,2],
 "structsmt__core__theoryt_1_1andt.html#acd1ddfa17d0ba5737de26a38a2443ca3":[7,0,1125,0,0],
 "structsmt__core__theoryt_1_1andt.html#af17b3b7d012927c19b57d52d31cbbb9e":[7,0,1125,0,1],
-"structsmt__core__theoryt_1_1distinctt.html":[7,0,1125,1]
+"structsmt__core__theoryt_1_1distinctt.html":[7,0,1125,1],
+"structsmt__core__theoryt_1_1distinctt.html#a96eda491703a51fd7aa5504f10be9c93":[7,0,1125,1,1],
+"structsmt__core__theoryt_1_1distinctt.html#abed80e9560ace077fc6a3571554baaab":[7,0,1125,1,2]
 };

@@ -7,7 +7,6 @@ var classc__qualifierst =
     [ "clear", "classc__qualifierst.html#ad7eef7a924db3612d8be1b57621e54aa", null ],
     [ "clear", "classc__qualifierst.html#a338d97770de7b4c13d80da56ddaeceaa", null ],
     [ "clone", "classc__qualifierst.html#a9b260e5846ba04b51d16e88005d67d34", null ],
-    [ "count", "classc__qualifierst.html#ab8141cb4fbca5c34cd4f2bef7a4e1c74", null ],
     [ "is_subset_of", "classc__qualifierst.html#aac7728a0faed919fdf946cde36aa5292", null ],
     [ "operator!=", "classc__qualifierst.html#a34261312797e32877a9e999bd4740fd1", null ],
     [ "operator+=", "classc__qualifierst.html#a67b31efab8625d403598f1b62442480e", null ],
