@@ -705,15 +705,15 @@ void java_bytecode_parsert::rconstant_pool()
       break;
 
     case CONSTANT_Utf8:
-      {
-        const u2 bytes = read<u2>();
-        std::string s;
-        s.resize(bytes);
-        for(auto &ch : s)
-          ch = read<std::string::value_type>();
-        it->s = s; // Add to string table
-      }
+    {
+      const u2 bytes = read<u2>();
+      std::string s;
+      s.resize(bytes);
+      for(auto &ch : s)
+        ch = read<std::string::value_type>();
+      it->s = s; // Add to string table
       break;
+    }
 
     case CONSTANT_MethodHandle:
       it->ref1 = read<u1>();
@@ -951,34 +951,34 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
       break;
 
     case 'b': // a signed byte
-      {
-        const s1 c = read<s1>();
-        instruction.args.push_back(from_integer(c, signedbv_typet(8)));
-      }
+    {
+      const s1 c = read<s1>();
+      instruction.args.push_back(from_integer(c, signedbv_typet(8)));
       address+=1;
       break;
+    }
 
     case 'o': // two byte branch offset, signed
-      {
-        const s2 offset = read<s2>();
-        // By converting the signed offset into an absolute address (by adding
-        // the current address) the number represented becomes unsigned.
-        instruction.args.push_back(
-          from_integer(address+offset, unsignedbv_typet(16)));
-      }
+    {
+      const s2 offset = read<s2>();
+      // By converting the signed offset into an absolute address (by adding
+      // the current address) the number represented becomes unsigned.
+      instruction.args.push_back(
+        from_integer(address + offset, unsignedbv_typet(16)));
       address+=2;
       break;
+    }
 
     case 'O': // four byte branch offset, signed
-      {
-        const s4 offset = read<s4>();
-        // By converting the signed offset into an absolute address (by adding
-        // the current address) the number represented becomes unsigned.
-        instruction.args.push_back(
-          from_integer(address+offset, unsignedbv_typet(32)));
-      }
+    {
+      const s4 offset = read<s4>();
+      // By converting the signed offset into an absolute address (by adding
+      // the current address) the number represented becomes unsigned.
+      instruction.args.push_back(
+        from_integer(address + offset, unsignedbv_typet(32)));
       address+=4;
       break;
+    }
 
     case 'v': // local variable index (one byte)
       {
@@ -1140,8 +1140,8 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
 
     case 's': // a signed short
       {
-        const s2 s = read<s2>();
-        instruction.args.push_back(from_integer(s, signedbv_typet(16)));
+      const s2 s = read<s2>();
+      instruction.args.push_back(from_integer(s, signedbv_typet(16)));
       }
       address+=2;
       break;
