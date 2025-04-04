@@ -143,7 +143,8 @@ protected:
     {
       return next_id++;
     }
-  } handle_sequence, array_sequence, index_sequence, padding_sequence;
+  };
+  sequencet handle_sequence, array_sequence, index_sequence, padding_sequence;
   /// When the `handle(exprt)` member function is called, the decision procedure
   /// commands the SMT solver to define a new function corresponding to the
   /// given expression. The mapping of the expressions to the function

@@ -12,7 +12,7 @@ env:
 jobs:
   # This job takes approximately 22 to 75 minutes
   Linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -45,10 +45,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-Coverage-${{ github.ref }}
-            ${{ runner.os }}-20.04-Coverage
+            ${{ runner.os }}-24.04-Coverage-${{ github.ref }}
+            ${{ runner.os }}-24.04-Coverage
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV

@@ -7,7 +7,7 @@ on:
 jobs:
   # This job takes approximately 33 minutes
   CompileXen:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,19 +19,19 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y build-essential git flex bison software-properties-common curl python
-          sudo apt-get install --no-install-recommends -y bin86 gdb bcc liblzma-dev python-dev gettext iasl uuid-dev libncurses5-dev libncursesw5-dev pkg-config
-          sudo apt-get install --no-install-recommends -y libgtk2.0-dev libyajl-dev time ccache clang-10 clang++-10
+          sudo apt-get install --no-install-recommends -y build-essential git flex bison software-properties-common curl python3
+          sudo apt-get install --no-install-recommends -y bin86 gdb bcc liblzma-dev python3-dev gettext iasl uuid-dev libncurses5-dev libncursesw5-dev pkg-config
+          sudo apt-get install --no-install-recommends -y libgtk2.0-dev libyajl-dev time ccache clang-19 clang++-19
 
       - name: Prepare ccache
         uses: actions/cache@v4
         with:
           save-always: true
           path: .ccache
-          key: ${{ runner.os }}-20.04-make-clang-${{ github.ref }}-${{ github.sha }}-XEN
+          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-XEN
           restore-keys: |
-            ${{ runner.os }}-20.04-make-clang-${{ github.ref }}
-            ${{ runner.os }}-20.04-make-clang
+            ${{ runner.os }}-24.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-24.04-make-clang
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV

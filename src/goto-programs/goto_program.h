@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_instruction_code.h"
 
-#include <iosfwd>
 #include <limits>
 #include <list>
 #include <set>

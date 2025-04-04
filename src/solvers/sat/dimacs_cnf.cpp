@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/magic.h>
 
-#include <iostream>
-
 dimacs_cnft::dimacs_cnft(message_handlert &message_handler)
   : cnf_clause_listt(message_handler), break_lines(false)
 {

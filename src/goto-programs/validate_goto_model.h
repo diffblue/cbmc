@@ -10,7 +10,7 @@ Date: Oct 2018
 #ifndef CPROVER_GOTO_PROGRAMS_VALIDATE_GOTO_MODEL_H
 #define CPROVER_GOTO_PROGRAMS_VALIDATE_GOTO_MODEL_H
 
-#include <util/validation_mode.h>
+#include <util/validation_mode.h> // IWYU pragma: keep
 
 class goto_model_validation_optionst final
 {

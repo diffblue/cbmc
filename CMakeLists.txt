@@ -156,9 +156,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
         add_custom_target(coverage
             COMMAND ${CMAKE_COMMAND} -E make_directory ${CODE_COVERAGE_OUTPUT_DIR}
             COMMAND ctest -V -L CORE -j${parallel_tests}
-            COMMAND ${CODE_COVERAGE_LCOV} ${LCOV_FLAGS} --capture --directory ${CMAKE_BINARY_DIR} --output-file ${CODE_COVERAGE_INFO_FILE}
+            COMMAND ${CODE_COVERAGE_LCOV} ${LCOV_FLAGS} --ignore-errors mismatch --capture --directory ${CMAKE_BINARY_DIR} --output-file ${CODE_COVERAGE_INFO_FILE}
             COMMAND ${CODE_COVERAGE_LCOV} ${LCOV_FLAGS} --remove ${CODE_COVERAGE_INFO_FILE} '/usr/*' --output-file ${CODE_COVERAGE_INFO_FILE}
-            COMMAND ${CODE_COVERAGE_GENHTML} ${CODE_COVERAGE_INFO_FILE} --output-directory ${CODE_COVERAGE_OUTPUT_DIR}
+            COMMAND ${CODE_COVERAGE_GENHTML} --ignore-errors unmapped ${CODE_COVERAGE_INFO_FILE} --output-directory ${CODE_COVERAGE_OUTPUT_DIR}
             DEPENDS
               "$<TARGET_FILE:java-unit>"
               "$<TARGET_FILE:unit>"

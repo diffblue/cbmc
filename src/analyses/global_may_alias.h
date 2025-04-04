@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_GLOBAL_MAY_ALIAS_H
 #define CPROVER_ANALYSES_GLOBAL_MAY_ALIAS_H
 
-#include <util/numbering.h>
 #include <util/threeval.h>
 #include <util/union_find.h>
 

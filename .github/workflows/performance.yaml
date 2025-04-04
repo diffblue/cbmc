@@ -8,7 +8,7 @@ on:
 
 jobs:
   perf-benchcomp:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Save push event HEAD and HEAD~ to environment variables
         if: ${{ github.event_name == 'push' }}
@@ -51,10 +51,10 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .ccache
-          key: ${{ runner.os }}-20.04-Release-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            ${{ runner.os }}-20.04-Release-${{ github.ref }}
-            ${{ runner.os }}-20.04-Release
+            ${{ runner.os }}-24.04-Release-${{ github.ref }}
+            ${{ runner.os }}-24.04-Release
       - name: ccache environment
         run: echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Zero ccache stats and limit in size

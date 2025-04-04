@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_conv.h"
 
-#include <fstream>
-
 class message_handlert;
 
 class smt2_stringstreamt

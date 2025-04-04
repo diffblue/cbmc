@@ -23,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr2c.h"
 #include "type2name.h"
 
-#include <fstream>
-
 std::set<std::string> ansi_c_languaget::extensions() const
 {
   return { "c", "i" };

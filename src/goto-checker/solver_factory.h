@@ -15,6 +15,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/flattening/boolbv.h>
 #include <solvers/smt2/smt2_dec.h>
 
+#include <fstream>
 #include <memory>
 
 class cmdlinet;
