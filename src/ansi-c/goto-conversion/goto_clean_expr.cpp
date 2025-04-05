@@ -211,19 +211,16 @@ static exprt convert_statement_expression(
     // path_condition && cond.
     case goto_program_instruction_typet::GOTO:
     {
-      if(!current_it->condition().is_true())
+      exprt condition = current_it->condition();
+      replace_expr(value_map, condition);
+      if(!condition.is_true())
       {
         auto next_it = current_it->targets.front();
         exprt copy_path_condition = path_condition;
-        replace_mapt copy_symbol_map = value_map;
-        auto copy_condition = current_it->condition();
-        path_condition =
-          and_exprt(path_condition, not_exprt(current_it->condition()));
+        path_condition = and_exprt(path_condition, not_exprt(condition));
         current_it++;
         paths.push_back(
-          next_it,
-          and_exprt(copy_path_condition, copy_condition),
-          copy_symbol_map);
+          next_it, and_exprt(copy_path_condition, condition), value_map);
       }
       else
       {
