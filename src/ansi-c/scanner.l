@@ -1012,11 +1012,12 @@ enable_or_disable ("enable"|"disable")
                      TOK_CHAR16_T);
                  }
 
-"__nullptr"     { // GNU extension
+"__nullptr"     { // GNU, clang, VS extension
                    return conditional_keyword(
                      PARSER.cpp98 &&
                      (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                      PARSER.mode==configt::ansi_ct::flavourt::CLANG),
+                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
+                      PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO),
                      TOK_NULLPTR);
                  }
 
