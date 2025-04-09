@@ -950,38 +950,38 @@ enable_or_disable ("enable"|"disable")
    http://clang.llvm.org/docs/LanguageExtensions.html#checks-for-type-trait-primitives */
 %}
 
-"__has_assign"      { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_copy"        { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_finalizer"   { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_assign" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_constructor" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_copy" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_assign" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_constructor" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_copy" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_destructor" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__has_user_destructor" { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_virtual_destructor" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_abstract"     { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_base_of"      { loc(); return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
-"__is_class"        { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_convertible_to" { loc(); return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
-"__is_delegate"     { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_empty"        { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_enum"         { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_interface_class" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_pod"          { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_polymorphic"  { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_ref_array"    { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_ref_class"    { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_sealed"       { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_simple_value_class" { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_union"        { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_value_class"  { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__has_assign"      { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__has_copy"        { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__has_finalizer"   { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_assign" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_constructor" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_copy" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_assign" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_constructor" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_copy" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_destructor" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_user_destructor" { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__has_virtual_destructor" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_abstract"     { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_base_of"      { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_class"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_convertible_to" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_delegate"     { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_empty"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_enum"         { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_interface_class" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_pod"          { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_polymorphic"  { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_ref_array"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_ref_class"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_sealed"       { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_simple_value_class" { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_union"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_value_class"  { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 
-"__if_exists"       { loc(); return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }
-"__if_not_exists"   { loc(); return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
-"__underlying_type" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNDERLYING_TYPE); }
+"__if_exists"       { return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }
+"__if_not_exists"   { return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
+"__underlying_type" { return conditional_keyword(PARSER.cpp98, TOK_UNDERLYING_TYPE); }
 
 "["{ws}"repeatable" |
 "["{ws}"source_annotation_attribute" |
