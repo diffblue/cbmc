@@ -149,26 +149,17 @@ int MSC_Keyword(int token)
     return make_identifier();
 }
 
-int cpp98_keyword(int token)
+/// Exits the scanner with the current yytext. If the condition holds,
+/// yytext is returned as keyword, and otherwise as an identifier.
+int conditional_keyword(bool condition, int token)
 {
-  if(PARSER.cpp98)
+  if(condition)
   {
     loc();
     return token;
   }
   else
-    return make_identifier();
-}
-
-int cpp11_keyword(int token)
-{
-  if(PARSER.cpp11)
-  {
-    loc();
-    return token;
-  }
-  else
-    return make_identifier();
+    return make_identifier();    
 }
 
 int MSC_cpp_keyword(int token)
@@ -843,75 +834,73 @@ enable_or_disable ("enable"|"disable")
 /* C++ Keywords and Operators */
 %}
 
-alignas             { return cpp11_keyword(TOK_ALIGNAS); } // C++11
-alignof             { return cpp11_keyword(TOK_ALIGNOF); } // C++11
-and                 { return cpp98_keyword(TOK_ANDAND); }
-and_eq              { return cpp98_keyword(TOK_ANDASSIGN); }
-bool                { return cpp98_keyword(TOK_BOOL); }
-catch               { return cpp98_keyword(TOK_CATCH); }
+alignas             { return conditional_keyword(PARSER.cpp11, TOK_ALIGNAS); } // C++11
+alignof             { return conditional_keyword(PARSER.cpp11, TOK_ALIGNOF); } // C++11
+and                 { return conditional_keyword(PARSER.cpp98, TOK_ANDAND); }
+and_eq              { return conditional_keyword(PARSER.cpp98, TOK_ANDASSIGN); }
+bool                { return conditional_keyword(PARSER.cpp98, TOK_BOOL); }
+catch               { return conditional_keyword(PARSER.cpp98, TOK_CATCH); }
 char16_t            { // C++11, but Visual Studio uses typedefs
-                      if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                        return make_identifier();
-                      else
-                        return cpp11_keyword(TOK_CHAR16_T);
+                      return conditional_keyword(
+                        PARSER.cpp11 &&
+                        PARSER.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO,
+                        TOK_CHAR16_T);
                     }
 char32_t            { // C++11, but Visual Studio uses typedefs
-                      if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                        return make_identifier();
-                      else
-                        return cpp11_keyword(TOK_CHAR32_T);
+                      return conditional_keyword(
+                        PARSER.cpp11 &&
+                        PARSER.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO,
+                        TOK_CHAR32_T);
                     }
-class               { return cpp98_keyword(TOK_CLASS); }
-compl               { return cpp98_keyword('~'); }
-constexpr           { return cpp11_keyword(TOK_CONSTEXPR); } // C++11
-delete              { return cpp98_keyword(TOK_DELETE); }
-decltype            { return cpp11_keyword(TOK_DECLTYPE); } // C++11
-explicit            { return cpp98_keyword(TOK_EXPLICIT); }
-false               { return cpp98_keyword(TOK_FALSE); }
-friend              { return cpp98_keyword(TOK_FRIEND); }
-mutable             { return cpp98_keyword(TOK_MUTABLE); }
-namespace           { return cpp98_keyword(TOK_NAMESPACE); }
-new                 { return cpp98_keyword(TOK_NEW); }
-nodiscard           { return cpp11_keyword(TOK_NODISCARD); } // C++11
-noexcept            { return cpp11_keyword(TOK_NOEXCEPT); } // C++11
-noreturn            { return cpp11_keyword(TOK_NORETURN); } // C++11
-not                 { return cpp98_keyword('!'); }
-not_eq              { return cpp98_keyword(TOK_NE); }
-nullptr             { return cpp11_keyword(TOK_NULLPTR); } // C++11
-operator            { return cpp98_keyword(TOK_OPERATOR); }
-or                  { return cpp98_keyword(TOK_OROR); }
-or_eq               { return cpp98_keyword(TOK_ORASSIGN); }
-private             { return cpp98_keyword(TOK_PRIVATE); }
-protected           { return cpp98_keyword(TOK_PROTECTED); }
-public              { return cpp98_keyword(TOK_PUBLIC); }
+class               { return conditional_keyword(PARSER.cpp98, TOK_CLASS); }
+compl               { return conditional_keyword(PARSER.cpp98, '~'); }
+constexpr           { return conditional_keyword(PARSER.cpp11, TOK_CONSTEXPR); } // C++11
+delete              { return conditional_keyword(PARSER.cpp98, TOK_DELETE); }
+decltype            { return conditional_keyword(PARSER.cpp11, TOK_DECLTYPE); } // C++11
+explicit            { return conditional_keyword(PARSER.cpp98, TOK_EXPLICIT); }
+false               { return conditional_keyword(PARSER.cpp98, TOK_FALSE); }
+friend              { return conditional_keyword(PARSER.cpp98, TOK_FRIEND); }
+mutable             { return conditional_keyword(PARSER.cpp98, TOK_MUTABLE); }
+namespace           { return conditional_keyword(PARSER.cpp98, TOK_NAMESPACE); }
+new                 { return conditional_keyword(PARSER.cpp98, TOK_NEW); }
+nodiscard           { return conditional_keyword(PARSER.cpp11, TOK_NODISCARD); } // C++11
+noexcept            { return conditional_keyword(PARSER.cpp11, TOK_NOEXCEPT); } // C++11
+noreturn            { return conditional_keyword(PARSER.cpp11, TOK_NORETURN); } // C++11
+not                 { return conditional_keyword(PARSER.cpp98, '!'); }
+not_eq              { return conditional_keyword(PARSER.cpp98, TOK_NE); }
+nullptr             { return conditional_keyword(PARSER.cpp11, TOK_NULLPTR); } // C++11
+operator            { return conditional_keyword(PARSER.cpp98, TOK_OPERATOR); }
+or                  { return conditional_keyword(PARSER.cpp98, TOK_OROR); }
+or_eq               { return conditional_keyword(PARSER.cpp98, TOK_ORASSIGN); }
+private             { return conditional_keyword(PARSER.cpp98, TOK_PRIVATE); }
+protected           { return conditional_keyword(PARSER.cpp98, TOK_PROTECTED); }
+public              { return conditional_keyword(PARSER.cpp98, TOK_PUBLIC); }
 static_assert       { // C++11, but Visual Studio supports it in all modes
                       // as a keyword, even though the documentation claims
                       // it's a macro.
-                      if(PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
-                      {
-                        loc(); return TOK_STATIC_ASSERT;
-                      }
-                      else
-                        return cpp11_keyword(TOK_STATIC_ASSERT);
+                      return conditional_keyword(
+                        PARSER.cpp11 ||
+                        PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO,
+                        TOK_STATIC_ASSERT);
                     }
-template            { return cpp98_keyword(TOK_TEMPLATE); }
-this                { return cpp98_keyword(TOK_THIS); }
-thread_local        { return cpp11_keyword(TOK_THREAD_LOCAL); } // C++11
-throw               { return cpp98_keyword(TOK_THROW); }
-true                { return cpp98_keyword(TOK_TRUE); }
-typeid              { return cpp98_keyword(TOK_TYPEID); }
-typename            { return cpp98_keyword(TOK_TYPENAME); }
-using               { return cpp98_keyword(TOK_USING); }
-virtual             { return cpp98_keyword(TOK_VIRTUAL); }
+template            { return conditional_keyword(PARSER.cpp98, TOK_TEMPLATE); }
+this                { return conditional_keyword(PARSER.cpp98, TOK_THIS); }
+thread_local        { return conditional_keyword(PARSER.cpp11, TOK_THREAD_LOCAL); } // C++11
+throw               { return conditional_keyword(PARSER.cpp98, TOK_THROW); }
+true                { return conditional_keyword(PARSER.cpp98, TOK_TRUE); }
+typeid              { return conditional_keyword(PARSER.cpp98, TOK_TYPEID); }
+typename            { return conditional_keyword(PARSER.cpp98, TOK_TYPENAME); }
+using               { return conditional_keyword(PARSER.cpp98, TOK_USING); }
+virtual             { return conditional_keyword(PARSER.cpp98, TOK_VIRTUAL); }
 wchar_t             { // CodeWarrior doesn't have wchar_t built in,
                       // and MSC has a command-line option to turn it off
-                      if(PARSER.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
-                        return make_identifier();
-                      else
-                        return cpp98_keyword(TOK_WCHAR_T);
+                      return conditional_keyword(
+                        PARSER.cpp98 &&
+                        PARSER.mode!=configt::ansi_ct::flavourt::CODEWARRIOR,
+                        TOK_WCHAR_T);
                     }
-xor                 { return cpp98_keyword('^'); }
-xor_eq              { return cpp98_keyword(TOK_XORASSIGN); }
+xor                 { return conditional_keyword(PARSER.cpp98, '^'); }
+xor_eq              { return conditional_keyword(PARSER.cpp98, TOK_XORASSIGN); }
 ".*"                { return cpp_operator(TOK_DOTPM); }
 "->*"               { return cpp_operator(TOK_ARROWPM); }
 "::"                { if(PARSER.cpp98)
@@ -925,12 +914,11 @@ xor_eq              { return cpp98_keyword(TOK_XORASSIGN); }
                       }
                     }
 
-__decltype          { if(PARSER.cpp98 &&
-                         (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                          PARSER.mode==configt::ansi_ct::flavourt::CLANG))
-                        return cpp98_keyword(TOK_DECLTYPE);
-                      else
-                        return make_identifier();
+__decltype          { return conditional_keyword(
+                        PARSER.cpp98 &&
+                        (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                         PARSER.mode==configt::ansi_ct::flavourt::CLANG),
+                        TOK_DECLTYPE);
                     }
 
 %{
@@ -943,35 +931,35 @@ __decltype          { if(PARSER.cpp98 &&
 "__has_assign"      { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__has_copy"        { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__has_finalizer"   { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_assign" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_constructor" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_copy" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_assign" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_constructor" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_copy" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_trivial_destructor" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_assign" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_constructor" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_copy" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_assign" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_constructor" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_copy" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_trivial_destructor" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__has_user_destructor" { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__has_virtual_destructor" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_abstract"     { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_base_of"      { loc(); return cpp98_keyword(TOK_BINARY_TYPE_PREDICATE); }
-"__is_class"        { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_convertible_to" { loc(); return cpp98_keyword(TOK_BINARY_TYPE_PREDICATE); }
+"__has_virtual_destructor" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_abstract"     { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_base_of"      { loc(); return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_class"        { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_convertible_to" { loc(); return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_delegate"     { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_empty"        { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_enum"         { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_interface_class" { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_pod"          { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_polymorphic"  { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_empty"        { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_enum"         { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_interface_class" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_pod"          { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_polymorphic"  { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_array"    { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_class"    { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_sealed"       { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_simple_value_class" { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
-"__is_union"        { loc(); return cpp98_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_union"        { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_value_class"  { loc(); return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 
 "__if_exists"       { loc(); return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }
 "__if_not_exists"   { loc(); return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
-"__underlying_type" { loc(); return cpp98_keyword(TOK_UNDERLYING_TYPE); }
+"__underlying_type" { loc(); return conditional_keyword(PARSER.cpp98, TOK_UNDERLYING_TYPE); }
 
 "["{ws}"repeatable" |
 "["{ws}"source_annotation_attribute" |
@@ -994,32 +982,36 @@ __decltype          { if(PARSER.cpp98 &&
                    }
                  }
 
-"__char16_t"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                      PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                     return cpp98_keyword(TOK_CHAR16_T); // GNU extension
-                   else
-                     return make_identifier();
+"__char16_t"     { // GNU extension
+                   return conditional_keyword(
+                     PARSER.cpp98 &&
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::CLANG),
+                     TOK_CHAR16_T);
                  }
 
-"__nullptr"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                      PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                     return cpp98_keyword(TOK_NULLPTR); // GNU extension
-                   else
-                     return make_identifier();
+"__nullptr"     { // GNU extension
+                   return conditional_keyword(
+                     PARSER.cpp98 &&
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::CLANG),
+                     TOK_NULLPTR);
                  }
 
-"__null"         { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                      PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                     return cpp98_keyword(TOK_NULLPTR); // GNU extension
-                   else
-                     return make_identifier();
+"__null"         { // GNU extension
+                   return conditional_keyword(
+                     PARSER.cpp98 &&
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::CLANG),
+                   TOK_NULLPTR);
                  }
 
-"__char32_t"     { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                      PARSER.mode==configt::ansi_ct::flavourt::CLANG)
-                     return cpp98_keyword(TOK_CHAR32_T); // GNU extension
-                   else
-                     return make_identifier();
+"__char32_t"     { // GNU extension
+                   return conditional_keyword(
+                     PARSER.cpp98 &&
+                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                      PARSER.mode==configt::ansi_ct::flavourt::CLANG),
+                     TOK_CHAR32_T);
                  }
 
 "__declspec" |
