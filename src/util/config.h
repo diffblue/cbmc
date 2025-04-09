@@ -45,6 +45,12 @@ class symbol_table_baset;
       : configt::ansi_ct::default_c_standard() ==                              \
           configt::ansi_ct::c_standardt::C11                                   \
         ? "c11"                                                                \
+      : configt::ansi_ct::default_c_standard() ==                              \
+          configt::ansi_ct::c_standardt::C17                                   \
+        ? "c17"                                                                \
+      : configt::ansi_ct::default_c_standard() ==                              \
+          configt::ansi_ct::c_standardt::C23                                   \
+        ? "c23"                                                                \
         : "") +                                                                \
     ")\n"                                                                      \
     " {y--cpp98}, {y--cpp03}, {y--cpp11} \t "                                  \
@@ -166,7 +172,9 @@ public:
     {
       C89,
       C99,
-      C11
+      C11,
+      C17,
+      C23
     } c_standard;
     static c_standardt default_c_standard();
 
@@ -183,6 +191,16 @@ public:
     void set_c11()
     {
       c_standard = c_standardt::C11;
+      for_has_scope = true;
+    }
+    void set_c17()
+    {
+      c_standard = c_standardt::C17;
+      for_has_scope = true;
+    }
+    void set_c23()
+    {
+      c_standard = c_standardt::C23;
       for_has_scope = true;
     }
 
