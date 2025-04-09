@@ -23,7 +23,7 @@ class symbol_table_baset;
 
 #define OPT_CONFIG_C_CPP                                                       \
   "D:I:(include)(function)"                                                    \
-  "(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)"                                       \
+  "(c89)(c99)(c11)(c17)(c23)(cpp98)(cpp03)(cpp11)"                             \
   "(unsigned-char)"                                                            \
   "(round-to-even)(round-to-nearest)"                                          \
   "(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)"                     \
@@ -33,7 +33,7 @@ class symbol_table_baset;
   " {y-I} {upath} \t set include path (C/C++)\n"                               \
   " {y--include} {ufile} \t set include file (C/C++)\n"                        \
   " {y-D} {umacro} \t define preprocessor macro (C/C++)\n"                     \
-  " {y--c89}, {y--c99}, {y--c11} \t "                                          \
+  " {y--c89}, {y--c99}, {y--c11},\n {y--c17}, {y--c23} \t "                    \
   "set C language standard (default: " +                                       \
     std::string(                                                               \
       configt::ansi_ct::default_c_standard() ==                                \

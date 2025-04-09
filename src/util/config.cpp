@@ -1238,6 +1238,12 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("c11"))
     ansi_c.set_c11();
 
+  if(cmdline.isset("c17"))
+    ansi_c.set_c17();
+
+  if(cmdline.isset("c23"))
+    ansi_c.set_c23();
+
   if(cmdline.isset("cpp98"))
     cpp.set_cpp98();
 

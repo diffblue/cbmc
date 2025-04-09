@@ -58,6 +58,8 @@ static bool convert(
   ansi_c_parser.fp16_type = config.ansi_c.fp16_type;
   ansi_c_parser.cpp98=false; // it's not C++
   ansi_c_parser.cpp11=false; // it's not C++
+  ansi_c_parser.c17 = false; // we do C11 for now
+  ansi_c_parser.c23 = false; // we do C11 for now
   ansi_c_parser.mode=config.ansi_c.mode;
 
   ansi_c_scanner_init(ansi_c_parser);

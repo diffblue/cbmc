@@ -77,6 +77,13 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     int32_cnt++;
   else if(type.id()==ID_int64)
     int64_cnt++;
+  else if(type.id() == ID_c_bitint)
+  {
+    bitint_cnt++;
+    const exprt &size_expr = static_cast<const exprt &>(type.find(ID_size));
+
+    bv_width = size_expr;
+  }
   else if(type.id()==ID_gcc_float16)
     gcc_float16_cnt++;
   else if(type.id()==ID_gcc_float32)
@@ -290,15 +297,13 @@ void ansi_c_convert_typet::write(typet &type)
 
   if(!other.empty())
   {
-    if(double_cnt || float_cnt || signed_cnt ||
-       unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
-       short_cnt || char_cnt || complex_cnt || long_cnt ||
-       int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       gcc_float16_cnt ||
-       gcc_float32_cnt || gcc_float32x_cnt ||
-       gcc_float64_cnt || gcc_float64x_cnt ||
-       gcc_float128_cnt || gcc_float128x_cnt ||
-       gcc_int128_cnt || bv_cnt)
+    if(
+      double_cnt || float_cnt || signed_cnt || unsigned_cnt || int_cnt ||
+      c_bool_cnt || proper_bool_cnt || bitint_cnt || short_cnt || char_cnt ||
+      complex_cnt || long_cnt || int8_cnt || int16_cnt || int32_cnt ||
+      int64_cnt || gcc_float16_cnt || gcc_float32_cnt || gcc_float32x_cnt ||
+      gcc_float64_cnt || gcc_float64x_cnt || gcc_float128_cnt ||
+      gcc_float128x_cnt || gcc_int128_cnt || bv_cnt)
     {
       log.error().source_location = source_location;
       log.error() << "illegal type modifier for defined type" << messaget::eom;
@@ -373,10 +378,10 @@ void ansi_c_convert_typet::write(typet &type)
           gcc_float64_cnt || gcc_float64x_cnt ||
           gcc_float128_cnt || gcc_float128x_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
-       int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       gcc_int128_cnt || bv_cnt ||
-       short_cnt || char_cnt)
+    if(
+      signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
+      bitint_cnt || int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
+      gcc_int128_cnt || bv_cnt || short_cnt || char_cnt)
     {
       log.error().source_location = source_location;
       log.error() << "cannot combine integer type with floating-point type"
@@ -415,10 +420,10 @@ void ansi_c_convert_typet::write(typet &type)
   }
   else if(double_cnt || float_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
-       int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       gcc_int128_cnt|| bv_cnt ||
-       short_cnt || char_cnt)
+    if(
+      signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
+      bitint_cnt || int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
+      gcc_int128_cnt || bv_cnt || short_cnt || char_cnt)
     {
       log.error().source_location = source_location;
       log.error() << "cannot combine integer type with floating-point type"
@@ -460,10 +465,10 @@ void ansi_c_convert_typet::write(typet &type)
   }
   else if(c_bool_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
-       int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       gcc_float128_cnt || bv_cnt || proper_bool_cnt ||
-       char_cnt || long_cnt)
+    if(
+      signed_cnt || unsigned_cnt || int_cnt || short_cnt || bitint_cnt ||
+      int8_cnt || int16_cnt || int32_cnt || int64_cnt || gcc_float128_cnt ||
+      bv_cnt || proper_bool_cnt || char_cnt || long_cnt)
     {
       log.error().source_location = source_location;
       log.error() << "illegal type modifier for C boolean type"
@@ -475,10 +480,10 @@ void ansi_c_convert_typet::write(typet &type)
   }
   else if(proper_bool_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
-       int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       gcc_float128_cnt || bv_cnt ||
-       char_cnt || long_cnt)
+    if(
+      signed_cnt || unsigned_cnt || int_cnt || short_cnt || bitint_cnt ||
+      int8_cnt || int16_cnt || int32_cnt || int64_cnt || gcc_float128_cnt ||
+      bv_cnt || char_cnt || long_cnt)
     {
       log.error().source_location = source_location;
       log.error() << "illegal type modifier for proper boolean type"
@@ -496,9 +501,9 @@ void ansi_c_convert_typet::write(typet &type)
   }
   else if(char_cnt)
   {
-    if(int_cnt || short_cnt || long_cnt ||
-       int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       gcc_float128_cnt || bv_cnt || proper_bool_cnt)
+    if(
+      int_cnt || short_cnt || long_cnt || bitint_cnt || int8_cnt || int16_cnt ||
+      int32_cnt || int64_cnt || gcc_float128_cnt || bv_cnt || proper_bool_cnt)
     {
       log.error().source_location = source_location;
       log.error() << "illegal type modifier for char type" << messaget::eom;
@@ -537,7 +542,9 @@ void ansi_c_convert_typet::write(typet &type)
 
     if(int8_cnt || int16_cnt || int32_cnt || int64_cnt)
     {
-      if(long_cnt || char_cnt || short_cnt || gcc_int128_cnt || bv_cnt)
+      if(
+        long_cnt || char_cnt || short_cnt || bitint_cnt || gcc_int128_cnt ||
+        bv_cnt)
       {
         log.error().source_location = source_location;
         log.error() << "conflicting type modifiers" << messaget::eom;
@@ -573,6 +580,12 @@ void ansi_c_convert_typet::write(typet &type)
         type=gcc_signed_int128_type();
       else
         type=gcc_unsigned_int128_type();
+    }
+    else if(bitint_cnt)
+    {
+      // explicitly-given expression for the number of value bits
+      type.id(is_signed ? ID_c_signed_bitint : ID_c_unsigned_bitint);
+      type.set(ID_width, bv_width);
     }
     else if(bv_cnt)
     {

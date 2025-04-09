@@ -94,7 +94,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_c_enum_tag_type(to_c_enum_tag_type(type));
   else if(type.id()==ID_c_bit_field)
     typecheck_c_bit_field_type(to_c_bit_field_type(type));
-  else if(type.id()==ID_typeof)
+  else if(type.id() == ID_typeof || type.id() == ID_c_typeof_unqual)
     typecheck_typeof_type(type);
   else if(type.id() == ID_typedef_type)
     typecheck_typedef_type(type);
@@ -116,6 +116,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
           type.id()==ID_custom_floatbv ||
           type.id()==ID_custom_fixedbv)
     typecheck_custom_type(type);
+  else if(type.id() == ID_c_signed_bitint || type.id() == ID_c_unsigned_bitint)
+  {
+    typecheck_bitint_type(type);
+  }
   else if(type.id()==ID_gcc_attribute_mode)
   {
     // get that mode
@@ -415,6 +419,62 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
   }
   else
     UNREACHABLE;
+}
+
+void c_typecheck_baset::typecheck_bitint_type(typet &type)
+{
+  // These have a given width, which is the sum of the number of
+  // value bits and, if signed, one for the sign bit (ISO C 2024, 6.2.6.2)
+  exprt width_expr = static_cast<const exprt &>(type.find(ID_width));
+
+  typecheck_expr(width_expr);
+  source_locationt source_location = width_expr.source_location();
+  make_constant_index(width_expr);
+
+  mp_integer width_int;
+  if(to_integer(to_constant_expr(width_expr), width_int))
+  {
+    throw errort().with_location(source_location)
+      << "failed to convert _BitInt width to constant";
+  }
+
+  bool is_signed = type.id() == ID_c_signed_bitint;
+
+  // Must have at least one value bit
+  if(!is_signed)
+  {
+    if(width_int < 1)
+    {
+      throw errort().with_location(source_location)
+        << "unsigned _BitInt must have at least one bit";
+    }
+  }
+  else
+  {
+    if(width_int < 2)
+    {
+      throw errort().with_location(source_location)
+        << "signed _BitInt must have at least two bits";
+    }
+  }
+
+  // These get padded up, much like _Bool.
+  // The padding is implementation-defined,
+  // and takes unspecified values.
+  auto bytes = (width_int % 8) == 0 ? width_int / 8 : width_int / 8 + 1;
+
+  // We pad up to until the number of bytes is a power of two.
+  auto bytes_padded = power(2, bytes == 1 ? 0 : address_bits(bytes));
+
+  auto width = 8 * bytes_padded;
+
+  type.set(ID_width, integer2string(width));
+  type.set(ID_C_c_type, type.id());
+  type.id(ID_bv);
+
+  // We remember the original number of bits before padding,
+  // since these determine semantics
+  type.set(ID_C_c_bitint_width, integer2string(width_int));
 }
 
 void c_typecheck_baset::typecheck_code_type(code_typet &type)

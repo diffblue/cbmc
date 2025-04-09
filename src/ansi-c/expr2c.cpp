@@ -617,6 +617,19 @@ std::string expr2ct::convert_rec(
   {
     return q+"__attribute__(("+id2string(src.id())+")) void"+d;
   }
+  else if(src.id() == ID_bv)
+  {
+    // annotated?
+    irep_idt c_type = src.get(ID_C_c_type);
+    if(c_type == ID_c_signed_bitint)
+    {
+      return "_BitInt(" + src.get_string(ID_C_c_bitint_width) + ")";
+    }
+    else if(c_type == ID_c_unsigned_bitint)
+    {
+      return "unsigned _BitInt(" + src.get_string(ID_C_c_bitint_width) + ")";
+    }
+  }
 
   {
     lispexprt lisp;
@@ -1822,8 +1835,24 @@ std::string expr2ct::convert_constant(
     return convert_norep(src, precedence);
   else if(type.id()==ID_bv)
   {
-    // not C
-    dest=id2string(value);
+    // used for _BitInt
+    irep_idt c_type = src.get(ID_C_c_type);
+    if(c_type == ID_c_signed_bitint)
+    {
+      auto as_int = bvrep2integer(value, to_bv_type(type).width(), false);
+      auto width = src.get_int(ID_C_c_bitint_width);
+      auto binary = integer2binary(as_int, width); // drops padding
+      return integer2string(binary2integer(binary, true));
+    }
+    else if(c_type == ID_c_unsigned_bitint)
+    {
+      auto as_int = bvrep2integer(value, to_bv_type(type).width(), false);
+      auto width = src.get_int(ID_C_c_bitint_width);
+      auto binary = integer2binary(as_int, width); // drops padding
+      return integer2string(binary2integer(binary, false));
+    }
+    else
+      return convert_norep(src, precedence);
   }
   else if(type.id()==ID_bool)
   {

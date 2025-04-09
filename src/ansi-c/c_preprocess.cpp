@@ -602,10 +602,10 @@ bool c_preprocess_gcc_clang(
     case configt::ansi_ct::c_standardt::C23:
 #if defined(__OpenBSD__)
       if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
-        argv.push_back("-std=c23");
+        argv.push_back("-std=c2x");
       else
 #endif
-        argv.push_back("-std=gnu23");
+        argv.push_back("-std=gnu2x");
       break;
     }
   }
