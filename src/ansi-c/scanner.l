@@ -171,6 +171,28 @@ int cpp11_keyword(int token)
     return make_identifier();
 }
 
+int c17_keyword(int token)
+{
+  if(PARSER.c17)
+  {
+    loc();
+    return token;
+  }
+  else
+    return make_identifier();
+}
+
+int c23_keyword(int token)
+{
+  if(PARSER.c23)
+  {
+    loc();
+    return token;
+  }
+  else
+    return make_identifier();
+}
+
 int MSC_cpp_keyword(int token)
 {
   if(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)

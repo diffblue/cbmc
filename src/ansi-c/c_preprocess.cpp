@@ -589,6 +589,24 @@ bool c_preprocess_gcc_clang(
 #endif
         argv.push_back("-std=gnu11");
       break;
+
+    case configt::ansi_ct::c_standardt::C17:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c17");
+      else
+#endif
+        argv.push_back("-std=gnu17");
+      break;
+
+    case configt::ansi_ct::c_standardt::C23:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c23");
+      else
+#endif
+        argv.push_back("-std=gnu23");
+      break;
     }
   }
 
@@ -672,6 +690,7 @@ bool c_preprocess_arm(
     argv.push_back("--signed_chars");
 
   // Set the standard
+  // https://developer.arm.com/documentation/101458/2404/Standards-support/Supported-C-C---standards-in-Arm-C-C---Compiler
   switch(config.ansi_c.c_standard)
   {
   case configt::ansi_ct::c_standardt::C89:
@@ -679,8 +698,20 @@ bool c_preprocess_arm(
     break;
 
   case configt::ansi_ct::c_standardt::C99:
-  case configt::ansi_ct::c_standardt::C11:
     argv.push_back("--c99");
+    break;
+
+  case configt::ansi_ct::c_standardt::C11:
+    argv.push_back("--c11");
+    break;
+
+  case configt::ansi_ct::c_standardt::C17:
+    argv.push_back("--c17");
+    break;
+
+  case configt::ansi_ct::c_standardt::C23:
+    // C23 is not yet supported by armcc
+    argv.push_back("--c17");
     break;
   }
 
