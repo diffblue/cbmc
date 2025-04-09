@@ -705,187 +705,218 @@ $(document).ready(function(){initNavTree('c__preprocess_8cpp_source.html',''); i
 <div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span>        argv.push_back(<span class="stringliteral">&quot;-std=gnu11&quot;</span>);</div>
 <div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>    }</div>
-<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span>  }</div>
-<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span> </div>
-<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">define</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.defines)</div>
-<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>    argv.push_back(<span class="stringliteral">&quot;-D&quot;</span> + <a class="code hl_class" href="classait.html">define</a>);</div>
-<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span> </div>
-<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">include_path</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.include_paths)</div>
-<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span>    argv.push_back(<span class="stringliteral">&quot;-I&quot;</span> + <a class="code hl_class" href="classait.html">include_path</a>);</div>
-<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span> </div>
-<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">include_file</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.include_files)</div>
-<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>  {</div>
-<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>    argv.push_back(<span class="stringliteral">&quot;-include&quot;</span>);</div>
-<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span>    argv.push_back(<a class="code hl_class" href="classait.html">include_file</a>);</div>
-<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span>  }</div>
-<div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span> </div>
-<div class="line"><a id="l00607" name="l00607"></a><span class="lineno">  607</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">opt</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.preprocessor_options)</div>
-<div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span>    argv.push_back(<a class="code hl_class" href="classait.html">opt</a>);</div>
-<div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span> </div>
-<div class="line"><a id="l00610" name="l00610"></a><span class="lineno">  610</span>  <span class="keywordtype">int</span> result;</div>
-<div class="line"><a id="l00611" name="l00611"></a><span class="lineno">  611</span> </div>
-<div class="line"><a id="l00612" name="l00612"></a><span class="lineno">  612</span><span class="preprocessor">  #if 0</span></div>
-<div class="line"><a id="l00613" name="l00613"></a><span class="lineno">  613</span>  <span class="comment">// the following forces the mode</span></div>
-<div class="line"><a id="l00614" name="l00614"></a><span class="lineno">  614</span>  <span class="keywordflow">switch</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.mode)</div>
-<div class="line"><a id="l00615" name="l00615"></a><span class="lineno">  615</span>  {</div>
-<div class="line"><a id="l00616" name="l00616"></a><span class="lineno">  616</span>  <span class="keywordflow">case</span> configt::ansi_ct::flavourt::GCC_C: command+=<span class="stringliteral">&quot; -x c&quot;</span>; <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00617" name="l00617"></a><span class="lineno">  617</span>  <span class="keywordflow">case</span> configt::ansi_ct::flavourt::GCC_CPP: command+=<span class="stringliteral">&quot; -x c++&quot;</span>; <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00618" name="l00618"></a><span class="lineno">  618</span>  <span class="keywordflow">default</span>:</div>
-<div class="line"><a id="l00619" name="l00619"></a><span class="lineno">  619</span>    {</div>
-<div class="line"><a id="l00620" name="l00620"></a><span class="lineno">  620</span>    }</div>
-<div class="line"><a id="l00621" name="l00621"></a><span class="lineno">  621</span>  }</div>
-<div class="line"><a id="l00622" name="l00622"></a><span class="lineno">  622</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span> </div>
-<div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span>  <span class="comment">// the file that is to be preprocessed</span></div>
-<div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span>  argv.push_back(file);</div>
-<div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span> </div>
-<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span>  <span class="comment">// execute clang or gcc</span></div>
-<div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span>  result = <a class="code hl_function" href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a>(argv[0], argv, <span class="stringliteral">&quot;&quot;</span>, <a class="code hl_class" href="classait.html">outstream</a>, <a class="code hl_class" href="classait.html">stderr_file</a>());</div>
+<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span> </div>
+<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a5e2a3da748700c84863a802e1e594899">configt::ansi_ct::c_standardt::C17</a>:</div>
+<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span><span class="preprocessor">#if defined(__OpenBSD__)</span></div>
+<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>      <span class="keywordflow">if</span>(preprocessor == <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea5481bd2e9b6a066bd69eec52fff9dff8">configt::ansi_ct::preprocessort::CLANG</a>)</div>
+<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>        argv.push_back(<span class="stringliteral">&quot;-std=c17&quot;</span>);</div>
+<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>      <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span>        argv.push_back(<span class="stringliteral">&quot;-std=gnu17&quot;</span>);</div>
+<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span> </div>
+<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a83567cd28bc5c1e1749a19fa1d2ca5f8">configt::ansi_ct::c_standardt::C23</a>:</div>
+<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span><span class="preprocessor">#if defined(__OpenBSD__)</span></div>
+<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span>      <span class="keywordflow">if</span>(preprocessor == <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea5481bd2e9b6a066bd69eec52fff9dff8">configt::ansi_ct::preprocessort::CLANG</a>)</div>
+<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span>        argv.push_back(<span class="stringliteral">&quot;-std=c23&quot;</span>);</div>
+<div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span>      <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00607" name="l00607"></a><span class="lineno">  607</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span>        argv.push_back(<span class="stringliteral">&quot;-std=gnu23&quot;</span>);</div>
+<div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00610" name="l00610"></a><span class="lineno">  610</span>    }</div>
+<div class="line"><a id="l00611" name="l00611"></a><span class="lineno">  611</span>  }</div>
+<div class="line"><a id="l00612" name="l00612"></a><span class="lineno">  612</span> </div>
+<div class="line"><a id="l00613" name="l00613"></a><span class="lineno">  613</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">define</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.defines)</div>
+<div class="line"><a id="l00614" name="l00614"></a><span class="lineno">  614</span>    argv.push_back(<span class="stringliteral">&quot;-D&quot;</span> + <a class="code hl_class" href="classait.html">define</a>);</div>
+<div class="line"><a id="l00615" name="l00615"></a><span class="lineno">  615</span> </div>
+<div class="line"><a id="l00616" name="l00616"></a><span class="lineno">  616</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">include_path</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.include_paths)</div>
+<div class="line"><a id="l00617" name="l00617"></a><span class="lineno">  617</span>    argv.push_back(<span class="stringliteral">&quot;-I&quot;</span> + <a class="code hl_class" href="classait.html">include_path</a>);</div>
+<div class="line"><a id="l00618" name="l00618"></a><span class="lineno">  618</span> </div>
+<div class="line"><a id="l00619" name="l00619"></a><span class="lineno">  619</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">include_file</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.include_files)</div>
+<div class="line"><a id="l00620" name="l00620"></a><span class="lineno">  620</span>  {</div>
+<div class="line"><a id="l00621" name="l00621"></a><span class="lineno">  621</span>    argv.push_back(<span class="stringliteral">&quot;-include&quot;</span>);</div>
+<div class="line"><a id="l00622" name="l00622"></a><span class="lineno">  622</span>    argv.push_back(<a class="code hl_class" href="classait.html">include_file</a>);</div>
+<div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span>  }</div>
+<div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span> </div>
+<div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">opt</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.preprocessor_options)</div>
+<div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span>    argv.push_back(<a class="code hl_class" href="classait.html">opt</a>);</div>
+<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span> </div>
+<div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span>  <span class="keywordtype">int</span> result;</div>
 <div class="line"><a id="l00629" name="l00629"></a><span class="lineno">  629</span> </div>
-<div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span>  <span class="comment">// errors/warnings</span></div>
-<div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span>  std::ifstream <a class="code hl_class" href="classait.html">stderr_stream</a>(<a class="code hl_class" href="classait.html">stderr_file</a>());</div>
-<div class="line"><a id="l00632" name="l00632"></a><span class="lineno">  632</span>  <a class="code hl_function" href="c__preprocess_8cpp.html#a53d7cab482154055b62e3563af35d0f9">error_parse</a>(<a class="code hl_class" href="classait.html">stderr_stream</a>, result==0, message);</div>
-<div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span> </div>
-<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>  <span class="keywordflow">if</span>(result!=0)</div>
-<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>  {</div>
-<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>    message.<a class="code hl_function" href="classmessaget.html#a398ce0183d9f6a560dddbb7a7e47666d">error</a>() &lt;&lt; <span class="stringliteral">&quot;GCC preprocessing failed&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>  }</div>
-<div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span> </div>
-<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span>}</div>
-</div>
-<div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span> </div>
-<div class="foldopen" id="foldopen00644" data-start="{" data-end="}">
-<div class="line"><a id="l00644" name="l00644"></a><span class="lineno"><a class="line" href="c__preprocess_8cpp.html#a2f952e62b81b13298615aa73b71ad1f7">  644</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="c__preprocess_8cpp.html#a2f952e62b81b13298615aa73b71ad1f7">c_preprocess_arm</a>(</div>
-<div class="line"><a id="l00645" name="l00645"></a><span class="lineno">  645</span>  <span class="keyword">const</span> std::string &amp;file,</div>
-<div class="line"><a id="l00646" name="l00646"></a><span class="lineno">  646</span>  std::ostream &amp;<a class="code hl_class" href="classait.html">outstream</a>,</div>
-<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span>{</div>
-<div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span>  <span class="comment">// check extension</span></div>
-<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span>  <span class="keywordflow">if</span>(<a class="code hl_function" href="c__preprocess_8cpp.html#ae97d5f7ab2b09e524207a0eb72023c83">is_dot_i_file</a>(file))</div>
-<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="c__preprocess_8cpp.html#a47c5b7dc261fe5d6c3098392a720bd4a">c_preprocess_none</a>(file, <a class="code hl_class" href="classait.html">outstream</a>, message_handler);</div>
-<div class="line"><a id="l00652" name="l00652"></a><span class="lineno">  652</span> </div>
-<div class="line"><a id="l00653" name="l00653"></a><span class="lineno">  653</span>  <span class="comment">// preprocessing using armcc</span></div>
-<div class="line"><a id="l00654" name="l00654"></a><span class="lineno">  654</span>  <a class="code hl_class" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a id="l00655" name="l00655"></a><span class="lineno">  655</span> </div>
-<div class="line"><a id="l00656" name="l00656"></a><span class="lineno">  656</span>  <a class="code hl_class" href="classtemporary__filet.html">temporary_filet</a> <a class="code hl_class" href="classait.html">stderr_file</a>(<span class="stringliteral">&quot;tmp.stderr&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span><span class="preprocessor">  #if 0</span></div>
+<div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span>  <span class="comment">// the following forces the mode</span></div>
+<div class="line"><a id="l00632" name="l00632"></a><span class="lineno">  632</span>  <span class="keywordflow">switch</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.mode)</div>
+<div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span>  {</div>
+<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>  <span class="keywordflow">case</span> configt::ansi_ct::flavourt::GCC_C: command+=<span class="stringliteral">&quot; -x c&quot;</span>; <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>  <span class="keywordflow">case</span> configt::ansi_ct::flavourt::GCC_CPP: command+=<span class="stringliteral">&quot; -x c++&quot;</span>; <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>  <span class="keywordflow">default</span>:</div>
+<div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span>    {</div>
+<div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>    }</div>
+<div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>  }</div>
+<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span> </div>
+<div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span>  <span class="comment">// the file that is to be preprocessed</span></div>
+<div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span>  argv.push_back(file);</div>
+<div class="line"><a id="l00644" name="l00644"></a><span class="lineno">  644</span> </div>
+<div class="line"><a id="l00645" name="l00645"></a><span class="lineno">  645</span>  <span class="comment">// execute clang or gcc</span></div>
+<div class="line"><a id="l00646" name="l00646"></a><span class="lineno">  646</span>  result = <a class="code hl_function" href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a>(argv[0], argv, <span class="stringliteral">&quot;&quot;</span>, <a class="code hl_class" href="classait.html">outstream</a>, <a class="code hl_class" href="classait.html">stderr_file</a>());</div>
+<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span> </div>
+<div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span>  <span class="comment">// errors/warnings</span></div>
+<div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span>  std::ifstream <a class="code hl_class" href="classait.html">stderr_stream</a>(<a class="code hl_class" href="classait.html">stderr_file</a>());</div>
+<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span>  <a class="code hl_function" href="c__preprocess_8cpp.html#a53d7cab482154055b62e3563af35d0f9">error_parse</a>(<a class="code hl_class" href="classait.html">stderr_stream</a>, result==0, message);</div>
+<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span> </div>
+<div class="line"><a id="l00652" name="l00652"></a><span class="lineno">  652</span>  <span class="keywordflow">if</span>(result!=0)</div>
+<div class="line"><a id="l00653" name="l00653"></a><span class="lineno">  653</span>  {</div>
+<div class="line"><a id="l00654" name="l00654"></a><span class="lineno">  654</span>    message.<a class="code hl_function" href="classmessaget.html#a398ce0183d9f6a560dddbb7a7e47666d">error</a>() &lt;&lt; <span class="stringliteral">&quot;GCC preprocessing failed&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00655" name="l00655"></a><span class="lineno">  655</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00656" name="l00656"></a><span class="lineno">  656</span>  }</div>
 <div class="line"><a id="l00657" name="l00657"></a><span class="lineno">  657</span> </div>
-<div class="line"><a id="l00658" name="l00658"></a><span class="lineno">  658</span>  std::vector&lt;std::string&gt; argv;</div>
-<div class="line"><a id="l00659" name="l00659"></a><span class="lineno">  659</span> </div>
-<div class="line"><a id="l00660" name="l00660"></a><span class="lineno">  660</span>  argv.push_back(<span class="stringliteral">&quot;armcc&quot;</span>);</div>
-<div class="line"><a id="l00661" name="l00661"></a><span class="lineno">  661</span>  argv.push_back(<span class="stringliteral">&quot;-E&quot;</span>);</div>
-<div class="line"><a id="l00662" name="l00662"></a><span class="lineno">  662</span>  argv.push_back(<span class="stringliteral">&quot;-D__CPROVER__&quot;</span>);</div>
-<div class="line"><a id="l00663" name="l00663"></a><span class="lineno">  663</span> </div>
-<div class="line"><a id="l00664" name="l00664"></a><span class="lineno">  664</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.endianness == <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac03460009ec6fe5358dc3ce641d06a2fa06f788cfdee3702c759420e80d8cd442">configt::ansi_ct::endiannesst::IS_BIG_ENDIAN</a>)</div>
-<div class="line"><a id="l00665" name="l00665"></a><span class="lineno">  665</span>    argv.push_back(<span class="stringliteral">&quot;--bigend&quot;</span>);</div>
-<div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span>  <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00667" name="l00667"></a><span class="lineno">  667</span>    argv.push_back(<span class="stringliteral">&quot;--littleend&quot;</span>);</div>
-<div class="line"><a id="l00668" name="l00668"></a><span class="lineno">  668</span> </div>
-<div class="line"><a id="l00669" name="l00669"></a><span class="lineno">  669</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.char_is_unsigned)</div>
-<div class="line"><a id="l00670" name="l00670"></a><span class="lineno">  670</span>    argv.push_back(<span class="stringliteral">&quot;--unsigned_chars&quot;</span>);</div>
-<div class="line"><a id="l00671" name="l00671"></a><span class="lineno">  671</span>  <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00672" name="l00672"></a><span class="lineno">  672</span>    argv.push_back(<span class="stringliteral">&quot;--signed_chars&quot;</span>);</div>
-<div class="line"><a id="l00673" name="l00673"></a><span class="lineno">  673</span> </div>
-<div class="line"><a id="l00674" name="l00674"></a><span class="lineno">  674</span>  <span class="comment">// Set the standard</span></div>
-<div class="line"><a id="l00675" name="l00675"></a><span class="lineno">  675</span>  <span class="keywordflow">switch</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.c_standard)</div>
-<div class="line"><a id="l00676" name="l00676"></a><span class="lineno">  676</span>  {</div>
-<div class="line"><a id="l00677" name="l00677"></a><span class="lineno">  677</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a8a9f5c7cf9bfd7a6531d354d7cfc1f01">configt::ansi_ct::c_standardt::C89</a>:</div>
-<div class="line"><a id="l00678" name="l00678"></a><span class="lineno">  678</span>    argv.push_back(<span class="stringliteral">&quot;--c90&quot;</span>);</div>
-<div class="line"><a id="l00679" name="l00679"></a><span class="lineno">  679</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00680" name="l00680"></a><span class="lineno">  680</span> </div>
-<div class="line"><a id="l00681" name="l00681"></a><span class="lineno">  681</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987ad79a339fadaa631d027ba959da7f1892">configt::ansi_ct::c_standardt::C99</a>:</div>
-<div class="line"><a id="l00682" name="l00682"></a><span class="lineno">  682</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987aa42f23ef20764de07767b3a1558abf36">configt::ansi_ct::c_standardt::C11</a>:</div>
-<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span>    argv.push_back(<span class="stringliteral">&quot;--c99&quot;</span>);</div>
-<div class="line"><a id="l00684" name="l00684"></a><span class="lineno">  684</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00685" name="l00685"></a><span class="lineno">  685</span>  }</div>
-<div class="line"><a id="l00686" name="l00686"></a><span class="lineno">  686</span> </div>
-<div class="line"><a id="l00687" name="l00687"></a><span class="lineno">  687</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">define</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.defines)</div>
-<div class="line"><a id="l00688" name="l00688"></a><span class="lineno">  688</span>    argv.push_back(<span class="stringliteral">&quot;-D&quot;</span> + <a class="code hl_class" href="classait.html">define</a>);</div>
-<div class="line"><a id="l00689" name="l00689"></a><span class="lineno">  689</span> </div>
-<div class="line"><a id="l00690" name="l00690"></a><span class="lineno">  690</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">include_path</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.include_paths)</div>
-<div class="line"><a id="l00691" name="l00691"></a><span class="lineno">  691</span>    argv.push_back(<span class="stringliteral">&quot;-I&quot;</span> + <a class="code hl_class" href="classait.html">include_path</a>);</div>
-<div class="line"><a id="l00692" name="l00692"></a><span class="lineno">  692</span> </div>
-<div class="line"><a id="l00693" name="l00693"></a><span class="lineno">  693</span>  <span class="comment">// the file that is to be preprocessed</span></div>
-<div class="line"><a id="l00694" name="l00694"></a><span class="lineno">  694</span>  argv.push_back(file);</div>
-<div class="line"><a id="l00695" name="l00695"></a><span class="lineno">  695</span> </div>
-<div class="line"><a id="l00696" name="l00696"></a><span class="lineno">  696</span>  <span class="keywordtype">int</span> result;</div>
-<div class="line"><a id="l00697" name="l00697"></a><span class="lineno">  697</span> </div>
-<div class="line"><a id="l00698" name="l00698"></a><span class="lineno">  698</span>  <span class="comment">// execute armcc</span></div>
-<div class="line"><a id="l00699" name="l00699"></a><span class="lineno">  699</span>  result = <a class="code hl_function" href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a>(argv[0], argv, <span class="stringliteral">&quot;&quot;</span>, <a class="code hl_class" href="classait.html">outstream</a>, <a class="code hl_class" href="classait.html">stderr_file</a>());</div>
-<div class="line"><a id="l00700" name="l00700"></a><span class="lineno">  700</span> </div>
-<div class="line"><a id="l00701" name="l00701"></a><span class="lineno">  701</span>  <span class="comment">// errors/warnings</span></div>
-<div class="line"><a id="l00702" name="l00702"></a><span class="lineno">  702</span>  std::ifstream <a class="code hl_class" href="classait.html">stderr_stream</a>(<a class="code hl_class" href="classait.html">stderr_file</a>());</div>
-<div class="line"><a id="l00703" name="l00703"></a><span class="lineno">  703</span>  <a class="code hl_function" href="c__preprocess_8cpp.html#a53d7cab482154055b62e3563af35d0f9">error_parse</a>(<a class="code hl_class" href="classait.html">stderr_stream</a>, result==0, message);</div>
-<div class="line"><a id="l00704" name="l00704"></a><span class="lineno">  704</span> </div>
-<div class="line"><a id="l00705" name="l00705"></a><span class="lineno">  705</span>  <span class="keywordflow">if</span>(result!=0)</div>
-<div class="line"><a id="l00706" name="l00706"></a><span class="lineno">  706</span>  {</div>
-<div class="line"><a id="l00707" name="l00707"></a><span class="lineno">  707</span>    message.<a class="code hl_function" href="classmessaget.html#a398ce0183d9f6a560dddbb7a7e47666d">error</a>() &lt;&lt; <span class="stringliteral">&quot;ARMCC preprocessing failed&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00708" name="l00708"></a><span class="lineno">  708</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00709" name="l00709"></a><span class="lineno">  709</span>  }</div>
-<div class="line"><a id="l00710" name="l00710"></a><span class="lineno">  710</span> </div>
-<div class="line"><a id="l00711" name="l00711"></a><span class="lineno">  711</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00712" name="l00712"></a><span class="lineno">  712</span>}</div>
+<div class="line"><a id="l00658" name="l00658"></a><span class="lineno">  658</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00659" name="l00659"></a><span class="lineno">  659</span>}</div>
 </div>
-<div class="line"><a id="l00713" name="l00713"></a><span class="lineno">  713</span> </div>
-<div class="foldopen" id="foldopen00715" data-start="{" data-end="}">
-<div class="line"><a id="l00715" name="l00715"></a><span class="lineno"><a class="line" href="c__preprocess_8cpp.html#a47c5b7dc261fe5d6c3098392a720bd4a">  715</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="c__preprocess_8cpp.html#a47c5b7dc261fe5d6c3098392a720bd4a">c_preprocess_none</a>(</div>
-<div class="line"><a id="l00716" name="l00716"></a><span class="lineno">  716</span>  <span class="keyword">const</span> std::string &amp;file,</div>
-<div class="line"><a id="l00717" name="l00717"></a><span class="lineno">  717</span>  std::ostream &amp;<a class="code hl_class" href="classait.html">outstream</a>,</div>
-<div class="line"><a id="l00718" name="l00718"></a><span class="lineno">  718</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00719" name="l00719"></a><span class="lineno">  719</span>{</div>
-<div class="line"><a id="l00720" name="l00720"></a><span class="lineno">  720</span>  std::ifstream <a class="code hl_class" href="classait.html">infile</a>(<a class="code hl_define" href="unicode_8h.html#a54a797d3af974232b7a83cc83845156e">widen_if_needed</a>(file));</div>
-<div class="line"><a id="l00721" name="l00721"></a><span class="lineno">  721</span> </div>
-<div class="line"><a id="l00722" name="l00722"></a><span class="lineno">  722</span>  <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">infile</a>)</div>
-<div class="line"><a id="l00723" name="l00723"></a><span class="lineno">  723</span>  {</div>
-<div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span>    <a class="code hl_class" href="classmessaget.html">messaget</a> message(message_handler);</div>
-<div class="line"><a id="l00725" name="l00725"></a><span class="lineno">  725</span>    message.<a class="code hl_function" href="classmessaget.html#a398ce0183d9f6a560dddbb7a7e47666d">error</a>() &lt;&lt; <span class="stringliteral">&quot;failed to open &#39;&quot;</span> &lt;&lt; file &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span>  }</div>
+<div class="line"><a id="l00660" name="l00660"></a><span class="lineno">  660</span> </div>
+<div class="foldopen" id="foldopen00662" data-start="{" data-end="}">
+<div class="line"><a id="l00662" name="l00662"></a><span class="lineno"><a class="line" href="c__preprocess_8cpp.html#a2f952e62b81b13298615aa73b71ad1f7">  662</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="c__preprocess_8cpp.html#a2f952e62b81b13298615aa73b71ad1f7">c_preprocess_arm</a>(</div>
+<div class="line"><a id="l00663" name="l00663"></a><span class="lineno">  663</span>  <span class="keyword">const</span> std::string &amp;file,</div>
+<div class="line"><a id="l00664" name="l00664"></a><span class="lineno">  664</span>  std::ostream &amp;<a class="code hl_class" href="classait.html">outstream</a>,</div>
+<div class="line"><a id="l00665" name="l00665"></a><span class="lineno">  665</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span>{</div>
+<div class="line"><a id="l00667" name="l00667"></a><span class="lineno">  667</span>  <span class="comment">// check extension</span></div>
+<div class="line"><a id="l00668" name="l00668"></a><span class="lineno">  668</span>  <span class="keywordflow">if</span>(<a class="code hl_function" href="c__preprocess_8cpp.html#ae97d5f7ab2b09e524207a0eb72023c83">is_dot_i_file</a>(file))</div>
+<div class="line"><a id="l00669" name="l00669"></a><span class="lineno">  669</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="c__preprocess_8cpp.html#a47c5b7dc261fe5d6c3098392a720bd4a">c_preprocess_none</a>(file, <a class="code hl_class" href="classait.html">outstream</a>, message_handler);</div>
+<div class="line"><a id="l00670" name="l00670"></a><span class="lineno">  670</span> </div>
+<div class="line"><a id="l00671" name="l00671"></a><span class="lineno">  671</span>  <span class="comment">// preprocessing using armcc</span></div>
+<div class="line"><a id="l00672" name="l00672"></a><span class="lineno">  672</span>  <a class="code hl_class" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a id="l00673" name="l00673"></a><span class="lineno">  673</span> </div>
+<div class="line"><a id="l00674" name="l00674"></a><span class="lineno">  674</span>  <a class="code hl_class" href="classtemporary__filet.html">temporary_filet</a> <a class="code hl_class" href="classait.html">stderr_file</a>(<span class="stringliteral">&quot;tmp.stderr&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00675" name="l00675"></a><span class="lineno">  675</span> </div>
+<div class="line"><a id="l00676" name="l00676"></a><span class="lineno">  676</span>  std::vector&lt;std::string&gt; argv;</div>
+<div class="line"><a id="l00677" name="l00677"></a><span class="lineno">  677</span> </div>
+<div class="line"><a id="l00678" name="l00678"></a><span class="lineno">  678</span>  argv.push_back(<span class="stringliteral">&quot;armcc&quot;</span>);</div>
+<div class="line"><a id="l00679" name="l00679"></a><span class="lineno">  679</span>  argv.push_back(<span class="stringliteral">&quot;-E&quot;</span>);</div>
+<div class="line"><a id="l00680" name="l00680"></a><span class="lineno">  680</span>  argv.push_back(<span class="stringliteral">&quot;-D__CPROVER__&quot;</span>);</div>
+<div class="line"><a id="l00681" name="l00681"></a><span class="lineno">  681</span> </div>
+<div class="line"><a id="l00682" name="l00682"></a><span class="lineno">  682</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.endianness == <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac03460009ec6fe5358dc3ce641d06a2fa06f788cfdee3702c759420e80d8cd442">configt::ansi_ct::endiannesst::IS_BIG_ENDIAN</a>)</div>
+<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span>    argv.push_back(<span class="stringliteral">&quot;--bigend&quot;</span>);</div>
+<div class="line"><a id="l00684" name="l00684"></a><span class="lineno">  684</span>  <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00685" name="l00685"></a><span class="lineno">  685</span>    argv.push_back(<span class="stringliteral">&quot;--littleend&quot;</span>);</div>
+<div class="line"><a id="l00686" name="l00686"></a><span class="lineno">  686</span> </div>
+<div class="line"><a id="l00687" name="l00687"></a><span class="lineno">  687</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.char_is_unsigned)</div>
+<div class="line"><a id="l00688" name="l00688"></a><span class="lineno">  688</span>    argv.push_back(<span class="stringliteral">&quot;--unsigned_chars&quot;</span>);</div>
+<div class="line"><a id="l00689" name="l00689"></a><span class="lineno">  689</span>  <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00690" name="l00690"></a><span class="lineno">  690</span>    argv.push_back(<span class="stringliteral">&quot;--signed_chars&quot;</span>);</div>
+<div class="line"><a id="l00691" name="l00691"></a><span class="lineno">  691</span> </div>
+<div class="line"><a id="l00692" name="l00692"></a><span class="lineno">  692</span>  <span class="comment">// Set the standard</span></div>
+<div class="line"><a id="l00693" name="l00693"></a><span class="lineno">  693</span>  <span class="comment">// https://developer.arm.com/documentation/101458/2404/Standards-support/Supported-C-C---standards-in-Arm-C-C---Compiler</span></div>
+<div class="line"><a id="l00694" name="l00694"></a><span class="lineno">  694</span>  <span class="keywordflow">switch</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.c_standard)</div>
+<div class="line"><a id="l00695" name="l00695"></a><span class="lineno">  695</span>  {</div>
+<div class="line"><a id="l00696" name="l00696"></a><span class="lineno">  696</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a8a9f5c7cf9bfd7a6531d354d7cfc1f01">configt::ansi_ct::c_standardt::C89</a>:</div>
+<div class="line"><a id="l00697" name="l00697"></a><span class="lineno">  697</span>    argv.push_back(<span class="stringliteral">&quot;--c90&quot;</span>);</div>
+<div class="line"><a id="l00698" name="l00698"></a><span class="lineno">  698</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00699" name="l00699"></a><span class="lineno">  699</span> </div>
+<div class="line"><a id="l00700" name="l00700"></a><span class="lineno">  700</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987ad79a339fadaa631d027ba959da7f1892">configt::ansi_ct::c_standardt::C99</a>:</div>
+<div class="line"><a id="l00701" name="l00701"></a><span class="lineno">  701</span>    argv.push_back(<span class="stringliteral">&quot;--c99&quot;</span>);</div>
+<div class="line"><a id="l00702" name="l00702"></a><span class="lineno">  702</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00703" name="l00703"></a><span class="lineno">  703</span> </div>
+<div class="line"><a id="l00704" name="l00704"></a><span class="lineno">  704</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987aa42f23ef20764de07767b3a1558abf36">configt::ansi_ct::c_standardt::C11</a>:</div>
+<div class="line"><a id="l00705" name="l00705"></a><span class="lineno">  705</span>    argv.push_back(<span class="stringliteral">&quot;--c11&quot;</span>);</div>
+<div class="line"><a id="l00706" name="l00706"></a><span class="lineno">  706</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00707" name="l00707"></a><span class="lineno">  707</span> </div>
+<div class="line"><a id="l00708" name="l00708"></a><span class="lineno">  708</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a5e2a3da748700c84863a802e1e594899">configt::ansi_ct::c_standardt::C17</a>:</div>
+<div class="line"><a id="l00709" name="l00709"></a><span class="lineno">  709</span>    argv.push_back(<span class="stringliteral">&quot;--c17&quot;</span>);</div>
+<div class="line"><a id="l00710" name="l00710"></a><span class="lineno">  710</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00711" name="l00711"></a><span class="lineno">  711</span> </div>
+<div class="line"><a id="l00712" name="l00712"></a><span class="lineno">  712</span>  <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a83567cd28bc5c1e1749a19fa1d2ca5f8">configt::ansi_ct::c_standardt::C23</a>:</div>
+<div class="line"><a id="l00713" name="l00713"></a><span class="lineno">  713</span>    <span class="comment">// C23 is not yet supported by armcc</span></div>
+<div class="line"><a id="l00714" name="l00714"></a><span class="lineno">  714</span>    argv.push_back(<span class="stringliteral">&quot;--c17&quot;</span>);</div>
+<div class="line"><a id="l00715" name="l00715"></a><span class="lineno">  715</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00716" name="l00716"></a><span class="lineno">  716</span>  }</div>
+<div class="line"><a id="l00717" name="l00717"></a><span class="lineno">  717</span> </div>
+<div class="line"><a id="l00718" name="l00718"></a><span class="lineno">  718</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">define</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.defines)</div>
+<div class="line"><a id="l00719" name="l00719"></a><span class="lineno">  719</span>    argv.push_back(<span class="stringliteral">&quot;-D&quot;</span> + <a class="code hl_class" href="classait.html">define</a>);</div>
+<div class="line"><a id="l00720" name="l00720"></a><span class="lineno">  720</span> </div>
+<div class="line"><a id="l00721" name="l00721"></a><span class="lineno">  721</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">include_path</a> : <a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.include_paths)</div>
+<div class="line"><a id="l00722" name="l00722"></a><span class="lineno">  722</span>    argv.push_back(<span class="stringliteral">&quot;-I&quot;</span> + <a class="code hl_class" href="classait.html">include_path</a>);</div>
+<div class="line"><a id="l00723" name="l00723"></a><span class="lineno">  723</span> </div>
+<div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span>  <span class="comment">// the file that is to be preprocessed</span></div>
+<div class="line"><a id="l00725" name="l00725"></a><span class="lineno">  725</span>  argv.push_back(file);</div>
+<div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span> </div>
+<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span>  <span class="keywordtype">int</span> result;</div>
 <div class="line"><a id="l00728" name="l00728"></a><span class="lineno">  728</span> </div>
-<div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.mode==<a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826a571e24dc3d8793b5c5d3eb370c2aede9">configt::ansi_ct::flavourt::CODEWARRIOR</a>)</div>
-<div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span>  {</div>
-<div class="line"><a id="l00731" name="l00731"></a><span class="lineno">  731</span>    <span class="comment">// special treatment for &quot;/* #line&quot;</span></div>
-<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span>    <a class="code hl_function" href="c__preprocess_8cpp.html#a981923ae4c05c778f8ebb7e7a64f94ee">postprocess_codewarrior</a>(<a class="code hl_class" href="classait.html">infile</a>, <a class="code hl_class" href="classait.html">outstream</a>);</div>
-<div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span>  }</div>
-<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span>  <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span>  {</div>
-<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span>    <span class="keywordtype">char</span> <a class="code hl_class" href="classait.html">ch</a>;</div>
-<div class="line"><a id="l00737" name="l00737"></a><span class="lineno">  737</span> </div>
-<div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span>    <span class="keywordflow">while</span>(<a class="code hl_class" href="classait.html">infile</a>.read(&amp;<a class="code hl_class" href="classait.html">ch</a>, 1))</div>
-<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span>      <a class="code hl_class" href="classait.html">outstream</a> &lt;&lt; <a class="code hl_class" href="classait.html">ch</a>;</div>
+<div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span>  <span class="comment">// execute armcc</span></div>
+<div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span>  result = <a class="code hl_function" href="run_8cpp.html#a32e6ac327187b7ac705f730a35ab0628">run</a>(argv[0], argv, <span class="stringliteral">&quot;&quot;</span>, <a class="code hl_class" href="classait.html">outstream</a>, <a class="code hl_class" href="classait.html">stderr_file</a>());</div>
+<div class="line"><a id="l00731" name="l00731"></a><span class="lineno">  731</span> </div>
+<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span>  <span class="comment">// errors/warnings</span></div>
+<div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span>  std::ifstream <a class="code hl_class" href="classait.html">stderr_stream</a>(<a class="code hl_class" href="classait.html">stderr_file</a>());</div>
+<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span>  <a class="code hl_function" href="c__preprocess_8cpp.html#a53d7cab482154055b62e3563af35d0f9">error_parse</a>(<a class="code hl_class" href="classait.html">stderr_stream</a>, result==0, message);</div>
+<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span> </div>
+<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span>  <span class="keywordflow">if</span>(result!=0)</div>
+<div class="line"><a id="l00737" name="l00737"></a><span class="lineno">  737</span>  {</div>
+<div class="line"><a id="l00738" name="l00738"></a><span class="lineno">  738</span>    message.<a class="code hl_function" href="classmessaget.html#a398ce0183d9f6a560dddbb7a7e47666d">error</a>() &lt;&lt; <span class="stringliteral">&quot;ARMCC preprocessing failed&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00739" name="l00739"></a><span class="lineno">  739</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00740" name="l00740"></a><span class="lineno">  740</span>  }</div>
 <div class="line"><a id="l00741" name="l00741"></a><span class="lineno">  741</span> </div>
 <div class="line"><a id="l00742" name="l00742"></a><span class="lineno">  742</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00743" name="l00743"></a><span class="lineno">  743</span>}</div>
 </div>
 <div class="line"><a id="l00744" name="l00744"></a><span class="lineno">  744</span> </div>
-<div class="line"><a id="l00746" name="l00746"></a><span class="lineno"><a class="line" href="c__preprocess_8cpp.html#a694427aaa3d287f70d267a2bcf3c472f">  746</a></span><span class="keyword">const</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="c__preprocess_8cpp.html#a694427aaa3d287f70d267a2bcf3c472f">c_test_program</a>[]=</div>
-<div class="line"><a id="l00747" name="l00747"></a><span class="lineno">  747</span>  <span class="stringliteral">&quot;#include &lt;stdlib.h&gt;\n&quot;</span></div>
-<div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span>  <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line"><a id="l00749" name="l00749"></a><span class="lineno">  749</span>  <span class="stringliteral">&quot;int main() { }\n&quot;</span>;</div>
-<div class="line"><a id="l00750" name="l00750"></a><span class="lineno">  750</span> </div>
-<div class="foldopen" id="foldopen00751" data-start="{" data-end="}">
-<div class="line"><a id="l00751" name="l00751"></a><span class="lineno"><a class="line" href="c__preprocess_8cpp.html#aa7db733520f841f5fc46e376215c0dd1">  751</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="c__preprocess_8cpp.html#aa7db733520f841f5fc46e376215c0dd1">test_c_preprocessor</a>(<a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00752" name="l00752"></a><span class="lineno">  752</span>{</div>
-<div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span>  std::ostringstream out;</div>
-<div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span>  std::istringstream in(<a class="code hl_variable" href="c__preprocess_8cpp.html#a694427aaa3d287f70d267a2bcf3c472f">c_test_program</a>);</div>
-<div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span> </div>
-<div class="line"><a id="l00756" name="l00756"></a><span class="lineno">  756</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="c__preprocess_8cpp.html#a9bdcb2d99c35f5b6ba604645ef426ec7">c_preprocess</a>(in, out, message_handler);</div>
-<div class="line"><a id="l00757" name="l00757"></a><span class="lineno">  757</span>}</div>
+<div class="foldopen" id="foldopen00746" data-start="{" data-end="}">
+<div class="line"><a id="l00746" name="l00746"></a><span class="lineno"><a class="line" href="c__preprocess_8cpp.html#a47c5b7dc261fe5d6c3098392a720bd4a">  746</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="c__preprocess_8cpp.html#a47c5b7dc261fe5d6c3098392a720bd4a">c_preprocess_none</a>(</div>
+<div class="line"><a id="l00747" name="l00747"></a><span class="lineno">  747</span>  <span class="keyword">const</span> std::string &amp;file,</div>
+<div class="line"><a id="l00748" name="l00748"></a><span class="lineno">  748</span>  std::ostream &amp;<a class="code hl_class" href="classait.html">outstream</a>,</div>
+<div class="line"><a id="l00749" name="l00749"></a><span class="lineno">  749</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a id="l00750" name="l00750"></a><span class="lineno">  750</span>{</div>
+<div class="line"><a id="l00751" name="l00751"></a><span class="lineno">  751</span>  std::ifstream <a class="code hl_class" href="classait.html">infile</a>(<a class="code hl_define" href="unicode_8h.html#a54a797d3af974232b7a83cc83845156e">widen_if_needed</a>(file));</div>
+<div class="line"><a id="l00752" name="l00752"></a><span class="lineno">  752</span> </div>
+<div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span>  <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">infile</a>)</div>
+<div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span>  {</div>
+<div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span>    <a class="code hl_class" href="classmessaget.html">messaget</a> message(message_handler);</div>
+<div class="line"><a id="l00756" name="l00756"></a><span class="lineno">  756</span>    message.<a class="code hl_function" href="classmessaget.html#a398ce0183d9f6a560dddbb7a7e47666d">error</a>() &lt;&lt; <span class="stringliteral">&quot;failed to open &#39;&quot;</span> &lt;&lt; file &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00757" name="l00757"></a><span class="lineno">  757</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00758" name="l00758"></a><span class="lineno">  758</span>  }</div>
+<div class="line"><a id="l00759" name="l00759"></a><span class="lineno">  759</span> </div>
+<div class="line"><a id="l00760" name="l00760"></a><span class="lineno">  760</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a>.<a class="code hl_variable" href="classconfigt.html#afea36d271997788d5fae9e5baefd358b">ansi_c</a>.mode==<a class="code hl_enumvalue" href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826a571e24dc3d8793b5c5d3eb370c2aede9">configt::ansi_ct::flavourt::CODEWARRIOR</a>)</div>
+<div class="line"><a id="l00761" name="l00761"></a><span class="lineno">  761</span>  {</div>
+<div class="line"><a id="l00762" name="l00762"></a><span class="lineno">  762</span>    <span class="comment">// special treatment for &quot;/* #line&quot;</span></div>
+<div class="line"><a id="l00763" name="l00763"></a><span class="lineno">  763</span>    <a class="code hl_function" href="c__preprocess_8cpp.html#a981923ae4c05c778f8ebb7e7a64f94ee">postprocess_codewarrior</a>(<a class="code hl_class" href="classait.html">infile</a>, <a class="code hl_class" href="classait.html">outstream</a>);</div>
+<div class="line"><a id="l00764" name="l00764"></a><span class="lineno">  764</span>  }</div>
+<div class="line"><a id="l00765" name="l00765"></a><span class="lineno">  765</span>  <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00766" name="l00766"></a><span class="lineno">  766</span>  {</div>
+<div class="line"><a id="l00767" name="l00767"></a><span class="lineno">  767</span>    <span class="keywordtype">char</span> <a class="code hl_class" href="classait.html">ch</a>;</div>
+<div class="line"><a id="l00768" name="l00768"></a><span class="lineno">  768</span> </div>
+<div class="line"><a id="l00769" name="l00769"></a><span class="lineno">  769</span>    <span class="keywordflow">while</span>(<a class="code hl_class" href="classait.html">infile</a>.read(&amp;<a class="code hl_class" href="classait.html">ch</a>, 1))</div>
+<div class="line"><a id="l00770" name="l00770"></a><span class="lineno">  770</span>      <a class="code hl_class" href="classait.html">outstream</a> &lt;&lt; <a class="code hl_class" href="classait.html">ch</a>;</div>
+<div class="line"><a id="l00771" name="l00771"></a><span class="lineno">  771</span>  }</div>
+<div class="line"><a id="l00772" name="l00772"></a><span class="lineno">  772</span> </div>
+<div class="line"><a id="l00773" name="l00773"></a><span class="lineno">  773</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00774" name="l00774"></a><span class="lineno">  774</span>}</div>
+</div>
+<div class="line"><a id="l00775" name="l00775"></a><span class="lineno">  775</span> </div>
+<div class="line"><a id="l00777" name="l00777"></a><span class="lineno"><a class="line" href="c__preprocess_8cpp.html#a694427aaa3d287f70d267a2bcf3c472f">  777</a></span><span class="keyword">const</span> <span class="keywordtype">char</span> <a class="code hl_variable" href="c__preprocess_8cpp.html#a694427aaa3d287f70d267a2bcf3c472f">c_test_program</a>[]=</div>
+<div class="line"><a id="l00778" name="l00778"></a><span class="lineno">  778</span>  <span class="stringliteral">&quot;#include &lt;stdlib.h&gt;\n&quot;</span></div>
+<div class="line"><a id="l00779" name="l00779"></a><span class="lineno">  779</span>  <span class="stringliteral">&quot;\n&quot;</span></div>
+<div class="line"><a id="l00780" name="l00780"></a><span class="lineno">  780</span>  <span class="stringliteral">&quot;int main() { }\n&quot;</span>;</div>
+<div class="line"><a id="l00781" name="l00781"></a><span class="lineno">  781</span> </div>
+<div class="foldopen" id="foldopen00782" data-start="{" data-end="}">
+<div class="line"><a id="l00782" name="l00782"></a><span class="lineno"><a class="line" href="c__preprocess_8cpp.html#aa7db733520f841f5fc46e376215c0dd1">  782</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="c__preprocess_8cpp.html#aa7db733520f841f5fc46e376215c0dd1">test_c_preprocessor</a>(<a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a id="l00783" name="l00783"></a><span class="lineno">  783</span>{</div>
+<div class="line"><a id="l00784" name="l00784"></a><span class="lineno">  784</span>  std::ostringstream out;</div>
+<div class="line"><a id="l00785" name="l00785"></a><span class="lineno">  785</span>  std::istringstream in(<a class="code hl_variable" href="c__preprocess_8cpp.html#a694427aaa3d287f70d267a2bcf3c472f">c_test_program</a>);</div>
+<div class="line"><a id="l00786" name="l00786"></a><span class="lineno">  786</span> </div>
+<div class="line"><a id="l00787" name="l00787"></a><span class="lineno">  787</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="c__preprocess_8cpp.html#a9bdcb2d99c35f5b6ba604645ef426ec7">c_preprocess</a>(in, out, message_handler);</div>
+<div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span>}</div>
 </div>
 <div class="ttc" id="aapi_8cpp_html_ad2957e882e3568503e4f786a480f2bfe"><div class="ttname"><a href="api_8cpp.html#ad2957e882e3568503e4f786a480f2bfe">config</a></div><div class="ttdeci">configt config</div><div class="ttdef"><b>Definition</b> <a href="config_8cpp_source.html#l00025">config.cpp:25</a></div></div>
 <div class="ttc" id="ac__preprocess_8cpp_html_a07db2d842098347f9f2bc9c41beb5238"><div class="ttname"><a href="c__preprocess_8cpp.html#a07db2d842098347f9f2bc9c41beb5238">c_preprocess_visual_studio</a></div><div class="ttdeci">bool c_preprocess_visual_studio(const std::string &amp;, std::ostream &amp;, message_handlert &amp;)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00235">c_preprocess.cpp:235</a></div></div>
-<div class="ttc" id="ac__preprocess_8cpp_html_a2f952e62b81b13298615aa73b71ad1f7"><div class="ttname"><a href="c__preprocess_8cpp.html#a2f952e62b81b13298615aa73b71ad1f7">c_preprocess_arm</a></div><div class="ttdeci">bool c_preprocess_arm(const std::string &amp;, std::ostream &amp;, message_handlert &amp;)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00644">c_preprocess.cpp:644</a></div></div>
-<div class="ttc" id="ac__preprocess_8cpp_html_a47c5b7dc261fe5d6c3098392a720bd4a"><div class="ttname"><a href="c__preprocess_8cpp.html#a47c5b7dc261fe5d6c3098392a720bd4a">c_preprocess_none</a></div><div class="ttdeci">bool c_preprocess_none(const std::string &amp;, std::ostream &amp;, message_handlert &amp;)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00715">c_preprocess.cpp:715</a></div></div>
+<div class="ttc" id="ac__preprocess_8cpp_html_a2f952e62b81b13298615aa73b71ad1f7"><div class="ttname"><a href="c__preprocess_8cpp.html#a2f952e62b81b13298615aa73b71ad1f7">c_preprocess_arm</a></div><div class="ttdeci">bool c_preprocess_arm(const std::string &amp;, std::ostream &amp;, message_handlert &amp;)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00662">c_preprocess.cpp:662</a></div></div>
+<div class="ttc" id="ac__preprocess_8cpp_html_a47c5b7dc261fe5d6c3098392a720bd4a"><div class="ttname"><a href="c__preprocess_8cpp.html#a47c5b7dc261fe5d6c3098392a720bd4a">c_preprocess_none</a></div><div class="ttdeci">bool c_preprocess_none(const std::string &amp;, std::ostream &amp;, message_handlert &amp;)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00746">c_preprocess.cpp:746</a></div></div>
 <div class="ttc" id="ac__preprocess_8cpp_html_a53d7cab482154055b62e3563af35d0f9"><div class="ttname"><a href="c__preprocess_8cpp.html#a53d7cab482154055b62e3563af35d0f9">error_parse</a></div><div class="ttdeci">static void error_parse(std::istream &amp;errors, bool warning_only, messaget &amp;message)</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00142">c_preprocess.cpp:142</a></div></div>
-<div class="ttc" id="ac__preprocess_8cpp_html_a694427aaa3d287f70d267a2bcf3c472f"><div class="ttname"><a href="c__preprocess_8cpp.html#a694427aaa3d287f70d267a2bcf3c472f">c_test_program</a></div><div class="ttdeci">const char c_test_program[]</div><div class="ttdoc">tests ANSI-C preprocessing</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00746">c_preprocess.cpp:746</a></div></div>
+<div class="ttc" id="ac__preprocess_8cpp_html_a694427aaa3d287f70d267a2bcf3c472f"><div class="ttname"><a href="c__preprocess_8cpp.html#a694427aaa3d287f70d267a2bcf3c472f">c_test_program</a></div><div class="ttdeci">const char c_test_program[]</div><div class="ttdoc">tests ANSI-C preprocessing</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00777">c_preprocess.cpp:777</a></div></div>
 <div class="ttc" id="ac__preprocess_8cpp_html_a802d980341684c945f4d2bddb936a9dc"><div class="ttname"><a href="c__preprocess_8cpp.html#a802d980341684c945f4d2bddb936a9dc">c_preprocess_codewarrior</a></div><div class="ttdeci">bool c_preprocess_codewarrior(const std::string &amp;, std::ostream &amp;, message_handlert &amp;)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00363">c_preprocess.cpp:363</a></div></div>
 <div class="ttc" id="ac__preprocess_8cpp_html_a87f2874493b4d3c5266cf0fbee7c6622"><div class="ttname"><a href="c__preprocess_8cpp.html#a87f2874493b4d3c5266cf0fbee7c6622">error_parse_line</a></div><div class="ttdeci">static void error_parse_line(const std::string &amp;line, bool warning_only, messaget &amp;message)</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00022">c_preprocess.cpp:22</a></div></div>
 <div class="ttc" id="ac__preprocess_8cpp_html_a981923ae4c05c778f8ebb7e7a64f94ee"><div class="ttname"><a href="c__preprocess_8cpp.html#a981923ae4c05c778f8ebb7e7a64f94ee">postprocess_codewarrior</a></div><div class="ttdeci">void postprocess_codewarrior(std::istream &amp;instream, std::ostream &amp;outstream)</div><div class="ttdoc">post-processing specifically for CodeWarrior</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00327">c_preprocess.cpp:327</a></div></div>
 <div class="ttc" id="ac__preprocess_8cpp_html_a9bdcb2d99c35f5b6ba604645ef426ec7"><div class="ttname"><a href="c__preprocess_8cpp.html#a9bdcb2d99c35f5b6ba604645ef426ec7">c_preprocess</a></div><div class="ttdeci">bool c_preprocess(std::istream &amp;instream, std::ostream &amp;outstream, message_handlert &amp;message_handler)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00154">c_preprocess.cpp:154</a></div></div>
-<div class="ttc" id="ac__preprocess_8cpp_html_aa7db733520f841f5fc46e376215c0dd1"><div class="ttname"><a href="c__preprocess_8cpp.html#aa7db733520f841f5fc46e376215c0dd1">test_c_preprocessor</a></div><div class="ttdeci">bool test_c_preprocessor(message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00751">c_preprocess.cpp:751</a></div></div>
+<div class="ttc" id="ac__preprocess_8cpp_html_aa7db733520f841f5fc46e376215c0dd1"><div class="ttname"><a href="c__preprocess_8cpp.html#aa7db733520f841f5fc46e376215c0dd1">test_c_preprocessor</a></div><div class="ttdeci">bool test_c_preprocessor(message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00782">c_preprocess.cpp:782</a></div></div>
 <div class="ttc" id="ac__preprocess_8cpp_html_ae1a5ce99bf834702e54cd1da1e0c07cd"><div class="ttname"><a href="c__preprocess_8cpp.html#ae1a5ce99bf834702e54cd1da1e0c07cd">c_preprocess_gcc_clang</a></div><div class="ttdeci">bool c_preprocess_gcc_clang(const std::string &amp;, std::ostream &amp;, message_handlert &amp;, configt::ansi_ct::preprocessort)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00431">c_preprocess.cpp:431</a></div></div>
 <div class="ttc" id="ac__preprocess_8cpp_html_ae97d5f7ab2b09e524207a0eb72023c83"><div class="ttname"><a href="c__preprocess_8cpp.html#ae97d5f7ab2b09e524207a0eb72023c83">is_dot_i_file</a></div><div class="ttdeci">static bool is_dot_i_file(const std::string &amp;path)</div><div class="ttdoc">ANSI-C preprocessing.</div><div class="ttdef"><b>Definition</b> <a href="c__preprocess_8cpp_source.html#l00180">c_preprocess.cpp:180</a></div></div>
 <div class="ttc" id="ac__preprocess_8h_html"><div class="ttname"><a href="c__preprocess_8h.html">c_preprocess.h</a></div></div>
@@ -920,10 +951,12 @@ $(document).ready(function(){initNavTree('c__preprocess_8cpp_source.html',''); i
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_a8f293e8c67ef5f2614f8f3f455899864a060e86d0ae4eccb2d79362cf98986239"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#a8f293e8c67ef5f2614f8f3f455899864a060e86d0ae4eccb2d79362cf98986239">configt::ansi_ct::ost::NO_OS</a></div><div class="ttdeci">@ NO_OS</div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_ab387c011f5197baecbafce33f6732826a571e24dc3d8793b5c5d3eb370c2aede9"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ab387c011f5197baecbafce33f6732826a571e24dc3d8793b5c5d3eb370c2aede9">configt::ansi_ct::flavourt::CODEWARRIOR</a></div><div class="ttdeci">@ CODEWARRIOR</div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_ac03460009ec6fe5358dc3ce641d06a2fa06f788cfdee3702c759420e80d8cd442"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ac03460009ec6fe5358dc3ce641d06a2fa06f788cfdee3702c759420e80d8cd442">configt::ansi_ct::endiannesst::IS_BIG_ENDIAN</a></div><div class="ttdeci">@ IS_BIG_ENDIAN</div></div>
+<div class="ttc" id="astructconfigt_1_1ansi__ct_html_ac69d70848faf53f13ee574004dda9987a5e2a3da748700c84863a802e1e594899"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a5e2a3da748700c84863a802e1e594899">configt::ansi_ct::c_standardt::C17</a></div><div class="ttdeci">@ C17</div></div>
+<div class="ttc" id="astructconfigt_1_1ansi__ct_html_ac69d70848faf53f13ee574004dda9987a83567cd28bc5c1e1749a19fa1d2ca5f8"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a83567cd28bc5c1e1749a19fa1d2ca5f8">configt::ansi_ct::c_standardt::C23</a></div><div class="ttdeci">@ C23</div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_ac69d70848faf53f13ee574004dda9987a8a9f5c7cf9bfd7a6531d354d7cfc1f01"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a8a9f5c7cf9bfd7a6531d354d7cfc1f01">configt::ansi_ct::c_standardt::C89</a></div><div class="ttdeci">@ C89</div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_ac69d70848faf53f13ee574004dda9987aa42f23ef20764de07767b3a1558abf36"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987aa42f23ef20764de07767b3a1558abf36">configt::ansi_ct::c_standardt::C11</a></div><div class="ttdeci">@ C11</div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_ac69d70848faf53f13ee574004dda9987ad79a339fadaa631d027ba959da7f1892"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987ad79a339fadaa631d027ba959da7f1892">configt::ansi_ct::c_standardt::C99</a></div><div class="ttdeci">@ C99</div></div>
-<div class="ttc" id="astructconfigt_1_1ansi__ct_html_adbaf349966324503f4957fc2d8ff591e"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591e">configt::ansi_ct::preprocessort</a></div><div class="ttdeci">preprocessort</div><div class="ttdef"><b>Definition</b> <a href="config_8h_source.html#l00264">config.h:265</a></div></div>
+<div class="ttc" id="astructconfigt_1_1ansi__ct_html_adbaf349966324503f4957fc2d8ff591e"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591e">configt::ansi_ct::preprocessort</a></div><div class="ttdeci">preprocessort</div><div class="ttdef"><b>Definition</b> <a href="config_8h_source.html#l00282">config.h:283</a></div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_adbaf349966324503f4957fc2d8ff591ea32d8b233e3c58a262a0b75872297d8d5"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea32d8b233e3c58a262a0b75872297d8d5">configt::ansi_ct::preprocessort::GCC</a></div><div class="ttdeci">@ GCC</div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_adbaf349966324503f4957fc2d8ff591ea47f45e65244c17ec9fa8771a5c6d60e1"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea47f45e65244c17ec9fa8771a5c6d60e1">configt::ansi_ct::preprocessort::ARM</a></div><div class="ttdeci">@ ARM</div></div>
 <div class="ttc" id="astructconfigt_1_1ansi__ct_html_adbaf349966324503f4957fc2d8ff591ea4e039bbec176af81eb7f5ac299517216"><div class="ttname"><a href="structconfigt_1_1ansi__ct.html#adbaf349966324503f4957fc2d8ff591ea4e039bbec176af81eb7f5ac299517216">configt::ansi_ct::preprocessort::VISUAL_STUDIO</a></div><div class="ttdeci">@ VISUAL_STUDIO</div></div>

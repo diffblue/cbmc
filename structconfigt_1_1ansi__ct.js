@@ -3,7 +3,9 @@ var structconfigt_1_1ansi__ct =
     [ "c_standardt", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987", [
       [ "C89", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a8a9f5c7cf9bfd7a6531d354d7cfc1f01", null ],
       [ "C99", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987ad79a339fadaa631d027ba959da7f1892", null ],
-      [ "C11", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987aa42f23ef20764de07767b3a1558abf36", null ]
+      [ "C11", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987aa42f23ef20764de07767b3a1558abf36", null ],
+      [ "C17", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a5e2a3da748700c84863a802e1e594899", null ],
+      [ "C23", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a83567cd28bc5c1e1749a19fa1d2ca5f8", null ]
     ] ],
     [ "endiannesst", "structconfigt_1_1ansi__ct.html#ac03460009ec6fe5358dc3ce641d06a2f", [
       [ "NO_ENDIANNESS", "structconfigt_1_1ansi__ct.html#ac03460009ec6fe5358dc3ce641d06a2fafc1be4b6239ef544536fed65649bf9d5", null ],
@@ -65,6 +67,8 @@ var structconfigt_1_1ansi__ct =
     [ "set_arch_spec_x32", "structconfigt_1_1ansi__ct.html#a0efa0cc1ba49134b4d67ffb4a736bff0", null ],
     [ "set_arch_spec_x86_64", "structconfigt_1_1ansi__ct.html#ac69b95aea546b36440cad3e8b74a7eac", null ],
     [ "set_c11", "structconfigt_1_1ansi__ct.html#ae7f98e2473b7b01b85c77b43d6fd09cd", null ],
+    [ "set_c17", "structconfigt_1_1ansi__ct.html#abd8082c40740716b5331afc3e77ccd62", null ],
+    [ "set_c23", "structconfigt_1_1ansi__ct.html#a1f6804a57421613a1fdd5c2c98940e78", null ],
     [ "set_c89", "structconfigt_1_1ansi__ct.html#a5b4426993b82c56edbd47212f42660a3", null ],
     [ "set_c99", "structconfigt_1_1ansi__ct.html#a96fe7b153cf3b068fc739f38ba9ec662", null ],
     [ "set_ILP32", "structconfigt_1_1ansi__ct.html#a4977d70b1c0f623f54a39f9c462463aa", null ],

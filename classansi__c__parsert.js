@@ -32,6 +32,8 @@ var classansi__c__parsert =
     [ "__float128_is_keyword", "classansi__c__parsert.html#a6eb0ae102f2f72c8aefe08ef8915b735", null ],
     [ "asm_block_following", "classansi__c__parsert.html#a19916c0cd40647a66a3a58b19dc853cb", null ],
     [ "bf16_type", "classansi__c__parsert.html#a9ff4e898b5c6e5114b542077bc08ad4e", null ],
+    [ "c17", "classansi__c__parsert.html#a6bf5d4466c0dd78866e3b758ded9aafd", null ],
+    [ "c23", "classansi__c__parsert.html#afaf05c486859c505351f773f39c28ae0", null ],
     [ "cpp11", "classansi__c__parsert.html#ac458a0d24faa3493fa51944aa5a5c877", null ],
     [ "cpp98", "classansi__c__parsert.html#a8f4cd91a8834a9355e8fe8b5d147586e", null ],
     [ "float16_type", "classansi__c__parsert.html#a0cbe3a0662bdcb3d111d2bb9f97a3ac8", null ],
