@@ -62,8 +62,9 @@ int yyansi_cerror(const std::string &error);
 
 %token TOK_AUTO      "auto"
 %token TOK_BOOL      "bool"
-%token TOK_COMPLEX   "complex"
+%token TOK_BITINT    "_BitInt"
 %token TOK_BREAK     "break"
+%token TOK_COMPLEX   "complex"
 %token TOK_CASE      "case"
 %token TOK_CHAR      "char"
 %token TOK_CONST     "const"
@@ -91,6 +92,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_STRUCT    "struct"
 %token TOK_SWITCH    "switch"
 %token TOK_TYPEDEF   "typedef"
+%token TOK_TYPEOF_UNQUAL "typeof_unqual"
 %token TOK_UNION     "union"
 %token TOK_UNSIGNED  "unsigned"
 %token TOK_VOID      "void"
@@ -344,10 +346,33 @@ string:
 
 /*** Constants **********************************************************/
 
-constant: integer
+constant:
+          integer
         | floating
         | character
         | string
+        | predefined_constant
+        ;
+
+predefined_constant:
+          TOK_FALSE
+        { $$ = $1;
+          stack_expr($$).id(ID_constant);
+          stack_expr($$).set(ID_value, ID_0);
+          stack_expr($$).type() = c_bool_type();
+        }
+        | TOK_TRUE
+        { $$ = $1;
+          stack_expr($$).id(ID_constant);
+          stack_expr($$).set(ID_value, ID_1);
+          stack_expr($$).type() = c_bool_type();
+        }
+        | TOK_NULLPTR
+        { $$ = $1;
+          stack_expr($$).id(ID_constant);
+          stack_expr($$).set(ID_value, ID_NULL);
+          stack_expr($$).type() = pointer_type(void_type());
+        }
         ;
 
 /*** Expressions ********************************************************/
@@ -963,6 +988,14 @@ static_assert_declaration:
           mto($$, $3);
           mto($$, $5);
         }
+        | TOK_STATIC_ASSERT '(' assignment_expression ')'
+        {
+          // C23 adds static_assert without message
+          $$=$1;
+          set($$, ID_declaration);
+          to_ansi_c_declaration(parser_stack($$)).set_is_static_assert(true);
+          mto($$, $3);
+        }
         ;
 
 default_declaring_list:
@@ -1338,6 +1371,16 @@ typeof_specifier:
           parser_stack($$).id(ID_typeof);
           parser_stack($$).set(ID_type_arg, parser_stack($3));
         }
+        | TOK_TYPEOF_UNQUAL '(' comma_expression ')'
+        { $$ = $1;
+          parser_stack($$).id(ID_c_typeof_unqual);
+          mto($$, $3);
+        }
+        | TOK_TYPEOF_UNQUAL '(' type_name ')'
+        { $$ = $1;
+          parser_stack($$).id(ID_c_typeof_unqual);
+          parser_stack($$).set(ID_type_arg, parser_stack($3));
+        }
         ;
 
 typeof_type_specifier:
@@ -1517,6 +1560,11 @@ basic_type_name:
         | TOK_DOUBLE   { $$=$1; set($$, ID_double); }
         | TOK_SIGNED   { $$=$1; set($$, ID_signed); }
         | TOK_UNSIGNED { $$=$1; set($$, ID_unsigned); }
+        | TOK_BITINT '(' constant_expression ')'
+        {
+          init($$, ID_c_bitint);
+          parser_stack($$).add(ID_size).swap(parser_stack($3));
+        }
         | TOK_VOID     { $$=$1; set($$, ID_void); }
         | TOK_BOOL     { $$=$1; set($$, ID_c_bool); }
         | TOK_COMPLEX  { $$=$1; set($$, ID_complex); }

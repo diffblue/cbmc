@@ -1,0 +1,10 @@
+KNOWNBUG
+_BitInt3.c
+--c23
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+_BitInt implementation is missing.

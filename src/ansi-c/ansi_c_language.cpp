@@ -80,6 +80,11 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.fp16_type = config.ansi_c.fp16_type;
   ansi_c_parser.cpp98=false; // it's not C++
   ansi_c_parser.cpp11=false; // it's not C++
+  ansi_c_parser.c17 =
+    config.ansi_c.c_standard == configt::ansi_ct::c_standardt::C17 ||
+    config.ansi_c.c_standard == configt::ansi_ct::c_standardt::C23;
+  ansi_c_parser.c23 =
+    config.ansi_c.c_standard == configt::ansi_ct::c_standardt::C23;
   ansi_c_parser.mode=config.ansi_c.mode;
 
   ansi_c_scanner_init(ansi_c_parser);

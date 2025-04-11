@@ -24,10 +24,8 @@ class message_handlert;
 class ansi_c_convert_typet
 {
 public:
-  unsigned unsigned_cnt, signed_cnt, char_cnt,
-           int_cnt, short_cnt, long_cnt,
-           double_cnt, float_cnt, c_bool_cnt,
-           proper_bool_cnt, complex_cnt;
+  unsigned unsigned_cnt, signed_cnt, char_cnt, int_cnt, short_cnt, long_cnt,
+    double_cnt, float_cnt, c_bool_cnt, proper_bool_cnt, complex_cnt, bitint_cnt;
 
   // extensions
   unsigned int8_cnt, int16_cnt, int32_cnt, int64_cnt,
@@ -87,6 +85,7 @@ protected:
       c_bool_cnt(0),
       proper_bool_cnt(0),
       complex_cnt(0),
+      bitint_cnt(0),
       int8_cnt(0),
       int16_cnt(0),
       int32_cnt(0),

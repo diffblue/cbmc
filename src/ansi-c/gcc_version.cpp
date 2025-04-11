@@ -77,6 +77,10 @@ void gcc_versiont::get(const std::string &executable)
           default_c_standard = configt::ansi_ct::c_standardt::C99;
         else if(split[1] == "201112L")
           default_c_standard = configt::ansi_ct::c_standardt::C11;
+        else if(split[1] == "201710L")
+          default_c_standard = configt::ansi_ct::c_standardt::C17;
+        else if(split[1] == "202000L" || split[1] == "202311L")
+          default_c_standard = configt::ansi_ct::c_standardt::C23;
       }
     }
 

@@ -695,13 +695,15 @@ void goto_convertt::convert(
     convert_asm(to_code_asm(code), dest);
   else if(statement == ID_static_assert)
   {
-    PRECONDITION(code.operands().size() == 2);
+    // C23 allows static_assert without message
+    PRECONDITION(code.operands().size() == 1 || code.operands().size() == 2);
+    // We are double-checking the work of the type checker here.
     exprt assertion =
       typecast_exprt::conditional_cast(code.op0(), bool_typet());
     simplify(assertion, ns);
     INVARIANT_WITH_DIAGNOSTICS(
       !assertion.is_false(),
-      "static assertion " + id2string(get_string_constant(code.op1())),
+      "static assertion is false",
       code.op0().find_source_location());
   }
   else if(statement == ID_dead)
