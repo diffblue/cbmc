@@ -1,5 +1,7 @@
 var NAVTREEINDEX78 =
 {
+"dimacs__cnf_8h_source.html":[8,0,2,27,7,5],
+"dir_034d9ce8f5e904bef115a46acd2961c1.html":[8,0,2,15,2],
 "dir_03d682e021e4c6309d130abf57ca5133.html":[8,0,1,0,4],
 "dir_07fb78a0b4d496699ca5c92e9ebaed68.html":[8,0,2,18],
 "dir_0ae8a7d84de7430323d0a8da6a53a1ca.html":[8,0,2,26],
@@ -247,7 +249,5 @@ var NAVTREEINDEX78 =
 "event__graph_8h.html":[8,0,2,15,2,6],
 "event__graph_8h.html#a2ac977794ce28739859ac15ddf94fe21":[8,0,2,15,2,6,6],
 "event__graph_8h.html#ae9853342444fe83411eadb0d71433374":[8,0,2,15,2,6,7],
-"event__graph_8h_source.html":[8,0,2,15,2,6],
-"example_8c.html":[8,0,2,23,1,0],
-"example_8c.html#a0ddf1224851353fc92bfbff6f499fa97":[8,0,2,23,1,0,0]
+"event__graph_8h_source.html":[8,0,2,15,2,6]
 };

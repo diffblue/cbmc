@@ -1,5 +1,7 @@
 var NAVTREEINDEX22 =
 {
+"classcpp__enum__typet.html#a749ad63627d6fc29df03639c9a263afc":[7,0,313,1],
+"classcpp__enum__typet.html#a771d28d0f1ec839404cd68059099be18":[7,0,313,2],
 "classcpp__enum__typet.html#a7ac45c46cfa930a8f6dd34ac7019ba98":[7,0,313,6],
 "classcpp__enum__typet.html#ab5f098321d8e7510fef941aa51b1b875":[7,0,313,7],
 "classcpp__enum__typet.html#ae5768e7375e87c51fd7c0d1ba4878079":[7,0,313,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX22 =
 "classcpp__storage__spect.html#aee2bb06e425b56b28cde11051cefc5c4":[7,0,329,2],
 "classcpp__storage__spect.html#af5da1c4f9740eda0be789e50fc113e24":[7,0,329,22],
 "classcpp__storage__spect.html#af77f4d2a3a7ac78da24db00a86588544":[7,0,329,10],
-"classcpp__storage__spect.html#afdd263abefa616be8ec17857ffce93a0":[7,0,329,19],
-"classcpp__template__args__baset.html":[7,0,330],
-"classcpp__template__args__baset.html#a3a91f536f53ea15610685412ca9ee487":[7,0,330,3]
+"classcpp__storage__spect.html#afdd263abefa616be8ec17857ffce93a0":[7,0,329,19]
 };

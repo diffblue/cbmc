@@ -8,6 +8,7 @@ var classansi__c__convert__typet =
     [ "write", "classansi__c__convert__typet.html#a57c04d4c42d73494144f97a2eef77188", null ],
     [ "aligned", "classansi__c__convert__typet.html#a75a64a4c6b91a95c6c5f1be703120e12", null ],
     [ "alignment", "classansi__c__convert__typet.html#a2b8bb20fbf20a88271d90511b5d0688d", null ],
+    [ "bitint_cnt", "classansi__c__convert__typet.html#a9c1c9ef8c870fec49292a42fa3554f4a", null ],
     [ "bv_cnt", "classansi__c__convert__typet.html#ac7274c039ac1cdf270f14cf255a26c73", null ],
     [ "bv_width", "classansi__c__convert__typet.html#ac2a4fd91b4dfe49a7fb47bf6cf3531de", null ],
     [ "c_assigns", "classansi__c__convert__typet.html#aedd90d805858f70bdea7dea79d140781", null ],

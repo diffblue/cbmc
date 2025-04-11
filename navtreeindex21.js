@@ -1,5 +1,7 @@
 var NAVTREEINDEX21 =
 {
+"classcopy__on__write__pointeet.html#a1134f6b5c2a703b34fcca7aa6bf1117f":[7,0,285,5],
+"classcopy__on__write__pointeet.html#a197666e6226420d8c686a6aa9cda6f0c":[7,0,285,8],
 "classcopy__on__write__pointeet.html#a19aff0e06f26040e44de116a2e0942e4":[7,0,285,1],
 "classcopy__on__write__pointeet.html#a2c43a6fb2ed72d5954843ac48c7fcf76":[7,0,285,3],
 "classcopy__on__write__pointeet.html#a3b0df20ddbea9bbadd2cbeb028a4aff9":[7,0,285,9],
@@ -247,7 +249,5 @@ var NAVTREEINDEX21 =
 "classcpp__enum__typet.html":[7,0,313],
 "classcpp__enum__typet.html#a03b3e0ecc9ca510c2a954abbc14e5ad5":[7,0,313,5],
 "classcpp__enum__typet.html#a6f6e13cf4b382706a094238c9fb48d75":[7,0,313,0],
-"classcpp__enum__typet.html#a70842113ff7f3a1e0e9ab79164562664":[7,0,313,8],
-"classcpp__enum__typet.html#a749ad63627d6fc29df03639c9a263afc":[7,0,313,1],
-"classcpp__enum__typet.html#a771d28d0f1ec839404cd68059099be18":[7,0,313,2]
+"classcpp__enum__typet.html#a70842113ff7f3a1e0e9ab79164562664":[7,0,313,8]
 };

@@ -48,6 +48,7 @@ var classc__typecheck__baset =
     [ "typecheck_array_type", "classc__typecheck__baset.html#ae4fee3896dd7ee4f9b02b6d89f6eb987", null ],
     [ "typecheck_asm", "classc__typecheck__baset.html#a8c84b26c51b0fccec893fb20ab8e729f", null ],
     [ "typecheck_assign", "classc__typecheck__baset.html#a5891607cb3ee77da42a90130eac6f49c", null ],
+    [ "typecheck_bitint_type", "classc__typecheck__baset.html#ad87581291aa9c0ec9e652c2e630eed90", null ],
     [ "typecheck_block", "classc__typecheck__baset.html#a2683c86c744b996a5f187051a5523b44", null ],
     [ "typecheck_break", "classc__typecheck__baset.html#a02f1a47f2b8db323d4821ade079357d2", null ],
     [ "typecheck_builtin_overflow", "classc__typecheck__baset.html#a81ff0dce0891d79d864b538ca8ce8d3f", null ],
