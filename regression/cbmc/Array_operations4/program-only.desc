@@ -1,0 +1,13 @@
+CORE paths-lifo-expected-failure
+main.c
+--program-only
+target!0@1#2 ==
+target!0@1#3 ==
+^EXIT=0$
+^SIGNAL=0$
+--
+byte_update_
+--
+This test demonstrates that we can simplify byte_update expressions to, e.g.,
+WITH expressions.
+Disabled for paths-lifo mode, which does not support --program-only.

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 functional.c
 -DN=4 -DSLICE_BYTES --program-only
 ^EXIT=0$

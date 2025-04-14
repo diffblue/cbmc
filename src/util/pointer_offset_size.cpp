@@ -678,6 +678,16 @@ std::optional<exprt> get_subexpression_at_offset(
     expr, from_integer(offset_bytes, c_index_type()), target_type_raw);
 }
 
+static bool is_multiplication_by_constant(const exprt &expr)
+{
+  if(expr.id() != ID_mult)
+    return false;
+  if(expr.operands().size() != 2)
+    return false;
+  return to_multi_ary_expr(expr).op0().is_constant() ||
+         to_multi_ary_expr(expr).op1().is_constant();
+}
+
 std::optional<exprt> get_subexpression_at_offset(
   const exprt &expr,
   const exprt &offset,
@@ -687,7 +697,166 @@ std::optional<exprt> get_subexpression_at_offset(
   const auto offset_bytes = numeric_cast<mp_integer>(offset);
 
   if(!offset_bytes.has_value())
-    return {};
+  {
+    // offset is not a constant; try to see whether it is a multiple of a
+    // constant, or a sum that involves a multiple of a constant
+    if(auto array_type = type_try_dynamic_cast<array_typet>(expr.type()))
+    {
+      const auto target_size_bits = pointer_offset_bits(target_type, ns);
+      const auto elem_size_bits =
+        pointer_offset_bits(array_type->element_type(), ns);
+
+      // no arrays of zero-, or unknown-sized elements, or ones where elements
+      // have a bit-width that isn't a multiple of bytes
+      if(
+        !target_size_bits.has_value() || !elem_size_bits.has_value() ||
+        *elem_size_bits <= 0 ||
+        *elem_size_bits % config.ansi_c.char_width != 0 ||
+        *target_size_bits > *elem_size_bits)
+      {
+        return {};
+      }
+
+      // If we have an offset C + x (where C is a constant) we can try to
+      // recurse by first looking at the member at offset C.
+      if(
+        offset.id() == ID_plus && offset.operands().size() == 2 &&
+        (to_multi_ary_expr(offset).op0().is_constant() ||
+         to_multi_ary_expr(offset).op1().is_constant()))
+      {
+        const plus_exprt &offset_plus = to_plus_expr(offset);
+        const auto &const_factor = numeric_cast_v<mp_integer>(to_constant_expr(
+          offset_plus.op0().is_constant() ? offset_plus.op0()
+                                          : offset_plus.op1()));
+        const exprt &other_factor = offset_plus.op0().is_constant()
+                                      ? offset_plus.op1()
+                                      : offset_plus.op0();
+
+        auto expr_at_offset_C =
+          get_subexpression_at_offset(expr, const_factor, target_type, ns);
+
+        if(
+          expr_at_offset_C.has_value() && expr_at_offset_C->id() == ID_index &&
+          to_index_expr(*expr_at_offset_C).index().is_zero())
+        {
+          return get_subexpression_at_offset(
+            to_index_expr(*expr_at_offset_C).array(),
+            other_factor,
+            target_type,
+            ns);
+        }
+      }
+      // If we have an offset that is a sum of multiplications of the form K * i
+      // or i * K (where K is a constant) then try to recurse while removing one
+      // element from this sum.
+      else if(
+        offset.id() == ID_plus && offset.operands().size() == 2 &&
+        is_multiplication_by_constant(to_multi_ary_expr(offset).op0()))
+      {
+        const plus_exprt &offset_plus = to_plus_expr(offset);
+        const mult_exprt &mul = to_mult_expr(offset_plus.op0());
+        const exprt &remaining_offset = offset_plus.op1();
+        const auto &const_factor = numeric_cast_v<mp_integer>(
+          to_constant_expr(mul.op0().is_constant() ? mul.op0() : mul.op1()));
+        const exprt &other_factor =
+          mul.op0().is_constant() ? mul.op1() : mul.op0();
+
+        if(const_factor % (*elem_size_bits / config.ansi_c.char_width) != 0)
+          return {};
+
+        exprt index = mult_exprt{
+          other_factor,
+          from_integer(
+            const_factor / (*elem_size_bits / config.ansi_c.char_width),
+            other_factor.type())};
+
+        return get_subexpression_at_offset(
+          index_exprt{
+            expr,
+            typecast_exprt::conditional_cast(index, array_type->index_type())},
+          remaining_offset,
+          target_type,
+          ns);
+      }
+
+      // give up if the offset expression isn't of the form K * i or i * K
+      // (where K is a constant)
+      if(!is_multiplication_by_constant(offset))
+      {
+        return {};
+      }
+
+      const mult_exprt &offset_mult = to_mult_expr(offset);
+      const auto &const_factor = numeric_cast_v<mp_integer>(to_constant_expr(
+        offset_mult.op0().is_constant() ? offset_mult.op0()
+                                        : offset_mult.op1()));
+      const exprt &other_factor =
+        offset_mult.op0().is_constant() ? offset_mult.op1() : offset_mult.op0();
+
+      if(const_factor % (*elem_size_bits / config.ansi_c.char_width) != 0)
+        return {};
+
+      exprt index = mult_exprt{
+        other_factor,
+        from_integer(
+          const_factor / (*elem_size_bits / config.ansi_c.char_width),
+          other_factor.type())};
+
+      return get_subexpression_at_offset(
+        index_exprt{
+          expr,
+          typecast_exprt::conditional_cast(index, array_type->index_type())},
+        0,
+        target_type,
+        ns);
+    }
+    else if(
+      auto struct_tag_type =
+        type_try_dynamic_cast<struct_tag_typet>(expr.type()))
+    {
+      // If the struct only has a single member then we recurse into that
+      // member.
+      const auto &components = ns.follow_tag(*struct_tag_type).components();
+      if(components.size() == 1)
+      {
+        return get_subexpression_at_offset(
+          member_exprt{expr, components.front()}, offset, target_type, ns);
+      }
+      // If we have an offset C + x (where C is a constant) we can try to
+      // recurse by first looking at the member at offset C.
+      else if(
+        offset.id() == ID_plus && offset.operands().size() == 2 &&
+        (to_multi_ary_expr(offset).op0().is_constant() ||
+         to_multi_ary_expr(offset).op1().is_constant()))
+      {
+        const plus_exprt &offset_plus = to_plus_expr(offset);
+        const auto &const_factor = numeric_cast_v<mp_integer>(to_constant_expr(
+          offset_plus.op0().is_constant() ? offset_plus.op0()
+                                          : offset_plus.op1()));
+        const exprt &other_factor = offset_plus.op0().is_constant()
+                                      ? offset_plus.op1()
+                                      : offset_plus.op0();
+
+        auto expr_at_offset_C =
+          get_subexpression_at_offset(expr, const_factor, target_type, ns);
+
+        if(
+          expr_at_offset_C.has_value() && expr_at_offset_C->id() == ID_index &&
+          to_index_expr(*expr_at_offset_C).index().is_zero())
+        {
+          return get_subexpression_at_offset(
+            to_index_expr(*expr_at_offset_C).array(),
+            other_factor,
+            target_type,
+            ns);
+        }
+      }
+
+      return {};
+    }
+    else
+      return {};
+  }
   else
     return get_subexpression_at_offset(expr, *offset_bytes, target_type, ns);
 }
