@@ -12,9 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "byte_operators.h"
 #include "c_types.h"
 #include "expr_util.h"
+#include "namespace.h"
 #include "pointer_offset_size.h"
 #include "pointer_predicates.h"
 #include "simplify_expr.h"
+#include "symbol.h"
 
 void dynamic_object_exprt::set_instance(unsigned int instance)
 {
@@ -247,6 +249,41 @@ exprt pointer_in_range_exprt::lower() const
 
 exprt prophecy_r_or_w_ok_exprt::lower(const namespacet &ns) const
 {
+  exprt base_ptr = skip_typecast(pointer());
+  if(auto plus_expr = expr_try_dynamic_cast<plus_exprt>(base_ptr))
+  {
+    if(plus_expr->op0().id() == ID_address_of)
+      base_ptr = plus_expr->op0();
+  }
+  if(auto address_of = expr_try_dynamic_cast<address_of_exprt>(base_ptr))
+  {
+    const exprt &root_object =
+      object_descriptor_exprt::root_object(address_of->object());
+    if(auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(root_object))
+    {
+      const symbolt *s_ptr = nullptr;
+      if(
+        !ns.lookup(symbol_expr->get_identifier(), s_ptr) &&
+        s_ptr->is_static_lifetime)
+      {
+        return and_exprt{
+          {not_exprt{null_object(pointer())},
+           not_exprt{is_invalid_pointer_exprt{pointer()}},
+           not_exprt{object_lower_bound(pointer(), nil_exprt())},
+           not_exprt{object_upper_bound(pointer(), size())}}};
+      }
+      else if(symbol_expr->get_identifier().starts_with(SYMEX_DYNAMIC_PREFIX
+                                                        "::"))
+      {
+        return and_exprt{
+          {not_exprt{null_object(pointer())},
+           not_exprt{is_invalid_pointer_exprt{pointer()}},
+           not_exprt{same_object(pointer(), deallocated_ptr())},
+           not_exprt{object_lower_bound(pointer(), nil_exprt())},
+           not_exprt{object_upper_bound(pointer(), size())}}};
+      }
+    }
+  }
   return and_exprt{
     {not_exprt{null_object(pointer())},
      not_exprt{is_invalid_pointer_exprt{pointer()}},
