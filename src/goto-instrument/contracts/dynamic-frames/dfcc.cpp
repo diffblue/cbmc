@@ -257,6 +257,12 @@ void dfcct::partition_function_symbols(
   std::set<irep_idt> &contract_symbols,
   std::set<irep_idt> &other_symbols)
 {
+  std::set<irep_idt> called_functions;
+  find_used_functions(
+    goto_functionst::entry_point(),
+    goto_model.goto_functions,
+    called_functions);
+
   // collect contract and other symbols
   for(auto &entry : goto_model.symbol_table)
   {
@@ -272,7 +278,7 @@ void dfcct::partition_function_symbols(
     {
       contract_symbols.insert(sym_name);
     }
-    else
+    else if(called_functions.find(sym_name) != called_functions.end())
     {
       // it is not a contract
       other_symbols.insert(sym_name);
