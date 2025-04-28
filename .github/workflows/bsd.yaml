@@ -80,10 +80,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: openbsd-7.4-gmake-${{ github.ref }}-${{ github.sha }}-PR
+          key: openbsd-7.6-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            openbsd-7.4-gmake-${{ github.ref }}
-            openbsd-7.4-gmake
+            openbsd-7.6-gmake-${{ github.ref }}
+            openbsd-7.6-gmake
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -91,7 +91,7 @@ jobs:
       - name: Build and Test
         uses: vmactions/openbsd-vm@v1
         with:
-          release: 7.4
+          release: 7.6
           run: |
             # apparently fail-on-error isn't the default here
             set -e -x
