@@ -1,3 +1,34 @@
+# CBMC 6.6.0
+
+This release adds C17 and C23 support to our C front-end (via #8620, #8623). We
+have no longer provide Ubuntu 20.04 pre-built binaries as security support for
+that distribution has ended.
+
+## What's Changed
+* CI: Remove use of Ubuntu 20.04 by @tautschnig in https://github.com/diffblue/cbmc/pull/8613
+* C17 and C23 support by @kroening in https://github.com/diffblue/cbmc/pull/8620
+
+## Bug Fixes
+* Fix display of code changes in clang-format CI action by @tautschnig in https://github.com/diffblue/cbmc/pull/8609
+* Use same CMake minimum version in DownloadProject configuration by @tautschnig in https://github.com/diffblue/cbmc/pull/8611
+* Fix quantifiers with nested statement-expressions by @qinheping in https://github.com/diffblue/cbmc/pull/8616
+* Fix filename completion in bash autocompletion by @tautschnig in https://github.com/diffblue/cbmc/pull/8587
+* Upgrade CVC5 in CI to 1.2.1 by @tautschnig in https://github.com/diffblue/cbmc/pull/8585
+* Remove unused {c,java}_qualifierst::count by @tautschnig in https://github.com/diffblue/cbmc/pull/8583
+* Remove set but not used variables by @mgudemann in https://github.com/diffblue/cbmc/pull/8595
+* Replace conditions in quantified statement expressions by @qinheping in https://github.com/diffblue/cbmc/pull/8618
+* Refine-arithmetic supports simplifier by @peterschrammel in https://github.com/diffblue/cbmc/pull/8619
+* ansi-c: introduce `conditional_keyword(c, t)` by @kroening in https://github.com/diffblue/cbmc/pull/8621
+* ansi-c: add `""` around C++ keywords by @kroening in https://github.com/diffblue/cbmc/pull/8622
+* Visual Studio recognises `__nullptr` in C++ mode by @kroening in https://github.com/diffblue/cbmc/pull/8624
+* ansi-c: remove duplicate `loc()` invocations from scanner by @kroening in https://github.com/diffblue/cbmc/pull/8626
+* ansi-c: more use of `conditional_keyword` by @kroening in https://github.com/diffblue/cbmc/pull/8625
+* C23 keywords by @kroening in https://github.com/diffblue/cbmc/pull/8623
+* Use GitHub mirror to download GNU parallel by @tautschnig in https://github.com/diffblue/cbmc/pull/8631
+* DFCC instrumentation: skip unused functions by @tautschnig in https://github.com/diffblue/cbmc/pull/8628
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.5.0...cbmc-6.6.0
+
 # CBMC 6.5.0
 
 This release addresses both soundness (via #8562) and performance issues (via
