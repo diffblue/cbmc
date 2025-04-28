@@ -776,7 +776,7 @@ jobs:
           Move-Item -Path .\cvc5-Win64-x86_64-static\cvc5-Win64-x86_64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
           echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
           New-Item -ItemType directory "C:\tools\parallel"
-          wget.exe -O c:\tools\parallel\parallel https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel
+          wget.exe -O c:\tools\parallel\parallel https://raw.githubusercontent.com/martinda/gnu-parallel/refs/heads/master/src/parallel
           echo "c:\tools\parallel" >> $env:GITHUB_PATH
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
