@@ -38,6 +38,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <ansi-c/goto-conversion/link_to_library.h>
 #include <goto-instrument/contracts/cfg_info.h>
 #include <goto-instrument/contracts/utils.h>
+#include <goto-instrument/generate_function_bodies.h>
 #include <goto-instrument/nondet_static.h>
 #include <langapi/language.h>
 #include <langapi/language_file.h>
@@ -492,21 +493,6 @@ void dfcct::transform_goto_model()
 
   library.inhibit_front_end_builtins();
 
-  // TODO implement a means to inhibit unreachable functions (possibly via the
-  // code that implements drop-unused-functions followed by
-  // generate-function-bodies):
-  // Traverse the call tree from the given entry point to identify
-  // functions symbols that are effectively called in the model,
-  // Then goes over all functions of the model and turns the bodies of all
-  // functions that are not in the used function set into:
-  //  ```c
-  //  assert(false, "function identified as unreachable");
-  //  assume(false);
-  //  ```
-  // That way, if the analysis mistakenly pruned some functions, assertions
-  // will be violated and the analysis will fail.
-  // TODO: add a command line flag to tell the instrumentation to not prune
-  // a function.
   goto_model.goto_functions.update();
 
   remove_skip(goto_model);
@@ -516,9 +502,23 @@ void dfcct::transform_goto_model()
 
   // This can prune too many functions if function pointers have not been
   // yet been removed or if the entry point is not defined.
-  // Another solution would be to rewrite the bodies of functions that seem to
-  // be unreachable into assert(false);assume(false)
+  // TODO: add a command line flag to tell the instrumentation to not prune
+  // a function.
   remove_unused_functions(goto_model, message_handler);
+  goto_model.goto_functions.update();
+
+  // generate assert(0); assume(0); function bodies for all functions missing an
+  // implementation (other than ones containing __CPROVER in their name)
+  auto generate_implementation = generate_function_bodies_factory(
+    "assert-false-assume-false",
+    c_object_factory_parameterst{},
+    goto_model.symbol_table,
+    message_handler);
+  generate_function_bodies(
+    std::regex("(?!" CPROVER_PREFIX ").*"),
+    *generate_implementation,
+    goto_model,
+    message_handler);
   goto_model.goto_functions.update();
 
   reinitialize_model();
