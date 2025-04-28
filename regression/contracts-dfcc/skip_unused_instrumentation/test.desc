@@ -1,0 +1,31 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that functions brought in from header files when loading
+entries from the model library are not subject to instrumentation (when those
+functions are never used). Else we end up with invariant failures like:
+[...]
+Instrumenting '__bswap_16'
+--- begin invariant violation report ---
+Invariant check failed
+File: /src/goto-instrument/contracts/dynamic-frames/dfcc_instrument.cpp:329 function: instrument_function
+Condition: Precondition
+Reason: found != goto_model.goto_functions.function_map.end()
+Backtrace:
+build/bin/goto-instrument(+0xbfe182) [0x649c3d22b182]
+[...]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90) [0x78dc2f029d90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80) [0x78dc2f029e40]
+build/bin/goto-instrument(+0x363cb5) [0x649c3c990cb5]
+
+Diagnostics:
+<< EXTRA DIAGNOSTICS >>
+Function '__bswap_16' must exist in the model.
+<< END EXTRA DIAGNOSTICS >>
+
+--- end invariant violation report ---
