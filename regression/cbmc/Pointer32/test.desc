@@ -1,0 +1,12 @@
+CORE paths-lifo-expected-failure
+main.c
+--show-vcc
+main::1::s!0@1#2..len = .+ \? .+ : .+
+^SIGNAL=0$
+^EXIT=0$
+--
+main::1::s!0@1#2..len = .+ \? .+ \?
+--
+We should not find nested if-then-else expressions in the right-hand side
+evaluating `len` when simplification works as intended. (With --paths lifo we do
+not have any branching, so it is marked paths-lifo-expected-failure.)

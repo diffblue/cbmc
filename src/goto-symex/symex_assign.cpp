@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include "symex_assign.h"
+#include <util/simplify_expr_class.h>
 
 #include <util/byte_operators.h>
 #include <util/expr_util.h>
@@ -206,7 +207,10 @@ void symex_assignt::assign_non_struct_symbol(
   assignmentt assignment{lhs, full_lhs, l2_rhs};
 
   if(symex_config.simplify_opt)
-    assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
+  {
+    simplify_exprt simp{ns, true};
+    simp.simplify(assignment.rhs);
+  }
 
   const ssa_exprt l2_lhs = state
                              .assignment(
