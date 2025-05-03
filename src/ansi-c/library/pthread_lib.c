@@ -356,7 +356,9 @@ __CPROVER_HIDE:;
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
   if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
   if(value_ptr!=0) (void)**(char**)value_ptr;
+  __CPROVER_atomic_begin();
   __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread]);
+  __CPROVER_atomic_end();
 
   return 0;
 }
@@ -604,7 +606,9 @@ __CPROVER_HIDE:;
       __CPROVER_thread_key_dtors[i](key);
   }
 #endif
+  __CPROVER_atomic_begin();
   __CPROVER_threads_exited[this_thread_id] = 1;
+  __CPROVER_atomic_end();
 }
 
 /* FUNCTION: pthread_create */

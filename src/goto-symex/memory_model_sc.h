@@ -38,7 +38,7 @@ protected:
     const per_thread_mapt &per_thread_map);
   void program_order(symex_target_equationt &equation);
   void from_read(symex_target_equationt &equation);
-  void write_serialization_external(symex_target_equationt &equation);
+  virtual void write_serialization_external(symex_target_equationt &equation);
 };
 
 #endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_SC_H
