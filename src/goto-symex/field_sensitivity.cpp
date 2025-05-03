@@ -17,8 +17,6 @@ Author: Michael Tautschnig
 #include "goto_symex_state.h"
 #include "symex_target.h"
 
-#define ENABLE_ARRAY_FIELD_SENSITIVITY
-
 exprt field_sensitivityt::apply(
   const namespacet &ns,
   goto_symex_statet &state,
