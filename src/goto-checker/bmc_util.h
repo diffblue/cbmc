@@ -182,6 +182,7 @@ void run_property_decider(
   "(partial-loops)"                                                            \
   "(paths):"                                                                   \
   "(show-symex-strategies)"                                                    \
+  "(retrace):"                                                                 \
   "(depth):"                                                                   \
   "(max-field-sensitivity-array-size):"                                        \
   "(no-array-field-sensitivity)"                                               \
@@ -197,6 +198,8 @@ void run_property_decider(
 #define HELP_BMC                                                               \
   " {y--paths} [strategy] \t explore paths one at a time\n"                    \
   " {y--show-symex-strategies} \t list strategies for use with {y--paths}\n"   \
+  " {y--retrace} [trace] \t follow a single control flow path, given by a "    \
+  "trace string of 0s and 1s\n"                                                \
   " {y--show-goto-symex-steps} \t show which steps symex travels, includes "   \
   "diagnostic information\n"                                                   \
   " {y--show-points-to-sets} \t show points-to sets for pointer dereference. " \

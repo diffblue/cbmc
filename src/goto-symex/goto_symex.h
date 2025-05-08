@@ -318,6 +318,9 @@ protected:
   /// Symbolically execute a GOTO instruction in the context of unreachable code
   /// \param state: Symbolic execution state for current instruction
   void symex_unreachable_goto(statet &state);
+  /// Symbolically execute a GOTO along a control flow retrace input path
+  /// \param state: Symbolic execution state for current instruction
+  void symex_goto_retrace(statet &state);
   /// Symbolically execute a SET_RETURN_VALUE instruction
   /// \param state: Symbolic execution state for current instruction
   /// \param return_value: The value to be returned

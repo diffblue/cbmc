@@ -24,6 +24,9 @@ struct symex_configt final
 
   bool doing_path_exploration;
 
+  bool retracing;
+  std::string retrace_input;
+
   bool allow_pointer_unsoundness;
 
   bool constant_propagation;

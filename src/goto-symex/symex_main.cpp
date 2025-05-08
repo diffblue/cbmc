@@ -30,6 +30,8 @@ Author: Daniel Kroening, kroening@kroening.com
 symex_configt::symex_configt(const optionst &options)
   : max_depth(options.get_unsigned_int_option("depth")),
     doing_path_exploration(options.is_set("paths")),
+    retracing(options.is_set("retrace")),
+    retrace_input(options.get_option("retrace")),
     allow_pointer_unsoundness(
       options.get_bool_option("allow-pointer-unsoundness")),
     constant_propagation(options.get_bool_option("propagation")),
@@ -641,7 +643,9 @@ void goto_symext::execute_next_instruction(
     break;
 
   case GOTO:
-    if(state.reachable)
+    if(symex_config.retracing)
+      symex_goto_retrace(state);
+    else if(state.reachable)
       symex_goto(state);
     else
       symex_unreachable_goto(state);
