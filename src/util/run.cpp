@@ -27,16 +27,17 @@ Date: August 2012
 // clang-format on
 #else
 
-#include <cstring>
-#include <cerrno>
-#include <cstdio>
-#include <cstdlib>
+#  include <sys/stat.h>
+#  include <sys/wait.h>
 
-#include <fcntl.h>
-#include <signal.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#  include <cctype>
+#  include <cerrno>
+#  include <cstdio>
+#  include <cstdlib>
+#  include <cstring>
+#  include <fcntl.h>
+#  include <signal.h>
+#  include <unistd.h>
 
 #endif
 
@@ -486,18 +487,18 @@ std::string shell_quote(const std::string &src)
 
   // first check if quoting is needed at all
 
-  if(src.find(' ')==std::string::npos &&
-     src.find('"')==std::string::npos &&
-     src.find('*')==std::string::npos &&
-     src.find('$')==std::string::npos &&
-     src.find('\\')==std::string::npos &&
-     src.find('?')==std::string::npos &&
-     src.find('&')==std::string::npos &&
-     src.find('|')==std::string::npos &&
-     src.find('>')==std::string::npos &&
-     src.find('<')==std::string::npos &&
-     src.find('^')==std::string::npos &&
-     src.find('\'')==std::string::npos)
+  bool quotes_needed = false;
+
+  if(src.empty())
+    quotes_needed = true;
+  else
+  {
+    for(auto &ch : src)
+      if(!isalnum(ch) && ch != '_' && ch != '.' && ch != '/' && ch != '-')
+        quotes_needed = true;
+  }
+
+  if(!quotes_needed)
   {
     // seems fine -- return as is
     return src;

@@ -13,6 +13,24 @@ Author: Michael Tautschnig
 
 #include <fstream>
 
+SCENARIO("shell_quote() escaping", "[core][util][run]")
+{
+#ifdef _WIN32
+  REQUIRE(shell_quote("foo.bar") == "foo.bar");
+  REQUIRE(shell_quote("foo&bar") == "\"foo&bar\"");
+  REQUIRE(shell_quote("foo(bar)") == "\"foo(bar)\"");
+  REQUIRE(shell_quote("foo\"bar") == "\"foo\"\"bar\"");
+#else
+  REQUIRE(shell_quote("foo.bar") == "foo.bar");
+  REQUIRE(shell_quote("foo/bar") == "foo/bar");
+  REQUIRE(shell_quote("--foo") == "--foo");
+  REQUIRE(shell_quote("") == "''");
+  REQUIRE(shell_quote("foo\nbar") == "'foo\nbar'");
+  REQUIRE(shell_quote("foo(bar)") == "'foo(bar)'");
+  REQUIRE(shell_quote("foo'bar") == "'foo'\\'''bar'");
+#endif
+}
+
 SCENARIO("run() error reporting", "[core][util][run]")
 {
   GIVEN("A command invoking a non-existent executable")
