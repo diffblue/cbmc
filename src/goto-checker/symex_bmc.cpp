@@ -11,12 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_bmc.h"
 
-#include <limits>
-
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
 
-#include <goto-instrument/unwindset.h>
+#include <goto-programs/unwindset.h>
+
+#include <limits>
 
 symex_bmct::symex_bmct(
   message_handlert &mh,

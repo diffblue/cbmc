@@ -12,12 +12,11 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_ONLY_CHECKER_H
 #define CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_ONLY_CHECKER_H
 
-#include "incremental_goto_checker.h"
+#include <goto-programs/unwindset.h>
 
 #include <goto-symex/path_storage.h>
 
-#include <goto-instrument/unwindset.h>
-
+#include "incremental_goto_checker.h"
 #include "symex_bmc.h"
 
 class multi_path_symex_only_checkert : public incremental_goto_checkert

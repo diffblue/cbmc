@@ -25,7 +25,6 @@ OBJ += \
   ../goto-instrument/nondet_static$(OBJEXT) \
   ../goto-instrument/reachability_slicer$(OBJEXT) \
   ../goto-instrument/source_lines$(OBJEXT) \
-  ../goto-instrument/unwindset$(OBJEXT) \
   ../goto-programs/goto-programs$(LIBEXT) \
   ../goto-symex/goto-symex$(LIBEXT) \
   ../json-symtab-language/json-symtab-language$(LIBEXT) \

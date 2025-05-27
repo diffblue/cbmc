@@ -6,13 +6,13 @@ Author: Peter Schrammel, Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <limits>
-
 #include "symex_bmc_incremental_one_loop.h"
 
 #include <util/structured_data.h>
 
-#include <goto-instrument/unwindset.h>
+#include <goto-programs/unwindset.h>
+
+#include <limits>
 
 symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
   message_handlert &message_handler,

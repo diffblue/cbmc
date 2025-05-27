@@ -36,7 +36,6 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-instrument/reachability_slicer$(OBJEXT) \
       ../goto-instrument/nondet_static$(OBJEXT) \
       ../goto-instrument/full_slicer$(OBJEXT) \
-      ../goto-instrument/unwindset$(OBJEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \

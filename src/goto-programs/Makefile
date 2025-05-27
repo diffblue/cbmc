@@ -56,6 +56,7 @@ SRC = adjust_float_expressions.cpp \
       string_abstraction.cpp \
       structured_trace_util.cpp \
       system_library_symbols.cpp \
+      unwindset.cpp \
       validate_code.cpp \
       validate_goto_model.cpp \
       vcd_goto_trace.cpp \

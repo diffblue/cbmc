@@ -99,7 +99,6 @@ SRC = accelerate/accelerate.cpp \
       undefined_functions.cpp \
       uninitialized.cpp \
       unwind.cpp \
-      unwindset.cpp \
       value_set_fi_fp_removal.cpp \
       wmm/abstract_event.cpp \
       wmm/cycle_collection.cpp \

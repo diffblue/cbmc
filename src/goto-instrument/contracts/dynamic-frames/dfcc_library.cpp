@@ -20,6 +20,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 
 #include <goto-programs/goto_function.h>
 #include <goto-programs/goto_model.h>
+#include <goto-programs/unwindset.h>
 
 #include <ansi-c/c_expr.h>
 #include <ansi-c/c_object_factory_parameters.h>
@@ -27,7 +28,6 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <goto-instrument/generate_function_bodies.h>
 #include <goto-instrument/unwind.h>
-#include <goto-instrument/unwindset.h>
 #include <linking/static_lifetime_init.h>
 
 #include "dfcc_utils.h"
