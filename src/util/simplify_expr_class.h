@@ -175,7 +175,8 @@ public:
   [[nodiscard]] resultt<> simplify_bitnot(const bitnot_exprt &);
   [[nodiscard]] resultt<> simplify_not(const not_exprt &);
   [[nodiscard]] resultt<> simplify_boolean(const exprt &);
-  [[nodiscard]] resultt<> simplify_inequality(const binary_relation_exprt &);
+  [[nodiscard]] virtual resultt<>
+  simplify_inequality(const binary_relation_exprt &);
   [[nodiscard]] resultt<>
   simplify_ieee_float_relation(const binary_relation_exprt &);
   [[nodiscard]] resultt<> simplify_lambda(const lambda_exprt &);

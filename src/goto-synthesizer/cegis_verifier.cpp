@@ -13,9 +13,11 @@ Author: Qinheping Hu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_iterator.h>
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/simplify_expr.h>
 
 #include <goto-programs/pointer_arithmetic.h>
 #include <goto-programs/process_goto_program.h>

@@ -160,9 +160,9 @@ exprt field_sensitivityt::apply(
       // place the entire index expression, not just the array operand, in an
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(index.array());
-      auto l2_index = state.rename(index.index(), ns);
+      auto l2_index = state.rename(index.index(), ns).get();
       if(should_simplify)
-        l2_index.simplify(ns);
+        simplify(l2_index, ns);
       bool was_l2 = !tmp.get_level_2().empty();
       exprt l2_size =
         state.rename(to_array_type(index.array().type()).size(), ns).get();
@@ -181,14 +181,14 @@ exprt field_sensitivityt::apply(
         numeric_cast_v<mp_integer>(to_constant_expr(l2_size)) <=
           max_field_sensitivity_array_size)
       {
-        if(l2_index.get().is_constant())
+        if(l2_index.is_constant())
         {
           // place the entire index expression, not just the array operand,
           // in an SSA expression
           ssa_exprt ssa_array = to_ssa_expr(index.array());
           ssa_array.remove_level_2();
           index.array() = ssa_array.get_original_expr();
-          index.index() = l2_index.get();
+          index.index() = l2_index;
           tmp.set_expression(index);
           if(was_l2)
           {

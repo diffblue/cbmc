@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/range.h>
+#include <util/simplify_expr.h>
 
 #include "expr_skeleton.h"
 #include "goto_symex_state.h"

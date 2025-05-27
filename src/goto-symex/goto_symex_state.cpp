@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>

@@ -460,7 +460,10 @@ void goto_symext::symex_output(
   {
     renamedt<exprt, L2> l2_arg = state.rename(code.operands()[i], ns);
     if(symex_config.simplify_opt)
-      l2_arg.simplify(ns);
+    {
+      simplify_exprt simp{ns};
+      l2_arg.simplify(simp);
+    }
     args.emplace_back(l2_arg);
   }
 
