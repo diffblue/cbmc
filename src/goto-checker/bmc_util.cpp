@@ -11,7 +11,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "bmc_util.h"
 
-#include <iostream>
+#include <util/json_stream.h>
+#include <util/ui_message.h>
 
 #include <goto-programs/graphml_witness.h>
 #include <goto-programs/json_goto_trace.h>
@@ -21,16 +22,12 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/memory_model_pso.h>
 #include <goto-symex/slice.h>
 #include <goto-symex/symex_target_equation.h>
-
-#include <linking/static_lifetime_init.h>
-
 #include <solvers/decision_procedure.h>
-
-#include <util/json_stream.h>
-#include <util/ui_message.h>
 
 #include "goto_symex_property_decider.h"
 #include "symex_bmc.h"
+
+#include <iostream>
 
 void message_building_error_trace(messaget &log)
 {
@@ -173,21 +170,6 @@ get_memory_model(const optionst &options, const namespacet &ns)
   {
     throw "invalid memory model '" + mm + "': use one of sc, tso, pso";
   }
-}
-
-void setup_symex(
-  symex_bmct &symex,
-  const namespacet &ns,
-  ui_message_handlert &ui_message_handler)
-{
-  messaget msg(ui_message_handler);
-  const symbolt *init_symbol;
-  if(!ns.lookup(INITIALIZE_FUNCTION, init_symbol))
-    symex.language_mode = init_symbol->mode;
-
-  msg.status() << "Starting Bounded Model Checking" << messaget::eom;
-
-  symex.last_source_location.make_nil();
 }
 
 void slice(

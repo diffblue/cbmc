@@ -425,7 +425,6 @@ void _check_with_strategy(
       *worklist,
       guard_manager,
       unwindset);
-    setup_symex(symex, ns, ui_message_handler);
 
     symex.initialize_path_storage_from_entry_point_of(
       goto_symext::get_goto_function(goto_model),
@@ -448,7 +447,6 @@ void _check_with_strategy(
       *worklist,
       guard_manager,
       unwindset);
-    setup_symex(symex, ns, ui_message_handler);
 
     symex_symbol_table = symex.resume_symex_from_saved_state(
       goto_symext::get_goto_function(goto_model),

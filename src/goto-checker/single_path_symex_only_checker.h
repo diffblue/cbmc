@@ -48,7 +48,10 @@ protected:
     const symex_bmct &symex,
     const symex_target_equationt &equation);
 
-  virtual void setup_symex(symex_bmct &symex);
+  virtual void setup_symex(symex_bmct &symex)
+  {
+    // deriving classes may do extra work here
+  }
 
   /// Adds the initial goto-symex state as a path to the worklist
   virtual void initialize_worklist();

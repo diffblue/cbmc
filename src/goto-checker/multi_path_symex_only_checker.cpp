@@ -39,7 +39,6 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   unwindset.parse_unwind(options.get_option("unwind"));
   unwindset.parse_unwindset(
     options.get_list_option("unwindset"), goto_model, ui_message_handler);
-  setup_symex(symex, ns, ui_message_handler);
 }
 
 incremental_goto_checkert::resultt multi_path_symex_only_checkert::

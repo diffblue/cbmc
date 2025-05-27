@@ -69,8 +69,6 @@ void output_graphml(
 std::unique_ptr<memory_model_baset>
 get_memory_model(const optionst &options, const namespacet &);
 
-void setup_symex(symex_bmct &, const namespacet &, ui_message_handlert &);
-
 void slice(
   symex_bmct &,
   symex_target_equationt &symex_target_equation,
