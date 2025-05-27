@@ -42,6 +42,7 @@ SCENARIO(
     source,
     DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
     true,
+    irep_idt{},
     manager,
     fresh_name};
 

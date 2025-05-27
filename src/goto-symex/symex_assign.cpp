@@ -15,10 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/range.h>
-#include <util/simplify_expr.h>
 
 #include "expr_skeleton.h"
 #include "goto_symex_state.h"
+#include "simplify_expr_with_value_set.h"
 #include "symex_config.h"
 
 // We can either use with_exprt or update_exprt when building expressions that
@@ -207,7 +207,10 @@ void symex_assignt::assign_non_struct_symbol(
   assignmentt assignment{lhs, full_lhs, l2_rhs};
 
   if(symex_config.simplify_opt)
-    assignment.rhs = simplify_expr(std::move(assignment.rhs), ns);
+  {
+    simplify_expr_with_value_sett{state.value_set, language_mode, ns}.simplify(
+      assignment.rhs);
+  }
 
   const ssa_exprt l2_lhs = state
                              .assignment(

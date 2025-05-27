@@ -9,36 +9,33 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
-#include "goto_symex.h"
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_iterator.h>
 #include <util/pointer_offset_size.h>
-#include <util/simplify_expr.h>
+
+#include <pointer-analysis/value_set_dereference.h>
 
 #include "expr_skeleton.h"
+#include "goto_symex.h"
 #include "path_storage.h"
 #include "symex_assign.h"
 #include "symex_dereference_state.h"
-
-#include <pointer-analysis/value_set_dereference.h>
 
 /// Given an expression, find the root object and the offset into it.
 ///
 /// The extra complication to be considered here is that the expression may
 /// have any number of ternary expressions mixed with type casts.
-static void
-process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
+static void process_array_expr(exprt &expr, const namespacet &ns)
 {
   // This may change the type of the expression!
 
   if(expr.id()==ID_if)
   {
     if_exprt &if_expr=to_if_expr(expr);
-    process_array_expr(if_expr.true_case(), do_simplify, ns);
-    process_array_expr(if_expr.false_case(), do_simplify, ns);
+    process_array_expr(if_expr.true_case(), ns);
+    process_array_expr(if_expr.false_case(), ns);
 
     if(if_expr.true_case() != if_expr.false_case())
     {
@@ -57,7 +54,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
     // strip
     exprt tmp = to_address_of_expr(expr).object();
     expr.swap(tmp);
-    process_array_expr(expr, do_simplify, ns);
+    process_array_expr(expr, ns);
   }
   else if(
     is_ssa_expr(expr) && to_ssa_expr(expr).get_original_expr().id() == ID_index)
@@ -67,7 +64,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
     exprt tmp=index_expr.array();
     expr.swap(tmp);
 
-    process_array_expr(expr, do_simplify, ns);
+    process_array_expr(expr, ns);
   }
   else if(expr.id() != ID_symbol)
   {
@@ -88,8 +85,6 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
       {
         auto array_size = size_of_expr(expr.type(), ns);
         CHECK_RETURN(array_size.has_value());
-        if(do_simplify)
-          simplify(array_size.value(), ns);
         expr = make_byte_extract(
           expr,
           from_integer(0, c_index_type()),
@@ -116,8 +111,6 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
           subtraction, ID_ge, from_integer(0, subtraction.type())},
         subtraction,
         from_integer(0, subtraction.type())};
-      if(do_simplify)
-        simplify(new_size, ns);
 
       array_typet new_array_type(subtype, new_size);
 
@@ -141,7 +134,8 @@ void goto_symext::process_array_expr(statet &state, exprt &expr)
   expr = dereference.dereference(expr, symex_config.show_points_to_sets);
   lift_lets(state, expr);
 
-  ::process_array_expr(expr, symex_config.simplify_opt, ns);
+  ::process_array_expr(expr, ns);
+  do_simplify(expr, state.value_set);
 }
 
 /// Rewrite index/member expressions in byte_extract to offset
@@ -184,7 +178,7 @@ void goto_symext::lift_let(statet &state, const let_exprt &let_expr)
 {
   exprt let_value = clean_expr(let_expr.value(), state, false);
   let_value = state.rename(std::move(let_value), ns).get();
-  do_simplify(let_value);
+  do_simplify(let_value, state.value_set);
 
   exprt::operandst value_assignment_guard;
   symex_assignt{
@@ -193,6 +187,7 @@ void goto_symext::lift_let(statet &state, const let_exprt &let_expr)
     symex_targett::assignment_typet::HIDDEN,
     ns,
     symex_config,
+    language_mode,
     target}
     .assign_symbol(
       to_ssa_expr(state.rename<L1>(let_expr.symbol(), ns).get()),

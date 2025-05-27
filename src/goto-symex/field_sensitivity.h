@@ -14,6 +14,7 @@ Author: Michael Tautschnig
 class namespacet;
 class goto_symex_statet;
 class symex_targett;
+class value_sett;
 
 class field_sensitive_ssa_exprt : public exprt
 {
@@ -119,9 +120,14 @@ public:
   /// \param max_array_size: maximum size for which field sensitivity will be
   ///   applied to array cells
   /// \param should_simplify: simplify expressions
-  field_sensitivityt(std::size_t max_array_size, bool should_simplify)
+  /// \param language_mode: mode of the language that expressions belong to.
+  field_sensitivityt(
+    std::size_t max_array_size,
+    bool should_simplify,
+    const irep_idt &language_mode)
     : max_field_sensitivity_array_size(max_array_size),
-      should_simplify(should_simplify)
+      should_simplify(should_simplify),
+      language_mode(language_mode)
   {
   }
 
@@ -201,6 +207,7 @@ private:
   const std::size_t max_field_sensitivity_array_size;
 
   const bool should_simplify;
+  const irep_idt &language_mode;
 
   void field_assignments_rec(
     const namespacet &ns,
@@ -210,7 +217,10 @@ private:
     symex_targett &target,
     bool allow_pointer_unsoundness) const;
 
-  [[nodiscard]] exprt simplify_opt(exprt e, const namespacet &ns) const;
+  [[nodiscard]] exprt simplify_opt(
+    exprt e,
+    const value_sett &value_set,
+    const namespacet &ns) const;
 };
 
 #endif // CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H

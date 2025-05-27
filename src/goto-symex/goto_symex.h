@@ -27,6 +27,7 @@ class shadow_memory_field_definitionst;
 class side_effect_exprt;
 class symex_assignt;
 class typet;
+class value_sett;
 
 /// \brief The main class for the forward symbolic simulator
 /// \remarks
@@ -528,7 +529,7 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   void symex_catch(statet &state);
 
-  virtual void do_simplify(exprt &expr);
+  virtual void do_simplify(exprt &expr, const value_sett &value_set);
 
   /// Symbolically execute an ASSIGN instruction or simulate such an execution
   /// for a synthetic assignment

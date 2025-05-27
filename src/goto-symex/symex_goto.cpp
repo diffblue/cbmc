@@ -118,7 +118,7 @@ void goto_symext::symex_goto(statet &state)
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
       exprt negated_guard = boolean_negate(new_guard);
-      do_simplify(negated_guard);
+      do_simplify(negated_guard, state.value_set);
       log.statistics() << "replacing self-loop at "
                        << state.source.pc->source_location() << " by assume("
                        << from_expr(ns, state.source.function_id, negated_guard)
@@ -669,7 +669,11 @@ static void merge_names(
   {
     rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
     if(do_simplify)
+    {
+      // Do not value-set supported filtering here as neither dest_state nor
+      // goto_state necessarily have a comprehensive value set.
       simplify(rhs, ns);
+    }
   }
 
   dest_state.record_events.push(false);

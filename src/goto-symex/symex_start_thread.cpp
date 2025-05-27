@@ -99,6 +99,7 @@ void goto_symext::symex_start_thread(statet &state)
       symex_targett::assignment_typet::HIDDEN,
       ns,
       symex_config,
+      language_mode,
       target}
       .assign_symbol(lhs_l1, expr_skeletont{}, rhs, lhs_conditions);
     const exprt l2_lhs = state.rename(lhs_l1, ns).get();
@@ -150,6 +151,7 @@ void goto_symext::symex_start_thread(statet &state)
       symex_targett::assignment_typet::HIDDEN,
       ns,
       symex_config,
+      language_mode,
       target}
       .assign_symbol(lhs, expr_skeletont{}, rhs, lhs_conditions);
   }

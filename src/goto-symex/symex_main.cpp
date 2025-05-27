@@ -157,7 +157,7 @@ void goto_symext::symex_assert(
   // First, push negations in and perhaps convert existential quantifiers into
   // universals:
   if(has_subexpr(condition, ID_exists) || has_subexpr(condition, ID_forall))
-    do_simplify(condition);
+    do_simplify(condition, state.value_set);
 
   // Second, L2-rename universal quantifiers:
   if(has_subexpr(condition, ID_forall))
@@ -167,7 +167,7 @@ void goto_symext::symex_assert(
   exprt l2_condition = state.rename(std::move(condition), ns).get();
 
   // now try simplifier on it
-  do_simplify(l2_condition);
+  do_simplify(l2_condition, state.value_set);
 
   std::string msg = id2string(instruction.source_location().get_comment());
   if(msg.empty())
@@ -200,7 +200,7 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
 {
   exprt simplified_cond = clean_expr(cond, state, false);
   simplified_cond = state.rename(std::move(simplified_cond), ns).get();
-  do_simplify(simplified_cond);
+  do_simplify(simplified_cond, state.value_set);
 
   // It would be better to call try_filter_value_sets after apply_condition,
   // but it is not currently possible. See the comment at the beginning of
@@ -418,6 +418,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
     symex_targett::sourcet(entry_point_id, start_function->body),
     symex_config.max_field_sensitivity_array_size,
     symex_config.simplify_opt,
+    language_mode,
     guard_manager,
     [storage](const irep_idt &id) { return storage->get_unique_l2_index(id); });
 
@@ -847,13 +848,13 @@ void goto_symext::try_filter_value_sets(
     // without another round of constant propagation.
     // It would be sufficient to replace this call to do_simplify() with
     // something that just replaces `*&x` with `x` whenever it finds it.
-    do_simplify(modified_condition);
+    do_simplify(modified_condition, state.value_set);
 
     state.record_events.push(false);
     modified_condition = state.rename(std::move(modified_condition), ns).get();
     state.record_events.pop();
 
-    do_simplify(modified_condition);
+    do_simplify(modified_condition, state.value_set);
 
     if(jump_taken_value_set && modified_condition.is_false())
     {

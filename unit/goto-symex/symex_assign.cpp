@@ -52,6 +52,7 @@ SCENARIO(
     source,
     DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
     true,
+    irep_idt{},
     manager,
     fresh_name};
 
@@ -89,6 +90,7 @@ SCENARIO(
         symex_targett::assignment_typet::STATE,
         ns,
         symex_config,
+        irep_idt{},
         target_equation}
         .assign_symbol(ssa_foo, expr_skeletont{}, rhs1, guard);
       THEN("An equation is added to the target")
@@ -145,6 +147,7 @@ SCENARIO(
         symex_targett::assignment_typet::STATE,
         ns,
         symex_config,
+        irep_idt{},
         target_equation};
       symex_assign.assign_symbol(ssa_foo, expr_skeletont{}, rhs1, guard);
       THEN("An equation with an empty guard is added to the target")
@@ -231,6 +234,7 @@ SCENARIO(
         symex_targett::assignment_typet::STATE,
         ns,
         symex_config,
+        irep_idt{},
         target_equation}
         .assign_symbol(struct1_ssa, skeleton, rhs, guard);
       THEN("Two equations are added to the target")

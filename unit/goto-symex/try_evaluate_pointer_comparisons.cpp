@@ -62,6 +62,7 @@ SCENARIO(
     source,
     DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
     true,
+    ID_java,
     guard_manager,
     fresh_name};
 
@@ -243,7 +244,7 @@ SCENARIO(
     // struct_symbol..pointer_field <- &value1
     {
       field_sensitivityt field_sensitivity{
-        DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE, true};
+        DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE, true, ID_java};
       const exprt index_fs =
         field_sensitivity.apply(ns, state, member_l1.get(), true);
       value_set.assign(index_fs, address1_l1.get(), ns, false, false);
