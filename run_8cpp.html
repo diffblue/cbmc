@@ -103,14 +103,15 @@ $(document).ready(function(){initNavTree('run_8cpp.html',''); initResizable(); }
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="run_8h_source.html">run.h</a>&quot;</code><br />
-<code>#include &lt;cstring&gt;</code><br />
+<code>#include &lt;sys/stat.h&gt;</code><br />
+<code>#include &lt;sys/wait.h&gt;</code><br />
+<code>#include &lt;cctype&gt;</code><br />
 <code>#include &lt;cerrno&gt;</code><br />
 <code>#include &lt;cstdio&gt;</code><br />
 <code>#include &lt;cstdlib&gt;</code><br />
+<code>#include &lt;cstring&gt;</code><br />
 <code>#include &lt;fcntl.h&gt;</code><br />
 <code>#include &lt;signal.h&gt;</code><br />
-<code>#include &lt;sys/stat.h&gt;</code><br />
-<code>#include &lt;sys/wait.h&gt;</code><br />
 <code>#include &lt;unistd.h&gt;</code><br />
 <code>#include &lt;fstream&gt;</code><br />
 <code>#include &quot;<a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>&quot;</code><br />
@@ -120,7 +121,7 @@ $(document).ready(function(){initNavTree('run_8cpp.html',''); initResizable(); }
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="run_8cpp__incl.svg" width="1403" height="198"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="run_8cpp__incl.svg" width="1492" height="198"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="run_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -160,7 +161,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00059">59</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00060">60</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
 
 </div>
 </div>
@@ -191,7 +192,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00048">48</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00049">49</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
 
 </div>
 </div>
@@ -242,7 +243,7 @@ Functions</h2></td></tr>
 <p>This runs the executable given by the file name <code>what</code>. </p>
 <p>Control returns when execution has finished. Stdin, stdout and stderr may be redirected from/to a given file. Give the empty string to retain the default handle. Any shell-meta characters in the executable, <code>argv</code> and the I/O redirect files are escaped as needed. </p>
 
-<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00252">252</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00253">253</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
 
 </div>
 </div>
@@ -293,7 +294,7 @@ Functions</h2></td></tr>
 <p>This runs the executable given by the file name <code>what</code>. </p>
 <p>Control returns when execution has finished. Stdin and stderr may be redirected from/to a given file. Give the empty string to retain the default handle. Any output to stdout is stored in the <code>std_output</code> stream buffer. Any shell-meta characters in the executable, <code>argv</code> and the I/O redirect files are escaped as needed. </p>
 
-<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00524">524</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00525">525</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
 
 </div>
 </div>
@@ -316,7 +317,7 @@ Functions</h2></td></tr>
 <p>quote a string for bash and CMD </p>
 <p>This performs shell quoting if necessary on input <code>src</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00451">451</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00452">452</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
 
 </div>
 </div>
@@ -356,7 +357,7 @@ Functions</h2></td></tr>
 
 <p>open given file to replace either stdin, stderr, stdout </p>
 
-<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00063">63</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="run_8cpp_source.html#l00064">64</a> of file <a class="el" href="run_8cpp_source.html">run.cpp</a>.</p>
 
 </div>
 </div>
