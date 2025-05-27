@@ -28,6 +28,7 @@ void unwindsett::parse_unwind(const std::string &unwind)
 
 void unwindsett::parse_unwindset_one_loop(
   std::string val,
+  abstract_goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   if(val.empty())
@@ -181,10 +182,11 @@ void unwindsett::parse_unwindset_one_loop(
 
 void unwindsett::parse_unwindset(
   const std::list<std::string> &unwindset,
+  abstract_goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   for(auto &element : unwindset)
-    parse_unwindset_one_loop(element, message_handler);
+    parse_unwindset_one_loop(element, goto_model, message_handler);
 }
 
 std::optional<unsigned>
@@ -211,6 +213,7 @@ unwindsett::get_limit(const irep_idt &loop_id, unsigned thread_nr) const
 
 void unwindsett::parse_unwindset_file(
   const std::string &file_name,
+  abstract_goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   std::ifstream file(widen_if_needed(file_name));
@@ -225,5 +228,5 @@ void unwindsett::parse_unwindset_file(
     split_string(buffer.str(), ',', true, true);
 
   for(auto &element : unwindset_elements)
-    parse_unwindset_one_loop(element, message_handler);
+    parse_unwindset_one_loop(element, goto_model, message_handler);
 }

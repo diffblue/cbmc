@@ -1493,8 +1493,9 @@ void code_contractst::apply_loop_contracts(
   // unwind all transformed loops twice.
   if(loop_contract_config.unwind_transformed_loops)
   {
-    unwindsett unwindset{goto_model};
-    unwindset.parse_unwindset(loop_names, log.get_message_handler());
+    unwindsett unwindset;
+    unwindset.parse_unwindset(
+      loop_names, goto_model, log.get_message_handler());
     goto_unwindt goto_unwind;
     goto_unwind(goto_model, unwindset, goto_unwindt::unwind_strategyt::ASSUME);
   }

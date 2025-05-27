@@ -178,7 +178,6 @@ get_memory_model(const optionst &options, const namespacet &ns)
 void setup_symex(
   symex_bmct &symex,
   const namespacet &ns,
-  const optionst &options,
   ui_message_handlert &ui_message_handler)
 {
   messaget msg(ui_message_handler);
@@ -189,10 +188,6 @@ void setup_symex(
   msg.status() << "Starting Bounded Model Checking" << messaget::eom;
 
   symex.last_source_location.make_nil();
-
-  symex.unwindset.parse_unwind(options.get_option("unwind"));
-  symex.unwindset.parse_unwindset(
-    options.get_list_option("unwindset"), ui_message_handler);
 }
 
 void slice(

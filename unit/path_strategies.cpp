@@ -409,7 +409,10 @@ void _check_with_strategy(
   propertiest properties(initialize_properties(goto_model));
   std::unique_ptr<path_storaget> worklist = get_path_strategy(strategy);
   guard_managert guard_manager;
-  unwindsett unwindset{goto_model};
+  unwindsett unwindset;
+  unwindset.parse_unwind(options.get_option("unwind"));
+  unwindset.parse_unwindset(
+    options.get_list_option("unwindset"), goto_model, ui_message_handler);
 
   {
     // Put initial state into the work list
@@ -422,7 +425,7 @@ void _check_with_strategy(
       *worklist,
       guard_manager,
       unwindset);
-    setup_symex(symex, ns, options, ui_message_handler);
+    setup_symex(symex, ns, ui_message_handler);
 
     symex.initialize_path_storage_from_entry_point_of(
       goto_symext::get_goto_function(goto_model),
@@ -445,7 +448,7 @@ void _check_with_strategy(
       *worklist,
       guard_manager,
       unwindset);
-    setup_symex(symex, ns, options, ui_message_handler);
+    setup_symex(symex, ns, ui_message_handler);
 
     symex_symbol_table = symex.resume_symex_from_saved_state(
       goto_symext::get_goto_function(goto_model),
