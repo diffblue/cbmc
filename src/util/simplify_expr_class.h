@@ -203,7 +203,8 @@ public:
   [[nodiscard]] resultt<>
   simplify_dereference_preorder(const dereference_exprt &);
   [[nodiscard]] resultt<> simplify_address_of(const address_of_exprt &);
-  [[nodiscard]] resultt<> simplify_pointer_offset(const pointer_offset_exprt &);
+  [[nodiscard]] virtual resultt<>
+  simplify_pointer_offset(const pointer_offset_exprt &);
   [[nodiscard]] resultt<> simplify_bswap(const bswap_exprt &);
   [[nodiscard]] resultt<> simplify_isinf(const unary_exprt &);
   [[nodiscard]] resultt<> simplify_isnan(const unary_exprt &);

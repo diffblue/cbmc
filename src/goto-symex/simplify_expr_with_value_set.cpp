@@ -154,3 +154,58 @@ simplify_exprt::resultt<> simplify_expr_with_value_sett::simplify_inequality(
   else
     return unchanged(expr);
 }
+
+simplify_exprt::resultt<>
+simplify_expr_with_value_sett::simplify_pointer_offset(
+  const pointer_offset_exprt &expr)
+{
+  const exprt &ptr = expr.pointer();
+
+  if(ptr.type().id() != ID_pointer)
+    return unchanged(expr);
+
+  const ssa_exprt *ssa_symbol_expr = expr_try_dynamic_cast<ssa_exprt>(ptr);
+
+  if(!ssa_symbol_expr)
+    return simplify_exprt::simplify_pointer_offset(expr);
+
+  ssa_exprt l1_expr{*ssa_symbol_expr};
+  l1_expr.remove_level_2();
+  const std::vector<exprt> value_set_elements =
+    value_set.get_value_set(l1_expr, ns);
+
+  std::optional<exprt> offset;
+
+  for(const auto &value_set_element : value_set_elements)
+  {
+    if(
+      value_set_element.id() == ID_unknown ||
+      value_set_element.id() == ID_invalid ||
+      is_failed_symbol(
+        to_object_descriptor_expr(value_set_element).root_object()) ||
+      to_object_descriptor_expr(value_set_element).offset().id() == ID_unknown)
+    {
+      offset.reset();
+      break;
+    }
+
+    exprt this_offset = to_object_descriptor_expr(value_set_element).offset();
+    if(
+      this_offset.id() == ID_unknown ||
+      (offset.has_value() && this_offset != *offset))
+    {
+      offset.reset();
+      break;
+    }
+    else if(!offset.has_value())
+    {
+      offset = this_offset;
+    }
+  }
+
+  if(!offset.has_value())
+    return simplify_exprt::simplify_pointer_offset(expr);
+
+  return changed(
+    simplify_rec(typecast_exprt::conditional_cast(*offset, expr.type())));
+}
