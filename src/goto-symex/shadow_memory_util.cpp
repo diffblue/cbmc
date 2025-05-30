@@ -982,7 +982,7 @@ normalize(const object_descriptor_exprt &expr, const namespacet &ns)
   {
     return expr;
   }
-  if(expr.offset().id() == ID_unknown)
+  if(!expr.offset().is_constant())
   {
     return expr;
   }

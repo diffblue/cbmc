@@ -23,14 +23,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
+#include <util/ssa_expr.h>
 #include <util/std_code.h>
 #include <util/symbol.h>
 #include <util/xml.h>
 
 #ifdef DEBUG
-#include <iostream>
-#include <util/format_expr.h>
-#include <util/format_type.h>
+#  include <iostream>
 #endif
 
 #include "add_failed_symbols.h"
@@ -184,7 +183,7 @@ void value_sett::output(std::ostream &out, const std::string &indent) const
         stream << "<" << format(o) << ", ";
 
         if(o_it->second)
-          stream << *o_it->second;
+          stream << format(*o_it->second);
         else
           stream << '*';
 
@@ -261,7 +260,7 @@ exprt value_sett::to_expr(const object_map_dt::value_type &it) const
   od.object()=object;
 
   if(it.second)
-    od.offset() = from_integer(*it.second, c_index_type());
+    od.offset() = *it.second;
 
   od.type()=od.object().type();
 
@@ -352,17 +351,34 @@ bool value_sett::eval_pointer_offset(
         it=object_map.begin();
         it!=object_map.end();
         it++)
-      if(!it->second)
+    {
+      if(!it->second || !it->second->is_constant())
         return false;
       else
       {
+        // This branch should not be reached as any constant offset will have
+        // been used before already. The following code will trigger
+        // `eval_pointer_offset`, yet we wouldn't end up in this branch:
+        // struct S { int a; char b; };
+        //
+        // int main()
+        // {
+        //   struct S s;
+        //   int offset;
+        //   __CPROVER_assume(offset >= 0 && offset <= 1 && offset % 2 == 0);
+        //   int *p = (char*)&s + offset;
+        //   int x = *p;
+        //   __CPROVER_assert(s.a == x, "");
+        // }
+        UNREACHABLE;
         const exprt &object=object_numbering[it->first];
         auto ptr_offset = compute_pointer_offset(object, ns);
 
         if(!ptr_offset.has_value())
           return false;
 
-        *ptr_offset += *it->second;
+        *ptr_offset +=
+          numeric_cast_v<mp_integer>(to_constant_expr(*it->second));
 
         if(mod && *ptr_offset != previous_offset)
           return false;
@@ -371,6 +387,7 @@ bool value_sett::eval_pointer_offset(
         previous_offset = *ptr_offset;
         mod=true;
       }
+    }
 
     if(mod)
       expr.swap(new_expr);
@@ -556,8 +573,11 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_symbol)
   {
-    auto entry_index = get_index_of_symbol(
-      to_symbol_expr(expr).get_identifier(), expr.type(), suffix, ns);
+    const symbol_exprt expr_l1 = is_ssa_expr(expr)
+                                   ? remove_level_2(to_ssa_expr(expr))
+                                   : to_symbol_expr(expr);
+    auto entry_index =
+      get_index_of_symbol(expr_l1.get_identifier(), expr.type(), suffix, ns);
 
     if(entry_index.has_value())
       make_union(dest, find_entry(*entry_index)->object_map);
@@ -623,7 +643,7 @@ void value_sett::get_value_set_rec(
       insert(
         dest,
         exprt(ID_null_object, to_pointer_type(expr.type()).base_type()),
-        mp_integer{0});
+        from_integer(0, c_index_type()));
     }
     else if(
       expr.type().id() == ID_unsignedbv || expr.type().id() == ID_signedbv)
@@ -655,7 +675,10 @@ void value_sett::get_value_set_rec(
 
       if(op.is_zero())
       {
-        insert(dest, exprt(ID_null_object, empty_typet{}), mp_integer{0});
+        insert(
+          dest,
+          exprt(ID_null_object, empty_typet{}),
+          from_integer(0, c_index_type()));
       }
       else
       {
@@ -697,7 +720,7 @@ void value_sett::get_value_set_rec(
       expr.id_string() + " expected to have at least two operands");
 
     object_mapt pointer_expr_set;
-    std::optional<mp_integer> i;
+    std::optional<exprt> additional_offset;
 
     // special case for plus/minus and exactly one pointer
     std::optional<exprt> ptr_operand;
@@ -705,7 +728,6 @@ void value_sett::get_value_set_rec(
       expr.type().id() == ID_pointer &&
       (expr.id() == ID_plus || expr.id() == ID_minus))
     {
-      bool non_const_offset = false;
       for(const auto &op : expr.operands())
       {
         if(op.type().id() == ID_pointer)
@@ -718,24 +740,20 @@ void value_sett::get_value_set_rec(
 
           ptr_operand = op;
         }
-        else if(!non_const_offset)
+        else
         {
-          auto offset = numeric_cast<mp_integer>(op);
-          if(!offset.has_value())
-          {
-            i.reset();
-            non_const_offset = true;
-          }
+          if(!additional_offset.has_value())
+            additional_offset = op;
           else
           {
-            if(!i.has_value())
-              i = mp_integer{0};
-            i = *i + *offset;
+            additional_offset = plus_exprt{
+              *additional_offset,
+              typecast_exprt::conditional_cast(op, additional_offset->type())};
           }
         }
       }
 
-      if(ptr_operand.has_value() && i.has_value())
+      if(ptr_operand.has_value() && additional_offset.has_value())
       {
         typet pointer_base_type =
           to_pointer_type(ptr_operand->type()).base_type();
@@ -746,18 +764,22 @@ void value_sett::get_value_set_rec(
 
         if(!size.has_value() || (*size) == 0)
         {
-          i.reset();
+          additional_offset.reset();
         }
         else
         {
-          *i *= *size;
+          additional_offset = mult_exprt{
+            *additional_offset, from_integer(*size, additional_offset->type())};
 
           if(expr.id()==ID_minus)
           {
             DATA_INVARIANT(
               to_minus_expr(expr).lhs() == *ptr_operand,
               "unexpected subtraction of pointer from integer");
-            i->negate();
+            DATA_INVARIANT(
+              additional_offset->type().id() != ID_unsignedbv,
+              "offset type must support negation");
+            additional_offset = unary_minus_exprt{*additional_offset};
           }
         }
       }
@@ -791,8 +813,15 @@ void value_sett::get_value_set_rec(
       offsett offset = it->second;
 
       // adjust by offset
-      if(offset && i.has_value())
-        *offset += *i;
+      if(offset && additional_offset.has_value())
+      {
+        offset = simplify_expr(
+          plus_exprt{
+            *offset,
+            typecast_exprt::conditional_cast(
+              *additional_offset, offset->type())},
+          ns);
+      }
       else
         offset.reset();
 
@@ -873,7 +902,7 @@ void value_sett::get_value_set_rec(
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
-      insert(dest, dynamic_object, mp_integer{0});
+      insert(dest, dynamic_object, from_integer(0, c_index_type()));
     }
     else if(statement==ID_cpp_new ||
             statement==ID_cpp_new_array)
@@ -888,7 +917,7 @@ void value_sett::get_value_set_rec(
       dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
-      insert(dest, dynamic_object, mp_integer{0});
+      insert(dest, dynamic_object, from_integer(0, c_index_type()));
     }
     else
       insert(dest, exprt(ID_unknown, original_type));
@@ -1335,12 +1364,17 @@ void value_sett::get_reference_set_rec(
      expr.id()==ID_string_constant ||
      expr.id()==ID_array)
   {
+    exprt l1_expr =
+      is_ssa_expr(expr) ? remove_level_2(to_ssa_expr(expr)) : expr;
+
     if(
       expr.type().id() == ID_array &&
       to_array_type(expr.type()).element_type().id() == ID_array)
-      insert(dest, expr);
+    {
+      insert(dest, l1_expr);
+    }
     else
-      insert(dest, expr, mp_integer{0});
+      insert(dest, l1_expr, from_integer(0, c_index_type()));
 
     return;
   }
@@ -1366,7 +1400,7 @@ void value_sett::get_reference_set_rec(
   {
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
-    const exprt &offset=index_expr.index();
+    const exprt &index = index_expr.index();
 
     DATA_INVARIANT(
       array.type().id() == ID_array, "index takes array-typed operand");
@@ -1394,22 +1428,24 @@ void value_sett::get_reference_set_rec(
           from_integer(0, c_index_type()));
 
         offsett o = a_it->second;
-        const auto i = numeric_cast<mp_integer>(offset);
 
-        if(offset.is_zero())
-        {
-        }
-        else if(i.has_value() && o)
+        if(!index.is_zero() && o.has_value())
         {
           auto size = pointer_offset_size(array_type.element_type(), ns);
 
           if(!size.has_value() || *size == 0)
             o.reset();
           else
-            *o = *i * (*size);
+          {
+            o = simplify_expr(
+              plus_exprt{
+                *o,
+                typecast_exprt::conditional_cast(
+                  mult_exprt{index, from_integer(*size, index.type())},
+                  o->type())},
+              ns);
+          }
         }
-        else
-          o.reset();
 
         insert(dest, deref_index_expr, o);
       }
@@ -1659,7 +1695,9 @@ void value_sett::assign_rec(
 
   if(lhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
+    const symbol_exprt lhs_l1 =
+      is_ssa_expr(lhs) ? remove_level_2(to_ssa_expr(lhs)) : to_symbol_expr(lhs);
+    const irep_idt &identifier = lhs_l1.get_identifier();
 
     update_entry(
       entryt{identifier, suffix}, lhs.type(), values_rhs, add_to_sets);
@@ -1858,8 +1896,11 @@ void value_sett::apply_code_rec(
       (symbol_type.id() == ID_array &&
        to_array_type(symbol_type).element_type().id() == ID_pointer))
     {
+      const symbol_exprt symbol_l1 = is_ssa_expr(symbol)
+                                       ? remove_level_2(to_ssa_expr(symbol))
+                                       : to_symbol_expr(symbol);
       // assign the address of the failed object
-      if(auto failed = get_failed_symbol(symbol, ns))
+      if(auto failed = get_failed_symbol(symbol_l1, ns))
       {
         address_of_exprt address_of_expr(*failed, to_pointer_type(symbol_type));
         assign(symbol, address_of_expr, ns, false, false);
