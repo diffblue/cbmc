@@ -156,6 +156,78 @@ simplify_exprt::resultt<> simplify_expr_with_value_sett::simplify_inequality(
 }
 
 simplify_exprt::resultt<>
+simplify_expr_with_value_sett::simplify_inequality_pointer_object(
+  const binary_relation_exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
+  PRECONDITION(expr.is_boolean());
+
+  auto collect_objects = [this](const exprt &pointer)
+  {
+    std::set<exprt> objects;
+    if(auto address_of = expr_try_dynamic_cast<address_of_exprt>(pointer))
+    {
+      objects.insert(
+        object_descriptor_exprt::root_object(address_of->object()));
+    }
+    else if(auto ssa_expr = expr_try_dynamic_cast<ssa_exprt>(pointer))
+    {
+      ssa_exprt l1_expr{*ssa_expr};
+      l1_expr.remove_level_2();
+      const std::vector<exprt> value_set_elements =
+        value_set.get_value_set(l1_expr, ns);
+
+      for(const auto &value_set_element : value_set_elements)
+      {
+        if(
+          value_set_element.id() == ID_unknown ||
+          value_set_element.id() == ID_invalid ||
+          is_failed_symbol(
+            to_object_descriptor_expr(value_set_element).root_object()))
+        {
+          objects.clear();
+          break;
+        }
+
+        objects.insert(
+          to_object_descriptor_expr(value_set_element).root_object());
+      }
+    }
+    return objects;
+  };
+
+  auto lhs_objects =
+    collect_objects(to_pointer_object_expr(expr.lhs()).pointer());
+  auto rhs_objects =
+    collect_objects(to_pointer_object_expr(expr.rhs()).pointer());
+
+  if(lhs_objects.size() == 1 && lhs_objects == rhs_objects)
+  {
+    // there is exactly one pointed-to object on both left-hand and right-hand
+    // side, and that object is the same
+    return expr.id() == ID_equal ? changed(static_cast<exprt>(true_exprt{}))
+                                 : changed(static_cast<exprt>(false_exprt{}));
+  }
+
+  std::list<exprt> intersection;
+  std::set_intersection(
+    lhs_objects.begin(),
+    lhs_objects.end(),
+    rhs_objects.begin(),
+    rhs_objects.end(),
+    std::back_inserter(intersection));
+  if(!lhs_objects.empty() && !rhs_objects.empty() && intersection.empty())
+  {
+    // all pointed-to objects on the left-hand side are different from any of
+    // the pointed-to objects on the right-hand side
+    return expr.id() == ID_equal ? changed(static_cast<exprt>(false_exprt{}))
+                                 : changed(static_cast<exprt>(true_exprt{}));
+  }
+
+  return simplify_exprt::simplify_inequality_pointer_object(expr);
+}
+
+simplify_exprt::resultt<>
 simplify_expr_with_value_sett::simplify_pointer_offset(
   const pointer_offset_exprt &expr)
 {

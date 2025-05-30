@@ -277,7 +277,7 @@ public:
   simplify_inequality_rhs_is_constant(const binary_relation_exprt &);
   [[nodiscard]] resultt<>
   simplify_inequality_address_of(const binary_relation_exprt &);
-  [[nodiscard]] resultt<>
+  [[nodiscard]] virtual resultt<>
   simplify_inequality_pointer_object(const binary_relation_exprt &);
 
   // main recursion

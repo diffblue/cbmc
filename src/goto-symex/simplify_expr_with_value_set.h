@@ -29,6 +29,8 @@ public:
   /// When all candidates in the value set have the same offset we can replace a
   /// pointer_offset expression by the offset value found in the value set.
   [[nodiscard]] resultt<>
+  simplify_inequality_pointer_object(const binary_relation_exprt &) override;
+  [[nodiscard]] resultt<>
   simplify_pointer_offset(const pointer_offset_exprt &) override;
 
 protected:
