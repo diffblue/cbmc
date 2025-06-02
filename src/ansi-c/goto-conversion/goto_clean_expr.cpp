@@ -61,9 +61,11 @@ static exprt convert_statement_expression(
   const quantifier_exprt &qex,
   const code_expressiont &code,
   const irep_idt &mode,
-  goto_convertt &converter)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   goto_programt where;
+  goto_convertt converter{symbol_table, message_handler};
   converter.goto_convert(code, where, mode);
   where.compute_location_numbers();
 
@@ -716,7 +718,8 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
       code.operands()[0].get_named_sub()[ID_statement].id() ==
         ID_statement_expression)
     {
-      auto res = convert_statement_expression(qex, code, mode, *this);
+      auto res = convert_statement_expression(
+        qex, code, mode, symbol_table, get_message_handler());
       qex.where() = res;
       return clean_expr(res, mode, result_is_used);
     }
