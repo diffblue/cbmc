@@ -38,6 +38,10 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['Pointer_Arithmetic19', 'test.desc'],
     ['Quantifiers-simplify', 'simplify_not_forall.desc'],
     ['array-cell-sensitivity15', 'test.desc'],
+    ['havoc_slice', 'functional_assign.desc'],
+    ['havoc_slice', 'functional_assign_direct.desc'],
+    ['havoc_slice', 'functional_slice_bytes.desc'],
+    ['havoc_slice', 'functional_slice_typed.desc'],
     ['saturating_arithmetric', 'output-formula.desc'],
     # these test for invalid command line handling
     ['bad_option', 'test_multiple.desc'],
