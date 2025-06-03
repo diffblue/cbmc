@@ -305,8 +305,6 @@ bool c_preprocess_visual_studio(
     command_file << shell_quote(file) << "\n";
   }
 
-  // _popen isn't very reliable on WIN32
-  // that's why we use run()
   int result =
     run("cl", {"cl", "@" + command_file_name()}, "", outstream, stderr_file());
 
