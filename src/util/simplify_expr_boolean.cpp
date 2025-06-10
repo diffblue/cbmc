@@ -377,3 +377,33 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
 
   return unchanged(expr);
 }
+
+simplify_exprt::resultt<>
+simplify_exprt::simplify_quantifier_expr(const quantifier_exprt &expr)
+{
+  const exprt &where = expr.where();
+
+  if(!expr.is_boolean() || !where.is_boolean())
+  {
+    return unchanged(expr);
+  }
+
+  // the following simplification only holds when the domain is non-empty
+  if(
+    (where.is_false() || where.is_true()) &&
+    std::all_of(
+      expr.variables().begin(),
+      expr.variables().end(),
+      [](const symbol_exprt &v)
+      {
+        return v.type().id() == ID_integer || v.type().id() == ID_rational ||
+               v.type().id() == ID_real || v.type().id() == ID_bool ||
+               (can_cast_type<bitvector_typet>(v.type()) &&
+                to_bitvector_type(v.type()).get_width() > 0);
+      }))
+  {
+    return where;
+  }
+
+  return unchanged(expr);
+}

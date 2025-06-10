@@ -6,12 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/simplify_expr.h>
+
+#include "boolbv.h"
 
 /// A method to detect equivalence between experts that can contain typecast
 static bool expr_eq(const exprt &expr1, const exprt &expr2)
@@ -174,7 +175,13 @@ static std::optional<exprt> eager_quantifier_instantiation(
 
   const exprt where_simplified = simplify_expr(expr.where(), ns);
 
-  if(where_simplified.is_true() || where_simplified.is_false())
+  if(
+    (where_simplified.is_true() || where_simplified.is_false()) &&
+    (var_expr.type().id() == ID_integer ||
+     var_expr.type().id() == ID_rational || var_expr.type().id() == ID_real ||
+     var_expr.type().id() == ID_bool ||
+     (can_cast_type<bitvector_typet>(var_expr.type()) &&
+      to_bitvector_type(var_expr.type()).get_width() > 0)))
   {
     return where_simplified;
   }
