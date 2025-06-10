@@ -73,6 +73,7 @@ var classsimplify__exprt =
     [ "simplify_power", "classsimplify__exprt.html#aea6b8756cffb42a709817afce98f1b2a", null ],
     [ "simplify_prophecy_pointer_in_range", "classsimplify__exprt.html#a593fbffe8e85cc5a4f0a20a09b4c8747", null ],
     [ "simplify_prophecy_r_or_w_ok", "classsimplify__exprt.html#a3f276636c12a79a535f544cf4d00cb54", null ],
+    [ "simplify_quantifier_expr", "classsimplify__exprt.html#a0e4c189748c748ce11ad6b01f19e5097", null ],
     [ "simplify_rec", "classsimplify__exprt.html#a6bc0edfa759d71ad602d938230f74423", null ],
     [ "simplify_shifts", "classsimplify__exprt.html#a7b701da4ded3c35513c096e143cb3954", null ],
     [ "simplify_sign", "classsimplify__exprt.html#afa8fb811e6cb143aab8ecf14d92e3c96", null ],

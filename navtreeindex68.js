@@ -1,5 +1,6 @@
 var NAVTREEINDEX68 =
 {
+"classtree__nodet.html#a8f759d22dcd47e91046bd35ad06adc1d":[7,0,1290,10],
 "classtree__nodet.html#aa64b07dd4c50732f898f0907c3ec7195":[7,0,1290,7],
 "classtrivial__functions__filtert.html":[7,0,1291],
 "classtrivial__functions__filtert.html#a236fca9fc42970ef9d268cb5906604c4":[7,0,1291,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX68 =
 "classunion__exprt.html#aae09846f5d583101ad9cd76801131995":[7,0,1322,1],
 "classunion__exprt.html#aedb01b51af0fb18de87d8eabec53a127":[7,0,1322,0],
 "classunion__find.html":[7,0,1323],
-"classunion__find.html#a04ae95a3af57f022ddbf10748a70efba":[7,0,1323,26],
-"classunion__find.html#a143297f1e46f5e518c9f009efa53d0d9":[7,0,1323,27]
+"classunion__find.html#a04ae95a3af57f022ddbf10748a70efba":[7,0,1323,26]
 };
