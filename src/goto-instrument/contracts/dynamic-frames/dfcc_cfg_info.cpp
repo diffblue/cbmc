@@ -360,31 +360,31 @@ static struct contract_clausest default_loop_contract_clauses(
     else
     {
       // infer assigns clause targets if none given
-      log.warning() << "No assigns clause provided for loop " << function_id
-                    << "." << loop.latch->loop_number << " at "
-                    << loop.head->source_location() << ". The inferred set {";
+      log.debug() << "No assigns clause provided for loop " << function_id
+                  << "." << loop.latch->loop_number << " at "
+                  << loop.head->source_location() << ". The inferred set {";
       bool first = true;
       for(const auto &expr : inferred_assigns)
       {
         if(!first)
         {
-          log.warning() << ", ";
+          log.debug() << ", ";
         }
         first = false;
-        log.warning() << format(expr);
+        log.debug() << format(expr);
       }
-      log.warning() << "} might be incomplete or imprecise, please provide an "
-                       "assigns clause if the analysis fails."
-                    << messaget::eom;
+      log.debug() << "} might be incomplete or imprecise, please provide an "
+                     "assigns clause if the analysis fails."
+                  << messaget::eom;
       result.assigns = inferred_assigns;
     }
 
     if(result.decreases_clauses.empty())
     {
-      log.warning() << "No decrease clause provided for loop " << function_id
-                    << "." << loop.latch->loop_number << " at "
-                    << loop.head->source_location()
-                    << ". Termination will not be checked." << messaget::eom;
+      log.debug() << "No decrease clause provided for loop " << function_id
+                  << "." << loop.latch->loop_number << " at "
+                  << loop.head->source_location()
+                  << ". Termination will not be checked." << messaget::eom;
     }
   }
   return result;
