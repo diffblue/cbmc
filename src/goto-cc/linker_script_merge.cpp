@@ -136,7 +136,7 @@ linker_script_merget::linker_script_merget(
          "address of array's first member",
          [](const exprt &expr) -> const symbol_exprt & {
            return to_symbol_expr(
-             to_index_expr(to_address_of_expr(expr).object()).index());
+             to_index_expr(to_address_of_expr(expr).object()).array());
          },
          [](const exprt &expr) {
            return expr.id() == ID_address_of &&
