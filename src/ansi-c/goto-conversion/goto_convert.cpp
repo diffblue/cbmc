@@ -1078,7 +1078,7 @@ void goto_convertt::convert_loop_contracts(
   if(assigns.is_not_nil())
   {
     PRECONDITION(loop->is_goto() || loop->is_incomplete_goto());
-    loop->condition_nonconst().add(ID_C_spec_assigns).swap(assigns.op());
+    loop->condition_nonconst().add(ID_C_spec_assigns).swap(assigns);
   }
 
   auto invariant =
