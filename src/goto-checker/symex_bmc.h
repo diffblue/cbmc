@@ -42,7 +42,7 @@ public:
   /// enforced. They return true to halt unwinding, false to authorise
   /// unwinding, or Unknown to indicate they have no opinion.
   typedef std::function<
-    tvt(const call_stackt &, unsigned, unsigned, unsigned &)>
+    tvt(const call_stackt &, std::size_t, std::size_t, std::size_t &)>
     loop_unwind_handlert;
 
   /// Recursion unwind handlers take the function ID, the unwind count so far,
@@ -51,7 +51,7 @@ public:
   /// information for the user (e.g. "unwinding iteration N, max M"),
   /// and is not enforced. They return true to halt unwinding, false to
   /// authorise unwinding, or Unknown to indicate they have no opinion.
-  typedef std::function<tvt(const irep_idt &, unsigned, unsigned &)>
+  typedef std::function<tvt(const irep_idt &, std::size_t, std::size_t &)>
     recursion_unwind_handlert;
 
   /// Add a callback function that will be called to determine whether to unwind
@@ -102,12 +102,12 @@ protected:
   bool should_stop_unwind(
     const symex_targett::sourcet &source,
     const call_stackt &context,
-    unsigned unwind) override;
+    std::size_t unwind) override;
 
   bool get_unwind_recursion(
     const irep_idt &identifier,
-    unsigned thread_nr,
-    unsigned unwind) override;
+    std::size_t thread_nr,
+    std::size_t unwind) override;
 
   symex_coveraget symex_coverage;
 };

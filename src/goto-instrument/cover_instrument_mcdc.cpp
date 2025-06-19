@@ -353,7 +353,7 @@ void remove_repetition(std::set<exprt> &exprs)
       {
         std::set<signed> signs1 = sign_of_expr(c, x);
         std::set<signed> signs2 = sign_of_expr(c, y);
-        int s1 = signs1.size(), s2 = signs2.size();
+        std::size_t s1 = signs1.size(), s2 = signs2.size();
         // it is easy to check non-equivalence;
         if(s1 != s2)
         {

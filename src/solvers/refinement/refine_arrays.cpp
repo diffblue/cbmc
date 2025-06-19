@@ -38,7 +38,7 @@ void bv_refinementt::arrays_overapproximated()
   if(!config_.refine_arrays)
     return;
 
-  unsigned nb_active=0;
+  std::size_t nb_active = 0;
 
   std::list<lazy_constraintt>::iterator it=lazy_array_constraints.begin();
   while(it!=lazy_array_constraints.end())

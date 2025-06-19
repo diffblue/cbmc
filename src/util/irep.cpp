@@ -48,7 +48,17 @@ const irep_idt &irept::get(const irep_idt &name) const
 
   if(it==s.end())
   {
+#ifdef _MSC_VER
+// NOLINTNEXTLINE(build/include)
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
     static const irep_idt empty;
+#ifdef _MSC_VER
+// NOLINTNEXTLINE(build/include)
+#include <util/pragma_pop.def>
+#endif
     return empty;
   }
   return it->second.id();

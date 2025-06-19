@@ -354,7 +354,7 @@ void trace_automatont::get_transitions(sym_mapt &transitions)
     for(const auto &trans : dta_transitions)
     {
       goto_programt::targett l=trans.first;
-      unsigned int j=trans.second;
+      const auto j = trans.second;
 
       // We have a transition: i -l-> j.
       state_pairt state_pair(i, j);
@@ -411,7 +411,7 @@ void automatont::reverse(goto_programt::targett epsilon)
     for(const auto &t : trans)
     {
       goto_programt::targett l=t.first;
-      unsigned int j=t.second;
+      const auto j = t.second;
 
       // There was a transition i -l-> j, so add a transition
       // j -l-> i.
@@ -438,7 +438,7 @@ void automatont::trim()
 
       for(const auto &t : trans)
       {
-        unsigned int j=t.second;
+        const auto j = t.second;
 
         if(reachable.find(j)==reachable.end())
         {

@@ -83,7 +83,7 @@ unsigned java_local_variable_slots(const typet &t);
 
 /// Returns the the number of JVM local variables (slots) used by the JVM to
 /// pass, upon call, the arguments of a Java method whose type is \p t.
-unsigned java_method_parameter_slots(const java_method_typet &t);
+method_offsett java_method_parameter_slots(const java_method_typet &t);
 
 const std::string java_class_to_package(const std::string &canonical_classname);
 

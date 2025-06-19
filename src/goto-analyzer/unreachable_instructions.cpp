@@ -151,9 +151,11 @@ static void add_to_json(
     s.erase(s.size()-1);
 
     // print info for file actually with full path
-    const source_locationt &l = it->second->source_location();
-    json_objectt i_entry{{"sourceLocation", json(l)},
-                         {"statement", json_stringt(s)}};
+    const source_locationt &l=it->second->source_location;
+    jsont source_location_json(json(l));
+    json_stringt statement_json(s);
+    json_objectt i_entry{
+      {{"sourceLocation", std::move(source_location_json)}, {"statement", std::move(statement_json)}}};
     dead_ins.push_back(std::move(i_entry));
   }
 

@@ -12,7 +12,7 @@ Author: Michael Tautschnig
 #include <testing-utils/use_catch.h>
 
 TEST_CASE(
-  "Format a range of unsigned numbers",
+  "Format a range of std::size_t numbers",
   "[core][util][format_number_range]")
 {
   const std::vector<mp_integer> singleton = {1};

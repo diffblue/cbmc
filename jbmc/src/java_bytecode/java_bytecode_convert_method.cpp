@@ -196,7 +196,7 @@ symbol_exprt java_bytecode_convert_methodt::tmp_variable(
 exprt java_bytecode_convert_methodt::variable(
   const exprt &arg,
   char type_char,
-  size_t address)
+  method_offsett address)
 {
   const std::size_t number_int =
     numeric_cast_v<std::size_t>(to_constant_expr(arg));
@@ -825,7 +825,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   {
     // Range wholly contained within a child block
     return get_or_create_block_for_pcrange(
-      tree.branch[child_offset],
+      tree.branch[static_cast<std::size_t>(child_offset)],
       child_block,
       address_start,
       address_limit,
@@ -892,7 +892,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   for(auto blockidx=child_offset, blocklim=child_offset+nblocks;
       blockidx!=blocklim;
       ++blockidx)
-    newblock.add(this_block_children[blockidx]);
+    newblock.add(this_block_children[static_cast<std::size_t>(blockidx)]);
 
   // Relabel the inner header:
   to_code_label(newblock.statements()[0]).set_label(new_label_irep);
@@ -905,7 +905,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   auto dellim=delfirst;
   std::advance(dellim, nblocks-1);
   this_block_children.erase(delfirst, dellim);
-  this_block_children[child_offset].swap(newlabel);
+  this_block_children[static_cast<std::size_t>(child_offset)].swap(newlabel);
 
   // Perform the same transformation on the index tree:
   block_tree_nodet newnode;
@@ -932,18 +932,17 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   ++branchaddriter;
   tree.branch_addresses.erase(branchaddriter, branchaddrlim);
 
-  tree.branch[child_offset]=std::move(newnode);
+  tree.branch[static_cast<std::size_t>(child_offset)] = std::move(newnode);
 
   CHECK_RETURN(tree.branch.size() == tree.branch_addresses.size());
 
-  return
-    to_code_block(
-      to_code_label(
-        this_block_children[child_offset]).code());
+  return to_code_block(
+    to_code_label(this_block_children[static_cast<std::size_t>(child_offset)])
+      .code());
 }
 
 static void gather_symbol_live_ranges(
-  java_bytecode_convert_methodt::method_offsett pc,
+  method_offsett pc,
   const exprt &e,
   std::map<irep_idt, java_bytecode_convert_methodt::variablet> &result)
 {
@@ -965,7 +964,8 @@ static void gather_symbol_live_ranges(
       }
       else
       {
-        var.length=std::max(var.length, (pc-var.start_pc)+1);
+        var.length = std::max(
+          var.length, static_cast<method_offsett>((pc - var.start_pc) + 1));
       }
     }
   }
@@ -1137,7 +1137,8 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
       // clang-format on
       PRECONDITION(!i_it->args.empty());
 
-      auto target = numeric_cast_v<unsigned>(to_constant_expr(i_it->args[0]));
+      auto target =
+        numeric_cast_v<method_offsett>(to_constant_expr(i_it->args[0]));
       targets.insert(target);
 
       a_entry.first->second.successors.push_back(target);
@@ -1158,7 +1159,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
       {
         if(is_label)
         {
-          auto target = numeric_cast_v<unsigned>(to_constant_expr(arg));
+          auto target = numeric_cast_v<method_offsett>(to_constant_expr(arg));
           targets.insert(target);
           a_entry.first->second.successors.push_back(target);
         }
@@ -2002,7 +2003,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
       root,
       root_block,
       v.start_pc,
-      v.start_pc + v.length,
+      static_cast<method_offsett>(v.start_pc + v.length),
       std::numeric_limits<method_offsett>::max(),
       address_map);
   }
@@ -2018,7 +2019,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
       root,
       root_block,
       v.start_pc,
-      v.start_pc + v.length,
+      static_cast<method_offsett>(v.start_pc + v.length),
       std::numeric_limits<method_offsett>::max());
     code_declt d(v.symbol_expr);
     block.statements().insert(block.statements().begin(), d);
@@ -3173,7 +3174,7 @@ void java_bytecode_convert_methodt::draw_edges_from_ret_to_jsr(
   }
 }
 
-std::vector<java_bytecode_convert_methodt::method_offsett>
+std::vector<method_offsett>
 java_bytecode_convert_methodt::try_catch_handler(
   const method_offsett address,
   const java_bytecode_parse_treet::methodt::exception_tablet &exception_table)
@@ -3212,7 +3213,7 @@ void java_bytecode_initialize_parameter_names(
   java_method_typet::parameterst &parameters = method_type.parameters();
 
   // Find number of parameters
-  unsigned slots_for_parameters = java_method_parameter_slots(method_type);
+  auto slots_for_parameters = java_method_parameter_slots(method_type);
 
   // Find parameter names in the local variable table:
   typedef std::pair<irep_idt, irep_idt> base_name_and_identifiert;

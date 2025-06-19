@@ -41,7 +41,7 @@ struct default_trace_stept
 {
   default_step_kindt kind;
   bool hidden;
-  unsigned thread_number;
+  std::size_t thread_number;
   std::size_t step_number;
   source_locationt location;
 };

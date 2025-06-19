@@ -656,7 +656,7 @@ std::optional<typet> java_type_from_string(
          subtype_letter=='[' || // Array-of-arrays
          subtype_letter=='T')   // Array of generic types
         subtype_letter='A';
-      subtype_letter = std::tolower(subtype_letter);
+      subtype_letter = static_cast<char>(std::tolower(subtype_letter));
       if(subtype_letter == 'a')
       {
         return java_reference_array_type(

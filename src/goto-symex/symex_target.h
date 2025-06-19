@@ -35,7 +35,7 @@ public:
   /// first instruction of the input GOTO program.
   struct sourcet
   {
-    unsigned thread_nr;
+    std::size_t thread_nr;
     irep_idt function_id;
     // The program counter is an iterator which indicates where the execution
     // is in its program sequence

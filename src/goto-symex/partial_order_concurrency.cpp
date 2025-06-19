@@ -78,7 +78,7 @@ void partial_order_concurrencyt::build_event_lists(
   add_init_writes(equation);
 
   // a per-thread counter
-  std::map<unsigned, unsigned> counter;
+  std::map<std::size_t, unsigned> counter;
 
   for(eventst::const_iterator
       e_it=equation.SSA_steps.begin();
@@ -89,7 +89,7 @@ void partial_order_concurrencyt::build_event_lists(
        e_it->is_shared_write() ||
        e_it->is_spawn())
     {
-      unsigned thread_nr=e_it->source.thread_nr;
+      std::size_t thread_nr = e_it->source.thread_nr;
 
       if(!e_it->is_spawn())
       {

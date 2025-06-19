@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_parser.h"
 
-#include "smt2_format.h"
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
@@ -19,6 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/prefix.h>
 #include <util/range.h>
+#include <util/string2int.h>
+
+#include "smt2_format.h"
 
 #include <numeric>
 
@@ -507,7 +508,7 @@ exprt smt2_parsert::function_application()
         if(next_token() != smt2_tokenizert::NUMERAL)
           throw error("expected numeral as bitvector literal width");
 
-        auto width = std::stoll(smt2_tokenizer.get_buffer());
+        const auto width = safe_string2size_t(smt2_tokenizer.get_buffer());
 
         if(next_token() != smt2_tokenizert::CLOSE)
           throw error("expected ')' after bitvector literal");
@@ -623,12 +624,12 @@ exprt smt2_parsert::function_application()
           if(next_token() != smt2_tokenizert::NUMERAL)
             throw error("expected numeral after extract");
 
-          auto upper = std::stoll(smt2_tokenizer.get_buffer());
+          const auto upper = safe_string2size_t(smt2_tokenizer.get_buffer());
 
           if(next_token() != smt2_tokenizert::NUMERAL)
             throw error("expected two numerals after extract");
 
-          auto lower = std::stoll(smt2_tokenizer.get_buffer());
+          const auto lower = safe_string2size_t(smt2_tokenizer.get_buffer());
 
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error("expected ')' after extract");

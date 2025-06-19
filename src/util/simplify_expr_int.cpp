@@ -951,7 +951,8 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
           else
             opi = eb_merged;
           // erase opn
-          new_expr.operands().erase(new_expr.operands().begin() + i + 1);
+          new_expr.operands().erase(
+            new_expr.operands().begin() + static_cast<std::ptrdiff_t>(i) + 1);
           no_change = false;
         }
         else
@@ -983,7 +984,8 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
         to_bitvector_type(opi.type()).set_width(new_value.size());
         opi.type().id(ID_verilog_unsignedbv);
         // erase opn
-        new_expr.operands().erase(new_expr.operands().begin() + i + 1);
+        new_expr.operands().erase(
+          new_expr.operands().begin() + static_cast<std::ptrdiff_t>(i) + 1);
         no_change = false;
       }
       else

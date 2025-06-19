@@ -112,7 +112,7 @@ public:
   goto_programt::const_targett pc;
 
   // this transition done by given thread number
-  unsigned thread_nr;
+  std::size_t thread_nr;
 
   // for assume, assert, goto
   bool cond_value;

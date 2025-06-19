@@ -24,7 +24,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_storage.h"
 #include "symex_assign.h"
 
-bool goto_symext::get_unwind_recursion(const irep_idt &, unsigned, unsigned)
+bool goto_symext::get_unwind_recursion(
+  const irep_idt &,
+  std::size_t,
+  std::size_t)
 {
   return false;
 }

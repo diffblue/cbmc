@@ -43,7 +43,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
 
   for(unsigned i=0; i<src.size(); i++)
   {
-    T ch=(unsigned char)src[i];
+    T ch = static_cast<T>(static_cast<unsigned char>(src[i]));
 
     if(ch=='\\') // escape?
     {
@@ -51,7 +51,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
       i++;
       INVARIANT(i < src.size(), "backslash can't be last character");
 
-      ch=(unsigned char)src[i];
+      ch = static_cast<T>(static_cast<unsigned char>(src[i]));
       switch(ch)
       {
       case '\\': dest.push_back(ch); break;
@@ -105,7 +105,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
           // go back
           i--;
 
-          ch=hex_to_unsigned(hex.c_str(), hex.size());
+          ch = static_cast<T>(hex_to_unsigned(hex.c_str(), hex.size()));
         }
 
         // if T isn't sufficiently wide to hold unsigned values
@@ -116,7 +116,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
         break;
 
       default:
-        if(isdigit(ch)) // octal
+        if(isdigit(static_cast<int>(ch))) // octal
         {
           std::string octal;
 
@@ -129,7 +129,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
           // go back
           i--;
 
-          ch=octal_to_unsigned(octal.c_str(), octal.size());
+          ch = static_cast<T>(octal_to_unsigned(octal.c_str(), octal.size()));
           dest.push_back(ch);
         }
         else

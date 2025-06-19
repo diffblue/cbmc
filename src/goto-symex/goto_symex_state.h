@@ -175,7 +175,7 @@ public:
   void print_backtrace(std::ostream &) const;
 
   // threads
-  typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
+  typedef std::pair<std::size_t, std::list<guardt>> a_s_r_entryt;
   typedef std::list<guardt> a_s_w_entryt;
   std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_section;
   std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>

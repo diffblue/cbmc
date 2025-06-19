@@ -440,7 +440,7 @@ protected:
   virtual bool should_stop_unwind(
     const symex_targett::sourcet &source,
     const call_stackt &context,
-    unsigned unwind);
+    std::size_t unwind);
 
   virtual void loop_bound_exceeded(statet &state, const exprt &guard);
 
@@ -505,8 +505,8 @@ protected:
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
-    unsigned thread_nr,
-    unsigned unwind);
+    std::size_t thread_nr,
+    std::size_t unwind);
 
   /// Iterates over \p arguments and assigns them to the parameters, which are
   /// symbols whose name and type are deduced from the type of \p goto_function.

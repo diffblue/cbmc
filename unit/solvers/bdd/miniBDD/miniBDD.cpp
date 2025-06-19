@@ -58,7 +58,7 @@ public:
       return const_literal(bdd.is_true());
     std::size_t index = bdd.node_number();
     bdd_map[index] = bdd;
-    return literalt(index, false);
+    return literalt(static_cast<literalt::var_not>(index), false);
   }
 
   literalt land(literalt a, literalt b) override

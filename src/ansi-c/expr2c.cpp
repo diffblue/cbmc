@@ -2262,7 +2262,7 @@ std::string expr2ct::convert_array(const exprt &src)
       if(last_was_hex)
       {
         // we use "string splicing" to avoid ambiguity
-        if(isxdigit(ch))
+        if(isxdigit(static_cast<int>(ch)))
           dest+="\" \"";
 
         last_was_hex=false;

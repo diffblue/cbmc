@@ -12,8 +12,6 @@ Author: John Dumbell
 
 #include "goto_symex_state.h"
 
-#include <cmath>
-
 complexity_limitert::complexity_limitert(
   message_handlert &message_handler,
   const optionst &options)
@@ -28,7 +26,7 @@ complexity_limitert::complexity_limitert(
 
     const std::size_t failed_child_loops_limit = options.get_signed_int_option(
       "symex-complexity-failed-child-loops-limit");
-    const std::size_t unwind = options.get_signed_int_option("unwind");
+    const int unwind = options.get_signed_int_option("unwind");
 
     // If we have complexity enabled, try to work out a failed_children_limit.
     // In order of priority:
@@ -38,7 +36,7 @@ complexity_limitert::complexity_limitert(
     if(failed_child_loops_limit > 0)
       max_loops_complexity = failed_child_loops_limit;
     else if(unwind > 0)
-      max_loops_complexity = std::max(static_cast<int>(floor(unwind / 3)), 1);
+      max_loops_complexity = std::max(unwind / 3, 1);
     else
       max_loops_complexity = limit;
   }

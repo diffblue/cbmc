@@ -64,8 +64,8 @@ void small_map_test()
     int cnt = 0;
     for(auto it = m.begin(); it != m.end(); it++)
     {
-      REQUIRE(it->first == it->second);
-      REQUIRE((*it).first == (*it).second);
+      REQUIRE(static_cast<int>(it->first) == it->second);
+      REQUIRE(static_cast<int>((*it).first) == (*it).second);
       cnt++;
     }
 
@@ -143,7 +143,7 @@ void small_map_test()
 
     for(std::size_t i = 0; i < small_mapt<int>::NUM; i++)
     {
-      m[i] = i;
+      m[i] = static_cast<int>(i);
     }
 
     for(std::size_t i = 0; i < small_mapt<int>::NUM; i++)

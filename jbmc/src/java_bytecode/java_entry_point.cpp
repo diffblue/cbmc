@@ -76,9 +76,17 @@ static bool should_init_symbol(const symbolt &sym)
 
 irep_idt get_java_class_literal_initializer_signature()
 {
-  static irep_idt signature =
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
+  static const irep_idt signature =
     "java::java.lang.Class.cproverInitializeClassLiteral:"
     "(Ljava/lang/String;ZZZZZZZ)V";
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
   return signature;
 }
 

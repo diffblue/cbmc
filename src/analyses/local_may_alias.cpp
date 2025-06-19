@@ -51,7 +51,7 @@ void local_may_aliast::assign_lhs(
   {
     if(lhs.type().id()==ID_pointer)
     {
-      unsigned dest_pointer=objects.number(lhs);
+      const std::size_t dest_pointer = objects.number(lhs);
 
       // isolate the lhs pointer
       loc_info_dest.aliases.isolate(dest_pointer);
@@ -154,7 +154,7 @@ bool local_may_aliast::aliases(
      tmp2.find(unknown_object)!=tmp2.end())
     return true;
 
-  std::list<unsigned> result;
+  std::list<std::size_t> result;
 
   std::set_intersection(
     tmp1.begin(), tmp1.end(),
@@ -180,7 +180,7 @@ void local_may_aliast::get_rec(
   {
     if(rhs.type().id()==ID_pointer)
     {
-      unsigned src_pointer=objects.number(rhs);
+      const std::size_t src_pointer = objects.number(rhs);
 
       dest.insert(src_pointer);
 
@@ -202,7 +202,7 @@ void local_may_aliast::get_rec(
 
     if(object.id()==ID_symbol)
     {
-      unsigned object_nr=objects.number(rhs);
+      const std::size_t object_nr = objects.number(rhs);
       dest.insert(object_nr);
 
       for(std::size_t i=0; i<loc_info_src.aliases.size(); i++)
@@ -217,7 +217,7 @@ void local_may_aliast::get_rec(
         index_exprt tmp1=index_expr;
         tmp1.index() = from_integer(0, c_index_type());
         address_of_exprt tmp2(tmp1);
-        unsigned object_nr=objects.number(tmp2);
+        const std::size_t object_nr = objects.number(tmp2);
         dest.insert(object_nr);
 
         for(std::size_t i=0; i<loc_info_src.aliases.size(); i++)
@@ -229,7 +229,7 @@ void local_may_aliast::get_rec(
         index_exprt tmp1=index_expr;
         tmp1.index() = from_integer(0, c_index_type());
         address_of_exprt tmp2(tmp1);
-        unsigned object_nr=objects.number(tmp2);
+        const std::size_t object_nr = objects.number(tmp2);
         dest.insert(object_nr);
 
         for(std::size_t i=0; i<loc_info_src.aliases.size(); i++)
@@ -465,7 +465,7 @@ void local_may_aliast::output(
   const goto_functiont &goto_function,
   const namespacet &ns) const
 {
-  unsigned l=0;
+  std::size_t l = 0;
 
   for(const auto &instruction : goto_function.body.instructions)
   {

@@ -276,7 +276,7 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
 }
 
 static void
-switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
+switch_to_thread(goto_symex_statet &state, const std::size_t thread_nb)
 {
   PRECONDITION(state.source.thread_nr < state.threads.size());
   PRECONDITION(thread_nb < state.threads.size());
@@ -311,7 +311,7 @@ void goto_symext::symex_threaded_step(
   if(state.call_stack().empty() &&
      state.source.thread_nr+1<state.threads.size())
   {
-    unsigned t=state.source.thread_nr+1;
+    std::size_t t = state.source.thread_nr + 1;
 #if 0
     std::cout << "********* Now executing thread " << t << '\n';
 #endif

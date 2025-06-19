@@ -12,17 +12,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_GRAPH_H
 #define CPROVER_UTIL_GRAPH_H
 
+#include "invariant.h"
+
 #include <algorithm>
 #include <functional>
 #include <iosfwd>
+#include <limits>
 #include <list>
 #include <map>
 #include <queue>
 #include <sstream>
 #include <stack>
 #include <vector>
-
-#include "invariant.h"
 
 class empty_edget
 {
@@ -332,8 +333,8 @@ protected:
   {
   public:
     std::vector<bool> visited;
-    std::vector<unsigned> depth;
-    std::vector<unsigned> lowlink;
+    std::vector<std::size_t> depth;
+    std::vector<std::size_t> lowlink;
     std::vector<bool> in_scc;
     std::stack<node_indext> scc_stack;
     std::vector<node_indext> &subgraph_nr;
@@ -423,12 +424,12 @@ void grapht<N>::shortest_path(
   bool non_trivial) const
 {
   std::vector<bool> visited;
-  std::vector<unsigned> distance;
-  std::vector<unsigned> previous;
+  std::vector<std::size_t> distance;
+  std::vector<std::size_t> previous;
 
   // initialization
   visited.resize(nodes.size(), false);
-  distance.resize(nodes.size(), (unsigned)(-1));
+  distance.resize(nodes.size(), std::numeric_limits<std::size_t>::max());
   previous.resize(nodes.size(), 0);
 
   if(!non_trivial)
@@ -445,7 +446,7 @@ void grapht<N>::shortest_path(
 
   frontier_set.push_back(src);
 
-  unsigned d=0;
+  std::size_t d = 0;
   bool found=false;
 
   while(!frontier_set.empty() && !found)
@@ -493,7 +494,7 @@ void grapht<N>::shortest_path(
   path.clear();
 
   // reachable at all?
-  if(distance[dest]==(unsigned)(-1))
+  if(distance[dest] == std::numeric_limits<std::size_t>::max())
     return; // nah
 
   while(true)

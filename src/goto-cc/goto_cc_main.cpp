@@ -11,10 +11,11 @@ Date: May 2006
 /// \file
 /// GOTO-CC Main Module
 
-#include <algorithm>
-#include <iostream>
-
 #include <util/get_base_name.h>
+
+#include <algorithm>
+#include <cctype>
+#include <iostream>
 
 #ifdef _MSC_VER
 #  include <util/unicode.h>
@@ -40,7 +41,9 @@ Date: May 2006
 std::string to_lower_string(const std::string &s)
 {
   std::string result=s;
-  transform(result.begin(), result.end(), result.begin(), tolower);
+  transform(result.begin(), result.end(), result.begin(), [](char c) {
+    return static_cast<char>(std::tolower(c));
+  });
   return result;
 }
 
