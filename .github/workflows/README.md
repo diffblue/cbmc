@@ -32,7 +32,7 @@ We are currently building and testing CBMC under the following configurations:
 * `cmake` * `gcc` * `linux` (ubuntu 22.04 32-bit)
 * `make` * `clang` * `macos` (13)
 * `cmake` * `clang` * `macos` (14)
-* `cmake` * `vs` * `windows` (vs2019)
+* `cmake` * `vs` * `windows` (vs2025)
 * `make` * `vs` * `windows` (vs2022)
 
 Aside from the main platform builds for testing, we are also performing

@@ -181,7 +181,7 @@ jobs:
           go run scripts/slack_notification_action.go
 
   windows-msi-package:
-    runs-on: windows-2019
+    runs-on: windows-2025
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:

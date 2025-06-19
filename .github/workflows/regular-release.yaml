@@ -76,9 +76,9 @@ jobs:
             PATH="C:\Program Files\cbmc\bin";%PATH%
             ```
 
-            Note that we depend on the Visual C++ redistributables. You likely already have these, if not please download and run vcredist.x64.exe from Microsoft to install them prior to running cbmc, or make sure you have Visual Studio 2019 installed.
+            Note that we depend on the Visual C++ redistributables. You likely already have these, if not please download and run vcredist.x64.exe from Microsoft to install them prior to running cbmc, or make sure you have Visual Studio 2025 installed.
 
-            You can download either [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/community/) or the [Visual C++ Redistributables](https://support.microsoft.com/en-gb/help/2977003/the-latest-supported-visual-c-downloads) from Microsoft for free.
+            You can download either [Visual Studio 2025 Community Edition](https://visualstudio.microsoft.com/vs/community/) or the [Visual C++ Redistributables](https://support.microsoft.com/en-gb/help/2977003/the-latest-supported-visual-c-downloads) from Microsoft for free.
 
             ## Docker
 

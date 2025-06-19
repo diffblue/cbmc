@@ -684,8 +684,8 @@ jobs:
         run: cd build; ctest -V -L CORE . -j3
 
   # This job takes approximately 49 to 70 minutes
-  check-vs-2019-cmake-build-and-test:
-    runs-on: windows-2019
+  check-vs-2025-cmake-build-and-test:
+    runs-on: windows-2025
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -825,7 +825,7 @@ jobs:
 
   # This job takes approximately 7 to 32 minutes
   windows-msi-package:
-    runs-on: windows-2019
+    runs-on: windows-2025
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
