@@ -1,5 +1,5 @@
 CORE
-msvc.c
+msvc.i
 --pointer-check --bounds-check --winx64
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,3 +1,10 @@
+extern int __CPROVER_rounding_mode;
+
+void __asm_fstcw(void *dest)
+{
+  *(unsigned short *)dest = __CPROVER_rounding_mode << 10;
+}
+
 int main()
 {
   unsigned short cw;

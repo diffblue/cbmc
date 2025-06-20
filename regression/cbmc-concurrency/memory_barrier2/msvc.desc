@@ -1,5 +1,5 @@
 CORE
-msvc.c
+msvc.i
 --mm tso --winx64
 ^EXIT=0$
 ^SIGNAL=0$
