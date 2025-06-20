@@ -132,9 +132,19 @@ private:
   T read()
   {
     static_assert(
-      std::is_unsigned<T>::value, "T should be an unsigned integer");
+      std::is_unsigned<T>::value || std::is_signed<T>::value,
+      "T should be a signed or unsigned integer");
     const constexpr size_t bytes = sizeof(T);
-    u8 result = 0;
+    if(bytes == 1)
+    {
+      if(!*in)
+      {
+        log.error() << "unexpected end of bytecode file" << messaget::eom;
+        throw 0;
+      }
+      return static_cast<T>(in->get());
+    }
+    T result = 0;
     for(size_t i = 0; i < bytes; i++)
     {
       if(!*in)
@@ -145,7 +155,7 @@ private:
       result <<= 8u;
       result |= static_cast<u1>(in->get());
     }
-    return narrow_cast<T>(result);
+    return result;
   }
 
   void store_unknown_method_handle(size_t bootstrap_method_index);
@@ -695,15 +705,15 @@ void java_bytecode_parsert::rconstant_pool()
       break;
 
     case CONSTANT_Utf8:
-      {
-        const u2 bytes = read<u2>();
-        std::string s;
-        s.resize(bytes);
-        for(auto &ch : s)
-          ch = read<u1>();
-        it->s = s; // Add to string table
-      }
+    {
+      const u2 bytes = read<u2>();
+      std::string s;
+      s.resize(bytes);
+      for(auto &ch : s)
+        ch = read<std::string::value_type>();
+      it->s = s; // Add to string table
       break;
+    }
 
     case CONSTANT_MethodHandle:
       it->ref1 = read<u1>();
@@ -941,34 +951,34 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
       break;
 
     case 'b': // a signed byte
-      {
-        const s1 c = read<u1>();
-        instruction.args.push_back(from_integer(c, signedbv_typet(8)));
-      }
+    {
+      const s1 c = read<s1>();
+      instruction.args.push_back(from_integer(c, signedbv_typet(8)));
       address+=1;
       break;
+    }
 
     case 'o': // two byte branch offset, signed
-      {
-        const s2 offset = read<u2>();
-        // By converting the signed offset into an absolute address (by adding
-        // the current address) the number represented becomes unsigned.
-        instruction.args.push_back(
-          from_integer(address+offset, unsignedbv_typet(16)));
-      }
+    {
+      const s2 offset = read<s2>();
+      // By converting the signed offset into an absolute address (by adding
+      // the current address) the number represented becomes unsigned.
+      instruction.args.push_back(
+        from_integer(address + offset, unsignedbv_typet(16)));
       address+=2;
       break;
+    }
 
     case 'O': // four byte branch offset, signed
-      {
-        const s4 offset = read<u4>();
-        // By converting the signed offset into an absolute address (by adding
-        // the current address) the number represented becomes unsigned.
-        instruction.args.push_back(
-          from_integer(address+offset, unsignedbv_typet(32)));
-      }
+    {
+      const s4 offset = read<s4>();
+      // By converting the signed offset into an absolute address (by adding
+      // the current address) the number represented becomes unsigned.
+      instruction.args.push_back(
+        from_integer(address + offset, unsignedbv_typet(32)));
       address+=4;
       break;
+    }
 
     case 'v': // local variable index (one byte)
       {
@@ -994,7 +1004,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
       {
         const u2 v = read<u2>();
         instruction.args.push_back(from_integer(v, unsignedbv_typet(16)));
-        const s2 c = read<u2>();
+        const s2 c = read<s2>();
         instruction.args.push_back(from_integer(c, signedbv_typet(16)));
         address+=4;
       }
@@ -1002,7 +1012,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
       {
         const u1 v = read<u1>();
         instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
-        const s1 c = read<u1>();
+        const s1 c = read<s1>();
         instruction.args.push_back(from_integer(c, signedbv_typet(8)));
         address+=2;
       }
@@ -1032,7 +1042,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         }
 
         // now default value
-        const s4 default_value = read<u4>();
+        const s4 default_value = read<s4>();
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
@@ -1045,8 +1055,8 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
 
         for(std::size_t i=0; i<npairs; i++)
         {
-          const s4 match = read<u4>();
-          const s4 offset = read<u4>();
+          const s4 match = read<s4>();
+          const s4 offset = read<s4>();
           instruction.args.push_back(
             from_integer(match, signedbv_typet(32)));
           // By converting the signed offset into an absolute address (by adding
@@ -1070,23 +1080,23 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
         }
 
         // now default value
-        const s4 default_value = read<u4>();
+        const s4 default_value = read<s4>();
         instruction.args.push_back(
           from_integer(base_offset+default_value, signedbv_typet(32)));
         address+=4;
 
         // now low value
-        const s4 low_value = read<u4>();
+        const s4 low_value = read<s4>();
         address+=4;
 
         // now high value
-        const s4 high_value = read<u4>();
+        const s4 high_value = read<s4>();
         address+=4;
 
         // there are high-low+1 offsets, and they are signed
         for(s4 i=low_value; i<=high_value; i++)
         {
-          s4 offset = read<u4>();
+          s4 offset = read<s4>();
           instruction.args.push_back(from_integer(i, signedbv_typet(32)));
           // By converting the signed offset into an absolute address (by adding
           // the current address) the number represented becomes unsigned.
@@ -1130,8 +1140,8 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
 
     case 's': // a signed short
       {
-        const s2 s = read<u2>();
-        instruction.args.push_back(from_integer(s, signedbv_typet(16)));
+      const s2 s = read<s2>();
+      instruction.args.push_back(from_integer(s, signedbv_typet(16)));
       }
       address+=2;
       break;
