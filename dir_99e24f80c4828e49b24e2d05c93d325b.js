@@ -48,6 +48,8 @@ var dir_99e24f80c4828e49b24e2d05c93d325b =
     [ "show_program.h", "show__program_8h.html", "show__program_8h" ],
     [ "show_vcc.cpp", "show__vcc_8cpp.html", "show__vcc_8cpp" ],
     [ "show_vcc.h", "show__vcc_8h.html", "show__vcc_8h" ],
+    [ "simplify_expr_with_value_set.cpp", "simplify__expr__with__value__set_8cpp.html", "simplify__expr__with__value__set_8cpp" ],
+    [ "simplify_expr_with_value_set.h", "simplify__expr__with__value__set_8h.html", "simplify__expr__with__value__set_8h" ],
     [ "slice.cpp", "slice_8cpp.html", "slice_8cpp" ],
     [ "slice.h", "slice_8h.html", "slice_8h" ],
     [ "solver_hardness.cpp", "solver__hardness_8cpp.html", null ],

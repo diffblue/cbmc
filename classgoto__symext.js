@@ -26,7 +26,7 @@ var classgoto__symext =
     [ "constant_propagate_trim", "classgoto__symext.html#a79aef84b04468d7db62ebadc4c852df8", null ],
     [ "dereference", "classgoto__symext.html#ad6751f48d9d16d92b161f74fb7691ec0", null ],
     [ "dereference_rec", "classgoto__symext.html#ae3deb50ec234ea8a62922acb327b264e", null ],
-    [ "do_simplify", "classgoto__symext.html#abee39663b3787f0d19f530a3c27574f8", null ],
+    [ "do_simplify", "classgoto__symext.html#aa397568af068fe59d3213228db952baf", null ],
     [ "execute_next_instruction", "classgoto__symext.html#afd39af32ddc613bd9e2036a048d422ab", null ],
     [ "get_goto_function", "classgoto__symext.html#a2ea8c5e3c13c108ade1d799523a89f9e", null ],
     [ "get_new_string_data_symbol", "classgoto__symext.html#abc84ad4e51df52a42b2bd4dfedbef1b0", null ],

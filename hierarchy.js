@@ -1887,7 +1887,9 @@ var hierarchy =
     [ "smt_bit_vector_theoryt::signed_less_than_or_equalt", "structsmt__bit__vector__theoryt_1_1signed__less__than__or__equalt.html", null ],
     [ "smt_bit_vector_theoryt::signed_less_thant", "structsmt__bit__vector__theoryt_1_1signed__less__thant.html", null ],
     [ "smt_bit_vector_theoryt::signed_remaindert", "structsmt__bit__vector__theoryt_1_1signed__remaindert.html", null ],
-    [ "simplify_exprt", "classsimplify__exprt.html", null ],
+    [ "simplify_exprt", "classsimplify__exprt.html", [
+      [ "simplify_expr_with_value_sett", "classsimplify__expr__with__value__sett.html", null ]
+    ] ],
     [ "reachability_slicert::slicer_entryt", "structreachability__slicert_1_1slicer__entryt.html", null ],
     [ "slicing_criteriont", "classslicing__criteriont.html", [
       [ "assert_criteriont", "classassert__criteriont.html", null ],

@@ -79,10 +79,10 @@
 <area shape="poly" id="edge115_Node000030_Node000053" title=" " alt="" coords="1693,136,1442,322,1439,318,1690,131"/>
 <area shape="rect" id="Node000080" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="1258,409,1393,434"/>
 <area shape="poly" id="edge116_Node000030_Node000080" title=" " alt="" coords="1629,130,1562,137,1492,148,1432,163,1409,173,1392,183,1372,206,1357,233,1337,291,1328,349,1327,395,1322,395,1323,348,1332,290,1352,231,1368,203,1389,179,1406,168,1430,158,1491,143,1562,132,1629,125"/>
-<area shape="rect" id="Node000097" href="$field__sensitivity_8h.html" title=" " alt="" coords="1911,181,2046,207"/>
-<area shape="poly" id="edge113_Node000030_Node000097" title=" " alt="" coords="1751,131,1922,175,1921,180,1750,136"/>
-<area shape="rect" id="Node000098" href="$shadow__memory__state_8h.html" title="Symex Shadow Memory Instrumentation State." alt="" coords="2121,489,2308,515"/>
-<area shape="poly" id="edge117_Node000030_Node000098" title=" " alt="" coords="1784,124,1961,143,2045,159,2079,168,2104,179,2134,195,2157,212,2172,234,2177,266,2177,342,2180,379,2188,415,2207,475,2202,477,2183,417,2175,380,2172,342,2172,266,2167,236,2153,216,2131,200,2101,184,2077,173,2044,164,1960,149,1784,130"/>
+<area shape="rect" id="Node000094" href="$field__sensitivity_8h.html" title=" " alt="" coords="1911,181,2046,207"/>
+<area shape="poly" id="edge113_Node000030_Node000094" title=" " alt="" coords="1751,131,1922,175,1921,180,1750,136"/>
+<area shape="rect" id="Node000095" href="$shadow__memory__state_8h.html" title="Symex Shadow Memory Instrumentation State." alt="" coords="2121,489,2308,515"/>
+<area shape="poly" id="edge117_Node000030_Node000095" title=" " alt="" coords="1784,124,1961,143,2045,159,2079,168,2104,179,2134,195,2157,212,2172,234,2177,266,2177,342,2180,379,2188,415,2207,475,2202,477,2183,417,2175,380,2172,342,2172,266,2167,236,2153,216,2131,200,2101,184,2077,173,2044,164,1960,149,1784,130"/>
 <area shape="poly" id="edge40_Node000031_Node000032" title=" " alt="" coords="1986,279,2078,556,2073,557,1981,281"/>
 <area shape="poly" id="edge49_Node000032_Node000005" title=" " alt="" coords="2040,593,1926,605,1786,609,1553,614,1323,627,1240,638,1211,645,1194,653,1178,674,1162,709,1138,785,1133,783,1157,707,1173,671,1190,649,1209,640,1239,632,1323,621,1553,609,1786,604,1925,600,2039,587"/>
 <area shape="rect" id="Node000033" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="2070,724,2167,749"/>
@@ -126,10 +126,10 @@
 <area shape="rect" id="Node000052" href="$frame_8h.html" title="Class for stack frames." alt="" coords="1390,255,1463,280"/>
 <area shape="poly" id="edge74_Node000051_Node000052" title=" " alt="" coords="1450,208,1438,243,1433,241,1445,206"/>
 <area shape="poly" id="edge75_Node000052_Node000053" title=" " alt="" coords="1427,281,1422,315,1416,314,1422,280"/>
-<area shape="rect" id="Node000086" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1490,328,1614,353"/>
-<area shape="poly" id="edge107_Node000052_Node000086" title=" " alt="" coords="1448,278,1521,319,1518,323,1445,282"/>
-<area shape="rect" id="Node000087" href="$lexical__loops_8h.html" title="Compute lexical loops in a goto_function." alt="" coords="939,489,1120,515"/>
-<area shape="poly" id="edge109_Node000052_Node000087" title=" " alt="" coords="1390,274,1319,283,1230,304,1183,321,1137,343,1095,370,1058,403,1047,420,1039,439,1032,476,1027,475,1034,437,1042,417,1054,400,1092,366,1135,338,1181,316,1228,299,1318,278,1389,268"/>
+<area shape="rect" id="Node000083" href="$symex__target_8h.html" title="Generate Equation using Symbolic Execution." alt="" coords="1490,328,1614,353"/>
+<area shape="poly" id="edge107_Node000052_Node000083" title=" " alt="" coords="1448,278,1521,319,1518,323,1445,282"/>
+<area shape="rect" id="Node000084" href="$lexical__loops_8h.html" title="Compute lexical loops in a goto_function." alt="" coords="939,489,1120,515"/>
+<area shape="poly" id="edge109_Node000052_Node000084" title=" " alt="" coords="1390,274,1319,283,1230,304,1183,321,1137,343,1095,370,1058,403,1047,420,1039,439,1032,476,1027,475,1034,437,1042,417,1054,400,1092,366,1135,338,1181,316,1228,299,1318,278,1389,268"/>
 <area shape="poly" id="edge98_Node000053_Node000049" title=" " alt="" coords="1450,351,1605,402,1604,407,1448,356"/>
 <area shape="rect" id="Node000054" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="1234,489,1377,515"/>
 <area shape="poly" id="edge76_Node000053_Node000054" title=" " alt="" coords="1419,353,1421,395,1417,419,1408,443,1384,468,1354,486,1352,481,1380,464,1403,440,1412,418,1416,394,1414,354"/>
@@ -171,15 +171,15 @@
 <area shape="rect" id="Node000081" href="$renamed_8h.html" title="Class for expressions or types renamed up to a given level." alt="" coords="1754,489,1846,515"/>
 <area shape="poly" id="edge105_Node000080_Node000081" title=" " alt="" coords="1393,431,1740,488,1740,493,1392,436"/>
 <area shape="poly" id="edge106_Node000081_Node000032" title=" " alt="" coords="1844,512,2021,560,2033,564,2032,569,2019,565,1842,517"/>
-<area shape="poly" id="edge108_Node000086_Node000081" title=" " alt="" coords="1615,350,1674,368,1704,382,1732,399,1751,416,1768,436,1791,475,1787,478,1763,439,1747,420,1729,403,1702,386,1672,373,1613,355"/>
-<area shape="poly" id="edge110_Node000087_Node000011" title=" " alt="" coords="1002,517,965,537,929,565,883,621,846,682,819,740,800,785,795,783,814,738,842,680,879,618,925,561,962,532,1000,512"/>
-<area shape="poly" id="edge111_Node000087_Node000068" title=" " alt="" coords="1021,517,981,561,977,558,1017,513"/>
-<area shape="poly" id="edge112_Node000087_Node000069" title=" " alt="" coords="1033,515,1036,556,1030,556,1027,515"/>
-<area shape="poly" id="edge114_Node000097_Node000031" title=" " alt="" coords="1982,207,1982,241,1977,241,1976,207"/>
-<area shape="poly" id="edge118_Node000098_Node000032" title=" " alt="" coords="2197,517,2116,565,2114,560,2194,513"/>
-<area shape="poly" id="edge122_Node000098_Node000048" title=" " alt="" coords="2211,516,2185,558,2166,583,2143,605,2091,635,2041,654,2039,649,2089,630,2140,601,2162,579,2181,555,2207,513"/>
-<area shape="rect" id="Node000099" href="$shadow__memory__field__definitions_8h.html" title="Symex Shadow Memory Field Definitions." alt="" coords="2205,563,2374,603"/>
-<area shape="poly" id="edge119_Node000098_Node000099" title=" " alt="" coords="2228,513,2264,551,2260,554,2224,517"/>
-<area shape="poly" id="edge120_Node000099_Node000035" title=" " alt="" coords="2257,605,2166,658,2060,726,1979,790,1975,786,2057,722,2164,653,2254,601"/>
-<area shape="poly" id="edge121_Node000099_Node000048" title=" " alt="" coords="2221,605,2041,654,2039,649,2220,600"/>
+<area shape="poly" id="edge108_Node000083_Node000081" title=" " alt="" coords="1615,350,1674,368,1704,382,1732,399,1751,416,1768,436,1791,475,1787,478,1763,439,1747,420,1729,403,1702,386,1672,373,1613,355"/>
+<area shape="poly" id="edge110_Node000084_Node000011" title=" " alt="" coords="1002,517,965,537,929,565,883,621,846,682,819,740,800,785,795,783,814,738,842,680,879,618,925,561,962,532,1000,512"/>
+<area shape="poly" id="edge111_Node000084_Node000068" title=" " alt="" coords="1021,517,981,561,977,558,1017,513"/>
+<area shape="poly" id="edge112_Node000084_Node000069" title=" " alt="" coords="1033,515,1036,556,1030,556,1027,515"/>
+<area shape="poly" id="edge114_Node000094_Node000031" title=" " alt="" coords="1982,207,1982,241,1977,241,1976,207"/>
+<area shape="poly" id="edge118_Node000095_Node000032" title=" " alt="" coords="2197,517,2116,565,2114,560,2194,513"/>
+<area shape="poly" id="edge122_Node000095_Node000048" title=" " alt="" coords="2211,516,2185,558,2166,583,2143,605,2091,635,2041,654,2039,649,2089,630,2140,601,2162,579,2181,555,2207,513"/>
+<area shape="rect" id="Node000096" href="$shadow__memory__field__definitions_8h.html" title="Symex Shadow Memory Field Definitions." alt="" coords="2205,563,2374,603"/>
+<area shape="poly" id="edge119_Node000095_Node000096" title=" " alt="" coords="2228,513,2264,551,2260,554,2224,517"/>
+<area shape="poly" id="edge120_Node000096_Node000035" title=" " alt="" coords="2257,605,2166,658,2060,726,1979,790,1975,786,2057,722,2164,653,2254,601"/>
+<area shape="poly" id="edge121_Node000096_Node000048" title=" " alt="" coords="2221,605,2041,654,2039,649,2220,600"/>
 </map>

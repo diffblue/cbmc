@@ -1,13 +1,15 @@
 <map id="/home/runner/work/cbmc/cbmc/src/pointer&#45;analysis/value_set.h" name="/home/runner/work/cbmc/cbmc/src/pointer&#45;analysis/value_set.h">
-<area shape="rect" id="Node000001" title="Value Set." alt="" coords="2978,5,3171,60"/>
+<area shape="rect" id="Node000001" title="Value Set." alt="" coords="3123,5,3317,60"/>
 <area shape="rect" id="Node000002" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="2578,108,2777,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2966,64,2778,112,2776,106,2964,59"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="3110,54,2958,79,2789,111,2777,113,2776,108,2787,105,2957,74,3110,48"/>
 <area shape="rect" id="Node000072" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="2800,115,3085,155"/>
-<area shape="poly" id="edge42_Node000001_Node000072" title=" " alt="" coords="3031,71,2969,117,2966,113,3028,66"/>
-<area shape="rect" id="Node000073" href="$value__set_8cpp.html" title="Value Set." alt="" coords="3110,108,3303,163"/>
-<area shape="poly" id="edge43_Node000001_Node000073" title=" " alt="" coords="3121,66,3174,106,3170,110,3118,70"/>
-<area shape="rect" id="Node000074" href="$value__set__domain_8h.html" title="Value Set." alt="" coords="3327,108,3521,163"/>
-<area shape="poly" id="edge44_Node000001_Node000074" title=" " alt="" coords="3179,61,3334,105,3332,111,3178,66"/>
+<area shape="poly" id="edge42_Node000001_Node000072" title=" " alt="" coords="3136,67,2996,118,2994,113,3134,62"/>
+<area shape="rect" id="Node000073" href="$simplify__expr__with__value__set_8cpp.html" title=" " alt="" coords="3109,108,3331,163"/>
+<area shape="poly" id="edge43_Node000001_Node000073" title=" " alt="" coords="3223,74,3223,108,3217,108,3217,74"/>
+<area shape="rect" id="Node000074" href="$value__set_8cpp.html" title="Value Set." alt="" coords="3355,108,3549,163"/>
+<area shape="poly" id="edge44_Node000001_Node000074" title=" " alt="" coords="3294,63,3393,105,3390,110,3292,68"/>
+<area shape="rect" id="Node000075" href="$value__set__domain_8h.html" title="Value Set." alt="" coords="3573,108,3766,163"/>
+<area shape="poly" id="edge45_Node000001_Node000075" title=" " alt="" coords="3330,55,3561,105,3573,108,3572,113,3559,111,3329,60"/>
 <area shape="rect" id="Node000003" href="$frame_8h.html" title="Class for stack frames." alt="" coords="2715,218,2936,258"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="2728,168,2799,216,2796,220,2725,172"/>
 <area shape="rect" id="Node000006" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="2695,423,2894,478"/>
@@ -37,7 +39,7 @@
 <area shape="rect" id="Node000052" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="3394,541,3609,595"/>
 <area shape="poly" id="edge36_Node000006_Node000052" title=" " alt="" coords="2888,479,2906,483,2977,495,3039,502,3143,508,3248,512,3382,531,3414,538,3413,543,3381,536,3248,518,3143,513,3038,507,2977,500,2905,488,2887,484"/>
 <area shape="rect" id="Node000053" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="3725,533,3939,603"/>
-<area shape="poly" id="edge37_Node000006_Node000053" title=" " alt="" coords="2887,479,2906,483,3014,500,3105,509,3262,515,3420,516,3513,521,3622,531,3725,545,3724,550,3621,536,3512,526,3420,521,3262,520,3105,515,3013,505,2905,488,2886,484"/>
+<area shape="poly" id="edge37_Node000006_Node000053" title=" " alt="" coords="2887,479,2906,483,3013,500,3105,509,3262,515,3419,516,3511,521,3620,531,3725,545,3724,550,3620,536,3511,526,3419,522,3261,520,3104,515,3013,505,2905,488,2886,484"/>
 <area shape="rect" id="Node000012" href="$jbmc__parse__options_8cpp.html" title="JBMC Command Line Option Processing." alt="" coords="2836,658,3028,713"/>
 <area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="2340,577,2564,603,2694,623,2823,648,2852,655,2851,661,2822,653,2694,628,2564,608,2339,582"/>
 <area shape="rect" id="Node000013" href="$cbmc__parse__options_8cpp.html" title="CBMC Command Line Option Processing." alt="" coords="276,775,481,830"/>
@@ -80,16 +82,16 @@
 <area shape="rect" id="Node000054" href="$complexity__limiter_8h.html" title="Symbolic Execution." alt="" coords="3803,658,4045,713"/>
 <area shape="poly" id="edge38_Node000053_Node000054" title=" " alt="" coords="3870,612,3905,656,3901,659,3865,615"/>
 <area shape="poly" id="edge39_Node000054_Node000007" title=" " alt="" coords="3952,722,3987,774,3982,777,3947,725"/>
-<area shape="rect" id="Node000075" href="$value__set__analysis_8h.html" title="Value Set Propagation." alt="" coords="3327,211,3521,265"/>
-<area shape="poly" id="edge45_Node000074_Node000075" title=" " alt="" coords="3427,176,3427,211,3421,211,3421,176"/>
-<area shape="rect" id="Node000076" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="3233,423,3492,478"/>
-<area shape="poly" id="edge46_Node000075_Node000076" title=" " alt="" coords="3402,278,3385,314,3372,372,3366,423,3361,423,3367,371,3380,312,3397,276"/>
-<area shape="rect" id="Node000077" href="$show__value__sets_8cpp.html" title="Show Value Sets." alt="" coords="3526,423,3719,478"/>
-<area shape="poly" id="edge47_Node000075_Node000077" title=" " alt="" coords="3535,263,3572,283,3603,312,3618,339,3626,368,3628,423,3623,423,3621,369,3613,340,3599,315,3569,287,3532,267"/>
-<area shape="rect" id="Node000078" href="$show__value__sets_8h.html" title="Show Value Sets." alt="" coords="3395,313,3589,368"/>
-<area shape="poly" id="edge48_Node000075_Node000078" title=" " alt="" coords="3452,275,3476,312,3472,315,3447,278"/>
-<area shape="rect" id="Node000079" href="$value__set__analysis_8cpp.html" title="Value Set Propagation." alt="" coords="3126,313,3319,368"/>
-<area shape="poly" id="edge51_Node000075_Node000079" title=" " alt="" coords="3361,274,3276,316,3274,311,3358,269"/>
-<area shape="poly" id="edge49_Node000078_Node000076" title=" " alt="" coords="3451,379,3396,425,3393,421,3448,375"/>
-<area shape="poly" id="edge50_Node000078_Node000077" title=" " alt="" coords="3536,375,3592,421,3589,425,3533,379"/>
+<area shape="rect" id="Node000076" href="$value__set__analysis_8h.html" title="Value Set Propagation." alt="" coords="3573,211,3766,265"/>
+<area shape="poly" id="edge46_Node000075_Node000076" title=" " alt="" coords="3672,176,3672,211,3667,211,3667,176"/>
+<area shape="rect" id="Node000077" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="3479,423,3737,478"/>
+<area shape="poly" id="edge47_Node000076_Node000077" title=" " alt="" coords="3647,278,3631,314,3617,372,3612,423,3606,423,3612,371,3625,312,3642,276"/>
+<area shape="rect" id="Node000078" href="$show__value__sets_8cpp.html" title="Show Value Sets." alt="" coords="3771,423,3965,478"/>
+<area shape="poly" id="edge48_Node000076_Node000078" title=" " alt="" coords="3780,263,3818,283,3849,312,3864,339,3871,368,3874,423,3868,423,3866,369,3859,340,3845,315,3814,287,3778,267"/>
+<area shape="rect" id="Node000079" href="$show__value__sets_8h.html" title="Show Value Sets." alt="" coords="3641,313,3834,368"/>
+<area shape="poly" id="edge49_Node000076_Node000079" title=" " alt="" coords="3697,275,3722,312,3717,315,3693,278"/>
+<area shape="rect" id="Node000080" href="$value__set__analysis_8cpp.html" title="Value Set Propagation." alt="" coords="3371,313,3565,368"/>
+<area shape="poly" id="edge52_Node000076_Node000080" title=" " alt="" coords="3606,274,3522,316,3519,311,3604,269"/>
+<area shape="poly" id="edge50_Node000079_Node000077" title=" " alt="" coords="3697,379,3641,425,3638,421,3693,375"/>
+<area shape="poly" id="edge51_Node000079_Node000078" title=" " alt="" coords="3781,375,3838,421,3834,425,3778,379"/>
 </map>

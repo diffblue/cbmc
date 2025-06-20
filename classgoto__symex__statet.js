@@ -9,7 +9,7 @@ var classgoto__symex__statet =
       [ "IN_ATOMIC_SECTION", "classgoto__symex__statet.html#a6460011152fae567f384429606e14b39a3958126e452ae84b33abb96f701be727", null ],
       [ "SHARED", "classgoto__symex__statet.html#a6460011152fae567f384429606e14b39a049518eb4dc1859c7cebbe15876cfd63", null ]
     ] ],
-    [ "goto_symex_statet", "classgoto__symex__statet.html#ae0d202b70d9e409b37a40d6f36bc5dda", null ],
+    [ "goto_symex_statet", "classgoto__symex__statet.html#aae92129886497a16b7bbfb0dd3cd2168", null ],
     [ "~goto_symex_statet", "classgoto__symex__statet.html#ae2152cf8a4c1c18e7b4c7474cca834a8", null ],
     [ "goto_symex_statet", "classgoto__symex__statet.html#a22d0f4a588b68c1c76484db2390286d8", null ],
     [ "goto_symex_statet", "classgoto__symex__statet.html#adb9a8c6ad2d827fac086eaab3432116e", null ],
@@ -43,6 +43,7 @@ var classgoto__symex__statet =
     [ "has_saved_jump_target", "classgoto__symex__statet.html#ad5daf6e464acd0978bc49f404a322f03", null ],
     [ "has_saved_next_instruction", "classgoto__symex__statet.html#af8ba4b998093bf0cdccb7e2c38439dc1", null ],
     [ "l1_types", "classgoto__symex__statet.html#ab560c64d167d8753ac9a39d82abb9789", null ],
+    [ "language_mode", "classgoto__symex__statet.html#a73e8e7d8b6557097a55313cf308e5430", null ],
     [ "level1", "classgoto__symex__statet.html#a71a5283a1ac8974d6941773d31ff7eba", null ],
     [ "read_in_atomic_section", "classgoto__symex__statet.html#a5d7fe070f6420a7fa21c5e7badab8087", null ],
     [ "record_events", "classgoto__symex__statet.html#a1ca55f73e9ea14286f584b4385dc60ca", null ],

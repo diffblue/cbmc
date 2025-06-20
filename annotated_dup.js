@@ -1099,6 +1099,7 @@ var annotated_dup =
     [ "sign_exprt", "classsign__exprt.html", "classsign__exprt" ],
     [ "signedbv_typet", "classsignedbv__typet.html", "classsignedbv__typet" ],
     [ "simple_entryt", "classsimple__entryt.html", "classsimple__entryt" ],
+    [ "simplify_expr_with_value_sett", "classsimplify__expr__with__value__sett.html", "classsimplify__expr__with__value__sett" ],
     [ "simplify_exprt", "classsimplify__exprt.html", "classsimplify__exprt" ],
     [ "single_function_filtert", "classsingle__function__filtert.html", "classsingle__function__filtert" ],
     [ "single_loop_incremental_symex_checkert", "classsingle__loop__incremental__symex__checkert.html", "classsingle__loop__incremental__symex__checkert" ],

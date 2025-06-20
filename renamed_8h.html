@@ -98,23 +98,21 @@ $(document).ready(function(){initNavTree('renamed_8h.html',''); initResizable();
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle"><div class="title">renamed.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>Class for expressions or types renamed up to a given level.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="expr__iterator_8h_source.html">util/expr_iterator.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="simplify__expr_8h_source.html">util/simplify_expr.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="simplify__expr__class_8h_source.html">util/simplify_expr_class.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for renamed.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="renamed_8h__incl.svg" width="1406" height="858"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="renamed_8h__incl.svg" width="1262" height="872"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> This graph shows which files directly or indirectly include this file:</div>
@@ -141,16 +139,6 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a12b6f080eb6cdc36761e4d2ca8cec5f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Symex renaming level names.  <a href="renamed_8h.html#a12b6f080eb6cdc36761e4d2ca8cec5f7">More...</a><br /></td></tr>
 <tr class="separator:a12b6f080eb6cdc36761e4d2ca8cec5f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:ac5367442716ff369c0988002477318c4" id="r_ac5367442716ff369c0988002477318c4"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="renamed_8h.html#a12b6f080eb6cdc36761e4d2ca8cec5f7">levelt</a> level&gt; </td></tr>
-<tr class="memitem:ac5367442716ff369c0988002477318c4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrenamedt.html">renamedt</a>&lt; <a class="el" href="classexprt.html">exprt</a>, level &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="renamed_8h.html#ac5367442716ff369c0988002477318c4">make_renamed</a> (<a class="el" href="classconstant__exprt.html">constant_exprt</a> constant)</td></tr>
-<tr class="separator:ac5367442716ff369c0988002477318c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68c860fe66697dd96efc0bff2d4b0845" id="r_a68c860fe66697dd96efc0bff2d4b0845"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="renamed_8h.html#a12b6f080eb6cdc36761e4d2ca8cec5f7">levelt</a> level&gt; </td></tr>
-<tr class="memitem:a68c860fe66697dd96efc0bff2d4b0845"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="renamed_8h.html#a68c860fe66697dd96efc0bff2d4b0845">selectively_mutate</a> (<a class="el" href="classrenamedt.html">renamedt</a>&lt; <a class="el" href="classexprt.html">exprt</a>, level &gt; &amp;<a class="el" href="classait.html">renamed</a>, <a class="el" href="classait.html">typename</a> <a class="el" href="classrenamedt.html">renamedt</a>&lt; <a class="el" href="classexprt.html">exprt</a>, level &gt;::mutator_functiont <a class="el" href="classait.html">get_mutated_expr</a>)</td></tr>
-<tr class="memdesc:a68c860fe66697dd96efc0bff2d4b0845"><td class="mdescLeft">&#160;</td><td class="mdescRight">This permits replacing subexpressions of the renamed value, so long as each replacement is consistent with our current renaming level (for example, replacing subexpressions of L2 expressions with ones which are themselves L2 renamed).  <br /></td></tr>
-<tr class="separator:a68c860fe66697dd96efc0bff2d4b0845"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for expressions or types renamed up to a given level. </p>
@@ -178,64 +166,6 @@ Functions</h2></td></tr>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="renamed_8h_source.html#l00021">21</a> of file <a class="el" href="renamed_8h_source.html">renamed.h</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="ac5367442716ff369c0988002477318c4" name="ac5367442716ff369c0988002477318c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac5367442716ff369c0988002477318c4">&#9670;&#160;</a></span>make_renamed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="renamed_8h.html#a12b6f080eb6cdc36761e4d2ca8cec5f7">levelt</a> level&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classrenamedt.html">renamedt</a>&lt; <a class="el" href="classexprt.html">exprt</a>, level &gt; make_renamed </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classconstant__exprt.html">constant_exprt</a>&#160;</td>
-          <td class="paramname"><em>constant</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="renamed_8h_source.html#l00082">82</a> of file <a class="el" href="renamed_8h_source.html">renamed.h</a>.</p>
-
-</div>
-</div>
-<a id="a68c860fe66697dd96efc0bff2d4b0845" name="a68c860fe66697dd96efc0bff2d4b0845"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a68c860fe66697dd96efc0bff2d4b0845">&#9670;&#160;</a></span>selectively_mutate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="renamed_8h.html#a12b6f080eb6cdc36761e4d2ca8cec5f7">levelt</a> level&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">void</a> selectively_mutate </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classrenamedt.html">renamedt</a>&lt; <a class="el" href="classexprt.html">exprt</a>, level &gt; &amp;&#160;</td>
-          <td class="paramname"><em>renamed</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classait.html">typename</a> <a class="el" href="classrenamedt.html">renamedt</a>&lt; <a class="el" href="classexprt.html">exprt</a>, level &gt;::mutator_functiont&#160;</td>
-          <td class="paramname"><em>get_mutated_expr</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This permits replacing subexpressions of the renamed value, so long as each replacement is consistent with our current renaming level (for example, replacing subexpressions of L2 expressions with ones which are themselves L2 renamed). </p>
-<p>The passed function will be called with each expression node in preorder (i.e. parent expressions before children), and should return an empty optional to make no change or a renamed expression to make a change. </p>
-
-<p class="definition">Definition at line <a class="el" href="renamed_8h_source.html#l00095">95</a> of file <a class="el" href="renamed_8h_source.html">renamed.h</a>.</p>
 
 </div>
 </div>

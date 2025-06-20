@@ -1,23 +1,25 @@
 <map id="/home/runner/work/cbmc/cbmc/src/pointer&#45;analysis/object_numbering.h" name="/home/runner/work/cbmc/cbmc/src/pointer&#45;analysis/object_numbering.h">
-<area shape="rect" id="Node000001" title="Object Numbering." alt="" coords="1374,5,1567,60"/>
-<area shape="rect" id="Node000002" href="$value__set_8h.html" title="Value Set." alt="" coords="1110,108,1303,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1390,67,1276,110,1275,105,1388,62"/>
-<area shape="rect" id="Node000081" href="$value__set__fi_8h.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="1639,108,1833,163"/>
-<area shape="poly" id="edge30_Node000001_Node000081" title=" " alt="" coords="1553,62,1668,105,1666,110,1551,67"/>
-<area shape="rect" id="Node000003" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="1107,211,1306,265"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1209,176,1209,211,1204,211,1204,176"/>
-<area shape="rect" id="Node000073" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="1329,218,1615,258"/>
-<area shape="poly" id="edge20_Node000002_Node000073" title=" " alt="" coords="1289,165,1423,215,1421,220,1287,170"/>
-<area shape="rect" id="Node000074" href="$value__set_8cpp.html" title="Value Set." alt="" coords="673,211,866,265"/>
-<area shape="poly" id="edge21_Node000002_Node000074" title=" " alt="" coords="1097,164,878,213,867,216,866,211,877,208,1096,158"/>
-<area shape="rect" id="Node000075" href="$value__set__domain_8h.html" title="Value Set." alt="" coords="890,211,1083,265"/>
-<area shape="poly" id="edge22_Node000002_Node000075" title=" " alt="" coords="1138,171,1045,213,1043,208,1136,166"/>
+<area shape="rect" id="Node000001" title="Object Numbering." alt="" coords="1318,5,1511,60"/>
+<area shape="rect" id="Node000002" href="$value__set_8h.html" title="Value Set." alt="" coords="999,108,1193,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1320,67,1180,110,1178,105,1318,62"/>
+<area shape="rect" id="Node000082" href="$value__set__fi_8h.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="1638,108,1831,163"/>
+<area shape="poly" id="edge31_Node000001_Node000082" title=" " alt="" coords="1512,62,1652,105,1650,110,1510,67"/>
+<area shape="rect" id="Node000003" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="1106,211,1305,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1137,170,1179,209,1175,213,1133,174"/>
+<area shape="rect" id="Node000073" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="1328,218,1613,258"/>
+<area shape="poly" id="edge20_Node000002_Node000073" title=" " alt="" coords="1207,163,1401,215,1400,221,1205,169"/>
+<area shape="rect" id="Node000074" href="$simplify__expr__with__value__set_8cpp.html" title=" " alt="" coords="425,211,647,265"/>
+<area shape="poly" id="edge21_Node000002_Node000074" title=" " alt="" coords="986,157,659,213,648,215,647,210,658,208,985,151"/>
+<area shape="rect" id="Node000075" href="$value__set_8cpp.html" title="Value Set." alt="" coords="671,211,865,265"/>
+<area shape="poly" id="edge22_Node000002_Node000075" title=" " alt="" coords="998,169,854,213,853,208,997,164"/>
+<area shape="rect" id="Node000076" href="$value__set__domain_8h.html" title="Value Set." alt="" coords="889,211,1082,265"/>
+<area shape="poly" id="edge23_Node000002_Node000076" title=" " alt="" coords="1059,174,1016,213,1012,209,1055,170"/>
 <area shape="rect" id="Node000004" href="$frame_8h.html" title="Class for stack frames." alt="" coords="952,321,1173,361"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1159,276,1091,323,1088,318,1156,271"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1158,276,1091,323,1088,318,1155,271"/>
 <area shape="rect" id="Node000007" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="1111,526,1310,581"/>
-<area shape="poly" id="edge19_Node000003_Node000007" title=" " alt="" coords="1210,279,1213,526,1208,526,1205,279"/>
+<area shape="poly" id="edge19_Node000003_Node000007" title=" " alt="" coords="1209,279,1213,526,1208,526,1203,279"/>
 <area shape="rect" id="Node000010" href="$goto__state_8cpp.html" title=" " alt="" coords="1970,643,2169,698"/>
-<area shape="poly" id="edge18_Node000003_Node000010" title=" " alt="" coords="1229,276,1256,321,1292,373,1337,425,1390,468,1466,515,1535,546,1599,566,1661,578,1794,597,1871,611,1959,633,1984,641,1982,646,1958,639,1870,616,1793,602,1660,583,1597,571,1533,551,1464,519,1386,473,1333,428,1288,376,1251,324,1224,279"/>
+<area shape="poly" id="edge18_Node000003_Node000010" title=" " alt="" coords="1243,273,1353,368,1424,421,1499,468,1591,509,1722,556,1984,641,1982,646,1720,561,1589,514,1496,473,1421,426,1349,373,1240,277"/>
 <area shape="rect" id="Node000005" href="$call__stack_8h.html" title=" " alt="" coords="966,416,1159,471"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1065,374,1065,416,1060,416,1060,374"/>
 <area shape="rect" id="Node000006" href="$java__enum__static__init__unwind__handler_8cpp.html" title="Unwind loops in static initializers." alt="" coords="865,519,1087,588"/>
@@ -27,7 +29,7 @@
 <area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="1118,587,1099,591,972,609,865,617,769,619,680,618,495,617,387,623,260,639,222,646,221,641,260,633,387,618,495,611,680,612,769,614,864,612,972,604,1098,585,1117,581"/>
 <area shape="rect" id="Node000009" href="$field__sensitivity_8cpp.html" title=" " alt="" coords="273,643,471,698"/>
 <area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="1118,587,1099,591,1006,605,927,612,791,614,655,617,576,624,483,639,452,646,451,641,482,633,575,619,655,612,791,609,926,607,1005,600,1098,585,1117,581"/>
-<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="1317,581,1340,585,1434,598,1513,605,1650,607,1786,611,1866,619,1959,633,1991,641,1989,646,1958,639,1865,624,1786,616,1650,613,1513,610,1433,604,1340,591,1316,586"/>
+<area shape="poly" id="edge9_Node000007_Node000010" title=" " alt="" coords="1324,569,1443,585,1588,598,1702,603,1815,611,1959,633,1990,641,1989,646,1958,639,1815,616,1702,608,1588,603,1442,591,1324,575"/>
 <area shape="rect" id="Node000011" href="$goto__symex__state_8cpp.html" title="Symbolic Execution." alt="" coords="495,643,694,698"/>
 <area shape="poly" id="edge10_Node000007_Node000011" title=" " alt="" coords="1116,587,1099,591,989,608,902,615,816,621,706,639,676,646,675,641,705,633,815,616,902,609,988,603,1098,585,1115,582"/>
 <area shape="rect" id="Node000012" href="$path__storage_8h.html" title="Storage of symbolic execution paths to resume." alt="" coords="718,643,917,698"/>
@@ -41,32 +43,32 @@
 <area shape="rect" id="Node000053" href="$symex__assign_8cpp.html" title="Symbolic Execution." alt="" coords="1493,643,1707,698"/>
 <area shape="poly" id="edge16_Node000007_Node000053" title=" " alt="" coords="1313,582,1512,641,1511,646,1311,587"/>
 <area shape="rect" id="Node000054" href="$symex__complexity__limit__exceeded__action_8h.html" title=" " alt="" coords="1731,636,1946,705"/>
-<area shape="poly" id="edge17_Node000007_Node000054" title=" " alt="" coords="1320,581,1340,585,1446,602,1530,609,1613,616,1719,633,1731,636,1730,641,1718,639,1612,622,1529,614,1446,607,1340,591,1319,586"/>
+<area shape="poly" id="edge17_Node000007_Node000054" title=" " alt="" coords="1324,569,1541,602,1719,633,1731,636,1730,641,1718,639,1541,607,1323,574"/>
 <area shape="poly" id="edge15_Node000051_Node000050" title=" " alt="" coords="1335,711,1304,755,1300,752,1330,708"/>
-<area shape="rect" id="Node000076" href="$value__set__analysis_8h.html" title="Value Set Propagation." alt="" coords="531,313,725,368"/>
-<area shape="poly" id="edge23_Node000075_Node000076" title=" " alt="" coords="881,272,722,316,721,311,879,266"/>
-<area shape="rect" id="Node000077" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="364,526,623,581"/>
-<area shape="poly" id="edge24_Node000076_Node000077" title=" " alt="" coords="562,378,539,396,521,417,508,444,500,473,495,526,490,526,495,472,503,442,516,415,536,392,559,374"/>
-<area shape="rect" id="Node000078" href="$show__value__sets_8cpp.html" title="Show Value Sets." alt="" coords="647,526,841,581"/>
-<area shape="poly" id="edge25_Node000076_Node000078" title=" " alt="" coords="699,374,721,392,738,415,749,443,754,473,752,526,746,525,749,473,744,444,734,417,717,396,695,378"/>
-<area shape="rect" id="Node000079" href="$show__value__sets_8h.html" title="Show Value Sets." alt="" coords="531,416,725,471"/>
-<area shape="poly" id="edge26_Node000076_Node000079" title=" " alt="" coords="631,382,631,416,625,416,625,382"/>
-<area shape="rect" id="Node000080" href="$value__set__analysis_8cpp.html" title="Value Set Propagation." alt="" coords="262,416,455,471"/>
-<area shape="poly" id="edge29_Node000076_Node000080" title=" " alt="" coords="546,375,430,418,428,413,544,370"/>
-<area shape="poly" id="edge27_Node000079_Node000077" title=" " alt="" coords="586,482,528,528,525,524,583,477"/>
-<area shape="poly" id="edge28_Node000079_Node000078" title=" " alt="" coords="669,479,717,524,714,528,665,483"/>
-<area shape="rect" id="Node000082" href="$value__set__domain__fi_8h.html" title="Value Set (Flow Insensitive)" alt="" coords="1639,211,1833,265"/>
-<area shape="poly" id="edge31_Node000081_Node000082" title=" " alt="" coords="1739,176,1739,211,1733,211,1733,176"/>
-<area shape="rect" id="Node000088" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="1857,211,2050,265"/>
-<area shape="poly" id="edge37_Node000081_Node000088" title=" " alt="" coords="1806,166,1898,208,1896,213,1804,171"/>
-<area shape="rect" id="Node000083" href="$value__set__analysis__fi_8h.html" title="Value Set Propagation (flow insensitive)" alt="" coords="1637,313,1830,368"/>
-<area shape="poly" id="edge32_Node000082_Node000083" title=" " alt="" coords="1738,279,1737,313,1731,313,1732,279"/>
-<area shape="rect" id="Node000087" href="$value__set__domain__fi_8cpp.html" title="Value Set Domain (Flow Insensitive)" alt="" coords="1854,313,2047,368"/>
-<area shape="poly" id="edge36_Node000082_Node000087" title=" " alt="" coords="1805,269,1896,311,1894,316,1803,273"/>
-<area shape="rect" id="Node000084" href="$reaching__definitions_8cpp.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="1854,416,2061,471"/>
-<area shape="poly" id="edge33_Node000083_Node000084" title=" " alt="" coords="1805,371,1900,414,1898,418,1803,376"/>
-<area shape="rect" id="Node000085" href="$value__set__fi__fp__removal_8cpp.html" title=" " alt="" coords="1401,416,1613,471"/>
-<area shape="poly" id="edge34_Node000083_Node000085" title=" " alt="" coords="1663,376,1567,418,1565,414,1661,371"/>
-<area shape="rect" id="Node000086" href="$value__set__analysis__fi_8cpp.html" title="Value Set Propagation (Flow Insensitive)" alt="" coords="1637,416,1830,471"/>
-<area shape="poly" id="edge35_Node000083_Node000086" title=" " alt="" coords="1736,382,1736,416,1731,416,1731,382"/>
+<area shape="rect" id="Node000077" href="$value__set__analysis_8h.html" title="Value Set Propagation." alt="" coords="531,313,725,368"/>
+<area shape="poly" id="edge24_Node000076_Node000077" title=" " alt="" coords="880,272,722,316,720,311,878,266"/>
+<area shape="rect" id="Node000078" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="364,526,623,581"/>
+<area shape="poly" id="edge25_Node000077_Node000078" title=" " alt="" coords="562,378,539,396,521,417,508,444,500,473,495,526,490,526,495,472,503,442,516,415,536,392,559,374"/>
+<area shape="rect" id="Node000079" href="$show__value__sets_8cpp.html" title="Show Value Sets." alt="" coords="647,526,841,581"/>
+<area shape="poly" id="edge26_Node000077_Node000079" title=" " alt="" coords="699,374,721,392,738,415,749,443,754,473,752,526,746,525,749,473,744,444,734,417,717,396,695,378"/>
+<area shape="rect" id="Node000080" href="$show__value__sets_8h.html" title="Show Value Sets." alt="" coords="531,416,725,471"/>
+<area shape="poly" id="edge27_Node000077_Node000080" title=" " alt="" coords="631,382,631,416,625,416,625,382"/>
+<area shape="rect" id="Node000081" href="$value__set__analysis_8cpp.html" title="Value Set Propagation." alt="" coords="262,416,455,471"/>
+<area shape="poly" id="edge30_Node000077_Node000081" title=" " alt="" coords="546,375,430,418,428,413,544,370"/>
+<area shape="poly" id="edge28_Node000080_Node000078" title=" " alt="" coords="586,482,528,528,525,524,583,477"/>
+<area shape="poly" id="edge29_Node000080_Node000079" title=" " alt="" coords="669,479,717,524,714,528,665,483"/>
+<area shape="rect" id="Node000083" href="$value__set__domain__fi_8h.html" title="Value Set (Flow Insensitive)" alt="" coords="1855,211,2049,265"/>
+<area shape="poly" id="edge32_Node000082_Node000083" title=" " alt="" coords="1805,166,1896,208,1894,213,1802,171"/>
+<area shape="rect" id="Node000089" href="$value__set__fi_8cpp.html" title="Value Set (Flow Insensitive, Sharing)" alt="" coords="1638,211,1831,265"/>
+<area shape="poly" id="edge38_Node000082_Node000089" title=" " alt="" coords="1737,176,1737,211,1732,211,1732,176"/>
+<area shape="rect" id="Node000084" href="$value__set__analysis__fi_8h.html" title="Value Set Propagation (flow insensitive)" alt="" coords="1746,313,1939,368"/>
+<area shape="poly" id="edge33_Node000083_Node000084" title=" " alt="" coords="1915,277,1873,315,1869,311,1911,273"/>
+<area shape="rect" id="Node000088" href="$value__set__domain__fi_8cpp.html" title="Value Set Domain (Flow Insensitive)" alt="" coords="1963,313,2157,368"/>
+<area shape="poly" id="edge37_Node000083_Node000088" title=" " alt="" coords="1992,273,2034,311,2030,315,1989,277"/>
+<area shape="rect" id="Node000085" href="$reaching__definitions_8cpp.html" title="Range&#45;based reaching definitions analysis (following Field&#45; Sensitive Program Dependence Analysis,..." alt="" coords="1963,416,2170,471"/>
+<area shape="poly" id="edge34_Node000084_Node000085" title=" " alt="" coords="1914,371,2009,414,2007,418,1912,376"/>
+<area shape="rect" id="Node000086" href="$value__set__fi__fp__removal_8cpp.html" title=" " alt="" coords="1510,416,1722,471"/>
+<area shape="poly" id="edge35_Node000084_Node000086" title=" " alt="" coords="1772,376,1676,418,1674,414,1770,371"/>
+<area shape="rect" id="Node000087" href="$value__set__analysis__fi_8cpp.html" title="Value Set Propagation (Flow Insensitive)" alt="" coords="1746,416,1939,471"/>
+<area shape="poly" id="edge36_Node000084_Node000087" title=" " alt="" coords="1845,382,1845,416,1840,416,1840,382"/>
 </map>
