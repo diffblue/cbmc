@@ -11,9 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include "expr_skeleton.h"
-#include "symex_assign.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/format_expr.h>
@@ -21,18 +18,23 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
-#include <util/simplify_expr.h>
 #include <util/simplify_utils.h>
 #include <util/std_code.h>
 #include <util/string_expr.h>
 #include <util/string_utils.h>
 
+#include "expr_skeleton.h"
+#include "simplify_expr_with_value_set.h"
+#include "symex_assign.h"
+
 #include <climits>
 
-void goto_symext::do_simplify(exprt &expr)
+void goto_symext::do_simplify(exprt &expr, const value_sett &value_set)
 {
   if(symex_config.simplify_opt)
-    simplify(expr, ns);
+  {
+    simplify_expr_with_value_sett{value_set, language_mode, ns}.simplify(expr);
+  }
 }
 
 void goto_symext::symex_assign(
@@ -61,7 +63,7 @@ void goto_symext::symex_assign(
   // "byte_extract <type> from an_lvalue offset this_rvalue") can affect whether
   // we use field-sensitive symbols or not, so L2-rename them up front:
   lhs = state.l2_rename_rvalues(lhs, ns);
-  do_simplify(lhs);
+  do_simplify(lhs, state.value_set);
   lhs = state.field_sensitivity.apply(ns, state, std::move(lhs), true);
 
   if(rhs.id() == ID_side_effect)
@@ -104,7 +106,13 @@ void goto_symext::symex_assign(
       assignment_type = symex_targett::assignment_typet::HIDDEN;
 
     symex_assignt symex_assign{
-      shadow_memory, state, assignment_type, ns, symex_config, target};
+      shadow_memory,
+      state,
+      assignment_type,
+      ns,
+      symex_config,
+      language_mode,
+      target};
 
     // Try to constant propagate potential side effects of the assignment, when
     // simplification is turned on and there is one thread only. Constant
@@ -134,7 +142,13 @@ void goto_symext::symex_assign(
 
     exprt::operandst lhs_if_then_else_conditions;
     symex_assignt{
-      shadow_memory, state, assignment_type, ns, symex_config, target}
+      shadow_memory,
+      state,
+      assignment_type,
+      ns,
+      symex_config,
+      language_mode,
+      target}
       .assign_rec(lhs, expr_skeletont{}, rhs, lhs_if_then_else_conditions);
 
     if(need_atomic_section)

@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include "goto_symex_can_forward_propagate.h"
+#include "simplify_expr_with_value_set.h"
 #include "symex_target_equation.h"
 
 static void get_l1_name(exprt &expr);
@@ -32,14 +33,19 @@ goto_symex_statet::goto_symex_statet(
   const symex_targett::sourcet &_source,
   std::size_t max_field_sensitive_array_size,
   bool should_simplify,
+  const irep_idt &language_mode,
   guard_managert &manager,
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
   : goto_statet(manager),
     source(_source),
     guard_manager(manager),
     symex_target(nullptr),
-    field_sensitivity(max_field_sensitive_array_size, should_simplify),
+    field_sensitivity(
+      max_field_sensitive_array_size,
+      should_simplify,
+      language_mode),
     record_events({true}),
+    language_mode(language_mode),
     fresh_l2_name_provider(fresh_l2_name_provider)
 {
   threads.emplace_back(guard_manager);
@@ -85,7 +91,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
   // the type might need renaming
   rename<L2>(lhs.type(), l1_identifier, ns);
   if(rhs_is_simplified)
-    simplify(lhs, ns);
+    simplify_expr_with_value_sett{value_set, language_mode, ns}.simplify(lhs);
   lhs.update_type();
   if(run_validation_checks)
   {

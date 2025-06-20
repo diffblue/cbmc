@@ -8,8 +8,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/c_types.h>
 #include <util/magic.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
 
-#include <goto-symex/goto_symex.h>
+#include <goto-programs/goto_program.h>
+
+#include <goto-symex/goto_symex_state.h>
+#include <goto-symex/simplify_expr_with_value_set.h>
+#include <pointer-analysis/value_set.h>
 #include <testing-utils/use_catch.h>
 
 static void add_to_symbol_table(
@@ -56,6 +62,7 @@ SCENARIO(
     source,
     DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
     true,
+    ID_java,
     guard_manager,
     fresh_name};
 
@@ -70,13 +77,12 @@ SCENARIO(
     WHEN("Evaluating ptr1 == &value1")
     {
       const equal_exprt comparison{ptr1, address1};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation succeeds")
       {
-        REQUIRE(result.get() == true_exprt{});
+        REQUIRE(renamed_comparison.get() == true_exprt{});
       }
     }
 
@@ -88,39 +94,36 @@ SCENARIO(
       const equal_exprt comparison{
         ptr1,
         typecast_exprt{typecast_exprt{address1, ptr_short_type}, ptr_type}};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation succeeds")
       {
-        REQUIRE(result.get() == true_exprt{});
+        REQUIRE(renamed_comparison.get() == true_exprt{});
       }
     }
 
     WHEN("Evaluating ptr1 != &value1")
     {
       const notequal_exprt comparison{ptr1, address1};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation succeeds")
       {
-        REQUIRE(result.get() == false_exprt{});
+        REQUIRE(renamed_comparison.get() == false_exprt{});
       }
     }
 
     WHEN("Evaluating ptr1 == ptr2")
     {
       const equal_exprt comparison{ptr1, ptr2};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation leaves the expression unchanged")
       {
-        REQUIRE(result.get() == renamed_comparison.get());
+        REQUIRE(renamed_comparison.get() == renamed_comparison.get());
       }
     }
   }
@@ -139,39 +142,36 @@ SCENARIO(
     WHEN("Evaluating ptr1 == &value1")
     {
       const equal_exprt comparison{ptr1, address1};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation leaves the expression unchanged")
       {
-        REQUIRE(result.get() == renamed_comparison.get());
+        REQUIRE(renamed_comparison.get() == renamed_comparison.get());
       }
     }
 
     WHEN("Evaluating ptr1 != &value1")
     {
       const notequal_exprt comparison{ptr1, address1};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation leaves the expression unchanged")
       {
-        REQUIRE(result.get() == renamed_comparison.get());
+        REQUIRE(renamed_comparison.get() == renamed_comparison.get());
       }
     }
 
     WHEN("Evaluating ptr1 != nullptr")
     {
       const notequal_exprt comparison{ptr1, null_ptr};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation succeeds")
       {
-        REQUIRE(result.get() == true_exprt{});
+        REQUIRE(renamed_comparison.get() == true_exprt{});
       }
     }
   }
@@ -191,39 +191,36 @@ SCENARIO(
     WHEN("Evaluating ptr1 == &value1")
     {
       const equal_exprt comparison{ptr1, address1};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation leaves the expression unchanged")
       {
-        REQUIRE(result.get() == renamed_comparison.get());
+        REQUIRE(renamed_comparison.get() == renamed_comparison.get());
       }
     }
 
     WHEN("Evaluating ptr1 != &value1")
     {
       const notequal_exprt comparison{ptr1, address1};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation leaves the expression unchanged")
       {
-        REQUIRE(result.get() == renamed_comparison.get());
+        REQUIRE(renamed_comparison.get() == renamed_comparison.get());
       }
     }
 
     WHEN("Evaluating ptr1 != nullptr")
     {
       const notequal_exprt comparison{ptr1, null_ptr};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation leaves the expression unchanged")
       {
-        REQUIRE(result.get() == renamed_comparison.get());
+        REQUIRE(renamed_comparison.get() == renamed_comparison.get());
       }
     }
   }
@@ -247,7 +244,7 @@ SCENARIO(
     // struct_symbol..pointer_field <- &value1
     {
       field_sensitivityt field_sensitivity{
-        DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE, true};
+        DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE, true, ID_java};
       const exprt index_fs =
         field_sensitivity.apply(ns, state, member_l1.get(), true);
       value_set.assign(index_fs, address1_l1.get(), ns, false, false);
@@ -256,26 +253,24 @@ SCENARIO(
     WHEN("Evaluating struct_symbol.pointer_field == &value1")
     {
       const equal_exprt comparison{member, address1};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation succeeds")
       {
-        REQUIRE(result.get() == true_exprt{});
+        REQUIRE(renamed_comparison.get() == true_exprt{});
       }
     }
 
     WHEN("Evaluating struct_symbol.pointer_field == &value2")
     {
       const equal_exprt comparison{member, address2};
-      const renamedt<exprt, L2> renamed_comparison =
-        state.rename(comparison, ns);
-      auto result = try_evaluate_pointer_comparisons(
-        renamed_comparison, value_set, ID_java, ns);
+      renamedt<exprt, L2> renamed_comparison = state.rename(comparison, ns);
+      simplify_expr_with_value_sett simp{value_set, ID_java, ns};
+      renamed_comparison.simplify(simp);
       THEN("Evaluation succeeds")
       {
-        REQUIRE(result.get() == false_exprt{});
+        REQUIRE(renamed_comparison.get() == false_exprt{});
       }
     }
   }

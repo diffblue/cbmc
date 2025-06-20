@@ -20,6 +20,7 @@ Author: Peter Schrammel
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>

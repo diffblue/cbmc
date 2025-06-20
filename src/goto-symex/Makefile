@@ -18,6 +18,7 @@ SRC = auto_objects.cpp \
       shadow_memory_util.cpp \
       show_program.cpp \
       show_vcc.cpp \
+      simplify_expr_with_value_set.cpp \
       slice.cpp \
       solver_hardness.cpp \
       ssa_step.cpp \

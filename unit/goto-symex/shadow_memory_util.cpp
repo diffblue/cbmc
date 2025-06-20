@@ -6,6 +6,7 @@
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/pointer_expr.h>
+#include <util/simplify_expr.h>
 #include <util/string_constant.h>
 
 #include <goto-symex/shadow_memory_util.h>
