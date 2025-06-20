@@ -134,11 +134,13 @@ linker_script_merget::linker_script_merget(
     replacement_predicates(
       {replacement_predicatet(
          "address of array's first member",
-         [](const exprt &expr) -> const symbol_exprt & {
+         [](const exprt &expr) -> const symbol_exprt &
+         {
            return to_symbol_expr(
-             to_index_expr(to_address_of_expr(expr).object()).index());
+             to_index_expr(to_address_of_expr(expr).object()).array());
          },
-         [](const exprt &expr) {
+         [](const exprt &expr)
+         {
            return expr.id() == ID_address_of &&
                   expr.type().id() == ID_pointer &&
 
@@ -164,10 +166,10 @@ linker_script_merget::linker_script_merget(
          }),
        replacement_predicatet(
          "address of array",
-         [](const exprt &expr) -> const symbol_exprt & {
-           return to_symbol_expr(to_address_of_expr(expr).object());
-         },
-         [](const exprt &expr) {
+         [](const exprt &expr) -> const symbol_exprt &
+         { return to_symbol_expr(to_address_of_expr(expr).object()); },
+         [](const exprt &expr)
+         {
            return expr.id() == ID_address_of &&
                   expr.type().id() == ID_pointer &&
 
@@ -176,10 +178,10 @@ linker_script_merget::linker_script_merget(
          }),
        replacement_predicatet(
          "address of struct",
-         [](const exprt &expr) -> const symbol_exprt & {
-           return to_symbol_expr(to_address_of_expr(expr).object());
-         },
-         [](const exprt &expr) {
+         [](const exprt &expr) -> const symbol_exprt &
+         { return to_symbol_expr(to_address_of_expr(expr).object()); },
+         [](const exprt &expr)
+         {
            return expr.id() == ID_address_of &&
                   expr.type().id() == ID_pointer &&
 
@@ -190,20 +192,16 @@ linker_script_merget::linker_script_merget(
          }),
        replacement_predicatet(
          "array variable",
-         [](const exprt &expr) -> const symbol_exprt & {
-           return to_symbol_expr(expr);
-         },
-         [](const exprt &expr) {
-           return expr.id() == ID_symbol && expr.type().id() == ID_array;
-         }),
+         [](const exprt &expr) -> const symbol_exprt &
+         { return to_symbol_expr(expr); },
+         [](const exprt &expr)
+         { return expr.id() == ID_symbol && expr.type().id() == ID_array; }),
        replacement_predicatet(
          "pointer (does not need pointerizing)",
-         [](const exprt &expr) -> const symbol_exprt & {
-           return to_symbol_expr(expr);
-         },
-         [](const exprt &expr) {
-           return expr.id() == ID_symbol && expr.type().id() == ID_pointer;
-         })})
+         [](const exprt &expr) -> const symbol_exprt &
+         { return to_symbol_expr(expr); },
+         [](const exprt &expr)
+         { return expr.id() == ID_symbol && expr.type().id() == ID_pointer; })})
 {}
 
 int linker_script_merget::pointerize_linker_defined_symbols(
