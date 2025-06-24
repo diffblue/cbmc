@@ -838,7 +838,7 @@ var searchData=
   ['mz_5fver_5frevision_835',['MZ_VER_REVISION',['../miniz_8h.html#af685fd946d23a6eea4705d5830bb10d4',1,'miniz.h']]],
   ['mz_5fver_5fsubrevision_836',['MZ_VER_SUBREVISION',['../miniz_8h.html#ac78dfe8be78df919afad8d29c19264f8',1,'miniz.h']]],
   ['mz_5fvernum_837',['MZ_VERNUM',['../miniz_8h.html#ada760edfdc8e8f93c2b6ce340096cb9d',1,'miniz.h']]],
-  ['mz_5fversion_838',['mz_version',['../miniz_8h.html#a69229ba2b86a229226516575d1a458c8',1,'MZ_VERSION:&#160;miniz.h'],['../miniz_8cpp.html#a68a4b87921b654b87c37ea8e5b626e80',1,'mz_version(void):&#160;miniz.cpp']]],
+  ['mz_5fversion_838',['mz_version',['../miniz_8cpp.html#a68a4b87921b654b87c37ea8e5b626e80',1,'mz_version(void):&#160;miniz.cpp'],['../miniz_8h.html#a69229ba2b86a229226516575d1a458c8',1,'MZ_VERSION:&#160;miniz.h']]],
   ['mz_5fzip64_5fecdh_5fcdir_5fnum_5fentries_5fon_5fdisk_5fofs_839',['MZ_ZIP64_ECDH_CDIR_NUM_ENTRIES_ON_DISK_OFS',['../miniz_8cpp.html#abed82baf7f470b522273a3e37c24c600a63640ed20841b4aad31e5f27bc11f5c4',1,'miniz.cpp']]],
   ['mz_5fzip64_5fecdh_5fcdir_5fofs_5fofs_840',['MZ_ZIP64_ECDH_CDIR_OFS_OFS',['../miniz_8cpp.html#abed82baf7f470b522273a3e37c24c600ac3072ff7e0d451b2d918e4be650c998c',1,'miniz.cpp']]],
   ['mz_5fzip64_5fecdh_5fcdir_5fsize_5fofs_841',['MZ_ZIP64_ECDH_CDIR_SIZE_OFS',['../miniz_8cpp.html#abed82baf7f470b522273a3e37c24c600a8bd9fc50f35f48bf3ce4456b4d57bac3',1,'miniz.cpp']]],

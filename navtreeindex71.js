@@ -1,6 +1,5 @@
 var NAVTREEINDEX71 =
 {
-"classvariable__sensitivity__dependence__grapht.html#a8f2191d091230e051e5c93205283c313":[7,0,1358,14],
 "classvariable__sensitivity__dependence__grapht.html#a9c576e3f8df0d1de70c9648ef5a412dd":[7,0,1358,5],
 "classvariable__sensitivity__dependence__grapht.html#a9c88392765bbcdb9a3c0e8b0fba3bc38":[7,0,1358,10],
 "classvariable__sensitivity__dependence__grapht.html#aaa5515c47d3392d51731ca5b448f5749":[7,0,1358,13],
@@ -249,5 +248,6 @@ var NAVTREEINDEX71 =
 "code-walkthrough.html#equation-section":[0,4,11,3,0],
 "code-walkthrough.html#front-end-languages-generating-codet-from-multiple-languages-section":[0,4,11,2],
 "code-walkthrough.html#language-uit-section":[0,4,11,2,0],
-"code-walkthrough.html#languages-c-section":[0,4,11,2,1]
+"code-walkthrough.html#languages-c-section":[0,4,11,2,1],
+"code-walkthrough.html#languages-cpp-section":[0,4,11,2,2]
 };

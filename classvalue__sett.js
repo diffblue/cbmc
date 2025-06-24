@@ -3,7 +3,7 @@ var classvalue__sett =
     [ "entryt", "structvalue__sett_1_1entryt.html", "structvalue__sett_1_1entryt" ],
     [ "object_map_dt", "classvalue__sett.html#af92a5fe9e1495ee3c3396b02e9b2ace6", null ],
     [ "object_mapt", "classvalue__sett.html#abb2dc066654abb235711fa84799fc148", null ],
-    [ "offsett", "classvalue__sett.html#a9ae9143371cfcfd97a0cc265f80e5c09", null ],
+    [ "offsett", "classvalue__sett.html#a448fcd97ceb8f5595dadb74dfaee525b", null ],
     [ "valuest", "classvalue__sett.html#a0edf7b833a50b85f5edb037200ae5c8d", null ],
     [ "insert_actiont", "classvalue__sett.html#ad59a616b46a7d5e0bc3e188565392483", [
       [ "INSERT", "classvalue__sett.html#ad59a616b46a7d5e0bc3e188565392483a61ee777e7f71dc466c3b2c685d8d313b", null ],
@@ -42,7 +42,6 @@ var classvalue__sett =
     [ "guard", "classvalue__sett.html#ad3e54193b046f37d1d653e835c9dbaa7", null ],
     [ "insert", "classvalue__sett.html#ab5d6165550ac1f167bbfbc2fccceae0e", null ],
     [ "insert", "classvalue__sett.html#ae7f5a475129fbb6cc218307e722f2865", null ],
-    [ "insert", "classvalue__sett.html#aa456fcebc126d24a6bd4dbce907c72f5", null ],
     [ "insert", "classvalue__sett.html#a8161d31257998f32f3e26ba0b9071585", null ],
     [ "insert", "classvalue__sett.html#a42e63d7b4c8d636ad2d8dbe41a0f46b5", null ],
     [ "make_union", "classvalue__sett.html#a20733d1151343e04f1fc937e219dd7a9", null ],

@@ -1,6 +1,5 @@
 var NAVTREEINDEX72 =
 {
-"code-walkthrough.html#languages-cpp-section":[0,4,11,2,2],
 "code-walkthrough.html#languages-java-section":[0,4,11,2,3],
 "code-walkthrough.html#solvers-infrastructure-section":[0,4,11,5],
 "code-walkthrough.html#static-analysis-apis-section":[0,4,11,6],
@@ -249,5 +248,6 @@ var NAVTREEINDEX72 =
 "contracts-loop-invariants.html#autotoc_md108":[1,0,5,2],
 "contracts-loops.html":[1,0,1],
 "contracts-loops.html#autotoc_md109":[1,0,1,0],
-"contracts-loops.html#autotoc_md110":[1,0,1,0,0]
+"contracts-loops.html#autotoc_md110":[1,0,1,0,0],
+"contracts-loops.html#autotoc_md111":[1,0,1,0,1]
 };
