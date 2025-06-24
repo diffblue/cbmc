@@ -77,9 +77,13 @@ bool is_ptr_comparison(const exprt &expr)
          (expr.operands()[1].type().id() == ID_pointer);
 }
 
-static bool is_access_expr(const irep_idt &id)
+static bool is_access_expr(const exprt &expr)
 {
-  return id == ID_member || id == ID_index || id == ID_dereference;
+  if(auto tc = expr_try_dynamic_cast<typecast_exprt>(expr))
+    return is_access_expr(tc->op());
+
+  return expr.id() == ID_member || expr.id() == ID_index ||
+         expr.id() == ID_dereference;
 }
 
 static bool is_object_creation(const irep_idt &id)
@@ -107,7 +111,7 @@ abstract_environmentt::eval(const exprt &expr, const namespacet &ns) const
     return resolve_symbol(simplified_expr, ns);
 
   if(
-    is_access_expr(simplified_id) || is_ptr_diff(simplified_expr) ||
+    is_access_expr(simplified_expr) || is_ptr_diff(simplified_expr) ||
     is_ptr_comparison(simplified_expr))
   {
     auto const operands = eval_operands(simplified_expr, *this, ns);
@@ -168,7 +172,9 @@ bool abstract_environmentt::assign(
   std::stack<exprt> stactions; // I'm not a continuation, honest guv'
   while(s.id() != ID_symbol)
   {
-    if(s.id() == ID_index || s.id() == ID_member || s.id() == ID_dereference)
+    if(
+      s.id() == ID_index || s.id() == ID_member || s.id() == ID_dereference ||
+      s.id() == ID_typecast)
     {
       stactions.push(s);
       s = s.operands()[0];
@@ -248,8 +254,8 @@ abstract_object_pointert abstract_environmentt::write(
   const irep_idt &stack_head_id = next_expr.id();
   INVARIANT(
     stack_head_id == ID_index || stack_head_id == ID_member ||
-      stack_head_id == ID_dereference,
-    "Write stack expressions must be index, member, or dereference");
+      stack_head_id == ID_dereference || stack_head_id == ID_typecast,
+    "Write stack expressions must be index, member, dereference, or typecast");
 
   return lhs->write(*this, ns, remaining_stack, next_expr, rhs, merge_write);
 }
