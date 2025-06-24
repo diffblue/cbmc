@@ -692,8 +692,9 @@ void value_sett::get_value_set_rec(
     expr.id() == ID_bitnand || expr.id() == ID_bitnor ||
     expr.id() == ID_bitxnor)
   {
-    if(expr.operands().size()<2)
-      throw expr.id_string()+" expected to have at least two operands";
+    DATA_INVARIANT(
+      expr.operands().size() >= 2,
+      expr.id_string() + " expected to have at least two operands");
 
     object_mapt pointer_expr_set;
     std::optional<mp_integer> i;
@@ -803,8 +804,9 @@ void value_sett::get_value_set_rec(
     // this is to do stuff like
     // (int*)((sel*(ulong)&a)+((sel^0x1)*(ulong)&b))
 
-    if(expr.operands().size()<2)
-      throw expr.id_string()+" expected to have at least two operands";
+    DATA_INVARIANT(
+      expr.operands().size() >= 2,
+      expr.id_string() + " expected to have at least two operands");
 
     object_mapt pointer_expr_set;
 
@@ -858,7 +860,7 @@ void value_sett::get_value_set_rec(
     if(statement==ID_function_call)
     {
       // these should be gone
-      throw "unexpected function_call sideeffect";
+      UNREACHABLE;
     }
     else if(statement==ID_allocate)
     {
@@ -876,6 +878,8 @@ void value_sett::get_value_set_rec(
     else if(statement==ID_cpp_new ||
             statement==ID_cpp_new_array)
     {
+      // this is rewritten in the front-end, should be gone
+      UNREACHABLE;
       PRECONDITION(suffix.empty());
       PRECONDITION(expr.type().id() == ID_pointer);
 
@@ -1360,9 +1364,6 @@ void value_sett::get_reference_set_rec(
   }
   else if(expr.id()==ID_index)
   {
-    if(expr.operands().size()!=2)
-      throw "index expected to have two operands";
-
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
     const exprt &offset=index_expr.index();
@@ -1676,8 +1677,9 @@ void value_sett::assign_rec(
   }
   else if(lhs.id()==ID_dereference)
   {
-    if(lhs.operands().size()!=1)
-      throw lhs.id_string()+" expected to have one operand";
+    DATA_INVARIANT(
+      lhs.operands().size() == 1,
+      lhs.id_string() + " expected to have one operand");
 
     object_mapt reference_set;
     get_reference_set(lhs, reference_set, ns);
@@ -1763,7 +1765,7 @@ void value_sett::assign_rec(
     // which we don't track
   }
   else
-    throw "assign NYI: '" + lhs.id_string() + "'";
+    UNIMPLEMENTED_FEATURE("assign NYI: '" + lhs.id_string() + "'");
 }
 
 void value_sett::do_function_call(
@@ -1842,36 +1844,28 @@ void value_sett::apply_code_rec(
   }
   else if(statement==ID_assign)
   {
-    if(code.operands().size()!=2)
-      throw "assignment expected to have two operands";
-
-    assign(code.op0(), code.op1(), ns, false, false);
+    const code_assignt &a = to_code_assign(code);
+    assign(a.lhs(), a.rhs(), ns, false, false);
   }
   else if(statement==ID_decl)
   {
-    if(code.operands().size()!=1)
-      throw "decl expected to have one operand";
-
-    const exprt &lhs=code.op0();
-
-    if(lhs.id()!=ID_symbol)
-      throw "decl expected to have symbol on lhs";
-
-    const typet &lhs_type = lhs.type();
+    const code_declt &decl = to_code_decl(code);
+    const symbol_exprt &symbol = decl.symbol();
+    const typet &symbol_type = symbol.type();
 
     if(
-      lhs_type.id() == ID_pointer ||
-      (lhs_type.id() == ID_array &&
-       to_array_type(lhs_type).element_type().id() == ID_pointer))
+      symbol_type.id() == ID_pointer ||
+      (symbol_type.id() == ID_array &&
+       to_array_type(symbol_type).element_type().id() == ID_pointer))
     {
       // assign the address of the failed object
-      if(auto failed = get_failed_symbol(to_symbol_expr(lhs), ns))
+      if(auto failed = get_failed_symbol(symbol, ns))
       {
-        address_of_exprt address_of_expr(*failed, to_pointer_type(lhs.type()));
-        assign(lhs, address_of_expr, ns, false, false);
+        address_of_exprt address_of_expr(*failed, to_pointer_type(symbol_type));
+        assign(symbol, address_of_expr, ns, false, false);
       }
       else
-        assign(lhs, exprt(ID_invalid), ns, false, false);
+        assign(symbol, exprt(ID_invalid), ns, false, false);
     }
   }
   else if(statement==ID_expression)
@@ -1944,8 +1938,8 @@ void value_sett::apply_code_rec(
   }
   else
   {
-    // std::cerr << code.pretty() << '\n';
-    throw "value_sett: unexpected statement: "+id2string(statement);
+    UNIMPLEMENTED_FEATURE(
+      "value_sett: unexpected statement: " + id2string(statement));
   }
 }
 
