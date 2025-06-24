@@ -27,8 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_with_value_set.h"
 #include "symex_target_equation.h"
 
-static void get_l1_name(exprt &expr);
-
 goto_symex_statet::goto_symex_statet(
   const symex_targett::sourcet &_source,
   std::size_t max_field_sensitive_array_size,
@@ -129,20 +127,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
   else
     propagation.erase_if_exists(l1_identifier);
 
-  {
-    // update value sets
-    exprt l1_rhs(rhs);
-    get_l1_name(l1_rhs);
-
-    const ssa_exprt l1_lhs = remove_level_2(lhs);
-    if(run_validation_checks)
-    {
-      DATA_INVARIANT(!check_renaming_l1(l1_lhs), "lhs renaming failed on l1");
-      DATA_INVARIANT(!check_renaming_l1(l1_rhs), "rhs renaming failed on l1");
-    }
-
-    value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
-  }
+  value_set.assign(lhs, rhs, ns, rhs_is_simplified, is_shared);
 
 #ifdef DEBUG
   std::cout << "Assigning " << l1_identifier << '\n';
@@ -787,17 +772,6 @@ void goto_symex_statet::rename(
   if(level==L2 &&
      !l1_identifier.empty())
     l1_type_entry.first->second=type;
-}
-
-static void get_l1_name(exprt &expr)
-{
-  // do not reset the type !
-
-  if(is_ssa_expr(expr))
-    to_ssa_expr(expr).remove_level_2();
-  else
-    Forall_operands(it, expr)
-      get_l1_name(*it);
 }
 
 /// Dumps the current state of symex, printing the function name and location

@@ -12,14 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_H
 
-#include <unordered_set>
-
-#include <util/mp_arith.h>
 #include <util/reference_counting.h>
 #include <util/sharing_map.h>
 
 #include "object_numbering.h"
 #include "value_sets.h"
+
+#include <unordered_set>
 
 class namespacet;
 class xmlt;
@@ -76,9 +75,9 @@ public:
   /// in value sets.
   static object_numberingt object_numbering;
 
-  /// Represents the offset into an object: either a unique integer offset,
-  /// or an unknown value, represented by `!offset`.
-  typedef std::optional<mp_integer> offsett;
+  /// Represents the offset into an object: either some (possibly constant)
+  /// expression, or an unknown value, represented by `!offset`.
+  typedef std::optional<exprt> offsett;
 
   /// Represents a set of expressions (`exprt` instances) with corresponding
   /// offsets (`offsett` instances). This is the RHS set of a single row of
@@ -138,20 +137,6 @@ public:
   bool insert(object_mapt &dest, const exprt &src) const
   {
     return insert(dest, object_numbering.number(src), offsett());
-  }
-
-  /// Adds an expression to an object map, with known offset. If the
-  /// destination map has an existing element for the same expression
-  /// with a differing offset its offset is marked unknown.
-  /// \param dest: object map to update
-  /// \param src: expression to add
-  /// \param offset_value: offset into `src`
-  bool insert(
-    object_mapt &dest,
-    const exprt &src,
-    const mp_integer &offset_value) const
-  {
-    return insert(dest, object_numbering.number(src), offsett(offset_value));
   }
 
   /// Adds a numbered expression and offset to an object map. If the

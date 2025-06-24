@@ -298,4 +298,138 @@ SCENARIO(
       }
     }
   }
+
+  GIVEN("A value-set containing pointers with offsets")
+  {
+    signedbv_typet int_type{sizeof(int) * CHAR_BIT};
+    pointer_typet int_ptr_type{int_type, sizeof(void *) * CHAR_BIT};
+
+    // Create struct S { int a; char b }
+    struct_typet struct_S{{{"a", int_type}, {"b", unsignedbv_typet{CHAR_BIT}}}};
+    struct_S.set_tag("S");
+
+    auto &S_a = struct_S.components()[0];
+    auto &S_b = struct_S.components()[1];
+
+    S_a.set_base_name("a");
+    S_a.set_pretty_name("a");
+
+    S_b.set_base_name("b");
+    S_b.set_pretty_name("b");
+
+    type_symbolt S_symbol{"S", struct_S, irep_idt{}};
+    S_symbol.base_name = "S";
+    S_symbol.pretty_name = "S";
+
+    symbol_table.add(S_symbol);
+
+    // Create global symbols struct S s, int *p
+
+    symbolt s_symbol{"s", struct_tag_typet{S_symbol.name}, irep_idt{}};
+    s_symbol.pretty_name = "s";
+    s_symbol.is_static_lifetime = true;
+    symbol_table.add(s_symbol);
+
+    symbolt p1_symbol{"p1", int_ptr_type, irep_idt{}};
+    p1_symbol.pretty_name = "p1";
+    p1_symbol.is_static_lifetime = true;
+    symbol_table.add(p1_symbol);
+
+    // Assign p1 = &s + s.a + s.a; (which we cannot easily create via regression
+    // tests, because front-ends would turn this into binary expressions)
+    member_exprt s_a(s_symbol.symbol_expr(), S_a);
+    code_assignt assign_p1{
+      p1_symbol.symbol_expr(),
+      plus_exprt{
+        {typecast_exprt{
+           address_of_exprt{s_symbol.symbol_expr()}, p1_symbol.type},
+         s_a,
+         s_a},
+        int_ptr_type}};
+
+    value_set.apply_code(assign_p1, ns);
+
+    WHEN("We query what p1 points to")
+    {
+      const std::vector<exprt> p1_result =
+        value_set.get_value_set(p1_symbol.symbol_expr(), ns);
+
+      THEN("It should point to 's'")
+      {
+        REQUIRE(p1_result.size() == 1);
+        const exprt &result = *p1_result.begin();
+        REQUIRE(object_descriptor_matches(result, s_symbol.symbol_expr()));
+      }
+    }
+
+    symbolt p2_symbol{"p2", int_ptr_type, irep_idt{}};
+    p2_symbol.pretty_name = "p2";
+    p2_symbol.is_static_lifetime = true;
+    symbol_table.add(p2_symbol);
+
+    // Assign p2 = &s - s.a; (which the simplifier would always rewrite to &s +
+    // -(s.a), so use the value_sett::assign interface to wrongly claim
+    // simplification had already taken place)
+    value_set.assign(
+      p2_symbol.symbol_expr(),
+      minus_exprt{
+        typecast_exprt{
+          address_of_exprt{s_symbol.symbol_expr()}, p2_symbol.type},
+        s_a},
+      ns,
+      true,
+      true);
+
+    WHEN("We query what p2 points to")
+    {
+      const std::vector<exprt> p2_result =
+        value_set.get_value_set(p2_symbol.symbol_expr(), ns);
+
+      THEN("It should point to 's'")
+      {
+        REQUIRE(p2_result.size() == 1);
+        const exprt &result = *p2_result.begin();
+        REQUIRE(object_descriptor_matches(result, s_symbol.symbol_expr()));
+      }
+    }
+
+    symbolt A_symbol{
+      "A", array_typet{int_type, from_integer(2, int_type)}, irep_idt{}};
+    A_symbol.pretty_name = "A";
+    A_symbol.is_static_lifetime = true;
+    symbol_table.add(A_symbol);
+
+    symbolt p3_symbol{"p3", int_ptr_type, irep_idt{}};
+    p3_symbol.pretty_name = "p3";
+    p3_symbol.is_static_lifetime = true;
+    symbol_table.add(p3_symbol);
+
+    // Assign p3 = &A[1]; (which the simplifier would always rewrite to A +
+    // sizeof(int), so use the value_sett::assign interface to wrongly claim
+    // simplification had already taken place)
+    value_set.assign(
+      p3_symbol.symbol_expr(),
+      address_of_exprt{
+        index_exprt{A_symbol.symbol_expr(), from_integer(1, int_type)}},
+      ns,
+      true,
+      true);
+
+    WHEN("We query what p3 points to")
+    {
+      const std::vector<exprt> p3_result =
+        value_set.get_value_set(p3_symbol.symbol_expr(), ns);
+
+      THEN("It should point to 'A'")
+      {
+        REQUIRE(p3_result.size() == 1);
+        const exprt &result = *p3_result.begin();
+        REQUIRE(object_descriptor_matches(
+          result,
+          index_exprt{
+            A_symbol.symbol_expr(),
+            from_integer(0, to_array_type(A_symbol.type).index_type())}));
+      }
+    }
+  }
 }
