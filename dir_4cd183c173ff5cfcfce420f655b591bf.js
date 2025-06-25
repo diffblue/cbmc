@@ -108,8 +108,6 @@ var dir_4cd183c173ff5cfcfce420f655b591bf =
     [ "uninitialized.h", "uninitialized_8h.html", "uninitialized_8h" ],
     [ "unwind.cpp", "unwind_8cpp.html", null ],
     [ "unwind.h", "unwind_8h.html", "unwind_8h" ],
-    [ "unwindset.cpp", "unwindset_8cpp.html", null ],
-    [ "unwindset.h", "unwindset_8h.html", "unwindset_8h" ],
     [ "value_set_fi_fp_removal.cpp", "value__set__fi__fp__removal_8cpp.html", "value__set__fi__fp__removal_8cpp" ],
     [ "value_set_fi_fp_removal.h", "value__set__fi__fp__removal_8h.html", "value__set__fi__fp__removal_8h" ]
 ];
