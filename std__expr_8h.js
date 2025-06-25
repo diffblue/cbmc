@@ -122,6 +122,7 @@ var std__expr_8h =
     [ "can_cast_expr< xnor_exprt >", "std__expr_8h.html#a3d180316add11b1b516567d63aa4fded", null ],
     [ "can_cast_expr< xor_exprt >", "std__expr_8h.html#a192776b7e7b44bb6c095c15e4812bf2e", null ],
     [ "conjunction", "std__expr_8h.html#a6f5bbd063b7d74fe4f284dde56330267", null ],
+    [ "conjunction", "std__expr_8h.html#addae1945ff0ba28efc42c47a1a493034", null ],
     [ "disjunction", "std__expr_8h.html#a5bdf114cebb1638065da3653c2645e3c", null ],
     [ "to_abs_expr", "std__expr_8h.html#a8198f2807c93ab5a0ea315a98ae6bb87", null ],
     [ "to_abs_expr", "std__expr_8h.html#aaa27766c65cda3153717fd221c02c9b3", null ],

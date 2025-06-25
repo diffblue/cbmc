@@ -424,10 +424,10 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns true if <code>expr</code> has a pointer type and a value NULL; it also returns true when <code>expr</code> has value zero and NULL_is_zero is true; returns false in all other cases. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000021">Deprecated:</a></b></dt><dd>"deprecated since " "2024" "-" "9" "-" "10" "; " "use constant_exprt::is_null_pointer() instead" <br  />
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000022">Deprecated:</a></b></dt><dd>"deprecated since " "2024" "-" "9" "-" "10" "; " "use constant_exprt::is_null_pointer() instead" <br  />
  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00344">344</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00326">326</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -490,7 +490,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Conjunction of two expressions. </p>
-<p>If the second is already an <code><a class="el" href="classand__exprt.html" title="Boolean AND.">and_exprt</a></code> add to its operands instead of creating a new expression. If one is <code>true</code>, return the other expression. If one is <code>false</code> returns <code>false</code>. </p>
+<p>If the second is already an <code><a class="el" href="classand__exprt.html" title="Boolean AND.">and_exprt</a></code> add to its operands instead of creating a new expression. If one is <code>true</code>, return the other expression. If one is <code>false</code> returns <code>false</code>. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000021">Deprecated:</a></b></dt><dd>"deprecated since " "2025" "-" "6" "-" "25" "; " "use conjunction(exprt, exprt) instead" <br  />
+ </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00321">321</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
