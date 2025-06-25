@@ -66,11 +66,6 @@ exprt make_binary(const exprt &expr)
   return previous;
 }
 
-with_exprt make_with_expr(const update_exprt &src)
-{
-  return src.make_with_expr();
-}
-
 exprt is_not_zero(
   const exprt &src,
   const namespacet &ns)

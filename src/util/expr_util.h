@@ -40,10 +40,6 @@ bool is_assignable(const exprt &);
 /// splits an expression with >=3 operands into nested binary expressions
 exprt make_binary(const exprt &);
 
-/// converts an update expr into a (possibly nested) with expression
-DEPRECATED(SINCE(2024, 9, 10, "use update_exprt::make_with_expr() instead"))
-with_exprt make_with_expr(const update_exprt &);
-
 /// converts a scalar/float expression to C/C++ Booleans
 exprt is_not_zero(const exprt &, const namespacet &ns);
 
