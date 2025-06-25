@@ -1,0 +1,10 @@
+CORE
+functional.c
+-DN=4 -DASSIGN --program-only
+^EXIT=0$
+^SIGNAL=0$
+--
+byte_update
+--
+We want these tests not to produce any byte_update expressions, but instead want
+updates at specific array indices.
