@@ -5,7 +5,7 @@ int main()
 
   // clang-format off
   // clang-format would rewrite the "==>" as "== >"
-  __CPROVER_assume( __CPROVER_forall { signed char i; (i>=0 && i<2) ==> b[i]>=10 && b[i]<=10 } );
+  __CPROVER_assume( __CPROVER_forall { unsigned char i; (i>=0 && i<2) ==> b[i]>=10 && b[i]<=10 } );
   __CPROVER_assume( __CPROVER_forall { unsigned i; (i>=0 && i<2) ==> c[i]>=10 && c[i]<=10 } );
   // clang-format on
 

@@ -543,16 +543,32 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   // The first parameter is the va_list, and the second
   // is the type, which will need to be fixed and checked.
   // The type is given by the parser as type of the expression.
-
-  typet arg_type=expr.type();
-  typecheck_type(arg_type);
-
-  const code_typet new_type(
-    {code_typet::parametert(pointer_type(void_type()))}, std::move(arg_type));
+  auto type_not_permitted = [this](const exprt &expr)
+  {
+    const exprt &arg = to_unary_expr(expr).op();
+    error().source_location = expr.source_location();
+    error() << "argument of type '" << to_string(arg.type())
+            << "' not permitted for va_arg" << eom;
+    throw 0;
+  };
 
   exprt arg = to_unary_expr(expr).op();
+  if(auto struct_tag_type = type_try_dynamic_cast<struct_tag_typet>(arg.type()))
+  {
+    // aarch64 ABI mandates that va_list has struct type with member names as
+    // specified
+    const auto &components = follow_tag(*struct_tag_type).components();
+    if(components.size() != 5)
+      type_not_permitted(expr);
+  }
+  else if(arg.type().id() != ID_pointer && arg.type().id() != ID_array)
+    type_not_permitted(expr);
 
-  implicit_typecast(arg, pointer_type(void_type()));
+  typet arg_type = expr.type();
+  typecheck_type(arg_type);
+
+  const code_typet new_type{
+    {code_typet::parametert{arg.type()}}, std::move(arg_type)};
 
   symbol_exprt function(ID_gcc_builtin_va_arg, new_type);
   function.add_source_location() = expr.source_location();

@@ -155,6 +155,23 @@ void cpp_internal_additions(std::ostream &out)
       out << "typedef signed __int128 __int128_t;" << '\n';
       out << "typedef unsigned __int128 __uint128_t;" << '\n';
     }
+
+    if(
+      config.ansi_c.arch == "arm64" &&
+      config.ansi_c.os != configt::ansi_ct::ost::OS_MACOS)
+    {
+      out << "typedef struct __va_list {";
+      out << "void *__stack;";
+      out << "void *__gr_top;";
+      out << "void *__vr_top;";
+      out << "int   __gr_offs;";
+      out << "int   __vr_offs;";
+      out << " } __builtin_va_list;" << '\n';
+    }
+    else
+    {
+      out << "typedef void ** __builtin_va_list;" << '\n';
+    }
   }
 
   // this is Visual C/C++ only

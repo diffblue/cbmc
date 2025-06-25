@@ -593,8 +593,20 @@ void goto_convertt::do_array_op(
   copy(array_op_statement, OTHER, dest);
 }
 
-exprt make_va_list(const exprt &expr)
+static exprt make_va_list(const exprt &expr, const namespacet &ns)
 {
+  if(
+    auto struct_tag_type = type_try_dynamic_cast<struct_tag_typet>(expr.type()))
+  {
+    // aarch64 ABI mandates that va_list has struct type with member names as
+    // specified
+    const auto &components = ns.follow_tag(*struct_tag_type).components();
+    DATA_INVARIANT(
+      components.size() == 5,
+      "va_list struct type expected to have 5 components");
+    return member_exprt{expr, components.front()};
+  }
+
   exprt result = skip_typecast(expr);
 
   // if it's an address of an lvalue, we take that
@@ -1296,14 +1308,15 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    exprt list_arg = make_va_list(arguments[0]);
+    exprt list_arg = make_va_list(arguments[0], ns);
+    const bool va_list_is_void_ptr =
+      list_arg.type().id() == ID_pointer &&
+      to_pointer_type(list_arg.type()).base_type().id() == ID_empty;
 
     if(lhs.is_not_nil())
     {
       exprt list_arg_cast = list_arg;
-      if(
-        list_arg.type().id() == ID_pointer &&
-        to_pointer_type(list_arg.type()).base_type().id() == ID_empty)
+      if(va_list_is_void_ptr)
       {
         list_arg_cast =
           typecast_exprt{list_arg, pointer_type(pointer_type(empty_typet{}))};
@@ -1317,8 +1330,14 @@ void goto_convertt::do_function_call_symbol(
         goto_programt::make_assignment(lhs, rhs, function.source_location()));
     }
 
-    code_assignt assign{
-      list_arg, plus_exprt{list_arg, from_integer(1, pointer_diff_type())}};
+    exprt list_arg_ptr_arithmetic = typecast_exprt::conditional_cast(
+      plus_exprt{
+        (va_list_is_void_ptr
+           ? typecast_exprt{list_arg, pointer_type(pointer_type(empty_typet{}))}
+           : list_arg),
+        from_integer(1, pointer_diff_type())},
+      list_arg.type());
+    code_assignt assign{list_arg, std::move(list_arg_ptr_arithmetic)};
     assign.rhs().set(
       ID_C_va_arg_type, to_code_type(function.type()).return_type());
     dest.add(goto_programt::make_assignment(
@@ -1333,7 +1352,7 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    exprt dest_expr = make_va_list(arguments[0]);
+    exprt dest_expr = make_va_list(arguments[0], ns);
     const typecast_exprt src_expr(arguments[1], dest_expr.type());
 
     if(!is_assignable(dest_expr))
@@ -1357,7 +1376,7 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    exprt dest_expr = make_va_list(arguments[0]);
+    exprt dest_expr = make_va_list(arguments[0], ns);
 
     if(!is_assignable(dest_expr))
     {
@@ -1392,7 +1411,7 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    exprt dest_expr = make_va_list(arguments[0]);
+    exprt dest_expr = make_va_list(arguments[0], ns);
 
     if(!is_assignable(dest_expr))
     {

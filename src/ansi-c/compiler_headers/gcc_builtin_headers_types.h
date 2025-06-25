@@ -1,5 +1,4 @@
 // clang-format off
-typedef void ** __builtin_va_list;
 typedef void ** __builtin_ms_va_list;
 
 typedef int    __gcc_m64   __attribute__ ((__vector_size__ (8), __may_alias__));
@@ -45,4 +44,13 @@ enum __gcc_atomic_memmodels {
 };
 
 typedef unsigned char __tile __attribute__ ((__vector_size__ (1024)));
+
+// GCC and Clang use the following on ARM:
+typedef float __Float32x4_t __attribute__ ((__vector_size__ (16)));
+typedef double __Float64x2_t __attribute__ ((__vector_size__ (16)));
+// The following ARM (scalable vector) extensions define vectors the size of
+// which is not known at compile time.
+typedef float *__SVFloat32_t;
+typedef double *__SVFloat64_t;
+typedef __CPROVER_bool *__SVBool_t;
 // clang-format on

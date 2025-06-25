@@ -351,7 +351,17 @@ static std::optional<exprt> get_va_args(const exprt::operandst &operands)
   if(operands.size() != 2)
     return {};
 
-  const exprt &second_op = skip_typecast(operands.back());
+  exprt second_op = skip_typecast(operands.back());
+  if(second_op.id() == ID_struct)
+  {
+    // aarch64 ABI mandates that va_list has struct type with member names as
+    // specified
+    if(second_op.operands().size() != 5)
+      return {};
+
+    second_op = skip_typecast(second_op.operands().front());
+  }
+
   if(second_op.id() != ID_address_of)
     return {};
 
@@ -402,11 +412,12 @@ void goto_symext::symex_printf(
       return;
     }
 
-    // Visual Studio has va_list == char*, else we have va_list == void** and
-    // need to add dereferencing
+    // Visual Studio has va_list == char*, else we have va_list == void** or a
+    // struct containing void** (aarch64) and need to add dereferencing
     const bool need_deref =
-      operands.back().type().id() == ID_pointer &&
-      to_pointer_type(operands.back().type()).base_type().id() == ID_pointer;
+      operands.back().type().id() == ID_struct_tag ||
+      (operands.back().type().id() == ID_pointer &&
+       to_pointer_type(operands.back().type()).base_type().id() == ID_pointer);
 
     for(const auto &op : va_args->operands())
     {

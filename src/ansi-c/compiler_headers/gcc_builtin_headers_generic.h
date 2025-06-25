@@ -2,14 +2,14 @@
 // stdarg
 void* __builtin_apply_args();
 void* __builtin_apply(void (*)(), void*, __CPROVER_size_t);
-void __builtin_ms_va_end(void *ap);
-void __builtin_ms_va_start(void *ap, ...);
+void __builtin_ms_va_end(__builtin_ms_va_list ap);
+void __builtin_ms_va_start(__builtin_ms_va_list ap, ...);
 void* __builtin_next_arg();
 int __builtin_va_arg_pack();
 int __builtin_va_arg_pack_len();
 void __builtin_va_copy(__builtin_va_list dest, __builtin_va_list src);
-void __builtin_va_end(void *ap);
-void __builtin_va_start(void *ap, ...);
+void __builtin_va_end(__builtin_va_list ap);
+void __builtin_va_start(__builtin_va_list ap, ...);
 
 // stdlib
 void __builtin__Exit(int);
