@@ -34,8 +34,8 @@ var gcc__builtin__headers__generic_8h =
     [ "__builtin_is_constant_evaluated", "gcc__builtin__headers__generic_8h.html#a3d22dd7ce291e1ad1c117697094d3358", null ],
     [ "__builtin_LINE", "gcc__builtin__headers__generic_8h.html#a186ce09cb97bf5f3a74558e82636deb7", null ],
     [ "__builtin_longjmp", "gcc__builtin__headers__generic_8h.html#af84e43cc22130a4ec205f551916b3fb6", null ],
-    [ "__builtin_ms_va_end", "gcc__builtin__headers__generic_8h.html#ae0d077d0db39ad3ae3cb263a4e48e617", null ],
-    [ "__builtin_ms_va_start", "gcc__builtin__headers__generic_8h.html#a9f0f9eeeeba8dbe9664c0a4dfad73d26", null ],
+    [ "__builtin_ms_va_end", "gcc__builtin__headers__generic_8h.html#a3bbb3418ea8c3fbe7a7c60d2a31880f1", null ],
+    [ "__builtin_ms_va_start", "gcc__builtin__headers__generic_8h.html#afb4e381ba1336eeea78f93c9c0b3e38d", null ],
     [ "__builtin_next_arg", "gcc__builtin__headers__generic_8h.html#a26b4102444d9113f18451af516ed5528", null ],
     [ "__builtin_return", "gcc__builtin__headers__generic_8h.html#a37de57cbc76df28b74354615e7c401ee", null ],
     [ "__builtin_saveregs", "gcc__builtin__headers__generic_8h.html#aefedc8677a151b621341b2212581f510", null ],
@@ -49,7 +49,7 @@ var gcc__builtin__headers__generic_8h =
     [ "__builtin_va_arg_pack", "gcc__builtin__headers__generic_8h.html#a77cf9c55a301905f7f871d715895eede", null ],
     [ "__builtin_va_arg_pack_len", "gcc__builtin__headers__generic_8h.html#a11d76ed3da735c1822f1ca7ee58441df", null ],
     [ "__builtin_va_copy", "gcc__builtin__headers__generic_8h.html#a4ad6d0e30084f66d900365d7c5287068", null ],
-    [ "__builtin_va_end", "gcc__builtin__headers__generic_8h.html#a5130d070e813a53f4dc73ee2c24c89ee", null ],
-    [ "__builtin_va_start", "gcc__builtin__headers__generic_8h.html#a16e486af0f81b63f157be402e5c57251", null ],
+    [ "__builtin_va_end", "gcc__builtin__headers__generic_8h.html#aa33cc0082ed0b4fb4d7cdfa66bc12b55", null ],
+    [ "__builtin_va_start", "gcc__builtin__headers__generic_8h.html#a007ce4baeee5beb8fa670413a3e2f2bb", null ],
     [ "__sync_synchronize", "gcc__builtin__headers__generic_8h.html#a65d8b50d80a35bbcd64f409e4f4fcf38", null ]
 ];

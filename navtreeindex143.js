@@ -1,5 +1,7 @@
 var NAVTREEINDEX143 =
 {
+"structrecursive__initializationt_1_1constructor__keyt.html#af94e5865d0d027a3dbb7bd12dff3091c":[7,0,990,0,3],
+"structref__count__ift.html":[7,0,991],
 "structref__expr__set__dt.html":[7,0,992],
 "structref__expr__set__dt.html#a12f7ba14b8a099f3f6a8097b9577eeed":[7,0,992,1],
 "structref__expr__set__dt.html#a6047a172bb5d06c2a4cf0b74886a5ba1":[7,0,992,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX143 =
 "structsmt__bit__vector__theoryt_1_1unsigned__remaindert.html#a8a6eb2cf1b617b507ce0d5d1de43d19a":[7,0,1116,30,1],
 "structsmt__bit__vector__theoryt_1_1xnort.html":[7,0,1116,31],
 "structsmt__bit__vector__theoryt_1_1xnort.html#a56acd29fb3c4b2d8e6c3b3f5f7c995c4":[7,0,1116,31,2],
-"structsmt__bit__vector__theoryt_1_1xnort.html#a99b3e800c6503bc6ba751daca7339fdf":[7,0,1116,31,1],
-"structsmt__bit__vector__theoryt_1_1xnort.html#aae3f89dee78093dbaddded21e84ad3b9":[7,0,1116,31,0],
-"structsmt__bit__vector__theoryt_1_1xort.html":[7,0,1116,32]
+"structsmt__bit__vector__theoryt_1_1xnort.html#a99b3e800c6503bc6ba751daca7339fdf":[7,0,1116,31,1]
 };
