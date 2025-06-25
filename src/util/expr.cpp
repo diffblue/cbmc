@@ -80,7 +80,7 @@ bool exprt::is_zero() const
     }
     else if(type_id==ID_pointer)
     {
-      return is_null_pointer(constant);
+      return constant.is_null_pointer();
     }
   }
 
