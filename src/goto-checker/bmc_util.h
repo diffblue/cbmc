@@ -12,7 +12,8 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_BMC_UTIL_H
 #define CPROVER_GOTO_CHECKER_BMC_UTIL_H
 
-#include <goto-instrument/unwindset.h>
+#include <goto-programs/unwindset.h>
+
 #include <goto-symex/build_goto_trace.h>
 
 #include "incremental_goto_checker.h"

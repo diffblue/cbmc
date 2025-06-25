@@ -20,8 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include <goto-programs/goto_functions.h>
-
-#include "unwindset.h"
+#include <goto-programs/unwindset.h>
 
 void goto_unwindt::copy_segment(
   const goto_programt::const_targett start,

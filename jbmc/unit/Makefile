@@ -116,7 +116,6 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               $(CPROVER_DIR)/src/goto-instrument/reachability_slicer$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/nondet_static$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/full_slicer$(OBJEXT) \
-              $(CPROVER_DIR)/src/goto-instrument/unwindset$(OBJEXT) \
               $(CPROVER_DIR)/src/pointer-analysis/pointer-analysis$(LIBEXT) \
               $(CPROVER_DIR)/src/langapi/langapi$(LIBEXT) \
               $(CPROVER_DIR)/src/xmllang/xmllang$(LIBEXT) \

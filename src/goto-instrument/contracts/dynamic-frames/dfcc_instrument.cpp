@@ -20,13 +20,13 @@ Author: Remi Delmas, delmarsd@amazon.com
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/unwindset.h>
 
 #include <ansi-c/c_expr.h>
 #include <ansi-c/c_object_factory_parameters.h>
 #include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/generate_function_bodies.h>
 #include <goto-instrument/unwind.h>
-#include <goto-instrument/unwindset.h>
 #include <langapi/language_util.h>
 
 #include "dfcc_cfg_info.h"

@@ -26,7 +26,6 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-instrument/loop_utils$(OBJEXT) \
       ../goto-instrument/nondet_static$(OBJEXT) \
       ../goto-instrument/unwind$(OBJEXT) \
-      ../goto-instrument/unwindset$(OBJEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \

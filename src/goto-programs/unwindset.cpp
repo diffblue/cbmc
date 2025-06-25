@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/unicode.h>
 
-#include <goto-programs/abstract_goto_model.h>
+#include "abstract_goto_model.h"
 
 #include <algorithm>
 #include <fstream>
@@ -216,7 +216,7 @@ void unwindsett::parse_unwindset_file(
   std::ifstream file(widen_if_needed(file_name));
 
   if(!file)
-    throw "cannot open file "+file_name;
+    throw "cannot open file " + file_name;
 
   std::stringstream buffer;
   buffer << file.rdbuf();

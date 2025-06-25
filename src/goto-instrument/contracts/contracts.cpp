@@ -27,13 +27,13 @@ Date: February 2016
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/unwindset.h>
 
 #include <analyses/local_may_alias.h>
 #include <ansi-c/c_expr.h>
 #include <goto-instrument/havoc_utils.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/unwind.h>
-#include <goto-instrument/unwindset.h>
 #include <langapi/language_util.h>
 
 #include "cfg_info.h"
