@@ -320,25 +320,7 @@ constant_exprt make_boolean_expr(bool value)
 
 exprt make_and(exprt a, exprt b)
 {
-  PRECONDITION(a.is_boolean() && b.is_boolean());
-  if(b.is_constant())
-  {
-    if(b.get(ID_value) == ID_false)
-      return false_exprt{};
-    return a;
-  }
-  if(a.is_constant())
-  {
-    if(a.get(ID_value) == ID_false)
-      return false_exprt{};
-    return b;
-  }
-  if(b.id() == ID_and)
-  {
-    b.add_to_operands(std::move(a));
-    return b;
-  }
-  return and_exprt{std::move(a), std::move(b)};
+  return conjunction(a, b);
 }
 
 bool is_null_pointer(const constant_exprt &expr)
