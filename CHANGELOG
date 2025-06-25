@@ -1,3 +1,34 @@
+# CBMC 6.7.0
+
+This release adds aarch64 va_list support (via #8572), which makes all tests
+pass on aarch64 Linux. We reworked expression simplification during symbolic
+execution (via #8642, #8647, #8627) to produce smaller and quicker-to-solve
+formulae for scenarios seen by our users.
+
+## What's Changed
+* Change the "no assigns..." and "no decreases..." warnings to higher verbosity by @rod-chapman in https://github.com/diffblue/cbmc/pull/8655
+* Add aarch64 (Arm 64-bit) CI job by @tautschnig in https://github.com/diffblue/cbmc/pull/8572
+
+## Bug Fixes
+* fix shell quoting by @kroening in https://github.com/diffblue/cbmc/pull/8641
+* goto-checker no longer depends on cbmc by @tautschnig in https://github.com/diffblue/cbmc/pull/8644
+* Use `std::size_t` by @kroening in https://github.com/diffblue/cbmc/pull/8648
+* `run(..., std::ostream &, ...)` with pipe by @kroening in https://github.com/diffblue/cbmc/pull/8650
+* Simplify quantified expressions over constants by @tautschnig in https://github.com/diffblue/cbmc/pull/8608
+* CI: use Visual Studio 2025 runners instead of 2019 by @tautschnig in https://github.com/diffblue/cbmc/pull/8660
+* Cleanup type conversions in java_bytecode_parsert::read by @tautschnig in https://github.com/diffblue/cbmc/pull/8584
+* Avoid need for preprocessor calls with -m64 by @tautschnig in https://github.com/diffblue/cbmc/pull/8658
+* fixup! fix exprt::opX accesses in linker_script_merge by @tautschnig in https://github.com/diffblue/cbmc/pull/8657
+* Introduce value-set supported simplifier for goto-symex by @tautschnig in https://github.com/diffblue/cbmc/pull/8642
+* Value set: lift offset from numeric constants to expressions by @tautschnig in https://github.com/diffblue/cbmc/pull/8647
+* goto-analyzer: support typecasts as left-hand sides by @tautschnig in https://github.com/diffblue/cbmc/pull/8659
+* Move unwindset.{h,cpp} to goto-programs by @tautschnig in https://github.com/diffblue/cbmc/pull/8645
+* Deprecate make_and in favour of conjunction(expr, expr) by @tautschnig in https://github.com/diffblue/cbmc/pull/8450
+* Simplify multiple-of-element size access to arrays by @tautschnig in https://github.com/diffblue/cbmc/pull/8627
+* Fix statement-expression expansion for Kani-provided quantifiers by @tautschnig in https://github.com/diffblue/cbmc/pull/8649
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.6.0...cbmc-6.7.0
+
 # CBMC 6.6.0
 
 This release adds C17 and C23 support to our C front-end (via #8620, #8623). We
