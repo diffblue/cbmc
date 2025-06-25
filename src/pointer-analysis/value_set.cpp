@@ -356,21 +356,6 @@ bool value_sett::eval_pointer_offset(
         return false;
       else
       {
-        // This branch should not be reached as any constant offset will have
-        // been used before already. The following code will trigger
-        // `eval_pointer_offset`, yet we wouldn't end up in this branch:
-        // struct S { int a; char b; };
-        //
-        // int main()
-        // {
-        //   struct S s;
-        //   int offset;
-        //   __CPROVER_assume(offset >= 0 && offset <= 1 && offset % 2 == 0);
-        //   int *p = (char*)&s + offset;
-        //   int x = *p;
-        //   __CPROVER_assert(s.a == x, "");
-        // }
-        UNREACHABLE;
         const exprt &object=object_numbering[it->first];
         auto ptr_offset = compute_pointer_offset(object, ns);
 
