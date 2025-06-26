@@ -2157,7 +2157,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
    *             value)
    */
 
-  if(value.id()==ID_with)
+  if(value.id() == ID_with && value.operands().size() == 3)
   {
     const with_exprt &with=to_with_expr(value);
 
@@ -2297,6 +2297,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
 
         if(
           expr_at_offset_C.id() == ID_with &&
+          expr_at_offset_C.operands().size() == 3 &&
           to_with_expr(expr_at_offset_C).where().is_zero())
         {
           tmp.set_op(to_with_expr(expr_at_offset_C).old());

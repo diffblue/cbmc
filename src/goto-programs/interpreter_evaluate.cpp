@@ -948,30 +948,34 @@ interpretert::mp_vectort interpretert::evaluate(const exprt &expr)
     const auto &wexpr=to_with_expr(expr);
 
     mp_vectort dest = evaluate(wexpr.old());
-    mp_vectort where = evaluate(wexpr.where());
-    mp_vectort new_value = evaluate(wexpr.new_value());
 
-    const auto &subtype = to_array_type(expr.type()).element_type();
-
-    if(!new_value.empty() && where.size()==1 && !unbounded_size(subtype))
+    for(std::size_t i = 1; i < wexpr.operands().size(); i += 2)
     {
-      // Ignore indices < 0, which the string solver sometimes produces
-      if(where[0]<0)
-        return {};
+      mp_vectort where = evaluate(wexpr.operands()[i]);
+      mp_vectort new_value = evaluate(wexpr.operands()[i + 1]);
 
-      mp_integer where_idx=where[0];
-      mp_integer subtype_size=get_size(subtype);
-      mp_integer need_size=(where_idx+1)*subtype_size;
+      const auto &subtype = to_array_type(expr.type()).element_type();
 
-      if(dest.size()<need_size)
-        dest.resize(numeric_cast_v<std::size_t>(need_size), 0);
+      if(!new_value.empty() && where.size() == 1 && !unbounded_size(subtype))
+      {
+        // Ignore indices < 0, which the string solver sometimes produces
+        if(where[0] < 0)
+          return {};
 
-      for(std::size_t i=0; i<new_value.size(); ++i)
-        dest[numeric_cast_v<std::size_t>((where_idx * subtype_size) + i)] =
-          new_value[i];
+        mp_integer where_idx = where[0];
+        mp_integer subtype_size = get_size(subtype);
+        mp_integer need_size = (where_idx + 1) * subtype_size;
 
-      return {};
+        if(dest.size() < need_size)
+          dest.resize(numeric_cast_v<std::size_t>(need_size), 0);
+
+        for(std::size_t i = 0; i < new_value.size(); ++i)
+          dest[numeric_cast_v<std::size_t>((where_idx * subtype_size) + i)] =
+            new_value[i];
+      }
     }
+
+    return dest;
   }
   else if(expr.id()==ID_nil)
   {

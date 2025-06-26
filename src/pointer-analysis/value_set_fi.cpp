@@ -1058,17 +1058,21 @@ void value_set_fit::assign(
         {
           // see if this is the member we want
           const auto &rhs_with = to_with_expr(rhs);
-          const exprt &member_operand = rhs_with.where();
-
-          const irep_idt &component_name=
-            member_operand.get(ID_component_name);
-
-          if(component_name==name)
+          bool member_found = false;
+          for(std::size_t i = 1; i < rhs_with.operands().size(); i += 2)
           {
-            // yes! just take op2
-            rhs_member = rhs_with.new_value();
+            const exprt &member_operand = rhs_with.operands()[i];
+
+            const irep_idt &component_name =
+              member_operand.get(ID_component_name);
+
+            if(component_name == name)
+            {
+              rhs_member = rhs_with.operands()[i + 1];
+              member_found = true;
+            }
           }
-          else
+          if(!member_found)
           {
             // no! do op0
             rhs_member=exprt(ID_member, subtype);
@@ -1126,13 +1130,17 @@ void value_set_fit::assign(
       }
       else if(rhs.id()==ID_with)
       {
+        const with_exprt &with_expr = to_with_expr(rhs);
         const index_exprt op0_index(
-          to_with_expr(rhs).old(),
+          with_expr.old(),
           exprt(ID_unknown, c_index_type()),
           to_array_type(lhs.type()).element_type());
 
         assign(lhs_index, op0_index, ns);
-        assign(lhs_index, to_with_expr(rhs).new_value(), ns);
+        for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+        {
+          assign(lhs_index, with_expr.operands()[i + 1], ns);
+        }
       }
       else
       {

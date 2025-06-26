@@ -973,26 +973,38 @@ void value_sett::get_value_set_rec(
       (expr.type().id() == ID_struct_tag || expr.type().id() == ID_struct) &&
       !suffix.empty())
     {
-      irep_idt component_name = with_expr.where().get(ID_component_name);
-      if(suffix_starts_with_field(suffix, id2string(component_name)))
+      bool any_matching_suffix = false;
+      bool all_matching_component_names = true;
+      for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
       {
-        // Looking for the member overwritten by this WITH expression
-        std::string remaining_suffix =
-          strip_first_field_from_suffix(suffix, id2string(component_name));
-        get_value_set_rec(
-          with_expr.new_value(),
-          dest,
-          includes_nondet_pointer,
-          remaining_suffix,
-          original_type,
-          ns);
+        irep_idt component_name =
+          with_expr.operands()[i].get(ID_component_name);
+        if(suffix_starts_with_field(suffix, id2string(component_name)))
+        {
+          // Looking for the member overwritten by this WITH expression
+          any_matching_suffix = true;
+          std::string remaining_suffix =
+            strip_first_field_from_suffix(suffix, id2string(component_name));
+          get_value_set_rec(
+            with_expr.operands()[i + 1],
+            dest,
+            includes_nondet_pointer,
+            remaining_suffix,
+            original_type,
+            ns);
+        }
+        else if(
+          all_matching_component_names &&
+          (expr.type().id() != ID_struct ||
+           !to_struct_type(expr.type()).has_component(component_name)) &&
+          (expr.type().id() != ID_struct_tag ||
+           !ns.follow_tag(to_struct_tag_type(expr.type()))
+              .has_component(component_name)))
+        {
+          all_matching_component_names = false;
+        }
       }
-      else if(
-        (expr.type().id() == ID_struct &&
-         to_struct_type(expr.type()).has_component(component_name)) ||
-        (expr.type().id() == ID_struct_tag &&
-         ns.follow_tag(to_struct_tag_type(expr.type()))
-           .has_component(component_name)))
+      if(!any_matching_suffix && all_matching_component_names)
       {
         // Looking for a non-overwritten member, look through this expression
         get_value_set_rec(
@@ -1003,7 +1015,7 @@ void value_sett::get_value_set_rec(
           original_type,
           ns);
       }
-      else
+      else if(!any_matching_suffix)
       {
         // Member we're looking for is not defined in this struct -- this
         // must be a reinterpret cast of some sort. Default to conservatively
@@ -1015,13 +1027,16 @@ void value_sett::get_value_set_rec(
           suffix,
           original_type,
           ns);
-        get_value_set_rec(
-          with_expr.new_value(),
-          dest,
-          includes_nondet_pointer,
-          "",
-          original_type,
-          ns);
+        for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+        {
+          get_value_set_rec(
+            with_expr.operands()[i + 1],
+            dest,
+            includes_nondet_pointer,
+            "",
+            original_type,
+            ns);
+        }
       }
     }
     else if(expr.type().id() == ID_array && !suffix.empty())
@@ -1040,13 +1055,16 @@ void value_sett::get_value_set_rec(
         suffix,
         original_type,
         ns);
-      get_value_set_rec(
-        with_expr.new_value(),
-        dest,
-        includes_nondet_pointer,
-        new_value_suffix,
-        original_type,
-        ns);
+      for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+      {
+        get_value_set_rec(
+          with_expr.operands()[i + 1],
+          dest,
+          includes_nondet_pointer,
+          new_value_suffix,
+          original_type,
+          ns);
+      }
     }
     else
     {
@@ -1059,13 +1077,16 @@ void value_sett::get_value_set_rec(
         suffix,
         original_type,
         ns);
-      get_value_set_rec(
-        with_expr.new_value(),
-        dest,
-        includes_nondet_pointer,
-        "",
-        original_type,
-        ns);
+      for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+      {
+        get_value_set_rec(
+          with_expr.operands()[i + 1],
+          dest,
+          includes_nondet_pointer,
+          "",
+          original_type,
+          ns);
+      }
     }
   }
   else if(expr.id()==ID_array)
@@ -1624,14 +1645,18 @@ void value_sett::assign(
       }
       else if(rhs.id()==ID_with)
       {
+        const with_exprt &with_expr = to_with_expr(rhs);
         const index_exprt op0_index(
-          to_with_expr(rhs).old(),
+          with_expr.old(),
           exprt(ID_unknown, c_index_type()),
           to_array_type(lhs.type()).element_type());
 
         assign(lhs_index, op0_index, ns, is_simplified, add_to_sets);
-        assign(
-          lhs_index, to_with_expr(rhs).new_value(), ns, is_simplified, true);
+        for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+        {
+          assign(
+            lhs_index, with_expr.operands()[i + 1], ns, is_simplified, true);
+        }
       }
       else
       {

@@ -139,9 +139,14 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
   else if(expr.id() == ID_with && expr.type().id() == ID_array)
   {
     const auto &with_expr = to_with_expr(expr);
-    out << "(store " << smt2_format(with_expr.old()) << ' '
-        << smt2_format(with_expr.where()) << ' '
-        << smt2_format(with_expr.new_value()) << ')';
+    for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+      out << "(store ";
+    out << smt2_format(with_expr.old()) << ' ';
+    for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+    {
+      out << smt2_format(with_expr.operands()[i]) << ' '
+          << smt2_format(with_expr.operands()[i + 1]) << ')';
+    }
   }
   else if(expr.id() == ID_array_list)
   {

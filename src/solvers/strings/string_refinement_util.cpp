@@ -70,9 +70,12 @@ sparse_arrayt::sparse_arrayt(const with_exprt &expr)
   while(can_cast_expr<with_exprt>(ref.get()))
   {
     const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
-    const auto current_index =
-      numeric_cast_v<std::size_t>(to_constant_expr(with_expr.where()));
-    entries[current_index] = with_expr.new_value();
+    for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+    {
+      const auto current_index =
+        numeric_cast_v<std::size_t>(to_constant_expr(with_expr.operands()[i]));
+      entries[current_index] = with_expr.operands()[i + 1];
+    }
     ref = with_expr.old();
   }
 
