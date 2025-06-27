@@ -131,9 +131,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a9f346bc3bd55cbc19052d93613618180" id="r_a9f346bc3bd55cbc19052d93613618180"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#a9f346bc3bd55cbc19052d93613618180">make_binary</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a9f346bc3bd55cbc19052d93613618180"><td class="mdescLeft">&#160;</td><td class="mdescRight">splits an expression with &gt;=3 operands into nested binary expressions  <br /></td></tr>
 <tr class="separator:a9f346bc3bd55cbc19052d93613618180"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a5b8328a59c893b808298ab27a14857" id="r_a4a5b8328a59c893b808298ab27a14857"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classwith__exprt.html">with_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#a4a5b8328a59c893b808298ab27a14857">make_with_expr</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classupdate__exprt.html">update_exprt</a> &amp;src)</td></tr>
-<tr class="memdesc:a4a5b8328a59c893b808298ab27a14857"><td class="mdescLeft">&#160;</td><td class="mdescRight">converts an update expr into a (possibly nested) with expression  <br /></td></tr>
-<tr class="separator:a4a5b8328a59c893b808298ab27a14857"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d01db18df5f008e36afa967be393e6f" id="r_a4d01db18df5f008e36afa967be393e6f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8cpp.html#a4d01db18df5f008e36afa967be393e6f">is_not_zero</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;src, <a class="el" href="classait.html">const</a> <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a4d01db18df5f008e36afa967be393e6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">converts a scalar/float expression to C/C++ Booleans  <br /></td></tr>
 <tr class="separator:a4d01db18df5f008e36afa967be393e6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,7 +184,7 @@ Functions</h2></td></tr>
 
 <p>negate a Boolean expression, possibly removing a <a class="el" href="classnot__exprt.html" title="Boolean negation.">not_exprt</a>, and swapping false and true </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00103">103</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00098">98</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +216,7 @@ Functions</h2></td></tr>
 
 <p>returns true if the expression has a subexpression that satisfies pred </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00115">115</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00110">110</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -251,7 +248,7 @@ Functions</h2></td></tr>
 
 <p>returns true if the expression has a subexpression with given ID </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00123">123</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00118">118</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -289,7 +286,7 @@ Functions</h2></td></tr>
 
 <p>returns true if any of the contained types is id </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00171">171</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00166">166</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -336,7 +333,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if one of the subtype of <code>type</code> satisfies predicate <code>pred</code>. The meaning of "subtype" is in the algebraic datatype sense: for example, the subtypes of a struct are the types of its components, the subtype of a pointer is the type it points to, etc... For instance in the type <code>t</code> defined by <code>{ int a; char[] b; double * c; { bool d} e}</code>, <code>int</code>, <code>char</code>, <code>double</code> and <code>bool</code> are subtypes of <code>t</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00129">129</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00124">124</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -396,7 +393,7 @@ Functions</h2></td></tr>
 
 <p>converts a scalar/float expression to C/C++ Booleans </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00074">74</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00069">69</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -417,10 +414,10 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns true if <code>expr</code> has a pointer type and a value NULL; it also returns true when <code>expr</code> has value zero and NULL_is_zero is true; returns false in all other cases. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000022">Deprecated:</a></b></dt><dd>"deprecated since " "2024" "-" "9" "-" "10" "; " "use constant_exprt::is_null_pointer() instead" <br  />
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000021">Deprecated:</a></b></dt><dd>"deprecated since " "2024" "-" "9" "-" "10" "; " "use constant_exprt::is_null_pointer() instead" <br  />
  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00326">326</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00321">321</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -452,7 +449,7 @@ Functions</h2></td></tr>
 
 <p>lift up an <a class="el" href="classif__exprt.html" title="The trinary if-then-else operator.">if_exprt</a> one level </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00177">177</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00172">172</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -483,10 +480,10 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Conjunction of two expressions. </p>
-<p>If the second is already an <code><a class="el" href="classand__exprt.html" title="Boolean AND.">and_exprt</a></code> add to its operands instead of creating a new expression. If one is <code>true</code>, return the other expression. If one is <code>false</code> returns <code>false</code>. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000021">Deprecated:</a></b></dt><dd>"deprecated since " "2025" "-" "6" "-" "25" "; " "use conjunction(exprt, exprt) instead" <br  />
+<p>If the second is already an <code><a class="el" href="classand__exprt.html" title="Boolean AND.">and_exprt</a></code> add to its operands instead of creating a new expression. If one is <code>true</code>, return the other expression. If one is <code>false</code> returns <code>false</code>. </p><dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000020">Deprecated:</a></b></dt><dd>"deprecated since " "2025" "-" "6" "-" "25" "; " "use conjunction(exprt, exprt) instead" <br  />
  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00321">321</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00316">316</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -530,31 +527,7 @@ Functions</h2></td></tr>
 
 <p>returns <a class="el" href="classtrue__exprt.html" title="The Boolean constant true.">true_exprt</a> if given true and <a class="el" href="classfalse__exprt.html" title="The Boolean constant false.">false_exprt</a> otherwise </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00313">313</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a4a5b8328a59c893b808298ab27a14857" name="a4a5b8328a59c893b808298ab27a14857"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a5b8328a59c893b808298ab27a14857">&#9670;&#160;</a></span>make_with_expr()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classwith__exprt.html">with_exprt</a> make_with_expr </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classupdate__exprt.html">update_exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>src</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>converts an update expr into a (possibly nested) with expression </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000020">Deprecated:</a></b></dt><dd>"deprecated since " "2024" "-" "9" "-" "10" "; " "use update_exprt::make_with_expr() instead" <br  />
- </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00069">69</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00308">308</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
@@ -576,7 +549,7 @@ Functions</h2></td></tr>
 
 <p>find the expression nested inside typecasts, if any </p>
 
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00193">193</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00188">188</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>

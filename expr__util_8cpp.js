@@ -12,6 +12,5 @@ var expr__util_8cpp =
     [ "make_and", "expr__util_8cpp.html#ad711fee0d815a935c677223fd60c818a", null ],
     [ "make_binary", "expr__util_8cpp.html#a9f346bc3bd55cbc19052d93613618180", null ],
     [ "make_boolean_expr", "expr__util_8cpp.html#a2136c5a8afa707d785e91b233df849b9", null ],
-    [ "make_with_expr", "expr__util_8cpp.html#a4a5b8328a59c893b808298ab27a14857", null ],
     [ "skip_typecast", "expr__util_8cpp.html#a510dd076481af52602c95ca33fee2f97", null ]
 ];

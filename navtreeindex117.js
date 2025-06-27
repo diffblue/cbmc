@@ -1,7 +1,5 @@
 var NAVTREEINDEX117 =
 {
-"java__types_8h.html#a099d7473e9d529c2fbf29980039d4480":[8,0,1,0,1,88,35],
-"java__types_8h.html#a0f7b5b48c4fd294c62edbd8f670e7c63":[8,0,1,0,1,88,69],
 "java__types_8h.html#a1795756d1735a3cbd6fc8aedf80c5d52":[8,0,1,0,1,88,88],
 "java__types_8h.html#a1a1dd888938c1d9569e98d8d70612883":[8,0,1,0,1,88,93],
 "java__types_8h.html#a1a6afb379178555c3b579171a49e8278":[8,0,1,0,1,88,72],
@@ -249,5 +247,7 @@ var NAVTREEINDEX117 =
 "json__expr_8h.html#aadccc53e96e49f6eb3f10945c93b5bda":[8,0,2,16,42,0],
 "json__expr_8h_source.html":[8,0,2,16,42],
 "json__goto__trace_8cpp.html":[8,0,2,16,43],
-"json__goto__trace_8cpp.html#a163d31632f83547420a57ee8b39d3d6a":[8,0,2,16,43,0]
+"json__goto__trace_8cpp.html#a163d31632f83547420a57ee8b39d3d6a":[8,0,2,16,43,0],
+"json__goto__trace_8cpp.html#a2d71d4c3a71cf1b64073f13337dedc62":[8,0,2,16,43,4],
+"json__goto__trace_8cpp.html#a639f2a423be86e62c24274aeef940e3d":[8,0,2,16,43,3]
 };
