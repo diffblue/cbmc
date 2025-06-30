@@ -317,8 +317,3 @@ exprt make_and(exprt a, exprt b)
 {
   return conjunction(a, b);
 }
-
-bool is_null_pointer(const constant_exprt &expr)
-{
-  return expr.is_null_pointer();
-}
