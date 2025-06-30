@@ -162,9 +162,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ad711fee0d815a935c677223fd60c818a" id="r_ad711fee0d815a935c677223fd60c818a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8h.html#ad711fee0d815a935c677223fd60c818a">make_and</a> (<a class="el" href="classexprt.html">exprt</a> <a class="el" href="classait.html">a</a>, <a class="el" href="classexprt.html">exprt</a> <a class="el" href="classait.html">b</a>)</td></tr>
 <tr class="memdesc:ad711fee0d815a935c677223fd60c818a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conjunction of two expressions.  <br /></td></tr>
 <tr class="separator:ad711fee0d815a935c677223fd60c818a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2ae8e358c96aa4b13b11a502bc9328b" id="r_ae2ae8e358c96aa4b13b11a502bc9328b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__util_8h.html#ae2ae8e358c96aa4b13b11a502bc9328b">is_null_pointer</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classconstant__exprt.html">constant_exprt</a> &amp;expr)</td></tr>
-<tr class="memdesc:ae2ae8e358c96aa4b13b11a502bc9328b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if <code>expr</code> has a pointer type and a value NULL; it also returns true when <code>expr</code> has value zero and NULL_is_zero is true; returns false in all other cases.  <br /></td></tr>
-<tr class="separator:ae2ae8e358c96aa4b13b11a502bc9328b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Deprecated expression utility functions. </p>
@@ -401,30 +398,6 @@ Functions</h2></td></tr>
 <p>converts a scalar/float expression to C/C++ Booleans </p>
 
 <p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00069">69</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ae2ae8e358c96aa4b13b11a502bc9328b" name="ae2ae8e358c96aa4b13b11a502bc9328b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2ae8e358c96aa4b13b11a502bc9328b">&#9670;&#160;</a></span>is_null_pointer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">bool</a> is_null_pointer </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classconstant__exprt.html">constant_exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>expr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns true if <code>expr</code> has a pointer type and a value NULL; it also returns true when <code>expr</code> has value zero and NULL_is_zero is true; returns false in all other cases. </p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000021">Deprecated:</a></b></dt><dd>"deprecated since " "2024" "-" "9" "-" "10" "; " "use constant_exprt::is_null_pointer() instead" <br  />
- </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="expr__util_8cpp_source.html#l00321">321</a> of file <a class="el" href="expr__util_8cpp_source.html">expr_util.cpp</a>.</p>
 
 </div>
 </div>
