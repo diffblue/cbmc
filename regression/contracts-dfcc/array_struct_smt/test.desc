@@ -1,0 +1,12 @@
+CORE
+main.c
+--dfcc main --replace-call-with-contract mlk_poly_add _ --no-array-field-sensitivity --cprover-smt2
+^\[mlk_poly_add.overflow.1\] line 8 arithmetic overflow on signed \+
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Make sure the SMT back-end produces valid SMT2 when structs and arrays are
+nested in each other.

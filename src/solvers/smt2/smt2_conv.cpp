@@ -4400,50 +4400,63 @@ void smt2_convt::convert_with(const with_exprt &expr)
     }
     else
     {
+      auto convert_operand = [this](const exprt &op)
+      {
+        // may need to flatten array-theory arrays in there
+        if(op.type().id() == ID_array && use_array_theory(op))
+          flatten_array(op);
+        else if(op.type().id() == ID_bool)
+          flatten2bv(op);
+        else
+          convert_expr(op);
+      };
+
       std::size_t struct_width=boolbv_width(struct_type);
 
       // figure out the offset and width of the member
       const boolbv_widtht::membert &m =
         boolbv_width.get_member(struct_type, component_name);
 
-      out << "(let ((?withop ";
-      convert_expr(expr.old());
-      out << ")) ";
-
       if(m.width==struct_width)
       {
-        // the struct is the same as the member, no concat needed,
-        // ?withop won't be used
-        convert_expr(value);
-      }
-      else if(m.offset==0)
-      {
-        // the member is at the beginning
-        out << "(concat "
-            << "((_ extract " << (struct_width-1) << " "
-                              << m.width << ") ?withop) ";
-        convert_expr(value);
-        out << ")"; // concat
-      }
-      else if(m.offset+m.width==struct_width)
-      {
-        // the member is at the end
-        out << "(concat ";
-        convert_expr(value);
-        out << " ((_ extract " << (m.offset - 1) << " 0) ?withop))";
+        // the struct is the same as the member, no concat needed
+        convert_operand(value);
       }
       else
       {
-        // most general case, need two concat-s
-        out << "(concat (concat "
-            << "((_ extract " << (struct_width-1) << " "
-                              << (m.offset+m.width) << ") ?withop) ";
-        convert_expr(value);
-        out << ") ((_ extract " << (m.offset-1) << " 0) ?withop)";
-        out << ")"; // concat
-      }
+        out << "(let ((?withop ";
+        convert_operand(expr.old());
+        out << ")) ";
 
-      out << ")"; // let ?withop
+        if(m.offset == 0)
+        {
+          // the member is at the beginning
+          out << "(concat "
+              << "((_ extract " << (struct_width - 1) << " " << m.width
+              << ") ?withop) ";
+          convert_operand(value);
+          out << ")"; // concat
+        }
+        else if(m.offset + m.width == struct_width)
+        {
+          // the member is at the end
+          out << "(concat ";
+          convert_operand(value);
+          out << " ((_ extract " << (m.offset - 1) << " 0) ?withop))";
+        }
+        else
+        {
+          // most general case, need two concat-s
+          out << "(concat (concat "
+              << "((_ extract " << (struct_width - 1) << " "
+              << (m.offset + m.width) << ") ?withop) ";
+          convert_operand(value);
+          out << ") ((_ extract " << (m.offset - 1) << " 0) ?withop)";
+          out << ")"; // concat
+        }
+
+        out << ")"; // let ?withop
+      }
     }
   }
   else if(expr_type.id() == ID_union || expr_type.id() == ID_union_tag)
