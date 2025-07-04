@@ -19,27 +19,6 @@ float fabsf(float f)
   return __CPROVER_fabsf(f);
 }
 
-/* FUNCTION: __builtin_fabs */
-
-double __builtin_fabs(double d)
-{
-  return __CPROVER_fabs(d);
-}
-
-/* FUNCTION: __builtin_fabsl */
-
-long double __builtin_fabsl(long double d)
-{
-  return __CPROVER_fabsl(d);
-}
-
-/* FUNCTION: __builtin_fabsf */
-
-float __builtin_fabsf(float f)
-{
-  return __CPROVER_fabsf(f);
-}
-
 /* FUNCTION: __CPROVER_isgreaterf */
 
 int __CPROVER_isgreaterf(float f, float g) { return f > g; }
@@ -112,6 +91,27 @@ int __finitef(float f) { return __CPROVER_isfinitef(f); }
 
 int __finitel(long double ld) { return __CPROVER_isfiniteld(ld); }
 
+/* FUNCTION: __isfinitef */
+
+int __isfinitef(float f)
+{
+  return __CPROVER_isfinitef(f);
+}
+
+/* FUNCTION: __isfinite */
+
+int __isfinite(double d)
+{
+  return __CPROVER_isfinited(d);
+}
+
+/* FUNCTION: __isfinitel */
+
+int __isfinitel(long double ld)
+{
+  return __CPROVER_isfiniteld(ld);
+}
+
 /* FUNCTION: isinf */
 
 #undef isinf
@@ -172,6 +172,13 @@ int __isnan(double d)
   return __CPROVER_isnand(d);
 }
 
+/* FUNCTION: __isnand */
+
+int __isnand(double d)
+{
+  return __CPROVER_isnand(d);
+}
+
 /* FUNCTION: __isnanf */
 
 int __isnanf(float f)
@@ -214,6 +221,20 @@ int isnormal(double d)
 int __isnormalf(float f)
 {
   return __CPROVER_isnormalf(f);
+}
+
+/* FUNCTION: __isnormal */
+
+int __isnormal(double d)
+{
+  return __CPROVER_isnormald(d);
+}
+
+/* FUNCTION: __isnormall */
+
+int __isnormall(long double ld)
+{
+  return __CPROVER_isnormalld(ld);
 }
 
 /* FUNCTION: __builtin_isinf */
@@ -330,7 +351,14 @@ int __signbitf(float f)
 
 /* FUNCTION: __signbit */
 
-int __signbit(double ld)
+int __signbit(double d)
+{
+  return __CPROVER_signd(d);
+}
+
+/* FUNCTION: __signbitl */
+
+int __signbitl(long double ld)
 {
   return __CPROVER_signld(ld);
 }
@@ -3044,8 +3072,6 @@ long double log10l(long double x)
 
 int32_t __VERIFIER_nondet_int32_t(void);
 
-double __builtin_inf(void);
-
 double pow(double x, double y)
 {
   // see man pow (https://linux.die.net/man/3/pow)
@@ -3078,7 +3104,7 @@ double pow(double x, double y)
     else if(__CPROVER_signd(y))
     {
       if(fabs(x) < 1.0)
-        return __builtin_inf();
+        return __CPROVER_inf();
       else
         return +0.0;
     }
@@ -3087,7 +3113,7 @@ double pow(double x, double y)
       if(fabs(x) < 1.0)
         return +0.0;
       else
-        return __builtin_inf();
+        return __CPROVER_inf();
     }
   }
   else if(isinf(x) && __CPROVER_signd(x))
@@ -3102,9 +3128,9 @@ double pow(double x, double y)
     else
     {
       if(nearbyint(y) == y && fabs(fmod(y, 2.0)) == 1.0)
-        return -__builtin_inf();
+        return -__CPROVER_inf();
       else
-        return __builtin_inf();
+        return __CPROVER_inf();
     }
   }
   else if(isinf(x) && !__CPROVER_signd(x))
@@ -3112,7 +3138,7 @@ double pow(double x, double y)
     if(__CPROVER_signd(y))
       return +0.0;
     else
-      return __builtin_inf();
+      return __CPROVER_inf();
   }
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signd(y))
   {
@@ -3192,8 +3218,6 @@ double pow(double x, double y)
 
 int32_t __VERIFIER_nondet_int32_t(void);
 
-float __builtin_inff(void);
-
 float powf(float x, float y)
 {
   // see man pow (https://linux.die.net/man/3/pow)
@@ -3226,7 +3250,7 @@ float powf(float x, float y)
     else if(__CPROVER_signf(y))
     {
       if(fabsf(x) < 1.0f)
-        return __builtin_inff();
+        return __CPROVER_inff();
       else
         return +0.0f;
     }
@@ -3235,7 +3259,7 @@ float powf(float x, float y)
       if(fabsf(x) < 1.0f)
         return +0.0f;
       else
-        return __builtin_inff();
+        return __CPROVER_inff();
     }
   }
   else if(isinff(x) && __CPROVER_signf(x))
@@ -3250,9 +3274,9 @@ float powf(float x, float y)
     else
     {
       if(nearbyintf(y) == y && fabsf(fmodf(y, 2.0f)) == 1.0f)
-        return -__builtin_inff();
+        return -__CPROVER_inff();
       else
-        return __builtin_inff();
+        return __CPROVER_inff();
     }
   }
   else if(isinff(x) && !__CPROVER_signf(x))
@@ -3260,7 +3284,7 @@ float powf(float x, float y)
     if(__CPROVER_signf(y))
       return +0.0f;
     else
-      return __builtin_inff();
+      return __CPROVER_inff();
   }
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signf(y))
   {
@@ -3337,8 +3361,6 @@ float powf(float x, float y)
 
 int32_t __VERIFIER_nondet_int32_t(void);
 
-long double __builtin_infl(void);
-
 long double powl(long double x, long double y)
 {
   // see man pow (https://linux.die.net/man/3/pow)
@@ -3371,7 +3393,7 @@ long double powl(long double x, long double y)
     else if(__CPROVER_signld(y))
     {
       if(fabsl(x) < 1.0l)
-        return __builtin_infl();
+        return __CPROVER_infl();
       else
         return +0.0l;
     }
@@ -3380,7 +3402,7 @@ long double powl(long double x, long double y)
       if(fabsl(x) < 1.0l)
         return +0.0l;
       else
-        return __builtin_infl();
+        return __CPROVER_infl();
     }
   }
   else if(isinfl(x) && __CPROVER_signld(x))
@@ -3395,9 +3417,9 @@ long double powl(long double x, long double y)
     else
     {
       if(nearbyintl(y) == y && fabsl(fmodl(y, 2.0l)) == 1.0l)
-        return -__builtin_infl();
+        return -__CPROVER_infl();
       else
-        return __builtin_infl();
+        return __CPROVER_infl();
     }
   }
   else if(isinfl(x) && !__CPROVER_signld(x))
@@ -3405,7 +3427,7 @@ long double powl(long double x, long double y)
     if(__CPROVER_signld(y))
       return +0.0f;
     else
-      return __builtin_infl();
+      return __CPROVER_infl();
   }
   else if(fpclassify(x) == FP_ZERO && __CPROVER_signld(y))
   {
@@ -3578,8 +3600,6 @@ long double fmal(long double x, long double y, long double z)
 
 int32_t __VERIFIER_nondet_int32_t(void);
 
-double __builtin_inf(void);
-
 double __builtin_powi(double x, int y)
 {
   // see man pow (https://linux.die.net/man/3/pow), specialized for y being an
@@ -3607,9 +3627,9 @@ double __builtin_powi(double x, int y)
     else
     {
       if(y % 2 == 1)
-        return -__builtin_inf();
+        return -__CPROVER_inf();
       else
-        return __builtin_inf();
+        return __CPROVER_inf();
     }
   }
   else if(isinf(x) && !__CPROVER_signd(x))
@@ -3617,7 +3637,7 @@ double __builtin_powi(double x, int y)
     if(y < 0)
       return +0.0;
     else
-      return __builtin_inf();
+      return __CPROVER_inf();
   }
   else if(fpclassify(x) == FP_ZERO && y < 0)
   {
@@ -3697,8 +3717,6 @@ double __builtin_powi(double x, int y)
 
 int32_t __VERIFIER_nondet_int32_t(void);
 
-float __builtin_inff(void);
-
 float __builtin_powif(float x, int y)
 {
   // see man pow (https://linux.die.net/man/3/pow), specialized for y being an
@@ -3726,9 +3744,9 @@ float __builtin_powif(float x, int y)
     else
     {
       if(y % 2 == 1)
-        return -__builtin_inff();
+        return -__CPROVER_inff();
       else
-        return __builtin_inff();
+        return __CPROVER_inff();
     }
   }
   else if(isinff(x) && !__CPROVER_signf(x))
@@ -3736,7 +3754,7 @@ float __builtin_powif(float x, int y)
     if(y < 0)
       return +0.0f;
     else
-      return __builtin_inff();
+      return __CPROVER_inff();
   }
   else if(fpclassify(x) == FP_ZERO && y < 0)
   {
@@ -3812,7 +3830,6 @@ float __builtin_powif(float x, int y)
 
 int32_t __VERIFIER_nondet_int32_t(void);
 
-long double __builtin_infl(void);
 double __builtin_powi(double, int);
 
 long double __builtin_powil(long double x, int y)
@@ -3842,9 +3859,9 @@ long double __builtin_powil(long double x, int y)
     else
     {
       if(y % 2 == 1)
-        return -__builtin_infl();
+        return -__CPROVER_infl();
       else
-        return __builtin_infl();
+        return __CPROVER_infl();
     }
   }
   else if(isinf(x) && !__CPROVER_signld(x))
@@ -3852,7 +3869,7 @@ long double __builtin_powil(long double x, int y)
     if(y < 0)
       return +0.0f;
     else
-      return __builtin_infl();
+      return __CPROVER_infl();
   }
   else if(fpclassify(x) == FP_ZERO && y < 0)
   {
