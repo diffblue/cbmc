@@ -6,6 +6,7 @@
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
+#include <util/simplify_expr.h>
 #include <util/symbol_table.h>
 
 #include <solvers/smt2_incremental/encoding/nondet_padding.h>
@@ -242,12 +243,16 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         symbol_expr,
         make_member_name_expression("green"),
         from_integer(0, signedbv_typet{32})};
-      const concatenation_exprt expected{
-        {from_integer(0, signedbv_typet{32}),
-         extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
-         extractbits_exprt{symbol_expr_as_bv, 0, signedbv_typet{24}}},
-        bv_typet{72}};
-      REQUIRE(test.struct_encoding.encode(with) == expected);
+      const exprt expected = simplify_expr(
+        concatenation_exprt{
+          {from_integer(0, signedbv_typet{32}),
+           extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
+           extractbits_exprt{symbol_expr_as_bv, 0, signedbv_typet{24}}},
+          bv_typet{72}},
+        test.ns);
+      const exprt encoded =
+        simplify_expr(test.struct_encoding.encode(with), test.ns);
+      REQUIRE(encoded == expected);
     }
     SECTION("Second member")
     {
@@ -268,20 +273,26 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         symbol_expr,
         make_member_name_expression("ham"),
         from_integer(0, signedbv_typet{24})};
-      const concatenation_exprt expected{
-        {extractbits_exprt{symbol_expr_as_bv, 40, signedbv_typet{32}},
-         extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
-         from_integer(0, signedbv_typet{24})},
-        bv_typet{72}};
-      REQUIRE(test.struct_encoding.encode(with) == expected);
+      const exprt expected = simplify_expr(
+        concatenation_exprt{
+          {extractbits_exprt{symbol_expr_as_bv, 40, signedbv_typet{32}},
+           extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
+           from_integer(0, signedbv_typet{24})},
+          bv_typet{72}},
+        test.ns);
+      const exprt encoded =
+        simplify_expr(test.struct_encoding.encode(with), test.ns);
+      REQUIRE(encoded == expected);
     }
     SECTION("First and second members")
     {
-      const concatenation_exprt expected{
-        {from_integer(0, signedbv_typet{32}),
-         from_integer(1, unsignedbv_typet{16}),
-         extractbits_exprt{symbol_expr_as_bv, 0, signedbv_typet{24}}},
-        bv_typet{72}};
+      const exprt expected = simplify_expr(
+        concatenation_exprt{
+          {from_integer(0, signedbv_typet{32}),
+           from_integer(1, unsignedbv_typet{16}),
+           extractbits_exprt{symbol_expr_as_bv, 0, signedbv_typet{24}}},
+          bv_typet{72}},
+        test.ns);
       SECTION("Operands in field order")
       {
         with_exprt with_in_order{
@@ -291,7 +302,9 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         with_in_order.operands().push_back(make_member_name_expression("eggs"));
         with_in_order.operands().push_back(
           from_integer(1, unsignedbv_typet{16}));
-        REQUIRE(test.struct_encoding.encode(with_in_order) == expected);
+        const exprt encoded =
+          simplify_expr(test.struct_encoding.encode(with_in_order), test.ns);
+        REQUIRE(encoded == expected);
       }
       SECTION("Operands in reverse order vs fields")
       {
@@ -302,16 +315,20 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         with_reversed.operands().push_back(
           make_member_name_expression("green"));
         with_reversed.operands().push_back(from_integer(0, signedbv_typet{32}));
-        REQUIRE(test.struct_encoding.encode(with_reversed) == expected);
+        const exprt encoded =
+          simplify_expr(test.struct_encoding.encode(with_reversed), test.ns);
+        REQUIRE(encoded == expected);
       }
     }
     SECTION("First and third members")
     {
-      const concatenation_exprt expected{
-        {from_integer(0, signedbv_typet{32}),
-         extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
-         from_integer(1, signedbv_typet{24})},
-        bv_typet{72}};
+      const exprt expected = simplify_expr(
+        concatenation_exprt{
+          {from_integer(0, signedbv_typet{32}),
+           extractbits_exprt{symbol_expr_as_bv, 24, unsignedbv_typet{16}},
+           from_integer(1, signedbv_typet{24})},
+          bv_typet{72}},
+        test.ns);
       SECTION("Operands in field order")
       {
         with_exprt with_in_order{
@@ -320,7 +337,9 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
           from_integer(0, signedbv_typet{32})};
         with_in_order.operands().push_back(make_member_name_expression("ham"));
         with_in_order.operands().push_back(from_integer(1, signedbv_typet{24}));
-        REQUIRE(test.struct_encoding.encode(with_in_order) == expected);
+        const exprt encoded =
+          simplify_expr(test.struct_encoding.encode(with_in_order), test.ns);
+        REQUIRE(encoded == expected);
       }
       SECTION("Operands in reverse order vs fields")
       {
@@ -331,16 +350,20 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         with_reversed.operands().push_back(
           make_member_name_expression("green"));
         with_reversed.operands().push_back(from_integer(0, signedbv_typet{32}));
-        REQUIRE(test.struct_encoding.encode(with_reversed) == expected);
+        const exprt encoded =
+          simplify_expr(test.struct_encoding.encode(with_reversed), test.ns);
+        REQUIRE(encoded == expected);
       }
     }
     SECTION("Second and third members")
     {
-      const concatenation_exprt expected{
-        {extractbits_exprt{symbol_expr_as_bv, 40, signedbv_typet{32}},
-         from_integer(0, unsignedbv_typet{16}),
-         from_integer(1, signedbv_typet{24})},
-        bv_typet{72}};
+      const exprt expected = simplify_expr(
+        concatenation_exprt{
+          {extractbits_exprt{symbol_expr_as_bv, 40, signedbv_typet{32}},
+           from_integer(0, unsignedbv_typet{16}),
+           from_integer(1, signedbv_typet{24})},
+          bv_typet{72}},
+        test.ns);
       SECTION("Operands in field order")
       {
         with_exprt with_in_order{
@@ -349,7 +372,9 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
           from_integer(0, unsignedbv_typet{16})};
         with_in_order.operands().push_back(make_member_name_expression("ham"));
         with_in_order.operands().push_back(from_integer(1, signedbv_typet{24}));
-        REQUIRE(test.struct_encoding.encode(with_in_order) == expected);
+        const exprt encoded =
+          simplify_expr(test.struct_encoding.encode(with_in_order), test.ns);
+        REQUIRE(encoded == expected);
       }
       SECTION("Operands in reverse order vs fields")
       {
@@ -360,16 +385,20 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         with_reversed.operands().push_back(make_member_name_expression("eggs"));
         with_reversed.operands().push_back(
           from_integer(0, unsignedbv_typet{16}));
-        REQUIRE(test.struct_encoding.encode(with_reversed) == expected);
+        const exprt encoded =
+          simplify_expr(test.struct_encoding.encode(with_reversed), test.ns);
+        REQUIRE(encoded == expected);
       }
     }
     SECTION("All members")
     {
-      const concatenation_exprt expected{
-        {from_integer(1, signedbv_typet{32}),
-         from_integer(2, unsignedbv_typet{16}),
-         from_integer(3, signedbv_typet{24})},
-        bv_typet{72}};
+      const exprt expected = simplify_expr(
+        concatenation_exprt{
+          {from_integer(1, signedbv_typet{32}),
+           from_integer(2, unsignedbv_typet{16}),
+           from_integer(3, signedbv_typet{24})},
+          bv_typet{72}},
+        test.ns);
       SECTION("Operands in field order")
       {
         with_exprt with{
@@ -380,7 +409,9 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         with.operands().push_back(from_integer(2, unsignedbv_typet{16}));
         with.operands().push_back(make_member_name_expression("ham"));
         with.operands().push_back(from_integer(3, signedbv_typet{24}));
-        REQUIRE(test.struct_encoding.encode(with) == expected);
+        const exprt encoded =
+          simplify_expr(test.struct_encoding.encode(with), test.ns);
+        REQUIRE(encoded == expected);
       }
       SECTION("Operands out of order vs fields")
       {
@@ -392,7 +423,9 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         with.operands().push_back(from_integer(3, signedbv_typet{24}));
         with.operands().push_back(make_member_name_expression("green"));
         with.operands().push_back(from_integer(1, signedbv_typet{32}));
-        REQUIRE(test.struct_encoding.encode(with) == expected);
+        const exprt encoded =
+          simplify_expr(test.struct_encoding.encode(with), test.ns);
+        REQUIRE(encoded == expected);
       }
     }
   }

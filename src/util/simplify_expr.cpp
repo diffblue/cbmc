@@ -1339,6 +1339,19 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       return changed(simplify_address_of(result)); // recursive call
     }
   }
+  else if(auto extractbits = expr_try_dynamic_cast<extractbits_exprt>(operand))
+  {
+    if(
+      can_cast_type<bitvector_typet>(expr_type) &&
+      can_cast_type<bitvector_typet>(operand.type()) &&
+      to_bitvector_type(expr_type).get_width() ==
+        to_bitvector_type(operand.type()).get_width())
+    {
+      extractbits_exprt result = *extractbits;
+      result.type() = expr_type;
+      return changed(simplify_extractbits(result));
+    }
+  }
 
   return unchanged(expr);
 }

@@ -992,10 +992,15 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
   }
 
   // { x } = x
-  if(
-    new_expr.operands().size() == 1 && new_expr.op0().type() == new_expr.type())
+  if(new_expr.operands().size() == 1)
   {
-    return new_expr.op0();
+    if(new_expr.op0().type() == new_expr.type())
+      return new_expr.op0();
+    else
+    {
+      return changed(
+        simplify_typecast(typecast_exprt{new_expr.op0(), new_expr.type()}));
+    }
   }
 
   if(no_change)
