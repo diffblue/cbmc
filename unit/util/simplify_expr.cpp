@@ -247,7 +247,7 @@ TEST_CASE("Simplify pointer_object equality", "[core][util]")
 
   exprt simp = simplify_expr(equal_exprt{p_o_void, p_o_int}, ns);
 
-  REQUIRE(simp.is_true());
+  REQUIRE(simp == true);
 }
 
 TEST_CASE("Simplify cast from bool", "[core][util]")

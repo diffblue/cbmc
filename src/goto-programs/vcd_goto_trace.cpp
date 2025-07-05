@@ -131,10 +131,10 @@ void output_vcd(
         // booleans are special in VCD
         if(type.id() == ID_bool)
         {
-          if(step.full_lhs_value.is_true())
+          if(step.full_lhs_value == true)
             out << "1"
                 << "V" << number << "\n";
-          else if(step.full_lhs_value.is_false())
+          else if(step.full_lhs_value == false)
             out << "0"
                 << "V" << number << "\n";
           else

@@ -3635,9 +3635,9 @@ exprt c_typecheck_baset::do_special_functions(
 
     mp_integer arg1;
 
-    if(expr.arguments()[1].is_true())
+    if(expr.arguments()[1] == true)
       arg1=1;
-    else if(expr.arguments()[1].is_false())
+    else if(expr.arguments()[1] == false)
       arg1=0;
     else if(to_integer(to_constant_expr(expr.arguments()[1]), arg1))
     {
@@ -3679,7 +3679,7 @@ exprt c_typecheck_baset::do_special_functions(
       typecast_exprt::conditional_cast(expr.arguments()[0], bool_typet());
     make_constant(arg0);
 
-    if(arg0.is_true())
+    if(arg0 == true)
       return expr.arguments()[1];
     else
       return expr.arguments()[2];

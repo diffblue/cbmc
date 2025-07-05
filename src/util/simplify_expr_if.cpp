@@ -250,8 +250,7 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
   // 1 ? a : b -> a  and  0 ? a : b -> b
   if(r_cond.expr.is_constant())
   {
-    return changed(
-      simplify_rec(r_cond.expr.is_true() ? truevalue : falsevalue));
+    return changed(simplify_rec(r_cond.expr == true ? truevalue : falsevalue));
   }
 
   if(do_simplify_if)
@@ -350,33 +349,33 @@ simplify_exprt::resultt<> simplify_exprt::simplify_if(const if_exprt &expr)
     {
       // a?b:c <-> (a && b) || (!a && c)
 
-      if(truevalue.is_true() && falsevalue.is_false())
+      if(truevalue == true && falsevalue == false)
       {
         // a?1:0 <-> a
         return cond;
       }
-      else if(truevalue.is_false() && falsevalue.is_true())
+      else if(truevalue == false && falsevalue == true)
       {
         // a?0:1 <-> !a
         return changed(simplify_not(not_exprt(cond)));
       }
-      else if(falsevalue.is_false())
+      else if(falsevalue == false)
       {
         // a?b:0 <-> a AND b
         return changed(simplify_boolean(and_exprt(cond, truevalue)));
       }
-      else if(falsevalue.is_true())
+      else if(falsevalue == true)
       {
         // a?b:1 <-> !a OR b
         return changed(
           simplify_boolean(or_exprt(simplify_not(not_exprt(cond)), truevalue)));
       }
-      else if(truevalue.is_true())
+      else if(truevalue == true)
       {
         // a?1:b <-> a||(!a && b) <-> a OR b
         return changed(simplify_boolean(or_exprt(cond, falsevalue)));
       }
-      else if(truevalue.is_false())
+      else if(truevalue == false)
       {
         // a?0:b <-> !a && b
         return changed(simplify_boolean(

@@ -73,7 +73,7 @@ exprt simplify_evaluate_update(
   if(may_alias.has_value())
   {
     // 'simple' case
-    if(may_alias->is_true())
+    if(*may_alias == true)
     {
       // The object is known to be the same.
       // (ς[A:=V])(A) --> V
@@ -83,7 +83,7 @@ exprt simplify_evaluate_update(
         address_taken,
         ns);
     }
-    else if(may_alias->is_false())
+    else if(*may_alias == false)
     {
       // The object is known to be different.
       // (ς[❝x❞:=V])(❝y❞) --> ς(❝y❞)
@@ -680,7 +680,7 @@ exprt simplify_is_cstring_expr(
     auto may_alias =
       ::may_alias(pointer, update_state_expr.address(), address_taken, ns);
 
-    if(may_alias.has_value() && may_alias->is_false())
+    if(may_alias.has_value() && *may_alias == false)
     {
       // different objects
       // cstring(s[x:=v], p) --> cstring(s, p)
@@ -776,7 +776,7 @@ exprt simplify_cstrlen_expr(
     auto may_be_same_object = ::may_be_same_object(
       pointer, update_state_expr.address(), address_taken, ns);
 
-    if(may_be_same_object.is_false())
+    if(may_be_same_object == false)
     {
       // different objects
       // cstrlen(s[x:=v], p) --> cstrlen(s, p)

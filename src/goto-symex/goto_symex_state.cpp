@@ -344,9 +344,9 @@ exprt goto_symex_statet::l2_rename_rvalues(exprt lvalue, const namespacet &ns)
     // The condition is an rvalue:
     auto &if_lvalue = to_if_expr(lvalue);
     if_lvalue.cond() = rename(if_lvalue.cond(), ns);
-    if(!if_lvalue.cond().is_false())
+    if(if_lvalue.cond() != false)
       if_lvalue.true_case() = l2_rename_rvalues(if_lvalue.true_case(), ns);
-    if(!if_lvalue.cond().is_true())
+    if(if_lvalue.cond() != true)
       if_lvalue.false_case() = l2_rename_rvalues(if_lvalue.false_case(), ns);
   }
   else if(lvalue.id() == ID_complex_real)
@@ -441,7 +441,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     }
 
     guardt cond = read_guard;
-    if(!no_write.op().is_false())
+    if(no_write.op() != false)
       cond |= guardt{no_write.op(), guard_manager};
 
     // It is safe to perform constant propagation in case we have read or
@@ -485,7 +485,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     expr = std::move(ssa_l2);
 
     a_s_read.second.push_back(guard);
-    if(!no_write.op().is_false())
+    if(no_write.op() != false)
       a_s_read.second.back().add(no_write);
 
     return true;

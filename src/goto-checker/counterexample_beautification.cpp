@@ -37,7 +37,7 @@ void counterexample_beautificationt::get_minimization_list(
       it->is_assignment() &&
       it->assignment_type == symex_targett::assignment_typet::STATE)
     {
-      if(!prop_conv.get(it->guard_handle).is_false())
+      if(prop_conv.get(it->guard_handle) != false)
       {
         const typet &type = it->ssa_lhs.type();
 
@@ -76,8 +76,8 @@ counterexample_beautificationt::get_failed_property(
       it++)
   {
     if(
-      it->is_assert() && prop_conv.get(it->guard_handle).is_true() &&
-      prop_conv.get(it->cond_handle).is_false())
+      it->is_assert() && prop_conv.get(it->guard_handle) == true &&
+      prop_conv.get(it->cond_handle) == false)
     {
       return it;
     }

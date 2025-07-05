@@ -1860,7 +1860,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_bool)
   {
-    dest=convert_constant_bool(src.is_true());
+    dest = convert_constant_bool(src == true);
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -3563,7 +3563,7 @@ std::string expr2ct::convert_conditional_target_group(const exprt &src)
   std::string dest;
   unsigned p;
   const auto &cond = src.operands().front();
-  if(!cond.is_true())
+  if(cond != true)
   {
     dest += convert_with_precedence(cond, p);
     dest += ": ";

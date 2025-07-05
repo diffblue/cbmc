@@ -56,13 +56,13 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 
       bool erase;
 
-      if(it->is_true())
+      if(*it == true)
       {
         erase=true;
         negate=!negate;
       }
       else
-        erase=it->is_false();
+        erase = *it == false;
 
       if(erase)
       {
@@ -110,8 +110,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
       if(!it->is_boolean())
         return unchanged(expr);
 
-      bool is_true=it->is_true();
-      bool is_false=it->is_false();
+      bool is_true = *it == true;
+      bool is_false = *it == false;
 
       if(expr.id()==ID_and && is_false)
       {
@@ -334,11 +334,11 @@ simplify_exprt::resultt<> simplify_exprt::simplify_not(const not_exprt &expr)
   {
     return to_not_expr(op).op();
   }
-  else if(op.is_false())
+  else if(op == false)
   {
     return true_exprt();
   }
-  else if(op.is_true())
+  else if(op == true)
   {
     return false_exprt();
   }
@@ -390,7 +390,7 @@ simplify_exprt::simplify_quantifier_expr(const quantifier_exprt &expr)
 
   // the following simplification only holds when the domain is non-empty
   if(
-    (where.is_false() || where.is_true()) &&
+    (where == false || where == true) &&
     std::all_of(
       expr.variables().begin(),
       expr.variables().end(),

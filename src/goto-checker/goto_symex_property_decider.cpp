@@ -88,9 +88,7 @@ void goto_symex_property_decidert::add_constraint_from_goals(
 
   for(const auto &goal_pair : goal_map)
   {
-    if(
-      select_property(goal_pair.first) &&
-      !goal_pair.second.condition.is_false())
+    if(select_property(goal_pair.first) && goal_pair.second.condition != false)
     {
       disjuncts.push_back(goal_pair.second.condition);
     }
@@ -143,9 +141,7 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
     {
       auto &status = properties.at(goal_pair.first).status;
       if(
-        solver->decision_procedure()
-          .get(goal_pair.second.condition)
-          .is_true() &&
+        solver->decision_procedure().get(goal_pair.second.condition) == true &&
         status != property_statust::FAIL)
       {
         status |= property_statust::FAIL;

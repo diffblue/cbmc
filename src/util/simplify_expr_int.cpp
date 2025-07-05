@@ -882,9 +882,9 @@ simplify_exprt::simplify_concatenation(const concatenation_exprt &expr)
     Forall_operands(it, new_expr)
     {
       exprt &op=*it;
-      if(op.is_true() || op.is_false())
+      if(op == true || op == false)
       {
-        const bool value = op.is_true();
+        const bool value = op == true;
         op = from_integer(value, unsignedbv_typet(1));
         no_change = false;
       }
@@ -1655,7 +1655,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_no_constant(
                            std::move(offset), ID_lt, std::move(*object_size)})
               .expr;
           if(in_object_bounds.is_constant())
-            return tvt{in_object_bounds.is_true()};
+            return tvt{in_object_bounds == true};
         }
 
         return tvt::unknown();

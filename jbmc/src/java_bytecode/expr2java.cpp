@@ -179,9 +179,9 @@ std::string expr2javat::convert_constant(
   }
   else if(src.is_boolean())
   {
-    if(src.is_true())
+    if(src == true)
       return "true";
-    else if(src.is_false())
+    else if(src == false)
       return "false";
   }
   else if(src.type().id()==ID_pointer)

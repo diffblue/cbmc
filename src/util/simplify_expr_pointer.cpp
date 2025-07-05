@@ -218,11 +218,11 @@ simplify_exprt::simplify_address_of_arg(const exprt &expr)
     }
 
     // condition is a constant?
-    if(new_if_expr.cond().is_true())
+    if(new_if_expr.cond() == true)
     {
       return new_if_expr.true_case();
     }
-    else if(new_if_expr.cond().is_false())
+    else if(new_if_expr.cond() == false)
     {
       return new_if_expr.false_case();
     }

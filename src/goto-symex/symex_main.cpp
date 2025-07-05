@@ -186,7 +186,7 @@ void goto_symext::vcc(
   state.total_vccs++;
   path_segment_vccs++;
 
-  if(condition.is_true())
+  if(condition == true)
     return;
 
   const exprt guarded_condition = state.guard.guard_expr(condition);
@@ -218,10 +218,10 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
 
 void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
 {
-  if(cond.is_true())
+  if(cond == true)
     return;
 
-  if(cond.is_false())
+  if(cond == false)
     state.reachable = false;
 
   // we are willing to re-write some quantified expressions
@@ -856,11 +856,11 @@ void goto_symext::try_filter_value_sets(
 
     do_simplify(modified_condition, state.value_set);
 
-    if(jump_taken_value_set && modified_condition.is_false())
+    if(jump_taken_value_set && modified_condition == false)
     {
       erase_from_jump_taken_value_set.insert(value_set_element);
     }
-    else if(jump_not_taken_value_set && modified_condition.is_true())
+    else if(jump_not_taken_value_set && modified_condition == true)
     {
       erase_from_jump_not_taken_value_set.insert(value_set_element);
     }

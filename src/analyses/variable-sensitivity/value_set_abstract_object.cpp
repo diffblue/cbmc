@@ -441,11 +441,11 @@ static bool is_set_extreme(const typet &type, const abstract_object_sett &set)
       set,
       [](const abstract_value_objectt &value) {
         auto c = value.to_constant();
-        return c.is_false() || (c.id() == ID_min_value);
+        return c == false || (c.id() == ID_min_value);
       },
       [](const abstract_value_objectt &value) {
         auto c = value.to_constant();
-        return c.is_true() || (c.id() == ID_max_value);
+        return c == true || (c.id() == ID_max_value);
       });
   }
 

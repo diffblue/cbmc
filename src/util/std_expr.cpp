@@ -254,13 +254,13 @@ exprt conjunction(exprt a, exprt b)
   PRECONDITION(a.is_boolean() && b.is_boolean());
   if(b.is_constant())
   {
-    if(to_constant_expr(b).is_false())
+    if(to_constant_expr(b) == false)
       return false_exprt{};
     return a;
   }
   if(a.is_constant())
   {
-    if(to_constant_expr(a).is_false())
+    if(to_constant_expr(a) == false)
       return false_exprt{};
     return b;
   }

@@ -69,7 +69,7 @@ static bool is_call_to(
 
 static bool is_assume_false(goto_programt::const_targett inst)
 {
-  return inst->is_assume() && inst->condition().is_false();
+  return inst->is_assume() && inst->condition() == false;
 }
 
 /// Interpret `program`, resolving classid comparisons assuming any actual
@@ -90,12 +90,12 @@ static goto_programt::const_targett interpret_classid_comparison(
     {
       exprt guard = pc->condition();
       guard = resolve_classid_test(guard, actual_class_id, ns);
-      if(guard.is_true())
+      if(guard == true)
       {
         REQUIRE(pc->targets.begin() != pc->targets.end());
         pc = *(pc->targets.begin());
       }
-      else if(guard.is_false())
+      else if(guard == false)
         ++pc;
       else
       {

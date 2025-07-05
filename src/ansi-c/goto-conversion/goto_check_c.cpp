@@ -1776,7 +1776,7 @@ void goto_check_ct::add_guarded_property(
     enable_simplify ? simplify_expr(asserted_expr, ns) : asserted_expr;
 
   // throw away trivial properties?
-  if(!retain_trivial && simplified_expr.is_true())
+  if(!retain_trivial && simplified_expr == true)
     return;
 
   // add the guard
@@ -2245,7 +2245,7 @@ void goto_check_ct::goto_check(
       // These are further 'exit points' of the program
       const exprt simplified_guard = simplify_expr(i.condition(), ns);
       if(
-        enable_memory_cleanup_check && simplified_guard.is_false() &&
+        enable_memory_cleanup_check && simplified_guard == false &&
         (function_identifier == "abort" || function_identifier == "exit" ||
          function_identifier == "_Exit" ||
          (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))

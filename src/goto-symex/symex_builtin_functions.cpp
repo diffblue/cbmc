@@ -173,7 +173,7 @@ void goto_symext::symex_allocate(
   INVARIANT(
     zero_init.is_constant(), "allocate expects constant as second argument");
 
-  if(!zero_init.is_zero() && !zero_init.is_false())
+  if(!zero_init.is_zero() && zero_init != false)
   {
     const auto zero_value =
       zero_initializer(*object_type, code.source_location(), ns);

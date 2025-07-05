@@ -1129,12 +1129,12 @@ void c_typecheck_baset::typecheck_compound_body(
       assertion = typecast_exprt(assertion, bool_typet());
       make_constant(assertion);
 
-      if(assertion.is_false())
+      if(assertion == false)
       {
         throw errort().with_location(it->source_location())
           << "failed _Static_assert";
       }
-      else if(!assertion.is_true())
+      else if(assertion != true)
       {
         // should warn/complain
       }
@@ -1303,9 +1303,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       typecheck_expr(tmp_v);
       add_rounding_mode(tmp_v);
       simplify(tmp_v, *this);
-      if(tmp_v.is_true())
+      if(tmp_v == true)
         value=1;
-      else if(tmp_v.is_false())
+      else if(tmp_v == false)
         value=0;
       else if(
         tmp_v.is_constant() && !to_integer(to_constant_expr(tmp_v), value))

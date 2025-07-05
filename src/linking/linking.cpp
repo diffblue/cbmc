@@ -551,7 +551,7 @@ bool linkingt::adjust_object_type_rec(
 
       equal_exprt eq(old_size, new_size);
 
-      if(!simplify_expr(eq, ns).is_true())
+      if(simplify_expr(eq, ns) != true)
       {
         linking_diagnosticst diag{message_handler, ns};
         diag.error(

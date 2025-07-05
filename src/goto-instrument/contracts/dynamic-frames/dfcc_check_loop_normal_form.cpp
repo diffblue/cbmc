@@ -156,7 +156,7 @@ void dfcc_check_loop_normal_form(goto_programt &goto_program, messaget &log)
     //       IF TRUE GOTO HEAD
     // EXIT: SKIP
     // ```
-    if(latch->has_condition() && !latch->condition().is_true())
+    if(latch->has_condition() && latch->condition() != true)
     {
       const source_locationt &loc = latch->source_location();
       const auto &exit =

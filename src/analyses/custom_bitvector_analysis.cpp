@@ -530,7 +530,7 @@ void custom_bitvector_domaint::transform(
 
       const exprt result2 = simplify_expr(eval(guard, cba), ns);
 
-      if(result2.is_false())
+      if(result2 == false)
         make_bottom();
     }
     break;
@@ -814,9 +814,9 @@ void custom_bitvector_analysist::check(
       if(use_xml)
       {
         out << "<result status=\"";
-        if(result.is_true())
+        if(result == true)
           out << "SUCCESS";
-        else if(result.is_false())
+        else if(result == false)
           out << "FAILURE";
         else
           out << "UNKNOWN";
@@ -838,9 +838,9 @@ void custom_bitvector_analysist::check(
         out << '\n';
       }
 
-      if(result.is_true())
+      if(result == true)
         pass++;
-      else if(result.is_false())
+      else if(result == false)
         fail++;
       else
         unknown++;

@@ -1072,11 +1072,11 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
          expr_type_id==ID_c_enum ||
          expr_type_id==ID_c_bit_field)
       {
-        if(operand.is_true())
+        if(operand == true)
         {
           return from_integer(1, expr_type);
         }
-        else if(operand.is_false())
+        else if(operand == false)
         {
           return from_integer(0, expr_type);
         }
@@ -1086,15 +1086,15 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
         const auto &c_enum_type = ns.follow_tag(to_c_enum_tag_type(expr_type));
         if(!c_enum_type.is_incomplete()) // possibly incomplete
         {
-          unsigned int_value = operand.is_true() ? 1u : 0u;
+          unsigned int_value = operand == true ? 1u : 0u;
           exprt tmp=from_integer(int_value, c_enum_type);
           tmp.type()=expr_type; // we maintain the tag type
           return std::move(tmp);
         }
       }
-      else if(expr_type_id==ID_pointer &&
-              operand.is_false() &&
-              config.ansi_c.NULL_is_zero)
+      else if(
+        expr_type_id == ID_pointer && operand == false &&
+        config.ansi_c.NULL_is_zero)
       {
         return null_pointer_exprt(to_pointer_type(expr_type));
       }

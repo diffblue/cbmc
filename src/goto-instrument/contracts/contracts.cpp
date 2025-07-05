@@ -365,7 +365,7 @@ void code_contractst::check_apply_loop_contracts(
   }
 
   // TODO: Fix loop contract handling for do/while loops.
-  if(loop_end->is_goto() && !loop_end->condition().is_true())
+  if(loop_end->is_goto() && loop_end->condition() != true)
   {
     log.error() << "Loop contracts are unsupported on do/while loops: "
                 << loop_head_location << messaget::eom;
@@ -772,7 +772,7 @@ void code_contractst::apply_function_contract(
   // Generate: assume(ensures)
   for(auto &clause : instantiated_ensures_clauses)
   {
-    if(clause.is_false())
+    if(clause == false)
     {
       throw invalid_input_exceptiont(
         std::string("Attempt to assume false at ")
@@ -1340,7 +1340,7 @@ void code_contractst::add_contract_check(
   {
     auto instantiated_clause =
       to_lambda_expr(clause).application(instantiation_values);
-    if(instantiated_clause.is_false())
+    if(instantiated_clause == false)
     {
       throw invalid_input_exceptiont(
         std::string("Attempt to assume false at ")

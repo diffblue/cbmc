@@ -57,7 +57,7 @@ bool ensure_one_backedge_per_target(
 
   // If the last backedge is a conditional jump, add an extra unconditional
   // backedge after it:
-  if(!last_backedge->condition().is_true())
+  if(last_backedge->condition() != true)
   {
     auto new_goto =
       goto_program.insert_after(last_backedge, goto_programt::make_goto(it));

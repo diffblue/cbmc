@@ -110,12 +110,12 @@ exprt assigns_match(const exprt &assigns, const exprt &lhs)
 
   if(lhs.id() == ID_member)
   {
-    if(assigns_match(assigns, to_member_expr(lhs).struct_op()).is_true())
+    if(assigns_match(assigns, to_member_expr(lhs).struct_op()) == true)
       return true_exprt();
   }
   else if(lhs.id() == ID_index)
   {
-    if(assigns_match(assigns, to_index_expr(lhs).array()).is_true())
+    if(assigns_match(assigns, to_index_expr(lhs).array()) == true)
       return true_exprt();
   }
 
@@ -169,7 +169,7 @@ static exprt make_assigns_assertion(
       auto match = assigns_match(a, lhs);
 
       // trivial?
-      if(match.is_true())
+      if(match == true)
         return true_exprt();
 
       disjuncts.push_back(std::move(match));

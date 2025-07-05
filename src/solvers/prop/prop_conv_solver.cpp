@@ -78,11 +78,11 @@ std::optional<bool> prop_conv_solvert::get_bool(const exprt &expr) const
 {
   // trivial cases
 
-  if(expr.is_true())
+  if(expr == true)
   {
     return true;
   }
-  else if(expr.is_false())
+  else if(expr == false)
   {
     return false;
   }
@@ -195,12 +195,12 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
 
   if(expr.is_constant())
   {
-    if(expr.is_true())
+    if(expr == true)
       return const_literal(true);
     else
     {
       INVARIANT(
-        expr.is_false(),
+        expr == false,
         "constant expression of type bool should be either true or false");
       return const_literal(false);
     }

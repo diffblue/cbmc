@@ -307,7 +307,7 @@ struct sort_based_literal_convertert : public smt_sort_const_downcast_visitort
 
   void visit(const smt_bool_sortt &) override
   {
-    result = smt_bool_literal_termt{member_input.is_true()};
+    result = smt_bool_literal_termt{member_input == true};
   }
 
   void visit(const smt_bit_vector_sortt &bit_vector_sort) override

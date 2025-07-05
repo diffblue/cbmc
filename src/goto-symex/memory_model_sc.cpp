@@ -302,7 +302,7 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
           exprt cond;
           cond.make_nil();
 
-          if(c_it->first.second==*w_prime && !ws1.is_false())
+          if(c_it->first.second == *w_prime && ws1 != false)
           {
             exprt fr=before(r, *w);
 
@@ -314,7 +314,7 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
                 and_exprt(r->guard, (*w)->guard, ws1, rf),
                 fr);
           }
-          else if(c_it->first.second==*w && !ws2.is_false())
+          else if(c_it->first.second == *w && ws2 != false)
           {
             exprt fr=before(r, *w_prime);
 

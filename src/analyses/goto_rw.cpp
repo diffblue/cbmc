@@ -116,9 +116,9 @@ void rw_range_sett::get_objects_if(
   const range_spect &range_start,
   const range_spect &size)
 {
-  if(if_expr.cond().is_false())
+  if(if_expr.cond() == false)
     get_objects_rec(mode, if_expr.false_case(), range_start, size);
-  else if(if_expr.cond().is_true())
+  else if(if_expr.cond() == true)
     get_objects_rec(mode, if_expr.true_case(), range_start, size);
   else
   {
@@ -735,9 +735,9 @@ void rw_guarded_range_set_value_sett::get_objects_if(
   const range_spect &range_start,
   const range_spect &size)
 {
-  if(if_expr.cond().is_false())
+  if(if_expr.cond() == false)
     get_objects_rec(mode, if_expr.false_case(), range_start, size);
-  else if(if_expr.cond().is_true())
+  else if(if_expr.cond() == true)
     get_objects_rec(mode, if_expr.true_case(), range_start, size);
   else
   {

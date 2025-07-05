@@ -929,19 +929,19 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
     const exprt base_cond = get_matched_base_cond(
       shadowed_address.address, matched_base_address, ns, log);
     shadow_memory_log_text_and_expr(ns, log, "base_cond", base_cond);
-    if(base_cond.is_false())
+    if(base_cond == false)
     {
       continue;
     }
 
     const exprt expr_cond =
       get_matched_expr_cond(dereference.pointer, expr, ns, log);
-    if(expr_cond.is_false())
+    if(expr_cond == false)
     {
       continue;
     }
 
-    if(base_cond.is_true() && expr_cond.is_true())
+    if(base_cond == true && expr_cond == true)
     {
 #ifdef DEBUG_SHADOW_MEMORY
       log.debug() << "exact match" << messaget::eom;
@@ -952,7 +952,7 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
       break;
     }
 
-    if(base_cond.is_true())
+    if(base_cond == true)
     {
       // No point looking at further shadow addresses
       // as only one of them can match.
@@ -1096,19 +1096,19 @@ get_shadow_memory_for_matched_object(
     const exprt base_cond = get_matched_base_cond(
       shadowed_address.address, matched_base_address, ns, log);
     shadow_memory_log_text_and_expr(ns, log, "base_cond", base_cond);
-    if(base_cond.is_false())
+    if(base_cond == false)
     {
       continue;
     }
 
     const exprt expr_cond =
       get_matched_expr_cond(dereference.pointer, expr, ns, log);
-    if(expr_cond.is_false())
+    if(expr_cond == false)
     {
       continue;
     }
 
-    if(base_cond.is_true() && expr_cond.is_true())
+    if(base_cond == true && expr_cond == true)
     {
       log_shadow_memory_message(log, "exact match");
 
@@ -1118,7 +1118,7 @@ get_shadow_memory_for_matched_object(
       break;
     }
 
-    if(base_cond.is_true())
+    if(base_cond == true)
     {
       // No point looking at further shadow addresses
       // as only one of them can match.
