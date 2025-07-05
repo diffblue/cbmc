@@ -295,26 +295,28 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         test.ns);
       SECTION("Operands in field order")
       {
-        with_exprt with_in_order{
+        with_exprt with_in_order_inner{
           symbol_expr,
           make_member_name_expression("green"),
           from_integer(0, signedbv_typet{32})};
-        with_in_order.operands().push_back(make_member_name_expression("eggs"));
-        with_in_order.operands().push_back(
-          from_integer(1, unsignedbv_typet{16}));
+        with_exprt with_in_order{
+          with_in_order_inner,
+          make_member_name_expression("eggs"),
+          from_integer(1, unsignedbv_typet{16})};
         const exprt encoded =
           simplify_expr(test.struct_encoding.encode(with_in_order), test.ns);
         REQUIRE(encoded == expected);
       }
       SECTION("Operands in reverse order vs fields")
       {
-        with_exprt with_reversed{
+        with_exprt with_reversed_inner{
           symbol_expr,
           make_member_name_expression("eggs"),
           from_integer(1, unsignedbv_typet{16})};
-        with_reversed.operands().push_back(
-          make_member_name_expression("green"));
-        with_reversed.operands().push_back(from_integer(0, signedbv_typet{32}));
+        with_exprt with_reversed{
+          with_reversed_inner,
+          make_member_name_expression("green"),
+          from_integer(0, signedbv_typet{32})};
         const exprt encoded =
           simplify_expr(test.struct_encoding.encode(with_reversed), test.ns);
         REQUIRE(encoded == expected);
@@ -331,25 +333,28 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         test.ns);
       SECTION("Operands in field order")
       {
-        with_exprt with_in_order{
+        with_exprt with_in_order_inner{
           symbol_expr,
           make_member_name_expression("green"),
           from_integer(0, signedbv_typet{32})};
-        with_in_order.operands().push_back(make_member_name_expression("ham"));
-        with_in_order.operands().push_back(from_integer(1, signedbv_typet{24}));
+        with_exprt with_in_order{
+          with_in_order_inner,
+          make_member_name_expression("ham"),
+          from_integer(1, signedbv_typet{24})};
         const exprt encoded =
           simplify_expr(test.struct_encoding.encode(with_in_order), test.ns);
         REQUIRE(encoded == expected);
       }
       SECTION("Operands in reverse order vs fields")
       {
-        with_exprt with_reversed{
+        with_exprt with_reversed_inner{
           symbol_expr,
           make_member_name_expression("ham"),
           from_integer(1, signedbv_typet{24})};
-        with_reversed.operands().push_back(
-          make_member_name_expression("green"));
-        with_reversed.operands().push_back(from_integer(0, signedbv_typet{32}));
+        with_exprt with_reversed{
+          with_reversed_inner,
+          make_member_name_expression("green"),
+          from_integer(0, signedbv_typet{32})};
         const exprt encoded =
           simplify_expr(test.struct_encoding.encode(with_reversed), test.ns);
         REQUIRE(encoded == expected);
@@ -366,25 +371,28 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         test.ns);
       SECTION("Operands in field order")
       {
-        with_exprt with_in_order{
+        with_exprt with_in_order_inner{
           symbol_expr,
           make_member_name_expression("eggs"),
           from_integer(0, unsignedbv_typet{16})};
-        with_in_order.operands().push_back(make_member_name_expression("ham"));
-        with_in_order.operands().push_back(from_integer(1, signedbv_typet{24}));
+        with_exprt with_in_order{
+          with_in_order_inner,
+          make_member_name_expression("ham"),
+          from_integer(1, signedbv_typet{24})};
         const exprt encoded =
           simplify_expr(test.struct_encoding.encode(with_in_order), test.ns);
         REQUIRE(encoded == expected);
       }
       SECTION("Operands in reverse order vs fields")
       {
-        with_exprt with_reversed{
+        with_exprt with_reversed_inner{
           symbol_expr,
           make_member_name_expression("ham"),
           from_integer(1, signedbv_typet{24})};
-        with_reversed.operands().push_back(make_member_name_expression("eggs"));
-        with_reversed.operands().push_back(
-          from_integer(0, unsignedbv_typet{16}));
+        with_exprt with_reversed{
+          with_reversed_inner,
+          make_member_name_expression("eggs"),
+          from_integer(0, unsignedbv_typet{16})};
         const exprt encoded =
           simplify_expr(test.struct_encoding.encode(with_reversed), test.ns);
         REQUIRE(encoded == expected);
@@ -401,28 +409,36 @@ TEST_CASE("struct encoding of expressions", "[core][smt2_incremental]")
         test.ns);
       SECTION("Operands in field order")
       {
-        with_exprt with{
+        with_exprt with_innermost{
           symbol_expr,
           make_member_name_expression("green"),
           from_integer(1, signedbv_typet{32})};
-        with.operands().push_back(make_member_name_expression("eggs"));
-        with.operands().push_back(from_integer(2, unsignedbv_typet{16}));
-        with.operands().push_back(make_member_name_expression("ham"));
-        with.operands().push_back(from_integer(3, signedbv_typet{24}));
+        with_exprt with_inner{
+          with_innermost,
+          make_member_name_expression("eggs"),
+          from_integer(2, unsignedbv_typet{16})};
+        with_exprt with{
+          with_inner,
+          make_member_name_expression("ham"),
+          from_integer(3, signedbv_typet{24})};
         const exprt encoded =
           simplify_expr(test.struct_encoding.encode(with), test.ns);
         REQUIRE(encoded == expected);
       }
       SECTION("Operands out of order vs fields")
       {
-        with_exprt with{
+        with_exprt with_innermost{
           symbol_expr,
           make_member_name_expression("eggs"),
           from_integer(2, unsignedbv_typet{16})};
-        with.operands().push_back(make_member_name_expression("ham"));
-        with.operands().push_back(from_integer(3, signedbv_typet{24}));
-        with.operands().push_back(make_member_name_expression("green"));
-        with.operands().push_back(from_integer(1, signedbv_typet{32}));
+        with_exprt with_inner{
+          with_innermost,
+          make_member_name_expression("ham"),
+          from_integer(3, signedbv_typet{24})};
+        with_exprt with{
+          with_inner,
+          make_member_name_expression("green"),
+          from_integer(1, signedbv_typet{32})};
         const exprt encoded =
           simplify_expr(test.struct_encoding.encode(with), test.ns);
         REQUIRE(encoded == expected);

@@ -334,16 +334,14 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
 void smt2_incremental_decision_proceduret::define_index_identifiers(
   const exprt &expr)
 {
-  expr.visit_pre([&](const exprt &expr_node) {
-    if(!can_cast_type<array_typet>(expr_node.type()))
-      return;
-    if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
+  expr.visit_post(
+    [&](const exprt &expr_node)
     {
-      for(auto operand_ite = ++with_expr->operands().begin();
-          operand_ite != with_expr->operands().end();
-          operand_ite += 2)
+      if(!can_cast_type<array_typet>(expr_node.type()))
+        return;
+      if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
       {
-        const auto index_expr = *operand_ite;
+        const auto index_expr = with_expr->where();
         const auto index_term = convert_expr_to_smt(index_expr);
         const auto index_identifier =
           "index_" + std::to_string(index_sequence());
@@ -356,8 +354,7 @@ void smt2_incremental_decision_proceduret::define_index_identifiers(
         solver_process->send(
           smt_define_function_commandt{index_identifier, {}, index_term});
       }
-    }
-  });
+    });
 }
 
 exprt smt2_incremental_decision_proceduret::substitute_defined_padding(

@@ -1271,17 +1271,17 @@ TEST_CASE(
       INFO("Expression being converted: " + with.pretty(2, 0));
       CHECK(test.convert(with) == expected);
     }
-    SECTION("Dual where/new_value pair update")
+    SECTION("Nested where/new_value pair update")
     {
       exprt index2 = from_integer(24, unsignedbv_typet{64});
       exprt value2 = from_integer(21, value_type);
-      with.add_to_operands(std::move(index2), std::move(value2));
+      with_exprt with2{with, std::move(index2), std::move(value2)};
       const smt_termt expected2 = smt_array_theoryt::store(
         expected,
         smt_bit_vector_constant_termt{24, 64},
         smt_bit_vector_constant_termt{21, 8});
-      INFO("Expression being converted: " + with.pretty(2, 0));
-      CHECK(test.convert(with) == expected2);
+      INFO("Expression being converted: " + with2.pretty(2, 0));
+      CHECK(test.convert(with2) == expected2);
     }
   }
 }

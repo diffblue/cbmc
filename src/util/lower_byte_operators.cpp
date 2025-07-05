@@ -1607,10 +1607,7 @@ static exprt lower_byte_update_byte_array_vector(
         index_exprt{src.op(), where}};
     }
 
-    if(result.id() != ID_with)
-      result = with_exprt{result, std::move(where), std::move(update_value)};
-    else
-      result.add_to_operands(std::move(where), std::move(update_value));
+    result = with_exprt{result, std::move(where), std::move(update_value)};
   }
 
   return simplify_expr(std::move(result), ns);
@@ -1892,7 +1889,7 @@ static exprt lower_byte_update_array_vector_non_const(
         src.get_bits_per_byte()},
       ns);
 
-    result.add_to_operands(std::move(where), std::move(element));
+    result = with_exprt{result, std::move(where), std::move(element)};
   };
 
   std::size_t i = 1;

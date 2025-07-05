@@ -4308,27 +4308,9 @@ void smt2_convt::convert_floatbv_rem(const binary_exprt &expr)
 
 void smt2_convt::convert_with(const with_exprt &expr)
 {
-  // get rid of "with" that has more than three operands
-
-  if(expr.operands().size()>3)
-  {
-    std::size_t s=expr.operands().size();
-
-    // strip off the trailing two operands
-    with_exprt tmp = expr;
-    tmp.operands().resize(s-2);
-
-    with_exprt new_with_expr(
-      tmp, expr.operands()[s - 2], expr.operands().back());
-
-    // recursive call
-    return convert_with(new_with_expr);
-  }
-
   INVARIANT(
     expr.operands().size() == 3,
-    "with expression should have been converted to a version with three "
-    "operands above");
+    "with expression should have exactly three operands");
 
   const typet &expr_type = expr.type();
 

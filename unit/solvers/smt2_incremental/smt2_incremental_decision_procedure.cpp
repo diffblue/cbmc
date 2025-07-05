@@ -766,14 +766,16 @@ TEST_CASE(
   const auto original_array_symbol =
     make_test_symbol("original_array", array_type);
   const auto result_array_symbol = make_test_symbol("result_array", array_type);
-  with_exprt with_expr{
+  with_exprt with_expr_innermost{
     original_array_symbol.symbol_expr(),
     from_integer(0, index_type),
     from_integer(0, value_type)};
-  with_expr.add_to_operands(
-    from_integer(1, index_type), from_integer(1, value_type));
-  with_expr.add_to_operands(
-    from_integer(2, index_type), from_integer(2, value_type));
+  with_exprt with_expr_inner{
+    with_expr_innermost,
+    from_integer(1, index_type),
+    from_integer(1, value_type)};
+  with_exprt with_expr{
+    with_expr_inner, from_integer(2, index_type), from_integer(2, value_type)};
   const equal_exprt equal_expr{result_array_symbol.symbol_expr(), with_expr};
   test.sent_commands.clear();
   test.procedure.set_to(equal_expr, true);

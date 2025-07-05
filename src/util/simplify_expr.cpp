@@ -1458,84 +1458,52 @@ simplify_exprt::simplify_lambda(const lambda_exprt &expr)
 
 simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
 {
-  bool no_change = true;
-
-  if((expr.operands().size()%2)!=1)
-    return unchanged(expr);
-
-  // copy
-  auto with_expr = expr;
-
   // now look at first operand
 
   if(
-    with_expr.old().type().id() == ID_struct ||
-    with_expr.old().type().id() == ID_struct_tag)
+    expr.old().type().id() == ID_struct ||
+    expr.old().type().id() == ID_struct_tag)
   {
-    if(with_expr.old().id() == ID_struct || with_expr.old().is_constant())
+    if(expr.old().id() == ID_struct || expr.old().is_constant())
     {
-      while(with_expr.operands().size() > 1)
-      {
-        const irep_idt &component_name =
-          with_expr.where().get(ID_component_name);
+      const irep_idt &component_name = expr.where().get(ID_component_name);
 
-        const struct_typet &old_type_followed =
-          with_expr.old().type().id() == ID_struct_tag
-            ? ns.follow_tag(to_struct_tag_type(with_expr.old().type()))
-            : to_struct_type(with_expr.old().type());
-        if(!old_type_followed.has_component(component_name))
-          return unchanged(expr);
+      const struct_typet &old_type_followed =
+        expr.old().type().id() == ID_struct_tag
+          ? ns.follow_tag(to_struct_tag_type(expr.old().type()))
+          : to_struct_type(expr.old().type());
+      if(!old_type_followed.has_component(component_name))
+        return unchanged(expr);
 
-        std::size_t number = old_type_followed.component_number(component_name);
+      std::size_t number = old_type_followed.component_number(component_name);
 
-        if(number >= with_expr.old().operands().size())
-          return unchanged(expr);
+      if(number >= expr.old().operands().size())
+        return unchanged(expr);
 
-        with_expr.old().operands()[number].swap(with_expr.new_value());
-
-        with_expr.operands().erase(++with_expr.operands().begin());
-        with_expr.operands().erase(++with_expr.operands().begin());
-
-        no_change = false;
-      }
+      exprt result = expr.old();
+      result.operands()[number] = expr.new_value();
+      return result;
     }
   }
   else if(
-    with_expr.old().type().id() == ID_array ||
-    with_expr.old().type().id() == ID_vector)
+    expr.old().type().id() == ID_array || expr.old().type().id() == ID_vector)
   {
     if(
-      with_expr.old().id() == ID_array || with_expr.old().is_constant() ||
-      with_expr.old().id() == ID_vector)
+      expr.old().id() == ID_array || expr.old().is_constant() ||
+      expr.old().id() == ID_vector)
     {
-      while(with_expr.operands().size() > 1)
+      const auto i = numeric_cast<mp_integer>(expr.where());
+
+      if(i.has_value() && *i >= 0 && *i < expr.old().operands().size())
       {
-        const auto i = numeric_cast<mp_integer>(with_expr.where());
-
-        if(!i.has_value())
-          break;
-
-        if(*i < 0 || *i >= with_expr.old().operands().size())
-          break;
-
-        with_expr.old().operands()[numeric_cast_v<std::size_t>(*i)].swap(
-          with_expr.new_value());
-
-        with_expr.operands().erase(++with_expr.operands().begin());
-        with_expr.operands().erase(++with_expr.operands().begin());
-
-        no_change = false;
+        exprt result = expr.old();
+        result.operands()[numeric_cast_v<std::size_t>(*i)] = expr.new_value();
+        return result;
       }
     }
   }
 
-  if(with_expr.operands().size() == 1)
-    return with_expr.old();
-
-  if(no_change)
-    return unchanged(expr);
-  else
-    return std::move(with_expr);
+  return unchanged(expr);
 }
 
 simplify_exprt::resultt<>
@@ -2276,7 +2244,8 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
 
         for(mp_integer i = 1; i < n_elements; ++i)
         {
-          result_expr.add_to_operands(
+          result_expr = with_exprt{
+            result_expr,
             from_integer(base_offset + i, array_type->index_type()),
             byte_extract_exprt{
               matching_byte_extract_id,
@@ -2284,7 +2253,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
               from_integer(
                 i * (*el_size / expr.get_bits_per_byte()), offset.type()),
               expr.get_bits_per_byte(),
-              array_type->element_type()});
+              array_type->element_type()}};
         }
 
         return changed(simplify_rec(result_expr));
@@ -2350,7 +2319,8 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
           mp_integer n_elements = *val_size / *el_size;
           for(mp_integer i = 1; i < n_elements; ++i)
           {
-            result_expr.add_to_operands(
+            result_expr = with_exprt{
+              result_expr,
               typecast_exprt::conditional_cast(
                 plus_exprt{base_offset, from_integer(i, base_offset.type())},
                 array_type->index_type()),
@@ -2360,7 +2330,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
                 from_integer(
                   i * (*el_size / expr.get_bits_per_byte()), offset.type()),
                 expr.get_bits_per_byte(),
-                array_type->element_type()});
+                array_type->element_type()}};
           }
           return changed(simplify_rec(result_expr));
         }
