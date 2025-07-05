@@ -8,10 +8,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
+#include "arith_tools.h"
 #include "config.h"
+#include "expr_util.h"
+#include "fixedbv.h"
+#include "ieee_float.h"
+#include "mathematical_types.h"
 #include "namespace.h"
 #include "pointer_expr.h"
 #include "range.h"
+#include "rational.h"
+#include "rational_tools.h"
 #include "substitute_symbols.h"
 
 #include <map>
@@ -20,6 +27,144 @@ bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());
   return val.find_first_not_of('0')==std::string::npos;
+}
+
+bool operator==(const exprt &lhs, bool rhs)
+{
+  return lhs.is_constant() && to_constant_expr(lhs) == rhs;
+}
+
+bool operator!=(const exprt &lhs, bool rhs)
+{
+  return !lhs.is_constant() || to_constant_expr(lhs) != rhs;
+}
+
+bool operator==(const constant_exprt &lhs, bool rhs)
+{
+  return lhs.is_boolean() && (lhs.get_value() != ID_false) == rhs;
+}
+
+bool operator!=(const constant_exprt &lhs, bool rhs)
+{
+  return !lhs.is_boolean() || (lhs.get_value() != ID_false) != rhs;
+}
+
+bool operator==(const exprt &lhs, int rhs)
+{
+  if(lhs.is_constant())
+    return to_constant_expr(lhs) == rhs;
+  else
+    return false;
+}
+
+bool operator!=(const exprt &lhs, int rhs)
+{
+  if(lhs.is_constant())
+    return to_constant_expr(lhs) != rhs;
+  else
+    return true;
+}
+
+bool operator==(const constant_exprt &lhs, int rhs)
+{
+  if(rhs == 0)
+  {
+    const irep_idt &type_id = lhs.type().id();
+
+    if(type_id == ID_integer)
+    {
+      return integer_typet{}.zero_expr() == lhs;
+    }
+    else if(type_id == ID_natural)
+    {
+      return natural_typet{}.zero_expr() == lhs;
+    }
+    else if(type_id == ID_real)
+    {
+      return real_typet{}.zero_expr() == lhs;
+    }
+    else if(type_id == ID_rational)
+    {
+      rationalt rat_value;
+      if(to_rational(lhs, rat_value))
+        CHECK_RETURN(false);
+      return rat_value.is_zero();
+    }
+    else if(
+      type_id == ID_unsignedbv || type_id == ID_signedbv ||
+      type_id == ID_c_bool || type_id == ID_c_bit_field)
+    {
+      return lhs.value_is_zero_string();
+    }
+    else if(type_id == ID_fixedbv)
+    {
+      return fixedbvt(lhs).is_zero();
+    }
+    else if(type_id == ID_floatbv)
+    {
+      return ieee_float_valuet(lhs).is_zero();
+    }
+    else if(type_id == ID_pointer)
+    {
+      return lhs == nullptr;
+    }
+    else
+      return false;
+  }
+  else if(rhs == 1)
+  {
+    const irep_idt &type_id = lhs.type().id();
+
+    if(type_id == ID_integer)
+    {
+      return integer_typet{}.one_expr() == lhs;
+    }
+    else if(type_id == ID_natural)
+    {
+      return natural_typet{}.one_expr() == lhs;
+    }
+    else if(type_id == ID_real)
+    {
+      return real_typet{}.one_expr() == lhs;
+    }
+    else if(type_id == ID_rational)
+    {
+      rationalt rat_value;
+      if(to_rational(lhs, rat_value))
+        CHECK_RETURN(false);
+      return rat_value.is_one();
+    }
+    else if(
+      type_id == ID_unsignedbv || type_id == ID_signedbv ||
+      type_id == ID_c_bool || type_id == ID_c_bit_field)
+    {
+      const auto width = to_bitvector_type(lhs.type()).get_width();
+      mp_integer int_value =
+        bvrep2integer(id2string(lhs.get_value()), width, false);
+      return int_value == 1;
+    }
+    else if(type_id == ID_fixedbv)
+    {
+      fixedbv_spect spec{to_fixedbv_type(lhs.type())};
+      fixedbvt one{spec};
+      one.from_integer(1);
+      return one == fixedbvt{lhs};
+    }
+    else if(type_id == ID_floatbv)
+    {
+      return ieee_float_valuet(lhs) == 1;
+    }
+    else
+      return false;
+  }
+  else
+    PRECONDITION(false);
+}
+
+bool operator!=(const constant_exprt &lhs, int rhs) const
+{
+  PRECONDITION(rhs == 0 || rhs == 1);
+  return !(lhs == rhs);
 }
 
 bool constant_exprt::is_null_pointer() const
@@ -36,6 +181,30 @@ bool constant_exprt::is_null_pointer() const
     !value_is_zero_string() || !config.ansi_c.NULL_is_zero,
     "front-end should use ID_NULL");
   return false;
+}
+
+bool operator==(const exprt &lhs, std::nullptr_t rhs)
+{
+  (void)rhs; // unused parameter
+  return lhs.is_constant() && to_constant_expr(lhs).is_null_pointer();
+}
+
+bool operator!=(const exprt &lhs, std::nullptr_t rhs)
+{
+  (void)rhs; // unused parameter
+  return !lhs.is_constant() || !to_constant_expr(lhs).is_null_pointer();
+}
+
+bool operator==(const constant_exprt &lhs, std::nullptr_t rhs)
+{
+  (void)rhs; // unused parameter
+  return lhs.is_null_pointer();
+}
+
+bool operator!=(const constant_exprt &lhs, std::nullptr_t rhs) const
+{
+  (void)rhs; // unused parameter
+  return !lhs.is_null_pointer();
 }
 
 void constant_exprt::check(const exprt &expr, const validation_modet vm)
