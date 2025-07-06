@@ -79,7 +79,7 @@ static void process_array_expr(exprt &expr, const namespacet &ns)
     if(expr.type().id() == ID_empty)
       return;
 
-    if(!ode.offset().is_zero())
+    if(ode.offset() != 0)
     {
       if(expr.type().id() != ID_array)
       {

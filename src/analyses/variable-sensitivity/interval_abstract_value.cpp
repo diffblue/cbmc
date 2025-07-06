@@ -241,8 +241,7 @@ bool new_interval_is_top(const constant_interval_exprt &e)
 
   if(e.get_lower() == false && e.get_upper() == true)
     return true;
-  if(
-    e.type().id() == ID_c_bool && e.get_lower().is_zero() && e.get_upper() == 1)
+  if(e.type().id() == ID_c_bool && e.get_lower() == 0 && e.get_upper() == 1)
   {
     return true;
   }

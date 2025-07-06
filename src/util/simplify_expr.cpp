@@ -858,7 +858,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   if(
     expr_type.id() == ID_pointer && expr.op().is_constant() &&
     (to_constant_expr(expr.op()).get_value() == ID_NULL ||
-     (expr.op().is_zero() && config.ansi_c.NULL_is_zero)))
+     (expr.op() == 0 && config.ansi_c.NULL_is_zero)))
   {
     exprt tmp = expr.op();
     tmp.type()=expr.type();
@@ -904,7 +904,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 
     if(
       (op_plus_expr.op0().id() == ID_typecast &&
-       to_typecast_expr(op_plus_expr.op0()).op().is_zero()) ||
+       to_typecast_expr(op_plus_expr.op0()).op() == 0) ||
       (op_plus_expr.op0().is_constant() &&
        to_constant_expr(op_plus_expr.op0()).is_null_pointer()))
     {
@@ -2089,7 +2089,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
 
   // byte update of full object is byte_extract(new value)
   if(
-    offset.is_zero() && val_size.has_value() && *val_size > 0 &&
+    offset == 0 && val_size.has_value() && *val_size > 0 &&
     root_size.has_value() && *root_size > 0 && *val_size >= *root_size)
   {
     byte_extract_exprt be(
@@ -2285,7 +2285,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
 
         if(
           expr_at_offset_C.id() == ID_with &&
-          to_with_expr(expr_at_offset_C).where().is_zero())
+          to_with_expr(expr_at_offset_C).where() == 0)
         {
           tmp.set_op(to_with_expr(expr_at_offset_C).old());
           tmp.set_offset(other_factor);
@@ -2536,8 +2536,8 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
   // When one operand is zero, an overflow can only occur for a subtraction from
   // zero.
   if(
-    expr.op1().is_zero() ||
-    (expr.op0().is_zero() && !can_cast_expr<minus_overflow_exprt>(expr)))
+    expr.op1() == 0 ||
+    (expr.op0() == 0 && !can_cast_expr<minus_overflow_exprt>(expr)))
   {
     return false_exprt{};
   }
@@ -2606,7 +2606,7 @@ simplify_exprt::resultt<>
 simplify_exprt::simplify_overflow_unary(const unary_overflow_exprt &expr)
 {
   // zero is a neutral element for all operations supported here
-  if(expr.op().is_zero())
+  if(expr.op() == 0)
     return false_exprt{};
 
   // catch some cases over mathematical types
@@ -2656,7 +2656,7 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
   if(expr.id() == ID_overflow_result_unary_minus)
   {
     // zero is a neutral element
-    if(expr.op0().is_zero())
+    if(expr.op0() == 0)
       return struct_exprt{{expr.op0(), false_exprt{}}, expr.type()};
 
     // catch some cases over mathematical types
@@ -2707,7 +2707,7 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
   {
     // When one operand is zero, an overflow can only occur for a subtraction
     // from zero.
-    if(expr.op0().is_zero())
+    if(expr.op0() == 0)
     {
       if(
         expr.id() == ID_overflow_result_plus ||
@@ -2721,7 +2721,7 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
           {from_integer(0, expr.op0().type()), false_exprt{}}, expr.type()};
       }
     }
-    else if(expr.op1().is_zero())
+    else if(expr.op1() == 0)
     {
       if(
         expr.id() == ID_overflow_result_plus ||

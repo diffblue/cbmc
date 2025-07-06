@@ -165,7 +165,7 @@ void c_safety_checks_rec(
     const auto &div_expr = to_div_expr(expr);
     if(
       div_expr.divisor().is_constant() &&
-      !to_constant_expr(div_expr.divisor()).is_zero())
+      to_constant_expr(div_expr.divisor()) != 0)
     {
     }
     else
@@ -186,7 +186,7 @@ void c_safety_checks_rec(
     const auto &mod_expr = to_mod_expr(expr);
     if(
       mod_expr.divisor().is_constant() &&
-      !to_constant_expr(mod_expr.divisor()).is_zero())
+      to_constant_expr(mod_expr.divisor()) != 0)
     {
     }
     else

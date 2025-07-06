@@ -172,7 +172,7 @@ std::string expr2javat::convert_constant(
 {
   if(src.type().id()==ID_c_bool)
   {
-    if(!src.is_zero())
+    if(src != 0)
       return "true";
     else
       return "false";
@@ -187,7 +187,7 @@ std::string expr2javat::convert_constant(
   else if(src.type().id()==ID_pointer)
   {
     // Java writes 'null' for the null reference
-    if(src.is_zero())
+    if(src == 0)
       return "null";
   }
   else if(src.type()==java_char_type())

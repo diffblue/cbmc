@@ -691,7 +691,7 @@ static void clean_string_constant(exprt &expr)
 {
   const auto *index_expr = expr_try_dynamic_cast<index_exprt>(expr);
   if(
-    index_expr && index_expr->index().is_zero() &&
+    index_expr && index_expr->index() == 0 &&
     can_cast_expr<string_constantt>(index_expr->array()))
   {
     expr = index_expr->array();

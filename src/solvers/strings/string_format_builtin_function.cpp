@@ -597,7 +597,7 @@ string_constraintst string_format_builtin_functiont::constraints(
   auto result_constraint_pair = add_axioms_for_format(
     generator, result, format_string.value(), inputs, message_handler);
   INVARIANT(
-    simplify_expr(result_constraint_pair.first, generator.ns).is_zero(),
+    simplify_expr(result_constraint_pair.first, generator.ns) == 0,
     "add_axioms_for_format should return 0, meaning that formatting was"
     "successful");
   result_constraint_pair.second.existential.push_back(

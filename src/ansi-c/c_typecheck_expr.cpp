@@ -1457,15 +1457,13 @@ void c_typecheck_baset::typecheck_expr_rel(
   else
   {
     // pointer and zero
-    if(type0.id()==ID_pointer &&
-       simplify_expr(op1, *this).is_zero())
+    if(type0.id() == ID_pointer && simplify_expr(op1, *this) == 0)
     {
       op1 = null_pointer_exprt{to_pointer_type(type0)};
       return;
     }
 
-    if(type1.id()==ID_pointer &&
-       simplify_expr(op0, *this).is_zero())
+    if(type1.id() == ID_pointer && simplify_expr(op0, *this) == 0)
     {
       op0 = null_pointer_exprt{to_pointer_type(type1)};
       return;

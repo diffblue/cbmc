@@ -46,7 +46,7 @@ static bool is_string_constant_initialization(const exprt &rhs)
       const auto &index =
         expr_try_dynamic_cast<index_exprt>(address_of->object()))
     {
-      if(index->array().id() == ID_string_constant && index->index().is_zero())
+      if(index->array().id() == ID_string_constant && index->index() == 0)
       {
         return true;
       }

@@ -20,7 +20,7 @@ SCENARIO("bitfield-expr-is-zero", "[core][util][expr]")
 
     THEN("is_zero() should be false")
     {
-      REQUIRE_FALSE(bitfield3.is_zero());
+      REQUIRE_FALSE(bitfield3 == 0);
     }
   }
   GIVEN("An exprt representing a bitfield constant of 0")
@@ -30,7 +30,7 @@ SCENARIO("bitfield-expr-is-zero", "[core][util][expr]")
 
     THEN("is_zero() should be true")
     {
-      REQUIRE(bitfield0.is_zero());
+      REQUIRE(bitfield0 == 0);
     }
   }
 }

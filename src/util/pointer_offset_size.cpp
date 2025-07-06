@@ -742,7 +742,7 @@ std::optional<exprt> get_subexpression_at_offset(
 
         if(
           expr_at_offset_C.has_value() && expr_at_offset_C->id() == ID_index &&
-          to_index_expr(*expr_at_offset_C).index().is_zero())
+          to_index_expr(*expr_at_offset_C).index() == 0)
         {
           return get_subexpression_at_offset(
             to_index_expr(*expr_at_offset_C).array(),
@@ -847,7 +847,7 @@ std::optional<exprt> get_subexpression_at_offset(
 
         if(
           expr_at_offset_C.has_value() && expr_at_offset_C->id() == ID_index &&
-          to_index_expr(*expr_at_offset_C).index().is_zero())
+          to_index_expr(*expr_at_offset_C).index() == 0)
         {
           return get_subexpression_at_offset(
             to_index_expr(*expr_at_offset_C).array(),

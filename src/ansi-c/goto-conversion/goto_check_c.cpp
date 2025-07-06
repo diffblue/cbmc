@@ -1695,7 +1695,7 @@ void goto_check_ct::bounds_check_index(
   }
   else if(
     expr.array().id() == ID_member &&
-    (size.is_zero() || array_type.get_bool(ID_C_flexible_array_member)))
+    (size == 0 || array_type.get_bool(ID_C_flexible_array_member)))
   {
     // a variable sized struct member
     //

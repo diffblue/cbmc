@@ -19,9 +19,9 @@ exprt pointer_offset_sum(const exprt &a, const exprt &b)
     return a;
   else if(b.id() == ID_unknown)
     return b;
-  else if(a.is_zero())
+  else if(a == 0)
     return b;
-  else if(b.is_zero())
+  else if(b == 0)
     return a;
 
   return plus_exprt(a, typecast_exprt::conditional_cast(b, a.type()));

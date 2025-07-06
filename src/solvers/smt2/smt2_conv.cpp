@@ -897,7 +897,7 @@ void smt2_convt::convert_address_of_rec(
     const exprt &array = index_expr.array();
     const exprt &index = index_expr.index();
 
-    if(index.is_zero())
+    if(index == 0)
     {
       if(array.type().id()==ID_pointer)
         convert_expr(array);

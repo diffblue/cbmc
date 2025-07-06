@@ -998,7 +998,7 @@ constant_exprt constant_interval_exprt::zero(const typet &type)
 {
   constant_exprt zero = from_integer(mp_integer(0), type);
   INVARIANT(
-    zero.is_zero() || (type.id() == ID_bool && zero == false),
+    zero == 0 || (type.id() == ID_bool && zero == false),
     "The value created from 0 should be zero or false");
   return zero;
 }
@@ -1269,7 +1269,7 @@ bool constant_interval_exprt::is_zero(const exprt &expr)
 
   INVARIANT(!is_max(expr) && !is_min(expr), "We excluded those cases");
 
-  if(expr.is_zero())
+  if(expr == 0)
   {
     return true;
   }
@@ -1875,7 +1875,7 @@ bool constant_interval_exprt::contains_zero() const
     return false;
   }
 
-  if(get_lower().is_zero() || get_upper().is_zero())
+  if(get_lower() == 0 || get_upper() == 0)
   {
     return true;
   }

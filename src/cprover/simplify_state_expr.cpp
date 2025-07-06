@@ -690,7 +690,7 @@ exprt simplify_is_cstring_expr(
     // maybe the same
 
     // Are we writing zero?
-    if(update_state_expr.new_value().is_zero())
+    if(update_state_expr.new_value() == 0)
     {
       // cstring(s[p:=0], q) --> if p alias q then true else cstring(s, q)
       auto same_object = ::same_object(pointer, update_state_expr.address());
