@@ -1606,8 +1606,10 @@ pragma_packed:
         {
           init($$);
           if(!PARSER.pragma_pack.empty() &&
-             PARSER.pragma_pack.back().is_one())
+             PARSER.pragma_pack.back() == 1)
+          {
             set($$, ID_packed);
+          }
         }
         ;
 

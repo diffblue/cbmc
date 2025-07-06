@@ -2545,7 +2545,7 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
   // One is neutral element for multiplication
   if(
     can_cast_expr<mult_overflow_exprt>(expr) &&
-    (expr.op0().is_one() || expr.op1().is_one()))
+    (expr.op0() == 1 || expr.op1() == 1))
   {
     return false_exprt{};
   }
@@ -2740,10 +2740,10 @@ simplify_exprt::simplify_overflow_result(const overflow_result_exprt &expr)
     // One is neutral element for multiplication
     if(
       expr.id() == ID_overflow_result_mult &&
-      (expr.op0().is_one() || expr.op1().is_one()))
+      (expr.op0() == 1 || expr.op1() == 1))
     {
       return struct_exprt{
-        {expr.op0().is_one() ? expr.op1() : expr.op0(), false_exprt{}},
+        {expr.op0() == 1 ? expr.op1() : expr.op0(), false_exprt{}},
         expr.type()};
     }
 

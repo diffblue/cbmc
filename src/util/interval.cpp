@@ -689,7 +689,7 @@ exprt constant_interval_exprt::generate_division_expression(
 
   PRECONDITION(!is_zero(rhs));
 
-  if(rhs.is_one())
+  if(rhs == 1)
   {
     return lhs;
   }
@@ -744,7 +744,7 @@ exprt constant_interval_exprt::generate_modulo_expression(
 
   PRECONDITION(!is_zero(rhs));
 
-  if(rhs.is_one())
+  if(rhs == 1)
   {
     return lhs;
   }

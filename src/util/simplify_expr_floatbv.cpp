@@ -347,8 +347,9 @@ simplify_exprt::simplify_floatbv_op(const ieee_float_op_exprt &expr)
   }
 
   // division by one? Exact for all rounding modes.
-  if(expr.id()==ID_floatbv_div &&
-     op1.is_constant() && op1.is_one())
+  if(
+    expr.id() == ID_floatbv_div && op1.is_constant() &&
+    ieee_float_valuet{to_constant_expr(op1)} == 1)
   {
     return op0;
   }

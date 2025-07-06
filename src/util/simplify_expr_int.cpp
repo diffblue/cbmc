@@ -253,7 +253,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_mult(const mult_exprt &expr)
   else
   {
     // if the constant is a one and there are other factors
-    if(constant_found && constant->is_one())
+    if(constant_found && *constant == 1)
     {
       // just delete it
       new_operands.erase(constant);
@@ -346,8 +346,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_div(const div_exprt &expr)
   else if(expr_type.id()==ID_fixedbv)
   {
     // division by one?
-    if(expr.op1().is_constant() &&
-       expr.op1().is_one())
+    if(expr.op1().is_constant() && expr.op1() == 1)
     {
       return expr.op0();
     }
@@ -678,7 +677,7 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
       if(op.id() == ID_typecast && to_typecast_expr(op).op().is_boolean())
       {
       }
-      else if(op.is_zero() || op.is_one())
+      else if(op.is_zero() || op == 1)
       {
       }
       else
@@ -707,7 +706,7 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
           *it = to_typecast_expr(*it).op();
         else if(it->is_zero())
           *it=false_exprt();
-        else if(it->is_one())
+        else if(*it == 1)
           *it=true_exprt();
       }
 

@@ -459,7 +459,7 @@ static bool is_set_extreme(const typet &type, const abstract_object_sett &set)
       },
       [](const abstract_value_objectt &value) {
         auto c = value.to_constant();
-        return c.is_one() || (c.id() == ID_max_value);
+        return c == 1 || (c.id() == ID_max_value);
       });
   }
 

@@ -618,7 +618,7 @@ static exprt make_va_list(const exprt &expr, const namespacet &ns)
   }
 
   while(result.type().id() == ID_array &&
-        to_array_type(result.type()).size().is_one())
+        to_array_type(result.type()).size() == 1)
   {
     result = index_exprt{result, from_integer(0, c_index_type())};
   }
