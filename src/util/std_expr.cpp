@@ -39,14 +39,14 @@ bool operator!=(const exprt &lhs, bool rhs)
   return !lhs.is_constant() || to_constant_expr(lhs) != rhs;
 }
 
-bool operator==(const constant_exprt &lhs, bool rhs)
+bool constant_exprt::operator==(bool rhs) const
 {
-  return lhs.is_boolean() && (lhs.get_value() != ID_false) == rhs;
+  return is_boolean() && (get_value() != ID_false) == rhs;
 }
 
-bool operator!=(const constant_exprt &lhs, bool rhs)
+bool constant_exprt::operator!=(bool rhs) const
 {
-  return !lhs.is_boolean() || (lhs.get_value() != ID_false) != rhs;
+  return !is_boolean() || (get_value() != ID_false) != rhs;
 }
 
 bool operator==(const exprt &lhs, int rhs)
@@ -65,28 +65,28 @@ bool operator!=(const exprt &lhs, int rhs)
     return true;
 }
 
-bool operator==(const constant_exprt &lhs, int rhs)
+bool constant_exprt::operator==(int rhs) const
 {
   if(rhs == 0)
   {
-    const irep_idt &type_id = lhs.type().id();
+    const irep_idt &type_id = type().id();
 
     if(type_id == ID_integer)
     {
-      return integer_typet{}.zero_expr() == lhs;
+      return integer_typet{}.zero_expr() == *this;
     }
     else if(type_id == ID_natural)
     {
-      return natural_typet{}.zero_expr() == lhs;
+      return natural_typet{}.zero_expr() == *this;
     }
     else if(type_id == ID_real)
     {
-      return real_typet{}.zero_expr() == lhs;
+      return real_typet{}.zero_expr() == *this;
     }
     else if(type_id == ID_rational)
     {
       rationalt rat_value;
-      if(to_rational(lhs, rat_value))
+      if(to_rational(*this, rat_value))
         CHECK_RETURN(false);
       return rat_value.is_zero();
     }
@@ -94,43 +94,43 @@ bool operator==(const constant_exprt &lhs, int rhs)
       type_id == ID_unsignedbv || type_id == ID_signedbv ||
       type_id == ID_c_bool || type_id == ID_c_bit_field)
     {
-      return lhs.value_is_zero_string();
+      return value_is_zero_string();
     }
     else if(type_id == ID_fixedbv)
     {
-      return fixedbvt(lhs).is_zero();
+      return fixedbvt(*this).is_zero();
     }
     else if(type_id == ID_floatbv)
     {
-      return ieee_float_valuet(lhs).is_zero();
+      return ieee_float_valuet(*this).is_zero();
     }
     else if(type_id == ID_pointer)
     {
-      return lhs == nullptr;
+      return *this == nullptr;
     }
     else
       return false;
   }
   else if(rhs == 1)
   {
-    const irep_idt &type_id = lhs.type().id();
+    const irep_idt &type_id = type().id();
 
     if(type_id == ID_integer)
     {
-      return integer_typet{}.one_expr() == lhs;
+      return integer_typet{}.one_expr() == *this;
     }
     else if(type_id == ID_natural)
     {
-      return natural_typet{}.one_expr() == lhs;
+      return natural_typet{}.one_expr() == *this;
     }
     else if(type_id == ID_real)
     {
-      return real_typet{}.one_expr() == lhs;
+      return real_typet{}.one_expr() == *this;
     }
     else if(type_id == ID_rational)
     {
       rationalt rat_value;
-      if(to_rational(lhs, rat_value))
+      if(to_rational(*this, rat_value))
         CHECK_RETURN(false);
       return rat_value.is_one();
     }
@@ -138,21 +138,21 @@ bool operator==(const constant_exprt &lhs, int rhs)
       type_id == ID_unsignedbv || type_id == ID_signedbv ||
       type_id == ID_c_bool || type_id == ID_c_bit_field)
     {
-      const auto width = to_bitvector_type(lhs.type()).get_width();
+      const auto width = to_bitvector_type(type()).get_width();
       mp_integer int_value =
-        bvrep2integer(id2string(lhs.get_value()), width, false);
+        bvrep2integer(id2string(get_value()), width, false);
       return int_value == 1;
     }
     else if(type_id == ID_fixedbv)
     {
-      fixedbv_spect spec{to_fixedbv_type(lhs.type())};
+      fixedbv_spect spec{to_fixedbv_type(type())};
       fixedbvt one{spec};
       one.from_integer(1);
-      return one == fixedbvt{lhs};
+      return one == fixedbvt{*this};
     }
     else if(type_id == ID_floatbv)
     {
-      return ieee_float_valuet(lhs) == 1;
+      return ieee_float_valuet(*this) == 1;
     }
     else
       return false;
@@ -161,10 +161,10 @@ bool operator==(const constant_exprt &lhs, int rhs)
     PRECONDITION(false);
 }
 
-bool operator!=(const constant_exprt &lhs, int rhs) const
+bool constant_exprt::operator!=(int rhs) const
 {
   PRECONDITION(rhs == 0 || rhs == 1);
-  return !(lhs == rhs);
+  return !(*this == rhs);
 }
 
 bool constant_exprt::is_null_pointer() const
@@ -195,16 +195,16 @@ bool operator!=(const exprt &lhs, std::nullptr_t rhs)
   return !lhs.is_constant() || !to_constant_expr(lhs).is_null_pointer();
 }
 
-bool operator==(const constant_exprt &lhs, std::nullptr_t rhs)
+bool constant_exprt::operator==(std::nullptr_t rhs) const
 {
   (void)rhs; // unused parameter
-  return lhs.is_null_pointer();
+  return is_null_pointer();
 }
 
-bool operator!=(const constant_exprt &lhs, std::nullptr_t rhs) const
+bool constant_exprt::operator!=(std::nullptr_t rhs) const
 {
   (void)rhs; // unused parameter
-  return !lhs.is_null_pointer();
+  return !is_null_pointer();
 }
 
 void constant_exprt::check(const exprt &expr, const validation_modet vm)
