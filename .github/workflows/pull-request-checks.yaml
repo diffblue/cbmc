@@ -799,7 +799,7 @@ jobs:
           Set-Location build
           ctest -V -L CORE -C Release . -j${{env.windows-vcpus}}
 
-  # This job takes approximately 18 to 84 minutes
+  # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
     runs-on: windows-2022
     env:
@@ -829,9 +829,6 @@ jobs:
           Expand-Archive -LiteralPath '.\cvc5-Win64-x86_64-static.Zip'
           Move-Item -Path .\cvc5-Win64-x86_64-static\cvc5-Win64-x86_64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
           echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
-          New-Item -ItemType directory "C:\tools\parallel"
-          wget.exe -O c:\tools\parallel\parallel https://raw.githubusercontent.com/martinda/gnu-parallel/refs/heads/master/src/parallel
-          echo "c:\tools\parallel" >> $env:GITHUB_PATH
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Confirm cvc5 solver is available and log the version installed
@@ -875,7 +872,7 @@ jobs:
           make CXX=clcache BUILD_ENV=MSVC -C unit test TAGS="[z3]"
           make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
       - name: Run CBMC regression tests
-        run: make CXX=clcache BUILD_ENV=MSVC -C regression test-parallel JOBS=${{env.windows-vcpus}}
+        run: make CXX=clcache BUILD_ENV=MSVC -C regression test
 
   # This job takes approximately 7 to 32 minutes
   windows-msi-package:
