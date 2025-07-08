@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_utils.h"
 
+#include <util/arith_tools.h>
+
 #include <list>
 #include <utility>
 
@@ -1692,4 +1694,66 @@ bvt bv_utilst::verilog_bv_normal_bits(const bvt &src)
   }
 
   return even_bits;
+}
+
+/// Symbolic implementation of popcount (count of 1 bits in a bit vector)
+/// Based on the pop0 algorithm from Hacker's Delight
+/// \param bv: The bit vector to count 1s in
+/// \return A bit vector representing the count
+bvt bv_utilst::popcount(const bvt &bv)
+{
+  PRECONDITION(!bv.empty());
+
+  // Determine the result width: log2(bv.size()) + 1
+  std::size_t log2 = address_bits(bv.size());
+  CHECK_RETURN(log2 >= 1);
+
+  // Start with the original bit vector
+  bvt x = bv;
+
+  // Apply the parallel bit counting algorithm from Hacker's Delight (pop0).
+  // The algorithm works by summing adjacent bit groups of increasing sizes.
+
+  // Iterate through the stages of the algorithm, doubling the field size each
+  // time
+  for(std::size_t stage = 0; stage < log2; ++stage)
+  {
+    std::size_t shift_amount = 1 << stage;     // 1, 2, 4, 8, 16, ...
+    std::size_t field_size = 2 * shift_amount; // 2, 4, 8, 16, 32, ...
+
+    // Skip if the bit vector is smaller than the field size
+    if(x.size() <= shift_amount)
+      break;
+
+    // Shift the bit vector
+    bvt x_shifted = shift(x, shiftt::SHIFT_LRIGHT, shift_amount);
+
+    // Create a mask with 'shift_amount' ones followed by 'shift_amount' zeros,
+    // repeated
+    bvt mask;
+    mask.reserve(x.size());
+    for(std::size_t i = 0; i < x.size(); i++)
+    {
+      if((i % field_size) < shift_amount)
+        mask.push_back(const_literal(true));
+      else
+        mask.push_back(const_literal(false));
+    }
+
+    // Apply the mask to both the original and shifted bit vectors
+    bvt masked_x, masked_shifted;
+    masked_x.reserve(x.size());
+    masked_shifted.reserve(x.size());
+
+    for(std::size_t i = 0; i < x.size(); i++)
+    {
+      masked_x.push_back(prop.land(x[i], mask[i]));
+      masked_shifted.push_back(prop.land(x_shifted[i], mask[i]));
+    }
+
+    // Add the masked vectors
+    x = add(masked_x, masked_shifted);
+  }
+
+  return x;
 }
