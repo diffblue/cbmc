@@ -648,6 +648,20 @@ int gcc_modet::doit()
        std_string=="gnu1x" || std_string=="c1x")
       config.ansi_c.set_c11();
 
+    if(
+      std_string == "gnu17" || std_string == "c17" || std_string == "gnu18" ||
+      std_string == "c18")
+    {
+      config.ansi_c.set_c17();
+    }
+
+    if(
+      std_string == "gnu2x" || std_string == "c2x" || std_string == "gnu23" ||
+      std_string == "c23")
+    {
+      config.ansi_c.set_c23();
+    }
+
     if(std_string=="c++11" || std_string=="c++1x" ||
        std_string=="gnu++11" || std_string=="gnu++1x" ||
        std_string=="c++1y" ||

@@ -899,8 +899,18 @@ enable_or_disable ("enable"|"disable")
 "__if_not_exists"   { return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
 "__underlying_type" { return conditional_keyword(PARSER.cpp98, TOK_UNDERLYING_TYPE); }
 
-"[["                { if(PARSER.c23)
+"[["                { // C23 attributes (also C++11 and later, but for C++ we
+                      // handle them directly in the parser); GCC >= 11, Clang
+                      // >= 17, and Visual Studio >= 2022 support these
+                      // irrespective of the language standard selected on the
+                      // command-line.
+                      if(PARSER.c23 ||
+                         PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                         PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
+                         PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
+                      {
                         BEGIN(STD_ANNOTATION);
+                      }
                       else
                       {
                         yyless(1); // puts one [ back into stream
