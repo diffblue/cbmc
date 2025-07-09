@@ -806,6 +806,48 @@ bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
   return add(a, b);
 }
 
+bvt bv_utilst::comba_column_wise(const std::vector<bvt> &pps)
+{
+  PRECONDITION(!pps.empty());
+
+  std::vector<bvt> columns(pps.front().size());
+  for(const auto &pp : pps)
+  {
+    PRECONDITION(pp.size() == pps.front().size());
+    for(std::size_t i = 0; i < pp.size(); ++i)
+    {
+      if(!pp[i].is_false())
+        columns[i].push_back(pp[i]);
+    }
+  }
+
+  bvt result;
+  result.reserve(columns.size());
+
+  for(std::size_t i = 0; i < columns.size(); ++i)
+  {
+    const bvt &column = columns[i];
+
+    if(column.empty())
+      result.push_back(const_literal(false));
+    else
+    {
+      bvt column_sum = popcount(column);
+      CHECK_RETURN(!column_sum.empty());
+      result.push_back(column_sum.front());
+      for(std::size_t j = 1; j < column_sum.size(); ++j)
+      {
+        if(i + j >= columns.size())
+          break;
+        if(!column_sum[j].is_false())
+          columns[i + j].push_back(column_sum[j]);
+      }
+    }
+  }
+
+  return result;
+}
+
 // Wallace tree multiplier. This is disabled, as runtimes have
 // been observed to go up by 5%-10%, and on some models even by 20%.
 // #define WALLACE_TREE
@@ -958,10 +1000,11 @@ bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
 // #define RADIX_MULTIPLIER 8
 // #define USE_KARATSUBA
 // #define USE_TOOM_COOK
-#define USE_SCHOENHAGE_STRASSEN
+// #define USE_SCHOENHAGE_STRASSEN
 #ifdef RADIX_MULTIPLIER
 #  define DADDA_TREE
 #endif
+#define COMBA
 
 #ifdef RADIX_MULTIPLIER
 static bvt unsigned_multiply_by_3(propt &prop, const bvt &op)
@@ -1850,6 +1893,8 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     return wallace_tree(pps);
 #elif defined(DADDA_TREE)
     return dadda_tree(pps);
+#elif defined(COMBA)
+    return comba_column_wise(pps);
 #else
     bvt product = pps.front();
 
@@ -2124,6 +2169,8 @@ bvt bv_utilst::unsigned_toom_cook_multiplier(const bvt &_op0, const bvt &_op1)
     return wallace_tree(c_ops);
 #elif defined(DADDA_TREE)
     return dadda_tree(c_ops);
+#elif defined(COMBA)
+    return comba_column_wise(c_ops);
 #else
     bvt product = c_ops.front();
 
