@@ -1,3 +1,17 @@
+# CBMC 6.7.1
+
+This release addresses bugs in our handling of array-update ("with")
+expressions (via #8674) and gaps in our C17/C23 support (via #8673).
+
+## Bug Fixes
+* Remove deprecated make_with_expr by @tautschnig in https://github.com/diffblue/cbmc/pull/8666
+* Remove deprecated is_null_pointer by @tautschnig in https://github.com/diffblue/cbmc/pull/8665
+* Stop using GNU parallel on windows-2022 runner by @tautschnig in https://github.com/diffblue/cbmc/pull/8669
+* Support C17, C23 standards with goto-cc by @tautschnig in https://github.com/diffblue/cbmc/pull/8673
+* Restrict with_exprt to exactly three operands by @tautschnig in https://github.com/diffblue/cbmc/pull/8674
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.7.0...cbmc-6.7.1
+
 # CBMC 6.7.0
 
 This release adds aarch64 va_list support (via #8572), which makes all tests
