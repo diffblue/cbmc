@@ -277,6 +277,5 @@ var searchData=
   ['extract_5fto_5ffile_274',['extract_to_file',['../classmz__zip__archivet.html#a134afcf79cb2ba433fca39a8ff1fcf32',1,'mz_zip_archivet']]],
   ['extract_5fviolation_5ftype_275',['extract_violation_type',['../classcegis__verifiert.html#a69530cf71e1fc012ea4244022d13df1a',1,'cegis_verifiert']]],
   ['extractbit_5fexprt_276',['extractbit_exprt',['../classextractbit__exprt.html#a19572b5a76045fc10be567a57dbe6fa5',1,'extractbit_exprt::extractbit_exprt(exprt _src, exprt _index)'],['../classextractbit__exprt.html#a718a7c91092531dd8739591866df02f5',1,'extractbit_exprt::extractbit_exprt(exprt _src, const std::size_t _index)']]],
-  ['extractbits_5fexprt_277',['extractbits_exprt',['../classextractbits__exprt.html#abb8d947b1490ab94b29eac7408b3fb1a',1,'extractbits_exprt::extractbits_exprt(exprt _src, exprt _index, typet _type)'],['../classextractbits__exprt.html#a9f078c727fe7824a8597182efcde4f36',1,'extractbits_exprt::extractbits_exprt(exprt _src, const std::size_t _index, typet _type)']]],
-  ['extricate_5fupdates_278',['extricate_updates',['../struct__encoding_8cpp.html#aa4941e1597266f912611e2a07f175ca0',1,'struct_encoding.cpp']]]
+  ['extractbits_5fexprt_277',['extractbits_exprt',['../classextractbits__exprt.html#abb8d947b1490ab94b29eac7408b3fb1a',1,'extractbits_exprt::extractbits_exprt(exprt _src, exprt _index, typet _type)'],['../classextractbits__exprt.html#a9f078c727fe7824a8597182efcde4f36',1,'extractbits_exprt::extractbits_exprt(exprt _src, const std::size_t _index, typet _type)']]]
 ];
