@@ -1342,6 +1342,7 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   else if(auto extractbits = expr_try_dynamic_cast<extractbits_exprt>(operand))
   {
     if(
+      expr_type_id != ID_floatbv && expr_type_id != ID_pointer &&
       can_cast_type<bitvector_typet>(expr_type) &&
       can_cast_type<bitvector_typet>(operand.type()) &&
       to_bitvector_type(expr_type).get_width() ==
