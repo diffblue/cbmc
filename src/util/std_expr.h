@@ -2649,11 +2649,7 @@ inline bool can_cast_expr<with_exprt>(const exprt &base)
 
 inline void validate_expr(const with_exprt &value)
 {
-  validate_operands(
-    value, 3, "array/structure update must have at least 3 operands", true);
-  DATA_INVARIANT(
-    value.operands().size() % 2 == 1,
-    "array/structure update must have an odd number of operands");
+  validate_operands(value, 3, "array/structure update must have 3 operands");
 }
 
 /// \brief Cast an exprt to a \ref with_exprt

@@ -16,28 +16,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_with(const with_exprt &expr)
 {
+  DATA_INVARIANT(
+    expr.operands().size() == 3,
+    "with_exprt with more than 3 operands should no longer exist");
+
   auto &type = expr.type();
 
   if(
     type.id() == ID_bv || type.id() == ID_unsignedbv ||
     type.id() == ID_signedbv)
   {
-    if(expr.operands().size() > 3)
-    {
-      std::size_t s = expr.operands().size();
-
-      // strip off the trailing two operands
-      with_exprt tmp = expr;
-      tmp.operands().resize(s - 2);
-
-      with_exprt new_with_expr(
-        tmp, expr.operands()[s - 2], expr.operands().back());
-
-      // recursive call
-      return convert_with(new_with_expr);
-    }
-
-    PRECONDITION(expr.operands().size() == 3);
     if(expr.new_value().type().id() == ID_bool)
     {
       return convert_bv(
@@ -50,7 +38,7 @@ bvt boolbvt::convert_with(const with_exprt &expr)
     }
   }
 
-  bvt bv = convert_bv(expr.old());
+  bvt bv_old = convert_bv(expr.old());
 
   std::size_t width = boolbv_width(type);
 
@@ -61,21 +49,14 @@ bvt boolbvt::convert_with(const with_exprt &expr)
   }
 
   DATA_INVARIANT_WITH_DIAGNOSTICS(
-    bv.size() == width,
+    bv_old.size() == width,
     "unexpected operand 0 width",
     irep_pretty_diagnosticst{expr});
 
-  bvt prev_bv;
-  prev_bv.resize(width);
+  bvt bv;
+  bv.resize(width);
 
-  const exprt::operandst &ops=expr.operands();
-
-  for(std::size_t op_no=1; op_no<ops.size(); op_no+=2)
-  {
-    bv.swap(prev_bv);
-
-    convert_with(expr.old().type(), ops[op_no], ops[op_no + 1], prev_bv, bv);
-  }
+  convert_with(expr.old().type(), expr.where(), expr.new_value(), bv_old, bv);
 
   return bv;
 }
