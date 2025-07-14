@@ -137,7 +137,7 @@ public:
 
   static inline literalt sign_bit(const bvt &op)
   {
-    return op[op.size()-1];
+    return op.back();
   }
 
   literalt is_zero(const bvt &op)

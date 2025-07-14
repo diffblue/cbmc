@@ -407,7 +407,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     CHECK_RETURN(!bv.empty());
     const irep_idt type_id = op.type().id();
     if(type_id == ID_signedbv || type_id == ID_fixedbv || type_id == ID_floatbv)
-      return bv[bv.size()-1];
+      return bv_utils.sign_bit(bv);
     if(type_id == ID_unsignedbv)
       return const_literal(false);
   }
