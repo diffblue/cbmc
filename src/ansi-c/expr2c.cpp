@@ -1156,24 +1156,30 @@ std::string expr2ct::convert_allocate(const exprt &src, unsigned &precedence)
   if(src.operands().size() != 2)
     return convert_norep(src, precedence);
 
-  unsigned p0;
-  std::string op0 = convert_with_precedence(to_binary_expr(src).op0(), p0);
+  const binary_exprt &binary_expr = to_binary_expr(src);
 
   unsigned p1;
-  std::string op1 = convert_with_precedence(to_binary_expr(src).op1(), p1);
+  std::string op1 = convert_with_precedence(binary_expr.op1(), p1);
 
-  std::string dest = "ALLOCATE";
+  std::string dest = CPROVER_PREFIX "allocate";
   dest += '(';
 
+  const typet &type =
+    static_cast<const typet &>(binary_expr.op0().find(ID_C_c_sizeof_type));
   if(
     src.type().id() == ID_pointer &&
-    to_pointer_type(src.type()).base_type().id() != ID_empty)
+    to_pointer_type(src.type()).base_type() == type)
   {
-    dest += convert(to_pointer_type(src.type()).base_type());
+    dest += "sizeof(" + convert(to_pointer_type(src.type()).base_type()) + ')';
     dest+=", ";
   }
+  else
+  {
+    unsigned p0;
+    dest += convert_with_precedence(binary_expr.op0(), p0);
+  }
 
-  dest += op0 + ", " + op1;
+  dest += ", " + op1;
   dest += ')';
 
   return dest;
