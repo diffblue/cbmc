@@ -372,24 +372,6 @@ irep_idt recursive_initializationt::build_constructor(const exprt &expr)
   return type_constructor_names.at(key);
 }
 
-symbol_exprt recursive_initializationt::get_malloc_function()
-{
-  auto malloc_sym = goto_model.symbol_table.lookup("malloc");
-  if(malloc_sym == nullptr)
-  {
-    symbolt new_malloc_sym{
-      "malloc",
-      code_typet{
-        {code_typet::parametert{size_type()}}, pointer_type(empty_typet{})},
-      initialization_config.mode};
-    new_malloc_sym.pretty_name = "malloc";
-    new_malloc_sym.base_name = "malloc";
-    goto_model.symbol_table.insert(new_malloc_sym);
-    return new_malloc_sym.symbol_expr();
-  }
-  return malloc_sym->symbol_expr();
-}
-
 bool recursive_initializationt::should_be_treated_as_array(
   const irep_idt &array_name) const
 {
@@ -630,24 +612,6 @@ std::string recursive_initializationt::type2id(const typet &type) const
     return "";
 }
 
-symbol_exprt recursive_initializationt::get_free_function()
-{
-  auto free_sym = goto_model.symbol_table.lookup("free");
-  if(free_sym == nullptr)
-  {
-    symbolt new_free_sym{
-      "free",
-      code_typet{
-        {code_typet::parametert{pointer_type(empty_typet{})}}, empty_typet{}},
-      initialization_config.mode};
-    new_free_sym.pretty_name = "free";
-    new_free_sym.base_name = "free";
-    goto_model.symbol_table.insert(new_free_sym);
-    return new_free_sym.symbol_expr();
-  }
-  return free_sym->symbol_expr();
-}
-
 code_blockt recursive_initializationt::build_pointer_constructor(
   const exprt &depth,
   const symbol_exprt &result)
@@ -724,10 +688,13 @@ code_blockt recursive_initializationt::build_pointer_constructor(
 
   then_case.add(code_declt{local_result});
   const namespacet ns{goto_model.symbol_table};
-  then_case.add(code_function_callt{
+  then_case.add(code_assignt{
     local_result,
-    get_malloc_function(),
-    {*size_of_expr(non_const_pointer_type.base_type(), ns)}});
+    side_effect_exprt{
+      ID_allocate,
+      {*size_of_expr(non_const_pointer_type.base_type(), ns), false_exprt{}},
+      non_const_pointer_type,
+      source_locationt::nil()}});
   initialize(
     dereference_exprt{local_result},
     plus_exprt{depth, from_integer(1, depth.type())},
@@ -869,10 +836,16 @@ code_blockt recursive_initializationt::build_dynamic_array_constructor(
   {
     body.add(code_ifthenelset{
       equal_exprt{nondet_size, from_integer(array_size, nondet_size.type())},
-      code_function_callt{local_result,
-                          get_malloc_function(),
-                          {mult_exprt{from_integer(array_size, size_type()),
-                                      *size_of_expr(element_type, ns)}}}});
+      code_assignt{
+        local_result,
+        side_effect_exprt{
+          ID_allocate,
+          {mult_exprt{
+             from_integer(array_size, size_type()),
+             *size_of_expr(element_type, ns)},
+           false_exprt{}},
+          mutable_dynamic_array_type,
+          source_locationt::nil()}}});
   }
 
   const symbol_exprt &index_iter = get_fresh_local_symexpr("index");
@@ -942,6 +915,24 @@ bool recursive_initializationt::needs_freeing(const exprt &expr) const
   return true;
 }
 
+code_blockt
+recursive_initializationt::deallocate_code(const exprt &pointer) const
+{
+  code_blockt block;
+  const auto should_track =
+    get_fresh_local_typed_symexpr("mark_deallocated", bool_typet{});
+  block.add(code_declt{should_track});
+  const symbol_exprt deallocated = goto_model.get_symbol_table()
+                                     .lookup_ref(CPROVER_PREFIX "deallocated")
+                                     .symbol_expr();
+  block.add(code_ifthenelset{
+    should_track,
+    code_assignt{
+      deallocated,
+      typecast_exprt::conditional_cast(pointer, deallocated.type())}});
+  return block;
+}
+
 void recursive_initializationt::free_if_possible(
   const exprt &expr,
   code_blockt &body)
@@ -949,11 +940,10 @@ void recursive_initializationt::free_if_possible(
   PRECONDITION(expr.id() == ID_symbol);
   const auto expr_id = to_symbol_expr(expr).get_identifier();
   const auto maybe_cluster_index = find_equal_cluster(expr_id);
-  const auto call_free = code_function_callt{get_free_function(), {expr}};
   if(!maybe_cluster_index.has_value())
   {
     // not in any equality cluster -> just free
-    body.add(call_free);
+    body.add(deallocate_code(expr));
     return;
   }
 
@@ -965,7 +955,7 @@ void recursive_initializationt::free_if_possible(
     // in equality cluster but not common origin -> free if not equal to origin
     const auto condition =
       notequal_exprt{expr, *common_arguments_origins[*maybe_cluster_index]};
-    body.add(code_ifthenelset{condition, call_free});
+    body.add(code_ifthenelset{condition, deallocate_code(expr)});
   }
   else
   {
@@ -979,7 +969,7 @@ void recursive_initializationt::free_cluster_origins(code_blockt &body)
 {
   for(auto const &origin : common_arguments_origins)
   {
-    body.add(code_function_callt{get_free_function(), {*origin}});
+    body.add(deallocate_code(*origin));
   }
 }
 

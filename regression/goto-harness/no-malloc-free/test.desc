@@ -1,0 +1,13 @@
+CORE
+main.c
+--harness-type call-function --function test_fn
+^\[test_fn.assertion.1\] line 11 assertion \(a == \(int \*\)0\) \|\| \(\*a != 5\): FAILURE$
+^\*\* 1 of \d+ failed
+VERIFICATION FAILED
+^EXIT=10$
+^SIGNAL=0$
+--
+CALL.*malloc
+CALL.*free
+--
+Ensure that we do not generate calls to malloc or free.

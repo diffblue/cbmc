@@ -92,7 +92,7 @@ SCENARIO(
           CPROVER_PREFIX "assume(tmp_object_factory <= 20);",
           "char (*nondet_infinite_array_pointer)[INFINITY()];",
           "nondet_infinite_array_pointer = "
-            "ALLOCATE(char [INFINITY()], INFINITY(), false);",
+            CPROVER_PREFIX "allocate(INFINITY(), false);",
           "*nondet_infinite_array_pointer = NONDET(char [INFINITY()]);",
           "int return_array;",
           "return_array = cprover_associate_array_to_pointer_func"

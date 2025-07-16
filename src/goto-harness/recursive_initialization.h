@@ -98,11 +98,6 @@ public:
   /// \param body: The code block to write initialisation code to.
   void initialize(const exprt &lhs, const exprt &depth, code_blockt &body);
 
-  /// Get the `free` function as symbol expression, and inserts it into the
-  ///   goto-model if it doesn't exist already.
-  /// \return the symbol expression for the `free` function
-  symbol_exprt get_free_function();
-
   static bool is_initialization_allowed(const symbolt &symbol)
   {
     auto const symbol_name = id2string(symbol.name);
@@ -124,11 +119,6 @@ private:
   irep_idt min_depth_var_name;
   type_constructor_namest type_constructor_names;
   std::vector<std::optional<exprt>> common_arguments_origins;
-
-  /// Get the malloc function as symbol exprt,
-  /// and inserts it into the goto-model if it doesn't
-  /// exist already.
-  symbol_exprt get_malloc_function();
 
   bool should_be_treated_as_array(const irep_idt &pointer_name) const;
   std::optional<equal_cluster_idt>
@@ -275,6 +265,10 @@ private:
     const exprt &depth,
     code_blockt &body,
     const std::vector<irep_idt> &selection_spec);
+
+  /// Generate code mimicking __CPROVER_deallocate (which is what C's free
+  /// calls) with \p pointer as argument.
+  code_blockt deallocate_code(const exprt &pointer) const;
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H
