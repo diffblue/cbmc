@@ -1,6 +1,5 @@
 var NAVTREEINDEX137 =
 {
-"structbv__pointerst_1_1postponedt.html#ac38d063c2c0604a24b14e8d2d7cf66e7":[7,0,143,0,1],
 "structbv__pointerst_1_1postponedt.html#ae2ffeee7846753ed6b3a60fcb36001b4":[7,0,143,0,0],
 "structbv__refinementt_1_1approximationt.html":[7,0,144,0],
 "structbv__refinementt_1_1approximationt.html#a1caf997b8b7ceb413f5307997061c94a":[7,0,144,0,18],
@@ -249,5 +248,6 @@ var NAVTREEINDEX137 =
 "structconfigt_1_1ansi__ct.html#ab5be1ba83a6b4d0bd2e22612491c7252":[7,0,262,0,65],
 "structconfigt_1_1ansi__ct.html#ab7b2b37a491309b8a4aae80af956ff08":[7,0,262,0,46],
 "structconfigt_1_1ansi__ct.html#ab995de4b180e22cf6a3da3ed82a97dc5":[7,0,262,0,7],
-"structconfigt_1_1ansi__ct.html#ababde253d2ae6c7cbf890f193c5f54c0":[7,0,262,0,12]
+"structconfigt_1_1ansi__ct.html#ababde253d2ae6c7cbf890f193c5f54c0":[7,0,262,0,12],
+"structconfigt_1_1ansi__ct.html#abd8082c40740716b5331afc3e77ccd62":[7,0,262,0,30]
 };

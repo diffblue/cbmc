@@ -1,6 +1,5 @@
 var NAVTREEINDEX125 =
 {
-"process__goto__program_8cpp.html#ada0c6acdca6b29a6c90cada8e52a7865":[8,0,2,16,61,0],
 "process__goto__program_8cpp_source.html":[8,0,2,16,61],
 "process__goto__program_8h.html":[8,0,2,16,62],
 "process__goto__program_8h.html#ada0c6acdca6b29a6c90cada8e52a7865":[8,0,2,16,62,0],
@@ -249,5 +248,6 @@ var NAVTREEINDEX125 =
 "read__bin__goto__object_8cpp_source.html":[8,0,2,16,63],
 "read__bin__goto__object_8h.html":[8,0,2,16,64],
 "read__bin__goto__object_8h.html#ae73d6315ff1b51fb15805d9001867509":[8,0,2,16,64,0],
-"read__bin__goto__object_8h_source.html":[8,0,2,16,64]
+"read__bin__goto__object_8h_source.html":[8,0,2,16,64],
+"read__goto__binary_8cpp.html":[8,0,2,16,65]
 };
