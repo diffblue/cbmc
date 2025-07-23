@@ -1407,9 +1407,35 @@ void smt2_convt::convert_expr(const exprt &expr)
     out << "(ite ";
     convert_expr(if_expr.cond());
     out << " ";
-    convert_expr(if_expr.true_case());
+    if(
+      expr.type().id() == ID_array && !use_array_theory(if_expr.true_case()) &&
+      use_array_theory(if_expr.false_case()))
+    {
+      unflatten(wheret::BEGIN, expr.type());
+
+      convert_expr(if_expr.true_case());
+
+      unflatten(wheret::END, expr.type());
+    }
+    else
+    {
+      convert_expr(if_expr.true_case());
+    }
     out << " ";
-    convert_expr(if_expr.false_case());
+    if(
+      expr.type().id() == ID_array && use_array_theory(if_expr.true_case()) &&
+      !use_array_theory(if_expr.false_case()))
+    {
+      unflatten(wheret::BEGIN, expr.type());
+
+      convert_expr(if_expr.false_case());
+
+      unflatten(wheret::END, expr.type());
+    }
+    else
+    {
+      convert_expr(if_expr.false_case());
+    }
     out << ")";
   }
   else if(expr.id()==ID_and ||
