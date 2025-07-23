@@ -72,9 +72,10 @@ jobs:
           make TAGS="[!shouldfail]" -C jbmc/unit test IPASIR=$PWD/riss.git/riss
       - name: Run regression tests
         run: |
+          export PATH=$PATH:`pwd`/src/solvers
           make -C regression test-parallel JOBS=${{env.linux-vcpus}} LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
           make -C regression/cbmc test-paths-lifo
-          env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
+          make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
       - name: Check cleanup
         run: |
@@ -153,9 +154,10 @@ jobs:
           make TAGS="[!shouldfail]" -C jbmc/unit test
       - name: Run regression tests
         run: |
+          export PATH=$PATH:`pwd`/src/solvers
           make -C regression test-parallel JOBS=${{env.linux-vcpus}}
           make -C regression/cbmc test-paths-lifo
-          env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
+          make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
   # This job has been copied from the one above it, and modified to only build CBMC
@@ -339,9 +341,10 @@ jobs:
           make TAGS="[!shouldfail]" -C jbmc/unit test
       - name: Run regression tests
         run: |
+          export PATH=$PATH:`pwd`/src/solvers
           make -C regression test-parallel JOBS=${{env.linux-vcpus}}
           make -C regression/cbmc test-paths-lifo
-          env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
+          make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
   # This job takes approximately 17 to 41 minutes
@@ -689,7 +692,9 @@ jobs:
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
       - name: Run regression tests
-        run: make -C regression test-parallel JOBS=4
+        run: |
+          export PATH=$PATH:`pwd`/src/solvers
+          make -C regression test-parallel JOBS=4
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=4
 
@@ -855,7 +860,9 @@ jobs:
       - name: Download minisat with make
         run: make -C src minisat2-download
       - name: Build CBMC with make
-        run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C src
+        run: |
+          make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C src
+          echo "$pwd\src\solvers;" >> $env:GITHUB_PATH
       - name: Build unit tests with make
         run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C unit all
       - name: Build jbmc with make

@@ -41,10 +41,15 @@ add_test_pl_profile(
 #)
 
 # solver appears on the PATH in Windows already
-#if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-#  set_property(
-#    TEST "cbmc-cprover-smt2-CORE"
-#    PROPERTY ENVIRONMENT
-#      "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
-#  )
-#endif()
+if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+  set_property(
+    TEST "contracts-dfcc-CORE"
+    PROPERTY ENVIRONMENT
+      "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
+  )
+  set_property(
+    TEST "contracts-non-dfcc-CORE"
+    PROPERTY ENVIRONMENT
+      "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
+  )
+endif()

@@ -1,0 +1,10 @@
+CORE
+main.c
+--dfcc main --apply-loop-contracts _ --cprover-smt2
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Make sure the SMT back-end produces valid SMT2 when structs and arrays are
+nested in each other.
