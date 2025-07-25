@@ -498,11 +498,14 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
 /// \param generate_function_body: Specifies what kind of body to generate
 /// \param model: The goto-model in which to generate the function bodies
 /// \param message_handler: Destination for status/warning messages
+/// \param ignore_no_match: Do not warn in case no function matched
+///   \p functions_regex
 void generate_function_bodies(
   const std::regex &functions_regex,
   const generate_function_bodiest &generate_function_body,
   goto_modelt &model,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool ignore_no_match)
 {
   messaget messages(message_handler);
   const std::regex cprover_prefix = std::regex("__CPROVER.*");
@@ -526,7 +529,7 @@ void generate_function_bodies(
         function.second, model.symbol_table, function.first);
     }
   }
-  if(!did_generate_body)
+  if(!did_generate_body && !ignore_no_match)
   {
     messages.warning()
       << "generate function bodies: No function name matched regex"
