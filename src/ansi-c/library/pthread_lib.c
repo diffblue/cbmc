@@ -341,7 +341,7 @@ __CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
 #ifndef LIBRARY_CHECK
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #endif
-unsigned long __CPROVER_next_thread_id = 0;
+unsigned long __CPROVER_next_thread_id;
 
 int pthread_join(pthread_t thread, void **value_ptr)
 {
@@ -379,7 +379,7 @@ __CPROVER_HIDE:;
 __CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
 #  ifndef LIBRARY_CHECK
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
-unsigned long __CPROVER_next_thread_id = 0;
+unsigned long __CPROVER_next_thread_id;
 #  endif
 
 int _pthread_join(pthread_t thread, void **value_ptr)
@@ -615,7 +615,7 @@ __CPROVER_HIDE:;
 #endif
 
 #ifndef LIBRARY_CHECK
-unsigned long __CPROVER_next_thread_id = 0;
+unsigned long __CPROVER_next_thread_id;
 #  if 0
 __CPROVER_thread_local void (
   *__CPROVER_thread_key_dtors[__CPROVER_constant_infinity_uint])(void *);

@@ -7,11 +7,11 @@
 #define __CPROVER_contracts_library_defined
 
 // external dependencies
-const void *__CPROVER_alloca_object = 0;
+const void *__CPROVER_alloca_object;
 extern const void *__CPROVER_deallocated;
-const void *__CPROVER_new_object = 0;
+const void *__CPROVER_new_object;
 extern const void *__CPROVER_memory_leak;
-__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array;
 #if defined(_WIN32) && defined(_M_X64)
 int __builtin_clzll(unsigned long long);
 #else

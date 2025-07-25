@@ -141,7 +141,7 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef __GNUC__
 _Bool __builtin_mul_overflow();
 #endif
-__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array;
 
 void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
@@ -204,7 +204,7 @@ __CPROVER_HIDE:;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef LIBRARY_CHECK
-__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
 // malloc is marked "inline" for the benefit of goto-analyzer. Really,
@@ -262,9 +262,9 @@ __CPROVER_HIDE:;
 /* FUNCTION: __builtin_alloca */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
-const void *__CPROVER_alloca_object = 0;
+const void *__CPROVER_alloca_object;
 #ifndef LIBRARY_CHECK
-__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
 void *__builtin_alloca(__CPROVER_size_t alloca_size)
@@ -307,11 +307,11 @@ __CPROVER_HIDE:;
 void __CPROVER_deallocate(void *);
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 #ifndef LIBRARY_CHECK
-const void *__CPROVER_alloca_object = 0;
+const void *__CPROVER_alloca_object;
 #endif
-const void *__CPROVER_new_object = 0;
+const void *__CPROVER_new_object;
 #ifndef LIBRARY_CHECK
-__CPROVER_bool __CPROVER_malloc_is_new_array = 0;
+__CPROVER_bool __CPROVER_malloc_is_new_array;
 #endif
 
 void free(void *ptr)
