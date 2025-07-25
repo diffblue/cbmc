@@ -7,17 +7,14 @@ Author: Remi Delmas, delmasrd@amazon.com
 \*******************************************************************/
 #include "dfcc_infer_loop_assigns.h"
 
-#include <util/expr.h>
 #include <util/find_symbols.h>
-#include <util/message.h>
 #include <util/pointer_expr.h>
-#include <util/std_code.h>
 
 #include <goto-programs/goto_inline.h>
 
 #include <analyses/goto_rw.h>
+#include <analyses/local_may_alias.h>
 #include <goto-instrument/contracts/utils.h>
-#include <goto-instrument/havoc_utils.h>
 
 #include "dfcc_loop_nesting_graph.h"
 #include "dfcc_root_object.h"

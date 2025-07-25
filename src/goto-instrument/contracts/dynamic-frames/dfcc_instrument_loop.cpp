@@ -13,16 +13,18 @@ Date: April 2023
 #include "dfcc_instrument_loop.h"
 #include <ansi-c/goto-conversion/goto_convert_class.h>
 
-#include <util/format_expr.h>
-#include <util/fresh_symbol.h>
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/expr_util.h>
 
 #include <goto-instrument/contracts/utils.h>
 
 #include "dfcc_cfg_info.h"
 #include "dfcc_contract_clauses_codegen.h"
-#include "dfcc_instrument.h"
+#include "dfcc_library.h"
 #include "dfcc_loop_tags.h"
 #include "dfcc_spec_functions.h"
+#include "dfcc_utils.h"
 
 dfcc_instrument_loopt::dfcc_instrument_loopt(
   goto_modelt &goto_model,

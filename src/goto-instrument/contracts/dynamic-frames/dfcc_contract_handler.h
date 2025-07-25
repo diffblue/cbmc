@@ -13,25 +13,20 @@ Date: August 2022
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_CONTRACT_HANDLER_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_CONTRACT_HANDLER_H
 
-#include <ansi-c/goto-conversion/goto_convert_class.h>
-
-#include <util/message.h>
-#include <util/namespace.h>
-#include <util/std_expr.h>
-
 #include "dfcc_contract_functions.h"
+#include "dfcc_contract_mode.h"
 
+#include <map>
 #include <set>
 
-class goto_modelt;
-class message_handlert;
-class dfcc_libraryt;
+class code_typet;
+class dfcc_contract_clauses_codegent;
 class dfcc_instrumentt;
+class dfcc_libraryt;
 class dfcc_lift_memory_predicatest;
 class dfcc_spec_functionst;
-class dfcc_contract_clauses_codegent;
-class code_with_contract_typet;
-class conditional_target_group_exprt;
+class goto_modelt;
+class goto_programt;
 
 /// A contract is represented by a function declaration or definition
 /// with contract clauses attached to its signature:

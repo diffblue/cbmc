@@ -14,27 +14,17 @@ Date: February 2016
 #include "contracts.h"
 
 #include <util/c_types.h>
-#include <util/exception_utils.h>
-#include <util/expr_util.h>
-#include <util/find_symbols.h>
 #include <util/format_expr.h>
 #include <util/fresh_symbol.h>
-#include <util/graph.h>
 #include <util/mathematical_expr.h>
-#include <util/message.h>
-#include <util/std_code.h>
 
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/goto_program.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/unwindset.h>
 
 #include <analyses/local_may_alias.h>
-#include <ansi-c/c_expr.h>
-#include <goto-instrument/havoc_utils.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/unwind.h>
-#include <langapi/language_util.h>
 
 #include "cfg_info.h"
 #include "havoc_assigns_clause_targets.h"

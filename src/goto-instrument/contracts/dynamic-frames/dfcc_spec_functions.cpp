@@ -7,16 +7,17 @@ Author: Remi Delmas, delmarsd@amazon.com
 \*******************************************************************/
 
 #include "dfcc_spec_functions.h"
-#include <ansi-c/goto-conversion/goto_convert_class.h>
 
-#include <util/format_expr.h>
-#include <util/namespace.h>
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/std_code.h>
 
 #include <goto-programs/goto_model.h>
 
 #include <langapi/language_util.h>
 
 #include "dfcc_library.h"
+#include "dfcc_utils.h"
 
 dfcc_spec_functionst::dfcc_spec_functionst(
   goto_modelt &goto_model,

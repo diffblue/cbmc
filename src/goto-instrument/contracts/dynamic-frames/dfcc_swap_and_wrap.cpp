@@ -8,31 +8,12 @@ Author: Remi Delmas, delmarsd@amazon.com
 
 #include "dfcc_swap_and_wrap.h"
 
-#include <util/config.h>
-#include <util/expr_util.h>
-#include <util/format_expr.h>
-#include <util/format_type.h>
-#include <util/fresh_symbol.h>
-#include <util/mathematical_expr.h>
-#include <util/mathematical_types.h>
-#include <util/namespace.h>
-#include <util/pointer_expr.h>
-#include <util/pointer_offset_size.h>
-#include <util/pointer_predicates.h>
-#include <util/std_expr.h>
-
-#include <goto-programs/goto_functions.h>
-#include <goto-programs/goto_inline.h>
-#include <goto-programs/goto_model.h>
-#include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/remove_skip.h>
 
-#include <ansi-c/c_expr.h>
-#include <ansi-c/cprover_library.h>
-#include <ansi-c/goto-conversion/link_to_library.h>
-#include <goto-instrument/contracts/cfg_info.h>
-#include <goto-instrument/contracts/utils.h>
-#include <linking/static_lifetime_init.h>
+#include "dfcc_contract_handler.h"
+#include "dfcc_instrument.h"
+#include "dfcc_library.h"
+#include "dfcc_utils.h"
 
 dfcc_swap_and_wrapt::dfcc_swap_and_wrapt(
   goto_modelt &goto_model,

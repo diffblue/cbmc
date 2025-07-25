@@ -13,10 +13,8 @@ Date: September 2021
 
 #include <ansi-c/goto-conversion/goto_convert_class.h>
 
-#include <goto-programs/goto_model.h>
 #include <goto-programs/loop_ids.h>
 
-#include <analyses/local_may_alias.h>
 #include <goto-instrument/havoc_utils.h>
 #include <goto-instrument/loop_utils.h>
 

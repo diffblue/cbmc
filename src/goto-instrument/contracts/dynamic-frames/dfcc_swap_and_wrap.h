@@ -16,27 +16,25 @@ Author: Remi Delmas, delmasrd@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_SWAP_AND_WRAP_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_SWAP_AND_WRAP_H
 
-#include <util/arith_tools.h>
-#include <util/c_types.h>
 #include <util/message.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
+#include <util/namespace.h>
 
-#include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <goto-instrument/contracts/loop_contract_config.h>
 
-#include "dfcc_contract_handler.h"
-#include "dfcc_instrument.h"
-#include "dfcc_library.h"
-#include "dfcc_spec_functions.h"
+#include "dfcc_contract_mode.h"
 
 #include <map>
 #include <set>
 
-class goto_modelt;
-class messaget;
-class message_handlert;
-class symbolt;
 class conditional_target_group_exprt;
+class dfcc_contract_handlert;
+class dfcc_instrumentt;
+class dfcc_libraryt;
+class dfcc_spec_functionst;
+class goto_modelt;
+class message_handlert;
+class messaget;
+class symbolt;
 
 class dfcc_swap_and_wrapt
 {

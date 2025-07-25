@@ -12,15 +12,11 @@ Author: Remi Delmas, delmasrd@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_INFER_LOOP_ASSIGNS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_INFER_LOOP_ASSIGNS_H
 
-#include <analyses/local_may_alias.h>
 #include <goto-instrument/loop_utils.h>
 
-#include "dfcc_loop_nesting_graph.h"
-
-class source_locationt;
-class messaget;
 class namespacet;
 class message_handlert;
+struct dfcc_loop_nesting_graph_nodet;
 
 /// Collect identifiers that are local to `loop`.
 std::unordered_set<irep_idt> gen_loop_locals_set(

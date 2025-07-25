@@ -15,22 +15,14 @@ Author: Remi Delmas, delmasrd@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_SPEC_FUNCTIONS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_SPEC_FUNCTIONS_H
 
-#include <util/arith_tools.h>
-#include <util/c_types.h>
 #include <util/message.h>
-#include <util/std_expr.h>
-#include <util/std_types.h>
+#include <util/namespace.h>
 
-#include "dfcc_library.h"
-#include "dfcc_utils.h"
-
-#include <map>
-#include <set>
-
-class goto_modelt;
-class message_handlert;
-class symbolt;
 class conditional_target_group_exprt;
+class dfcc_libraryt;
+class goto_modelt;
+class goto_programt;
+class symbolt;
 
 /// \brief Represents the different ways to havoc pointers.
 ///
