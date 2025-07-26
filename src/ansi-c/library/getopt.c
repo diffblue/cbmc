@@ -5,7 +5,7 @@
 #define __CPROVER_STRING_H_INCLUDED
 #endif
 
-char *optarg = NULL;
+char *optarg;
 int optind = 1;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);

@@ -83,7 +83,7 @@ int unlink(const char *s)
 extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
-unsigned __CPROVER_pipe_count = 0;
+unsigned __CPROVER_pipe_count;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
