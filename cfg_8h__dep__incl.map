@@ -8,10 +8,10 @@
 <area shape="poly" id="edge90_Node000001_Node000018" title=" " alt="" coords="3554,55,3573,92,3585,141,3593,190,3599,289,3596,375,3590,438,3585,437,3591,375,3594,289,3588,191,3580,142,3568,94,3550,58"/>
 <area shape="rect" id="Node000043" href="$utils_8cpp.html" title=" " alt="" coords="5771,321,5965,375"/>
 <area shape="poly" id="edge84_Node000001_Node000043" title=" " alt="" coords="3652,32,4014,62,4537,116,4835,154,5144,198,5456,250,5761,311,5789,318,5788,323,5759,316,5455,256,5144,203,4834,159,4536,122,4013,67,3652,38"/>
-<area shape="rect" id="Node000092" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="3634,93,3827,148"/>
-<area shape="poly" id="edge85_Node000001_Node000092" title=" " alt="" coords="3582,49,3675,91,3672,96,3580,53"/>
-<area shape="rect" id="Node000093" href="$points__to_8h.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="3365,93,3558,148"/>
-<area shape="poly" id="edge87_Node000001_Node000093" title=" " alt="" coords="3509,58,3482,95,3478,92,3504,55"/>
+<area shape="rect" id="Node000088" href="$count__eloc_8cpp.html" title="Count effective lines of code." alt="" coords="3634,93,3827,148"/>
+<area shape="poly" id="edge85_Node000001_Node000088" title=" " alt="" coords="3582,49,3675,91,3672,96,3580,53"/>
+<area shape="rect" id="Node000089" href="$points__to_8h.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="3365,93,3558,148"/>
+<area shape="poly" id="edge87_Node000001_Node000089" title=" " alt="" coords="3509,58,3482,95,3478,92,3504,55"/>
 <area shape="rect" id="Node000003" href="$java__bytecode__convert__method__class_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="769,203,1055,258"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="2021,134,1056,219,1055,214,2021,129"/>
 <area shape="rect" id="Node000010" href="$dependence__graph_8h.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="1760,203,1989,258"/>
@@ -20,10 +20,10 @@
 <area shape="poly" id="edge21_Node000002_Node000021" title=" " alt="" coords="2232,125,4111,222,4111,227,2232,130"/>
 <area shape="rect" id="Node000022" href="$sese__regions_8cpp.html" title="Single&#45;entry, single&#45;exit region analysis." alt="" coords="2472,321,2656,375"/>
 <area shape="poly" id="edge78_Node000002_Node000022" title=" " alt="" coords="2191,152,2515,318,2512,323,2189,157"/>
-<area shape="rect" id="Node000089" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="2013,196,2240,265"/>
-<area shape="poly" id="edge79_Node000002_Node000089" title=" " alt="" coords="2129,162,2129,196,2124,196,2124,162"/>
-<area shape="rect" id="Node000091" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="528,203,744,258"/>
-<area shape="poly" id="edge83_Node000002_Node000091" title=" " alt="" coords="2021,127,1740,136,1375,151,1017,172,869,184,756,199,722,206,721,201,756,193,868,179,1017,166,1375,146,1740,131,2020,122"/>
+<area shape="rect" id="Node000085" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="2013,196,2240,265"/>
+<area shape="poly" id="edge79_Node000002_Node000085" title=" " alt="" coords="2129,162,2129,196,2124,196,2124,162"/>
+<area shape="rect" id="Node000087" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="528,203,744,258"/>
+<area shape="poly" id="edge83_Node000002_Node000087" title=" " alt="" coords="2021,127,1740,136,1375,151,1017,172,869,184,756,199,722,206,721,201,756,193,868,179,1017,166,1375,146,1740,131,2020,122"/>
 <area shape="rect" id="Node000004" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="5,438,267,493"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="778,263,757,268,637,289,585,299,519,316,429,345,340,379,194,440,192,435,338,374,427,340,518,311,584,293,636,283,755,263,777,258"/>
 <area shape="rect" id="Node000005" href="$java__bytecode__convert__method_8h.html" title="JAVA Bytecode Language Conversion." alt="" coords="531,321,778,375"/>
@@ -92,10 +92,10 @@
 <area shape="poly" id="edge65_Node000021_Node000048" title=" " alt="" coords="4097,235,3761,240,3331,252,3122,263,2939,276,2799,294,2751,304,2720,316,2703,331,2696,349,2687,368,2670,385,2609,414,2555,429,2505,433,2457,431,2355,423,2297,424,2230,433,2201,440,2199,435,2229,428,2296,419,2355,418,2457,426,2505,428,2554,423,2607,409,2666,380,2683,365,2691,347,2699,328,2717,311,2750,299,2799,289,2939,271,3121,257,3331,247,3761,234,4097,230"/>
 <area shape="rect" id="Node000049" href="$loop__utils_8h.html" title="Helper functions for k&#45;induction and loop invariants." alt="" coords="2731,321,2925,375"/>
 <area shape="poly" id="edge66_Node000021_Node000049" title=" " alt="" coords="4098,243,3206,316,2925,341,2925,335,3205,311,4097,238"/>
-<area shape="rect" id="Node000055" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="2585,548,2796,617"/>
-<area shape="poly" id="edge77_Node000021_Node000055" title=" " alt="" coords="4098,242,3970,253,3828,268,3699,289,3647,302,3608,316,3565,340,3537,365,3478,432,3464,452,3454,470,3444,487,3424,502,3341,518,3173,537,2796,574,2796,569,3173,532,3341,512,3422,498,3440,483,3450,468,3459,449,3474,429,3533,361,3562,335,3606,311,3645,297,3698,284,3827,263,3969,247,4097,237"/>
-<area shape="rect" id="Node000088" href="$ensure__one__backedge__per__target_8cpp.html" title="Ensure one backedge per target." alt="" coords="3638,313,3837,383"/>
-<area shape="poly" id="edge76_Node000021_Node000088" title=" " alt="" coords="4099,258,3850,316,3837,319,3836,314,3849,311,4097,253"/>
+<area shape="rect" id="Node000053" href="$enumerative__loop__contracts__synthesizer_8cpp.html" title="Enumerative Loop Contracts Synthesizer." alt="" coords="2585,548,2796,617"/>
+<area shape="poly" id="edge77_Node000021_Node000053" title=" " alt="" coords="4098,242,3970,253,3828,268,3699,289,3647,302,3608,316,3565,340,3537,365,3478,432,3464,452,3454,470,3444,487,3424,502,3341,518,3173,537,2796,574,2796,569,3173,532,3341,512,3422,498,3440,483,3450,468,3459,449,3474,429,3533,361,3562,335,3606,311,3645,297,3698,284,3827,263,3969,247,4097,237"/>
+<area shape="rect" id="Node000084" href="$ensure__one__backedge__per__target_8cpp.html" title="Ensure one backedge per target." alt="" coords="3638,313,3837,383"/>
+<area shape="poly" id="edge76_Node000021_Node000084" title=" " alt="" coords="4099,258,3850,316,3837,319,3836,314,3849,311,4097,253"/>
 <area shape="poly" id="edge27_Node000025_Node000019" title=" " alt="" coords="3923,501,3801,558,3799,553,3920,496"/>
 <area shape="poly" id="edge26_Node000025_Node000024" title=" " alt="" coords="4010,503,4050,562,4076,591,4107,615,4132,627,4165,638,4250,658,4435,686,4435,691,4249,663,4164,643,4130,632,4104,620,4072,595,4045,566,4006,506"/>
 <area shape="poly" id="edge29_Node000026_Node000025" title=" " alt="" coords="4310,381,4087,441,4085,436,4309,376"/>
@@ -134,19 +134,19 @@
 <area shape="poly" id="edge74_Node000049_Node000048" title=" " alt="" coords="2732,381,2712,385,2639,397,2577,404,2471,409,2364,414,2302,421,2230,433,2200,441,2199,435,2229,428,2302,415,2364,408,2470,403,2577,399,2639,392,2712,380,2730,376"/>
 <area shape="rect" id="Node000050" href="$cfg__info_8h.html" title="Classes providing CFG&#45;based information about symbols to guide simplifications in function and loop a..." alt="" coords="2459,438,2653,493"/>
 <area shape="poly" id="edge67_Node000049_Node000050" title=" " alt="" coords="2755,383,2619,440,2617,435,2753,378"/>
-<area shape="poly" id="edge75_Node000049_Node000055" title=" " alt="" coords="2766,385,2740,406,2718,432,2705,460,2697,491,2692,548,2687,547,2692,490,2700,459,2714,429,2736,402,2763,381"/>
-<area shape="rect" id="Node000056" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="2242,438,2435,493"/>
-<area shape="poly" id="edge69_Node000049_Node000056" title=" " alt="" coords="2728,381,2713,385,2638,400,2580,409,2521,418,2447,433,2420,441,2418,435,2446,428,2520,412,2579,404,2637,395,2711,380,2727,376"/>
-<area shape="rect" id="Node000064" href="$dfcc__infer__loop__assigns_8h.html" title="Infer a set of assigns clause targets for a natural loop." alt="" coords="2728,431,2925,500"/>
-<area shape="poly" id="edge71_Node000049_Node000064" title=" " alt="" coords="2830,389,2830,430,2824,430,2825,389"/>
-<area shape="poly" id="edge68_Node000050_Node000055" title=" " alt="" coords="2599,499,2653,546,2649,550,2595,503"/>
-<area shape="poly" id="edge70_Node000056_Node000020" title=" " alt="" coords="2245,499,2230,503,2115,526,1998,546,1798,573,1797,568,1998,541,2114,521,2229,497,2244,494"/>
-<area shape="poly" id="edge72_Node000064_Node000040" title=" " alt="" coords="2939,497,3121,550,3119,555,2938,502"/>
-<area shape="poly" id="edge81_Node000089_Node000013" title=" " alt="" coords="2121,279,2113,321,2108,320,2115,278"/>
-<area shape="poly" id="edge82_Node000089_Node000014" title=" " alt="" coords="2048,274,1950,323,1947,318,2046,269"/>
-<area shape="rect" id="Node000090" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="2221,313,2448,383"/>
-<area shape="poly" id="edge80_Node000089_Node000090" title=" " alt="" coords="2200,270,2275,311,2273,315,2198,274"/>
-<area shape="poly" id="edge88_Node000093_Node000019" title=" " alt="" coords="3478,160,3498,209,3527,267,3564,327,3608,381,3631,396,3652,403,3674,411,3695,429,3715,460,3729,494,3744,554,3738,556,3724,495,3711,462,3691,432,3671,416,3650,408,3628,401,3605,385,3559,330,3522,269,3493,211,3473,162"/>
-<area shape="rect" id="Node000094" href="$points__to_8cpp.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="4331,203,4525,258"/>
-<area shape="poly" id="edge89_Node000093_Node000094" title=" " alt="" coords="3572,139,3623,145,3729,155,3819,160,3973,161,4126,167,4215,176,4321,193,4352,201,4351,206,4319,199,4215,182,4125,172,3972,167,3819,165,3729,161,3622,151,3572,144"/>
+<area shape="poly" id="edge75_Node000049_Node000053" title=" " alt="" coords="2766,385,2740,406,2718,432,2705,460,2697,491,2692,548,2687,547,2692,490,2700,459,2714,429,2736,402,2763,381"/>
+<area shape="rect" id="Node000054" href="$contracts_8h.html" title="Verify and use annotated invariants and pre/post&#45;conditions." alt="" coords="2242,438,2435,493"/>
+<area shape="poly" id="edge69_Node000049_Node000054" title=" " alt="" coords="2728,381,2713,385,2638,400,2580,409,2521,418,2447,433,2420,441,2418,435,2446,428,2520,412,2579,404,2637,395,2711,380,2727,376"/>
+<area shape="rect" id="Node000062" href="$dfcc__infer__loop__assigns_8h.html" title="Infer a set of assigns clause targets for a natural loop." alt="" coords="2728,431,2925,500"/>
+<area shape="poly" id="edge71_Node000049_Node000062" title=" " alt="" coords="2830,389,2830,430,2824,430,2825,389"/>
+<area shape="poly" id="edge68_Node000050_Node000053" title=" " alt="" coords="2599,499,2653,546,2649,550,2595,503"/>
+<area shape="poly" id="edge70_Node000054_Node000020" title=" " alt="" coords="2245,499,2230,503,2115,526,1998,546,1798,573,1797,568,1998,541,2114,521,2229,497,2244,494"/>
+<area shape="poly" id="edge72_Node000062_Node000040" title=" " alt="" coords="2939,497,3121,550,3119,555,2938,502"/>
+<area shape="poly" id="edge81_Node000085_Node000013" title=" " alt="" coords="2121,279,2113,321,2108,320,2115,278"/>
+<area shape="poly" id="edge82_Node000085_Node000014" title=" " alt="" coords="2048,274,1950,323,1947,318,2046,269"/>
+<area shape="rect" id="Node000086" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="2221,313,2448,383"/>
+<area shape="poly" id="edge80_Node000085_Node000086" title=" " alt="" coords="2200,270,2275,311,2273,315,2198,274"/>
+<area shape="poly" id="edge88_Node000089_Node000019" title=" " alt="" coords="3478,160,3498,209,3527,267,3564,327,3608,381,3631,396,3652,403,3674,411,3695,429,3715,460,3729,494,3744,554,3738,556,3724,495,3711,462,3691,432,3671,416,3650,408,3628,401,3605,385,3559,330,3522,269,3493,211,3473,162"/>
+<area shape="rect" id="Node000090" href="$points__to_8cpp.html" title="Field&#45;sensitive, location&#45;insensitive points&#45;to analysis." alt="" coords="4331,203,4525,258"/>
+<area shape="poly" id="edge89_Node000089_Node000090" title=" " alt="" coords="3572,139,3623,145,3729,155,3819,160,3973,161,4126,167,4215,176,4321,193,4352,201,4351,206,4319,199,4215,182,4125,172,3972,167,3819,165,3729,161,3622,151,3572,144"/>
 </map>

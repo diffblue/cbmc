@@ -1,58 +1,43 @@
 <map id="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_library.h" name="/home/runner/work/cbmc/cbmc/src/goto&#45;instrument/contracts/dynamic&#45;frames/dfcc_library.h">
-<area shape="rect" id="Node000001" title="Dynamic frame condition checking library loading." alt="" coords="1131,5,1329,75"/>
-<area shape="rect" id="Node000002" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="1905,365,2145,419"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1117,43,836,44,490,54,325,64,183,79,78,99,43,111,22,125,11,141,8,157,12,173,23,190,37,203,58,216,119,240,203,262,307,281,559,314,851,340,1157,359,1452,372,1904,386,1904,391,1452,377,1157,364,851,345,559,319,306,286,202,267,118,245,55,221,34,208,19,194,7,175,3,157,7,139,19,121,41,106,77,94,183,74,325,59,489,49,836,39,1117,38"/>
-<area shape="rect" id="Node000008" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="33,123,230,192"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1118,46,947,51,728,65,485,88,362,105,242,125,230,128,229,123,241,120,362,100,485,83,728,59,947,46,1118,40"/>
-<area shape="rect" id="Node000009" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="254,123,513,192"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1118,53,850,81,690,101,532,125,513,129,512,123,531,120,690,96,849,76,1117,48"/>
-<area shape="rect" id="Node000010" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="557,240,764,309"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1118,51,972,62,814,78,682,100,638,112,614,125,607,137,603,150,606,180,618,211,635,238,631,241,614,213,601,182,598,150,602,135,611,121,636,107,681,94,814,73,972,57,1117,46"/>
-<area shape="rect" id="Node000011" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="901,240,1098,309"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1117,51,977,63,825,79,699,100,657,112,634,125,624,141,620,157,624,173,634,190,646,198,668,206,735,224,901,255,900,261,734,229,666,211,643,203,631,194,619,175,615,157,619,139,631,121,655,107,698,95,825,74,976,58,1117,46"/>
-<area shape="rect" id="Node000012" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="1567,240,1765,309"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1118,44,995,49,864,61,803,72,749,86,707,103,679,124,668,141,664,158,667,174,678,190,709,197,787,206,1035,227,1567,264,1567,270,1034,232,787,211,709,202,675,194,662,176,659,158,663,139,675,121,704,98,748,81,802,67,863,56,995,43,1117,39"/>
-<area shape="rect" id="Node000013" href="$dfcc__is__freeable_8cpp.html" title=" " alt="" coords="689,123,886,192"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1119,70,899,125,887,129,885,123,897,120,1117,65"/>
-<area shape="rect" id="Node000014" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="910,123,1107,192"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1154,83,1074,125,1072,120,1152,79"/>
-<area shape="rect" id="Node000015" href="$dfcc__library_8cpp.html" title=" " alt="" coords="1131,123,1329,192"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1233,89,1233,122,1227,122,1227,89"/>
-<area shape="rect" id="Node000016" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="1353,123,1595,192"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1314,78,1404,120,1401,125,1312,83"/>
-<area shape="rect" id="Node000017" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="1619,123,1817,192"/>
-<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1343,60,1470,87,1608,120,1620,123,1618,128,1607,125,1469,93,1342,66"/>
-<area shape="rect" id="Node000018" href="$dfcc__pointer__equals_8cpp.html" title=" " alt="" coords="1841,123,2038,192"/>
-<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="1342,49,1568,75,1699,95,1829,120,1841,123,1840,128,1828,125,1698,100,1567,80,1342,54"/>
-<area shape="rect" id="Node000019" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="2062,123,2259,192"/>
-<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="1342,43,1485,51,1662,66,1857,88,2050,120,2062,123,2061,128,2049,125,1856,93,1662,71,1484,57,1342,48"/>
-<area shape="rect" id="Node000020" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="2283,240,2481,309"/>
-<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="1343,42,1644,52,2016,69,2339,91,2445,105,2477,113,2494,121,2506,138,2508,156,2504,174,2495,193,2475,220,2450,242,2447,238,2471,217,2490,191,2499,172,2503,155,2501,140,2491,125,2476,118,2444,110,2339,97,2016,74,1644,57,1343,47"/>
-<area shape="rect" id="Node000021" href="$dfcc__spec__functions_8h.html" title="Translate functions that specify assignable and freeable targets declaratively into active functions ..." alt="" coords="2283,123,2481,192"/>
-<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="1342,40,1522,45,1754,58,2012,82,2144,99,2272,120,2284,123,2283,128,2271,125,2143,104,2012,87,1753,63,1521,50,1342,45"/>
-<area shape="rect" id="Node000023" href="$dfcc__swap__and__wrap_8h.html" title="Given a function_id and contract_id, swaps its body to a function with a fresh mangled name,..." alt="" coords="2505,240,2702,309"/>
-<area shape="poly" id="edge30_Node000001_Node000023" title=" " alt="" coords="1343,40,1637,45,2004,58,2180,69,2333,82,2450,99,2491,109,2518,120,2547,145,2569,176,2586,209,2597,239,2592,241,2581,211,2565,179,2543,149,2515,125,2490,114,2449,104,2333,88,2180,74,2003,64,1637,51,1343,45"/>
-<area shape="rect" id="Node000025" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="2606,123,2809,192"/>
-<area shape="poly" id="edge31_Node000001_Node000025" title=" " alt="" coords="1342,37,1571,39,1881,50,2054,60,2233,75,2412,95,2588,120,2606,124,2605,129,2587,125,2412,100,2232,80,2054,65,1881,55,1571,45,1342,43"/>
-<area shape="rect" id="Node000003" href="$dfcc_8cpp.html" title=" " alt="" coords="1805,475,2002,544"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1989,430,1941,476,1937,472,1985,427"/>
-<area shape="rect" id="Node000004" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="2026,482,2269,537"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="2064,427,2121,480,2117,484,2060,430"/>
-<area shape="rect" id="Node000005" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="1789,592,2023,647"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="2077,545,1966,594,1964,589,2075,540"/>
-<area shape="rect" id="Node000006" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="2047,592,2247,647"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="2150,551,2150,592,2145,592,2145,551"/>
-<area shape="rect" id="Node000007" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="2271,592,2530,647"/>
-<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="2223,540,2340,589,2338,594,2220,545"/>
-<area shape="poly" id="edge21_Node000021_Node000002" title=" " alt="" coords="2270,195,2235,200,2202,201,2147,200,2123,202,2099,209,2076,221,2052,242,2034,270,2025,303,2022,336,2024,364,2018,365,2017,336,2020,302,2029,268,2048,238,2073,217,2097,204,2122,197,2147,195,2202,196,2234,195,2269,189"/>
-<area shape="poly" id="edge22_Node000021_Node000010" title=" " alt="" coords="2269,195,2061,223,1883,236,1726,239,1579,235,1432,229,1275,226,1098,229,889,243,764,258,764,253,888,237,1097,224,1275,221,1433,224,1579,230,1726,233,1883,231,2060,218,2269,189"/>
-<area shape="poly" id="edge23_Node000021_Node000011" title=" " alt="" coords="2270,194,1744,230,1098,270,1098,265,1744,225,2270,189"/>
-<area shape="poly" id="edge24_Node000021_Node000012" title=" " alt="" coords="2270,195,2130,221,1992,242,1765,268,1764,262,1992,236,2129,216,2269,189"/>
-<area shape="poly" id="edge26_Node000021_Node000020" title=" " alt="" coords="2385,206,2385,240,2379,240,2379,206"/>
-<area shape="rect" id="Node000022" href="$dfcc__instrument__loop_8cpp.html" title=" " alt="" coords="2062,240,2259,309"/>
-<area shape="poly" id="edge25_Node000021_Node000022" title=" " alt="" coords="2306,201,2226,242,2224,237,2304,196"/>
-<area shape="poly" id="edge27_Node000021_Node000023" title=" " alt="" coords="2460,196,2540,237,2537,242,2457,201"/>
-<area shape="poly" id="edge28_Node000023_Node000002" title=" " alt="" coords="2492,312,2306,350,2145,377,2144,371,2305,345,2491,307"/>
-<area shape="rect" id="Node000024" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="2505,357,2702,427"/>
-<area shape="poly" id="edge29_Node000023_Node000024" title=" " alt="" coords="2606,323,2606,357,2601,357,2601,323"/>
+<area shape="rect" id="Node000001" title="Dynamic frame condition checking library loading." alt="" coords="1775,5,1972,75"/>
+<area shape="rect" id="Node000002" href="$dfcc_8h.html" title="Main class orchestrating the the whole program transformation for function contracts with Dynamic Fra..." alt="" coords="121,130,361,185"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1761,47,1055,75,661,97,498,111,374,125,335,133,334,127,373,120,497,105,660,92,1054,69,1761,42"/>
+<area shape="rect" id="Node000008" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="385,123,583,192"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1761,48,1160,75,833,98,698,111,595,125,583,128,582,122,594,120,697,106,833,92,1160,70,1760,43"/>
+<area shape="rect" id="Node000009" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="607,123,865,192"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1761,48,1590,56,1369,70,1124,93,878,125,866,127,865,122,877,120,1123,88,1369,65,1589,50,1761,42"/>
+<area shape="rect" id="Node000010" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="889,123,1087,192"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1761,49,1627,58,1461,73,1280,95,1099,125,1087,128,1086,123,1098,120,1279,90,1460,68,1626,53,1761,44"/>
+<area shape="rect" id="Node000011" href="$dfcc__instrument__loop_8cpp.html" title=" " alt="" coords="1111,123,1308,192"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1762,56,1556,83,1437,102,1321,125,1309,128,1307,123,1319,120,1436,97,1555,77,1761,50"/>
+<area shape="rect" id="Node000012" href="$dfcc__is__freeable_8cpp.html" title=" " alt="" coords="1332,123,1529,192"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1762,70,1542,125,1530,129,1529,123,1541,120,1761,65"/>
+<area shape="rect" id="Node000013" href="$dfcc__is__fresh_8cpp.html" title=" " alt="" coords="1553,123,1751,192"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1798,83,1718,125,1715,120,1795,79"/>
+<area shape="rect" id="Node000014" href="$dfcc__library_8cpp.html" title=" " alt="" coords="1775,123,1972,192"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1876,89,1876,122,1871,122,1871,89"/>
+<area shape="rect" id="Node000015" href="$dfcc__lift__memory__predicates_8cpp.html" title=" " alt="" coords="1997,123,2238,192"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1958,78,2047,120,2045,125,1956,83"/>
+<area shape="rect" id="Node000016" href="$dfcc__obeys__contract_8cpp.html" title=" " alt="" coords="2263,123,2460,192"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1986,60,2114,87,2251,120,2263,123,2262,128,2250,125,2113,93,1985,66"/>
+<area shape="rect" id="Node000017" href="$dfcc__pointer__equals_8cpp.html" title=" " alt="" coords="2484,123,2681,192"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1986,49,2212,75,2343,95,2473,120,2485,123,2483,128,2471,125,2342,100,2211,80,1985,54"/>
+<area shape="rect" id="Node000018" href="$dfcc__pointer__in__range_8cpp.html" title=" " alt="" coords="2705,123,2903,192"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="1986,43,2128,51,2306,66,2500,88,2694,120,2706,123,2705,128,2693,125,2499,93,2305,71,2128,57,1985,48"/>
+<area shape="rect" id="Node000019" href="$dfcc__spec__functions_8cpp.html" title=" " alt="" coords="2927,123,3124,192"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="1986,40,2165,45,2397,58,2656,82,2787,99,2915,120,2927,123,2926,128,2914,125,2786,104,2655,87,2397,63,2165,50,1986,45"/>
+<area shape="rect" id="Node000020" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="3148,123,3345,192"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="1986,43,2579,70,2901,93,3035,106,3136,120,3149,122,3147,128,3136,125,3034,111,2901,98,2578,76,1986,48"/>
+<area shape="rect" id="Node000021" href="$dfcc__wrapper__program_8cpp.html" title=" " alt="" coords="3369,123,3572,192"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="1986,41,2289,51,2685,67,3074,90,3235,104,3358,120,3369,122,3368,128,3357,125,3235,109,3074,95,2685,72,2289,56,1986,47"/>
+<area shape="rect" id="Node000003" href="$dfcc_8cpp.html" title=" " alt="" coords="21,240,219,309"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="206,196,158,242,154,238,202,192"/>
+<area shape="rect" id="Node000004" href="$goto__instrument__parse__options_8h.html" title="Command Line Parsing." alt="" coords="243,247,485,302"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="281,192,338,245,334,249,277,196"/>
+<area shape="rect" id="Node000005" href="$goto__instrument__languages_8cpp.html" title="Language Registration." alt="" coords="5,357,240,412"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="294,310,183,360,180,355,292,305"/>
+<area shape="rect" id="Node000006" href="$goto__instrument__main_8cpp.html" title="Main Module." alt="" coords="264,357,464,412"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="367,316,367,357,361,357,361,316"/>
+<area shape="rect" id="Node000007" href="$goto__instrument__parse__options_8cpp.html" title="Main Module." alt="" coords="488,357,747,412"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="439,305,557,355,555,360,437,310"/>
 </map>
