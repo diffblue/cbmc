@@ -17,21 +17,17 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/std_expr.h>
 
-#include "dfcc_contract_functions.h"
 #include "dfcc_contract_mode.h"
 
 #include <set>
 
-class goto_modelt;
-class messaget;
-class message_handlert;
+class code_with_contract_typet;
+class dfcc_contract_functionst;
 class dfcc_instrumentt;
 class dfcc_libraryt;
 class dfcc_lift_memory_predicatest;
-class code_with_contract_typet;
-class conditional_target_group_exprt;
+class goto_modelt;
 
 /// \brief Generates the body of a wrapper function from a contract
 /// specified using requires, assigns, frees, ensures,

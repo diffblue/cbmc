@@ -30,7 +30,6 @@ class dfcc_libraryt;
 class dfcc_instrumentt;
 class message_handlert;
 class goto_modelt;
-class exprt;
 class replace_symbolt;
 
 class dfcc_lift_memory_predicatest

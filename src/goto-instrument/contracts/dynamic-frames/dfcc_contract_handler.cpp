@@ -9,27 +9,12 @@ Date: August 2022
 
 #include "dfcc_contract_handler.h"
 
-#include <util/arith_tools.h>
-#include <util/c_types.h>
-#include <util/expr_util.h>
-#include <util/format_type.h>
-#include <util/fresh_symbol.h>
-#include <util/invariant.h>
-#include <util/mathematical_expr.h>
-#include <util/namespace.h>
-#include <util/pointer_offset_size.h>
-#include <util/std_expr.h>
-
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_function_pointers.h>
 
-#include <ansi-c/c_expr.h>
-#include <goto-instrument/contracts/utils.h>
 #include <langapi/language_util.h>
 
-#include "dfcc_instrument.h"
-#include "dfcc_library.h"
-#include "dfcc_spec_functions.h"
+#include "dfcc_utils.h"
 #include "dfcc_wrapper_program.h"
 
 std::map<irep_idt, dfcc_contract_functionst>

@@ -13,8 +13,6 @@ Date: August 2022
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_UTILS_H
 
-#include <util/message.h>
-#include <util/namespace.h>
 #include <util/std_expr.h>
 
 #include <set>
@@ -22,6 +20,7 @@ Date: August 2022
 class goto_modelt;
 class goto_programt;
 class message_handlert;
+class symbol_table_baset;
 class symbolt;
 
 struct dfcc_utilst

@@ -9,43 +9,22 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include "dfcc.h"
 
 #include <util/config.h>
-#include <util/expr_util.h>
-#include <util/format_expr.h>
-#include <util/format_type.h>
-#include <util/fresh_symbol.h>
-#include <util/mathematical_expr.h>
-#include <util/mathematical_types.h>
-#include <util/namespace.h>
-#include <util/pointer_expr.h>
-#include <util/pointer_offset_size.h>
-#include <util/pointer_predicates.h>
 #include <util/prefix.h>
-#include <util/std_expr.h>
 #include <util/string_utils.h>
 
-#include <goto-programs/goto_functions.h>
-#include <goto-programs/goto_inline.h>
-#include <goto-programs/goto_model.h>
-#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unused_functions.h>
 
 #include <ansi-c/ansi_c_entry_point.h>
-#include <ansi-c/c_expr.h>
 #include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
-#include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <ansi-c/goto-conversion/link_to_library.h>
-#include <goto-instrument/contracts/cfg_info.h>
-#include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/generate_function_bodies.h>
 #include <goto-instrument/nondet_static.h>
-#include <langapi/language.h>
-#include <langapi/language_file.h>
-#include <langapi/mode.h>
 #include <linking/static_lifetime_init.h>
 
 #include "dfcc_lift_memory_predicates.h"
+#include "dfcc_utils.h"
 
 invalid_function_contract_pair_exceptiont::
   invalid_function_contract_pair_exceptiont(

@@ -12,7 +12,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_LIBRARY_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_LIBRARY_H
 
-#include <util/irep.h>
 #include <util/message.h>
 
 #include <goto-programs/goto_instruction_code.h>

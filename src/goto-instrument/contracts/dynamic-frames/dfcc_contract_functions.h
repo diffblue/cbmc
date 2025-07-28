@@ -14,24 +14,15 @@ Date: August 2022
 #ifndef CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_CONTRACT_FUNCTIONS_H
 #define CPROVER_GOTO_INSTRUMENT_CONTRACTS_DYNAMIC_FRAMES_DFCC_CONTRACT_FUNCTIONS_H
 
-#include <ansi-c/goto-conversion/goto_convert_class.h>
-
 #include <util/message.h>
 #include <util/namespace.h>
-#include <util/std_expr.h>
 
-#include "dfcc_contract_mode.h"
-
-#include <set>
-
-class goto_modelt;
-class message_handlert;
-class dfcc_libraryt;
-class dfcc_instrumentt;
-class dfcc_spec_functionst;
-class dfcc_contract_clauses_codegent;
 class code_with_contract_typet;
-class conditional_target_group_exprt;
+class dfcc_contract_clauses_codegent;
+class dfcc_instrumentt;
+class dfcc_libraryt;
+class dfcc_spec_functionst;
+class goto_modelt;
 
 /// Generates GOTO functions modelling a contract assigns and frees clauses.
 ///
