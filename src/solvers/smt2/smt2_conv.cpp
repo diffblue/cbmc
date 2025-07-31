@@ -976,17 +976,42 @@ literalt smt2_convt::convert(const exprt &expr)
   // Note that here we are always converting, so we do not need to consider
   // other literal kinds, only "|B###|"
 
-  // Z3 refuses get-value when a defined symbol contains a quantifier.
+  // Z3 refuses get-value when a defined symbol contains a quantifier, so we
+  // declare the symbol and constrain it separately rather than using
+  // define-fun.
   if(has_quantifier(prepared_expr))
   {
     out << "(declare-fun ";
     convert_literal(l);
     out << " () Bool)\n";
-    out << "(assert (= ";
-    convert_literal(l);
-    out << ' ';
-    convert_expr(prepared_expr);
-    out << "))\n";
+    if(solver == solvert::Z3)
+    {
+      // A single (assert (= B <expr>)) does not help on Z3: its solve_eqs
+      // preprocessor eliminates B by substituting the quantified <expr>, and
+      // then hands the eliminated form back through get-value (see
+      // Z3Prover/z3#7743). Asserting the equivalence as two implications
+      // instead prevents this. The underlying issue is fixed in Z3 >= 4.17
+      // (which also exposes (set-option :smt.solve_eqs.non_ground false)), but
+      // neither is widely available yet, so we keep the workaround for Z3.
+      out << "(assert (=> ";
+      convert_literal(l);
+      out << ' ';
+      convert_expr(prepared_expr);
+      out << "))\n";
+      out << "(assert (=> ";
+      convert_expr(prepared_expr);
+      out << ' ';
+      convert_literal(l);
+      out << "))\n";
+    }
+    else
+    {
+      out << "(assert (= ";
+      convert_literal(l);
+      out << ' ';
+      convert_expr(prepared_expr);
+      out << "))\n";
+    }
   }
   else
   {
