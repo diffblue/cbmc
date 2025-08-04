@@ -168,6 +168,21 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("retrace"))
+  {
+    auto retrace_input = cmdline.get_value("retrace");
+    options.set_option("retrace", retrace_input);
+
+    // check retrace input
+    for(auto &c : retrace_input)
+      if(c != '0' && c != '1')
+      {
+        log.error() << "--retrace input string must only contain 0s and 1s"
+                    << messaget::eom;
+        exit(CPROVER_EXIT_USAGE_ERROR);
+      }
+  }
+
   // We want to warn the user that if we are using standard checks (that enables
   // unwinding-assertions) and we did not disable them manually.
   if(

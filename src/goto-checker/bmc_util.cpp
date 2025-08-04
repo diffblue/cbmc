@@ -186,7 +186,14 @@ void setup_symex(
   if(!ns.lookup(INITIALIZE_FUNCTION, init_symbol))
     symex.language_mode = init_symbol->mode;
 
-  msg.status() << "Starting Bounded Model Checking" << messaget::eom;
+  if(options.is_set("retrace"))
+  {
+    msg.status() << "Starting Retrace Model Checking" << messaget::eom;
+  }
+  else
+  {
+    msg.status() << "Starting Bounded Model Checking" << messaget::eom;
+  }
 
   symex.last_source_location.make_nil();
 

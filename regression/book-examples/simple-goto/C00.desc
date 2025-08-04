@@ -1,0 +1,6 @@
+CORE
+simple_goto.c
+--function foo --retrace 00
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$

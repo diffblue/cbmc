@@ -98,8 +98,7 @@ void goto_symext::symex_goto(statet &state)
   DATA_INVARIANT(
     instruction.targets.size() == 1, "no support for non-deterministic gotos");
 
-  goto_programt::const_targett goto_target=
-    instruction.get_target();
+  goto_programt::const_targett goto_target = instruction.get_target();
 
   const bool backward = instruction.is_backwards_goto();
 
@@ -450,6 +449,194 @@ void goto_symext::symex_unreachable_goto(statet &state)
   }
 
   symex_transition(state);
+}
+
+void goto_symext::symex_goto_retrace(statet &state)
+{
+  // get guard, targets as in symex_goto()
+  const goto_programt::instructiont &instruction = *state.source.pc;
+
+  exprt new_guard = clean_expr(instruction.condition(), state, false);
+
+  renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
+  renamed_guard = try_evaluate_pointer_comparisons(
+    std::move(renamed_guard), state.value_set, language_mode, ns);
+  if(symex_config.simplify_opt)
+    renamed_guard.simplify(ns);
+  new_guard = renamed_guard.get();
+
+  target.goto_instruction(state.guard.as_expr(), renamed_guard, state.source);
+
+  DATA_INVARIANT(
+    !instruction.targets.empty(), "goto should have at least one target");
+
+  // we only do deterministic gotos for now
+  DATA_INVARIANT(
+    instruction.targets.size() == 1, "no support for non-deterministic gotos");
+
+  goto_programt::const_targett goto_target = instruction.get_target();
+
+  const bool backward = instruction.is_backwards_goto();
+
+  goto_programt::const_targett next_instruction = state.source.pc;
+  next_instruction++;
+
+  // goto or next depends on input trace from user
+  bool choose_goto;
+  static size_t retrace_index = 0;
+  if(retrace_index < symex_config.retrace_input.size())
+  {
+    choose_goto = symex_config.retrace_input[retrace_index] == '1';
+  }
+  else
+  {
+    choose_goto = false;
+  }
+  retrace_index++;
+
+  // print goto choice
+  log.conditional_output(
+    log.status(),
+    [this, &state, &goto_target, &next_instruction, choose_goto](
+      messaget::mstreamt &mstream)
+    {
+      source_locationt cur = state.source.pc->source_location();
+      source_locationt goto_dest = goto_target->source_location();
+      source_locationt next_dest = next_instruction->source_location();
+      source_locationt t_dest = choose_goto ? goto_dest : next_dest;
+      source_locationt nt_dest = choose_goto ? next_dest : goto_dest;
+
+      auto cur_file = cur.get_file();
+      if(cur_file.empty())
+        cur_file = "<unknown>";
+      auto t_file = t_dest.get_file();
+      if(t_file.empty())
+        t_file = "<unknown>";
+      auto nt_file = nt_dest.get_file();
+      if(nt_file.empty())
+        nt_file = "<unknown>";
+
+      // print nothing when files are the same
+      if(cur_file == t_file)
+        t_file = "";
+      if(cur_file == nt_file)
+        nt_file = "";
+
+      auto cur_line = cur.get_line();
+      if(cur_line.empty())
+        cur_line = "?";
+      auto t_line = t_dest.get_line();
+      if(t_line.empty())
+        t_line = "?";
+      auto nt_line = nt_dest.get_line();
+      if(nt_line.empty())
+        nt_line = "?";
+
+      std::string head = symex_config.retrace_input;
+      // add 0s in case input trace was shorter
+      head.resize(retrace_index - 1, '0');
+      std::string decision = choose_goto ? "1" : "0";
+
+      std::string step = choose_goto ? " goto " : " next ";
+
+      std::string padding_1 =
+        cur_line.size() < 3 ? std::string(3 - cur_line.size(), ' ') : "";
+      std::string padding_2 =
+        t_line.size() < 3 ? std::string(3 - t_line.size(), ' ') : "";
+
+      mstream << "Retrace " << head << messaget::bold << decision
+              << messaget::reset << " at " << cur_file << ":" << cur_line
+              << padding_1 << step << t_file << ":" << t_line << padding_2
+              << " (not " << nt_file << ":" << nt_line << ")" << messaget::eom;
+    });
+
+  // warn when not following unconditional goto
+  if(new_guard.is_true() && !choose_goto)
+  {
+    log.result() << "Retrace input " << messaget::red << "inconsistent"
+                 << messaget::reset << ": 0/next although guard is true!"
+                 << log.eom;
+    should_pause_symex = true;
+  }
+  else if(new_guard.is_false() && choose_goto)
+  {
+    log.result() << "Retrace input " << messaget::red << "inconsistent"
+                 << messaget::reset << ": 1/goto although guard is false!"
+                 << log.eom;
+    should_pause_symex = true;
+  }
+
+  symex_targett::sourcet original_source = state.source;
+  goto_programt::const_targett new_state_pc;
+
+  if(choose_goto)
+  {
+    // Jump to the jump target if the input is '1'
+    new_state_pc = goto_target;
+    symex_transition(state, new_state_pc, backward);
+  }
+  else
+  {
+    // Jump to the next instruction
+    new_state_pc = state.source.pc;
+    new_state_pc++;
+    symex_transition(state);
+  }
+
+  // produce new guard symbol
+  exprt guard_expr;
+
+  if(
+    new_guard.id() == ID_symbol ||
+    (new_guard.id() == ID_not && to_not_expr(new_guard).op().id() == ID_symbol))
+  {
+    guard_expr = new_guard;
+  }
+  else
+  {
+    symbol_exprt guard_symbol_expr =
+      symbol_exprt(statet::guard_identifier(), bool_typet());
+    exprt new_rhs = boolean_negate(new_guard);
+
+    ssa_exprt new_lhs =
+      state.rename_ssa<L1>(ssa_exprt{guard_symbol_expr}, ns).get();
+    new_lhs =
+      state.assignment(std::move(new_lhs), new_rhs, ns, true, false).get();
+
+    guardt guard{true_exprt{}, guard_manager};
+
+    log.conditional_output(
+      log.debug(),
+      [this, &new_lhs](messaget::mstreamt &mstream)
+      {
+        mstream << "Assignment to " << new_lhs.get_identifier() << " ["
+                << pointer_offset_bits(new_lhs.type(), ns).value_or(0)
+                << " bits]" << messaget::eom;
+      });
+
+    target.assignment(
+      guard.as_expr(),
+      new_lhs,
+      new_lhs,
+      guard_symbol_expr,
+      new_rhs,
+      original_source,
+      symex_targett::assignment_typet::GUARD);
+
+    guard_expr = state.rename(boolean_negate(guard_symbol_expr), ns).get();
+  }
+
+  if(choose_goto)
+  {
+    symex_assume_l2(state, guard_expr);
+    state.guard.add(guard_expr);
+  }
+  else
+  {
+    symex_assume_l2(state, boolean_negate(guard_expr));
+    state.guard.add(boolean_negate(guard_expr));
+  }
+  return;
 }
 
 bool goto_symext::check_break(const irep_idt &loop_id, unsigned unwind)
