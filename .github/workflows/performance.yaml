@@ -23,7 +23,7 @@ jobs:
           echo "NEW_REF=${{ github.event.pull_request.head.sha }}" | tee -a "$GITHUB_ENV"
 
       - name: Check out CBMC (old variant)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
           path: ./old
@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 2
 
       - name: Check out CBMC (new variant)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
           path: ./new
