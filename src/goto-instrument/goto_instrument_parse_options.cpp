@@ -1400,7 +1400,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       std::regex(cmdline.get_value("generate-function-body")),
       *generate_implementation,
       goto_model,
-      ui_message_handler);
+      ui_message_handler,
+      false);
   }
 
   if(cmdline.isset("generate-havocing-body"))
@@ -1427,7 +1428,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         std::regex(options_split[0]),
         *generate_implementation,
         goto_model,
-        ui_message_handler);
+        ui_message_handler,
+        false);
     }
     else
     {

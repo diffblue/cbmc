@@ -497,7 +497,8 @@ void dfcct::transform_goto_model()
     std::regex("(?!" CPROVER_PREFIX ").*"),
     *generate_implementation,
     goto_model,
-    message_handler);
+    message_handler,
+    true);
   goto_model.goto_functions.update();
 
   reinitialize_model();
