@@ -905,8 +905,12 @@ void value_set_fit::get_reference_set_sharing_rec(
     {
       const exprt &object = object_numbering[object_entry.first];
 
-      if(object.id()==ID_unknown)
+      if(
+        object.id() == ID_unknown ||
+        (object.type().id() != ID_array && object.type().id() != ID_vector))
+      {
         insert(dest, exprt(ID_unknown, expr.type()));
+      }
       else
       {
         index_exprt index_expr(
