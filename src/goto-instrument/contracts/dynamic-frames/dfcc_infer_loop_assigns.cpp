@@ -336,9 +336,11 @@ void dfcc_infer_loop_assigns_for_function(
   auto malloc_body = goto_functions.function_map.extract(irep_idt("malloc"));
   auto free_body = goto_functions.function_map.extract(irep_idt("free"));
 
-  // Inline all function calls in goto_function_copy.
+  // Inline all function calls in goto_function_copy; this is best-effort
+  // inlining, we can safely ignore warnings here.
+  null_message_handlert null_message_handler;
   goto_program_inline(
-    goto_functions, goto_function_copy.body, ns, log.get_message_handler());
+    goto_functions, goto_function_copy.body, ns, null_message_handler);
   // Update the body to make sure all goto correctly jump to valid targets.
   goto_function_copy.body.update();
   // Build the loop graph after inlining.

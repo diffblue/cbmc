@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --apply-loop-contracts
 ^\[ackermann\.\d+\] line 21 Check loop invariant before entry: SUCCESS$

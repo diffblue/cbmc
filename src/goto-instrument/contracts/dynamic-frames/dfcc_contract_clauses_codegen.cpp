@@ -265,6 +265,8 @@ void dfcc_contract_clauses_codegent::inline_and_check_warnings(
   std::set<irep_idt> recursive_call;
   std::set<irep_idt> not_enough_arguments;
 
+  // we inspect all warnings ourselves, no need to surface them
+  null_message_handlert null_message_handler;
   dfcc_utilst::inline_program(
     goto_model,
     goto_program,
@@ -272,7 +274,7 @@ void dfcc_contract_clauses_codegent::inline_and_check_warnings(
     recursive_call,
     missing_function,
     not_enough_arguments,
-    message_handler);
+    null_message_handler);
 
   // check that the only no body / missing functions are the cprover builtins
   for(const auto &id : no_body)

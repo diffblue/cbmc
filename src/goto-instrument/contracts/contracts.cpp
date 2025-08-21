@@ -838,12 +838,9 @@ void code_contractst::apply_loop_contract(
     return;
 
   inlining_decoratort decorated(log.get_message_handler());
-  goto_function_inline(
-    goto_functions, function_name, ns, log.get_message_handler());
+  goto_function_inline(goto_functions, function_name, ns, decorated);
 
-  INVARIANT(
-    decorated.get_recursive_call_set().size() == 0,
-    "Recursive functions found during inlining");
+  decorated.throw_on_recursive_calls(log, 0);
 
   // restore internal invariants
   goto_functions.update();

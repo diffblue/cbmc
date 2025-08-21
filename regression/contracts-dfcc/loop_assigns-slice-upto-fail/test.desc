@@ -19,5 +19,6 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 --
+no body for function '__CPROVER
 --
 This test shows that __CPROVER_object_upto is supported in loop contracts.
