@@ -1352,14 +1352,7 @@ void value_sett::get_reference_set_rec(
     exprt l1_expr =
       is_ssa_expr(expr) ? remove_level_2(to_ssa_expr(expr)) : expr;
 
-    if(
-      expr.type().id() == ID_array &&
-      to_array_type(expr.type()).element_type().id() == ID_array)
-    {
-      insert(dest, l1_expr);
-    }
-    else
-      insert(dest, l1_expr, from_integer(0, c_index_type()));
+    insert(dest, l1_expr, from_integer(0, c_index_type()));
 
     return;
   }
