@@ -141,9 +141,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a513e88cf04ede5ca3d59a7b2244aea35" id="r_a513e88cf04ede5ca3d59a7b2244aea35"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classgenerate__function__bodiest.html">generate_function_bodiest</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="generate__function__bodies_8h.html#a513e88cf04ede5ca3d59a7b2244aea35">generate_function_bodies_factory</a> (<a class="el" href="classait.html">const</a> std::string &amp;options, <a class="el" href="classait.html">const</a> <a class="el" href="structc__object__factory__parameterst.html">c_object_factory_parameterst</a> &amp;object_factory_parameters, <a class="el" href="classait.html">const</a> <a class="el" href="classsymbol__tablet.html">symbol_tablet</a> &amp;symbol_table, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:a513e88cf04ede5ca3d59a7b2244aea35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create the type that actually generates the functions.  <br /></td></tr>
 <tr class="separator:a513e88cf04ede5ca3d59a7b2244aea35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc11ceb1751784de46b67c46cbde6c3d" id="r_acc11ceb1751784de46b67c46cbde6c3d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="generate__function__bodies_8h.html#acc11ceb1751784de46b67c46cbde6c3d">generate_function_bodies</a> (<a class="el" href="classait.html">const</a> std::regex &amp;<a class="el" href="classait.html">functions_regex</a>, <a class="el" href="classait.html">const</a> <a class="el" href="classgenerate__function__bodiest.html">generate_function_bodiest</a> &amp;generate_function_body, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;model, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:acc11ceb1751784de46b67c46cbde6c3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate function bodies with some default behavior: assert-false, assume-false, assert-false-assume-false, havoc, nondet-return.  <br /></td></tr>
-<tr class="separator:acc11ceb1751784de46b67c46cbde6c3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60bb8cb14af88846c48fb0c452908317" id="r_a60bb8cb14af88846c48fb0c452908317"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="generate__function__bodies_8h.html#a60bb8cb14af88846c48fb0c452908317">generate_function_bodies</a> (<a class="el" href="classait.html">const</a> std::regex &amp;<a class="el" href="classait.html">functions_regex</a>, <a class="el" href="classait.html">const</a> <a class="el" href="classgenerate__function__bodiest.html">generate_function_bodiest</a> &amp;generate_function_body, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;model, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler, <a class="el" href="classait.html">bool</a> <a class="el" href="classait.html">ignore_no_match</a>)</td></tr>
+<tr class="memdesc:a60bb8cb14af88846c48fb0c452908317"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate function bodies with some default behavior: assert-false, assume-false, assert-false-assume-false, havoc, nondet-return.  <br /></td></tr>
+<tr class="separator:a60bb8cb14af88846c48fb0c452908317"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a810838f021b21fac6c10fd83db5947a6" id="r_a810838f021b21fac6c10fd83db5947a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="generate__function__bodies_8h.html#a810838f021b21fac6c10fd83db5947a6">generate_function_bodies</a> (<a class="el" href="classait.html">const</a> std::string &amp;function_name, <a class="el" href="classait.html">const</a> std::string &amp;<a class="el" href="classait.html">call_site_id</a>, <a class="el" href="classait.html">const</a> <a class="el" href="classgenerate__function__bodiest.html">generate_function_bodiest</a> &amp;generate_function_body, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;model, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
 <tr class="memdesc:a810838f021b21fac6c10fd83db5947a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a clone of <code>function_name</code> (labelled with <code>call_site_id</code>) and instantiate its body with selective havocing of its parameters.  <br /></td></tr>
 <tr class="separator:a810838f021b21fac6c10fd83db5947a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,7 +174,7 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;{yhavoc}[,{yparams}:{uregex}][,{yglobals}:{uregex}]&quot;</span>                        \</div>
 <div class="line">  <span class="stringliteral">&quot;[,{yparams}:{up1};{up2};..] (default: {ynondet-return})\n&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8h_source.html#l00092">92</a> of file <a class="el" href="generate__function__bodies_8h_source.html">generate_function_bodies.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8h_source.html#l00093">93</a> of file <a class="el" href="generate__function__bodies_8h_source.html">generate_function_bodies.h</a>.</p>
 
 </div>
 </div>
@@ -193,13 +193,13 @@ Functions</h2></td></tr>
 <div class="line">  <span class="stringliteral">&quot;(generate-havocing-body):&quot;</span> \</div>
 <div class="line">  <span class="stringliteral">&quot;(generate-function-body-options):&quot;</span></div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8h_source.html#l00087">87</a> of file <a class="el" href="generate__function__bodies_8h_source.html">generate_function_bodies.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8h_source.html#l00088">88</a> of file <a class="el" href="generate__function__bodies_8h_source.html">generate_function_bodies.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="acc11ceb1751784de46b67c46cbde6c3d" name="acc11ceb1751784de46b67c46cbde6c3d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc11ceb1751784de46b67c46cbde6c3d">&#9670;&#160;</a></span>generate_function_bodies() <span class="overload">[1/2]</span></h2>
+<a id="a60bb8cb14af88846c48fb0c452908317" name="a60bb8cb14af88846c48fb0c452908317"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60bb8cb14af88846c48fb0c452908317">&#9670;&#160;</a></span>generate_function_bodies() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -226,7 +226,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
-          <td class="paramname"><em>message_handler</em>&#160;</td>
+          <td class="paramname"><em>message_handler</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">bool</a>&#160;</td>
+          <td class="paramname"><em>ignore_no_match</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -243,11 +249,12 @@ Functions</h2></td></tr>
     <tr><td class="paramname">generate_function_body</td><td>Specifies what kind of body to generate </td></tr>
     <tr><td class="paramname">model</td><td>The goto-model in which to generate the function bodies </td></tr>
     <tr><td class="paramname">message_handler</td><td>Destination for status/warning messages </td></tr>
+    <tr><td class="paramname">ignore_no_match</td><td>Do not warn in case no function matched <code>functions_regex</code> </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8cpp_source.html#l00501">501</a> of file <a class="el" href="generate__function__bodies_8cpp_source.html">generate_function_bodies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8cpp_source.html#l00503">503</a> of file <a class="el" href="generate__function__bodies_8cpp_source.html">generate_function_bodies.cpp</a>.</p>
 
 </div>
 </div>
@@ -307,7 +314,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8cpp_source.html#l00537">537</a> of file <a class="el" href="generate__function__bodies_8cpp_source.html">generate_function_bodies.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="generate__function__bodies_8cpp_source.html#l00540">540</a> of file <a class="el" href="generate__function__bodies_8cpp_source.html">generate_function_bodies.cpp</a>.</p>
 
 </div>
 </div>
@@ -350,7 +357,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Create the type that actually generates the functions. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="generate__function__bodies_8cpp.html#acc11ceb1751784de46b67c46cbde6c3d" title="Generate function bodies with some default behavior: assert-false, assume-false, assert-false-assume-...">generate_function_bodies</a> for the syntax of the options parameter </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="generate__function__bodies_8cpp.html#a60bb8cb14af88846c48fb0c452908317" title="Generate function bodies with some default behavior: assert-false, assume-false, assert-false-assume-...">generate_function_bodies</a> for the syntax of the options parameter </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="generate__function__bodies_8cpp_source.html#l00375">375</a> of file <a class="el" href="generate__function__bodies_8cpp_source.html">generate_function_bodies.cpp</a>.</p>
 

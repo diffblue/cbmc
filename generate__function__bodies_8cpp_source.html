@@ -629,137 +629,138 @@ $(document).ready(function(){initNavTree('generate__function__bodies_8cpp_source
 <div class="line"><a id="l00492" name="l00492"></a><span class="lineno">  492</span>}</div>
 </div>
 <div class="line"><a id="l00493" name="l00493"></a><span class="lineno">  493</span> </div>
-<div class="foldopen" id="foldopen00501" data-start="{" data-end="}">
-<div class="line"><a id="l00501" name="l00501"></a><span class="lineno"><a class="line" href="generate__function__bodies_8cpp.html#acc11ceb1751784de46b67c46cbde6c3d">  501</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="generate__function__bodies_8cpp.html#acc11ceb1751784de46b67c46cbde6c3d">generate_function_bodies</a>(</div>
-<div class="line"><a id="l00502" name="l00502"></a><span class="lineno">  502</span>  <span class="keyword">const</span> std::regex &amp;<a class="code hl_class" href="classait.html">functions_regex</a>,</div>
-<div class="line"><a id="l00503" name="l00503"></a><span class="lineno">  503</span>  <span class="keyword">const</span> <a class="code hl_class" href="classgenerate__function__bodiest.html">generate_function_bodiest</a> &amp;generate_function_body,</div>
-<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>  <a class="code hl_class" href="classgoto__modelt.html">goto_modelt</a> &amp;model,</div>
-<div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span>{</div>
-<div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span>  <a class="code hl_class" href="classmessaget.html">messaget</a> messages(message_handler);</div>
-<div class="line"><a id="l00508" name="l00508"></a><span class="lineno">  508</span>  <span class="keyword">const</span> std::regex <a class="code hl_class" href="classait.html">cprover_prefix</a> = std::regex(<span class="stringliteral">&quot;__CPROVER.*&quot;</span>);</div>
-<div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span>  <span class="keywordtype">bool</span> <a class="code hl_class" href="classait.html">did_generate_body</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;function : model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code hl_variable" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span>  {</div>
-<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>    <span class="keywordflow">if</span>(</div>
-<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>      !function.second.body_available() &amp;&amp;</div>
-<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>      std::regex_match(<a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(function.first), <a class="code hl_class" href="classait.html">functions_regex</a>))</div>
-<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    {</div>
-<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span>      <span class="keywordflow">if</span>(std::regex_match(<a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(function.first), <a class="code hl_class" href="classait.html">cprover_prefix</a>))</div>
-<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span>      {</div>
-<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span>        messages.<a class="code hl_function" href="classmessaget.html#a613763e51c652c68b04add7009bc1d84">warning</a>() &lt;&lt; <span class="stringliteral">&quot;generate function bodies: matched function &#39;&quot;</span></div>
-<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span>                           &lt;&lt; <a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(function.first)</div>
-<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span>                           &lt;&lt; <span class="stringliteral">&quot;&#39; begins with __CPROVER &quot;</span></div>
-<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span>                           &lt;&lt; <span class="stringliteral">&quot;the generated body for this function &quot;</span></div>
-<div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span>                           &lt;&lt; <span class="stringliteral">&quot;may interfere with analysis&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span>      }</div>
-<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span>      <a class="code hl_class" href="classait.html">did_generate_body</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span>      generate_function_body.<a class="code hl_function" href="classgenerate__function__bodiest.html#a0dc1d2464d70f5cd633fb8ea277a7911">generate_function_body</a>(</div>
-<div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span>        function.second, model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, function.first);</div>
-<div class="line"><a id="l00527" name="l00527"></a><span class="lineno">  527</span>    }</div>
-<div class="line"><a id="l00528" name="l00528"></a><span class="lineno">  528</span>  }</div>
-<div class="line"><a id="l00529" name="l00529"></a><span class="lineno">  529</span>  <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">did_generate_body</a>)</div>
-<div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span>  {</div>
-<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span>    messages.<a class="code hl_function" href="classmessaget.html#a613763e51c652c68b04add7009bc1d84">warning</a>()</div>
-<div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span>      &lt;&lt; <span class="stringliteral">&quot;generate function bodies: No function name matched regex&quot;</span></div>
-<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>      &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span>  }</div>
-<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>}</div>
+<div class="foldopen" id="foldopen00503" data-start="{" data-end="}">
+<div class="line"><a id="l00503" name="l00503"></a><span class="lineno"><a class="line" href="generate__function__bodies_8cpp.html#a60bb8cb14af88846c48fb0c452908317">  503</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="generate__function__bodies_8cpp.html#a60bb8cb14af88846c48fb0c452908317">generate_function_bodies</a>(</div>
+<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>  <span class="keyword">const</span> std::regex &amp;<a class="code hl_class" href="classait.html">functions_regex</a>,</div>
+<div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span>  <span class="keyword">const</span> <a class="code hl_class" href="classgenerate__function__bodiest.html">generate_function_bodiest</a> &amp;generate_function_body,</div>
+<div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span>  <a class="code hl_class" href="classgoto__modelt.html">goto_modelt</a> &amp;model,</div>
+<div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler,</div>
+<div class="line"><a id="l00508" name="l00508"></a><span class="lineno">  508</span>  <span class="keywordtype">bool</span> <a class="code hl_class" href="classait.html">ignore_no_match</a>)</div>
+<div class="line"><a id="l00509" name="l00509"></a><span class="lineno">  509</span>{</div>
+<div class="line"><a id="l00510" name="l00510"></a><span class="lineno">  510</span>  <a class="code hl_class" href="classmessaget.html">messaget</a> messages(message_handler);</div>
+<div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span>  <span class="keyword">const</span> std::regex <a class="code hl_class" href="classait.html">cprover_prefix</a> = std::regex(<span class="stringliteral">&quot;__CPROVER.*&quot;</span>);</div>
+<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>  <span class="keywordtype">bool</span> <a class="code hl_class" href="classait.html">did_generate_body</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;function : model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code hl_variable" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>  {</div>
+<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    <span class="keywordflow">if</span>(</div>
+<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span>      !function.second.body_available() &amp;&amp;</div>
+<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span>      std::regex_match(<a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(function.first), <a class="code hl_class" href="classait.html">functions_regex</a>))</div>
+<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span>    {</div>
+<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span>      <span class="keywordflow">if</span>(std::regex_match(<a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(function.first), <a class="code hl_class" href="classait.html">cprover_prefix</a>))</div>
+<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span>      {</div>
+<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span>        messages.<a class="code hl_function" href="classmessaget.html#a613763e51c652c68b04add7009bc1d84">warning</a>() &lt;&lt; <span class="stringliteral">&quot;generate function bodies: matched function &#39;&quot;</span></div>
+<div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span>                           &lt;&lt; <a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(function.first)</div>
+<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span>                           &lt;&lt; <span class="stringliteral">&quot;&#39; begins with __CPROVER &quot;</span></div>
+<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span>                           &lt;&lt; <span class="stringliteral">&quot;the generated body for this function &quot;</span></div>
+<div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span>                           &lt;&lt; <span class="stringliteral">&quot;may interfere with analysis&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span>      }</div>
+<div class="line"><a id="l00527" name="l00527"></a><span class="lineno">  527</span>      <a class="code hl_class" href="classait.html">did_generate_body</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00528" name="l00528"></a><span class="lineno">  528</span>      generate_function_body.<a class="code hl_function" href="classgenerate__function__bodiest.html#a0dc1d2464d70f5cd633fb8ea277a7911">generate_function_body</a>(</div>
+<div class="line"><a id="l00529" name="l00529"></a><span class="lineno">  529</span>        function.second, model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, function.first);</div>
+<div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span>    }</div>
+<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span>  }</div>
+<div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span>  <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">did_generate_body</a> &amp;&amp; !<a class="code hl_class" href="classait.html">ignore_no_match</a>)</div>
+<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>  {</div>
+<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span>    messages.<a class="code hl_function" href="classmessaget.html#a613763e51c652c68b04add7009bc1d84">warning</a>()</div>
+<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>      &lt;&lt; <span class="stringliteral">&quot;generate function bodies: No function name matched regex&quot;</span></div>
+<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span>      &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>  }</div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>}</div>
 </div>
-<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span> </div>
-<div class="foldopen" id="foldopen00537" data-start="{" data-end="}">
-<div class="line"><a id="l00537" name="l00537"></a><span class="lineno"><a class="line" href="generate__function__bodies_8cpp.html#a810838f021b21fac6c10fd83db5947a6">  537</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="generate__function__bodies_8cpp.html#acc11ceb1751784de46b67c46cbde6c3d">generate_function_bodies</a>(</div>
-<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>  <span class="keyword">const</span> std::string &amp;function_name,</div>
-<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>  <span class="keyword">const</span> std::string &amp;<a class="code hl_class" href="classait.html">call_site_id</a>,</div>
-<div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span>  <span class="keyword">const</span> <a class="code hl_class" href="classgenerate__function__bodiest.html">generate_function_bodiest</a> &amp;generate_function_body,</div>
-<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>  <a class="code hl_class" href="classgoto__modelt.html">goto_modelt</a> &amp;model,</div>
-<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>{</div>
-<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code hl_function" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(function_name, <a class="code hl_define" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a>));</div>
-<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">call_site_number</a> = <a class="code hl_function" href="string2int_8cpp.html#a1c8cff1720713d6244e6eee9dae01951">string2optional_size_t</a>(<a class="code hl_class" href="classait.html">call_site_id</a>);</div>
-<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<a class="code hl_class" href="classait.html">call_site_number</a>.has_value());</div>
-<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span> </div>
-<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span>  <a class="code hl_class" href="classmessaget.html">messaget</a> messages(message_handler);</div>
-<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span> </div>
-<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span>  <span class="keywordtype">bool</span> <a class="code hl_class" href="classait.html">found</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span>  <a class="code hl_class" href="classdstringt.html">irep_idt</a> <a class="code hl_class" href="classait.html">function_mode</a>;</div>
-<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span>  <a class="code hl_class" href="classtypet.html">typet</a> function_type;</div>
-<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span> </div>
-<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>  <span class="comment">// get the mode and type from symbol table</span></div>
-<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> <span class="keyword">const</span> &amp;<a class="code hl_class" href="classait.html">symbol_pair</a> : model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>)</div>
-<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span>  {</div>
-<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>    <span class="keyword">auto</span> <span class="keyword">const</span> symbol = <a class="code hl_class" href="classait.html">symbol_pair</a>.second;</div>
-<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>    <span class="keywordflow">if</span>(symbol.type.id() == <a class="code hl_class" href="classait.html">ID_code</a> &amp;&amp; symbol.name == function_name)</div>
-<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>    {</div>
-<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>      <a class="code hl_class" href="classait.html">function_mode</a> = symbol.mode;</div>
-<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>      function_type = symbol.type;</div>
-<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>      <a class="code hl_class" href="classait.html">found</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>    }</div>
-<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>  }</div>
-<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(<a class="code hl_class" href="classait.html">found</a>);</div>
-<div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span> </div>
-<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>  <span class="comment">// add function of the right name to the symbol table</span></div>
-<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>  <a class="code hl_class" href="classsymbolt.html">symbolt</a> <a class="code hl_class" href="classait.html">havoc_function_symbol</a>{};</div>
-<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span>  <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.name = <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.base_name =</div>
-<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>    <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.pretty_name = function_name + <span class="stringliteral">&quot;.&quot;</span> + <a class="code hl_class" href="classait.html">call_site_id</a>;</div>
-<div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span> </div>
-<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>  <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.is_lvalue = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>  <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.mode = <a class="code hl_class" href="classait.html">function_mode</a>;</div>
-<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span>  <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.type = function_type;</div>
-<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span> </div>
-<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span>  model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code hl_function" href="classsymbol__tablet.html#ae31d4f0e92ce44384499a7ccc147bd1c">insert</a>(<a class="code hl_class" href="classait.html">havoc_function_symbol</a>);</div>
-<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span> </div>
-<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span>  <span class="keyword">auto</span> <span class="keyword">const</span> &amp;<a class="code hl_class" href="classait.html">generated_havoc</a> =</div>
-<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span>    model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code hl_function" href="classsymbol__table__baset.html#adb7b416fd0828b026529c4e5aa44b917">lookup_ref</a>(<a class="code hl_class" href="classait.html">havoc_function_symbol</a>.name);</div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span> </div>
+<div class="foldopen" id="foldopen00540" data-start="{" data-end="}">
+<div class="line"><a id="l00540" name="l00540"></a><span class="lineno"><a class="line" href="generate__function__bodies_8cpp.html#a810838f021b21fac6c10fd83db5947a6">  540</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="generate__function__bodies_8cpp.html#a60bb8cb14af88846c48fb0c452908317">generate_function_bodies</a>(</div>
+<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>  <span class="keyword">const</span> std::string &amp;function_name,</div>
+<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>  <span class="keyword">const</span> std::string &amp;<a class="code hl_class" href="classait.html">call_site_id</a>,</div>
+<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>  <span class="keyword">const</span> <a class="code hl_class" href="classgenerate__function__bodiest.html">generate_function_bodiest</a> &amp;generate_function_body,</div>
+<div class="line"><a id="l00544" name="l00544"></a><span class="lineno">  544</span>  <a class="code hl_class" href="classgoto__modelt.html">goto_modelt</a> &amp;model,</div>
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno">  545</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span>{</div>
+<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(!<a class="code hl_function" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(function_name, <a class="code hl_define" href="cprover__prefix_8h.html#a5f537726f4fcb4d977cbd151c99a39df">CPROVER_PREFIX</a>));</div>
+<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">call_site_number</a> = <a class="code hl_function" href="string2int_8cpp.html#a1c8cff1720713d6244e6eee9dae01951">string2optional_size_t</a>(<a class="code hl_class" href="classait.html">call_site_id</a>);</div>
+<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#a64cf940b0e83b0486a300085ed000dee">PRECONDITION</a>(<a class="code hl_class" href="classait.html">call_site_number</a>.has_value());</div>
+<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span> </div>
+<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span>  <a class="code hl_class" href="classmessaget.html">messaget</a> messages(message_handler);</div>
+<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span> </div>
+<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span>  <span class="keywordtype">bool</span> <a class="code hl_class" href="classait.html">found</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00554" name="l00554"></a><span class="lineno">  554</span>  <a class="code hl_class" href="classdstringt.html">irep_idt</a> <a class="code hl_class" href="classait.html">function_mode</a>;</div>
+<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span>  <a class="code hl_class" href="classtypet.html">typet</a> function_type;</div>
+<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span> </div>
+<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>  <span class="comment">// get the mode and type from symbol table</span></div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> <span class="keyword">const</span> &amp;<a class="code hl_class" href="classait.html">symbol_pair</a> : model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>)</div>
+<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>  {</div>
+<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>    <span class="keyword">auto</span> <span class="keyword">const</span> symbol = <a class="code hl_class" href="classait.html">symbol_pair</a>.second;</div>
+<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>    <span class="keywordflow">if</span>(symbol.type.id() == <a class="code hl_class" href="classait.html">ID_code</a> &amp;&amp; symbol.name == function_name)</div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>    {</div>
+<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span>      <a class="code hl_class" href="classait.html">function_mode</a> = symbol.mode;</div>
+<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>      function_type = symbol.type;</div>
+<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>      <a class="code hl_class" href="classait.html">found</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>    }</div>
+<div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>  }</div>
+<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#a3846e19582b97ae45a1650a541cac0a2">CHECK_RETURN</a>(<a class="code hl_class" href="classait.html">found</a>);</div>
+<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span> </div>
+<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>  <span class="comment">// add function of the right name to the symbol table</span></div>
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span>  <a class="code hl_class" href="classsymbolt.html">symbolt</a> <a class="code hl_class" href="classait.html">havoc_function_symbol</a>{};</div>
+<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>  <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.name = <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.base_name =</div>
+<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>    <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.pretty_name = function_name + <span class="stringliteral">&quot;.&quot;</span> + <a class="code hl_class" href="classait.html">call_site_id</a>;</div>
+<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span> </div>
+<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span>  <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.is_lvalue = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span>  <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.mode = <a class="code hl_class" href="classait.html">function_mode</a>;</div>
+<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span>  <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.type = function_type;</div>
+<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span> </div>
+<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span>  model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code hl_function" href="classsymbol__tablet.html#ae31d4f0e92ce44384499a7ccc147bd1c">insert</a>(<a class="code hl_class" href="classait.html">havoc_function_symbol</a>);</div>
 <div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span> </div>
-<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span>  <span class="comment">// convert to get the function stub to goto-model</span></div>
-<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>  <a class="code hl_function" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>, message_handler);</div>
+<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span>  <span class="keyword">auto</span> <span class="keyword">const</span> &amp;<a class="code hl_class" href="classait.html">generated_havoc</a> =</div>
+<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>    model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>.<a class="code hl_function" href="classsymbol__table__baset.html#adb7b416fd0828b026529c4e5aa44b917">lookup_ref</a>(<a class="code hl_class" href="classait.html">havoc_function_symbol</a>.name);</div>
 <div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span> </div>
-<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span>  <span class="comment">// now generate body as above</span></div>
-<div class="line"><a id="l00586" name="l00586"></a><span class="lineno">  586</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;function : model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code hl_variable" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span>  {</div>
-<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span>    <span class="keywordflow">if</span>(</div>
-<div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span>      !function.second.body_available() &amp;&amp;</div>
-<div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span>      <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.name == <a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(function.first))</div>
-<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span>    {</div>
-<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>      generate_function_body.<a class="code hl_function" href="classgenerate__function__bodiest.html#a0dc1d2464d70f5cd633fb8ea277a7911">generate_function_body</a>(</div>
-<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span>        function.second, model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, function.first);</div>
-<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span>    }</div>
-<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>  }</div>
-<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span> </div>
-<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">is_havoc_function_call</a> = [&amp;function_name](<span class="keyword">const</span> <a class="code hl_class" href="classexprt.html">exprt</a> &amp;expr) {</div>
-<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span>    <span class="keywordflow">if</span>(expr.id() != <a class="code hl_class" href="classait.html">ID_symbol</a>)</div>
-<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span>    std::string <a class="code hl_class" href="classait.html">called_function_name</a> =</div>
-<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span>      <a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(<a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(expr).get_identifier());</div>
-<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">called_function_name</a> == function_name)</div>
-<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span> </div>
-<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span>    <span class="keywordflow">return</span> (<a class="code hl_function" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code hl_class" href="classait.html">called_function_name</a>, function_name + <span class="stringliteral">&quot;.&quot;</span>));</div>
-<div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span>  };</div>
+<div class="line"><a id="l00585" name="l00585"></a><span class="lineno">  585</span>  <span class="comment">// convert to get the function stub to goto-model</span></div>
+<div class="line"><a id="l00586" name="l00586"></a><span class="lineno">  586</span>  <a class="code hl_function" href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a>(model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>, message_handler);</div>
+<div class="line"><a id="l00587" name="l00587"></a><span class="lineno">  587</span> </div>
+<div class="line"><a id="l00588" name="l00588"></a><span class="lineno">  588</span>  <span class="comment">// now generate body as above</span></div>
+<div class="line"><a id="l00589" name="l00589"></a><span class="lineno">  589</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;function : model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code hl_variable" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a id="l00590" name="l00590"></a><span class="lineno">  590</span>  {</div>
+<div class="line"><a id="l00591" name="l00591"></a><span class="lineno">  591</span>    <span class="keywordflow">if</span>(</div>
+<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>      !function.second.body_available() &amp;&amp;</div>
+<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span>      <a class="code hl_class" href="classait.html">havoc_function_symbol</a>.name == <a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(function.first))</div>
+<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span>    {</div>
+<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>      generate_function_body.<a class="code hl_function" href="classgenerate__function__bodiest.html#a0dc1d2464d70f5cd633fb8ea277a7911">generate_function_body</a>(</div>
+<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>        function.second, model.<a class="code hl_variable" href="classgoto__modelt.html#aa4063c1728aada83299deb1296363803">symbol_table</a>, function.first);</div>
+<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>    }</div>
+<div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span>  }</div>
+<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span> </div>
+<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">is_havoc_function_call</a> = [&amp;function_name](<span class="keyword">const</span> <a class="code hl_class" href="classexprt.html">exprt</a> &amp;expr) {</div>
+<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span>    <span class="keywordflow">if</span>(expr.id() != <a class="code hl_class" href="classait.html">ID_symbol</a>)</div>
+<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span>    std::string <a class="code hl_class" href="classait.html">called_function_name</a> =</div>
+<div class="line"><a id="l00604" name="l00604"></a><span class="lineno">  604</span>      <a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(<a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(expr).get_identifier());</div>
+<div class="line"><a id="l00605" name="l00605"></a><span class="lineno">  605</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">called_function_name</a> == function_name)</div>
+<div class="line"><a id="l00606" name="l00606"></a><span class="lineno">  606</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00607" name="l00607"></a><span class="lineno">  607</span> </div>
-<div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span>  <span class="comment">// finally, rename the (right) call site</span></div>
-<div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span>  std::size_t counter = 0;</div>
-<div class="line"><a id="l00610" name="l00610"></a><span class="lineno">  610</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;function : model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code hl_variable" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a id="l00611" name="l00611"></a><span class="lineno">  611</span>  {</div>
-<div class="line"><a id="l00612" name="l00612"></a><span class="lineno">  612</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;instruction : function.second.body.instructions)</div>
-<div class="line"><a id="l00613" name="l00613"></a><span class="lineno">  613</span>    {</div>
-<div class="line"><a id="l00614" name="l00614"></a><span class="lineno">  614</span>      <span class="keywordflow">if</span>(instruction.is_function_call())</div>
-<div class="line"><a id="l00615" name="l00615"></a><span class="lineno">  615</span>      {</div>
-<div class="line"><a id="l00616" name="l00616"></a><span class="lineno">  616</span>        <span class="keyword">auto</span> &amp;called_function = instruction.call_function();</div>
-<div class="line"><a id="l00617" name="l00617"></a><span class="lineno">  617</span>        <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">is_havoc_function_call</a>(called_function))</div>
-<div class="line"><a id="l00618" name="l00618"></a><span class="lineno">  618</span>        {</div>
-<div class="line"><a id="l00619" name="l00619"></a><span class="lineno">  619</span>          <span class="keywordflow">if</span>(++counter == *<a class="code hl_class" href="classait.html">call_site_number</a>)</div>
-<div class="line"><a id="l00620" name="l00620"></a><span class="lineno">  620</span>          {</div>
-<div class="line"><a id="l00621" name="l00621"></a><span class="lineno">  621</span>            called_function = <a class="code hl_class" href="classait.html">generated_havoc</a>.symbol_expr();</div>
-<div class="line"><a id="l00622" name="l00622"></a><span class="lineno">  622</span>            <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span>          }</div>
-<div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span>        }</div>
-<div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span>      }</div>
-<div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span>    }</div>
-<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span>  }</div>
-<div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span>}</div>
+<div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span>    <span class="keywordflow">return</span> (<a class="code hl_function" href="converter_8cpp.html#ad8e2b943a39300fa9ca5cd4b40266848">has_prefix</a>(<a class="code hl_class" href="classait.html">called_function_name</a>, function_name + <span class="stringliteral">&quot;.&quot;</span>));</div>
+<div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span>  };</div>
+<div class="line"><a id="l00610" name="l00610"></a><span class="lineno">  610</span> </div>
+<div class="line"><a id="l00611" name="l00611"></a><span class="lineno">  611</span>  <span class="comment">// finally, rename the (right) call site</span></div>
+<div class="line"><a id="l00612" name="l00612"></a><span class="lineno">  612</span>  std::size_t counter = 0;</div>
+<div class="line"><a id="l00613" name="l00613"></a><span class="lineno">  613</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;function : model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>.<a class="code hl_variable" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a id="l00614" name="l00614"></a><span class="lineno">  614</span>  {</div>
+<div class="line"><a id="l00615" name="l00615"></a><span class="lineno">  615</span>    <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;instruction : function.second.body.instructions)</div>
+<div class="line"><a id="l00616" name="l00616"></a><span class="lineno">  616</span>    {</div>
+<div class="line"><a id="l00617" name="l00617"></a><span class="lineno">  617</span>      <span class="keywordflow">if</span>(instruction.is_function_call())</div>
+<div class="line"><a id="l00618" name="l00618"></a><span class="lineno">  618</span>      {</div>
+<div class="line"><a id="l00619" name="l00619"></a><span class="lineno">  619</span>        <span class="keyword">auto</span> &amp;called_function = instruction.call_function();</div>
+<div class="line"><a id="l00620" name="l00620"></a><span class="lineno">  620</span>        <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">is_havoc_function_call</a>(called_function))</div>
+<div class="line"><a id="l00621" name="l00621"></a><span class="lineno">  621</span>        {</div>
+<div class="line"><a id="l00622" name="l00622"></a><span class="lineno">  622</span>          <span class="keywordflow">if</span>(++counter == *<a class="code hl_class" href="classait.html">call_site_number</a>)</div>
+<div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span>          {</div>
+<div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span>            called_function = <a class="code hl_class" href="classait.html">generated_havoc</a>.symbol_expr();</div>
+<div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span>          }</div>
+<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span>        }</div>
+<div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span>      }</div>
+<div class="line"><a id="l00629" name="l00629"></a><span class="lineno">  629</span>    }</div>
+<div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span>  }</div>
+<div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span>}</div>
 </div>
 <div class="ttc" id="aallocate__objects_8h_html_aef2674dc0460f626c48668130d60b964a0fcc90da4811c877ba9f9c12f7d60bc9"><div class="ttname"><a href="allocate__objects_8h.html#aef2674dc0460f626c48668130d60b964a0fcc90da4811c877ba9f9c12f7d60bc9">lifetimet::DYNAMIC</a></div><div class="ttdeci">@ DYNAMIC</div><div class="ttdoc">Allocate dynamic objects (using ALLOCATE)</div></div>
 <div class="ttc" id="ac__nondet__symbol__factory_8h_html"><div class="ttname"><a href="c__nondet__symbol__factory_8h.html">c_nondet_symbol_factory.h</a></div><div class="ttdoc">C Nondet Symbol Factory.</div></div>
@@ -844,7 +845,7 @@ $(document).ready(function(){initNavTree('generate__function__bodies_8cpp_source
 <div class="ttc" id="afresh__symbol_8cpp_html_a4b4b77b029e799764cdd07acfd6f0989"><div class="ttname"><a href="fresh__symbol_8cpp.html#a4b4b77b029e799764cdd07acfd6f0989">get_fresh_aux_symbol</a></div><div class="ttdeci">symbolt &amp; get_fresh_aux_symbol(const typet &amp;type, const std::string &amp;name_prefix, const std::string &amp;basename_prefix, const source_locationt &amp;source_location, const irep_idt &amp;symbol_mode, const namespacet &amp;ns, symbol_table_baset &amp;symbol_table)</div><div class="ttdoc">Installs a fresh-named symbol with respect to the given namespace ns with the requested name pattern ...</div><div class="ttdef"><b>Definition</b> <a href="fresh__symbol_8cpp_source.html#l00032">fresh_symbol.cpp:32</a></div></div>
 <div class="ttc" id="afresh__symbol_8h_html"><div class="ttname"><a href="fresh__symbol_8h.html">fresh_symbol.h</a></div><div class="ttdoc">Fresh auxiliary symbol creation.</div></div>
 <div class="ttc" id="agenerate__function__bodies_8cpp_html_a513e88cf04ede5ca3d59a7b2244aea35"><div class="ttname"><a href="generate__function__bodies_8cpp.html#a513e88cf04ede5ca3d59a7b2244aea35">generate_function_bodies_factory</a></div><div class="ttdeci">std::unique_ptr&lt; generate_function_bodiest &gt; generate_function_bodies_factory(const std::string &amp;options, const c_object_factory_parameterst &amp;object_factory_parameters, const symbol_tablet &amp;symbol_table, message_handlert &amp;message_handler)</div><div class="ttdoc">Create the type that actually generates the functions.</div><div class="ttdef"><b>Definition</b> <a href="generate__function__bodies_8cpp_source.html#l00375">generate_function_bodies.cpp:375</a></div></div>
-<div class="ttc" id="agenerate__function__bodies_8cpp_html_acc11ceb1751784de46b67c46cbde6c3d"><div class="ttname"><a href="generate__function__bodies_8cpp.html#acc11ceb1751784de46b67c46cbde6c3d">generate_function_bodies</a></div><div class="ttdeci">void generate_function_bodies(const std::regex &amp;functions_regex, const generate_function_bodiest &amp;generate_function_body, goto_modelt &amp;model, message_handlert &amp;message_handler)</div><div class="ttdoc">Generate function bodies with some default behavior: assert-false, assume-false, assert-false-assume-...</div><div class="ttdef"><b>Definition</b> <a href="generate__function__bodies_8cpp_source.html#l00501">generate_function_bodies.cpp:501</a></div></div>
+<div class="ttc" id="agenerate__function__bodies_8cpp_html_a60bb8cb14af88846c48fb0c452908317"><div class="ttname"><a href="generate__function__bodies_8cpp.html#a60bb8cb14af88846c48fb0c452908317">generate_function_bodies</a></div><div class="ttdeci">void generate_function_bodies(const std::regex &amp;functions_regex, const generate_function_bodiest &amp;generate_function_body, goto_modelt &amp;model, message_handlert &amp;message_handler, bool ignore_no_match)</div><div class="ttdoc">Generate function bodies with some default behavior: assert-false, assume-false, assert-false-assume-...</div><div class="ttdef"><b>Definition</b> <a href="generate__function__bodies_8cpp_source.html#l00503">generate_function_bodies.cpp:503</a></div></div>
 <div class="ttc" id="agenerate__function__bodies_8h_html"><div class="ttname"><a href="generate__function__bodies_8h.html">generate_function_bodies.h</a></div></div>
 <div class="ttc" id="agoto__convert_8cpp_html_a0b2fdcf00509d08b762b33e0eae67278"><div class="ttname"><a href="goto__convert_8cpp.html#a0b2fdcf00509d08b762b33e0eae67278">goto_convert</a></div><div class="ttdeci">void goto_convert(const codet &amp;code, symbol_table_baset &amp;symbol_table, goto_programt &amp;dest, message_handlert &amp;message_handler, const irep_idt &amp;mode)</div><div class="ttdef"><b>Definition</b> <a href="goto__convert_8cpp_source.html#l02189">goto_convert.cpp:2189</a></div></div>
 <div class="ttc" id="agoto__convert_8h_html"><div class="ttname"><a href="goto__convert_8h.html">goto_convert.h</a></div><div class="ttdoc">Program Transformation.</div></div>
