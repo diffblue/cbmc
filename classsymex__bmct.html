@@ -120,7 +120,7 @@ $(document).ready(function(){initNavTree('classsymex__bmct.html',''); initResiza
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classsymex__bmct__coll__graph.svg" width="2571" height="1780"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classsymex__bmct__coll__graph.svg" width="2584" height="1924"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
@@ -186,8 +186,6 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a75a8006c713c4be2cc52f95ed45a47de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae028002ec8b7b6c13dece37a957d4f89" id="r_ae028002ec8b7b6c13dece37a957d4f89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__bmct.html#ae028002ec8b7b6c13dece37a957d4f89">record_coverage</a></td></tr>
 <tr class="separator:ae028002ec8b7b6c13dece37a957d4f89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a4a7a193bb627a7209c3b10fa904c63" id="r_a4a4a7a193bb627a7209c3b10fa904c63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classunwindsett.html">unwindsett</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__bmct.html#a4a4a7a193bb627a7209c3b10fa904c63">unwindset</a></td></tr>
-<tr class="separator:a4a4a7a193bb627a7209c3b10fa904c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_classgoto__symext"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classgoto__symext')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classgoto__symext.html">goto_symext</a></td></tr>
 <tr class="memitem:ad38add6f5dd9dcbfbce5e3b6c37f8efc inherit pub_attribs_classgoto__symext" id="r_ad38add6f5dd9dcbfbce5e3b6c37f8efc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#ad38add6f5dd9dcbfbce5e3b6c37f8efc">should_pause_symex</a></td></tr>
 <tr class="memdesc:ad38add6f5dd9dcbfbce5e3b6c37f8efc inherit pub_attribs_classgoto__symext"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set when states are pushed onto the workqueue If this flag is set at the end of a symbolic execution run, it means that symbolic execution has been paused because we encountered a GOTO instruction while doing path exploration, and thus pushed the successor states of the GOTO onto path_storage.  <br /></td></tr>
@@ -422,6 +420,8 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
+<tr class="memitem:a4a4a7a193bb627a7209c3b10fa904c63" id="r_a4a4a7a193bb627a7209c3b10fa904c63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classunwindsett.html">unwindsett</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__bmct.html#a4a4a7a193bb627a7209c3b10fa904c63">unwindset</a></td></tr>
+<tr class="separator:a4a4a7a193bb627a7209c3b10fa904c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a394cee46306c88e7b0a136f3e975245b" id="r_a394cee46306c88e7b0a136f3e975245b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classsymex__bmct.html#a6163a633f38884fc4392859d179378d5">loop_unwind_handlert</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsymex__bmct.html#a394cee46306c88e7b0a136f3e975245b">loop_unwind_handlers</a></td></tr>
 <tr class="memdesc:a394cee46306c88e7b0a136f3e975245b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callbacks that may provide an unwind/do-not-unwind decision for a loop.  <br /></td></tr>
 <tr class="separator:a394cee46306c88e7b0a136f3e975245b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1010,14 +1010,22 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classunwindsett.html">unwindsett</a>&amp; symex_bmct::unwindset</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symex__bmc_8h_source.html#l00084">84</a> of file <a class="el" href="symex__bmc_8h_source.html">symex_bmc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symex__bmc_8h_source.html#l00085">85</a> of file <a class="el" href="symex__bmc_8h_source.html">symex_bmc.h</a>.</p>
 
 </div>
 </div>

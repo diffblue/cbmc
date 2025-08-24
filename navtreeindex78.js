@@ -1,6 +1,5 @@
 var NAVTREEINDEX78 =
 {
-"dfcc__wrapper__program_8cpp_source.html":[8,0,2,15,1,1,48],
 "dfcc__wrapper__program_8h.html":[8,0,2,15,1,1,49],
 "dfcc__wrapper__program_8h_source.html":[8,0,2,15,1,1,49],
 "dimacs__cnf_8cpp.html":[8,0,2,27,7,4],
@@ -249,5 +248,6 @@ var NAVTREEINDEX78 =
 "escape__analysis_8h_source.html":[8,0,2,0,26],
 "event__graph_8cpp.html":[8,0,2,15,2,5],
 "event__graph_8cpp.html#a0422b2b1eb0bb8c05dc7b99d3115f0c0":[8,0,2,15,2,5,2],
-"event__graph_8cpp.html#a45a250d49a988fb2b4e82b956f94f619":[8,0,2,15,2,5,0]
+"event__graph_8cpp.html#a45a250d49a988fb2b4e82b956f94f619":[8,0,2,15,2,5,0],
+"event__graph_8cpp.html#acea6188975bc4f489c19037e70a153b7":[8,0,2,15,2,5,1]
 };

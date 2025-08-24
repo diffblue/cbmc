@@ -135,215 +135,219 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 </div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
 <div class="foldopen" id="foldopen00029" data-start="{" data-end="}">
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classunwindsett.html#a3307f9d27beb3d69fd77e15933ca68b6">   29</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classunwindsett.html#a3307f9d27beb3d69fd77e15933ca68b6">unwindsett::parse_unwindset_one_loop</a>(</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classunwindsett.html#a29cae2ae0d03187253ba3cf49f4b11b0">   29</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classunwindsett.html#a29cae2ae0d03187253ba3cf49f4b11b0">unwindsett::parse_unwindset_one_loop</a>(</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  std::string <a class="code hl_class" href="classait.html">val</a>,</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>{</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">val</a>.empty())</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  std::optional&lt;unsigned&gt; thread_nr;</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  <span class="keywordflow">if</span>(<a class="code hl_function" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(<a class="code hl_class" href="classait.html">val</a>[0]))</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  {</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">c_pos</a> = <a class="code hl_class" href="classait.html">val</a>.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">c_pos</a> != std::string::npos)</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    {</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>      std::string <a class="code hl_class" href="classait.html">nr</a> = <a class="code hl_class" href="classait.html">val</a>.substr(0, <a class="code hl_class" href="classait.html">c_pos</a>);</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>      thread_nr = <a class="code hl_function" href="string2int_8cpp.html#abd0138cd96b5cc4443e92503dd580bc8">unsafe_string2unsigned</a>(<a class="code hl_class" href="classait.html">nr</a>);</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>      <a class="code hl_class" href="classait.html">val</a>.erase(0, <a class="code hl_class" href="classait.html">nr</a>.size() + 1);</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    }</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>  }</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">last_c_pos</a> = <a class="code hl_class" href="classait.html">val</a>.rfind(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">last_c_pos</a> != std::string::npos)</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  {</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    std::string <span class="keywordtype">id</span> = <a class="code hl_class" href="classait.html">val</a>.substr(0, <a class="code hl_class" href="classait.html">last_c_pos</a>);</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="comment">// The loop id can take three forms:</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="comment">// 1) Just a function name to limit recursion.</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="comment">// 2) F.N where F is a function name and N is a loop number.</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="comment">// 3) F.L where F is a function name and L is a label.</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keyword">const</span> <a class="code hl_class" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table = <a class="code hl_variable" href="classunwindsett.html#a965e53d6124668a1d4b59be398c5cdc7">goto_model</a>.<a class="code hl_function" href="classabstract__goto__modelt.html#a98020931a711776ce9448acf41ef532c">get_symbol_table</a>();</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keyword">const</span> <a class="code hl_class" href="classsymbolt.html">symbolt</a> *<a class="code hl_class" href="classait.html">maybe_fn</a> = symbol_table.<a class="code hl_function" href="classsymbol__table__baset.html#a32444b16e7057a36f72e450aeabb0183">lookup</a>(<span class="keywordtype">id</span>);</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">maybe_fn</a> &amp;&amp; <a class="code hl_class" href="classait.html">maybe_fn</a>-&gt;type.id() == <a class="code hl_class" href="classait.html">ID_code</a>)</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    {</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>      <span class="comment">// ok, recursion limit</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    }</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    {</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>      <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">last_dot_pos</a> = <a class="code hl_class" href="classait.html">val</a>.rfind(<span class="charliteral">&#39;.&#39;</span>);</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>      <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">last_dot_pos</a> == std::string::npos)</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>      {</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>{</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>          <span class="stringliteral">&quot;invalid loop identifier &quot;</span> + id, <span class="stringliteral">&quot;unwindset&quot;</span>};</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>      }</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>      std::string function_id = <span class="keywordtype">id</span>.substr(0, <a class="code hl_class" href="classait.html">last_dot_pos</a>);</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      std::string <a class="code hl_class" href="classait.html">loop_nr_label</a> = <span class="keywordtype">id</span>.substr(<a class="code hl_class" href="classait.html">last_dot_pos</a> + 1);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">loop_nr_label</a>.empty())</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      {</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>{</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>          <span class="stringliteral">&quot;invalid loop identifier &quot;</span> + id, <span class="stringliteral">&quot;unwindset&quot;</span>};</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>      }</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>      <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classunwindsett.html#a965e53d6124668a1d4b59be398c5cdc7">goto_model</a>.<a class="code hl_function" href="classabstract__goto__modelt.html#a6f99b3d8d5a53ba4ea6494863376c8a9">can_produce_function</a>(function_id))</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>      {</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        <a class="code hl_class" href="classmessaget.html">messaget</a> <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.warning() &lt;&lt; <span class="stringliteral">&quot;loop identifier &quot;</span> &lt;&lt; <span class="keywordtype">id</span></div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>                      &lt;&lt; <span class="stringliteral">&quot; for non-existent function provided with unwindset&quot;</span></div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                      &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>      }</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>      <span class="keyword">const</span> <a class="code hl_class" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function =</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        <a class="code hl_variable" href="classunwindsett.html#a965e53d6124668a1d4b59be398c5cdc7">goto_model</a>.<a class="code hl_function" href="classabstract__goto__modelt.html#a78b078f9c86479cca30fe48ee18b1ff2">get_goto_function</a>(function_id);</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(<a class="code hl_class" href="classait.html">loop_nr_label</a>[0]))</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>      {</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">nr</a> = <a class="code hl_function" href="string2int_8cpp.html#ae2f17603a549285adb39f1d3f5f13a29">string2optional_unsigned</a>(<a class="code hl_class" href="classait.html">loop_nr_label</a>);</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">nr</a>.has_value())</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        {</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>          <span class="keywordflow">throw</span> <a class="code hl_class" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>{</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>            <span class="stringliteral">&quot;invalid loop identifier &quot;</span> + id, <span class="stringliteral">&quot;unwindset&quot;</span>};</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        }</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="keywordtype">bool</span> <a class="code hl_class" href="classait.html">found</a> = std::any_of(</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>          goto_function.<a class="code hl_variable" href="classgoto__functiont.html#a2374f74a53fbd62d61a683fc6d4b5a62">body</a>.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin(),</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>          goto_function.<a class="code hl_variable" href="classgoto__functiont.html#a2374f74a53fbd62d61a683fc6d4b5a62">body</a>.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end(),</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>          [&amp;<a class="code hl_class" href="classait.html">nr</a>](<span class="keyword">const</span> <a class="code hl_class" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;instruction) {</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>            return instruction.is_backwards_goto() &amp;&amp;</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>                   instruction.loop_number == nr;</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>          });</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">found</a>)</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        {</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>          <a class="code hl_class" href="classmessaget.html">messaget</a> <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>          <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.warning() &lt;&lt; <span class="stringliteral">&quot;loop identifier &quot;</span> &lt;&lt; <span class="keywordtype">id</span></div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>                        &lt;&lt; <span class="stringliteral">&quot; provided with unwindset does not match any loop&quot;</span></div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                        &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>          <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        }</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>      }</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      {</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        std::optional&lt;unsigned&gt; <a class="code hl_class" href="classait.html">nr</a>;</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        std::optional&lt;source_locationt&gt; location;</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : goto_function.<a class="code hl_variable" href="classgoto__functiont.html#a2374f74a53fbd62d61a683fc6d4b5a62">body</a>.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        {</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>          <span class="keywordflow">if</span>(</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>            std::find(</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>              instruction.labels.begin(),</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>              instruction.labels.end(),</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>              <a class="code hl_class" href="classait.html">loop_nr_label</a>) != instruction.labels.end())</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>          {</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>            location = instruction.source_location();</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>            <span class="comment">// the label may be attached to the DECL part of an initializing</span></div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>            <span class="comment">// declaration, which we may have marked as hidden</span></div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>            location-&gt;remove(<a class="code hl_class" href="classait.html">ID_hide</a>);</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>          }</div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>          <span class="keywordflow">if</span>(</div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>            location.has_value() &amp;&amp; instruction.is_backwards_goto() &amp;&amp;</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>            instruction.source_location() == *location)</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>          {</div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>            <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">nr</a>.has_value())</div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>            {</div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>              <a class="code hl_class" href="classmessaget.html">messaget</a> <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>              <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.warning()</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>                &lt;&lt; <span class="stringliteral">&quot;loop identifier &quot;</span> &lt;&lt; <span class="keywordtype">id</span></div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>                &lt;&lt; <span class="stringliteral">&quot; provided with unwindset is ambiguous&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>            }</div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>            <a class="code hl_class" href="classait.html">nr</a> = instruction.loop_number;</div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>          }</div>
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>        }</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">nr</a>.has_value())</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        {</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>          <a class="code hl_class" href="classmessaget.html">messaget</a> <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>          <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.warning() &lt;&lt; <span class="stringliteral">&quot;loop identifier &quot;</span> &lt;&lt; <span class="keywordtype">id</span></div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>                        &lt;&lt; <span class="stringliteral">&quot; provided with unwindset does not match any loop&quot;</span></div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>                        &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>          <span class="keywordflow">return</span>;</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        }</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>          <span class="keywordtype">id</span> = function_id + <span class="stringliteral">&quot;.&quot;</span> + std::to_string(*<a class="code hl_class" href="classait.html">nr</a>);</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>      }</div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>    }</div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    std::string <a class="code hl_class" href="classait.html">uw_string</a> = <a class="code hl_class" href="classait.html">val</a>.substr(<a class="code hl_class" href="classait.html">last_c_pos</a> + 1);</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span> </div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    <span class="comment">// the below initialisation makes g++-5 happy</span></div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    std::optional&lt;unsigned&gt; <a class="code hl_class" href="classait.html">uw</a>(0);</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">uw_string</a>.empty())</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>      <a class="code hl_class" href="classait.html">uw</a> = {};</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>      <a class="code hl_class" href="classait.html">uw</a> = <a class="code hl_function" href="string2int_8cpp.html#abd0138cd96b5cc4443e92503dd580bc8">unsafe_string2unsigned</a>(<a class="code hl_class" href="classait.html">uw_string</a>);</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span> </div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    <span class="keywordflow">if</span>(thread_nr.has_value())</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    {</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>      <a class="code hl_variable" href="classunwindsett.html#a78e2abc265be9d9f0c1c32334914833c">thread_loop_map</a>[std::pair&lt;irep_idt, unsigned&gt;(<span class="keywordtype">id</span>, *thread_nr)] = <a class="code hl_class" href="classait.html">uw</a>;</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    }</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    {</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>      <a class="code hl_variable" href="classunwindsett.html#a05c9336ffcfa98048cb54101e636a865">loop_map</a>[id] = <a class="code hl_class" href="classait.html">uw</a>;</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    }</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>  }</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>}</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  <a class="code hl_class" href="classabstract__goto__modelt.html">abstract_goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>{</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">val</a>.empty())</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  std::optional&lt;unsigned&gt; thread_nr;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  <span class="keywordflow">if</span>(<a class="code hl_function" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(<a class="code hl_class" href="classait.html">val</a>[0]))</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">c_pos</a> = <a class="code hl_class" href="classait.html">val</a>.find(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">c_pos</a> != std::string::npos)</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>      std::string <a class="code hl_class" href="classait.html">nr</a> = <a class="code hl_class" href="classait.html">val</a>.substr(0, <a class="code hl_class" href="classait.html">c_pos</a>);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>      thread_nr = <a class="code hl_function" href="string2int_8cpp.html#abd0138cd96b5cc4443e92503dd580bc8">unsafe_string2unsigned</a>(<a class="code hl_class" href="classait.html">nr</a>);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>      <a class="code hl_class" href="classait.html">val</a>.erase(0, <a class="code hl_class" href="classait.html">nr</a>.size() + 1);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    }</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  }</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">last_c_pos</a> = <a class="code hl_class" href="classait.html">val</a>.rfind(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">last_c_pos</a> != std::string::npos)</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  {</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    std::string <span class="keywordtype">id</span> = <a class="code hl_class" href="classait.html">val</a>.substr(0, <a class="code hl_class" href="classait.html">last_c_pos</a>);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <span class="comment">// The loop id can take three forms:</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="comment">// 1) Just a function name to limit recursion.</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="comment">// 2) F.N where F is a function name and N is a loop number.</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="comment">// 3) F.L where F is a function name and L is a label.</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keyword">const</span> <a class="code hl_class" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table = goto_model.<a class="code hl_function" href="classabstract__goto__modelt.html#a98020931a711776ce9448acf41ef532c">get_symbol_table</a>();</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keyword">const</span> <a class="code hl_class" href="classsymbolt.html">symbolt</a> *<a class="code hl_class" href="classait.html">maybe_fn</a> = symbol_table.<a class="code hl_function" href="classsymbol__table__baset.html#a32444b16e7057a36f72e450aeabb0183">lookup</a>(<span class="keywordtype">id</span>);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">maybe_fn</a> &amp;&amp; <a class="code hl_class" href="classait.html">maybe_fn</a>-&gt;type.id() == <a class="code hl_class" href="classait.html">ID_code</a>)</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    {</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>      <span class="comment">// ok, recursion limit</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    }</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    {</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>      <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">last_dot_pos</a> = <a class="code hl_class" href="classait.html">val</a>.rfind(<span class="charliteral">&#39;.&#39;</span>);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>      <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">last_dot_pos</a> == std::string::npos)</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>      {</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>{</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>          <span class="stringliteral">&quot;invalid loop identifier &quot;</span> + id, <span class="stringliteral">&quot;unwindset&quot;</span>};</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>      }</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      std::string function_id = <span class="keywordtype">id</span>.substr(0, <a class="code hl_class" href="classait.html">last_dot_pos</a>);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>      std::string <a class="code hl_class" href="classait.html">loop_nr_label</a> = <span class="keywordtype">id</span>.substr(<a class="code hl_class" href="classait.html">last_dot_pos</a> + 1);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">loop_nr_label</a>.empty())</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>      {</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>{</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>          <span class="stringliteral">&quot;invalid loop identifier &quot;</span> + id, <span class="stringliteral">&quot;unwindset&quot;</span>};</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>      }</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>      <span class="keywordflow">if</span>(!goto_model.<a class="code hl_function" href="classabstract__goto__modelt.html#a6f99b3d8d5a53ba4ea6494863376c8a9">can_produce_function</a>(function_id))</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>      {</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <a class="code hl_class" href="classmessaget.html">messaget</a> <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.warning() &lt;&lt; <span class="stringliteral">&quot;loop identifier &quot;</span> &lt;&lt; <span class="keywordtype">id</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                      &lt;&lt; <span class="stringliteral">&quot; for non-existent function provided with unwindset&quot;</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>                      &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>      }</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>      <span class="keyword">const</span> <a class="code hl_class" href="classgoto__functiont.html">goto_functiont</a> &amp;goto_function =</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        goto_model.<a class="code hl_function" href="classabstract__goto__modelt.html#a78b078f9c86479cca30fe48ee18b1ff2">get_goto_function</a>(function_id);</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a>(<a class="code hl_class" href="classait.html">loop_nr_label</a>[0]))</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>      {</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">nr</a> = <a class="code hl_function" href="string2int_8cpp.html#ae2f17603a549285adb39f1d3f5f13a29">string2optional_unsigned</a>(<a class="code hl_class" href="classait.html">loop_nr_label</a>);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">nr</a>.has_value())</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        {</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>          <span class="keywordflow">throw</span> <a class="code hl_class" href="classinvalid__command__line__argument__exceptiont.html">invalid_command_line_argument_exceptiont</a>{</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>            <span class="stringliteral">&quot;invalid loop identifier &quot;</span> + id, <span class="stringliteral">&quot;unwindset&quot;</span>};</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        }</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="keywordtype">bool</span> <a class="code hl_class" href="classait.html">found</a> = std::any_of(</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>          goto_function.<a class="code hl_variable" href="classgoto__functiont.html#a2374f74a53fbd62d61a683fc6d4b5a62">body</a>.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin(),</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>          goto_function.<a class="code hl_variable" href="classgoto__functiont.html#a2374f74a53fbd62d61a683fc6d4b5a62">body</a>.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end(),</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>          [&amp;<a class="code hl_class" href="classait.html">nr</a>](<span class="keyword">const</span> <a class="code hl_class" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;instruction) {</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>            return instruction.is_backwards_goto() &amp;&amp;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>                   instruction.loop_number == nr;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>          });</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">found</a>)</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        {</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>          <a class="code hl_class" href="classmessaget.html">messaget</a> <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>          <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.warning() &lt;&lt; <span class="stringliteral">&quot;loop identifier &quot;</span> &lt;&lt; <span class="keywordtype">id</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                        &lt;&lt; <span class="stringliteral">&quot; provided with unwindset does not match any loop&quot;</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>                        &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>          <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        }</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      }</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>      {</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        std::optional&lt;unsigned&gt; <a class="code hl_class" href="classait.html">nr</a>;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        std::optional&lt;source_locationt&gt; location;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : goto_function.<a class="code hl_variable" href="classgoto__functiont.html#a2374f74a53fbd62d61a683fc6d4b5a62">body</a>.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        {</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>          <span class="keywordflow">if</span>(</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>            std::find(</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>              instruction.labels.begin(),</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>              instruction.labels.end(),</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>              <a class="code hl_class" href="classait.html">loop_nr_label</a>) != instruction.labels.end())</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>          {</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>            location = instruction.source_location();</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>            <span class="comment">// the label may be attached to the DECL part of an initializing</span></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>            <span class="comment">// declaration, which we may have marked as hidden</span></div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>            location-&gt;remove(<a class="code hl_class" href="classait.html">ID_hide</a>);</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>          }</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>          <span class="keywordflow">if</span>(</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>            location.has_value() &amp;&amp; instruction.is_backwards_goto() &amp;&amp;</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>            instruction.source_location() == *location)</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>          {</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>            <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">nr</a>.has_value())</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>            {</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>              <a class="code hl_class" href="classmessaget.html">messaget</a> <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>              <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.warning()</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>                &lt;&lt; <span class="stringliteral">&quot;loop identifier &quot;</span> &lt;&lt; <span class="keywordtype">id</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>                &lt;&lt; <span class="stringliteral">&quot; provided with unwindset is ambiguous&quot;</span> &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>            }</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>            <a class="code hl_class" href="classait.html">nr</a> = instruction.loop_number;</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>          }</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        }</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">nr</a>.has_value())</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        {</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>          <a class="code hl_class" href="classmessaget.html">messaget</a> <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>{message_handler};</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>          <a class="code hl_function" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>.warning() &lt;&lt; <span class="stringliteral">&quot;loop identifier &quot;</span> &lt;&lt; <span class="keywordtype">id</span></div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>                        &lt;&lt; <span class="stringliteral">&quot; provided with unwindset does not match any loop&quot;</span></div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>                        &lt;&lt; <a class="code hl_variable" href="classmessaget.html#af53bf1a50370a1e7ad55df9dd0e6fdd0">messaget::eom</a>;</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>          <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        }</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>          <span class="keywordtype">id</span> = function_id + <span class="stringliteral">&quot;.&quot;</span> + std::to_string(*<a class="code hl_class" href="classait.html">nr</a>);</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>      }</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    }</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    std::string <a class="code hl_class" href="classait.html">uw_string</a> = <a class="code hl_class" href="classait.html">val</a>.substr(<a class="code hl_class" href="classait.html">last_c_pos</a> + 1);</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span> </div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    <span class="comment">// the below initialisation makes g++-5 happy</span></div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    std::optional&lt;unsigned&gt; <a class="code hl_class" href="classait.html">uw</a>(0);</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">uw_string</a>.empty())</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>      <a class="code hl_class" href="classait.html">uw</a> = {};</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>      <a class="code hl_class" href="classait.html">uw</a> = <a class="code hl_function" href="string2int_8cpp.html#abd0138cd96b5cc4443e92503dd580bc8">unsafe_string2unsigned</a>(<a class="code hl_class" href="classait.html">uw_string</a>);</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    <span class="keywordflow">if</span>(thread_nr.has_value())</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    {</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>      <a class="code hl_variable" href="classunwindsett.html#a78e2abc265be9d9f0c1c32334914833c">thread_loop_map</a>[std::pair&lt;irep_idt, unsigned&gt;(<span class="keywordtype">id</span>, *thread_nr)] = <a class="code hl_class" href="classait.html">uw</a>;</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    }</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    {</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>      <a class="code hl_variable" href="classunwindsett.html#a05c9336ffcfa98048cb54101e636a865">loop_map</a>[id] = <a class="code hl_class" href="classait.html">uw</a>;</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    }</div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>  }</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>}</div>
 </div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span> </div>
-<div class="foldopen" id="foldopen00182" data-start="{" data-end="}">
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno"><a class="line" href="classunwindsett.html#aae4a4878d4234816708a4861f17420c3">  182</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classunwindsett.html#aae4a4878d4234816708a4861f17420c3">unwindsett::parse_unwindset</a>(</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>  <span class="keyword">const</span> std::list&lt;std::string&gt; &amp;unwindset,</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>{</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;element : unwindset)</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <a class="code hl_function" href="classunwindsett.html#a3307f9d27beb3d69fd77e15933ca68b6">parse_unwindset_one_loop</a>(element, message_handler);</div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>}</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span> </div>
+<div class="foldopen" id="foldopen00183" data-start="{" data-end="}">
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno"><a class="line" href="classunwindsett.html#a5d0407a7733138b58595b02bee9d8f97">  183</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classunwindsett.html#a5d0407a7733138b58595b02bee9d8f97">unwindsett::parse_unwindset</a>(</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>  <span class="keyword">const</span> std::list&lt;std::string&gt; &amp;unwindset,</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>  <a class="code hl_class" href="classabstract__goto__modelt.html">abstract_goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>{</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;element : unwindset)</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    <a class="code hl_function" href="classunwindsett.html#a29cae2ae0d03187253ba3cf49f4b11b0">parse_unwindset_one_loop</a>(element, goto_model, message_handler);</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>}</div>
 </div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>std::optional&lt;unsigned&gt;</div>
-<div class="foldopen" id="foldopen00191" data-start="{" data-end="}">
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno"><a class="line" href="classunwindsett.html#a105454e6d7e1d9381588c6b046c88a1f">  191</a></span><a class="code hl_function" href="classunwindsett.html#a105454e6d7e1d9381588c6b046c88a1f">unwindsett::get_limit</a>(<span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;loop_id, <span class="keywordtype">unsigned</span> thread_nr)<span class="keyword"> const</span></div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span><span class="keyword"></span>{</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>  <span class="comment">// We use the most specific limit we have</span></div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>  <span class="comment">// thread x loop</span></div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">tl_it</a> =</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    <a class="code hl_variable" href="classunwindsett.html#a78e2abc265be9d9f0c1c32334914833c">thread_loop_map</a>.find(std::pair&lt;irep_idt, unsigned&gt;(loop_id, thread_nr));</div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">tl_it</a> != <a class="code hl_variable" href="classunwindsett.html#a78e2abc265be9d9f0c1c32334914833c">thread_loop_map</a>.end())</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">tl_it</a>-&gt;second;</div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span> </div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>  <span class="comment">// loop</span></div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">l_it</a> = <a class="code hl_variable" href="classunwindsett.html#a05c9336ffcfa98048cb54101e636a865">loop_map</a>.find(loop_id);</div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span> </div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">l_it</a> != <a class="code hl_variable" href="classunwindsett.html#a05c9336ffcfa98048cb54101e636a865">loop_map</a>.end())</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">l_it</a>-&gt;second;</div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> </div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>  <span class="comment">// global, if any</span></div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classunwindsett.html#a73a0321d4d94c05c47feed8b91d8d1b6">global_limit</a>;</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>}</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>std::optional&lt;unsigned&gt;</div>
+<div class="foldopen" id="foldopen00193" data-start="{" data-end="}">
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno"><a class="line" href="classunwindsett.html#a105454e6d7e1d9381588c6b046c88a1f">  193</a></span><a class="code hl_function" href="classunwindsett.html#a105454e6d7e1d9381588c6b046c88a1f">unwindsett::get_limit</a>(<span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;loop_id, <span class="keywordtype">unsigned</span> thread_nr)<span class="keyword"> const</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span><span class="keyword"></span>{</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>  <span class="comment">// We use the most specific limit we have</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span> </div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>  <span class="comment">// thread x loop</span></div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">tl_it</a> =</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    <a class="code hl_variable" href="classunwindsett.html#a78e2abc265be9d9f0c1c32334914833c">thread_loop_map</a>.find(std::pair&lt;irep_idt, unsigned&gt;(loop_id, thread_nr));</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span> </div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">tl_it</a> != <a class="code hl_variable" href="classunwindsett.html#a78e2abc265be9d9f0c1c32334914833c">thread_loop_map</a>.end())</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">tl_it</a>-&gt;second;</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span> </div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>  <span class="comment">// loop</span></div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">l_it</a> = <a class="code hl_variable" href="classunwindsett.html#a05c9336ffcfa98048cb54101e636a865">loop_map</a>.find(loop_id);</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">l_it</a> != <a class="code hl_variable" href="classunwindsett.html#a05c9336ffcfa98048cb54101e636a865">loop_map</a>.end())</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">l_it</a>-&gt;second;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>  <span class="comment">// global, if any</span></div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classunwindsett.html#a73a0321d4d94c05c47feed8b91d8d1b6">global_limit</a>;</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>}</div>
 </div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span> </div>
-<div class="foldopen" id="foldopen00212" data-start="{" data-end="}">
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno"><a class="line" href="classunwindsett.html#a8ea86d77f734f11b9afbfdb1bf4a6a5f">  212</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classunwindsett.html#a8ea86d77f734f11b9afbfdb1bf4a6a5f">unwindsett::parse_unwindset_file</a>(</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>  <span class="keyword">const</span> std::string &amp;file_name,</div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>{</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>  std::ifstream file(<a class="code hl_define" href="unicode_8h.html#a54a797d3af974232b7a83cc83845156e">widen_if_needed</a>(file_name));</div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span> </div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>  <span class="keywordflow">if</span>(!file)</div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;cannot open file &quot;</span> + file_name;</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
+<div class="foldopen" id="foldopen00214" data-start="{" data-end="}">
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno"><a class="line" href="classunwindsett.html#a65fa77ebb33cb2a683902184b32892ed">  214</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classunwindsett.html#a65fa77ebb33cb2a683902184b32892ed">unwindsett::parse_unwindset_file</a>(</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>  <span class="keyword">const</span> std::string &amp;file_name,</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>  <a class="code hl_class" href="classabstract__goto__modelt.html">abstract_goto_modelt</a> &amp;goto_model,</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>  <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>{</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>  std::ifstream file(<a class="code hl_define" href="unicode_8h.html#a54a797d3af974232b7a83cc83845156e">widen_if_needed</a>(file_name));</div>
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>  std::stringstream buffer;</div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>  buffer &lt;&lt; file.rdbuf();</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>  <span class="keywordflow">if</span>(!file)</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    <span class="keywordflow">throw</span> <span class="stringliteral">&quot;cannot open file &quot;</span> + file_name;</div>
 <div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>  std::vector&lt;std::string&gt; <a class="code hl_class" href="classait.html">unwindset_elements</a> =</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    <a class="code hl_function" href="string__utils_8cpp.html#a6ed2086ccc7c5dffe024855536192cd6">split_string</a>(buffer.str(), <span class="charliteral">&#39;,&#39;</span>, <span class="keyword">true</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>  std::stringstream buffer;</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>  buffer &lt;&lt; file.rdbuf();</div>
 <div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;element : <a class="code hl_class" href="classait.html">unwindset_elements</a>)</div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    <a class="code hl_function" href="classunwindsett.html#a3307f9d27beb3d69fd77e15933ca68b6">parse_unwindset_one_loop</a>(element, message_handler);</div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>}</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>  std::vector&lt;std::string&gt; <a class="code hl_class" href="classait.html">unwindset_elements</a> =</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    <a class="code hl_function" href="string__utils_8cpp.html#a6ed2086ccc7c5dffe024855536192cd6">split_string</a>(buffer.str(), <span class="charliteral">&#39;,&#39;</span>, <span class="keyword">true</span>, <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;element : <a class="code hl_class" href="classait.html">unwindset_elements</a>)</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    <a class="code hl_function" href="classunwindsett.html#a29cae2ae0d03187253ba3cf49f4b11b0">parse_unwindset_one_loop</a>(element, goto_model, message_handler);</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>}</div>
 </div>
 <div class="ttc" id="aabstract__goto__model_8h_html"><div class="ttname"><a href="abstract__goto__model_8h.html">abstract_goto_model.h</a></div><div class="ttdoc">Abstract interface to eager or lazy GOTO models.</div></div>
+<div class="ttc" id="aclassabstract__goto__modelt_html"><div class="ttname"><a href="classabstract__goto__modelt.html">abstract_goto_modelt</a></div><div class="ttdoc">Abstract interface to eager or lazy GOTO models.</div><div class="ttdef"><b>Definition</b> <a href="abstract__goto__model_8h_source.html#l00021">abstract_goto_model.h:22</a></div></div>
 <div class="ttc" id="aclassabstract__goto__modelt_html_a6f99b3d8d5a53ba4ea6494863376c8a9"><div class="ttname"><a href="classabstract__goto__modelt.html#a6f99b3d8d5a53ba4ea6494863376c8a9">abstract_goto_modelt::can_produce_function</a></div><div class="ttdeci">virtual bool can_produce_function(const irep_idt &amp;id) const =0</div><div class="ttdoc">Determines if this model can produce a body for the given function.</div></div>
 <div class="ttc" id="aclassabstract__goto__modelt_html_a78b078f9c86479cca30fe48ee18b1ff2"><div class="ttname"><a href="classabstract__goto__modelt.html#a78b078f9c86479cca30fe48ee18b1ff2">abstract_goto_modelt::get_goto_function</a></div><div class="ttdeci">virtual const goto_functionst::goto_functiont &amp; get_goto_function(const irep_idt &amp;id)=0</div><div class="ttdoc">Get a GOTO function by name, or throw if no such function exists.</div></div>
 <div class="ttc" id="aclassabstract__goto__modelt_html_a98020931a711776ce9448acf41ef532c"><div class="ttname"><a href="classabstract__goto__modelt.html#a98020931a711776ce9448acf41ef532c">abstract_goto_modelt::get_symbol_table</a></div><div class="ttdeci">virtual const symbol_tablet &amp; get_symbol_table() const =0</div><div class="ttdoc">Accessor to get the symbol table.</div></div>
@@ -360,15 +364,14 @@ $(document).ready(function(){initNavTree('unwindset_8cpp_source.html',''); initR
 <div class="ttc" id="aclasssymbol__table__baset_html"><div class="ttname"><a href="classsymbol__table__baset.html">symbol_table_baset</a></div><div class="ttdoc">The symbol table base class interface.</div><div class="ttdef"><b>Definition</b> <a href="symbol__table__base_8h_source.html#l00022">symbol_table_base.h:23</a></div></div>
 <div class="ttc" id="aclasssymbol__table__baset_html_a32444b16e7057a36f72e450aeabb0183"><div class="ttname"><a href="classsymbol__table__baset.html#a32444b16e7057a36f72e450aeabb0183">symbol_table_baset::lookup</a></div><div class="ttdeci">const symbolt * lookup(const irep_idt &amp;name) const</div><div class="ttdoc">Find a symbol in the symbol table for read-only access.</div><div class="ttdef"><b>Definition</b> <a href="symbol__table__base_8h_source.html#l00096">symbol_table_base.h:96</a></div></div>
 <div class="ttc" id="aclasssymbolt_html"><div class="ttname"><a href="classsymbolt.html">symbolt</a></div><div class="ttdoc">Symbol table entry.</div><div class="ttdef"><b>Definition</b> <a href="symbol_8h_source.html#l00027">symbol.h:28</a></div></div>
-<div class="ttc" id="aclassunwindsett_html_a05c9336ffcfa98048cb54101e636a865"><div class="ttname"><a href="classunwindsett.html#a05c9336ffcfa98048cb54101e636a865">unwindsett::loop_map</a></div><div class="ttdeci">loop_mapt loop_map</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8h_source.html#l00062">unwindset.h:62</a></div></div>
-<div class="ttc" id="aclassunwindsett_html_a105454e6d7e1d9381588c6b046c88a1f"><div class="ttname"><a href="classunwindsett.html#a105454e6d7e1d9381588c6b046c88a1f">unwindsett::get_limit</a></div><div class="ttdeci">std::optional&lt; unsigned &gt; get_limit(const irep_idt &amp;loop, unsigned thread_id) const</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00191">unwindset.cpp:191</a></div></div>
-<div class="ttc" id="aclassunwindsett_html_a3307f9d27beb3d69fd77e15933ca68b6"><div class="ttname"><a href="classunwindsett.html#a3307f9d27beb3d69fd77e15933ca68b6">unwindsett::parse_unwindset_one_loop</a></div><div class="ttdeci">void parse_unwindset_one_loop(std::string loop_limit, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00029">unwindset.cpp:29</a></div></div>
+<div class="ttc" id="aclassunwindsett_html_a05c9336ffcfa98048cb54101e636a865"><div class="ttname"><a href="classunwindsett.html#a05c9336ffcfa98048cb54101e636a865">unwindsett::loop_map</a></div><div class="ttdeci">loop_mapt loop_map</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8h_source.html#l00060">unwindset.h:60</a></div></div>
+<div class="ttc" id="aclassunwindsett_html_a105454e6d7e1d9381588c6b046c88a1f"><div class="ttname"><a href="classunwindsett.html#a105454e6d7e1d9381588c6b046c88a1f">unwindsett::get_limit</a></div><div class="ttdeci">std::optional&lt; unsigned &gt; get_limit(const irep_idt &amp;loop, unsigned thread_id) const</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00193">unwindset.cpp:193</a></div></div>
+<div class="ttc" id="aclassunwindsett_html_a29cae2ae0d03187253ba3cf49f4b11b0"><div class="ttname"><a href="classunwindsett.html#a29cae2ae0d03187253ba3cf49f4b11b0">unwindsett::parse_unwindset_one_loop</a></div><div class="ttdeci">void parse_unwindset_one_loop(std::string loop_limit, abstract_goto_modelt &amp;goto_model, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00029">unwindset.cpp:29</a></div></div>
 <div class="ttc" id="aclassunwindsett_html_a413ecb0a5b3ea470d4e5ceaa2ab73b56"><div class="ttname"><a href="classunwindsett.html#a413ecb0a5b3ea470d4e5ceaa2ab73b56">unwindsett::parse_unwind</a></div><div class="ttdeci">void parse_unwind(const std::string &amp;unwind)</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00023">unwindset.cpp:23</a></div></div>
-<div class="ttc" id="aclassunwindsett_html_a73a0321d4d94c05c47feed8b91d8d1b6"><div class="ttname"><a href="classunwindsett.html#a73a0321d4d94c05c47feed8b91d8d1b6">unwindsett::global_limit</a></div><div class="ttdeci">std::optional&lt; unsigned &gt; global_limit</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8h_source.html#l00057">unwindset.h:57</a></div></div>
-<div class="ttc" id="aclassunwindsett_html_a78e2abc265be9d9f0c1c32334914833c"><div class="ttname"><a href="classunwindsett.html#a78e2abc265be9d9f0c1c32334914833c">unwindsett::thread_loop_map</a></div><div class="ttdeci">thread_loop_mapt thread_loop_map</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8h_source.html#l00067">unwindset.h:67</a></div></div>
-<div class="ttc" id="aclassunwindsett_html_a8ea86d77f734f11b9afbfdb1bf4a6a5f"><div class="ttname"><a href="classunwindsett.html#a8ea86d77f734f11b9afbfdb1bf4a6a5f">unwindsett::parse_unwindset_file</a></div><div class="ttdeci">void parse_unwindset_file(const std::string &amp;file_name, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00212">unwindset.cpp:212</a></div></div>
-<div class="ttc" id="aclassunwindsett_html_a965e53d6124668a1d4b59be398c5cdc7"><div class="ttname"><a href="classunwindsett.html#a965e53d6124668a1d4b59be398c5cdc7">unwindsett::goto_model</a></div><div class="ttdeci">abstract_goto_modelt &amp; goto_model</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8h_source.html#l00055">unwindset.h:55</a></div></div>
-<div class="ttc" id="aclassunwindsett_html_aae4a4878d4234816708a4861f17420c3"><div class="ttname"><a href="classunwindsett.html#aae4a4878d4234816708a4861f17420c3">unwindsett::parse_unwindset</a></div><div class="ttdeci">void parse_unwindset(const std::list&lt; std::string &gt; &amp;unwindset, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00182">unwindset.cpp:182</a></div></div>
+<div class="ttc" id="aclassunwindsett_html_a5d0407a7733138b58595b02bee9d8f97"><div class="ttname"><a href="classunwindsett.html#a5d0407a7733138b58595b02bee9d8f97">unwindsett::parse_unwindset</a></div><div class="ttdeci">void parse_unwindset(const std::list&lt; std::string &gt; &amp;unwindset, abstract_goto_modelt &amp;goto_model, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00183">unwindset.cpp:183</a></div></div>
+<div class="ttc" id="aclassunwindsett_html_a65fa77ebb33cb2a683902184b32892ed"><div class="ttname"><a href="classunwindsett.html#a65fa77ebb33cb2a683902184b32892ed">unwindsett::parse_unwindset_file</a></div><div class="ttdeci">void parse_unwindset_file(const std::string &amp;file_name, abstract_goto_modelt &amp;goto_model, message_handlert &amp;message_handler)</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8cpp_source.html#l00214">unwindset.cpp:214</a></div></div>
+<div class="ttc" id="aclassunwindsett_html_a73a0321d4d94c05c47feed8b91d8d1b6"><div class="ttname"><a href="classunwindsett.html#a73a0321d4d94c05c47feed8b91d8d1b6">unwindsett::global_limit</a></div><div class="ttdeci">std::optional&lt; unsigned &gt; global_limit</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8h_source.html#l00055">unwindset.h:55</a></div></div>
+<div class="ttc" id="aclassunwindsett_html_a78e2abc265be9d9f0c1c32334914833c"><div class="ttname"><a href="classunwindsett.html#a78e2abc265be9d9f0c1c32334914833c">unwindsett::thread_loop_map</a></div><div class="ttdeci">thread_loop_mapt thread_loop_map</div><div class="ttdef"><b>Definition</b> <a href="unwindset_8h_source.html#l00065">unwindset.h:65</a></div></div>
 <div class="ttc" id="actype_8c_html_a3fa45b35c8abf67a950b6d3d4063dede"><div class="ttname"><a href="ctype_8c.html#a3fa45b35c8abf67a950b6d3d4063dede">isdigit</a></div><div class="ttdeci">int isdigit(int c)</div><div class="ttdef"><b>Definition</b> <a href="ctype_8c_source.html#l00024">ctype.c:24</a></div></div>
 <div class="ttc" id="aexception__utils_8h_html"><div class="ttname"><a href="exception__utils_8h.html">exception_utils.h</a></div></div>
 <div class="ttc" id="amath_8c_html_adb302c9aafbaa5e180d9f60ee954bb82"><div class="ttname"><a href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a></div><div class="ttdeci">double log(double x)</div><div class="ttdef"><b>Definition</b> <a href="math_8c_source.html#l02449">math.c:2449</a></div></div>
