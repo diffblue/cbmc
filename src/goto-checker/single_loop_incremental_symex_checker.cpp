@@ -28,7 +28,6 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
     equation(ui_message_handler),
-    unwindset(goto_model),
     symex(
       ui_message_handler,
       goto_model.get_symbol_table(),
@@ -40,7 +39,10 @@ single_loop_incremental_symex_checkert::single_loop_incremental_symex_checkert(
       ui_message_handler.get_ui()),
     property_decider(options, ui_message_handler, equation, ns)
 {
-  setup_symex(symex, ns, options, ui_message_handler);
+  unwindset.parse_unwind(options.get_option("unwind"));
+  unwindset.parse_unwindset(
+    options.get_list_option("unwindset"), goto_model, ui_message_handler);
+  setup_symex(symex, ns, ui_message_handler);
 
   // Freeze all symbols if we are using a prop_conv_solvert
   prop_conv_solvert *prop_conv_solver = dynamic_cast<prop_conv_solvert *>(

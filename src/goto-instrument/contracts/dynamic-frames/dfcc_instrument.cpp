@@ -1208,8 +1208,8 @@ void dfcc_instrumentt::apply_loop_contracts(
   // If required, unwind all transformed loops to yield base and step cases
   if(loop_contract_config.unwind_transformed_loops)
   {
-    unwindsett unwindset{goto_model};
-    unwindset.parse_unwindset(to_unwind, log.get_message_handler());
+    unwindsett unwindset;
+    unwindset.parse_unwindset(to_unwind, goto_model, log.get_message_handler());
     goto_unwindt goto_unwind;
     goto_unwind(goto_model, unwindset, goto_unwindt::unwind_strategyt::ASSUME);
   }

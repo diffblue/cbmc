@@ -30,9 +30,7 @@ public:
   // 2) a limit per loop, all threads
   // 3) a limit for a particular thread.
   // We use the most specific of the above.
-  explicit unwindsett(abstract_goto_modelt &goto_model) : goto_model(goto_model)
-  {
-  }
+  unwindsett() = default;
 
   // global limit for all loops
   void parse_unwind(const std::string &unwind);
@@ -40,6 +38,7 @@ public:
   // limit for instances of a loop
   void parse_unwindset(
     const std::list<std::string> &unwindset,
+    abstract_goto_modelt &goto_model,
     message_handlert &message_handler);
 
   // queries
@@ -49,11 +48,10 @@ public:
   // read unwindset directives from a file
   void parse_unwindset_file(
     const std::string &file_name,
+    abstract_goto_modelt &goto_model,
     message_handlert &message_handler);
 
 protected:
-  abstract_goto_modelt &goto_model;
-
   std::optional<unsigned> global_limit;
 
   // Limit for all instances of a loop.
@@ -68,6 +66,7 @@ protected:
 
   void parse_unwindset_one_loop(
     std::string loop_limit,
+    abstract_goto_modelt &goto_model,
     message_handlert &message_handler);
 };
 

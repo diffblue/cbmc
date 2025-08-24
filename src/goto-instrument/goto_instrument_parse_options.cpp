@@ -183,7 +183,7 @@ int goto_instrument_parse_optionst::doit()
 
       if(unwind_given || unwindset_given || unwindset_file_given)
       {
-        unwindsett unwindset{goto_model};
+        unwindsett unwindset;
 
         if(unwind_given)
           unwindset.parse_unwind(cmdline.get_value("unwind"));
@@ -191,13 +191,16 @@ int goto_instrument_parse_optionst::doit()
         if(unwindset_file_given)
         {
           unwindset.parse_unwindset_file(
-            cmdline.get_value("unwindset-file"), ui_message_handler);
+            cmdline.get_value("unwindset-file"),
+            goto_model,
+            ui_message_handler);
         }
 
         if(unwindset_given)
         {
           unwindset.parse_unwindset(
             cmdline.get_comma_separated_values("unwindset"),
+            goto_model,
             ui_message_handler);
         }
 

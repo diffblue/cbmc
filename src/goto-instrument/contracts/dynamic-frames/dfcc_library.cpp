@@ -439,7 +439,6 @@ void dfcc_libraryt::specialize(const std::size_t contract_assigns_size)
     "dfcc_libraryt::specialize_functions can only be called once");
 
   specialized = true;
-  unwindsett unwindset{goto_model};
   std::list<std::string> loop_names;
 
   for(const auto &entry : to_unwind)
@@ -452,7 +451,8 @@ void dfcc_libraryt::specialize(const std::size_t contract_assigns_size)
     const auto &str = stream.str();
     loop_names.push_back(str);
   }
-  unwindset.parse_unwindset(loop_names, message_handler);
+  unwindsett unwindset;
+  unwindset.parse_unwindset(loop_names, goto_model, message_handler);
   goto_unwindt goto_unwind;
   goto_unwind(
     goto_model, unwindset, goto_unwindt::unwind_strategyt::ASSERT_ASSUME);

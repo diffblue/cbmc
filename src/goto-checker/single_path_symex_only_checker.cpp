@@ -29,9 +29,11 @@ single_path_symex_only_checkert::single_path_symex_only_checkert(
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
     worklist(get_path_strategy(options.get_option("exploration-strategy"))),
-    symex_runtime(0),
-    unwindset(goto_model)
+    symex_runtime(0)
 {
+  unwindset.parse_unwind(options.get_option("unwind"));
+  unwindset.parse_unwindset(
+    options.get_list_option("unwindset"), goto_model, ui_message_handler);
 }
 
 incremental_goto_checkert::resultt single_path_symex_only_checkert::
@@ -152,7 +154,7 @@ void single_path_symex_only_checkert::equation_output(
 
 void single_path_symex_only_checkert::setup_symex(symex_bmct &symex)
 {
-  ::setup_symex(symex, ns, options, ui_message_handler);
+  ::setup_symex(symex, ns, ui_message_handler);
 }
 
 void single_path_symex_only_checkert::update_properties(

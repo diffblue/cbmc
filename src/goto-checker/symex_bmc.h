@@ -81,9 +81,9 @@ public:
 
   const bool record_coverage;
 
+protected:
   unwindsett &unwindset;
 
-protected:
   /// Callbacks that may provide an unwind/do-not-unwind decision for a loop
   std::vector<loop_unwind_handlert> loop_unwind_handlers;
 
