@@ -706,7 +706,7 @@ jobs:
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: brew install cmake ninja maven flex bison ccache z3
+        run: brew install ninja maven flex bison ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc5 binary and make sure it can be deployed
