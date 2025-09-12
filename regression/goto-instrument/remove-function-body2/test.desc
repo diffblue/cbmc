@@ -1,0 +1,13 @@
+CORE
+main.c
+--remove-function-body-regex '^(foo[0-9].*|bar)$'
+^foox
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.no-body\.foo123\] line 26 no body for callee foo123: FAILURE$
+^\[main\.no-body\.bar\] line 28 no body for callee bar: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^bar
+^foo123
