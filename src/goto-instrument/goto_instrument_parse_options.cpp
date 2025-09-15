@@ -1055,6 +1055,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       ui_message_handler);
   }
 
+  if(cmdline.isset("remove-function-body-regex"))
+  {
+    remove_functions_regex(
+      goto_model,
+      cmdline.get_value("remove-function-body-regex"),
+      ui_message_handler);
+  }
+
   // we add the library in some cases, as some analyses benefit
 
   if(
@@ -1960,8 +1968,10 @@ void goto_instrument_parse_optionst::help()
     " {y--add-library} \t add models of C library functions\n"
     HELP_CONFIG_LIBRARY
     " {y--model-argc-argv} {un} \t model up to {un} command line arguments\n"
-    " {y--remove-function-body} {uf} remove the implementation of function {uf}"
-    " (may be repeated)\n"
+    " {y--remove-function-body} {uf} \t remove the implementation of function"
+    " {uf} (may be repeated)\n"
+    " {y--remove-function-body-regex} {uregex} \t remove the implementation of"
+    " functions matching regular expression {uregex}\n"
     HELP_REPLACE_CALLS
     HELP_ANSI_C_LANGUAGE
     "\n"

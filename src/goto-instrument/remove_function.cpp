@@ -17,6 +17,8 @@ Date: April 2017
 
 #include <goto-programs/goto_model.h>
 
+#include <regex>
+
 /// Remove the body of function "identifier" such that an analysis will treat it
 /// as a side-effect free function with non-deterministic return value.
 /// \par parameters: symbol_table  Input symbol table to be modified
@@ -72,4 +74,64 @@ void remove_functions(
 {
   for(const auto &f : names)
     remove_function(goto_model, f, message_handler);
+}
+
+/// Remove functions matching a regular expression pattern
+/// \param goto_model: The goto model to modify
+/// \param pattern: The regex pattern to match function names against
+/// \param pattern_as_str: The string representation of \p pattern
+/// \param message_handler: For status/warning/error messages
+static void remove_functions_regex(
+  goto_modelt &goto_model,
+  const std::regex &pattern,
+  const std::string &pattern_as_str,
+  message_handlert &message_handler)
+{
+  messaget message{message_handler};
+
+  message.debug() << "Removing functions matching pattern: " << pattern_as_str
+                  << messaget::eom;
+
+  // Collect matching function names first to avoid modifying the map while
+  // iterating
+  std::list<irep_idt> matching_functions;
+
+  for(const auto &entry : goto_model.goto_functions.function_map)
+  {
+    const std::string &function_name = id2string(entry.first);
+    if(std::regex_match(function_name, pattern))
+    {
+      matching_functions.push_back(entry.first);
+    }
+  }
+
+  // Now remove all matching functions
+  for(const auto &func : matching_functions)
+  {
+    remove_function(goto_model, func, message_handler);
+  }
+
+  message.debug() << "Removed " << matching_functions.size()
+                  << " function(s) matching pattern: " << pattern_as_str
+                  << messaget::eom;
+}
+
+void remove_functions_regex(
+  goto_modelt &goto_model,
+  const std::string &pattern,
+  message_handlert &message_handler)
+{
+  messaget message{message_handler};
+
+  try
+  {
+    std::regex regex_pattern{pattern};
+
+    remove_functions_regex(goto_model, regex_pattern, pattern, message_handler);
+  }
+  catch(const std::regex_error &e)
+  {
+    message.error() << "Invalid regular expression pattern: " << pattern << " ("
+                    << e.what() << ")" << messaget::eom;
+  }
 }
