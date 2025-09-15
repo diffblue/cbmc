@@ -152,11 +152,6 @@ void single_path_symex_only_checkert::equation_output(
   }
 }
 
-void single_path_symex_only_checkert::setup_symex(symex_bmct &symex)
-{
-  ::setup_symex(symex, ns, ui_message_handler);
-}
-
 void single_path_symex_only_checkert::update_properties(
   propertiest &properties,
   std::unordered_set<irep_idt> &updated_properties,
