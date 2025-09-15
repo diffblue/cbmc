@@ -1,7 +1,5 @@
 var NAVTREEINDEX4 =
 {
-"byte__operators_8h.html":[8,0,2,30,15],
-"byte__operators_8h.html#a087cf8b5e1c612c85d2a3ebe909897c8":[8,0,2,30,15,12],
 "byte__operators_8h.html#a10762c5a060eea34284efdc572830dbf":[8,0,2,30,15,11],
 "byte__operators_8h.html#a2617c89da4cf231d07a0f9b4b67cd126":[8,0,2,30,15,5],
 "byte__operators_8h.html#a424b32f665812317348db304c92152e0":[8,0,2,30,15,9],
@@ -249,5 +247,7 @@ var NAVTREEINDEX4 =
 "c__bit__field__replacement__type_8cpp_source.html":[8,0,2,27,1,64],
 "c__bit__field__replacement__type_8h.html":[8,0,2,27,1,65],
 "c__bit__field__replacement__type_8h.html#a29071532a31ac6398ec9ffdf1553cc12":[8,0,2,27,1,65,0],
-"c__bit__field__replacement__type_8h_source.html":[8,0,2,27,1,65]
+"c__bit__field__replacement__type_8h_source.html":[8,0,2,27,1,65],
+"c__defines_8cpp.html":[8,0,2,7,0],
+"c__defines_8cpp_source.html":[8,0,2,7,0]
 };

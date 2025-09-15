@@ -11,7 +11,6 @@ var bmc__util_8cpp =
     [ "postprocess_equation", "bmc__util_8cpp.html#adaaa98380f7ed18957370ccc886b9255", null ],
     [ "prepare_property_decider", "bmc__util_8cpp.html#a4be50a778f1fdcb152a2ff0d0c415f97", null ],
     [ "run_property_decider", "bmc__util_8cpp.html#a09d76a47a0f7e035ab57c86bc2634dc6", null ],
-    [ "setup_symex", "bmc__util_8cpp.html#ab25816b264bca4d193b280a3da05fc26", null ],
     [ "slice", "bmc__util_8cpp.html#a13baeb4f6da7bf278c9f9b2775212e2d", null ],
     [ "ssa_step_matches_failing_property", "bmc__util_8cpp.html#ab2e9d3eee5639fff340ab9bc89b1d539", null ],
     [ "update_properties_status_from_symex_target_equation", "bmc__util_8cpp.html#a775ad2c258576437c2067001c1749c01", null ],

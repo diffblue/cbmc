@@ -1,7 +1,5 @@
 var NAVTREEINDEX48 =
 {
-"classloop__contracts__synthesizer__baset.html#afe0f2f25659a33a84ffd2e2615d89a5d":[7,0,796,0],
-"classloop__templatet.html":[7,0,798],
 "classloop__templatet.html#a1bc0d4e6f6d9cd34f4044ee1d6b91af7":[7,0,798,11],
 "classloop__templatet.html#a36ab9c3983ba32dd5e13b5eac69bbc27":[7,0,798,8],
 "classloop__templatet.html#a5d422145b3d8cb6abb231be6d48fb053":[7,0,798,7],
@@ -249,5 +247,7 @@ var NAVTREEINDEX48 =
 "classmessaget_1_1commandt.html":[7,0,822,0],
 "classmessaget_1_1commandt.html#a379764db1ffb09ef119ec2d06a71acc9":[7,0,822,0,0],
 "classmessaget_1_1commandt.html#a97524a9c432a67ec9727baa7f86bb500":[7,0,822,0,1],
-"classmessaget_1_1eomt.html":[7,0,822,1]
+"classmessaget_1_1eomt.html":[7,0,822,1],
+"classmessaget_1_1mstreamt.html":[7,0,822,2],
+"classmessaget_1_1mstreamt.html#a1addf7f068c06c062eb4012fa30dc471":[7,0,822,2,10]
 };

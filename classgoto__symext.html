@@ -183,9 +183,6 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a2e575b321b4c4f6b0d02a5f4a378bc9f" id="r_a2e575b321b4c4f6b0d02a5f4a378bc9f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a2e575b321b4c4f6b0d02a5f4a378bc9f">ignore_assertions</a> = <a class="el" href="classait.html">false</a></td></tr>
 <tr class="memdesc:a2e575b321b4c4f6b0d02a5f4a378bc9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this flag is set to true then assertions will be temporarily ignored by the symbolic executions.  <br /></td></tr>
 <tr class="separator:a2e575b321b4c4f6b0d02a5f4a378bc9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f909a66c6f56fcd2ca9f2cc2f074113" id="r_a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a1f909a66c6f56fcd2ca9f2cc2f074113">language_mode</a></td></tr>
-<tr class="memdesc:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="mdescLeft">&#160;</td><td class="mdescRight">language_mode: ID_java, ID_C or another language identifier if we know the source language in use, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> otherwise.  <br /></td></tr>
-<tr class="separator:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8662b904beca440f2da5610fbcbbdda1" id="r_a8662b904beca440f2da5610fbcbbdda1"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a8662b904beca440f2da5610fbcbbdda1">path_segment_vccs</a></td></tr>
 <tr class="memdesc:a8662b904beca440f2da5610fbcbbdda1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of VCCs generated during the run of this <a class="el" href="classgoto__symext.html" title="The main class for the forward symbolic simulator.">goto_symext</a> object.  <br /></td></tr>
 <tr class="separator:a8662b904beca440f2da5610fbcbbdda1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -422,6 +419,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:ad0052c7fac2ec990504f85d80f72e451" id="r_ad0052c7fac2ec990504f85d80f72e451"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="structsymex__configt.html">symex_configt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#ad0052c7fac2ec990504f85d80f72e451">symex_config</a></td></tr>
 <tr class="memdesc:ad0052c7fac2ec990504f85d80f72e451"><td class="mdescLeft">&#160;</td><td class="mdescRight">The configuration to use for this symbolic execution.  <br /></td></tr>
 <tr class="separator:ad0052c7fac2ec990504f85d80f72e451"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f909a66c6f56fcd2ca9f2cc2f074113" id="r_a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a1f909a66c6f56fcd2ca9f2cc2f074113">language_mode</a></td></tr>
+<tr class="memdesc:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="mdescLeft">&#160;</td><td class="mdescRight">language_mode: ID_java, ID_C or another language identifier if we know the source language in use, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> otherwise.  <br /></td></tr>
+<tr class="separator:a1f909a66c6f56fcd2ca9f2cc2f074113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ec3970120a4cb4d7ea1fccae0723fa3" id="r_a1ec3970120a4cb4d7ea1fccae0723fa3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symext.html#a1ec3970120a4cb4d7ea1fccae0723fa3">outer_symbol_table</a></td></tr>
 <tr class="memdesc:a1ec3970120a4cb4d7ea1fccae0723fa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The symbol table associated with the goto-program being executed.  <br /></td></tr>
 <tr class="separator:a1ec3970120a4cb4d7ea1fccae0723fa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -494,7 +494,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00753">753</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00750">750</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -2018,7 +2018,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00852">852</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00849">849</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -2045,7 +2045,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00843">843</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00840">840</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4616,7 +4616,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00861">861</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00858">858</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4702,7 +4702,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00281">281</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00278">278</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4727,7 +4727,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00834">834</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00831">831</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4751,7 +4751,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00834">834</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00831">831</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4777,7 +4777,7 @@ Friends</h2></td></tr>
 
 <p>A monotonically increasing index for each encountered ATOMIC_BEGIN instruction. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00271">271</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00268">268</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4801,7 +4801,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00837">837</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00834">834</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4828,7 +4828,7 @@ Friends</h2></td></tr>
 <p>Used to create guards. </p>
 <p>Guards created with different guard managers cannot be combined together, so guards created by goto-symex should not escape the scope of this manager. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00264">264</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00261">261</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4873,7 +4873,7 @@ Friends</h2></td></tr>
 <p>Variables that should be killed at the end of the current symex_step invocation. </p>
 <p>Currently this is used for let-bound variables executed during symex, whose lifetime is at most one instruction long. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00276">276</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00273">273</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4882,16 +4882,24 @@ Friends</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> goto_symext::language_mode</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>language_mode: ID_java, ID_C or another language identifier if we know the source language in use, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt()</a> otherwise. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00242">242</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00240">240</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4917,7 +4925,7 @@ Friends</h2></td></tr>
 
 <p>The messaget to write log messages to. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00279">279</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00276">276</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4944,7 +4952,7 @@ Friends</h2></td></tr>
 <p>Initialized just before symbolic execution begins, to point to both <code>outer_symbol_table</code> and the symbol table owned by the <code><a class="el" href="classgoto__symex__statet.html" title="Central data structure: state.">goto_symex_statet</a></code> object used during symbolic execution. </p>
 <p>That symbol table must be owned by <a class="el" href="classgoto__symex__statet.html" title="Central data structure: state.">goto_symex_statet</a> rather than passed in, in case the state is saved and resumed. This namespacet is used during symbolic execution to look up names from the original goto-program, and the names of dynamically-created objects. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00259">259</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00256">256</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4971,7 +4979,7 @@ Friends</h2></td></tr>
 <p>The symbol table associated with the goto-program being executed. </p>
 <p>This symbol table will not have objects that are dynamically created as part of symbolic execution added to it; those object are stored in the symbol table passed as the <code>new_symbol_table</code> argument to the <code>symex_*</code> methods. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00250">250</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00247">247</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -4991,7 +4999,7 @@ Friends</h2></td></tr>
 <p>This member is always initialized to <code>0</code> upon construction of this object. It therefore differs from <a class="el" href="classgoto__symex__statet.html#a2603c3d7a77fe706b8fbd3c9ee671377">goto_symex_statet::total_vccs</a>, which persists across the creation of several <a class="el" href="classgoto__symext.html" title="The main class for the forward symbolic simulator.">goto_symext</a> objects. When CBMC is run in path-exploration mode, the meaning of this member is "the number of VCCs
 generated between the last branch point and the current instruction," while <a class="el" href="classgoto__symex__statet.html#a2603c3d7a77fe706b8fbd3c9ee671377">goto_symex_statet::total_vccs</a> records the total number of VCCs generated along the entire path from the beginning of the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00823">823</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00820">820</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -5018,7 +5026,7 @@ generated between the last branch point and the current instruction," while <a c
 <p>Symbolic execution paths to be resumed later. </p>
 <dl class="section remark"><dt>Remarks</dt><dd>Partially-executed symbolic execution <a class="el" href="structpath__storaget_1_1patht.html">paths</a> whose execution can be resumed later </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00811">811</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00808">808</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -5044,7 +5052,7 @@ generated between the last branch point and the current instruction," while <a c
 
 <p>Shadow memory instrumentation API. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00840">840</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00837">837</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>
@@ -5115,7 +5123,7 @@ generated between the last branch point and the current instruction," while <a c
 
 <p>The equation that this execution is building up. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00267">267</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex_8h_source.html#l00264">264</a> of file <a class="el" href="goto__symex_8h_source.html">goto_symex.h</a>.</p>
 
 </div>
 </div>

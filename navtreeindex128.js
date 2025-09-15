@@ -1,7 +1,5 @@
 var NAVTREEINDEX128 =
 {
-"resolve__inherited__component_8h.html":[8,0,2,16,90],
-"resolve__inherited__component_8h.html#a11838999e3db7e010343a213094dfcf4":[8,0,2,16,90,2],
 "resolve__inherited__component_8h_source.html":[8,0,2,16,90],
 "response__or__error_8h.html":[8,0,2,27,9,9],
 "response__or__error_8h_source.html":[8,0,2,27,9,9],
@@ -249,5 +247,7 @@ var NAVTREEINDEX128 =
 "shadow__memory__util_8cpp.html#a2909c4734476f16c5091a0b767ebc6fc":[8,0,2,17,42,11],
 "shadow__memory__util_8cpp.html#a2ca0c01ab498ff098449377dcdb46a1d":[8,0,2,17,42,17],
 "shadow__memory__util_8cpp.html#a2d598517b651e011bdea4b17d612c5aa":[8,0,2,17,42,32],
-"shadow__memory__util_8cpp.html#a35f3c4f9630820408ef9a3c091ac9b08":[8,0,2,17,42,9]
+"shadow__memory__util_8cpp.html#a35f3c4f9630820408ef9a3c091ac9b08":[8,0,2,17,42,9],
+"shadow__memory__util_8cpp.html#a3938f88acd850e5a8317f962c0a0e922":[8,0,2,17,42,1],
+"shadow__memory__util_8cpp.html#a3a2131272bd593d627524d1119a601b7":[8,0,2,17,42,15]
 };
