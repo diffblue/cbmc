@@ -132,6 +132,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ae29eaba5730f1b09446f728ccfa5c5ab" id="r_ae29eaba5730f1b09446f728ccfa5c5ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function_8h.html#ae29eaba5730f1b09446f728ccfa5c5ab">remove_functions</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;, <a class="el" href="classait.html">const</a> std::list&lt; std::string &gt; &amp;<a class="el" href="classait.html">names</a>, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;)</td></tr>
 <tr class="memdesc:ae29eaba5730f1b09446f728ccfa5c5ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the body of all functions listed in "names" such that an analysis will treat it as a side-effect free function with non-deterministic return value.  <br /></td></tr>
 <tr class="separator:ae29eaba5730f1b09446f728ccfa5c5ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0218ef16a1a09cb0d9480720a3b21ec" id="r_ae0218ef16a1a09cb0d9480720a3b21ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="remove__function_8h.html#ae0218ef16a1a09cb0d9480720a3b21ec">remove_functions_regex</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, <a class="el" href="classait.html">const</a> std::string &amp;<a class="el" href="classait.html">pattern</a>, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:ae0218ef16a1a09cb0d9480720a3b21ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove functions matching any of the provided regular expression patterns.  <br /></td></tr>
+<tr class="separator:ae0218ef16a1a09cb0d9480720a3b21ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Remove function definition. </p>
@@ -173,7 +176,7 @@ Functions</h2></td></tr>
 <p>Remove the body of function "identifier" such that an analysis will treat it as a side-effect free function with non-deterministic return value. </p>
 <dl class="section user"><dt>parameters: symbol_table Input symbol table to be modified</dt><dd>goto_model Input program to be modified identifier Function to be removed message_handler Error/status output </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__function_8cpp_source.html#l00026">26</a> of file <a class="el" href="remove__function_8cpp_source.html">remove_function.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__function_8cpp_source.html#l00028">28</a> of file <a class="el" href="remove__function_8cpp_source.html">remove_function.cpp</a>.</p>
 
 </div>
 </div>
@@ -212,7 +215,53 @@ Functions</h2></td></tr>
 <p>Remove the body of all functions listed in "names" such that an analysis will treat it as a side-effect free function with non-deterministic return value. </p>
 <dl class="section user"><dt>parameters: symbol_table Input symbol table to be modified</dt><dd>goto_model Input program to be modified names List of functions to be removed message_handler Error/status output </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="remove__function_8cpp_source.html#l00068">68</a> of file <a class="el" href="remove__function_8cpp_source.html">remove_function.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remove__function_8cpp_source.html#l00070">70</a> of file <a class="el" href="remove__function_8cpp_source.html">remove_function.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ae0218ef16a1a09cb0d9480720a3b21ec" name="ae0218ef16a1a09cb0d9480720a3b21ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0218ef16a1a09cb0d9480720a3b21ec">&#9670;&#160;</a></span>remove_functions_regex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">void</a> remove_functions_regex </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;&#160;</td>
+          <td class="paramname"><em>goto_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> std::string &amp;&#160;</td>
+          <td class="paramname"><em>pattern</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;&#160;</td>
+          <td class="paramname"><em>message_handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Remove functions matching any of the provided regular expression patterns. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">goto_model</td><td>The goto model to modify </td></tr>
+    <tr><td class="paramname">pattern</td><td>Regex patterns to match function names against </td></tr>
+    <tr><td class="paramname">message_handler</td><td>For status/warning/error messages </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="remove__function_8cpp_source.html#l00119">119</a> of file <a class="el" href="remove__function_8cpp_source.html">remove_function.cpp</a>.</p>
 
 </div>
 </div>
