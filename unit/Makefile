@@ -90,6 +90,11 @@ SRC += analyses/ai/ai.cpp \
        goto-symex/symex_level1.cpp \
        goto-symex/try_evaluate_pointer_comparisons.cpp \
        interpreter/interpreter.cpp \
+       json-symtab-language/json_goto_function.cpp \
+       json-symtab-language/json_goto_function_extended.cpp \
+       json-symtab-language/json_goto_functions.cpp \
+       json-symtab-language/json_goto_functions_extended.cpp \
+       json-symtab-language/json_malformed_input.cpp \
        json/json_parser.cpp \
        json_symbol_table.cpp \
        path_strategies.cpp \
