@@ -158,5 +158,39 @@ json_objectt json(const source_locationt &location)
   if(!location.get_java_bytecode_index().empty())
     result["bytecodeIndex"] = json_stringt(location.get_java_bytecode_index());
 
+  if(!location.get_property_id().empty())
+    result["propertyId"] = json_stringt{location.get_property_id()};
+
+  if(!location.get_property_class().empty())
+    result["propertyClass"] = json_stringt{location.get_property_class()};
+
+  if(!location.get_comment().empty())
+    result["comment"] = json_stringt{location.get_comment()};
+
+  if(!location.get_case_number().empty())
+    result["caseNumber"] = json_stringt{location.get_case_number()};
+
+  if(location.get_basic_block_source_lines().is_not_nil())
+  {
+    result["basicBlockSourceLines"] = json_irept{true}.convert_from_irep(
+      location.get_basic_block_source_lines());
+  }
+
+  if(location.property_fatal())
+    result["propertyFatal"] = jsont::json_boolean(true);
+
+  if(location.get_hide())
+    result["hide"] = jsont::json_boolean(true);
+
+  const auto &pragmas = location.get_pragmas();
+  if(!pragmas.empty())
+  {
+    auto json_pragma_range = make_range(pragmas.begin(), pragmas.end())
+                               .map([](const std::pair<irep_idt, irept> &entry)
+                                    { return json_stringt{entry.first}; });
+    result["pragma"] =
+      json_arrayt{json_pragma_range.begin(), json_pragma_range.end()};
+  }
+
   return result;
 }

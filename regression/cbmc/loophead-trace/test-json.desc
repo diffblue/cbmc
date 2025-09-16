@@ -4,7 +4,7 @@ test.c
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$
-\s*\{\n\s*  .*\n\s*  "sourceLocation": \{\n\s*    .*,\n\s*    .*,\n\s*    "line": "5",\n\s*    .*\n\s*  \},\n\s*  "stepType": "loop-head",\n\s*  .*\n\s*\},\n\s*\{\n\s*  .*\n\s*  "sourceLocation": \{\n\s*    .*,\n\s*    .*,\n\s*    "line": "5",\n\s*    .*\n\s*  \},\n\s*  "stepType": "loop-head",\n\s*  .*\n\s*\},
+\s*\{\n\s*  .*\n\s*  "sourceLocation": \{\n\s*    .*,\n\s*    .*,\n\s*    "line": "5",\n\s*    .*,\n\s*    .*\n\s*  \},\n\s*  "stepType": "loop-head",\n\s*  .*\n\s*\},\n\s*\{\n\s*  .*\n\s*  "sourceLocation": \{\n\s*    .*,\n\s*    .*,\n\s*    "line": "5",\n\s*    .*,\n\s*    .*\n\s*  \},\n\s*  "stepType": "loop-head",\n\s*  .*\n\s*\},
 --
 --
 Ensure even with sliced formulas, we get a location only step for
