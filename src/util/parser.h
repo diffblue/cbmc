@@ -135,6 +135,11 @@ public:
     _source_location.set_function(function);
   }
 
+  void clear_function()
+  {
+    _source_location.clear_function();
+  }
+
   void advance_column(unsigned token_width)
   {
     column+=token_width;
