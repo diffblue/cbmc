@@ -11,32 +11,127 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/exception_utils.h>
 #include <util/expr.h>
 #include <util/json_irep.h>
-#include <util/source_location.h>
 #include <util/type.h>
 
-/// Return string value for a given key if present in the json object.
-/// \param in: The json object that is getting fetched as a string.
-/// \param key: The key for the json value to be fetched.
-/// \return A string value for the corresponding key.
-static const std::string &
-try_get_string(const jsont &in, const std::string &key)
+const std::string &try_get_string(const jsont &in, const std::string &key)
 {
   if(!in.is_string())
-    throw deserialization_exceptiont(
-      "symbol_from_json: expected string for key '" + key + "'");
+  {
+    throw deserialization_exceptiont{"expected string for key '" + key + "'"};
+  }
   return in.value;
 }
 
-/// Return boolean value for a given key if present in the json object.
-/// \param in: The json object that is getting fetched as a boolean.
-/// \param key: The key for the json value to be fetched.
-/// \return A boolean value for the corresponding key.
-static bool try_get_bool(const jsont &in, const std::string &key)
+bool try_get_bool(const jsont &in, const std::string &key)
 {
   if(!(in.is_true() || in.is_false()))
-    throw deserialization_exceptiont(
-      "symbol_from_json: expected bool for key '" + key + "'");
+  {
+    throw deserialization_exceptiont{"expected bool for key '" + key + "'"};
+  }
   return in.is_true();
+}
+
+source_locationt try_get_source_location(const jsont &json)
+{
+  if(!json.is_object())
+  {
+    throw deserialization_exceptiont{
+      "source location should be encoded as an object"};
+  }
+
+  const json_objectt &json_object = to_json_object(json);
+
+  if(json_object.size() == 0)
+  {
+    return source_locationt::nil();
+  }
+  else if(json_object.find("id") != json_object.end())
+  {
+    json_irept json2irep{true};
+    irept irep = json2irep.convert_from_json(json_object);
+    return static_cast<source_locationt &>(irep);
+  }
+
+  source_locationt result;
+  for(const auto &kv : json_object)
+  {
+    if(kv.first == "workingDirectory")
+    {
+      result.set_working_directory(
+        try_get_string(kv.second, "workingDirectory"));
+    }
+    else if(kv.first == "file")
+    {
+      result.set_file(try_get_string(kv.second, "file"));
+    }
+    else if(kv.first == "line")
+    {
+      result.set_line(try_get_string(kv.second, "line"));
+    }
+    else if(kv.first == "column")
+    {
+      result.set_column(try_get_string(kv.second, "column"));
+    }
+    else if(kv.first == "function")
+    {
+      result.set_function(try_get_string(kv.second, "function"));
+    }
+    else if(kv.first == "bytecodeIndex")
+    {
+      result.set_java_bytecode_index(
+        try_get_string(kv.second, "bytecodeIndex"));
+    }
+    else if(kv.first == "propertyId")
+    {
+      result.set_property_id(try_get_string(kv.second, "propertyId"));
+    }
+    else if(kv.first == "propertyClass")
+    {
+      result.set_property_class(try_get_string(kv.second, "propertyClass"));
+    }
+    else if(kv.first == "comment")
+    {
+      result.set_comment(try_get_string(kv.second, "comment"));
+    }
+    else if(kv.first == "caseNumber")
+    {
+      result.set_case_number(try_get_string(kv.second, "caseNumber"));
+    }
+    else if(kv.first == "basicBlockSourceLines")
+    {
+      json_irept json2irep{true};
+      irept irep = json2irep.convert_from_json(kv.second);
+      result.set_basic_block_source_lines(irep);
+    }
+    else if(kv.first == "propertyFatal")
+    {
+      result.property_fatal(try_get_bool(kv.second, "propertyFatal"));
+    }
+    else if(kv.first == "hide")
+    {
+      if(try_get_bool(kv.second, "hide"))
+        result.set_hide();
+    }
+    else if(kv.first == "pragma")
+    {
+      if(!kv.second.is_array())
+        throw deserialization_exceptiont{"pragmas must be an array"};
+
+      for(const auto &pragma : to_json_array(kv.second))
+      {
+        if(!pragma.is_string())
+          throw deserialization_exceptiont{"pragma must be a string"};
+        result.add_pragma(pragma.value);
+      }
+    }
+    else
+    {
+      throw deserialization_exceptiont{
+        "try_get_source_location: unexpected key '" + kv.first + "'"};
+    }
+  }
+
+  return result;
 }
 
 /// Deserialise a json object to a symbolt.
@@ -61,10 +156,7 @@ symbolt symbol_from_json(const jsont &in)
       result.value = static_cast<exprt &>(irep);
     }
     else if(kv.first == "location")
-    {
-      irept irep = json2irep.convert_from_json(kv.second);
-      result.location = static_cast<source_locationt &>(irep);
-    }
+      result.location = try_get_source_location(kv.second);
     else if(kv.first == "name")
       result.name = try_get_string(kv.second, "name");
     else if(kv.first == "module")
