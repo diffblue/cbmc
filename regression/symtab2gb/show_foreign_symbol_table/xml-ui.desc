@@ -1,6 +1,6 @@
 CORE
 rust.json
---xml-ui --show-symbol-table
+ _ --xml-ui --show-symbol-table
 ^EXIT=0$
 ^SIGNAL=0$
 --

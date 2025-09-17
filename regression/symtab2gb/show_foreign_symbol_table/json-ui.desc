@@ -1,6 +1,6 @@
 CORE
 rust.json
---json-ui --show-symbol-table
+ _ --json-ui --show-symbol-table
 "symbolTable":
 "mode": "rust",
 ^EXIT=0$
