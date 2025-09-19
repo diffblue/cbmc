@@ -1,43 +1,45 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/json_irep.h" name="/home/runner/work/cbmc/cbmc/src/util/json_irep.h">
-<area shape="rect" id="Node000001" title="Util." alt="" coords="1861,5,2045,45"/>
+<area shape="rect" id="Node000001" title="Util." alt="" coords="1975,5,2159,45"/>
 <area shape="rect" id="Node000002" href="$dependence__graph_8cpp.html" title="Field&#45;Sensitive Program Dependence Analysis, Litvak et al., FSE 2010." alt="" coords="5,101,235,155"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1847,30,1505,36,1043,47,583,67,392,80,247,96,210,103,209,98,246,91,391,75,582,61,1043,42,1505,30,1847,25"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1961,30,1598,35,1103,46,608,65,403,79,247,96,210,103,209,98,246,91,402,74,608,60,1102,40,1598,29,1961,25"/>
 <area shape="rect" id="Node000003" href="$variable__sensitivity__dependence__graph_8cpp.html" title=" " alt="" coords="259,93,485,163"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1848,31,1551,38,1162,51,778,70,619,82,498,96,486,98,485,93,497,91,618,77,777,64,1162,45,1551,33,1848,26"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1961,31,1644,37,1221,49,803,68,629,81,498,96,486,98,485,93,497,91,629,76,803,63,1221,44,1643,32,1961,25"/>
 <area shape="rect" id="Node000004" href="$static__verifier_8cpp.html" title=" " alt="" coords="509,101,693,155"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1848,31,1590,38,1261,51,939,70,807,82,706,96,675,103,674,98,705,91,806,77,939,65,1261,46,1590,33,1847,26"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1961,31,1682,37,1320,49,964,68,817,81,706,96,675,103,674,98,705,91,817,76,964,63,1319,44,1682,32,1961,26"/>
 <area shape="rect" id="Node000005" href="$unreachable__instructions_8cpp.html" title="List all unreachable instructions." alt="" coords="717,101,933,155"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1848,29,1675,32,1450,42,1198,62,1070,77,946,96,911,103,910,98,945,91,1070,72,1198,57,1449,37,1675,27,1848,24"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1961,28,1770,30,1517,39,1232,59,1087,75,946,96,911,103,910,98,945,91,1087,70,1232,54,1517,33,1770,25,1961,23"/>
 <area shape="rect" id="Node000006" href="$cover__goals__report__util_8cpp.html" title="Cover Goals Reporting Utilities." alt="" coords="957,101,1163,155"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1847,32,1712,38,1544,49,1359,68,1175,96,1143,103,1142,98,1174,91,1358,63,1543,44,1712,32,1847,26"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1960,30,1806,35,1610,45,1392,65,1175,96,1143,103,1142,98,1174,91,1392,59,1609,40,1806,29,1960,25"/>
 <area shape="rect" id="Node000007" href="$properties_8cpp.html" title="Properties." alt="" coords="1187,101,1371,155"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1848,36,1635,57,1512,74,1390,96,1360,103,1359,98,1389,91,1511,69,1635,52,1847,31"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1961,33,1700,52,1544,70,1390,96,1359,103,1358,98,1389,91,1544,65,1700,47,1961,28"/>
 <area shape="rect" id="Node000008" href="$report__util_8cpp.html" title="Bounded Model Checking Utilities." alt="" coords="1237,211,1421,265"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1848,33,1737,40,1617,52,1509,70,1466,82,1435,95,1350,212,1346,209,1432,91,1464,77,1508,65,1616,46,1737,35,1847,28"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1961,30,1825,35,1671,45,1531,65,1475,79,1435,95,1350,212,1346,209,1432,91,1474,74,1530,60,1671,40,1825,29,1961,25"/>
 <area shape="rect" id="Node000009" href="$goto__diff__base_8cpp.html" title="GOTO&#45;DIFF Base Class." alt="" coords="1445,101,1629,155"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1849,49,1642,96,1617,103,1615,98,1641,91,1848,44"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1961,41,1810,63,1642,96,1615,103,1614,98,1641,91,1809,58,1961,36"/>
 <area shape="rect" id="Node000010" href="$json__goto__trace_8h.html" title="Traces of GOTO Programs." alt="" coords="1653,101,1837,155"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1903,54,1801,103,1798,98,1901,49"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1992,52,1850,96,1827,103,1826,98,1849,91,1991,47"/>
 <area shape="rect" id="Node000017" href="$loop__ids_8cpp.html" title="Loop IDs." alt="" coords="1861,101,2045,155"/>
-<area shape="poly" id="edge18_Node000001_Node000017" title=" " alt="" coords="1956,59,1956,100,1951,100,1951,59"/>
+<area shape="poly" id="edge18_Node000001_Node000017" title=" " alt="" coords="2037,56,1985,102,1981,98,2033,52"/>
 <area shape="rect" id="Node000018" href="$show__goto__functions__json_8cpp.html" title="Goto Program." alt="" coords="2069,101,2293,155"/>
-<area shape="poly" id="edge19_Node000001_Node000018" title=" " alt="" coords="2010,49,2123,98,2121,103,2008,53"/>
+<area shape="poly" id="edge19_Node000001_Node000018" title=" " alt="" coords="2100,52,2153,98,2149,102,2097,56"/>
 <area shape="rect" id="Node000019" href="$show__properties_8cpp.html" title="Show Claims." alt="" coords="2317,101,2501,155"/>
-<area shape="poly" id="edge20_Node000001_Node000019" title=" " alt="" coords="2059,41,2178,62,2306,91,2332,98,2331,103,2305,96,2177,67,2058,46"/>
+<area shape="poly" id="edge20_Node000001_Node000019" title=" " alt="" coords="2150,46,2306,91,2330,98,2328,103,2305,96,2149,52"/>
 <area shape="rect" id="Node000020" href="$show__symbol__table_8cpp.html" title="Show the symbol table." alt="" coords="2525,101,2709,155"/>
-<area shape="poly" id="edge21_Node000001_Node000020" title=" " alt="" coords="2059,31,2270,51,2393,68,2514,91,2542,98,2541,103,2513,96,2392,73,2270,56,2059,36"/>
+<area shape="poly" id="edge21_Node000001_Node000020" title=" " alt="" coords="2173,35,2334,57,2514,91,2541,98,2540,103,2513,96,2334,62,2172,40"/>
 <area shape="rect" id="Node000021" href="$show__program_8cpp.html" title="Output of the program (SSA) constraints." alt="" coords="2734,101,2938,155"/>
-<area shape="poly" id="edge22_Node000001_Node000021" title=" " alt="" coords="2059,27,2193,33,2359,44,2541,63,2722,91,2754,98,2753,103,2721,96,2540,68,2358,50,2193,38,2059,32"/>
+<area shape="poly" id="edge22_Node000001_Node000021" title=" " alt="" coords="2173,29,2424,49,2573,66,2722,91,2754,98,2753,103,2721,96,2573,72,2424,54,2172,34"/>
 <area shape="rect" id="Node000022" href="$show__vcc_8cpp.html" title="Output of the verification conditions (VCCs)" alt="" coords="2962,101,3166,155"/>
-<area shape="poly" id="edge23_Node000001_Node000022" title=" " alt="" coords="2059,23,2230,26,2453,36,2702,56,2828,71,2951,91,2984,98,2983,103,2950,96,2827,77,2701,61,2453,41,2230,32,2059,29"/>
+<area shape="poly" id="edge23_Node000001_Node000022" title=" " alt="" coords="2173,25,2326,29,2520,40,2736,59,2951,91,2983,98,2982,103,2950,96,2735,65,2520,45,2326,35,2173,30"/>
 <area shape="rect" id="Node000023" href="$solver__hardness_8cpp.html" title=" " alt="" coords="3191,101,3401,155"/>
-<area shape="poly" id="edge24_Node000001_Node000023" title=" " alt="" coords="2059,27,2635,48,2950,67,3080,78,3179,91,3213,98,3212,103,3178,96,3079,83,2949,72,2635,53,2059,32"/>
-<area shape="rect" id="Node000024" href="$json__symbol_8cpp.html" title=" " alt="" coords="3425,101,3625,155"/>
-<area shape="poly" id="edge25_Node000001_Node000024" title=" " alt="" coords="2059,25,2356,31,2747,43,3133,63,3292,75,3414,91,3447,98,3446,103,3413,96,3292,81,3132,68,2747,49,2356,37,2059,31"/>
-<area shape="rect" id="Node000025" href="$json__irep_8cpp.html" title="Util." alt="" coords="3649,108,3847,148"/>
-<area shape="poly" id="edge26_Node000001_Node000025" title=" " alt="" coords="2059,25,2398,29,2854,39,3307,59,3495,73,3638,91,3696,105,3695,111,3637,96,3495,79,3307,64,2853,45,2398,34,2059,30"/>
-<area shape="rect" id="Node000026" href="$ui__message_8cpp.html" title=" " alt="" coords="3872,108,4091,148"/>
-<area shape="poly" id="edge27_Node000001_Node000026" title=" " alt="" coords="2059,24,2438,28,2958,38,3479,58,3696,73,3860,91,3925,105,3923,111,3860,96,3696,78,3479,63,2958,44,2437,33,2059,30"/>
+<area shape="poly" id="edge24_Node000001_Node000023" title=" " alt="" coords="2173,23,2363,24,2613,33,2896,54,3039,70,3179,91,3213,98,3212,103,3178,96,3038,75,2895,59,2613,38,2362,30,2173,28"/>
+<area shape="rect" id="Node000024" href="$json__goto__function_8cpp.html" title="JSON goto_function deserialization." alt="" coords="3426,101,3667,155"/>
+<area shape="poly" id="edge25_Node000001_Node000024" title=" " alt="" coords="2172,27,2806,48,3157,67,3303,78,3414,91,3453,98,3452,103,3413,96,3302,83,3157,72,2806,53,2172,32"/>
+<area shape="rect" id="Node000025" href="$json__symbol_8cpp.html" title=" " alt="" coords="3692,101,3892,155"/>
+<area shape="poly" id="edge26_Node000001_Node000025" title=" " alt="" coords="2172,25,2498,30,2933,41,3365,60,3545,74,3680,91,3714,98,3712,103,3680,96,3544,79,3365,66,2933,46,2498,35,2172,30"/>
+<area shape="rect" id="Node000026" href="$json__irep_8cpp.html" title="Util." alt="" coords="3915,108,4114,148"/>
+<area shape="poly" id="edge27_Node000001_Node000026" title=" " alt="" coords="2173,24,2539,27,3039,37,3298,46,3539,57,3747,72,3904,91,3963,105,3962,111,3904,96,3747,77,3539,62,3298,51,3039,42,2539,33,2173,30"/>
+<area shape="rect" id="Node000027" href="$ui__message_8cpp.html" title=" " alt="" coords="4139,108,4357,148"/>
+<area shape="poly" id="edge28_Node000001_Node000027" title=" " alt="" coords="2173,24,2578,27,3143,36,3437,44,3712,56,3948,71,4127,91,4191,105,4190,111,4126,96,3948,77,3711,61,3437,50,3143,41,2578,32,2173,29"/>
 <area shape="poly" id="edge12_Node000010_Node000008" title=" " alt="" coords="1654,162,1642,165,1538,190,1434,213,1422,216,1421,211,1433,208,1537,185,1641,160,1652,157"/>
 <area shape="rect" id="Node000011" href="$c__test__input__generator_8cpp.html" title="Test Input Generator for C." alt="" coords="1445,211,1629,265"/>
 <area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1684,164,1589,213,1587,208,1681,159"/>

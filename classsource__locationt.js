@@ -5,6 +5,7 @@ var classsource__locationt =
     [ "as_string", "classsource__locationt.html#ad4d84629053c53775f7f4ec7fadd30da", null ],
     [ "as_string", "classsource__locationt.html#a12fae1c638da4b7e24149adec6ba5ff0", null ],
     [ "as_string_with_cwd", "classsource__locationt.html#ae1cb2a4e47af9e4942b9988bb16fc0e7", null ],
+    [ "clear_function", "classsource__locationt.html#a40f97f800824cbe17f63c59d90ffa197", null ],
     [ "full_path", "classsource__locationt.html#afbd0ca82c26310c4ef63d7c0c1c00843", null ],
     [ "get_basic_block_source_lines", "classsource__locationt.html#a97ab41152af9212ecc6ae8ff8a693e79", null ],
     [ "get_case_number", "classsource__locationt.html#a59ec0bb3f5b089f6813b283ee7149bac", null ],

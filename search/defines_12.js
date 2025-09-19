@@ -43,6 +43,7 @@ var searchData=
   ['sym_5fswap1_40',['SYM_SWAP1',['../symbol_8cpp.html#a7453a1c08d477deb5a9c0f044c0ffc0c',1,'symbol.cpp']]],
   ['sym_5fswap2_41',['SYM_SWAP2',['../symbol_8cpp.html#a0180f1ff60a2c15d5bbbe4257b3c01a7',1,'symbol.cpp']]],
   ['symex_5fdynamic_5fprefix_42',['SYMEX_DYNAMIC_PREFIX',['../pointer__predicates_8h.html#a7d09f325360eb12489ecdd12c34d8268',1,'pointer_predicates.h']]],
-  ['symtab2gb_5foptions_43',['SYMTAB2GB_OPTIONS',['../symtab2gb__parse__options_8h.html#a314aebff2cbbd99877d7e64a0ff6827f',1,'symtab2gb_parse_options.h']]],
-  ['symtab2gb_5fout_5ffile_5fopt_44',['SYMTAB2GB_OUT_FILE_OPT',['../symtab2gb__parse__options_8h.html#ab5f301549b42d5d1745d9aea4abf3cb5',1,'symtab2gb_parse_options.h']]]
+  ['symtab2gb_5fgoto_5ffunctions_5fopt_43',['SYMTAB2GB_GOTO_FUNCTIONS_OPT',['../symtab2gb__parse__options_8h.html#afa090be69779b07a36dcad0debd65ec3',1,'symtab2gb_parse_options.h']]],
+  ['symtab2gb_5foptions_44',['SYMTAB2GB_OPTIONS',['../symtab2gb__parse__options_8h.html#a314aebff2cbbd99877d7e64a0ff6827f',1,'symtab2gb_parse_options.h']]],
+  ['symtab2gb_5fout_5ffile_5fopt_45',['SYMTAB2GB_OUT_FILE_OPT',['../symtab2gb__parse__options_8h.html#ab5f301549b42d5d1745d9aea4abf3cb5',1,'symtab2gb_parse_options.h']]]
 ];

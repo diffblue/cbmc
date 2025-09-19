@@ -106,12 +106,15 @@ $(document).ready(function(){initNavTree('symtab2gb__parse__options_8cpp.html','
 <code>#include &lt;<a class="el" href="exception__utils_8h_source.html">util/exception_utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="exit__codes_8h_source.html">util/exit_codes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="help__formatter_8h_source.html">util/help_formatter.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="json_8h_source.html">util/json.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="version_8h_source.html">util/version.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__model_8h_source.html">goto-programs/goto_model.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="write__goto__binary_8h_source.html">goto-programs/write_goto_binary.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="ansi__c__language_8h_source.html">ansi-c/ansi_c_language.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__convert__functions_8h_source.html">ansi-c/goto-conversion/goto_convert_functions.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="json__goto__functions_8h_source.html">json-symtab-language/json_goto_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="json__symtab__language_8h_source.html">json-symtab-language/json_symtab_language.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="json__parser_8h_source.html">json/json_parser.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="mode_8h_source.html">langapi/mode.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="linking_8h_source.html">linking/linking.h</a>&gt;</code><br />
 <code>#include &lt;fstream&gt;</code><br />
@@ -122,7 +125,7 @@ $(document).ready(function(){initNavTree('symtab2gb__parse__options_8cpp.html','
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="symtab2gb__parse__options_8cpp__incl.svg" width="3666" height="711"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="symtab2gb__parse__options_8cpp__incl.svg" width="3775" height="726"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="symtab2gb__parse__options_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -131,8 +134,8 @@ $(document).ready(function(){initNavTree('symtab2gb__parse__options_8cpp.html','
 Functions</h2></td></tr>
 <tr class="memitem:ad19f4a5a730c9cb39387429ece68e2af" id="r_ad19f4a5a730c9cb39387429ece68e2af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="symtab2gb__parse__options_8cpp.html#ad19f4a5a730c9cb39387429ece68e2af">failed</a> (<a class="el" href="classait.html">bool</a> <a class="el" href="classait.html">error_indicator</a>)</td></tr>
 <tr class="separator:ad19f4a5a730c9cb39387429ece68e2af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b940069ca5f3c9d8d53bf02f595df12" id="r_a4b940069ca5f3c9d8d53bf02f595df12"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="symtab2gb__parse__options_8cpp.html#a4b940069ca5f3c9d8d53bf02f595df12">run_symtab2gb</a> (<a class="el" href="classait.html">const</a> std::vector&lt; std::string &gt; &amp;<a class="el" href="classait.html">symtab_filenames</a>, <a class="el" href="classait.html">const</a> std::string &amp;<a class="el" href="classait.html">gb_filename</a>, <a class="el" href="classait.html">const</a> std::string &amp;<a class="el" href="classait.html">cmdline_verbosity</a>)</td></tr>
-<tr class="separator:a4b940069ca5f3c9d8d53bf02f595df12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad183c0569d4f68cbe5bc8c0a8633eff2" id="r_ad183c0569d4f68cbe5bc8c0a8633eff2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="symtab2gb__parse__options_8cpp.html#ad183c0569d4f68cbe5bc8c0a8633eff2">run_symtab2gb</a> (<a class="el" href="classait.html">const</a> std::vector&lt; std::string &gt; &amp;<a class="el" href="classait.html">symtab_filenames</a>, <a class="el" href="classait.html">const</a> std::string &amp;<a class="el" href="classait.html">gb_filename</a>, <a class="el" href="classait.html">const</a> std::string &amp;<a class="el" href="classait.html">goto_functions_filename_or_empty</a>, <a class="el" href="classait.html">const</a> std::string &amp;<a class="el" href="classait.html">cmdline_verbosity</a>)</td></tr>
+<tr class="separator:ad183c0569d4f68cbe5bc8c0a8633eff2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ad19f4a5a730c9cb39387429ece68e2af" name="ad19f4a5a730c9cb39387429ece68e2af"></a>
@@ -159,12 +162,12 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symtab2gb__parse__options_8cpp_source.html#l00038">38</a> of file <a class="el" href="symtab2gb__parse__options_8cpp_source.html">symtab2gb_parse_options.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symtab2gb__parse__options_8cpp_source.html#l00041">41</a> of file <a class="el" href="symtab2gb__parse__options_8cpp_source.html">symtab2gb_parse_options.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a4b940069ca5f3c9d8d53bf02f595df12" name="a4b940069ca5f3c9d8d53bf02f595df12"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b940069ca5f3c9d8d53bf02f595df12">&#9670;&#160;</a></span>run_symtab2gb()</h2>
+<a id="ad183c0569d4f68cbe5bc8c0a8633eff2" name="ad183c0569d4f68cbe5bc8c0a8633eff2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad183c0569d4f68cbe5bc8c0a8633eff2">&#9670;&#160;</a></span>run_symtab2gb()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -188,6 +191,12 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classait.html">const</a> std::string &amp;&#160;</td>
+          <td class="paramname"><em>goto_functions_filename_or_empty</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> std::string &amp;&#160;</td>
           <td class="paramname"><em>cmdline_verbosity</em>&#160;</td>
         </tr>
         <tr>
@@ -203,7 +212,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="symtab2gb__parse__options_8cpp_source.html#l00043">43</a> of file <a class="el" href="symtab2gb__parse__options_8cpp_source.html">symtab2gb_parse_options.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="symtab2gb__parse__options_8cpp_source.html#l00046">46</a> of file <a class="el" href="symtab2gb__parse__options_8cpp_source.html">symtab2gb_parse_options.cpp</a>.</p>
 
 </div>
 </div>
