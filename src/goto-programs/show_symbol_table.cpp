@@ -177,7 +177,7 @@ static void show_symbol_table_json_ui(
 
       {"type", irep_converter.convert_from_irep(symbol.type)},
       {"value", irep_converter.convert_from_irep(symbol.value)},
-      {"location", irep_converter.convert_from_irep(symbol.location)},
+      {"location", json(symbol.location)},
 
       {"isType", jsont::json_boolean(symbol.is_type)},
       {"isMacro", jsont::json_boolean(symbol.is_macro)},

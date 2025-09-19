@@ -12,11 +12,13 @@ Author: Diffblue Ltd.
 #include <util/parse_options.h>
 
 #define SYMTAB2GB_OUT_FILE_OPT "out"
+#define SYMTAB2GB_GOTO_FUNCTIONS_OPT "goto-functions"
 
 // clang-format off
 
 #define SYMTAB2GB_OPTIONS                                                      \
   "(" SYMTAB2GB_OUT_FILE_OPT "):"                                              \
+  "(" SYMTAB2GB_GOTO_FUNCTIONS_OPT "):"                                        \
   "(verbosity):"                                                               \
 // end options
 

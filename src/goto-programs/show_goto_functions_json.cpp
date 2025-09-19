@@ -48,6 +48,14 @@ json_objectt show_goto_functions_jsont::convert(
                        function_name.starts_with("java::org.cprover") ||
                        function_name.starts_with("java::java");
     json_function["isInternal"]=jsont::json_boolean(is_internal);
+    json_function["isHidden"] = jsont::json_boolean(function.is_hidden());
+    auto json_parameter_id_range =
+      make_range(
+        function.parameter_identifiers.begin(),
+        function.parameter_identifiers.end())
+        .map([](const irep_idt &id) { return json_stringt{id}; });
+    json_function["parameterIdentifiers"] = json_arrayt{
+      json_parameter_id_range.begin(), json_parameter_id_range.end()};
 
     if(list_only)
       continue;
@@ -60,12 +68,14 @@ json_objectt show_goto_functions_jsont::convert(
         function.body.instructions)
       {
         json_objectt instruction_entry{
-          {"instructionId", json_stringt(instruction.to_string())}};
+          {"instructionId", json_stringt(instruction.to_string())},
+          {"locationNumber",
+           json_numbert{std::to_string(instruction.location_number)}}};
 
-        if(instruction.code().source_location().is_not_nil())
+        if(instruction.source_location().is_not_nil())
         {
           instruction_entry["sourceLocation"] =
-            json(instruction.code().source_location());
+            json(instruction.source_location());
         }
 
         std::ostringstream instruction_builder;
@@ -74,17 +84,12 @@ json_objectt show_goto_functions_jsont::convert(
         instruction_entry["instruction"]=
           json_stringt(instruction_builder.str());
 
-        if(!instruction.code().operands().empty())
+        if(instruction.code().is_not_nil())
         {
-          json_arrayt operand_array;
-          for(const exprt &operand : instruction.code().operands())
-          {
-            json_objectt operand_object=
-              no_comments_irep_converter.convert_from_irep(
-                operand);
-            operand_array.push_back(operand_object);
-          }
-          instruction_entry["operands"] = std::move(operand_array);
+          json_objectt code_object =
+            no_comments_irep_converter.convert_from_irep(instruction.code());
+
+          instruction_entry["code"] = std::move(code_object);
         }
 
         if(instruction.has_condition())
@@ -94,6 +99,27 @@ json_objectt show_goto_functions_jsont::convert(
               instruction.condition());
 
           instruction_entry["guard"] = std::move(guard_object);
+        }
+
+        if(!instruction.targets.empty())
+        {
+          auto json_target_range =
+            make_range(instruction.targets.begin(), instruction.targets.end())
+              .map(
+                [](const goto_programt::targett &target) {
+                  return json_numbert{std::to_string(target->location_number)};
+                });
+          instruction_entry["targets"] =
+            json_arrayt{json_target_range.begin(), json_target_range.end()};
+        }
+
+        if(!instruction.labels.empty())
+        {
+          auto json_label_range =
+            make_range(instruction.labels.begin(), instruction.labels.end())
+              .map([](const irep_idt &id) { return json_stringt{id}; });
+          instruction_entry["labels"] =
+            json_arrayt{json_label_range.begin(), json_label_range.end()};
         }
 
         json_instruction_array.push_back(std::move(instruction_entry));

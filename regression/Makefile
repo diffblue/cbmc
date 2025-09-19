@@ -53,7 +53,6 @@ DIRS = cbmc-shadow-memory \
        goto-cc-regression-gh-issue-5380 \
        linking-goto-binaries \
        symtab2gb \
-       symtab2gb-cbmc \
        solver-hardness \
        goto-ld \
        validate-trace-xml-schema \

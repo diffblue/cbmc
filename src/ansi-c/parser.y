@@ -3026,7 +3026,7 @@ function_definition:
           PARSER.pop_scope();
           
           // We are no longer in any function.
-          PARSER.set_function(irep_idt());
+          PARSER.clear_function();
         }
         ;
 
@@ -3589,7 +3589,7 @@ parameter_postfixing_abstract_declarator:
           // Clear function name in source location after parsing if
           // at global scope.
           if (PARSER.current_scope().prefix.empty()) {
-            PARSER.set_function(irep_idt());
+            PARSER.clear_function();
           }
 
           $$ = merge($4, $1);
@@ -3621,7 +3621,7 @@ parameter_postfixing_abstract_declarator:
           // Clear function name in source location after parsing if
           // at global scope.
           if (PARSER.current_scope().prefix.empty()) {
-            PARSER.set_function(irep_idt());
+            PARSER.clear_function();
           }
 
           if(parser_stack($5).is_not_nil())

@@ -134,7 +134,13 @@ public:
   DEPRECATED(SINCE(2022, 10, 13, "use identifier of containing function"))
   void set_function(const irep_idt &function)
   {
+    PRECONDITION(!function.empty());
     set(ID_function, function);
+  }
+
+  void clear_function()
+  {
+    remove(ID_function);
   }
 
   void set_property_id(const irep_idt &property_id)
