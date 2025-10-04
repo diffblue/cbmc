@@ -1,4 +1,6 @@
-SRC = arith_tools.cpp \
+SRC = \
+      algebraic_number.cpp \
+      arith_tools.cpp \
       array_element_from_pointer.cpp \
       array_name.cpp \
       bitvector_expr.cpp \
@@ -66,7 +68,6 @@ SRC = arith_tools.cpp \
       prefix_filter.cpp \
       rational.cpp \
       rational_tools.cpp \
-      real.cpp \
       ref_expr_set.cpp \
       refined_string_type.cpp \
       rename.cpp \

@@ -82,7 +82,9 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['integer-assignments1', 'test.desc'],
     # this test is expected to abort, thus producing invalid XML
     ['String_Abstraction17', 'test.desc'],
-    ['Quantifiers1', 'quantifier-with-side-effect.desc']
+    ['Quantifiers1', 'quantifier-with-side-effect.desc'],
+    # this test produces unicode output that cannot be decoded as ASCII
+    ['real-irrational1', 'test.desc']
 ]))
 
 # TODO maybe consider looking them up on PATH, but direct paths are

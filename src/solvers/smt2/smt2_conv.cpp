@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_conv.h"
 
+#include <util/algebraic_number.h>
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
@@ -31,7 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/range.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
-#include <util/real.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -447,10 +447,11 @@ constant_exprt smt2_convt::parse_literal(
         }
         else if(type.id() == ID_real)
         {
-          mp_integer first = string2integer(s.substr(0, pos));
-          mp_integer second = string2integer(s.substr(pos, std::string::npos));
-          realt real{first, second};
-          return real.as_expr();
+          rationalt rational_value;
+          bool failed = to_rational(
+            constant_exprt{src.id(), rational_typet{}}, rational_value);
+          CHECK_RETURN(!failed);
+          return algebraic_numbert{rational_value}.as_expr();
         }
         else
         {
@@ -537,6 +538,42 @@ constant_exprt smt2_convt::parse_literal(
     std::size_t e = unsafe_string2size_t(src.get_sub()[2].id_string());
     std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
     return ieee_float_valuet::NaN(ieee_float_spect(s - 1, e)).to_expr();
+  }
+  else if(
+    src.get_sub().size() == 3 &&
+    src.get_sub()[0].id() == "root-obj") // (root-obj (+ ...) 1)
+  {
+    // Z3 emits these while there isn't an agreed-upon standard for representing
+    // algebraic numbers just yet. https://smt-comp.github.io/2023/model.html
+    // gave some proposals, but these don't seem to have been implemented.
+    // For now, we use DATA_INVARIANT as our parsing may be overly restrictive.
+    // Eventually, these should become proper, user-facing exceptions.
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      src.get_sub()[1].id().empty() && src.get_sub()[1].get_sub().size() == 3 &&
+        src.get_sub()[1].get_sub()[0].id() == "+" &&
+        src.get_sub()[2].id() == "1",
+      "unexpected root-obj expression",
+      src.pretty());
+    irept sum_rhs = src.get_sub()[1].get_sub()[2];
+    rationalt constant_coeff;
+    bool failed =
+      to_rational(parse_literal(sum_rhs, rational_typet{}), constant_coeff);
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      !failed, "failed to parse rational constant coefficient", src.pretty());
+    irept sum_lhs = src.get_sub()[1].get_sub()[1];
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      sum_lhs.id().empty() && sum_lhs.get_sub().size() == 3 &&
+        sum_lhs.get_sub()[0].id() == "^" && sum_lhs.get_sub()[1].id() == "x",
+      "unexpected first operand to root-obj",
+      src.pretty());
+    std::size_t degree = unsafe_string2size_t(sum_lhs.get_sub()[2].id_string());
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      degree > 0, "polynomial degree must be positive", src.pretty());
+    std::vector<rationalt> coefficients{degree + 1, rationalt{}};
+    coefficients.front() = constant_coeff;
+    coefficients.back() = rationalt{1};
+    algebraic_numbert a{coefficients};
+    return a.as_expr();
   }
 
   if(type.id()==ID_signedbv ||
