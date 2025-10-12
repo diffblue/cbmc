@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecast.h"
 
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -17,10 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/rational.h>
+#include <util/rational_tools.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
 #include "c_qualifiers.h"
+
+#include <algorithm>
 
 bool c_implicit_typecast(
   exprt &expr,
@@ -102,30 +104,28 @@ bool check_c_implicit_typecast(
 
   if(src_type_id==ID_natural)
   {
-    if(dest_type.id()==ID_bool ||
-       dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_integer ||
-       dest_type.id()==ID_real ||
-       dest_type.id()==ID_complex ||
-       dest_type.id()==ID_unsignedbv ||
-       dest_type.id()==ID_signedbv ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_bool || dest_type.id() == ID_c_bool ||
+      dest_type.id() == ID_integer || dest_type.id() == ID_rational ||
+      dest_type.id() == ID_real || dest_type.id() == ID_complex ||
+      dest_type.id() == ID_unsignedbv || dest_type.id() == ID_signedbv ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_integer)
   {
-    if(dest_type.id()==ID_bool ||
-       dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_real ||
-       dest_type.id()==ID_complex ||
-       dest_type.id()==ID_unsignedbv ||
-       dest_type.id()==ID_signedbv ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_fixedbv ||
-       dest_type.id()==ID_pointer ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_bool || dest_type.id() == ID_c_bool ||
+      dest_type.id() == ID_natural || dest_type.id() == ID_rational ||
+      dest_type.id() == ID_real || dest_type.id() == ID_complex ||
+      dest_type.id() == ID_unsignedbv || dest_type.id() == ID_signedbv ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_fixedbv ||
+      dest_type.id() == ID_pointer || dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_real)
   {
@@ -139,28 +139,28 @@ bool check_c_implicit_typecast(
   }
   else if(src_type_id==ID_rational)
   {
-    if(dest_type.id()==ID_bool ||
-       dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_complex ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_fixedbv ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_bool || dest_type.id() == ID_c_bool ||
+      dest_type.id() == ID_real || dest_type.id() == ID_complex ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_fixedbv ||
+      dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_bool)
   {
-    if(dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_integer ||
-       dest_type.id()==ID_real ||
-       dest_type.id()==ID_unsignedbv ||
-       dest_type.id()==ID_signedbv ||
-       dest_type.id()==ID_pointer ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_fixedbv ||
-       dest_type.id()==ID_c_enum ||
-       dest_type.id()==ID_c_enum_tag ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_c_bool || dest_type.id() == ID_integer ||
+      dest_type.id() == ID_natural || dest_type.id() == ID_rational ||
+      dest_type.id() == ID_real || dest_type.id() == ID_unsignedbv ||
+      dest_type.id() == ID_signedbv || dest_type.id() == ID_pointer ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_fixedbv ||
+      dest_type.id() == ID_c_enum || dest_type.id() == ID_c_enum_tag ||
+      dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_unsignedbv ||
           src_type_id==ID_signedbv ||
@@ -168,20 +168,17 @@ bool check_c_implicit_typecast(
           src_type_id==ID_c_enum_tag ||
           src_type_id==ID_c_bool)
   {
-    if(dest_type.id()==ID_unsignedbv ||
-       dest_type.id()==ID_bool ||
-       dest_type.id()==ID_c_bool ||
-       dest_type.id()==ID_integer ||
-       dest_type.id()==ID_real ||
-       dest_type.id()==ID_rational ||
-       dest_type.id()==ID_signedbv ||
-       dest_type.id()==ID_floatbv ||
-       dest_type.id()==ID_fixedbv ||
-       dest_type.id()==ID_pointer ||
-       dest_type.id()==ID_c_enum ||
-       dest_type.id()==ID_c_enum_tag ||
-       dest_type.id()==ID_complex)
+    if(
+      dest_type.id() == ID_unsignedbv || dest_type.id() == ID_bool ||
+      dest_type.id() == ID_c_bool || dest_type.id() == ID_integer ||
+      dest_type.id() == ID_natural || dest_type.id() == ID_rational ||
+      dest_type.id() == ID_real || dest_type.id() == ID_signedbv ||
+      dest_type.id() == ID_floatbv || dest_type.id() == ID_fixedbv ||
+      dest_type.id() == ID_pointer || dest_type.id() == ID_c_enum ||
+      dest_type.id() == ID_c_enum_tag || dest_type.id() == ID_complex)
+    {
       return false;
+    }
   }
   else if(src_type_id==ID_floatbv ||
           src_type_id==ID_fixedbv)
@@ -415,6 +412,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   }
   else if(type.id() == ID_integer)
     return INTEGER;
+  else if(type.id() == ID_natural)
+    return NATURAL;
 
   return OTHER;
 }
@@ -454,6 +453,9 @@ void c_typecastt::implicit_typecast_arithmetic(
   case RATIONAL:   new_type=rational_typet(); break;
   case REAL:       new_type=real_typet(); break;
   case INTEGER:    new_type=integer_typet(); break;
+  case NATURAL:
+    new_type = natural_typet();
+    break;
   case COMPLEX:
   case OTHER:
   case VOIDPTR:
@@ -775,6 +777,27 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
     else if(dest_type.id()==ID_bool)
     {
       expr=is_not_zero(expr, ns);
+    }
+    else if(dest_type.id() == ID_rational)
+    {
+      if(auto div_expr = expr_try_dynamic_cast<div_exprt>(expr))
+      {
+        auto op1 = numeric_cast<mp_integer>(div_expr->lhs());
+        auto op2 = numeric_cast<mp_integer>(div_expr->rhs());
+        if(op1.has_value() && op2.has_value())
+        {
+          rationalt numerator{*op1};
+          expr = from_rational(rationalt{*op1} / rationalt{*op2});
+          return;
+        }
+      }
+      else if(auto int_const = numeric_cast<mp_integer>(expr))
+      {
+        expr = from_integer(*int_const, dest_type);
+        return;
+      }
+
+      expr = typecast_exprt(expr, dest_type);
     }
     else
     {

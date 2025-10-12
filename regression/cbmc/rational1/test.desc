@@ -1,0 +1,10 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--trace --smt2
+^\[main.assertion.2\] line 9 should fail: FAILURE$
+^\s*x=3/5
+^\s*y=3/5
+^\*\* 1 of 2 failed
+^EXIT=10$
+^SIGNAL=0$
+--

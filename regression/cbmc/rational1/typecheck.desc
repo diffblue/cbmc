@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-goto-functions
+^[[:space:]]*ASSIGN main::1::x := 3/5
+^[[:space:]]*ASSIGN main::1::y := 3/5
+^EXIT=0$
+^SIGNAL=0$
+--

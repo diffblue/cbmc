@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_conv.h"
 
+#include <util/algebraic_number.h>
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
@@ -29,6 +30,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/range.h>
+#include <util/rational.h>
+#include <util/rational_tools.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -430,6 +433,34 @@ constant_exprt smt2_convt::parse_literal(
     }
     else
     {
+      std::size_t pos = s.find(".");
+      if(pos != std::string::npos)
+      {
+        // Decimal, return as rational or real
+        if(type.id() == ID_rational)
+        {
+          rationalt rational_value;
+          bool failed = to_rational(
+            constant_exprt{src.id(), rational_typet{}}, rational_value);
+          CHECK_RETURN(!failed);
+          return from_rational(rational_value);
+        }
+        else if(type.id() == ID_real)
+        {
+          rationalt rational_value;
+          bool failed = to_rational(
+            constant_exprt{src.id(), rational_typet{}}, rational_value);
+          CHECK_RETURN(!failed);
+          return algebraic_numbert{rational_value}.as_expr();
+        }
+        else
+        {
+          UNREACHABLE_BECAUSE(
+            "smt2_convt::parse_literal parsed a number with a decimal point "
+            "as type " +
+            type.id_string());
+        }
+      }
       // Numeral
       value=string2integer(s);
     }
@@ -445,6 +476,18 @@ constant_exprt smt2_convt::parse_literal(
           src.get_sub()[1].id_string().substr(0, 2)=="bv")
   {
     value=string2integer(src.get_sub()[1].id_string().substr(2));
+  }
+  else if(
+    type.id() == ID_rational && src.get_sub().size() == 3 &&
+    src.get_sub()[0].id() == "/")
+  {
+    rationalt numerator;
+    rationalt denominator;
+    bool failed =
+      to_rational(parse_literal(src.get_sub()[1], type), numerator) ||
+      to_rational(parse_literal(src.get_sub()[2], type), denominator);
+    CHECK_RETURN(!failed);
+    return from_rational(numerator / denominator);
   }
   else if(src.get_sub().size()==4 &&
           src.get_sub()[0].id()=="fp") // (fp signbv exponentbv significandbv)
@@ -496,6 +539,42 @@ constant_exprt smt2_convt::parse_literal(
     std::size_t s = unsafe_string2size_t(src.get_sub()[3].id_string());
     return ieee_float_valuet::NaN(ieee_float_spect(s - 1, e)).to_expr();
   }
+  else if(
+    src.get_sub().size() == 3 &&
+    src.get_sub()[0].id() == "root-obj") // (root-obj (+ ...) 1)
+  {
+    // Z3 emits these while there isn't an agreed-upon standard for representing
+    // algebraic numbers just yet. https://smt-comp.github.io/2023/model.html
+    // gave some proposals, but these don't seem to have been implemented.
+    // For now, we use DATA_INVARIANT as our parsing may be overly restrictive.
+    // Eventually, these should become proper, user-facing exceptions.
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      src.get_sub()[1].id().empty() && src.get_sub()[1].get_sub().size() == 3 &&
+        src.get_sub()[1].get_sub()[0].id() == "+" &&
+        src.get_sub()[2].id() == "1",
+      "unexpected root-obj expression",
+      src.pretty());
+    irept sum_rhs = src.get_sub()[1].get_sub()[2];
+    rationalt constant_coeff;
+    bool failed =
+      to_rational(parse_literal(sum_rhs, rational_typet{}), constant_coeff);
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      !failed, "failed to parse rational constant coefficient", src.pretty());
+    irept sum_lhs = src.get_sub()[1].get_sub()[1];
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      sum_lhs.id().empty() && sum_lhs.get_sub().size() == 3 &&
+        sum_lhs.get_sub()[0].id() == "^" && sum_lhs.get_sub()[1].id() == "x",
+      "unexpected first operand to root-obj",
+      src.pretty());
+    std::size_t degree = unsafe_string2size_t(sum_lhs.get_sub()[2].id_string());
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      degree > 0, "polynomial degree must be positive", src.pretty());
+    std::vector<rationalt> coefficients{degree + 1, rationalt{}};
+    coefficients.front() = constant_coeff;
+    coefficients.back() = rationalt{1};
+    algebraic_numbert a{coefficients};
+    return a.as_expr();
+  }
 
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
@@ -519,7 +598,9 @@ constant_exprt smt2_convt::parse_literal(
     std::size_t width=boolbv_width(type);
     return constant_exprt(integer2bvrep(value, width), type);
   }
-  else if(type.id() == ID_integer)
+  else if(
+    type.id() == ID_integer || type.id() == ID_natural ||
+    type.id() == ID_rational || type.id() == ID_real)
   {
     return from_integer(value, type);
   }
@@ -726,7 +807,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
   if(
     type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
     type.id() == ID_integer || type.id() == ID_rational ||
-    type.id() == ID_real || type.id() == ID_c_enum ||
+    type.id() == ID_natural || type.id() == ID_real || type.id() == ID_c_enum ||
     type.id() == ID_c_enum_tag || type.id() == ID_fixedbv ||
     type.id() == ID_floatbv || type.id() == ID_c_bool || type.id() == ID_range)
   {
@@ -1359,6 +1440,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else
     {
+      PRECONDITION(type.id() != ID_natural);
       out << "(bvneg ";
       convert_expr(unary_minus_expr.op());
       out << ")";
@@ -2645,12 +2727,12 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   if(dest_type.id()==ID_bool)
   {
     // this is comparison with zero
-    if(src_type.id()==ID_signedbv ||
-       src_type.id()==ID_unsignedbv ||
-       src_type.id()==ID_c_bool ||
-       src_type.id()==ID_fixedbv ||
-       src_type.id()==ID_pointer ||
-       src_type.id()==ID_integer)
+    if(
+      src_type.id() == ID_signedbv || src_type.id() == ID_unsignedbv ||
+      src_type.id() == ID_c_bool || src_type.id() == ID_fixedbv ||
+      src_type.id() == ID_pointer || src_type.id() == ID_integer ||
+      src_type.id() == ID_natural || src_type.id() == ID_rational ||
+      src_type.id() == ID_real)
     {
       out << "(not (= ";
       convert_expr(src);
@@ -2847,9 +2929,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         out << ")";
       }
     }
-    else if(src_type.id()==ID_integer) // from integer to bit-vector
+    else if(src_type.id() == ID_integer || src_type.id() == ID_natural)
     {
-      // must be constant
+      // from integer to bit-vector, must be constant
       if(src.is_constant())
       {
         mp_integer i = numeric_cast_v<mp_integer>(to_constant_expr(src));
@@ -3142,7 +3224,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
   }
-  else if(dest_type.id()==ID_integer)
+  else if(dest_type.id() == ID_integer || dest_type.id() == ID_natural)
   {
     if(src_type.id()==ID_bool)
     {
@@ -3166,6 +3248,19 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       typecast_exprt tmp(typecast_exprt(src, t), dest_type);
       convert_typecast(tmp);
     }
+  }
+  else if(dest_type.id() == ID_rational)
+  {
+    if(src_type.id() == ID_signedbv)
+    {
+      // TODO: negative numbers
+      out << "(/ ";
+      convert_expr(src);
+      out << " 1)";
+    }
+    else
+      UNEXPECTEDCASE(
+        "Unknown typecast " + src_type.id_string() + " -> rational");
   }
   else
     UNEXPECTEDCASE(
@@ -3588,7 +3683,10 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     const bool negative = has_prefix(value, "-");
 
     if(negative)
+    {
       out << "(- ";
+      value = value.substr(1);
+    }
 
     size_t pos=value.find("/");
 
@@ -3603,6 +3701,13 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     if(negative)
       out << ')';
   }
+  else if(expr_type.id() == ID_real)
+  {
+    const std::string &value = id2string(expr.get_value());
+    out << value;
+    if(value.find('.') == std::string::npos)
+      out << ".0";
+  }
   else if(expr_type.id()==ID_integer)
   {
     const auto value = id2string(expr.get_value());
@@ -3612,6 +3717,10 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       out << "(- " << value.substr(1, std::string::npos) << ')';
     else
       out << value;
+  }
+  else if(expr_type.id() == ID_natural)
+  {
+    out << expr.get_value();
   }
   else if(expr_type.id() == ID_range)
   {
@@ -3764,8 +3873,9 @@ void smt2_convt::convert_relation(const binary_relation_exprt &expr)
     else
       convert_floatbv(expr);
   }
-  else if(op_type.id()==ID_rational ||
-          op_type.id()==ID_integer)
+  else if(
+    op_type.id() == ID_rational || op_type.id() == ID_integer ||
+    op_type.id() == ID_natural || op_type.id() == ID_real)
   {
     out << "(";
     out << expr.id();
@@ -3810,7 +3920,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 {
   if(
     expr.type().id() == ID_rational || expr.type().id() == ID_integer ||
-    expr.type().id() == ID_real)
+    expr.type().id() == ID_natural || expr.type().id() == ID_real)
   {
     // these are multi-ary in SMT-LIB2
     out << "(+";
@@ -4037,7 +4147,9 @@ void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
 
 void smt2_convt::convert_minus(const minus_exprt &expr)
 {
-  if(expr.type().id()==ID_integer)
+  if(
+    expr.type().id() == ID_integer || expr.type().id() == ID_natural ||
+    expr.type().id() == ID_rational || expr.type().id() == ID_real)
   {
     out << "(- ";
     convert_expr(expr.op0());
@@ -4190,6 +4302,16 @@ void smt2_convt::convert_div(const div_exprt &expr)
     // the rounding mode.  See smt2_convt::convert_floatbv_div.
     UNREACHABLE;
   }
+  else if(
+    expr.type().id() == ID_rational || expr.type().id() == ID_integer ||
+    expr.type().id() == ID_natural || expr.type().id() == ID_real)
+  {
+    out << "(/ ";
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
+  }
   else
     UNEXPECTEDCASE("unsupported type for /: "+expr.type().id_string());
 }
@@ -4271,9 +4393,9 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
 
     out << "))"; // bvmul, extract
   }
-  else if(expr.type().id()==ID_rational ||
-          expr.type().id()==ID_integer ||
-          expr.type().id()==ID_real)
+  else if(
+    expr.type().id() == ID_rational || expr.type().id() == ID_integer ||
+    expr.type().id() == ID_natural || expr.type().id() == ID_real)
   {
     out << "(*";
 
@@ -5806,6 +5928,8 @@ void smt2_convt::convert_type(const typet &type)
     out << "Real";
   else if(type.id()==ID_integer)
     out << "Int";
+  else if(type.id() == ID_natural)
+    out << "Nat";
   else if(type.id()==ID_complex)
   {
     if(use_datatypes)

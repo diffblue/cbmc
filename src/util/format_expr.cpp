@@ -202,8 +202,12 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     result += ']';
     return os << result;
   }
-  else if(type == ID_integer || type == ID_natural || type == ID_range)
+  else if(
+    type == ID_integer || type == ID_natural || type == ID_rational ||
+    type == ID_real || type == ID_range)
+  {
     return os << src.get_value();
+  }
   else if(type == ID_string)
     return os << '"' << escape(id2string(src.get_value())) << '"';
   else if(type == ID_floatbv)

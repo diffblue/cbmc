@@ -206,6 +206,14 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   {
     cache_entry = defined_entryt{0};
   }
+  else if(
+    type_id == ID_rational || type_id == ID_real || type_id == ID_integer ||
+    type_id == ID_natural)
+  {
+    // these have unbounded width, but we warn about this elsewhere and
+    // shouldn't fail in get_entry
+    cache_entry = defined_entryt{1};
+  }
   else
   {
     UNIMPLEMENTED_FEATURE(

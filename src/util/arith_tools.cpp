@@ -102,7 +102,7 @@ constant_exprt from_integer(
 {
   const irep_idt &type_id=type.id();
 
-  if(type_id==ID_integer)
+  if(type_id == ID_integer || type_id == ID_rational || type_id == ID_real)
   {
     return constant_exprt(integer2string(int_value), type);
   }
@@ -176,6 +176,10 @@ constant_exprt from_integer(
     // always rounds to zero
     ieee_float.from_integer(int_value);
     return ieee_float.to_expr();
+  }
+  else if(type_id == ID_rational)
+  {
+    return constant_exprt(integer2string(int_value), type);
   }
   else
     PRECONDITION(false);

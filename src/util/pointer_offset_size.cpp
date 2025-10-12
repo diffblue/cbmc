@@ -488,6 +488,11 @@ std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)
   {
     return from_integer(32 / config.ansi_c.char_width, size_type());
   }
+  else if(type.id() == ID_rational)
+  {
+    // these shouldn't really have sizes but this will do
+    return from_integer(1, size_type());
+  }
   else
     return {};
 }
