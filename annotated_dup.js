@@ -68,6 +68,7 @@ var annotated_dup =
     [ "ai_storage_baset", "classai__storage__baset.html", "classai__storage__baset" ],
     [ "ai_three_way_merget", "classai__three__way__merget.html", "classai__three__way__merget" ],
     [ "ait", "classait.html", "classait" ],
+    [ "algebraic_numbert", "classalgebraic__numbert.html", "classalgebraic__numbert" ],
     [ "all_paths_enumeratort", "classall__paths__enumeratort.html", "classall__paths__enumeratort" ],
     [ "all_properties_verifier_with_fault_localizationt", "classall__properties__verifier__with__fault__localizationt.html", "classall__properties__verifier__with__fault__localizationt" ],
     [ "all_properties_verifier_with_trace_storaget", "classall__properties__verifier__with__trace__storaget.html", "classall__properties__verifier__with__trace__storaget" ],

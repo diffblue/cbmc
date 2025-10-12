@@ -154,6 +154,7 @@ var hierarchy =
         [ "location_sensitive_storaget", "classlocation__sensitive__storaget.html", null ]
       ] ]
     ] ],
+    [ "algebraic_numbert", "classalgebraic__numbert.html", null ],
     [ "allocate_objectst", "classallocate__objectst.html", null ],
     [ "ancestry_resultt", "classancestry__resultt.html", null ],
     [ "smt_bit_vector_theoryt::andt", "structsmt__bit__vector__theoryt_1_1andt.html", null ],

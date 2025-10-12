@@ -15,6 +15,7 @@ var classc__typecastt =
       [ "LARGE_SIGNED_INT", "classc__typecastt.html#a0eee75bf61b8ff7fe1d1d11dba563296a7ef575ecd8f40505c15adb1787b7a479", null ],
       [ "LARGE_UNSIGNED_INT", "classc__typecastt.html#a0eee75bf61b8ff7fe1d1d11dba563296a1aeec321c8b62b447b66887685fac5f8", null ],
       [ "INTEGER", "classc__typecastt.html#a0eee75bf61b8ff7fe1d1d11dba563296af09713e3e27f1c3affaa29d1d53caffe", null ],
+      [ "NATURAL", "classc__typecastt.html#a0eee75bf61b8ff7fe1d1d11dba563296abc8ba45de10433e009ea1eb557ea5c91", null ],
       [ "FIXEDBV", "classc__typecastt.html#a0eee75bf61b8ff7fe1d1d11dba563296a82ab8eb1f044f2102b10a99f75190225", null ],
       [ "SINGLE", "classc__typecastt.html#a0eee75bf61b8ff7fe1d1d11dba563296a3711fa5f4e01cca8647d9b8ea6208cd7", null ],
       [ "DOUBLE", "classc__typecastt.html#a0eee75bf61b8ff7fe1d1d11dba563296af78a78ff5a1b2e05032c7e1f5ed2d20d", null ],

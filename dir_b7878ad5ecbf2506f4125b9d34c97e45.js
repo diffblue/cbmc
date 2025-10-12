@@ -1,5 +1,7 @@
 var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
 [
+    [ "algebraic_number.cpp", "algebraic__number_8cpp.html", "algebraic__number_8cpp" ],
+    [ "algebraic_number.h", "algebraic__number_8h.html", "algebraic__number_8h" ],
     [ "arith_tools.cpp", "arith__tools_8cpp.html", "arith__tools_8cpp" ],
     [ "arith_tools.h", "arith__tools_8h.html", "arith__tools_8h" ],
     [ "array_element_from_pointer.cpp", "array__element__from__pointer_8cpp.html", "array__element__from__pointer_8cpp" ],

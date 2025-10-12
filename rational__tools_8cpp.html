@@ -105,6 +105,7 @@ $(document).ready(function(){initNavTree('rational__tools_8cpp.html',''); initRe
 <p>Rational Numbers.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="rational__tools_8h_source.html">rational_tools.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="mathematical__types_8h_source.html">mathematical_types.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rational_8h_source.html">rational.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -112,15 +113,13 @@ $(document).ready(function(){initNavTree('rational__tools_8cpp.html',''); initRe
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="rational__tools_8cpp__incl.svg" width="1258" height="652"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="rational__tools_8cpp__incl.svg" width="1179" height="652"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="rational__tools_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a44c2a01356c52cbf8a23b3a21364040e" id="r_a44c2a01356c52cbf8a23b3a21364040e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rational__tools_8cpp.html#a44c2a01356c52cbf8a23b3a21364040e">power10</a> (<a class="el" href="classait.html">size_t</a> i)</td></tr>
-<tr class="separator:a44c2a01356c52cbf8a23b3a21364040e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10b9600f02c74893475b545b67f403d6" id="r_a10b9600f02c74893475b545b67f403d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rational__tools_8cpp.html#a10b9600f02c74893475b545b67f403d6">to_rational</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="classrationalt.html">rationalt</a> &amp;<a class="el" href="classait.html">rational_value</a>)</td></tr>
 <tr class="separator:a10b9600f02c74893475b545b67f403d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf9d90ecc0c1cab08c81ad9f89f6732c" id="r_aaf9d90ecc0c1cab08c81ad9f89f6732c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classconstant__exprt.html">constant_exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rational__tools_8cpp.html#aaf9d90ecc0c1cab08c81ad9f89f6732c">from_rational</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classrationalt.html">rationalt</a> &amp;<a class="el" href="classait.html">a</a>)</td></tr>
@@ -147,35 +146,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rational__tools_8cpp_source.html#l00081">81</a> of file <a class="el" href="rational__tools_8cpp_source.html">rational_tools.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a44c2a01356c52cbf8a23b3a21364040e" name="a44c2a01356c52cbf8a23b3a21364040e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44c2a01356c52cbf8a23b3a21364040e">&#9670;&#160;</a></span>power10()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">static</a> <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> power10 </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">size_t</a>&#160;</td>
-          <td class="paramname"><em>i</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="rational__tools_8cpp_source.html#l00017">17</a> of file <a class="el" href="rational__tools_8cpp_source.html">rational_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rational__tools_8cpp_source.html#l00089">89</a> of file <a class="el" href="rational__tools_8cpp_source.html">rational_tools.cpp</a>.</p>
 
 </div>
 </div>
@@ -205,7 +176,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="rational__tools_8cpp_source.html#l00027">27</a> of file <a class="el" href="rational__tools_8cpp_source.html">rational_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rational__tools_8cpp_source.html#l00018">18</a> of file <a class="el" href="rational__tools_8cpp_source.html">rational_tools.cpp</a>.</p>
 
 </div>
 </div>
