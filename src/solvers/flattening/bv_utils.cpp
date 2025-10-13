@@ -432,12 +432,11 @@ literalt bv_utilst::overflow_add(
     // An overflow occurs if the signs of the two operands are the same
     // and the sign of the sum is the opposite.
 
-    literalt old_sign=op0[op0.size()-1];
-    literalt sign_the_same=prop.lequal(op0[op0.size()-1], op1[op1.size()-1]);
+    literalt old_sign = sign_bit(op0);
+    literalt sign_the_same = prop.lequal(sign_bit(op0), sign_bit(op1));
 
     bvt result=add(op0, op1);
-    return
-      prop.land(sign_the_same, prop.lxor(result[result.size()-1], old_sign));
+    return prop.land(sign_the_same, prop.lxor(sign_bit(result), old_sign));
   }
   else if(rep==representationt::UNSIGNED)
   {
@@ -457,7 +456,7 @@ literalt bv_utilst::overflow_sub(
     // x is negative, always representable, and
     // thus not an overflow.
     literalt op1_is_int_min=is_int_min(op1);
-    literalt op0_is_negative=op0[op0.size()-1];
+    literalt op0_is_negative = sign_bit(op0);
 
     return
       prop.lselect(op1_is_int_min,
@@ -557,7 +556,7 @@ bvt bv_utilst::shift(const bvt &src, const shiftt s, std::size_t dist)
     case shiftt::SHIFT_ARIGHT:
       // src.size()-i won't underflow as i<src.size()
       // Then, if dist<src.size()-i, then i+dist<src.size()
-      l=(dist<src.size()-i?src[i+dist]:src[src.size()-1]); // sign bit
+      l = dist < src.size() - i ? src[i + dist] : sign_bit(src);
       break;
 
     case shiftt::SHIFT_LRIGHT:
@@ -608,7 +607,7 @@ literalt bv_utilst::overflow_negate(const bvt &bv)
   bvt should_be_zeros(bv);
   should_be_zeros.pop_back();
 
-  return prop.land(bv[bv.size() - 1], !prop.lor(should_be_zeros));
+  return prop.land(sign_bit(bv), !prop.lor(should_be_zeros));
 }
 
 void bv_utilst::incrementer(
@@ -1005,8 +1004,8 @@ bvt bv_utilst::signed_multiplier(const bvt &op0, const bvt &op1)
   if(op0.empty() || op1.empty())
     return bvt();
 
-  literalt sign0=op0[op0.size()-1];
-  literalt sign1=op1[op1.size()-1];
+  literalt sign0 = sign_bit(op0);
+  literalt sign1 = sign_bit(op1);
 
   bvt neg0=cond_negate(op0, sign0);
   bvt neg1=cond_negate(op1, sign1);
@@ -1034,7 +1033,7 @@ bvt bv_utilst::cond_negate(const bvt &bv, const literalt cond)
 bvt bv_utilst::absolute_value(const bvt &bv)
 {
   PRECONDITION(!bv.empty());
-  return cond_negate(bv, bv[bv.size()-1]);
+  return cond_negate(bv, sign_bit(bv));
 }
 
 bvt bv_utilst::cond_negate_no_overflow(const bvt &bv, literalt cond)
@@ -1051,15 +1050,15 @@ bvt bv_utilst::signed_multiplier_no_overflow(
   if(op0.empty() || op1.empty())
     return bvt();
 
-  literalt sign0=op0[op0.size()-1];
-  literalt sign1=op1[op1.size()-1];
+  literalt sign0 = sign_bit(op0);
+  literalt sign1 = sign_bit(op1);
 
   bvt neg0=cond_negate_no_overflow(op0, sign0);
   bvt neg1=cond_negate_no_overflow(op1, sign1);
 
   bvt result=unsigned_multiplier_no_overflow(neg0, neg1);
 
-  prop.l_set_to_false(result[result.size() - 1]);
+  prop.l_set_to_false(sign_bit(result));
 
   literalt result_sign=prop.lxor(sign0, sign1);
 
@@ -1112,8 +1111,8 @@ void bv_utilst::signed_divider(
 
   bvt _op0(op0), _op1(op1);
 
-  literalt sign_0=_op0[_op0.size()-1];
-  literalt sign_1=_op1[_op1.size()-1];
+  literalt sign_0 = sign_bit(_op0);
+  literalt sign_1 = sign_bit(_op1);
 
   bvt neg_0=negate(_op0), neg_1=negate(_op1);
 
@@ -1409,9 +1408,6 @@ literalt bv_utilst::lt_or_le(
 {
   PRECONDITION(bv0.size() == bv1.size());
 
-  literalt top0=bv0[bv0.size()-1],
-    top1=bv1[bv1.size()-1];
-
 #ifdef COMPACT_LT_OR_LE
   if(prop.has_set_to() && prop.cnf_handled_well())
   {
@@ -1422,6 +1418,8 @@ literalt bv_utilst::lt_or_le(
 
     if(rep == representationt::SIGNED)
     {
+      literalt top0 = sign_bit(bv0), top1 = sign_bit(bv1);
+
       if(top0.is_false() && top1.is_true())
         return const_literal(false);
       else if(top0.is_true() && top1.is_false())
@@ -1524,7 +1522,7 @@ literalt bv_utilst::lt_or_le(
     literalt result;
 
     if(rep==representationt::SIGNED)
-      result=prop.lxor(prop.lequal(top0, top1), carry);
+      result = prop.lxor(prop.lequal(sign_bit(bv0), sign_bit(bv1)), carry);
     else
     {
       INVARIANT(
