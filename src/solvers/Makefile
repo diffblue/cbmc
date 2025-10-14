@@ -118,6 +118,7 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/boolbv_onehot.cpp \
       flattening/boolbv_overflow.cpp \
       flattening/boolbv_power.cpp \
+      flattening/boolbv_popcount.cpp \
       flattening/boolbv_quantifier.cpp \
       flattening/boolbv_reduction.cpp \
       flattening/boolbv_replication.cpp \

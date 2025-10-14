@@ -218,6 +218,12 @@ public:
   literalt verilog_bv_has_x_or_z(const bvt &);
   static bvt verilog_bv_normal_bits(const bvt &);
 
+  /// Symbolic implementation of popcount (count of 1 bits in a bit vector)
+  /// Based on the pop0 algorithm from Hacker's Delight
+  /// \param bv: The bit vector to count 1s in
+  /// \return A bit vector representing the count
+  bvt popcount(const bvt &bv);
+
 protected:
   propt &prop;
 

@@ -37,6 +37,7 @@ class floatbv_round_to_integral_exprt;
 class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class overflow_result_exprt;
+class popcount_exprt;
 class replication_exprt;
 class unary_overflow_exprt;
 class union_typet;
@@ -203,6 +204,7 @@ protected:
   virtual bvt convert_bitreverse(const bitreverse_exprt &expr);
   virtual bvt convert_saturating_add_sub(const binary_exprt &expr);
   virtual bvt convert_overflow_result(const overflow_result_exprt &expr);
+  virtual bvt convert_popcount(const popcount_exprt &expr);
 
   bvt convert_update_bits(bvt src, const exprt &index, const bvt &new_value);
 
