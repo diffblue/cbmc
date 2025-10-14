@@ -2186,6 +2186,30 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         return;
       }
       else if(
+        identifier == "__builtin_nondeterministic_value" &&
+        config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG)
+      {
+        // From Clang's documentation:
+        // Each call to __builtin_nondeterministic_value returns a valid value
+        // of the type given by the argument.
+        // Clang only supports integer types, floating-point types, vector
+        // types.
+        if(expr.arguments().size() != 1)
+        {
+          error().source_location = f_op.source_location();
+          error() << "__builtin_nondeterministic_value expects one operand"
+                  << eom;
+          throw 0;
+        }
+        typecheck_expr(expr.arguments().front());
+
+        side_effect_expr_nondett result{
+          expr.arguments().front().type(), f_op.source_location()};
+        expr.swap(result);
+
+        return;
+      }
+      else if(
         identifier == "__builtin_shuffle" &&
         config.ansi_c.mode == configt::ansi_ct::flavourt::GCC)
       {

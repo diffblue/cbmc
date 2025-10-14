@@ -42,7 +42,14 @@ void test_shufflevector(void)
 
   vector_u res;
 
+#  if defined(__clang__)
+  // None of the indices refers to the second vector, so we can safely make it
+  // non-deterministic.
+  res.v = __builtin_shufflevector(
+    a, __builtin_nondeterministic_value(a), 0, 1, -1, 3);
+#  else
   res.v = __builtin_shufflevector(a, a, 0, 1, -1, 3);
+#  endif
   assert(res.members[0] == 1);
   assert(res.members[1] == 2);
   // res.members[2] is "don't care"
