@@ -1,5 +1,9 @@
 var NAVTREEINDEX119 =
 {
+"lispexpr_8h.html#af0adca5a47b28aa0000329a353c784e1":[8,0,2,30,119,4],
+"lispexpr_8h_source.html":[8,0,2,30,119],
+"lispirep_8cpp.html":[8,0,2,30,120],
+"lispirep_8cpp.html#a50769624c0e59651d087b7b5eaad8072":[8,0,2,30,120,1],
 "lispirep_8cpp.html#a5acfb63b9e64031bbfbb7a4ded91731f":[8,0,2,30,120,0],
 "lispirep_8cpp_source.html":[8,0,2,30,120],
 "lispirep_8h.html":[8,0,2,30,121],
@@ -26,11 +30,11 @@ var NAVTREEINDEX119 =
 "literal__expr_8h.html#ada70dd8e2db4b172d55bd910880d2ab7":[8,0,2,27,4,6,4],
 "literal__expr_8h.html#af81f640279884eafd2bb33c3cf292172":[8,0,2,27,4,6,1],
 "literal__expr_8h_source.html":[8,0,2,27,4,6],
-"literal__vector__expr_8h.html":[8,0,2,27,1,68],
-"literal__vector__expr_8h.html#a23df997c49e8cbe1cbcf55b7fe2c14bf":[8,0,2,27,1,68,2],
-"literal__vector__expr_8h.html#ab48844c748251586aada0e21a568dc5b":[8,0,2,27,1,68,3],
-"literal__vector__expr_8h.html#ab6ee326618cbc4b14912cb650752c543":[8,0,2,27,1,68,1],
-"literal__vector__expr_8h_source.html":[8,0,2,27,1,68],
+"literal__vector__expr_8h.html":[8,0,2,27,1,69],
+"literal__vector__expr_8h.html#a23df997c49e8cbe1cbcf55b7fe2c14bf":[8,0,2,27,1,69,2],
+"literal__vector__expr_8h.html#ab48844c748251586aada0e21a568dc5b":[8,0,2,27,1,69,3],
+"literal__vector__expr_8h.html#ab6ee326618cbc4b14912cb650752c543":[8,0,2,27,1,69,1],
+"literal__vector__expr_8h_source.html":[8,0,2,27,1,69],
 "liveness__context_8cpp.html":[8,0,2,0,0,26],
 "liveness__context_8cpp_source.html":[8,0,2,0,0,26],
 "liveness__context_8h.html":[8,0,2,0,0,27],
@@ -245,9 +249,5 @@ var NAVTREEINDEX119 =
 "math_8c.html#a7d000a00a80647dbbeaabeb26aeca2a7":[8,0,2,1,2,17,36],
 "math_8c.html#a7d179dac0d888a4610b1d638a3805e6b":[8,0,2,1,2,17,51],
 "math_8c.html#a7df19cf730447c00150569250a4b5e1d":[8,0,2,1,2,17,156],
-"math_8c.html#a81303ae9d978d20ca79b74025b9a9738":[8,0,2,1,2,17,49],
-"math_8c.html#a8246b3e17a39b137d0c62670d0c6e336":[8,0,2,1,2,17,127],
-"math_8c.html#a8259999687e8bd4b5509ca0d69b0ad9d":[8,0,2,1,2,17,118],
-"math_8c.html#a82a151adfde56b28fa8a50355c4f2ff6":[8,0,2,1,2,17,166],
-"math_8c.html#a82a6d70a29e839514b93bb0699f07bbe":[8,0,2,1,2,17,119]
+"math_8c.html#a81303ae9d978d20ca79b74025b9a9738":[8,0,2,1,2,17,49]
 };

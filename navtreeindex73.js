@@ -1,5 +1,9 @@
 var NAVTREEINDEX73 =
 {
+"contracts-history-variables.html#autotoc_md101":[1,0,9,1,0],
+"contracts-history-variables.html#autotoc_md102":[1,0,9,1,1],
+"contracts-history-variables.html#autotoc_md103":[1,0,9,1,2],
+"contracts-history-variables.html#autotoc_md104":[1,0,9,1,3],
 "contracts-history-variables.html#autotoc_md105":[1,0,9,2],
 "contracts-history-variables.html#autotoc_md96":[1,0,9,0],
 "contracts-history-variables.html#autotoc_md97":[1,0,9,0,0],
@@ -245,9 +249,5 @@ var NAVTREEINDEX73 =
 "convert__java__nondet_8cpp_source.html":[8,0,1,0,1,12],
 "convert__java__nondet_8h.html":[8,0,1,0,1,13],
 "convert__java__nondet_8h.html#a0dd72c8a29a1180f3909c00a80cf6914":[8,0,1,0,1,13,2],
-"convert__java__nondet_8h.html#a27d6ac56977e8db6caf8d54a211d96fd":[8,0,1,0,1,13,1],
-"convert__java__nondet_8h.html#ad528f40bc8bdba40e17b1a12fcb4a774":[8,0,1,0,1,13,0],
-"convert__java__nondet_8h_source.html":[8,0,1,0,1,13],
-"convert__real__literal_8cpp.html":[8,0,2,28,0,6],
-"convert__real__literal_8cpp.html#af3a37bbe3af8f0e58532ada4c606d3db":[8,0,2,28,0,6,0]
+"convert__java__nondet_8h.html#a27d6ac56977e8db6caf8d54a211d96fd":[8,0,1,0,1,13,1]
 };

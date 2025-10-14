@@ -39,6 +39,7 @@ var dir_95992f7eabcbd576bf4841b6d0d09aae =
     [ "boolbv_not.cpp", "boolbv__not_8cpp.html", null ],
     [ "boolbv_onehot.cpp", "boolbv__onehot_8cpp.html", null ],
     [ "boolbv_overflow.cpp", "boolbv__overflow_8cpp.html", "boolbv__overflow_8cpp" ],
+    [ "boolbv_popcount.cpp", "boolbv__popcount_8cpp.html", null ],
     [ "boolbv_power.cpp", "boolbv__power_8cpp.html", null ],
     [ "boolbv_quantifier.cpp", "boolbv__quantifier_8cpp.html", "boolbv__quantifier_8cpp" ],
     [ "boolbv_reduction.cpp", "boolbv__reduction_8cpp.html", null ],

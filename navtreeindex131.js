@@ -1,5 +1,9 @@
 var NAVTREEINDEX131 =
 {
+"smt__logics_8h.html":[8,0,2,27,9,0,5],
+"smt__logics_8h.html#a4565e178a5040422755e54ef6ecff265":[8,0,2,27,9,0,5,3],
+"smt__logics_8h.html#a4565e178a5040422755e54ef6ecff265":[8,0,2,27,9,0,5,4],
+"smt__logics_8h_source.html":[8,0,2,27,9,0,5],
 "smt__object__size_8cpp.html":[8,0,2,27,9,14],
 "smt__object__size_8cpp.html#a913c8ade1064d866c705a50f8dd2ab69":[8,0,2,27,9,14,0],
 "smt__object__size_8cpp_source.html":[8,0,2,27,9,14],
@@ -37,8 +41,8 @@ var NAVTREEINDEX131 =
 "smt__response__validation_8h.html#a057b9b3053c58e56d591e4191370c5bd":[8,0,2,27,9,17,0],
 "smt__response__validation_8h_source.html":[8,0,2,27,9,17],
 "smt__responses_8cpp.html":[8,0,2,27,9,0,8],
-"smt__responses_8cpp.html#ad080505313036e39c6bc046b588b6273":[8,0,2,27,9,0,8,0],
 "smt__responses_8cpp.html#ad080505313036e39c6bc046b588b6273":[8,0,2,27,9,0,8,1],
+"smt__responses_8cpp.html#ad080505313036e39c6bc046b588b6273":[8,0,2,27,9,0,8,0],
 "smt__responses_8cpp_source.html":[8,0,2,27,9,0,8],
 "smt__responses_8h.html":[8,0,2,27,9,0,9],
 "smt__responses_8h_source.html":[8,0,2,27,9,0,9],
@@ -48,10 +52,10 @@ var NAVTREEINDEX131 =
 "smt__solver__process_8h.html":[8,0,2,27,9,19],
 "smt__solver__process_8h_source.html":[8,0,2,27,9,19],
 "smt__sorts_8cpp.html":[8,0,2,27,9,0,10],
-"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[8,0,2,27,9,0,10,0],
-"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[8,0,2,27,9,0,10,1],
-"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[8,0,2,27,9,0,10,2],
 "smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[8,0,2,27,9,0,10,3],
+"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[8,0,2,27,9,0,10,2],
+"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[8,0,2,27,9,0,10,1],
+"smt__sorts_8cpp.html#a34b2293b46a63d0982c2f70e5114d831":[8,0,2,27,9,0,10,0],
 "smt__sorts_8cpp.html#a44d8f1fc245f3b9de7e6762b09484e1c":[8,0,2,27,9,0,10,4],
 "smt__sorts_8cpp_source.html":[8,0,2,27,9,0,10],
 "smt__sorts_8h.html":[8,0,2,27,9,0,11],
@@ -245,9 +249,5 @@ var NAVTREEINDEX131 =
 "ssa__step_8h.html":[8,0,2,17,55],
 "ssa__step_8h_source.html":[8,0,2,17,55],
 "stack__decision__procedure_8h.html":[8,0,2,27,15],
-"stack__decision__procedure_8h_source.html":[8,0,2,27,15],
-"stack__depth_8cpp.html":[8,0,2,15,98],
-"stack__depth_8cpp.html#a828a5468a1ee14893c2529351a566ab6":[8,0,2,15,98,1],
-"stack__depth_8cpp.html#a9976c3631a821730f44b7f02506d82b9":[8,0,2,15,98,2],
-"stack__depth_8cpp.html#ab00528ce946897226fdc433bf829e99b":[8,0,2,15,98,0]
+"stack__decision__procedure_8h_source.html":[8,0,2,27,15]
 };

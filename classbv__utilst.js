@@ -54,6 +54,7 @@ var classbv__utilst =
     [ "overflow_add", "classbv__utilst.html#a7c102fb50fa099e2134d4759b5d46475", null ],
     [ "overflow_negate", "classbv__utilst.html#a9f135fa31fdd49ab8e6088117f674150", null ],
     [ "overflow_sub", "classbv__utilst.html#a8b7a5f27b675b7dcda7dd303bbaed617", null ],
+    [ "popcount", "classbv__utilst.html#a7b224fe343564ec094f04408344d915c", null ],
     [ "rel", "classbv__utilst.html#aeb4322a29bfa63ac8c8cebfb9f157bb8", null ],
     [ "remainder", "classbv__utilst.html#a93e0d690297fb26cc35dd52057309435", null ],
     [ "saturating_add_sub", "classbv__utilst.html#afaa28ab00c8650a5e58337ee387ef7ab", null ],

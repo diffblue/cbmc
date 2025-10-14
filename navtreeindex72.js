@@ -1,5 +1,9 @@
 var NAVTREEINDEX72 =
 {
+"cnf_8cpp.html#a11ece1d71ffd6d8a03f7051e9e09641a":[8,0,2,27,7,0,0],
+"cnf_8cpp_source.html":[8,0,2,27,7,0],
+"cnf_8h.html":[8,0,2,27,7,1],
+"cnf_8h_source.html":[8,0,2,27,7,1],
 "cnf__clause__list_8cpp.html":[8,0,2,27,7,2],
 "cnf__clause__list_8cpp_source.html":[8,0,2,27,7,2],
 "cnf__clause__list_8h.html":[8,0,2,27,7,3],
@@ -245,9 +249,5 @@ var NAVTREEINDEX72 =
 "contracts-functions.html#autotoc_md94":[1,0,0,0],
 "contracts-functions.html#autotoc_md95":[1,0,0,1],
 "contracts-history-variables.html":[1,0,9],
-"contracts-history-variables.html#autotoc_md100":[1,0,9,1],
-"contracts-history-variables.html#autotoc_md101":[1,0,9,1,0],
-"contracts-history-variables.html#autotoc_md102":[1,0,9,1,1],
-"contracts-history-variables.html#autotoc_md103":[1,0,9,1,2],
-"contracts-history-variables.html#autotoc_md104":[1,0,9,1,3]
+"contracts-history-variables.html#autotoc_md100":[1,0,9,1]
 };

@@ -1,5 +1,7 @@
 var NAVTREEINDEX10 =
 {
+"classallocate__exprt.html#adb21a8b77bc59c401de7db3bb054f140":[7,0,57,8],
+"classallocate__objectst.html":[7,0,58],
 "classallocate__objectst.html#a0fe0ad9ce2ef77ef4bbea8e5339d1240":[7,0,58,1],
 "classallocate__objectst.html#a15b9e59458c237a7e53f47cca778259c":[7,0,58,6],
 "classallocate__objectst.html#a18e2cfa83a365497df806143a77d64a5":[7,0,58,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX10 =
 "classansi__c__scopet.html#a726cfd7ee69f5a9bf770eb738e8995eb":[7,0,75,7],
 "classansi__c__scopet.html#a72db92a644cd170a2591f2cf907dd5a7":[7,0,75,0],
 "classansi__c__scopet.html#a85f77a8a24f7dc7b71de2401c6ab6361":[7,0,75,5],
-"classansi__c__scopet.html#ad05d4e68252c723847eb2dc81c627db5":[7,0,75,6],
-"classansi__c__typecheckt.html":[7,0,76],
-"classansi__c__typecheckt.html#a087110c5c5a267a492ecab4dae819afa":[7,0,76,4]
+"classansi__c__scopet.html#ad05d4e68252c723847eb2dc81c627db5":[7,0,75,6]
 };
