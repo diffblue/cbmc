@@ -12,11 +12,8 @@ integration system. It separately tests both the CMake build system and the
 hand-written make files. The latest build steps being used in CI can be
 [found here](https://github.com/diffblue/cbmc/blob/develop/.github/workflows/pull-request-checks.yaml).
 
-The environments below have been used successfully in the
-past, but are not actively tested:
-
-- Solaris 11
-- FreeBSD 13
+The Solaris 11 environment below has been used successfully in the past, but is
+not actively tested.
 
 # Building using CMake
 

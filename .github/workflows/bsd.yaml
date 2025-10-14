@@ -18,10 +18,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: freebsd-13.2-gmake-${{ github.ref }}-${{ github.sha }}-PR
+          key: freebsd-15.0-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            freebsd-13.2-gmake-${{ github.ref }}
-            freebsd-13.2-gmake
+            freebsd-15.0-gmake-${{ github.ref }}
+            freebsd-15.0-gmake
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -29,7 +29,7 @@ jobs:
       - name: Build and Test
         uses: vmactions/freebsd-vm@v1
         with:
-          release: 13.2
+          release: "15.0"
           usesh: true
           run: |
             # apparently fail-on-error isn't the default here
@@ -49,7 +49,10 @@ jobs:
             gmake -C src -j2 CXX="ccache clang++"
             # gmake -C jbmc/src setup-submodules
             # gmake -C jbmc/src -j2 CXX="ccache clang++"
-            gmake -C unit "CXX=ccache clang++"
+            # https://github.com/catchorg/Catch2/issues/2910 is an issue
+            # specific to Clang/LLVM 19 (which is what FreeBSD 15 ships)
+            gmake -C unit "CXX=ccache clang++" \
+              CXXFLAGS="-Wall -pedantic -Werror -Wswitch-enum -Wno-deprecated-declarations -Wno-c++20-extensions"
             # gmake -C jbmc/unit "CXX=ccache clang++"
             echo "Print ccache stats"
             ccache -s
@@ -80,10 +83,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: openbsd-7.6-gmake-${{ github.ref }}-${{ github.sha }}-PR
+          key: openbsd-7.7-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            openbsd-7.6-gmake-${{ github.ref }}
-            openbsd-7.6-gmake
+            openbsd-7.7-gmake-${{ github.ref }}
+            openbsd-7.7-gmake
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -91,7 +94,7 @@ jobs:
       - name: Build and Test
         uses: vmactions/openbsd-vm@v1
         with:
-          release: 7.6
+          release: "7.7"
           run: |
             # apparently fail-on-error isn't the default here
             set -e -x
@@ -142,10 +145,10 @@ jobs:
         with:
           save-always: true
           path: .ccache
-          key: netbsd-9.3-gmake-${{ github.ref }}-${{ github.sha }}-PR
+          key: netbsd-10.1-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
-            netbsd-9.3-gmake-${{ github.ref }}
-            netbsd-9.3-gmake
+            netbsd-10.1-gmake-${{ github.ref }}
+            netbsd-10.1-gmake
       - name: ccache environment
         run: |
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
@@ -153,12 +156,12 @@ jobs:
       - name: Build and Test
         uses: vmactions/netbsd-vm@v1
         with:
-          release: 9.3
+          release: "10.1"
           run: |
             # apparently fail-on-error isn't the default here
             set -e -x
             echo "Fetch dependencies"
-            pkg_add -v bash gmake git python311 patch flex bison ccache parallel z3 gcc10
+            pkg_add -v gmake git python311 patch flex bison ccache parallel z3 gcc10
             ln -s $(which python3.11) /usr/pkg/bin/python3
             export PATH=/usr/pkg/gcc10/bin:$PATH
             echo "Fetch JBMC dependencies"
