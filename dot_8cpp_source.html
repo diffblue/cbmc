@@ -214,7 +214,7 @@ $(document).ready(function(){initNavTree('dot_8cpp_source.html',''); initResizab
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>      std::stringstream <a class="code hl_class" href="classait.html">tmp</a>;</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>      <span class="keywordflow">if</span>(it-&gt;is_goto())</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>      {</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        <span class="keywordflow">if</span>(it-&gt;condition().is_true())</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        <span class="keywordflow">if</span>(it-&gt;condition() == <span class="keyword">true</span>)</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>          <a class="code hl_class" href="classait.html">tmp</a>.str(<span class="stringliteral">&quot;Goto&quot;</span>);</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        {</div>
@@ -428,13 +428,13 @@ $(document).ready(function(){initNavTree('dot_8cpp_source.html',''); initResizab
 <div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>  std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt; &amp;<a class="code hl_class" href="classait.html">tres</a>,</div>
 <div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>  std::set&lt;goto_programt::const_targett, goto_programt::target_less_than&gt; &amp;<a class="code hl_class" href="classait.html">fres</a>)</div>
 <div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>{</div>
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>  <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; !it-&gt;condition().is_false())</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>  <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; it-&gt;condition() != <span class="keyword">false</span>)</div>
 <div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>  {</div>
 <div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;target : it-&gt;targets)</div>
 <div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>      <a class="code hl_class" href="classait.html">tres</a>.insert(target);</div>
 <div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>  }</div>
 <div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span> </div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>  <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; it-&gt;condition().is_true())</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>  <span class="keywordflow">if</span>(it-&gt;is_goto() &amp;&amp; it-&gt;condition() == <span class="keyword">true</span>)</div>
 <div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>    <span class="keywordflow">return</span>;</div>
 <div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span> </div>
 <div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>  <a class="code hl_typedef" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> next = it; next++;</div>
@@ -487,7 +487,7 @@ $(document).ready(function(){initNavTree('dot_8cpp_source.html',''); initResizab
 <div class="ttc" id="aclassdott_html_aada72a54654aba95aa4a63671a36260d"><div class="ttname"><a href="classdott.html#aada72a54654aba95aa4a63671a36260d">dott::output</a></div><div class="ttdeci">void output(std::ostream &amp;out)</div><div class="ttdef"><b>Definition</b> <a href="dot_8cpp_source.html#l00270">dot.cpp:270</a></div></div>
 <div class="ttc" id="aclassdott_html_ae40ef2be3953cb51404931736dca6bb4"><div class="ttname"><a href="classdott.html#ae40ef2be3953cb51404931736dca6bb4">dott::write_edge</a></div><div class="ttdeci">void write_edge(std::ostream &amp;, const goto_programt::instructiont &amp;, const goto_programt::instructiont &amp;, const std::string &amp;)</div><div class="ttdoc">writes an edge from the from node to the to node and with the given label to the output stream (dot f...</div><div class="ttdef"><b>Definition</b> <a href="dot_8cpp_source.html#l00340">dot.cpp:340</a></div></div>
 <div class="ttc" id="aclassdstringt_html"><div class="ttname"><a href="classdstringt.html">dstringt</a></div><div class="ttdoc">dstringt has one field, an unsigned integer no which is an index into a static table of strings.</div><div class="ttdef"><b>Definition</b> <a href="dstring_8h_source.html#l00037">dstring.h:38</a></div></div>
-<div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition</b> <a href="expr_8h_source.html#l00055">expr.h:56</a></div></div>
+<div class="ttc" id="aclassexprt_html"><div class="ttname"><a href="classexprt.html">exprt</a></div><div class="ttdoc">Base class for all expressions.</div><div class="ttdef"><b>Definition</b> <a href="expr_8h_source.html#l00056">expr.h:57</a></div></div>
 <div class="ttc" id="aclassgoto__modelt_html"><div class="ttname"><a href="classgoto__modelt.html">goto_modelt</a></div><div class="ttdef"><b>Definition</b> <a href="goto__model_8h_source.html#l00026">goto_model.h:27</a></div></div>
 <div class="ttc" id="aclassgoto__programt_1_1instructiont_html"><div class="ttname"><a href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a></div><div class="ttdoc">This class represents an instruction in the GOTO intermediate representation.</div><div class="ttdef"><b>Definition</b> <a href="goto__program_8h_source.html#l00179">goto_program.h:180</a></div></div>
 <div class="ttc" id="aclassgoto__programt_html"><div class="ttname"><a href="classgoto__programt.html">goto_programt</a></div><div class="ttdoc">A generic container class for the GOTO intermediate representation of one function.</div><div class="ttdef"><b>Definition</b> <a href="goto__program_8h_source.html#l00071">goto_program.h:72</a></div></div>

@@ -164,7 +164,7 @@ $(document).ready(function(){initNavTree('ensure__one__backedge__per__target_8cp
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>  <span class="comment">// If the last backedge is a conditional jump, add an extra unconditional</span></div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  <span class="comment">// backedge after it:</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">last_backedge</a>-&gt;condition().is_true())</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">last_backedge</a>-&gt;condition() != <span class="keyword">true</span>)</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>  {</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">new_goto</a> =</div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>      goto_program.<a class="code hl_function" href="classgoto__programt.html#a99b8eada755daa37331c52e53d2ee0b3">insert_after</a>(<a class="code hl_class" href="classait.html">last_backedge</a>, <a class="code hl_function" href="classgoto__programt.html#ae34f002c1001fe7430f617688016e473">goto_programt::make_goto</a>(it));</div>

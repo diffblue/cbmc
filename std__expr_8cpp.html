@@ -102,10 +102,17 @@ $(document).ready(function(){initNavTree('std__expr_8cpp.html',''); initResizabl
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="std__expr_8h_source.html">std_expr.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="arith__tools_8h_source.html">arith_tools.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="config_8h_source.html">config.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="expr__util_8h_source.html">expr_util.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="fixedbv_8h_source.html">fixedbv.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="mathematical__types_8h_source.html">mathematical_types.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="namespace_8h_source.html">namespace.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="pointer__expr_8h_source.html">pointer_expr.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="range_8h_source.html">range.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rational_8h_source.html">rational.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rational__tools_8h_source.html">rational_tools.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="substitute__symbols_8h_source.html">substitute_symbols.h</a>&quot;</code><br />
 <code>#include &lt;map&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -113,13 +120,31 @@ $(document).ready(function(){initNavTree('std__expr_8cpp.html',''); initResizabl
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="std__expr_8cpp__incl.svg" width="1432" height="931"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="std__expr_8cpp__incl.svg" width="1910" height="931"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="std__expr_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a10691362b53e5e684ad1eda3142ada9c" id="r_a10691362b53e5e684ad1eda3142ada9c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#a10691362b53e5e684ad1eda3142ada9c">operator==</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;lhs, <a class="el" href="classait.html">bool</a> rhs)</td></tr>
+<tr class="memdesc:a10691362b53e5e684ad1eda3142ada9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return whether the expression <code>lhs</code> is a constant of Boolean type that is representing the Boolean value <code>rhs</code>.  <br /></td></tr>
+<tr class="separator:a10691362b53e5e684ad1eda3142ada9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada734c1f945ec23fa005ee0a9da832c8" id="r_ada734c1f945ec23fa005ee0a9da832c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#ada734c1f945ec23fa005ee0a9da832c8">operator!=</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;lhs, <a class="el" href="classait.html">bool</a> rhs)</td></tr>
+<tr class="memdesc:ada734c1f945ec23fa005ee0a9da832c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return whether the expression <code>lhs</code> is not a constant of Boolean type or is not representing the Boolean value <code>rhs</code>.  <br /></td></tr>
+<tr class="separator:ada734c1f945ec23fa005ee0a9da832c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad3c40d1c985310afff0bee9ee171415" id="r_aad3c40d1c985310afff0bee9ee171415"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#aad3c40d1c985310afff0bee9ee171415">operator==</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;lhs, <a class="el" href="classait.html">int</a> rhs)</td></tr>
+<tr class="memdesc:aad3c40d1c985310afff0bee9ee171415"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return whether the expression <code>lhs</code> is a constant representing the numeric value <code>rhs</code>; only values 0 and 1 are supported for <code>rhs</code>.  <br /></td></tr>
+<tr class="separator:aad3c40d1c985310afff0bee9ee171415"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a164a29e9671b35dfc7544b46e872d4b1" id="r_a164a29e9671b35dfc7544b46e872d4b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#a164a29e9671b35dfc7544b46e872d4b1">operator!=</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;lhs, <a class="el" href="classait.html">int</a> rhs)</td></tr>
+<tr class="memdesc:a164a29e9671b35dfc7544b46e872d4b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the negation of <a class="el" href="std__expr_8cpp.html#a10691362b53e5e684ad1eda3142ada9c">operator==(const exprt &amp;, int)</a>.  <br /></td></tr>
+<tr class="separator:a164a29e9671b35dfc7544b46e872d4b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c1d73123a7d5e28285795e85d8dd393" id="r_a6c1d73123a7d5e28285795e85d8dd393"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#a6c1d73123a7d5e28285795e85d8dd393">operator==</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;lhs, std::nullptr_t rhs)</td></tr>
+<tr class="memdesc:a6c1d73123a7d5e28285795e85d8dd393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return whether the expression <code>lhs</code> is a constant representing the NULL pointer.  <br /></td></tr>
+<tr class="separator:a6c1d73123a7d5e28285795e85d8dd393"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a42ecbacc4b402ee11d75d223746fbc" id="r_a5a42ecbacc4b402ee11d75d223746fbc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#a5a42ecbacc4b402ee11d75d223746fbc">operator!=</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;lhs, std::nullptr_t rhs)</td></tr>
+<tr class="memdesc:a5a42ecbacc4b402ee11d75d223746fbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the negation of <a class="el" href="std__expr_8cpp.html#a6c1d73123a7d5e28285795e85d8dd393">operator==(const exprt &amp;, std::nullptr_t)</a>.  <br /></td></tr>
+<tr class="separator:a5a42ecbacc4b402ee11d75d223746fbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d859ac2f51f3b898154a185ddd2daa2" id="r_a4d859ac2f51f3b898154a185ddd2daa2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8cpp.html#a4d859ac2f51f3b898154a185ddd2daa2">disjunction</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">exprt::operandst</a> &amp;op)</td></tr>
 <tr class="memdesc:a4d859ac2f51f3b898154a185ddd2daa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">1) generates a disjunction for two or more operands 2) for one operand, returns the operand 3) returns false otherwise  <br /></td></tr>
 <tr class="separator:a4d859ac2f51f3b898154a185ddd2daa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,7 +194,7 @@ template&lt;<a class="el" href="classait.html">typename</a> T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00122">122</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00291">291</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -191,7 +216,7 @@ template&lt;<a class="el" href="classait.html">typename</a> T &gt; </div>
 
 <p>1) generates a conjunction for two or more operands 2) for one operand, returns the operand 3) returns true otherwise </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00106">106</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00275">275</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -224,7 +249,7 @@ template&lt;<a class="el" href="classait.html">typename</a> T &gt; </div>
 <p>Conjunction of two expressions. </p>
 <p>If the second is already an <code><a class="el" href="classand__exprt.html" title="Boolean AND.">and_exprt</a></code> add to its operands instead of creating a new expression. If one is <code>true</code>, return the other expression. If one is <code>false</code> returns <code>false</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00083">83</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00252">252</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>
@@ -246,7 +271,203 @@ template&lt;<a class="el" href="classait.html">typename</a> T &gt; </div>
 
 <p>1) generates a disjunction for two or more operands 2) for one operand, returns the operand 3) returns false otherwise </p>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00071">71</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00240">240</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ada734c1f945ec23fa005ee0a9da832c8" name="ada734c1f945ec23fa005ee0a9da832c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada734c1f945ec23fa005ee0a9da832c8">&#9670;&#160;</a></span>operator!=() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="interval_8cpp.html#aff2c7c23e9183e17b252198de5e5cf49">operator!</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">bool</a>&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return whether the expression <code>lhs</code> is not a constant of Boolean type or is not representing the Boolean value <code>rhs</code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00037">37</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a164a29e9671b35dfc7544b46e872d4b1" name="a164a29e9671b35dfc7544b46e872d4b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a164a29e9671b35dfc7544b46e872d4b1">&#9670;&#160;</a></span>operator!=() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="interval_8cpp.html#aff2c7c23e9183e17b252198de5e5cf49">operator!</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">int</a>&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the negation of <a class="el" href="std__expr_8cpp.html#a10691362b53e5e684ad1eda3142ada9c">operator==(const exprt &amp;, int)</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00060">60</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a5a42ecbacc4b402ee11d75d223746fbc" name="a5a42ecbacc4b402ee11d75d223746fbc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a42ecbacc4b402ee11d75d223746fbc">&#9670;&#160;</a></span>operator!=() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="interval_8cpp.html#aff2c7c23e9183e17b252198de5e5cf49">operator!</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the negation of <a class="el" href="std__expr_8cpp.html#a6c1d73123a7d5e28285795e85d8dd393">operator==(const exprt &amp;, std::nullptr_t)</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00192">192</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a10691362b53e5e684ad1eda3142ada9c" name="a10691362b53e5e684ad1eda3142ada9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10691362b53e5e684ad1eda3142ada9c">&#9670;&#160;</a></span>operator==() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="classait.html">operator</a>== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">bool</a>&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return whether the expression <code>lhs</code> is a constant of Boolean type that is representing the Boolean value <code>rhs</code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00032">32</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aad3c40d1c985310afff0bee9ee171415" name="aad3c40d1c985310afff0bee9ee171415"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad3c40d1c985310afff0bee9ee171415">&#9670;&#160;</a></span>operator==() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="classait.html">operator</a>== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">int</a>&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return whether the expression <code>lhs</code> is a constant representing the numeric value <code>rhs</code>; only values 0 and 1 are supported for <code>rhs</code>. </p>
+<p>For value 0 we consider the following types: ID_integer, ID_natural, ID_rational, ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field, ID_fixedbv, ID_floatbv, ID_pointer.<br  />
+ For ID_pointer, returns true iff the value is a zero string or a null pointer.<br  />
+ For value 1 we consider the following types: ID_integer, ID_natural, ID_rational, ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field, ID_fixedbv, ID_floatbv.<br  />
+ For all other types, return false. </p>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00052">52</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a6c1d73123a7d5e28285795e85d8dd393" name="a6c1d73123a7d5e28285795e85d8dd393"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c1d73123a7d5e28285795e85d8dd393">&#9670;&#160;</a></span>operator==() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="classait.html">operator</a>== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nullptr_t&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return whether the expression <code>lhs</code> is a constant representing the NULL pointer. </p>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00186">186</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
 
 </div>
 </div>

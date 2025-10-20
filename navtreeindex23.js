@@ -1,5 +1,13 @@
 var NAVTREEINDEX23 =
 {
+"classcpp__static__assertt.html#afe874b80f7788233c3e9825856920896":[7,0,329,4],
+"classcpp__storage__spect.html":[7,0,330],
+"classcpp__storage__spect.html#a2a65879ffe66a6777cb1234d623a799a":[7,0,330,7],
+"classcpp__storage__spect.html#a2dedc1922089e719817ddd50c8da1f46":[7,0,330,1],
+"classcpp__storage__spect.html#a35226bdbd5c3939e02516b015d3cfd7d":[7,0,330,8],
+"classcpp__storage__spect.html#a54ce275af5ede5eb4faeba50cdcdfdda":[7,0,330,4],
+"classcpp__storage__spect.html#a5e42436b15771758fd4e681bc1961780":[7,0,330,3],
+"classcpp__storage__spect.html#a691e3295d3f3ff2f8be726f0b6910f52":[7,0,330,13],
 "classcpp__storage__spect.html#a708af28aa6f709349d96f892ecb0097a":[7,0,330,11],
 "classcpp__storage__spect.html#a91b39b0244429b2e49ce27de4ae8a7f0":[7,0,330,6],
 "classcpp__storage__spect.html#aa7c6ee668b374b7ce26fc5ca53248a49":[7,0,330,9],
@@ -241,13 +249,5 @@ var NAVTREEINDEX23 =
 "classcpp__typecheckt.html#ab3dc6840992ac20234eed9c5af166f46":[7,0,339,11],
 "classcpp__typecheckt.html#ab9ce4dfec6f3de6260fa834cd3aef675":[7,0,339,130],
 "classcpp__typecheckt.html#aba099f495852400b1542b2abd622f10e":[7,0,339,126],
-"classcpp__typecheckt.html#abca38e9e7ea5d17c03e65708f14dac50":[7,0,339,151],
-"classcpp__typecheckt.html#abd5a792d151bfe4c3a71c6ff71c1ea6a":[7,0,339,13],
-"classcpp__typecheckt.html#abdb25c7f09e7c00cee3ab58e3c77b901":[7,0,339,145],
-"classcpp__typecheckt.html#abeb0841e276eade6ced10e4a6826f234":[7,0,339,129],
-"classcpp__typecheckt.html#abeb52874a8b6189d5490774d67660df2":[7,0,339,104],
-"classcpp__typecheckt.html#abec6012a5128b0fbd534bae768357fcd":[7,0,339,106],
-"classcpp__typecheckt.html#ac02971a367443b84f4aefab668d34fbe":[7,0,339,75],
-"classcpp__typecheckt.html#ac04b3c896a309c0d83e91718ef17007a":[7,0,339,37],
-"classcpp__typecheckt.html#ac04c6f4f108e75e723ee39d247f40cba":[7,0,339,43]
+"classcpp__typecheckt.html#abca38e9e7ea5d17c03e65708f14dac50":[7,0,339,151]
 };

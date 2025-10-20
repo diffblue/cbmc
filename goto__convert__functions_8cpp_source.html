@@ -223,7 +223,7 @@ $(document).ready(function(){initNavTree('goto__convert__functions_8cpp_source.h
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keywordflow">while</span>(<span class="keyword">true</span>)</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    {</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>      <span class="comment">// unconditional goto, say from while(1)?</span></div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>      <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">last_instruction</a>-&gt;is_goto() &amp;&amp; <a class="code hl_class" href="classait.html">last_instruction</a>-&gt;condition().is_true())</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>      <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">last_instruction</a>-&gt;is_goto() &amp;&amp; <a class="code hl_class" href="classait.html">last_instruction</a>-&gt;condition() == <span class="keyword">true</span>)</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>      {</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        <span class="keywordflow">return</span>;</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>      }</div>

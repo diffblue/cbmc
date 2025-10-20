@@ -565,8 +565,9 @@ $(document).ready(function(){initNavTree('irep_8cpp_source.html',''); initResiza
 <div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span> </div>
 <div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>  std::size_t result=<a class="code hl_function" href="dstring_8h.html#a0aec4fc6020e2441db91aa4814f337e0">hash_string</a>(<span class="keywordtype">id</span>());</div>
 <div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span> </div>
-<div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep : sub)</div>
-<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>    result = <a class="code hl_define" href="irep__hash_8h.html#ac80c0f52d3e41ec11f150e96bbba4878">hash_combine</a>(result, irep.hash());</div>
+<div class="foldopen" id="foldopen00427" data-start="{" data-end="}">
+<div class="line"><a id="l00427" name="l00427"></a><span class="lineno"><a class="line" href="classconstant__exprt.html#a0a0b6bdefafa5ce702f91c8acaffb0e2">  427</a></span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;irep : sub)</div>
+<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>    result = <a class="code hl_define" href="irep__hash_8h.html#ac80c0f52d3e41ec11f150e96bbba4878">hash_combine</a>(result, irep.<a class="code hl_function" href="classirept.html#a64713726b700bcd8efad03ab0c4224a8">hash</a>());</div>
 <div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span> </div>
 <div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>  std::size_t <a class="code hl_class" href="classait.html">number_of_named_ireps</a> = 0;</div>
 <div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span> </div>
@@ -590,7 +591,6 @@ $(document).ready(function(){initNavTree('irep_8cpp_source.html',''); initResiza
 <div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>  <span class="keywordflow">return</span> result;</div>
 <div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>}</div>
-</div>
 <div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span> </div>
 <div class="foldopen" id="foldopen00453" data-start="{" data-end="}">
 <div class="line"><a id="l00453" name="l00453"></a><span class="lineno"><a class="line" href="classirept.html#a9a20a40a0132c3b42cca72f3b5a1a103">  453</a></span>std::size_t <a class="code hl_function" href="classirept.html#a9a20a40a0132c3b42cca72f3b5a1a103">irept::full_hash</a>()<span class="keyword"> const</span></div>
@@ -674,6 +674,8 @@ $(document).ready(function(){initNavTree('irep_8cpp_source.html',''); initResiza
 <div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span>  : irep(irep)</div>
 <div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span>{</div>
 <div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span>}</div>
+</div>
+</div>
 </div>
 </div>
 <div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
